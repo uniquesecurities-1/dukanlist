@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>dukanlist.com — Every Shop, One Identity | Bharat's Local Business Directory</title>
+<meta name="description" content="Every shop in your city — doctor, carpenter, mechanic, CA, jewellery — discoverable in one click. Free for shopkeepers. Verified for customers. Pan-India.">
+<meta name="keywords" content="Dabwali shops, local business directory India, shopkeeper registration, find local services Haryana, Mandi Dabwali businesses">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Every Shop, One Identity — dukanlist.com">
+<meta property="og:description" content="Discover every local shop in your city. 1-click contact. Free shopkeeper registration. Verified, reviewed, trusted.">
+<meta property="og:url" content="https://dukanlist.com">
+<link rel="canonical" href="https://dukanlist.com/">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --saffron:#FF6B1A;
+  --saffron-deep:#E55100;
+  --saffron-light:#FFB088;
+  --indigo:#1E3A8A;
+  --indigo-deep:#1E1B4B;
+  --emerald:#059669;
+  --emerald-light:#10B981;
+  --cream:#FFFBF5;
+  --ink:#0B1220;
+  --ink-2:#1F2937;
+  --muted:#6B7280;
+  --line:#E5E7EB;
+  --bg:#FFFFFF;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.06), 0 4px 14px rgba(15,23,42,.06);
+  --shadow:0 4px 14px rgba(15,23,42,.10);
+  --shadow-lg:0 12px 40px rgba(15,23,42,.15);
+  --radius:14px;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--cream); color:var(--ink); line-height:1.55;
+  -webkit-font-smoothing:antialiased; min-height:100vh;
+}
+html[data-lang="hi"] body{ font-family:'Noto Sans Devanagari','Inter',sans-serif }
+html[data-lang="hi"] .keep-en{ font-family:'Inter',sans-serif }
+a{color:var(--indigo); text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%; display:block}
+
+/* Show/hide based on selected lang */
+[data-i18n-en], [data-i18n-hi]{ display:inline-block }
+html[data-lang="en"] [data-i18n-hi]{ display:none !important }
+html[data-lang="hi"] [data-i18n-en]{ display:none !important }
+/* Block-level variants */
+html[data-lang="en"] [data-i18n-hi].block{ display:none !important }
+html[data-lang="hi"] [data-i18n-en].block{ display:none !important }
+
+/* ===== HEADER ===== */
+.topbar{
+  background:linear-gradient(135deg,var(--indigo-deep) 0%, var(--indigo) 50%, #312E81 100%);
+  color:#fff;
+  padding:11px 16px;
+  position:sticky; top:0; z-index:50;
+  box-shadow:var(--shadow-sm);
+}
+.topbar-inner{ max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap }
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; color:#fff }
+.brand .logo{ width:36px; height:36px; background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); border-radius:9px; display:grid; place-items:center; font-size:1.15rem; box-shadow:0 2px 8px rgba(255,107,26,.4) }
+.brand em{ font-style:normal; color:var(--saffron-light); font-weight:600; font-size:.9rem; font-family:'Inter',sans-serif }
+.nav-links{ display:flex; gap:4px; align-items:center; flex-wrap:wrap }
+.nav-links a{ color:rgba(255,255,255,.86); padding:7px 13px; font-size:.88rem; font-weight:600; border-radius:8px; transition:.2s }
+.nav-links a:hover{ background:rgba(255,255,255,.12); color:#fff; text-decoration:none }
+.nav-cta{ background:var(--saffron) !important; color:#fff !important; padding:8px 16px !important; font-weight:700 !important; box-shadow:0 2px 8px rgba(255,107,26,.4) }
+.nav-cta:hover{ background:var(--saffron-deep) !important }
+
+/* ===== LANGUAGE TOGGLE ===== */
+.lang-toggle{
+  display:inline-flex; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.20);
+  border-radius:99px; padding:3px; gap:0; align-items:center; margin-right:6px;
+}
+.lang-toggle button{
+  border:none; background:transparent; color:rgba(255,255,255,.65);
+  padding:5px 13px; font-size:.78rem; font-weight:800; cursor:pointer;
+  border-radius:99px; transition:.18s; font-family:'Inter',sans-serif;
+  letter-spacing:.04em;
+}
+.lang-toggle button:hover{ color:#fff }
+.lang-toggle button.active{
+  background:var(--saffron); color:#fff;
+  box-shadow:0 1px 4px rgba(255,107,26,.5);
+}
+
+/* ===== HERO ===== */
+.hero{
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,107,26,.16), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(5,150,105,.13), transparent 45%),
+    linear-gradient(180deg, #FFFBF5 0%, #FFF 100%);
+  padding:60px 20px 50px;
+  text-align:center;
+  border-bottom:1px solid var(--line);
+  position:relative; overflow:hidden;
+}
+.hero::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--saffron) 0%, var(--saffron) 33%, #fff 33%, #fff 66%, var(--emerald) 66%, var(--emerald) 100%);
+}
+.hero-inner{ max-width:880px; margin:0 auto; position:relative }
+.hero-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,107,26,.10); color:var(--saffron-deep);
+  padding:7px 16px; border-radius:99px; font-size:.78rem; font-weight:800;
+  border:1px solid rgba(255,107,26,.30); margin-bottom:18px;
+  letter-spacing:.04em; text-transform:uppercase;
+}
+.hero h1{
+  font-family:'Plus Jakarta Sans', sans-serif;
+  font-size:clamp(2rem, 5.5vw, 3.4rem);
+  font-weight:900;
+  line-height:1.1;
+  letter-spacing:-.025em;
+  margin-bottom:14px;
+}
+html[data-lang="hi"] .hero h1{ font-family:'Noto Sans Devanagari',sans-serif; }
+.hero h1 .grad{
+  background:linear-gradient(135deg, var(--saffron) 0%, var(--saffron-deep) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p.lead{
+  font-size:clamp(1rem, 2.2vw, 1.15rem);
+  color:var(--ink-2); max-width:680px; margin:0 auto 26px;
+  line-height:1.6;
+}
+.hero-ctas{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:34px }
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 24px; border-radius:11px; font-weight:800;
+  font-size:.95rem; text-decoration:none; transition:.18s;
+  border:none; cursor:pointer; font-family:inherit; white-space:nowrap;
+}
+.btn-pri{
+  background:linear-gradient(135deg, var(--saffron) 0%, var(--saffron-deep) 100%);
+  color:#fff;
+  box-shadow:0 4px 14px rgba(255,107,26,.40);
+}
+.btn-pri:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(255,107,26,.55); text-decoration:none }
+.btn-sec{ background:#fff; color:var(--indigo); border:1.5px solid var(--indigo) }
+.btn-sec:hover{ background:var(--indigo); color:#fff; text-decoration:none }
+
+.hero-stats{ display:flex; gap:30px; justify-content:center; flex-wrap:wrap; padding-top:24px; border-top:1px dashed var(--line); margin-top:8px }
+.hero-stat{ text-align:center }
+.hero-stat b{ display:block; font-family:'Plus Jakarta Sans',sans-serif; font-size:1.6rem; font-weight:900; color:var(--indigo); letter-spacing:-.02em }
+.hero-stat span{ color:var(--muted); font-size:.78rem; font-weight:600 }
+
+/* ===== SEARCH ===== */
+.search-wrap{ max-width:760px; margin:-26px auto 50px; padding:0 16px; position:relative; z-index:5 }
+.search-card{
+  background:#fff; border-radius:16px; padding:8px;
+  box-shadow:var(--shadow-lg);
+  display:grid; grid-template-columns:1fr 1fr auto; gap:8px;
+  border:1px solid var(--line);
+}
+.search-card .field{ position:relative }
+.search-card .field input,
+.search-card .field select{
+  width:100%; padding:14px 16px 14px 44px;
+  border:none; background:transparent;
+  font-size:.95rem; font-weight:500; color:var(--ink); font-family:inherit;
+  border-radius:10px;
+}
+.search-card .field input:focus,
+.search-card .field select:focus{ outline:none; background:#F9FAFB }
+.search-card .field .ico{ position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1.1rem; opacity:.7 }
+.search-card .search-btn{
+  background:linear-gradient(135deg, var(--saffron), var(--saffron-deep));
+  color:#fff; border:none; padding:0 22px; border-radius:10px;
+  font-weight:800; font-size:.95rem; cursor:pointer;
+  display:flex; align-items:center; gap:6px; font-family:inherit;
+}
+.search-card .search-btn:hover{ box-shadow:0 4px 14px rgba(255,107,26,.45) }
+@media (max-width:680px){ .search-card{ grid-template-columns:1fr } }
+
+/* ===== SECTIONS ===== */
+section{ padding:50px 20px }
+.section-head{ max-width:1180px; margin:0 auto 28px; text-align:center }
+.section-head .eyebrow{ display:inline-block; background:rgba(30,58,138,.08); color:var(--indigo); padding:5px 12px; border-radius:99px; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px }
+.section-head h2{ font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(1.5rem,3.5vw,2.2rem); font-weight:900; letter-spacing:-.02em; color:var(--ink); margin-bottom:8px }
+html[data-lang="hi"] .section-head h2{ font-family:'Noto Sans Devanagari',sans-serif }
+.section-head p{ color:var(--muted); font-size:.98rem; max-width:580px; margin:0 auto }
+
+/* ===== CATEGORIES GRID ===== */
+.cats-wrap{ max-width:1180px; margin:0 auto }
+.cats-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px }
+.cat-card{
+  background:#fff; border:1.5px solid var(--line); border-radius:13px;
+  padding:18px 16px; cursor:pointer; transition:.18s;
+  display:flex; align-items:center; gap:13px; min-height:78px;
+  text-decoration:none; color:inherit;
+}
+.cat-card:hover{
+  transform:translateY(-3px); border-color:var(--saffron);
+  box-shadow:0 8px 24px rgba(255,107,26,.18); text-decoration:none;
+}
+.cat-card .cat-icon{
+  width:46px; height:46px; border-radius:11px;
+  display:grid; place-items:center; font-size:1.5rem;
+  flex-shrink:0; background:linear-gradient(135deg,#FAFAFA,#F1F5F9);
+  border:1px solid var(--line);
+}
+.cat-card .cat-body{ flex:1; min-width:0 }
+.cat-card .cat-name{ font-size:.95rem; font-weight:800; color:var(--ink); margin-bottom:2px; line-height:1.2 }
+.cat-card .cat-sub{ font-size:.76rem; color:var(--muted); font-weight:500; line-height:1.3 }
+
+/* ===== HOW IT WORKS ===== */
+.how{ background:linear-gradient(180deg, #fff 0%, #FAFAFA 100%) }
+.how-grid{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:18px }
+.how-step{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:24px 22px; transition:.18s; position:relative }
+.how-step:hover{ border-color:var(--indigo); transform:translateY(-2px); box-shadow:var(--shadow) }
+.how-step .n{
+  display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,var(--indigo),var(--indigo-deep));
+  color:#fff; border-radius:99px; font-weight:900; margin-bottom:14px;
+  font-family:'Plus Jakarta Sans',sans-serif; box-shadow:0 4px 10px rgba(30,58,138,.30);
+}
+.how-step h3{ font-family:'Plus Jakarta Sans',sans-serif; font-size:1.1rem; font-weight:800; color:var(--ink); margin-bottom:6px }
+html[data-lang="hi"] .how-step h3{ font-family:'Noto Sans Devanagari',sans-serif }
+.how-step p{ font-size:.88rem; color:var(--muted); line-height:1.55 }
+
+/* ===== CTA STRIP ===== */
+.cta-strip{
+  background:linear-gradient(135deg, var(--indigo-deep) 0%, var(--indigo) 100%);
+  padding:50px 20px; text-align:center; color:#fff;
+}
+.cta-strip h2{ font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(1.6rem,3.5vw,2.4rem); font-weight:900; letter-spacing:-.02em; margin-bottom:14px }
+html[data-lang="hi"] .cta-strip h2{ font-family:'Noto Sans Devanagari',sans-serif }
+.cta-strip h2 .grad{ background:linear-gradient(135deg, #FBBF24, var(--saffron)); -webkit-background-clip:text; background-clip:text; color:transparent }
+.cta-strip p{ color:rgba(255,255,255,.85); max-width:580px; margin:0 auto 26px; font-size:1rem }
+.cta-strip .btn-pri{ font-size:1.05rem; padding:16px 32px }
+
+/* ===== TRUST STRIP ===== */
+.trust{ padding:30px 20px; background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
+.trust-row{ max-width:1100px; margin:0 auto; display:flex; gap:30px; justify-content:space-around; align-items:center; flex-wrap:wrap }
+.trust-item{ display:flex; align-items:center; gap:10px; font-size:.85rem; color:var(--ink-2); font-weight:600 }
+.trust-item .ico{ font-size:1.4rem }
+
+/* ===== FOOTER ===== */
+footer{ background:var(--ink); color:rgba(255,255,255,.7); padding:34px 20px 22px; text-align:center }
+footer .ftop{ max-width:900px; margin:0 auto 18px }
+footer h4{ color:#fff; font-size:1.05rem; font-weight:800; margin-bottom:8px; font-family:'Plus Jakarta Sans',sans-serif }
+footer p{ font-size:.85rem; margin-bottom:14px; line-height:1.6 }
+footer .links{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; font-size:.85rem }
+footer .links a{ color:#FBBF24 }
+footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; border-top:1px solid rgba(255,255,255,.1) }
+
+@media (max-width:560px){
+  .hero{ padding:40px 16px 36px }
+  .hero h1{ font-size:1.85rem }
+  .hero-stats{ gap:18px }
+  section{ padding:36px 16px }
+  .cats-grid{ grid-template-columns:1fr 1fr; gap:9px }
+  .cat-card{ padding:13px 11px; min-height:64px; gap:10px }
+  .cat-card .cat-icon{ width:38px; height:38px; font-size:1.25rem }
+  .cat-card .cat-name{ font-size:.85rem }
+  .cat-card .cat-sub{ font-size:.68rem }
+  .nav-links{ gap:2px }
+  .nav-links a{ padding:6px 9px; font-size:.8rem }
+  .nav-cta{ padding:7px 12px !important }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand">
+      <span class="logo">🏪</span>
+      <span>Dukan<em>List</em></span>
+    </a>
+    <nav class="nav-links">
+      <div class="lang-toggle" role="group" aria-label="Language switcher">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/browse.html">
+        <span data-i18n-en>Categories</span>
+        <span data-i18n-hi>श्रेणियाँ</span>
+      </a>
+      <a href="/search.html">
+        <span data-i18n-en>Search</span>
+        <span data-i18n-hi>खोज</span>
+      </a>
+      <a href="/panel/login.html">
+        <span data-i18n-en>Shopkeeper Login</span>
+        <span data-i18n-hi>दुकानदार लॉगिन</span>
+      </a>
+      <a href="/register.html" class="nav-cta">
+        <span data-i18n-en>+ Register Free</span>
+        <span data-i18n-hi>+ रजिस्टर करें</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">
+      <span data-i18n-en>🇮🇳 Bharat's Local Directory · From Mandi Dabwali</span>
+      <span data-i18n-hi>🇮🇳 भारत की लोकल डायरेक्टरी · मंडी डबवाली से</span>
+    </span>
+    <h1>
+      <span data-i18n-en class="block">
+        <span class="grad">Every Shop,</span> One Identity
+      </span>
+      <span data-i18n-hi class="block">
+        <span class="grad">हर दुकान,</span> एक पहचान
+      </span>
+    </h1>
+    <p class="lead">
+      <span data-i18n-en class="block">
+        Every <strong>shopkeeper</strong> in your city — discoverable in one click.
+        Doctor, carpenter, mechanic, CA, jewellery — all on <strong>one platform</strong>.
+        100% free for shopkeepers. Verified, reviewed, and trusted for customers.
+      </span>
+      <span data-i18n-hi class="block">
+        आपके शहर के <strong>हर दुकानदार</strong> की डिजिटल पहचान।
+        डॉक्टर, मिस्त्री, मैकेनिक, CA, जौहरी — सब कुछ <strong>एक ही जगह</strong>।
+        दुकानदारों के लिए 100% फ्री। ग्राहकों के लिए वेरिफाइड, रिव्यूड, ट्रस्टेड।
+      </span>
+    </p>
+    <div class="hero-ctas">
+      <a href="/register.html" class="btn btn-pri">
+        <span data-i18n-en>🏪 Register Free</span>
+        <span data-i18n-hi>🏪 फ्री रजिस्टर करें</span>
+        <span style="font-size:1.2em">→</span>
+      </a>
+      <a href="#categories" class="btn btn-sec">
+        <span data-i18n-en>🔍 Find a Shop</span>
+        <span data-i18n-hi>🔍 दुकान खोजें</span>
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <b id="stat-shops">—</b>
+        <span data-i18n-en>Registered Shops</span>
+        <span data-i18n-hi>रजिस्टर्ड दुकानें</span>
+      </div>
+      <div class="hero-stat">
+        <b id="stat-cats">15</b>
+        <span data-i18n-en>Categories</span>
+        <span data-i18n-hi>श्रेणियाँ</span>
+      </div>
+      <div class="hero-stat">
+        <b>5</b>
+        <span data-i18n-en>States Live</span>
+        <span data-i18n-hi>राज्य</span>
+      </div>
+      <div class="hero-stat">
+        <b>₹0</b>
+        <span data-i18n-en>Forever Free</span>
+        <span data-i18n-hi>हमेशा फ्री</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SEARCH ===== -->
+<div class="search-wrap">
+  <form class="search-card" onsubmit="handleSearch(event)" role="search">
+    <div class="field">
+      <span class="ico">🔍</span>
+      <input type="text" name="q" id="searchInput" autocomplete="off"
+             data-ph-en="Doctor, carpenter, mechanic..."
+             data-ph-hi="डॉक्टर, मिस्त्री, मैकेनिक...">
+    </div>
+    <div class="field">
+      <span class="ico">📍</span>
+      <select name="city" id="citySelect">
+        <option value="" data-i18n-en="Select your city..." data-i18n-hi="अपना शहर चुनें...">Select your city...</option>
+        <option value="mandi-dabwali" selected>Mandi Dabwali</option>
+        <option value="sirsa">Sirsa</option>
+        <option value="ellenabad">Ellenabad</option>
+        <option value="rania">Rania</option>
+        <option value="kalanwali">Kalanwali</option>
+        <option value="fatehabad">Fatehabad</option>
+        <option value="bathinda">Bathinda</option>
+        <option value="mansa">Mansa</option>
+        <option value="hanumangarh">Hanumangarh</option>
+        <option value="sri-ganganagar">Sri Ganganagar</option>
+      </select>
+    </div>
+    <button type="submit" class="search-btn">
+      <span data-i18n-en>Search</span>
+      <span data-i18n-hi>खोजें</span>
+    </button>
+  </form>
+</div>
+
+<!-- ===== CATEGORIES ===== -->
+<section id="categories">
+  <div class="section-head">
+    <span class="eyebrow">
+      <span data-i18n-en>📚 15 Categories · More coming</span>
+      <span data-i18n-hi>📚 15 श्रेणियाँ · और जुड़ रही हैं</span>
+    </span>
+    <h2>
+      <span data-i18n-en>What do you need today?</span>
+      <span data-i18n-hi>आज क्या ढूंढना है?</span>
+    </h2>
+    <p>
+      <span data-i18n-en>Click a category — only verified shopkeepers shown.</span>
+      <span data-i18n-hi>श्रेणी पर क्लिक करें — सिर्फ वेरिफाइड दुकानदार दिखेंगे।</span>
+    </p>
+  </div>
+  <div class="cats-wrap">
+    <div class="cats-grid" id="catsGrid"><!-- populated via JS --></div>
+  </div>
+</section>
+
+<!-- ===== TRUST STRIP ===== -->
+<div class="trust">
+  <div class="trust-row">
+    <div class="trust-item">
+      <span class="ico">✅</span>
+      <span data-i18n-en>Mobile OTP Verified</span>
+      <span data-i18n-hi>मोबाइल OTP वेरिफाइड</span>
+    </div>
+    <div class="trust-item">
+      <span class="ico">📍</span>
+      <span data-i18n-en>Pincode-City Match</span>
+      <span data-i18n-hi>पिनकोड-शहर मैच</span>
+    </div>
+    <div class="trust-item">
+      <span class="ico">📸</span>
+      <span data-i18n-en>Real Shop Photos</span>
+      <span data-i18n-hi>असली दुकान की फोटो</span>
+    </div>
+    <div class="trust-item">
+      <span class="ico">⭐</span>
+      <span data-i18n-en>Customer Reviews</span>
+      <span data-i18n-hi>ग्राहक रिव्यू</span>
+    </div>
+    <div class="trust-item">
+      <span class="ico">🚫</span>
+      <span data-i18n-en>Anti-Fake System</span>
+      <span data-i18n-hi>एंटी-फेक सिस्टम</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how">
+  <div class="section-head">
+    <span class="eyebrow">
+      <span data-i18n-en>⚡ 4 Simple Steps</span>
+      <span data-i18n-hi>⚡ 4 आसान स्टेप्स</span>
+    </span>
+    <h2>
+      <span data-i18n-en>How it works</span>
+      <span data-i18n-hi>कैसे काम करता है</span>
+    </h2>
+    <p>
+      <span data-i18n-en>5 minutes to register for shopkeepers. 1-click discovery for customers.</span>
+      <span data-i18n-hi>दुकानदार के लिए 5 मिनट का रजिस्ट्रेशन। ग्राहक के लिए 1-क्लिक खोज।</span>
+    </p>
+  </div>
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="n">1</div>
+      <h3>
+        <span data-i18n-en>🏪 Register Your Shop</span>
+        <span data-i18n-hi>🏪 अपनी दुकान रजिस्टर करें</span>
+      </h3>
+      <p>
+        <span data-i18n-en>Free signup via mobile OTP in 2 minutes. Add shop name, category, photos and your USP.</span>
+        <span data-i18n-hi>मोबाइल OTP से 2 मिनट में फ्री साइनअप। दुकान का नाम, श्रेणी, फोटो और USP डालें।</span>
+      </p>
+    </div>
+    <div class="how-step">
+      <div class="n">2</div>
+      <h3>
+        <span data-i18n-en>✅ Auto-Verification</span>
+        <span data-i18n-hi>✅ ऑटो-वेरिफिकेशन</span>
+      </h3>
+      <p>
+        <span data-i18n-en>Mobile OTP + Pincode-Address match + Shop photo. 95% trust level achieved automatically.</span>
+        <span data-i18n-hi>मोबाइल OTP + पिनकोड-पता मैच + दुकान की फोटो। 95% ट्रस्ट लेवल।</span>
+      </p>
+    </div>
+    <div class="how-step">
+      <div class="n">3</div>
+      <h3>
+        <span data-i18n-en>🔍 Customers Discover</span>
+        <span data-i18n-hi>🔍 ग्राहक खोजते हैं</span>
+      </h3>
+      <p>
+        <span data-i18n-en>Choose category + city — verified shopkeepers appear with all info on one screen.</span>
+        <span data-i18n-hi>श्रेणी + शहर चुनो — वेरिफाइड दुकानदार सब जानकारी के साथ एक स्क्रीन पर।</span>
+      </p>
+    </div>
+    <div class="how-step">
+      <div class="n">4</div>
+      <h3>
+        <span data-i18n-en>📞 1-Click Contact</span>
+        <span data-i18n-hi>📞 1-क्लिक कॉन्टैक्ट</span>
+      </h3>
+      <p>
+        <span data-i18n-en>WhatsApp, Call, Directions — all in one tap. Customers leave reviews, trust grows.</span>
+        <span data-i18n-hi>WhatsApp, कॉल, दिशा — एक टैप में। ग्राहक रिव्यू देते हैं, भरोसा बढ़ता है।</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA STRIP ===== -->
+<section class="cta-strip">
+  <div>
+    <h2>
+      <span data-i18n-en>Are you a <span class="grad">shopkeeper?</span></span>
+      <span data-i18n-hi>क्या आप <span class="grad">दुकानदार हैं?</span></span>
+    </h2>
+    <p>
+      <span data-i18n-en>Register free today. Give your shop a digital identity. Let customers find you.</span>
+      <span data-i18n-hi>आज ही फ्री रजिस्टर करें। अपनी दुकान को डिजिटल पहचान दें। ग्राहक आपको ढूंढें।</span>
+    </p>
+    <a href="/register.html" class="btn btn-pri">
+      <span data-i18n-en>🏪 Start Free Registration →</span>
+      <span data-i18n-hi>🏪 फ्री रजिस्ट्रेशन शुरू करें →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="ftop">
+    <h4>🇮🇳 Made for Bharat. Started in Mandi Dabwali.</h4>
+    <p>
+      <span data-i18n-en class="block">"Every Shop, One Identity" — Pan-India local business directory.<br>From small towns to metros — digital identity for every shopkeeper.</span>
+      <span data-i18n-hi class="block">"हर दुकान, एक पहचान" — पूरे भारत की लोकल बिज़नेस डायरेक्टरी।<br>छोटे शहरों से मेट्रो तक — हर दुकानदार की डिजिटल पहचान।</span>
+    </p>
+    <div class="links">
+      <a href="/about.html"><span data-i18n-en>About</span><span data-i18n-hi>हमारे बारे में</span></a>
+      <a href="/privacy.html"><span data-i18n-en>Privacy</span><span data-i18n-hi>गोपनीयता</span></a>
+      <a href="/terms.html"><span data-i18n-en>Terms</span><span data-i18n-hi>शर्तें</span></a>
+      <a href="/contact.html"><span data-i18n-en>Contact</span><span data-i18n-hi>संपर्क</span></a>
+      <a href="https://mfdtools.com" target="_blank">Powered by MFDTools</a>
+    </div>
+  </div>
+  <div class="copy">
+    © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com · All rights reserved
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// LANGUAGE SWITCHER — EN (default) | HI
+// ============================================================
+function setLang(lang){
+  if (lang !== 'en' && lang !== 'hi') lang = 'en';
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  localStorage.setItem('shop_lang', lang);
+  // Toggle button states
+  document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('langBtnHi').classList.toggle('active', lang === 'hi');
+  // Search input placeholder
+  const si = document.getElementById('searchInput');
+  if (si) si.placeholder = si.getAttribute('data-ph-' + lang) || '';
+  // Re-render category cards (in case lang switched mid-load)
+  renderCategories();
+}
+
+function loadSavedLang(){
+  const saved = localStorage.getItem('shop_lang') || 'en';
+  setLang(saved);
+}
+
+// ============================================================
+// CATEGORY GRID
+// ============================================================
+let CATEGORIES_DATA = null;
+async function loadCategories(){
+  try{
+    const r = await fetch('/assets/data/categories.json', { cache:'no-cache' });
+    const data = await r.json();
+    CATEGORIES_DATA = data;
+    renderCategories();
+    document.getElementById('stat-cats').textContent = data.categories.length;
+  }catch(e){ console.error('Categories load failed', e); }
+}
+
+function renderCategories(){
+  if (!CATEGORIES_DATA) return;
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  const grid = document.getElementById('catsGrid');
+  grid.innerHTML = CATEGORIES_DATA.categories.map(c => {
+    const primary  = lang === 'hi' ? c.name_hi : c.name;
+    const secondary= lang === 'hi' ? c.name    : c.name_hi;
+    return `
+      <a class="cat-card" href="/browse.html?cat=${c.slug}">
+        <div class="cat-icon" style="background:${c.color}15;border-color:${c.color}30;">${c.icon}</div>
+        <div class="cat-body">
+          <div class="cat-name">${primary}</div>
+          <div class="cat-sub">${secondary}</div>
+        </div>
+      </a>`;
+  }).join('');
+}
+
+// ============================================================
+// SEARCH HANDLER
+// ============================================================
+function handleSearch(e){
+  e.preventDefault();
+  const q = document.getElementById('searchInput').value.trim();
+  const city = document.getElementById('citySelect').value;
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  if (city) params.set('city', city);
+  window.location.href = '/search.html?' + params.toString();
+}
+
+function loadStats(){
+  // TODO: Supabase RPC call to get_public_stats()
+  document.getElementById('stat-shops').textContent = '0';
+}
+
+// Boot
+window.addEventListener('DOMContentLoaded', () => {
+  loadSavedLang();
+  loadCategories();
+  loadStats();
+});
+</script>
+
+</body>
+</html>

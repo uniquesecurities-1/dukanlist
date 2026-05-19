@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Business Details — dukanlist.com</title>
+<meta name="description" id="metaDesc" content="">
+<meta property="og:title" id="ogTitle" content="">
+<meta property="og:description" id="ogDesc" content="">
+<link rel="canonical" id="canonicalLink" href="">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+.biz-hero{ background:linear-gradient(180deg,#FFF7ED 0%,#fff 100%); padding:20px 16px; border-bottom:1px solid var(--line) }
+.biz-hero-wrap{ max-width:980px; margin:0 auto }
+.biz-back{ display:inline-flex; align-items:center; gap:5px; font-size:.85rem; color:var(--muted); font-weight:600; margin-bottom:10px; text-decoration:none }
+.biz-back:hover{ color:var(--ink) }
+.biz-top{ display:grid; grid-template-columns:1fr; gap:16px }
+@media (min-width:760px){ .biz-top{ grid-template-columns:380px 1fr } }
+.gallery{ background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-sm) }
+.gallery .main{ aspect-ratio:16/11; background:linear-gradient(135deg,#FAFAFA,#F1F5F9); position:relative }
+.gallery .main img{ width:100%; height:100%; object-fit:cover; cursor:pointer }
+.gallery .main .ph-fb{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:5rem; opacity:.4 }
+.gallery .thumbs{ display:flex; gap:4px; padding:6px; overflow-x:auto }
+.gallery .thumbs img{ width:60px; height:46px; object-fit:cover; border-radius:6px; cursor:pointer; opacity:.7; transition:.15s; flex-shrink:0; border:2px solid transparent }
+.gallery .thumbs img.active{ opacity:1; border-color:var(--saffron) }
+
+.biz-meta-card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:var(--shadow-sm) }
+.biz-cat-pill{ display:inline-flex; align-items:center; gap:5px; background:rgba(255,107,26,.10); color:var(--saffron-deep); padding:4px 11px; border-radius:99px; font-size:.72rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px }
+.biz-title{ font-family:'Plus Jakarta Sans',sans-serif; font-size:1.6rem; font-weight:900; color:var(--ink); letter-spacing:-.02em; line-height:1.1; margin-bottom:5px }
+html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif }
+.biz-title-hi{ font-size:1rem; color:var(--indigo); font-weight:700; font-family:'Noto Sans Devanagari',sans-serif; margin-bottom:8px }
+.biz-rating-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:14px }
+.biz-rating{ display:flex; align-items:center; gap:5px; font-weight:800; color:var(--ink) }
+.biz-rating .num{ font-size:1.2rem; font-family:'Plus Jakarta Sans',sans-serif }
+.biz-rating .rc{ color:var(--muted); font-weight:600; font-size:.85rem }
+.verif-row{ display:flex; gap:5px; flex-wrap:wrap; margin-top:5px }
+.verify-pill{ display:inline-flex; align-items:center; gap:4px; background:#ECFDF5; color:#065F46; padding:3px 8px; border-radius:99px; font-size:.72rem; font-weight:800 }
+
+.usp-box{ background:linear-gradient(135deg,#FEF3C7 0%,#FFFBEB 100%); border-left:4px solid var(--saffron); padding:14px 16px; border-radius:0 10px 10px 0; margin-bottom:16px; font-size:.92rem; line-height:1.55; color:var(--ink-2) }
+
+.addr-box{ background:#F8FAFC; border-radius:10px; padding:13px 15px; margin-bottom:18px; font-size:.9rem; line-height:1.55; color:var(--ink-2) }
+.addr-box .a-label{ font-size:.72rem; font-weight:800; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; margin-bottom:4px }
+
+.cta-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-bottom:18px }
+.cta-btn{ display:flex; align-items:center; justify-content:center; gap:7px; padding:14px 10px; border-radius:10px; font-weight:800; font-size:.92rem; text-decoration:none; transition:.18s; border:none; cursor:pointer; font-family:inherit }
+.cta-wa{ background:#25D366; color:#fff; box-shadow:0 4px 12px rgba(37,211,102,.35) }
+.cta-wa:hover{ background:#1EBE5B; text-decoration:none; transform:translateY(-1px); color:#fff }
+.cta-call{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff; box-shadow:0 4px 12px rgba(255,107,26,.35) }
+.cta-call:hover{ text-decoration:none; transform:translateY(-1px); color:#fff }
+.cta-dir{ background:#fff; color:var(--indigo); border:1.5px solid var(--indigo) }
+.cta-dir:hover{ background:var(--indigo); color:#fff; text-decoration:none }
+.cta-share{ background:#F1F5F9; color:var(--ink); border:1.5px solid var(--line) }
+.cta-share:hover{ background:#E2E8F0; text-decoration:none }
+
+.sec-content{ max-width:980px; margin:24px auto; padding:0 16px; display:grid; grid-template-columns:1fr; gap:18px }
+@media (min-width:760px){ .sec-content{ grid-template-columns:2fr 1fr } }
+
+.card-pill h3{ font-family:'Plus Jakarta Sans',sans-serif; font-size:1.05rem; font-weight:800; margin-bottom:10px; color:var(--ink); display:flex; align-items:center; gap:7px }
+html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-serif }
+.card-pill{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:18px; box-shadow:var(--shadow-sm) }
+
+.hours-list{ font-size:.88rem; color:var(--ink-2); line-height:1.65 }
+.hours-list .day{ display:flex; justify-content:space-between; padding:3px 0 }
+.hours-list .day .d{ font-weight:600 }
+.hours-list .day .t{ color:var(--muted); font-family:'Inter',monospace }
+.hours-list .day.today{ background:#ECFDF5; padding:5px 10px; border-radius:6px; margin:0 -6px }
+
+.services-list{ list-style:none; padding:0 }
+.services-list li{ padding:9px 0; border-bottom:1px dashed var(--line); display:flex; justify-content:space-between; align-items:flex-start; gap:10px; font-size:.9rem }
+.services-list li:last-child{ border:none }
+.svc-name{ font-weight:700; color:var(--ink) }
+.svc-desc{ font-size:.8rem; color:var(--muted); margin-top:2px }
+.svc-price{ font-weight:800; color:var(--emerald); font-size:.88rem; white-space:nowrap }
+
+.reviews-list{ display:flex; flex-direction:column; gap:14px }
+.review{ background:#F8FAFC; border-radius:10px; padding:13px 15px; border:1px solid var(--line) }
+.review .r-head{ display:flex; align-items:center; gap:8px; margin-bottom:6px }
+.review .r-name{ font-weight:800; color:var(--ink); font-size:.92rem }
+.review .r-star{ color:#F59E0B; font-size:.88rem }
+.review .r-date{ font-size:.74rem; color:var(--muted); margin-left:auto }
+.review .r-text{ font-size:.88rem; color:var(--ink-2); line-height:1.55 }
+.review .r-reply{ background:#FFFBEB; border-left:3px solid var(--saffron); padding:8px 11px; margin-top:8px; border-radius:0 6px 6px 0; font-size:.84rem; color:var(--ink-2) }
+.review .r-reply b{ color:var(--saffron-deep); font-size:.78rem }
+
+.btn-write-review{ width:100%; margin-top:14px; background:#F1F5F9; color:var(--ink); border:1.5px solid var(--line); padding:12px; border-radius:9px; font-weight:800; font-size:.9rem; cursor:pointer; font-family:inherit }
+.btn-write-review:hover{ background:var(--saffron); color:#fff; border-color:var(--saffron) }
+
+.flag-link{ display:inline-block; margin-top:14px; font-size:.78rem; color:var(--muted); text-decoration:underline; cursor:pointer }
+.flag-link:hover{ color:var(--danger) }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><span class="logo">🏪</span><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/browse.html"><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></a>
+      <a href="/search.html"><span data-i18n-en>Search</span><span data-i18n-hi>खोज</span></a>
+    </nav>
+  </div>
+</header>
+
+<div id="loading" style="text-align:center;padding:60px 20px;color:var(--muted)">⏳ Loading business details...</div>
+
+<div id="notFound" style="display:none;text-align:center;padding:60px 20px">
+  <div style="font-size:3.5rem;margin-bottom:10px">🔍</div>
+  <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;color:var(--ink);margin-bottom:8px">Business not found</h2>
+  <p style="color:var(--muted);margin-bottom:18px">This shop may have been removed or the link is incorrect.</p>
+  <a href="/browse.html" class="btn btn-pri">← Browse Categories</a>
+</div>
+
+<div id="bizContent" style="display:none">
+  <!-- HERO -->
+  <section class="biz-hero">
+    <div class="biz-hero-wrap">
+      <a href="javascript:history.back()" class="biz-back">← <span data-i18n-en>Back</span><span data-i18n-hi>वापस</span></a>
+      <div class="biz-top">
+        <div class="gallery">
+          <div class="main" id="galleryMain"></div>
+          <div class="thumbs" id="galleryThumbs"></div>
+        </div>
+        <div class="biz-meta-card">
+          <span class="biz-cat-pill" id="bizCatPill"></span>
+          <h1 class="biz-title" id="bizName"></h1>
+          <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
+          <div class="biz-rating-row">
+            <div class="biz-rating" id="bizRating"></div>
+            <div class="verif-row" id="verifRow"></div>
+          </div>
+          <div class="usp-box" id="uspBox" style="display:none"></div>
+          <div class="addr-box">
+            <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
+            <div id="addrDisp"></div>
+          </div>
+          <div class="cta-row">
+            <a class="cta-btn cta-wa" id="ctaWa" target="_blank" rel="noopener">
+              💬 WhatsApp
+            </a>
+            <a class="cta-btn cta-call" id="ctaCall">
+              📞 <span data-i18n-en>Call Now</span><span data-i18n-hi>कॉल</span>
+            </a>
+            <a class="cta-btn cta-dir" id="ctaDir" target="_blank" rel="noopener">
+              🗺 <span data-i18n-en>Directions</span><span data-i18n-hi>दिशा</span>
+            </a>
+            <button class="cta-btn cta-share" onclick="shareBiz()">
+              🔗 <span data-i18n-en>Share</span><span data-i18n-hi>शेयर</span>
+            </button>
+          </div>
+          <a class="flag-link" onclick="reportBiz()">
+            🚩 <span data-i18n-en>Report this listing</span><span data-i18n-hi>इसकी रिपोर्ट करें</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <div class="sec-content">
+
+    <div>
+      <!-- Reviews -->
+      <div class="card-pill">
+        <h3>⭐ <span data-i18n-en>Customer Reviews</span><span data-i18n-hi>ग्राहक रिव्यू</span>
+          <span id="reviewCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
+        </h3>
+        <div class="reviews-list" id="reviewsList">
+          <div style="text-align:center;padding:20px;color:var(--muted);font-size:.88rem">
+            <span data-i18n-en>No reviews yet. Be the first!</span>
+            <span data-i18n-hi>अभी कोई रिव्यू नहीं। पहले बनें!</span>
+          </div>
+        </div>
+        <button class="btn-write-review" onclick="openReviewModal()">
+          ✍ <span data-i18n-en>Write a Review</span><span data-i18n-hi>रिव्यू लिखें</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <!-- Hours -->
+      <div class="card-pill" id="hoursCard" style="display:none">
+        <h3>🕒 <span data-i18n-en>Business Hours</span><span data-i18n-hi>दुकान का समय</span></h3>
+        <div class="hours-list" id="hoursList"></div>
+      </div>
+      <!-- Services -->
+      <div class="card-pill" id="servicesCard" style="display:none;margin-top:18px">
+        <h3>🛠 <span data-i18n-en>Services Offered</span><span data-i18n-hi>सेवाएं</span></h3>
+        <ul class="services-list" id="servicesList"></ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<!-- Review Modal -->
+<div id="reviewModal" style="display:none;position:fixed;inset:0;background:rgba(11,18,32,.7);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:14px;max-width:440px;width:100%;padding:24px;box-shadow:var(--shadow-lg)">
+    <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;margin-bottom:8px">
+      <span data-i18n-en>Write a Review</span><span data-i18n-hi>रिव्यू लिखें</span>
+    </h3>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">
+      <span data-i18n-en>Verified via mobile OTP (anti-spam).</span>
+      <span data-i18n-hi>मोबाइल OTP से वेरिफाई (एंटी-स्पैम)।</span>
+    </p>
+    <div class="alert info" style="font-size:.85rem">
+      <span class="a-icon">ℹ️</span>
+      <div>
+        <span data-i18n-en>Review form coming in next sprint — OTP verification + photo upload.</span>
+        <span data-i18n-hi>रिव्यू फॉर्म अगले स्प्रिंट में — OTP वेरिफिकेशन + फोटो अपलोड।</span>
+      </div>
+    </div>
+    <button class="btn btn-sec btn-block" onclick="closeReviewModal()">
+      <span data-i18n-en>Close</span><span data-i18n-hi>बंद करें</span>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+}
+
+let BIZ = null;
+
+async function loadBusiness(){
+  const slug = new URLSearchParams(location.search).get('slug');
+  if (!slug){ showNotFound(); return; }
+
+  const c = ShopDB.client;
+  if (!c){
+    document.getElementById('loading').innerHTML = '⚠️ Backend not configured';
+    return;
+  }
+
+  const { data, error } = await c
+    .from('businesses')
+    .select(`
+      id, slug, name, name_hi, owner_name,
+      mobile, whatsapp, email,
+      address_line1, address_line2, pincode, lat, lng,
+      hours_json, usp_text, usp_hi, about_text, photos, video_url,
+      services_json, status,
+      verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
+      rating_avg, rating_count, view_count,
+      categories(slug, name, name_hi, icon),
+      geo_cities(name, name_hi),
+      geo_localities(name, name_hi)
+    `)
+    .eq('slug', slug)
+    .eq('status', 'active')
+    .single();
+
+  if (error || !data){ showNotFound(); return; }
+  BIZ = data;
+  render();
+
+  // Log view (fire and forget)
+  try { c.rpc('log_lead', { p_business_id: BIZ.id, p_action: 'view' }); } catch(_) {}
+
+  // Load reviews
+  loadReviews(BIZ.id);
+}
+
+function showNotFound(){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('notFound').style.display = '';
+}
+
+function render(){
+  const b = BIZ;
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+
+  // Meta tags
+  document.title = `${b.name} — ${b.categories?.name || 'Local Shop'} in ${b.geo_cities?.name || ''} | dukanlist.com`;
+  document.getElementById('metaDesc').content = (b.usp_text || `${b.name} — ${b.categories?.name} in ${b.geo_cities?.name}`).slice(0,160);
+  document.getElementById('ogTitle').content = b.name;
+  document.getElementById('ogDesc').content = (b.usp_text || '').slice(0,160);
+  document.getElementById('canonicalLink').href = location.origin + '/business.html?slug=' + b.slug;
+
+  // Gallery
+  const photos = b.photos || [];
+  const mainEl = document.getElementById('galleryMain');
+  const thEl   = document.getElementById('galleryThumbs');
+  if (photos.length){
+    mainEl.innerHTML = `<img id="mainImg" src="${photos[0]}" alt="${escapeHTML(b.name)}">`;
+    thEl.innerHTML = photos.map((p, i) =>
+      `<img src="${p}" class="${i===0?'active':''}" onclick="swapImg(${i}, this)">`
+    ).join('');
+    if (photos.length === 1) thEl.style.display = 'none';
+  } else {
+    mainEl.innerHTML = `<div class="ph-fb">${b.categories?.icon || '🏪'}</div>`;
+    thEl.style.display = 'none';
+  }
+
+  // Header
+  document.getElementById('bizCatPill').innerHTML = `${b.categories?.icon || ''} ${escapeHTML(b.categories?.name || '')}`;
+  document.getElementById('bizName').textContent = b.name;
+  if (b.name_hi){
+    document.getElementById('bizNameHi').textContent = b.name_hi;
+    document.getElementById('bizNameHi').style.display = '';
+  }
+
+  // Rating
+  const rEl = document.getElementById('bizRating');
+  if (b.rating_avg > 0){
+    rEl.innerHTML = `<span class="num">⭐ ${Number(b.rating_avg).toFixed(1)}</span><span class="rc">(${b.rating_count} reviews)</span>`;
+  } else {
+    rEl.innerHTML = '<span style="color:var(--muted);font-weight:600;font-size:.85rem">No reviews yet</span>';
+  }
+
+  // Verification badges
+  const verifs = [];
+  if (b.verified_mobile)  verifs.push('✓ Mobile');
+  if (b.verified_address) verifs.push('✓ Address');
+  if (b.verified_photo)   verifs.push('✓ Photos');
+  if (b.verified_visit)   verifs.push('✓ Visited');
+  document.getElementById('verifRow').innerHTML = verifs.map(v => `<span class="verify-pill">${v}</span>`).join('');
+
+  // USP
+  if (b.usp_text){
+    const uspText = (lang === 'hi' && b.usp_hi) ? b.usp_hi : b.usp_text;
+    document.getElementById('uspBox').textContent = uspText;
+    document.getElementById('uspBox').style.display = '';
+  }
+
+  // Address
+  const addrParts = [b.address_line1, b.address_line2, b.geo_localities?.name, b.geo_cities?.name, b.pincode].filter(Boolean);
+  document.getElementById('addrDisp').textContent = addrParts.join(', ');
+
+  // CTAs
+  const wa = (b.whatsapp || b.mobile).replace(/[^\d]/g,'');
+  const waMsg = encodeURIComponent(`Hi ${b.owner_name || ''}, I found your shop on dukanlist.com — interested in your services.`);
+  document.getElementById('ctaWa').href = `https://wa.me/${wa}?text=${waMsg}`;
+  document.getElementById('ctaWa').addEventListener('click', () => logLead('whatsapp'));
+
+  document.getElementById('ctaCall').href = `tel:${b.mobile}`;
+  document.getElementById('ctaCall').addEventListener('click', () => logLead('call'));
+
+  const mapsQ = encodeURIComponent(addrParts.join(', '));
+  document.getElementById('ctaDir').href = `https://www.google.com/maps/search/?api=1&query=${mapsQ}`;
+  document.getElementById('ctaDir').addEventListener('click', () => logLead('direction'));
+
+  // Hours
+  if (b.hours_json && typeof b.hours_json === 'object' && Object.keys(b.hours_json).length){
+    renderHours(b.hours_json);
+    document.getElementById('hoursCard').style.display = '';
+  }
+
+  // Services
+  if (b.services_json && Array.isArray(b.services_json) && b.services_json.length){
+    renderServices(b.services_json);
+    document.getElementById('servicesCard').style.display = '';
+  }
+
+  // Show content
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('bizContent').style.display = '';
+}
+
+function swapImg(idx, el){
+  const photos = BIZ.photos || [];
+  document.getElementById('mainImg').src = photos[idx];
+  document.querySelectorAll('.gallery .thumbs img').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function renderHours(h){
+  const days = ['mon','tue','wed','thu','fri','sat','sun'];
+  const labels = { mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday', fri:'Friday', sat:'Saturday', sun:'Sunday' };
+  const todayIdx = (new Date().getDay() + 6) % 7;
+  const list = document.getElementById('hoursList');
+  list.innerHTML = days.map((d, i) => {
+    const entry = h[d];
+    let timeStr = 'Closed';
+    if (entry){
+      if (entry.closed) timeStr = 'Closed';
+      else if (entry.open && entry.close) timeStr = `${entry.open} – ${entry.close}`;
+    }
+    return `<div class="day ${i===todayIdx?'today':''}"><span class="d">${labels[d]}</span><span class="t">${timeStr}</span></div>`;
+  }).join('');
+}
+
+function renderServices(svcs){
+  const list = document.getElementById('servicesList');
+  list.innerHTML = svcs.map(s => {
+    const priceStr = s.price_min && s.price_max ? `₹${s.price_min}-${s.price_max}` : (s.price_min ? `from ₹${s.price_min}` : '');
+    return `<li>
+      <div>
+        <div class="svc-name">${escapeHTML(s.name || '')}</div>
+        ${s.desc ? `<div class="svc-desc">${escapeHTML(s.desc)}</div>` : ''}
+      </div>
+      ${priceStr ? `<div class="svc-price">${priceStr}</div>` : ''}
+    </li>`;
+  }).join('');
+}
+
+async function loadReviews(bizId){
+  const c = ShopDB.client; if (!c) return;
+  const { data } = await c.from('reviews')
+    .select('customer_name, rating, text, owner_reply, owner_reply_at, created_at')
+    .eq('business_id', bizId)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (!data || !data.length) return;
+  document.getElementById('reviewCount').textContent = `(${data.length})`;
+  document.getElementById('reviewsList').innerHTML = data.map(r => {
+    const stars = '⭐'.repeat(r.rating);
+    const date = new Date(r.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    return `<div class="review">
+      <div class="r-head">
+        <span class="r-name">${escapeHTML(r.customer_name || 'Anonymous')}</span>
+        <span class="r-star">${stars}</span>
+        <span class="r-date">${date}</span>
+      </div>
+      ${r.text ? `<div class="r-text">${escapeHTML(r.text)}</div>` : ''}
+      ${r.owner_reply ? `<div class="r-reply"><b>Owner reply:</b><br>${escapeHTML(r.owner_reply)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function logLead(action){
+  const c = ShopDB.client; if (!c || !BIZ) return;
+  try{
+    await c.rpc('log_lead', { p_business_id: BIZ.id, p_action: action });
+  }catch(e){ console.warn(e); }
+}
+
+function shareBiz(){
+  const url = location.href;
+  const msg = `🏪 ${BIZ.name}\n${BIZ.usp_text || ''}\n\n${url}`;
+  if (navigator.share){
+    navigator.share({ title: BIZ.name, text: msg, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('Link copied:\n' + url);
+  }
+  logLead('share');
+}
+
+function reportBiz(){
+  alert('Report flow — coming in next sprint.\nFor urgent reports, WhatsApp: +91 9541223377');
+}
+
+function openReviewModal(){ document.getElementById('reviewModal').style.display = 'flex'; }
+function closeReviewModal(){ document.getElementById('reviewModal').style.display = 'none'; }
+
+function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadBusiness();
+});
+</script>
+
+</body>
+</html>

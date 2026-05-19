@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Browse Categories — dukanlist.com</title>
+<meta name="description" content="Browse all 15 categories of local businesses — doctors, carpenters, mechanics, CA, jewellery and more.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+.cats-mega{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:30px }
+.cat-tile{ background:#fff; border:1.5px solid var(--line); border-radius:13px; padding:18px 16px; cursor:pointer; transition:.18s; display:flex; align-items:center; gap:13px; min-height:78px; text-decoration:none; color:inherit }
+.cat-tile:hover{ transform:translateY(-3px); border-color:var(--saffron); box-shadow:0 8px 24px rgba(255,107,26,.18); text-decoration:none }
+.cat-tile .cat-icon{ width:46px; height:46px; border-radius:11px; display:grid; place-items:center; font-size:1.5rem; flex-shrink:0; border:1px solid var(--line) }
+.cat-tile .cat-body{ flex:1; min-width:0 }
+.cat-tile .cat-name{ font-size:.95rem; font-weight:800; color:var(--ink); margin-bottom:2px; line-height:1.2 }
+.cat-tile .cat-sub{ font-size:.76rem; color:var(--muted); font-weight:500; line-height:1.3 }
+.cat-tile .cat-count{ font-size:.72rem; color:var(--emerald); font-weight:800; margin-top:3px }
+@media (max-width:560px){ .cats-mega{ grid-template-columns:1fr 1fr; gap:9px } .cat-tile{ padding:13px 11px; min-height:64px; gap:10px } .cat-tile .cat-icon{ width:38px; height:38px; font-size:1.25rem } .cat-tile .cat-name{ font-size:.85rem } .cat-tile .cat-sub{ font-size:.68rem } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><span class="logo">🏪</span><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/search.html"><span data-i18n-en>Search</span><span data-i18n-hi>खोज</span></a>
+      <a href="/panel/login.html"><span data-i18n-en>Login</span><span data-i18n-hi>लॉगिन</span></a>
+      <a href="/register.html" class="nav-cta">
+        <span data-i18n-en>+ Register</span><span data-i18n-hi>+ रजिस्टर</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+
+  <h1 class="title">
+    <span data-i18n-en>Browse <span class="grad">15 Categories</span></span>
+    <span data-i18n-hi><span class="grad">15 श्रेणियाँ</span> ब्राउज़ करें</span>
+  </h1>
+  <p class="subtitle">
+    <span data-i18n-en>Pick a category to see all verified shopkeepers in your city.</span>
+    <span data-i18n-hi>अपने शहर के सभी वेरिफाइड दुकानदार देखने के लिए श्रेणी चुनें।</span>
+  </p>
+
+  <div class="cats-mega" id="catsList"></div>
+
+  <div style="text-align:center;margin-top:20px;font-size:.85rem;color:var(--muted)">
+    <span data-i18n-en>Looking for something specific?</span>
+    <span data-i18n-hi>कुछ खास ढूंढ रहे हैं?</span>
+    <a href="/search.html" style="color:var(--saffron-deep);font-weight:700">
+      <span data-i18n-en>Search by keyword →</span>
+      <span data-i18n-hi>कीवर्ड से खोजें →</span>
+    </a>
+  </div>
+
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+  renderCats();
+}
+
+let CATS = [];
+
+async function loadCats(){
+  // First read JSON
+  const r = await fetch('/assets/data/categories.json');
+  CATS = (await r.json()).categories;
+
+  // Then try DB for live counts
+  const c = ShopDB.client;
+  if (c){
+    const { data } = await c.from('categories').select('slug, business_count').eq('active', true);
+    if (data){
+      const countMap = {};
+      data.forEach(d => countMap[d.slug] = d.business_count || 0);
+      CATS.forEach(cat => cat.count = countMap[cat.slug] || 0);
+    }
+  }
+  renderCats();
+}
+
+function renderCats(){
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  const html = CATS.map(c => {
+    const primary  = lang === 'hi' && c.name_hi ? c.name_hi : c.name;
+    const sub      = lang === 'hi' && c.name_hi ? c.name : (c.name_hi || '');
+    const cnt = c.count != null ? `${c.count} shop${c.count===1?'':'s'}` : '';
+    return `
+      <a class="cat-tile" href="/search.html?cat=${c.slug}">
+        <div class="cat-icon" style="background:${c.color}15;border-color:${c.color}30;">${c.icon}</div>
+        <div class="cat-body">
+          <div class="cat-name">${primary}</div>
+          <div class="cat-sub">${sub}</div>
+          ${cnt ? `<div class="cat-count">${cnt}</div>` : ''}
+        </div>
+      </a>`;
+  }).join('');
+  document.getElementById('catsList').innerHTML = html;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadCats();
+});
+</script>
+
+</body>
+</html>

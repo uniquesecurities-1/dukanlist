@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Shop Photos — dukanlist.com</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><span class="logo">🏪</span><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/profile.html"><span data-i18n-en>Edit Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-narrow">
+
+  <a href="/panel/dashboard.html" style="font-size:.85rem;color:var(--muted);font-weight:600;text-decoration:none">← <span data-i18n-en>Back to Dashboard</span><span data-i18n-hi>डैशबोर्ड पर वापस</span></a>
+
+  <h1 class="title" style="margin-top:10px">
+    <span data-i18n-en>📸 Shop <span class="grad">Photos</span></span>
+    <span data-i18n-hi>📸 दुकान की <span class="grad">फोटो</span></span>
+  </h1>
+  <p class="subtitle">
+    <span data-i18n-en>Upload up to 5 photos. At least 1 photo activates your listing.</span>
+    <span data-i18n-hi>5 तक फोटो अपलोड करें। 1 फोटो से लिस्टिंग चालू हो जाएगी।</span>
+  </p>
+
+  <div id="loading" style="text-align:center;padding:30px 0;color:var(--muted)">⏳ Loading...</div>
+
+  <div id="content" style="display:none">
+
+    <div class="alert info" id="statusAlert">
+      <span class="a-icon">📋</span>
+      <div id="statusText"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span data-i18n-en>Upload New Photo</span>
+        <span data-i18n-hi>नई फोटो अपलोड करें</span>
+      </div>
+      <div class="card-sub">
+        <span data-i18n-en>JPG/PNG · Max 2 MB each · Front of shop, interior, work samples</span>
+        <span data-i18n-hi>JPG/PNG · प्रत्येक अधिकतम 2 MB · दुकान का सामने, अंदर, काम के नमूने</span>
+      </div>
+
+      <label class="uploader" id="dropzone">
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+        <span class="ico">📷</span>
+        <div class="uploader-label">
+          <span data-i18n-en>Click or drag photos here</span>
+          <span data-i18n-hi>यहाँ क्लिक करें या फोटो खींचें</span>
+        </div>
+        <div class="uploader-help">
+          <span data-i18n-en>JPG / PNG / WebP · up to 2 MB each</span>
+          <span data-i18n-hi>JPG / PNG / WebP · अधिकतम 2 MB</span>
+        </div>
+      </label>
+
+      <div class="alert error" id="uploadErr" style="display:none;margin-top:14px"></div>
+      <div class="alert success" id="uploadOk" style="display:none;margin-top:14px"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">
+        <span data-i18n-en>Your Photos</span><span data-i18n-hi>आपकी फोटो</span>
+        <span id="photoCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:6px"></span>
+      </div>
+      <div class="photo-grid" id="photoGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.88rem">
+          <span data-i18n-en>No photos uploaded yet</span>
+          <span data-i18n-hi>अभी कोई फोटो नहीं</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;text-align:center">
+      <a href="/panel/dashboard.html" class="btn btn-pri">
+        <span data-i18n-en>← Back to Dashboard</span>
+        <span data-i18n-hi>← डैशबोर्ड पर वापस</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+}
+
+const MAX_PHOTOS  = 5;
+const MAX_BYTES   = 2 * 1024 * 1024; // 2 MB
+
+let MY_BIZ = null;
+
+async function loadMyBusiness(){
+  const user = await ShopDB.requireAuth();
+  if (!user) return;
+  const c = ShopDB.client;
+
+  const { data: owners } = await c.from('business_owners')
+    .select('business_id').eq('auth_user_id', user.id).limit(1);
+  if (!owners || !owners.length){
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+    return;
+  }
+  const { data: biz } = await c.from('businesses')
+    .select('id, slug, name, status, photos, verified_photo')
+    .eq('id', owners[0].business_id).single();
+  if (!biz){
+    document.getElementById('loading').innerHTML = '⚠ Could not load business';
+    return;
+  }
+  MY_BIZ = biz;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = '';
+  renderState();
+}
+
+function renderState(){
+  // Status alert
+  const alertEl = document.getElementById('statusAlert');
+  const txt = document.getElementById('statusText');
+  if (MY_BIZ.status === 'active'){
+    alertEl.className = 'alert success';
+    txt.innerHTML = '<b>✓ Listing Active</b> — Your shop is visible to customers.';
+  } else if (MY_BIZ.status === 'pending'){
+    alertEl.className = 'alert warning';
+    txt.innerHTML = '<b>⏳ Pending Activation</b> — Upload at least 1 photo to go live.';
+  } else {
+    alertEl.className = 'alert error';
+    txt.innerHTML = `<b>Status: ${MY_BIZ.status}</b> — Contact support if this looks wrong.`;
+  }
+
+  // Photo grid
+  const grid = document.getElementById('photoGrid');
+  const photos = MY_BIZ.photos || [];
+  document.getElementById('photoCount').textContent = `(${photos.length}/${MAX_PHOTOS})`;
+  if (!photos.length){
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.88rem">No photos uploaded yet</div>`;
+  } else {
+    grid.innerHTML = photos.map((p, i) => `
+      <div class="photo-thumb">
+        <img src="${p}" alt="Shop photo ${i+1}">
+        <button class="x" onclick="deletePhoto(${i})" title="Remove">×</button>
+      </div>
+    `).join('');
+  }
+}
+
+// ============================================================
+// UPLOAD
+// ============================================================
+const dz = document.getElementById('dropzone');
+const fi = document.getElementById('fileInput');
+dz.addEventListener('click', () => fi.click());
+fi.addEventListener('change', () => handleFiles(fi.files));
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+
+async function handleFiles(files){
+  if (!files || !files.length) return;
+  const errEl = document.getElementById('uploadErr');
+  const okEl  = document.getElementById('uploadOk');
+  errEl.style.display = okEl.style.display = 'none';
+
+  const existing = (MY_BIZ.photos || []).length;
+  if (existing >= MAX_PHOTOS){
+    errEl.textContent = `Max ${MAX_PHOTOS} photos allowed. Remove one first.`;
+    errEl.style.display = 'flex'; return;
+  }
+
+  const c = ShopDB.client;
+  const toUpload = Array.from(files).slice(0, MAX_PHOTOS - existing);
+  let uploaded = 0;
+  for (const f of toUpload){
+    if (f.size > MAX_BYTES){
+      errEl.innerHTML = `<span class="a-icon">⚠️</span><div>"${f.name}" is over 2MB — please compress.</div>`;
+      errEl.style.display = 'flex'; continue;
+    }
+    if (!f.type.startsWith('image/')){
+      errEl.innerHTML = `<span class="a-icon">⚠️</span><div>"${f.name}" is not a valid image.</div>`;
+      errEl.style.display = 'flex'; continue;
+    }
+    const ext = f.name.split('.').pop().toLowerCase();
+    const key = `${MY_BIZ.id}/${Date.now()}-${uploaded}.${ext}`;
+    const { error: upErr } = await c.storage.from('shop-photos').upload(key, f, { contentType: f.type, upsert: false });
+    if (upErr){
+      errEl.innerHTML = `<span class="a-icon">⚠️</span><div>Upload failed: ${upErr.message}</div>`;
+      errEl.style.display = 'flex'; continue;
+    }
+    // Get public URL
+    const { data: pub } = c.storage.from('shop-photos').getPublicUrl(key);
+    const url = pub.publicUrl;
+    // Append to business.photos
+    const newPhotos = [...(MY_BIZ.photos || []), url];
+    const { error: updErr } = await c.from('businesses')
+      .update({ photos: newPhotos })
+      .eq('id', MY_BIZ.id);
+    if (updErr){
+      errEl.innerHTML = `<span class="a-icon">⚠️</span><div>Save failed: ${updErr.message}</div>`;
+      errEl.style.display = 'flex'; continue;
+    }
+    MY_BIZ.photos = newPhotos;
+    uploaded++;
+  }
+
+  if (uploaded > 0){
+    // Activate if status was pending
+    if (MY_BIZ.status === 'pending'){
+      const { error: actErr } = await c.rpc('activate_business_after_photos', { p_business_id: MY_BIZ.id });
+      if (!actErr) MY_BIZ.status = 'active';
+    }
+    okEl.innerHTML = `<span class="a-icon">✅</span><div>${uploaded} photo${uploaded>1?'s':''} uploaded successfully!</div>`;
+    okEl.style.display = 'flex';
+    renderState();
+  }
+  fi.value = '';
+}
+
+async function deletePhoto(idx){
+  if (!confirm('Remove this photo?')) return;
+  const photos = [...(MY_BIZ.photos || [])];
+  const removed = photos.splice(idx, 1)[0];
+  const c = ShopDB.client;
+
+  // Try delete from storage (best-effort)
+  try{
+    const match = removed.match(/shop-photos\/(.+)$/);
+    if (match) await c.storage.from('shop-photos').remove([match[1]]);
+  }catch(_) {}
+
+  const { error } = await c.from('businesses').update({ photos }).eq('id', MY_BIZ.id);
+  if (error){ alert('Delete failed: ' + error.message); return; }
+  MY_BIZ.photos = photos;
+  renderState();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadMyBusiness();
+});
+</script>
+
+</body>
+</html>
