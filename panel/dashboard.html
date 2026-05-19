@@ -180,17 +180,57 @@ async function loadDashboard(){
 
   const { data: biz, error: bizErr } = await c
     .from('businesses')
-    .select('*, categories(slug, name, name_hi, icon), geo_cities(name, name_hi)')
+    .select('*, geo_cities(name, name_hi)')
     .eq('id', owners[0].business_id)
-    .single();
+    .maybeSingle();
 
   if (bizErr || !biz){
+    console.error('Business load error:', bizErr);
     document.getElementById('loading').innerHTML = '⚠ Could not load your business.';
     return;
   }
 
+  // Fetch primary category separately (avoids dual-FK ambiguity)
+  const primaryCatId = biz.sub_category_id || biz.category_id;
+  if (primaryCatId){
+    const { data: cat } = await c.from('categories')
+      .select('slug, name, name_hi, icon')
+      .eq('id', primaryCatId)
+      .maybeSingle();
+    biz.categories = cat || { slug:'', name:'—', icon:'🏪' };
+  } else {
+    biz.categories = { slug:'', name:'—', icon:'🏪' };
+  }
+
   MY_BUSINESS = biz;
   renderDashboard(biz);
+
+  // Load multi-cat badges
+  loadCategoryBadges(biz.id);
+}
+
+async function loadCategoryBadges(bizId){
+  const c = ShopDB.client;
+  try{
+    const { data } = await c.rpc('get_business_categories', { p_business_id: bizId });
+    if (!data || data.length <= 1) return;
+    // Sort: primary first
+    data.sort((a,b) => (b.is_primary?1:0) - (a.is_primary?1:0));
+    const html = data.map(cat => {
+      const isPri = cat.is_primary;
+      const star = isPri ? '⭐ ' : '';
+      const style = isPri
+        ? 'background:#FFFBEB;border-color:#F59E0B;color:#92400E;font-weight:800'
+        : 'background:#f1f5f9;border-color:#e2e8f0;color:#475569;font-weight:600';
+      return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:.75rem;border:1px solid;${style}">${star}${cat.icon||''} ${escapeHTML(cat.name)}</span>`;
+    }).join('');
+    const sub = document.getElementById('bizSubDisp');
+    sub.insertAdjacentHTML('afterend', `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${html}</div>`);
+  }catch(e){ console.warn('Category badges failed', e); }
+}
+
+function escapeHTML(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
 
 function renderDashboard(b){
@@ -237,8 +277,8 @@ function renderDashboard(b){
 function shareProfile(e){
   e.preventDefault();
   if (!MY_BUSINESS) return;
-  const url = location.origin + '/business/' + MY_BUSINESS.slug;
-  const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us: ${url}`;
+  const url = location.origin + '/business.html?slug=' + encodeURIComponent(MY_BUSINESS.slug);
+  const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us on DukanList: ${url}`;
   if (navigator.share) {
     navigator.share({ title: MY_BUSINESS.name, text: msg, url });
   } else {

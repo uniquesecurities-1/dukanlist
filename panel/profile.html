@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Edit Profile — dukanlist.com</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+.cat-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;font-size:.78rem;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);text-decoration:none}
+.cat-pill.primary{background:#FFFBEB;border-color:#F59E0B;color:#92400E;font-weight:800}
+.cat-pill .x{cursor:pointer;color:#94a3b8;font-weight:700;margin-left:2px}
+.cat-pill .x:hover{color:#dc2626}
+.cat-pill .star{cursor:pointer;color:#F59E0B}
+.hours-row{display:grid;grid-template-columns:100px 1fr 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.hours-row .d{font-weight:700;color:var(--ink)}
+.hours-row input[type=time]{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit}
+.hours-row .closed-cb{font-size:.8rem;color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><span class="logo">🏪</span><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-narrow">
+
+  <a href="/panel/dashboard.html" style="font-size:.85rem;color:var(--muted);font-weight:600;text-decoration:none">
+    ← <span data-i18n-en>Back to Dashboard</span><span data-i18n-hi>डैशबोर्ड पर वापस</span>
+  </a>
+
+  <h1 class="title" style="margin-top:10px">
+    <span data-i18n-en>✏️ Edit <span class="grad">Profile</span></span>
+    <span data-i18n-hi>✏️ <span class="grad">प्रोफाइल</span> बदलें</span>
+  </h1>
+  <p class="subtitle">
+    <span data-i18n-en>Update your business info. Changes go live immediately.</span>
+    <span data-i18n-hi>अपनी जानकारी अपडेट करें। बदलाव तुरंत लाइव होते हैं।</span>
+  </p>
+
+  <div id="loading" style="text-align:center;padding:30px 0;color:var(--muted)">⏳ Loading...</div>
+
+  <div id="content" style="display:none">
+
+    <!-- ===== BUSINESS DETAILS ===== -->
+    <div class="card">
+      <div class="card-title">
+        🏪 <span data-i18n-en>Business Details</span><span data-i18n-hi>दुकान की जानकारी</span>
+      </div>
+      <div class="form-group">
+        <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span><span class="req">*</span></label>
+        <input id="bizName" class="input" type="text" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label><span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>दुकान का नाम (हिंदी)</span></label>
+        <input id="bizNameHi" class="input" type="text" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label><span data-i18n-en>Owner Name</span><span data-i18n-hi>मालिक का नाम</span><span class="req">*</span></label>
+        <input id="ownerName" class="input" type="text" maxlength="60">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span></label>
+          <input id="whatsapp" class="input keep-en" type="tel" maxlength="13" placeholder="91XXXXXXXXXX">
+        </div>
+        <div class="form-group">
+          <label><span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span></label>
+          <input id="email" class="input keep-en" type="email" placeholder="shop@example.com">
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CATEGORIES ===== -->
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">
+        📚 <span data-i18n-en>Your Categories</span><span data-i18n-hi>आपकी श्रेणियाँ</span>
+        <span id="catCounter" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:6px">0/5</span>
+      </div>
+      <div class="card-sub">
+        <span data-i18n-en>Up to 5 categories. Star (⭐) marks the primary one. Tap × to remove.</span>
+        <span data-i18n-hi>5 तक श्रेणियाँ। ⭐ प्राइमरी, × हटाने के लिए।</span>
+      </div>
+
+      <div id="catPills" style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;min-height:36px;padding:6px;border:1.5px dashed var(--line);border-radius:10px;background:#fafafa"></div>
+
+      <select id="catSelect" class="select" onchange="addCategory(event)">
+        <option value="">+ Add a category</option>
+      </select>
+    </div>
+
+    <!-- ===== USP / About ===== -->
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">
+        ✨ <span data-i18n-en>USP / About</span><span data-i18n-hi>USP / परिचय</span>
+      </div>
+      <div class="form-group">
+        <label><span data-i18n-en>Your USP (English)</span><span data-i18n-hi>USP (English)</span></label>
+        <textarea id="usp" class="textarea" maxlength="280" rows="3"></textarea>
+        <div class="help"><span data-i18n-en>Max 280 chars · Why customers should choose you</span><span data-i18n-hi>अधिकतम 280 अक्षर · ग्राहक आपको क्यों चुनें</span></div>
+      </div>
+      <div class="form-group">
+        <label><span data-i18n-en>USP (Hindi)</span><span data-i18n-hi>USP (हिंदी)</span></label>
+        <textarea id="uspHi" class="textarea" maxlength="280" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- ===== BUSINESS HOURS ===== -->
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">
+        🕒 <span data-i18n-en>Business Hours</span><span data-i18n-hi>दुकान का समय</span>
+      </div>
+      <div class="card-sub">
+        <span data-i18n-en>Set opening hours per day. Check "Closed" if shop is closed that day.</span>
+        <span data-i18n-hi>हर दिन का समय। बंद हो तो "Closed" चुनें।</span>
+      </div>
+      <div id="hoursList"></div>
+    </div>
+
+    <!-- ===== ACTIONS ===== -->
+    <div class="alert error" id="saveErr" style="display:none;margin-top:14px"></div>
+    <div class="alert success" id="saveOk" style="display:none;margin-top:14px"></div>
+
+    <div class="btn-row" style="margin-top:20px">
+      <a href="/panel/dashboard.html" class="btn btn-sec">
+        <span data-i18n-en>← Back</span><span data-i18n-hi>← पीछे</span>
+      </a>
+      <div class="spacer"></div>
+      <button class="btn btn-pri" onclick="saveProfile()" id="saveBtn">
+        <span data-i18n-en>💾 Save Changes</span><span data-i18n-hi>💾 सेव करें</span>
+      </button>
+    </div>
+
+    <!-- View public profile link -->
+    <div style="text-align:center;margin-top:14px">
+      <a id="viewPublicLink" target="_blank" style="font-size:.85rem;color:var(--saffron-deep);font-weight:700">
+        🔗 <span data-i18n-en>View Public Profile</span><span data-i18n-hi>पब्लिक प्रोफाइल देखें</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+}
+
+let MY_BIZ = null;
+let ALL_CATS = [];       // all categories from DB
+let MY_CATS = [];        // current categories (array of {id, slug, name, icon, is_primary, parent_name})
+const MAX_CATS = 5;
+const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
+const DAY_LABELS = { mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday', fri:'Friday', sat:'Saturday', sun:'Sunday' };
+
+async function loadProfile(){
+  const user = await ShopDB.requireAuth();
+  if (!user) return;
+  const c = ShopDB.client;
+
+  // Find user's business
+  const { data: owners } = await c.from('business_owners')
+    .select('business_id').eq('auth_user_id', user.id).limit(1);
+  if (!owners || !owners.length){
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+    return;
+  }
+
+  // Load business
+  const { data: biz, error } = await c.from('businesses')
+    .select('*').eq('id', owners[0].business_id).maybeSingle();
+  if (error || !biz){
+    document.getElementById('loading').innerHTML = '⚠ Could not load business: ' + (error?.message || 'unknown');
+    return;
+  }
+  MY_BIZ = biz;
+
+  // Load my categories (junction)
+  const { data: cats } = await c.rpc('get_business_categories', { p_business_id: biz.id });
+  MY_CATS = cats || [];
+
+  // Load ALL active categories for selector
+  const { data: all } = await c.from('categories')
+    .select('id, slug, name, name_hi, icon, parent_id, sort_order')
+    .eq('active', true).order('sort_order');
+  ALL_CATS = all || [];
+
+  // Public profile link
+  document.getElementById('viewPublicLink').href = '/business.html?slug=' + encodeURIComponent(biz.slug);
+
+  populateFields();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = '';
+}
+
+function populateFields(){
+  document.getElementById('bizName').value = MY_BIZ.name || '';
+  document.getElementById('bizNameHi').value = MY_BIZ.name_hi || '';
+  document.getElementById('ownerName').value = MY_BIZ.owner_name || '';
+  document.getElementById('whatsapp').value = MY_BIZ.whatsapp || '';
+  document.getElementById('email').value = MY_BIZ.email || '';
+  document.getElementById('usp').value = MY_BIZ.usp_text || '';
+  document.getElementById('uspHi').value = MY_BIZ.usp_hi || '';
+
+  renderCatPills();
+  renderCatSelector();
+  renderHours();
+}
+
+function renderCatPills(){
+  const el = document.getElementById('catPills');
+  // Primary first
+  MY_CATS.sort((a,b) => (b.is_primary?1:0) - (a.is_primary?1:0));
+  if (!MY_CATS.length){
+    el.innerHTML = '<span style="color:#94a3b8;font-style:italic;padding:6px;font-size:.85rem">No categories. Add from dropdown below ↓</span>';
+  } else {
+    el.innerHTML = MY_CATS.map(cat => {
+      const isPri = cat.is_primary;
+      const star = isPri ? '⭐' : `<span class="star" onclick="setPrimary(${cat.category_id})" title="Set as primary">☆</span>`;
+      return `<span class="cat-pill ${isPri?'primary':''}" data-id="${cat.category_id}">
+        ${star} ${cat.icon||''} ${escapeHTML(cat.name)}
+        <span class="x" onclick="removeCategory(${cat.category_id})" title="Remove">×</span>
+      </span>`;
+    }).join('');
+  }
+  document.getElementById('catCounter').textContent = MY_CATS.length + '/' + MAX_CATS;
+}
+
+function renderCatSelector(){
+  const sel = document.getElementById('catSelect');
+  // Clear existing options except first
+  while (sel.options.length > 1) sel.remove(1);
+  const myIds = new Set(MY_CATS.map(c => c.category_id));
+  const parents = ALL_CATS.filter(c => c.parent_id == null);
+  parents.forEach(p => {
+    const og = document.createElement('optgroup');
+    og.label = (p.icon||'') + '  ' + p.name;
+    ALL_CATS.filter(s => s.parent_id === p.id).forEach(s => {
+      if (myIds.has(s.id)) return; // already selected
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = (s.icon||'') + '  ' + s.name;
+      og.appendChild(opt);
+    });
+    if (og.children.length > 0) sel.appendChild(og);
+  });
+}
+
+function addCategory(e){
+  const id = parseInt(e.target.value, 10);
+  e.target.value = '';
+  if (!id) return;
+  if (MY_CATS.length >= MAX_CATS){ alert('Maximum ' + MAX_CATS + ' categories'); return; }
+  const cat = ALL_CATS.find(c => c.id === id);
+  if (!cat) return;
+  const parent = cat.parent_id ? ALL_CATS.find(p => p.id === cat.parent_id) : null;
+  MY_CATS.push({
+    category_id: cat.id,
+    slug: cat.slug,
+    name: cat.name,
+    icon: cat.icon || '',
+    is_primary: MY_CATS.length === 0,
+    parent_name: parent ? parent.name : null
+  });
+  renderCatPills();
+  renderCatSelector();
+}
+
+function removeCategory(id){
+  const idx = MY_CATS.findIndex(c => c.category_id === id);
+  if (idx < 0) return;
+  const wasPri = MY_CATS[idx].is_primary;
+  MY_CATS.splice(idx, 1);
+  if (wasPri && MY_CATS.length){
+    MY_CATS[0].is_primary = true;
+  }
+  renderCatPills();
+  renderCatSelector();
+}
+
+function setPrimary(id){
+  MY_CATS.forEach(c => c.is_primary = (c.category_id === id));
+  renderCatPills();
+}
+
+function renderHours(){
+  const h = MY_BIZ.hours_json || {};
+  const html = DAYS.map(d => {
+    const entry = h[d] || { open:'09:00', close:'21:00', closed:false };
+    const isClosed = !!entry.closed;
+    return `
+      <div class="hours-row" data-day="${d}">
+        <div class="d">${DAY_LABELS[d]}</div>
+        <input type="time" value="${entry.open || '09:00'}" data-field="open" ${isClosed?'disabled':''}>
+        <input type="time" value="${entry.close || '21:00'}" data-field="close" ${isClosed?'disabled':''}>
+        <label class="closed-cb">
+          <input type="checkbox" ${isClosed?'checked':''} onchange="toggleClosed(this, '${d}')"> Closed
+        </label>
+      </div>`;
+  }).join('');
+  document.getElementById('hoursList').innerHTML = html;
+}
+
+function toggleClosed(cb, day){
+  const row = document.querySelector(`.hours-row[data-day="${day}"]`);
+  row.querySelectorAll('input[type=time]').forEach(i => i.disabled = cb.checked);
+}
+
+function collectHours(){
+  const h = {};
+  DAYS.forEach(d => {
+    const row = document.querySelector(`.hours-row[data-day="${d}"]`);
+    if (!row) return;
+    const isClosed = row.querySelector('input[type=checkbox]').checked;
+    if (isClosed){
+      h[d] = { closed:true };
+    } else {
+      h[d] = {
+        open: row.querySelector('input[data-field=open]').value || '09:00',
+        close: row.querySelector('input[data-field=close]').value || '21:00'
+      };
+    }
+  });
+  return h;
+}
+
+async function saveProfile(){
+  const errEl = document.getElementById('saveErr');
+  const okEl = document.getElementById('saveOk');
+  errEl.style.display = okEl.style.display = 'none';
+
+  const name = document.getElementById('bizName').value.trim();
+  const owner = document.getElementById('ownerName').value.trim();
+  if (name.length < 3){ errEl.textContent='Shop name min 3 chars'; errEl.style.display='flex'; return; }
+  if (owner.length < 3){ errEl.textContent='Owner name min 3 chars'; errEl.style.display='flex'; return; }
+  if (!MY_CATS.length){ errEl.textContent='Select at least 1 category'; errEl.style.display='flex'; return; }
+  if (!MY_CATS.some(c => c.is_primary)){ errEl.textContent='Mark one category as primary (⭐)'; errEl.style.display='flex'; return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.innerHTML = '<span>⏳ Saving...</span>';
+
+  const c = ShopDB.client;
+  const payload = {
+    name: name,
+    name_hi: document.getElementById('bizNameHi').value.trim() || null,
+    owner_name: owner,
+    whatsapp: document.getElementById('whatsapp').value.trim() || null,
+    email: document.getElementById('email').value.trim() || null,
+    usp_text: document.getElementById('usp').value.trim() || null,
+    usp_hi: document.getElementById('uspHi').value.trim() || null,
+    hours_json: collectHours()
+  };
+
+  // Update business
+  const { error: updErr } = await c.from('businesses').update(payload).eq('id', MY_BIZ.id);
+  if (updErr){
+    btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
+    errEl.textContent = 'Save failed: ' + updErr.message; errEl.style.display = 'flex'; return;
+  }
+
+  // Sync categories — delete existing junction entries, re-insert
+  const { error: delErr } = await c.from('business_categories').delete().eq('business_id', MY_BIZ.id);
+  if (delErr){
+    btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
+    errEl.textContent = 'Category update failed: ' + delErr.message; errEl.style.display='flex'; return;
+  }
+  const rows = MY_CATS.map(c => ({ business_id: MY_BIZ.id, category_id: c.category_id, is_primary: c.is_primary }));
+  const { error: insErr } = await c.from('business_categories').insert(rows);
+  if (insErr){
+    btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
+    errEl.textContent = 'Category insert failed: ' + insErr.message; errEl.style.display='flex'; return;
+  }
+
+  okEl.textContent = '✅ Profile saved. Changes are live on dukanlist.com';
+  okEl.style.display = 'flex';
+  btn.disabled = false; btn.innerHTML = '<span>💾 Save Changes</span>';
+  // Reload MY_BIZ so save reflects latest
+  Object.assign(MY_BIZ, payload);
+  setTimeout(() => { okEl.style.display = 'none'; }, 4000);
+}
+
+function escapeHTML(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadProfile();
+});
+</script>
+
+</body>
+</html>
