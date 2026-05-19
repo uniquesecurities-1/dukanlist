@@ -117,24 +117,88 @@ function setLang(lang){
 let CATEGORIES = [], CITIES = [];
 
 async function loadDropdowns(){
-  // Categories
-  try{
-    const r = await fetch('/assets/data/categories.json');
-    CATEGORIES = (await r.json()).categories;
-    const sel = document.getElementById('catSel');
-    sel.innerHTML = '<option value="">All categories</option>';
-    CATEGORIES.forEach(c => sel.innerHTML += `<option value="${c.slug}">${c.icon} ${c.name}</option>`);
-  }catch(e){ console.error(e); }
-
-  // Cities — load from Supabase if available, else fallback
   const c = ShopDB.client;
+  const sel = document.getElementById('catSel');
+  sel.innerHTML = '<option value="">All categories</option>';
+
+  // ----- Categories: prefer Supabase live data (hierarchical) -----
+  let loaded = false;
   if (c){
-    const { data } = await c.from('geo_cities').select('id, name').eq('active', true).order('name');
-    if (data){
-      CITIES = data;
-      const sel = document.getElementById('citySel');
-      data.forEach(ct => sel.innerHTML += `<option value="${ct.id}">${ct.name}</option>`);
-    }
+    try{
+      const { data: rows, error } = await c.from('categories')
+        .select('id, slug, name, icon, parent_id, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (!error && rows && rows.length){
+        const parents = rows.filter(r => r.parent_id == null);
+        parents.forEach(p => {
+          const og = document.createElement('optgroup');
+          og.label = (p.icon || '') + '  ' + p.name;
+          // "All in parent" option
+          const allOpt = document.createElement('option');
+          allOpt.value = p.slug;
+          allOpt.textContent = 'All ' + p.name;
+          og.appendChild(allOpt);
+          // Sub-categories under this parent
+          rows.filter(s => s.parent_id === p.id).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.slug;
+            opt.textContent = (s.icon || '') + '  ' + s.name;
+            og.appendChild(opt);
+          });
+          sel.appendChild(og);
+        });
+        CATEGORIES = rows;
+        loaded = true;
+      }
+    }catch(e){ console.warn('Supabase categories fetch failed', e); }
+  }
+
+  // ----- Fallback: bundled JSON (handles both old flat + new hierarchical structures) -----
+  if (!loaded){
+    try{
+      const r = await fetch('/assets/data/categories.json', { cache:'no-cache' });
+      const data = await r.json();
+      if (Array.isArray(data.parents)){
+        data.parents.forEach(p => {
+          const og = document.createElement('optgroup');
+          og.label = (p.icon || '') + '  ' + p.name;
+          const allOpt = document.createElement('option');
+          allOpt.value = p.slug;
+          allOpt.textContent = 'All ' + p.name;
+          og.appendChild(allOpt);
+          (p.subs || []).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.slug;
+            opt.textContent = (s.icon || '') + '  ' + s.name;
+            og.appendChild(opt);
+          });
+          sel.appendChild(og);
+        });
+        CATEGORIES = [];
+        data.parents.forEach(p => {
+          CATEGORIES.push({ slug:p.slug, name:p.name, icon:p.icon });
+          (p.subs || []).forEach(s => CATEGORIES.push({ slug:s.slug, name:s.name, icon:s.icon }));
+        });
+      } else if (Array.isArray(data.categories)){
+        CATEGORIES = data.categories;
+        CATEGORIES.forEach(cat => {
+          sel.innerHTML += `<option value="${cat.slug}">${cat.icon || ''} ${cat.name}</option>`;
+        });
+      }
+    }catch(e){ console.error('Categories load fail', e); }
+  }
+
+  // ----- Cities from Supabase -----
+  if (c){
+    try{
+      const { data } = await c.from('geo_cities').select('id, name').eq('active', true).order('name');
+      if (data){
+        CITIES = data;
+        const citySel = document.getElementById('citySel');
+        data.forEach(ct => citySel.innerHTML += `<option value="${ct.id}">${ct.name}</option>`);
+      }
+    }catch(e){ console.warn('Cities load fail', e); }
   }
 }
 
