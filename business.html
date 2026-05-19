@@ -90,6 +90,45 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 .flag-link{ display:inline-block; margin-top:14px; font-size:.78rem; color:var(--muted); text-decoration:underline; cursor:pointer }
 .flag-link:hover{ color:var(--danger) }
+
+/* Multi-category badges */
+.cat-badges{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px }
+.cat-badge{
+  display:inline-flex; align-items:center; gap:5px;
+  background:#f1f5f9; color:var(--ink); padding:5px 11px; border-radius:99px;
+  font-size:.74rem; font-weight:700; text-decoration:none;
+  border:1px solid var(--line); transition:.15s;
+}
+.cat-badge:hover{ background:#e2e8f0; text-decoration:none; transform:translateY(-1px) }
+.cat-badge.primary{
+  background:linear-gradient(135deg,#FFF7ED,#FED7AA);
+  color:var(--saffron-deep); border-color:var(--saffron);
+  font-weight:800; padding:5px 12px 5px 9px;
+}
+.cat-badge.primary::before{ content:'⭐'; font-size:.85rem }
+.cat-badge .cat-parent{ color:var(--muted); font-weight:500; font-size:.7rem; margin-left:2px }
+
+/* Modal styles */
+.modal-overlay{ display:none; position:fixed; inset:0; background:rgba(11,18,32,.7); z-index:100; align-items:center; justify-content:center; padding:18px }
+.modal-overlay.active{ display:flex }
+.modal-card{ background:#fff; border-radius:14px; max-width:440px; width:100%; padding:22px; box-shadow:var(--shadow-lg); max-height:90vh; overflow-y:auto }
+.modal-card h3{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; margin-bottom:6px; font-size:1.15rem }
+.modal-card .modal-sub{ color:var(--muted); font-size:.84rem; margin-bottom:14px; line-height:1.4 }
+.modal-card label{ display:block; font-size:.82rem; font-weight:700; color:var(--ink); margin:10px 0 4px }
+.modal-card .req{ color:var(--danger); margin-left:2px }
+.modal-card input, .modal-card textarea, .modal-card select{
+  width:100%; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px;
+  font-size:.92rem; font-family:inherit; outline:none; transition:border-color .15s;
+}
+.modal-card input:focus, .modal-card textarea:focus, .modal-card select:focus{ border-color:var(--saffron) }
+.modal-card .star-pick{ display:flex; gap:4px; margin:6px 0 }
+.modal-card .star-pick span{ font-size:2rem; cursor:pointer; user-select:none; filter:grayscale(1); opacity:.4; transition:.1s }
+.modal-card .star-pick span.active{ filter:none; opacity:1 }
+.modal-card .modal-actions{ display:flex; gap:8px; margin-top:14px }
+.modal-card .modal-actions .btn{ flex:1 }
+.modal-alert{ padding:10px 12px; border-radius:8px; font-size:.85rem; margin-top:10px }
+.modal-alert.error{ background:#fef2f2; color:#991b1b; border:1px solid #fecaca }
+.modal-alert.success{ background:#f0fdf4; color:#166534; border:1px solid #bbf7d0 }
 </style>
 </head>
 <body>
@@ -129,6 +168,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         </div>
         <div class="biz-meta-card">
           <span class="biz-cat-pill" id="bizCatPill"></span>
+          <div class="cat-badges" id="catBadges"></div>
           <h1 class="biz-title" id="bizName"></h1>
           <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
           <div class="biz-rating-row">
@@ -204,25 +244,87 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </footer>
 
 <!-- Review Modal -->
-<div id="reviewModal" style="display:none;position:fixed;inset:0;background:rgba(11,18,32,.7);z-index:100;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:14px;max-width:440px;width:100%;padding:24px;box-shadow:var(--shadow-lg)">
-    <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;margin-bottom:8px">
-      <span data-i18n-en>Write a Review</span><span data-i18n-hi>रिव्यू लिखें</span>
+<div id="reviewModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3>
+      <span data-i18n-en>✍ Write a Review</span><span data-i18n-hi>✍ रिव्यू लिखें</span>
     </h3>
-    <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">
-      <span data-i18n-en>Verified via mobile OTP (anti-spam).</span>
-      <span data-i18n-hi>मोबाइल OTP से वेरिफाई (एंटी-स्पैम)।</span>
+    <p class="modal-sub">
+      <span data-i18n-en>Your phone is hashed for anti-spam. One review per phone per shop.</span>
+      <span data-i18n-hi>स्पैम रोकने के लिए फोन हैश किया जाता है। एक फोन से एक ही रिव्यू।</span>
     </p>
-    <div class="alert info" style="font-size:.85rem">
-      <span class="a-icon">ℹ️</span>
-      <div>
-        <span data-i18n-en>Review form coming in next sprint — OTP verification + photo upload.</span>
-        <span data-i18n-hi>रिव्यू फॉर्म अगले स्प्रिंट में — OTP वेरिफिकेशन + फोटो अपलोड।</span>
-      </div>
+
+    <label><span data-i18n-en>Your Rating</span><span data-i18n-hi>रेटिंग</span><span class="req">*</span></label>
+    <div class="star-pick" id="starPick">
+      <span data-val="1" onclick="setRating(1)">⭐</span>
+      <span data-val="2" onclick="setRating(2)">⭐</span>
+      <span data-val="3" onclick="setRating(3)">⭐</span>
+      <span data-val="4" onclick="setRating(4)">⭐</span>
+      <span data-val="5" onclick="setRating(5)">⭐</span>
     </div>
-    <button class="btn btn-sec btn-block" onclick="closeReviewModal()">
-      <span data-i18n-en>Close</span><span data-i18n-hi>बंद करें</span>
-    </button>
+
+    <label><span data-i18n-en>Your Name</span><span data-i18n-hi>आपका नाम</span> <span style="color:var(--muted);font-weight:500">(optional)</span></label>
+    <input id="reviewName" type="text" placeholder="Rajesh Kumar" maxlength="50">
+
+    <label><span data-i18n-en>Your Mobile</span><span data-i18n-hi>मोबाइल नंबर</span><span class="req">*</span></label>
+    <input id="reviewPhone" type="tel" placeholder="10-digit Indian mobile" inputmode="numeric" maxlength="10">
+
+    <label><span data-i18n-en>Your Experience</span><span data-i18n-hi>आपका अनुभव</span> <span style="color:var(--muted);font-weight:500">(optional)</span></label>
+    <textarea id="reviewText" rows="3" maxlength="400" placeholder="Service was excellent, very professional..."></textarea>
+
+    <div class="modal-alert error" id="reviewErr" style="display:none"></div>
+    <div class="modal-alert success" id="reviewOk" style="display:none"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-sec" onclick="closeReviewModal()">
+        <span data-i18n-en>Cancel</span><span data-i18n-hi>रद्द</span>
+      </button>
+      <button class="btn btn-pri" onclick="submitReview()" id="submitReviewBtn">
+        <span data-i18n-en>Submit ✓</span><span data-i18n-hi>सबमिट ✓</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3>
+      <span data-i18n-en>🚩 Report this Listing</span><span data-i18n-hi>🚩 इसकी रिपोर्ट करें</span>
+    </h3>
+    <p class="modal-sub">
+      <span data-i18n-en>3+ flags from different phones → auto-flagged for admin review.</span>
+      <span data-i18n-hi>3+ अलग फोन से फ्लैग → एडमिन रिव्यू के लिए ऑटो-फ्लैग।</span>
+    </p>
+
+    <label><span data-i18n-en>Reason</span><span data-i18n-hi>कारण</span><span class="req">*</span></label>
+    <select id="reportReason">
+      <option value="">— Select reason —</option>
+      <option value="fake">Fake business / scam</option>
+      <option value="closed">Shop is permanently closed</option>
+      <option value="wrong-info">Wrong info (address, phone, hours)</option>
+      <option value="spam">Spam / inappropriate content</option>
+      <option value="duplicate">Duplicate listing</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label><span data-i18n-en>Your Mobile</span><span data-i18n-hi>मोबाइल नंबर</span><span class="req">*</span></label>
+    <input id="reportPhone" type="tel" placeholder="10-digit Indian mobile" inputmode="numeric" maxlength="10">
+
+    <label><span data-i18n-en>Details</span><span data-i18n-hi>विवरण</span> <span style="color:var(--muted);font-weight:500">(optional)</span></label>
+    <textarea id="reportText" rows="3" maxlength="280" placeholder="More context about the issue..."></textarea>
+
+    <div class="modal-alert error" id="reportErr" style="display:none"></div>
+    <div class="modal-alert success" id="reportOk" style="display:none"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-sec" onclick="closeReportModal()">
+        <span data-i18n-en>Cancel</span><span data-i18n-hi>रद्द</span>
+      </button>
+      <button class="btn btn-pri" onclick="submitReport()" id="submitReportBtn" style="background:var(--danger)">
+        <span data-i18n-en>Submit Report</span><span data-i18n-hi>रिपोर्ट करें</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -275,8 +377,27 @@ async function loadBusiness(){
   // Log view (fire and forget)
   try { c.rpc('log_lead', { p_business_id: BIZ.id, p_action: 'view' }); } catch(_) {}
 
-  // Load reviews
+  // Load all categories (multi-cat badges) and reviews in parallel
+  loadCategoryBadges(BIZ.id);
   loadReviews(BIZ.id);
+}
+
+async function loadCategoryBadges(bizId){
+  const c = ShopDB.client; if (!c) return;
+  try{
+    const { data, error } = await c.rpc('get_business_categories', { p_business_id: bizId });
+    if (error || !data || !data.length) return;
+    const el = document.getElementById('catBadges');
+    // Sort: primary first, then sub-categories
+    data.sort((a,b) => (b.is_primary?1:0) - (a.is_primary?1:0));
+    el.innerHTML = data.map(c => {
+      const cls = c.is_primary ? 'cat-badge primary' : 'cat-badge';
+      const parentTxt = c.parent_name ? `<span class="cat-parent">· ${escapeHTML(c.parent_name)}</span>` : '';
+      return `<a class="${cls}" href="/search.html?cat=${encodeURIComponent(c.slug)}">${c.icon || ''} ${escapeHTML(c.name)}${parentTxt}</a>`;
+    }).join('');
+    // Hide single-pill if we have multi badges (cleaner UI)
+    document.getElementById('bizCatPill').style.display = 'none';
+  }catch(e){ console.warn('Categories load fail', e); }
 }
 
 function showNotFound(){
@@ -456,12 +577,130 @@ function shareBiz(){
   logLead('share');
 }
 
-function reportBiz(){
-  alert('Report flow — coming in next sprint.\nFor urgent reports, WhatsApp: +91 9541223377');
+// ====== Review submission (anti-spam: phone hash + unique constraint) ======
+let REVIEW_RATING = 0;
+
+function openReviewModal(){
+  document.getElementById('reviewModal').classList.add('active');
+  document.getElementById('reviewErr').style.display = 'none';
+  document.getElementById('reviewOk').style.display = 'none';
+}
+function closeReviewModal(){ document.getElementById('reviewModal').classList.remove('active'); }
+
+function setRating(n){
+  REVIEW_RATING = n;
+  document.querySelectorAll('#starPick span').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
 }
 
-function openReviewModal(){ document.getElementById('reviewModal').style.display = 'flex'; }
-function closeReviewModal(){ document.getElementById('reviewModal').style.display = 'none'; }
+async function sha256Hex(text){
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function validatePhone10(p){ return /^[6-9]\d{9}$/.test(p); }
+
+async function submitReview(){
+  const errEl = document.getElementById('reviewErr');
+  const okEl  = document.getElementById('reviewOk');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+
+  const phone = document.getElementById('reviewPhone').value.replace(/\D/g,'');
+  const name  = document.getElementById('reviewName').value.trim();
+  const text  = document.getElementById('reviewText').value.trim();
+
+  if (!REVIEW_RATING || REVIEW_RATING < 1 || REVIEW_RATING > 5){
+    errEl.textContent = 'Please select a star rating (1-5).'; errEl.style.display = 'block'; return;
+  }
+  if (!validatePhone10(phone)){
+    errEl.textContent = 'Enter a valid 10-digit Indian mobile.'; errEl.style.display = 'block'; return;
+  }
+
+  const btn = document.getElementById('submitReviewBtn');
+  btn.disabled = true; btn.textContent = '⏳ Submitting...';
+
+  try {
+    const hash = await sha256Hex('+91' + phone);
+    const c = ShopDB.client;
+    const { error } = await c.rpc('submit_review', {
+      p_business_id  : BIZ.id,
+      p_customer_name: name || null,
+      p_phone_hash   : hash,
+      p_rating       : REVIEW_RATING,
+      p_text         : text || null
+    });
+    if (error){ throw error; }
+
+    okEl.textContent = '✓ Thank you! Your review is live.';
+    okEl.style.display = 'block';
+    btn.textContent = 'Submitted ✓'; btn.disabled = true;
+
+    setTimeout(() => {
+      closeReviewModal();
+      loadReviews(BIZ.id);
+      // Trigger reload of rating display
+      location.reload();
+    }, 1500);
+  } catch(e){
+    btn.disabled = false; btn.innerHTML = '<span>Submit ✓</span>';
+    const msg = (e.message || '').includes('duplicate') || (e.message || '').includes('unique')
+      ? 'You have already reviewed this shop from this number.'
+      : (e.message || 'Could not submit. Try again.');
+    errEl.textContent = msg; errEl.style.display = 'block';
+  }
+}
+
+// ====== Report submission ======
+function openReportModal(){
+  document.getElementById('reportModal').classList.add('active');
+  document.getElementById('reportErr').style.display = 'none';
+  document.getElementById('reportOk').style.display = 'none';
+}
+function closeReportModal(){ document.getElementById('reportModal').classList.remove('active'); }
+function reportBiz(){ openReportModal(); }
+
+async function submitReport(){
+  const errEl = document.getElementById('reportErr');
+  const okEl  = document.getElementById('reportOk');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+
+  const reason = document.getElementById('reportReason').value;
+  const phone  = document.getElementById('reportPhone').value.replace(/\D/g,'');
+  const text   = document.getElementById('reportText').value.trim();
+
+  if (!reason){
+    errEl.textContent = 'Please select a reason.'; errEl.style.display = 'block'; return;
+  }
+  if (!validatePhone10(phone)){
+    errEl.textContent = 'Enter a valid 10-digit mobile (anti-spam).'; errEl.style.display = 'block'; return;
+  }
+
+  const btn = document.getElementById('submitReportBtn');
+  btn.disabled = true; btn.textContent = '⏳ Submitting...';
+
+  try {
+    const hash = await sha256Hex('+91' + phone);
+    const c = ShopDB.client;
+    const { error } = await c.rpc('report_business', {
+      p_business_id: BIZ.id,
+      p_phone_hash : hash,
+      p_reason     : reason,
+      p_text       : text || null
+    });
+    if (error){ throw error; }
+
+    okEl.textContent = '✓ Report submitted. Admin will review.';
+    okEl.style.display = 'block';
+    btn.textContent = 'Submitted ✓'; btn.disabled = true;
+    setTimeout(() => closeReportModal(), 1800);
+  } catch(e){
+    btn.disabled = false; btn.innerHTML = '<span>Submit Report</span>';
+    errEl.textContent = e.message || 'Could not submit. Try again.';
+    errEl.style.display = 'block';
+  }
+}
 
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
