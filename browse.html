@@ -289,7 +289,9 @@ async function loadAll(){
 function renderParents(){
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
   const html = PARENTS.map(p => renderParentCard(p, lang)).join('');
-  document.getElementById('parentList').innerHTML = html;
+  const list = document.getElementById('parentList');
+  list.innerHTML = html;
+  list.classList.add('stagger');
 }
 
 function renderParentCard(p, lang){

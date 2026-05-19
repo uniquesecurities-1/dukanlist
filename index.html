@@ -492,7 +492,11 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
     </p>
   </div>
   <div class="cats-wrap">
-    <div id="featuredGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
+    <div id="featuredGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div></div>
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div></div>
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div></div>
+    </div>
     <div id="featuredEmpty" style="text-align:center;padding:40px 20px;color:var(--muted);display:none">
       <div style="font-size:2.5rem;margin-bottom:8px;opacity:.5">🏪</div>
       <span data-i18n-en class="block">No active listings yet. Be the first!</span>
@@ -735,6 +739,7 @@ function renderCategories(){
         </div>
       </a>`;
   }).join('');
+  grid.classList.add('stagger');
 }
 
 // ============================================================
@@ -751,9 +756,14 @@ async function loadFeatured(){
       p_limit: 8, p_offset: 0
     });
     if (error){ console.warn('Featured load failed', error); empty.style.display='block'; return; }
-    if (!data || !data.length){ empty.style.display = 'block'; return; }
+    if (!data || !data.length){
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
     grid.innerHTML = data.map(renderFeaturedCard).join('');
-  }catch(e){ console.error(e); empty.style.display='block'; }
+    grid.classList.add('stagger');
+  }catch(e){ console.error(e); grid.innerHTML = ''; empty.style.display='block'; }
 }
 
 function renderFeaturedCard(b){

@@ -147,7 +147,28 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   </div>
 </header>
 
-<div id="loading" style="text-align:center;padding:60px 20px;color:var(--muted)">⏳ Loading business details...</div>
+<div id="loading">
+  <section class="biz-hero">
+    <div class="biz-hero-wrap">
+      <div class="biz-top">
+        <div class="skeleton sk-square" style="background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:14px"></div>
+        <div style="padding:8px 4px">
+          <div class="skeleton sk-line sm w-30" style="margin-bottom:14px"></div>
+          <div class="skeleton sk-line lg w-70" style="margin-bottom:10px"></div>
+          <div class="skeleton sk-line w-50" style="margin-bottom:14px"></div>
+          <div class="skeleton" style="height:60px;width:100%;border-radius:10px;margin-bottom:14px"></div>
+          <div class="skeleton" style="height:80px;width:100%;border-radius:10px;margin-bottom:14px"></div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+            <div class="skeleton" style="height:44px;border-radius:10px"></div>
+            <div class="skeleton" style="height:44px;border-radius:10px"></div>
+            <div class="skeleton" style="height:44px;border-radius:10px"></div>
+            <div class="skeleton" style="height:44px;border-radius:10px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 
 <div id="notFound" style="display:none;text-align:center;padding:60px 20px">
   <div style="font-size:3.5rem;margin-bottom:10px">🔍</div>
@@ -574,9 +595,11 @@ function render(){
     document.getElementById('servicesCard').style.display = '';
   }
 
-  // Show content
+  // Show content with smooth fade-in
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('bizContent').style.display = '';
+  const content = document.getElementById('bizContent');
+  content.style.display = '';
+  content.classList.add('fade-in');
 }
 
 function swapImg(idx, el){

@@ -93,7 +93,14 @@
     </div>
   </div>
 
-  <div id="results"><div class="empty"><span class="ico">⏳</span>Loading...</div></div>
+  <div id="results">
+    <div class="biz-grid">
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
+    </div>
+  </div>
 
 </div>
 
@@ -253,7 +260,7 @@ async function runSearch(){
   }
 
   countEl.innerHTML = `<b>${data.length}</b> <span data-i18n-en>shop${data.length===1?'':'s'} found</span><span data-i18n-hi>दुकान मिली</span>`;
-  resEl.innerHTML = `<div class="biz-grid">${data.map(renderCard).join('')}</div>`;
+  resEl.innerHTML = `<div class="biz-grid stagger">${data.map(renderCard).join('')}</div>`;
 }
 
 function renderCard(b){
