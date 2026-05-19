@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#FF6B1A">
 <title>dukanlist.com — Every Shop, One Identity | Bharat's Local Business Directory</title>
-<meta name="description" content="Every shop in your city — doctor, carpenter, mechanic, CA, jewellery — discoverable in one click. Free for shopkeepers. Verified for customers. Pan-India.">
-<meta name="keywords" content="Dabwali shops, local business directory India, shopkeeper registration, find local services Haryana, Mandi Dabwali businesses">
+<meta name="description" content="Discover every local shop, doctor, financial advisor, mechanic, mutual fund distributor, insurance agent in your city — 82 categories across 10 segments. Free for shopkeepers. Verified for customers. Pan-India from Mandi Dabwali.">
+<meta name="keywords" content="local business directory India, mutual fund distributor Mandi Dabwali, stock broker, insurance advisor, doctor, mechanic, financial services, Haryana businesses, dukan registration, Bharat directory">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Every Shop, One Identity — dukanlist.com">
@@ -347,18 +347,18 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
     <div class="hero-stats">
       <div class="hero-stat">
         <b id="stat-shops">—</b>
-        <span data-i18n-en>Registered Shops</span>
-        <span data-i18n-hi>रजिस्टर्ड दुकानें</span>
+        <span data-i18n-en>Active Shops</span>
+        <span data-i18n-hi>लाइव दुकानें</span>
       </div>
       <div class="hero-stat">
-        <b id="stat-cats">15</b>
+        <b id="stat-cats">—</b>
         <span data-i18n-en>Categories</span>
         <span data-i18n-hi>श्रेणियाँ</span>
       </div>
       <div class="hero-stat">
-        <b>5</b>
-        <span data-i18n-en>States Live</span>
-        <span data-i18n-hi>राज्य</span>
+        <b id="stat-cities">—</b>
+        <span data-i18n-en>Cities Live</span>
+        <span data-i18n-hi>शहर</span>
       </div>
       <div class="hero-stat">
         <b>₹0</b>
@@ -401,24 +401,56 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   </form>
 </div>
 
-<!-- ===== CATEGORIES ===== -->
+<!-- ===== CATEGORIES (parent buckets) ===== -->
 <section id="categories">
   <div class="section-head">
     <span class="eyebrow">
-      <span data-i18n-en>📚 15 Categories · More coming</span>
-      <span data-i18n-hi>📚 15 श्रेणियाँ · और जुड़ रही हैं</span>
+      <span data-i18n-en id="eyebrowCats">📚 Loading...</span>
+      <span data-i18n-hi id="eyebrowCatsHi">📚 लोड हो रहा है...</span>
     </span>
     <h2>
       <span data-i18n-en>What do you need today?</span>
       <span data-i18n-hi>आज क्या ढूंढना है?</span>
     </h2>
     <p>
-      <span data-i18n-en>Click a category — only verified shopkeepers shown.</span>
-      <span data-i18n-hi>श्रेणी पर क्लिक करें — सिर्फ वेरिफाइड दुकानदार दिखेंगे।</span>
+      <span data-i18n-en>Pick a segment to browse verified shopkeepers in your city.</span>
+      <span data-i18n-hi>अपने शहर के वेरिफाइड दुकानदारों के लिए वर्ग चुनें।</span>
     </p>
   </div>
   <div class="cats-wrap">
     <div class="cats-grid" id="catsGrid"><!-- populated via JS --></div>
+    <div style="text-align:center;margin-top:22px">
+      <a href="/browse.html" class="btn btn-sec">
+        <span data-i18n-en>📂 Browse All Categories →</span>
+        <span data-i18n-hi>📂 सभी श्रेणियाँ देखें →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURED LISTINGS ===== -->
+<section id="featured" style="background:linear-gradient(180deg,#fff 0%,#FAFAFA 100%);padding-top:40px" id="featuredSection">
+  <div class="section-head">
+    <span class="eyebrow">
+      <span data-i18n-en>✨ Featured Shopkeepers</span>
+      <span data-i18n-hi>✨ चुने हुए दुकानदार</span>
+    </span>
+    <h2>
+      <span data-i18n-en>Latest on DukanList</span>
+      <span data-i18n-hi>DukanList पर नवीनतम</span>
+    </h2>
+    <p>
+      <span data-i18n-en>Verified businesses across India. Tap any to see details, photos, and contact info.</span>
+      <span data-i18n-hi>पूरे भारत के वेरिफाइड व्यवसाय। डिटेल्स, फोटो और कॉन्टैक्ट देखने के लिए क्लिक करें।</span>
+    </p>
+  </div>
+  <div class="cats-wrap">
+    <div id="featuredGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
+    <div id="featuredEmpty" style="text-align:center;padding:40px 20px;color:var(--muted);display:none">
+      <div style="font-size:2.5rem;margin-bottom:8px;opacity:.5">🏪</div>
+      <span data-i18n-en class="block">No active listings yet. Be the first!</span>
+      <span data-i18n-hi class="block">अभी कोई लाइव लिस्टिंग नहीं। पहले बनें!</span>
+    </div>
   </div>
 </section>
 
@@ -556,6 +588,8 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
 <script>
 // ============================================================
 // LANGUAGE SWITCHER — EN (default) | HI
@@ -581,35 +615,151 @@ function loadSavedLang(){
 }
 
 // ============================================================
-// CATEGORY GRID
+// CATEGORIES — Parent buckets (live from Supabase)
 // ============================================================
-let CATEGORIES_DATA = null;
+let PARENT_CATS = [];
+let TOTAL_CATS = 0;
+
 async function loadCategories(){
+  const c = (typeof ShopDB !== 'undefined') && ShopDB.client;
+
+  // 1. Try Supabase live
+  if (c){
+    try{
+      const { data, error } = await c.from('categories')
+        .select('id, slug, name, name_hi, icon, color, parent_id, business_count, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (!error && data && data.length){
+        TOTAL_CATS = data.length;
+        PARENT_CATS = data.filter(r => r.parent_id == null).map(p => ({
+          ...p,
+          subs: data.filter(r => r.parent_id === p.id),
+          subShopCount: data.filter(r => r.parent_id === p.id).reduce((s, x) => s + (x.business_count || 0), 0)
+        }));
+        renderCategories();
+        updateEyebrow();
+        return;
+      }
+    }catch(e){ console.warn('Supabase categories failed, falling back to JSON', e); }
+  }
+
+  // 2. Fallback to bundled JSON
   try{
     const r = await fetch('/assets/data/categories.json', { cache:'no-cache' });
     const data = await r.json();
-    CATEGORIES_DATA = data;
+    if (Array.isArray(data.parents)){
+      PARENT_CATS = data.parents.map(p => ({ ...p, subs: p.subs || [], subShopCount: 0 }));
+      TOTAL_CATS = data.parents.reduce((s, p) => s + 1 + (p.subs?.length || 0), 0);
+    } else if (Array.isArray(data.categories)){
+      // Very old structure — treat each as parent
+      PARENT_CATS = data.categories.map(c => ({ ...c, subs: [], subShopCount: 0 }));
+      TOTAL_CATS = data.categories.length;
+    }
     renderCategories();
-    document.getElementById('stat-cats').textContent = data.categories.length;
+    updateEyebrow();
   }catch(e){ console.error('Categories load failed', e); }
 }
 
+function updateEyebrow(){
+  document.getElementById('eyebrowCats').textContent = `📚 ${TOTAL_CATS} Categories · ${PARENT_CATS.length} Segments`;
+  document.getElementById('eyebrowCatsHi').textContent = `📚 ${TOTAL_CATS} श्रेणियाँ · ${PARENT_CATS.length} वर्ग`;
+  document.getElementById('stat-cats').textContent = TOTAL_CATS;
+}
+
 function renderCategories(){
-  if (!CATEGORIES_DATA) return;
+  if (!PARENT_CATS.length) return;
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
   const grid = document.getElementById('catsGrid');
-  grid.innerHTML = CATEGORIES_DATA.categories.map(c => {
-    const primary  = lang === 'hi' ? c.name_hi : c.name;
-    const secondary= lang === 'hi' ? c.name    : c.name_hi;
+  grid.innerHTML = PARENT_CATS.map(p => {
+    const primary   = (lang === 'hi' && p.name_hi) ? p.name_hi : p.name;
+    const secondary = (lang === 'hi' && p.name_hi) ? p.name : (p.name_hi || '');
+    const subCount  = p.subs.length;
+    const subTxt = lang === 'hi'
+      ? `${subCount} उप-श्रेणियाँ`
+      : `${subCount} sub-categor${subCount===1?'y':'ies'}`;
+    const color = p.color || '#FF6B1A';
     return `
-      <a class="cat-card" href="/browse.html?cat=${c.slug}">
-        <div class="cat-icon" style="background:${c.color}15;border-color:${c.color}30;">${c.icon}</div>
+      <a class="cat-card" href="/search.html?cat=${encodeURIComponent(p.slug)}">
+        <div class="cat-icon" style="background:${color};border-color:${color};color:#fff">${p.icon || '📂'}</div>
         <div class="cat-body">
-          <div class="cat-name">${primary}</div>
-          <div class="cat-sub">${secondary}</div>
+          <div class="cat-name">${escapeHTML(primary)}</div>
+          <div class="cat-sub">${secondary ? escapeHTML(secondary) + ' · ' : ''}${subTxt}</div>
         </div>
       </a>`;
   }).join('');
+}
+
+// ============================================================
+// FEATURED BUSINESSES (latest active listings)
+// ============================================================
+async function loadFeatured(){
+  const c = (typeof ShopDB !== 'undefined') && ShopDB.client;
+  const grid = document.getElementById('featuredGrid');
+  const empty = document.getElementById('featuredEmpty');
+  if (!c){ empty.style.display = 'block'; return; }
+  try{
+    const { data, error } = await c.rpc('search_businesses', {
+      p_query: null, p_category: null, p_city_id: null, p_state_id: null,
+      p_limit: 8, p_offset: 0
+    });
+    if (error){ console.warn('Featured load failed', error); empty.style.display='block'; return; }
+    if (!data || !data.length){ empty.style.display = 'block'; return; }
+    grid.innerHTML = data.map(renderFeaturedCard).join('');
+  }catch(e){ console.error(e); empty.style.display='block'; }
+}
+
+function renderFeaturedCard(b){
+  const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
+  const photoHTML = photo
+    ? `<img src="${photo}" alt="${escapeHTML(b.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover">`
+    : `<div style="width:100%;aspect-ratio:16/10;display:grid;place-items:center;background:linear-gradient(135deg,#FAFAFA,#F1F5F9);font-size:3rem;opacity:.5">${b.category_icon || '🏪'}</div>`;
+  const verified = b.verified_score >= 3
+    ? '<span style="position:absolute;top:9px;right:9px;background:rgba(5,150,105,.95);color:#fff;padding:3px 9px;border-radius:99px;font-size:.7rem;font-weight:800">✓ Verified</span>'
+    : '';
+  const rating = b.rating_avg > 0
+    ? `<span style="color:var(--ink);font-weight:700">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>`
+    : '<span style="color:var(--muted)">No reviews yet</span>';
+  return `
+    <a href="/business.html?slug=${encodeURIComponent(b.slug)}" style="background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:.18s;box-shadow:var(--shadow-sm)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow)';this.style.borderColor='var(--saffron)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-sm)';this.style.borderColor='var(--line)'">
+      <div style="position:relative">${photoHTML}${verified}</div>
+      <div style="padding:13px 14px;display:flex;flex-direction:column;gap:4px;flex:1">
+        <div style="font-size:.72rem;color:var(--saffron-deep);font-weight:800;letter-spacing:.04em;text-transform:uppercase">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.05rem;font-weight:800;color:var(--ink);line-height:1.2">${escapeHTML(b.name)}</div>
+        <div style="font-size:.83rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escapeHTML(b.usp_text || '')}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:6px;font-size:.78rem;color:var(--muted);padding-top:8px;border-top:1px dashed var(--line)">
+          ${rating}
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${escapeHTML(b.city_name || '')}</span>
+        </div>
+      </div>
+    </a>`;
+}
+
+// ============================================================
+// LIVE PUBLIC STATS (hero counters)
+// ============================================================
+async function loadStats(){
+  const c = (typeof ShopDB !== 'undefined') && ShopDB.client;
+  if (!c){
+    document.getElementById('stat-shops').textContent = '0';
+    return;
+  }
+  try{
+    const { data, error } = await c.rpc('get_public_stats');
+    if (error || !data || !data.length) throw error;
+    const s = data[0];
+    document.getElementById('stat-shops').textContent  = s.total_shops ?? 0;
+    document.getElementById('stat-cities').textContent = s.total_cities ?? 0;
+    // total_categories overrides cat count if already set; fallback otherwise
+    if (s.total_categories){
+      TOTAL_CATS = s.total_categories;
+      document.getElementById('stat-cats').textContent = TOTAL_CATS;
+    }
+  }catch(e){
+    console.warn('Stats load failed', e);
+    document.getElementById('stat-shops').textContent = '0';
+    document.getElementById('stat-cities').textContent = '0';
+  }
 }
 
 // ============================================================
@@ -625,9 +775,8 @@ function handleSearch(e){
   window.location.href = '/search.html?' + params.toString();
 }
 
-function loadStats(){
-  // TODO: Supabase RPC call to get_public_stats()
-  document.getElementById('stat-shops').textContent = '0';
+function escapeHTML(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
 
 // Boot
@@ -635,6 +784,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadSavedLang();
   loadCategories();
   loadStats();
+  loadFeatured();
 });
 </script>
 
