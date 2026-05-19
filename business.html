@@ -17,34 +17,49 @@
 .biz-hero-wrap{ max-width:980px; margin:0 auto }
 .biz-back{ display:inline-flex; align-items:center; gap:5px; font-size:.85rem; color:var(--muted); font-weight:600; margin-bottom:10px; text-decoration:none }
 .biz-back:hover{ color:var(--ink) }
-.biz-top{ display:grid; grid-template-columns:1fr; gap:16px }
-@media (min-width:760px){ .biz-top{ grid-template-columns:380px 1fr } }
-.gallery{ background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-sm) }
-.gallery .main{ aspect-ratio:16/11; background:linear-gradient(135deg,#FAFAFA,#F1F5F9); position:relative }
-.gallery .main img{ width:100%; height:100%; object-fit:cover; cursor:pointer }
+.biz-top{ display:grid; grid-template-columns:1fr; gap:18px; align-items:start }
+@media (min-width:760px){ .biz-top{ grid-template-columns:400px 1fr } }
+.gallery{
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  overflow:hidden; box-shadow:var(--shadow-sm);
+}
+@media (min-width:760px){
+  .gallery{ position:sticky; top:80px }
+}
+.gallery .main{
+  aspect-ratio:4/3;
+  background:linear-gradient(135deg,#F8FAFC,#E2E8F0);
+  position:relative; overflow:hidden;
+}
+.gallery .main img{ width:100%; height:100%; object-fit:cover; cursor:pointer; transition:transform .3s }
+.gallery .main img:hover{ transform:scale(1.03) }
 .gallery .main .ph-fb{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:5rem; opacity:.4 }
-.gallery .thumbs{ display:flex; gap:4px; padding:6px; overflow-x:auto }
-.gallery .thumbs img{ width:60px; height:46px; object-fit:cover; border-radius:6px; cursor:pointer; opacity:.7; transition:.15s; flex-shrink:0; border:2px solid transparent }
-.gallery .thumbs img.active{ opacity:1; border-color:var(--saffron) }
+.gallery .thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px; padding:8px }
+.gallery .thumbs img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:7px; cursor:pointer; opacity:.65; transition:.18s; border:2px solid transparent }
+.gallery .thumbs img:hover{ opacity:.9 }
+.gallery .thumbs img.active{ opacity:1; border-color:var(--saffron); box-shadow:0 2px 8px rgba(255,107,26,.3) }
 
 .biz-meta-card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:var(--shadow-sm) }
 .biz-cat-pill{ display:inline-flex; align-items:center; gap:5px; background:rgba(255,107,26,.10); color:var(--saffron-deep); padding:4px 11px; border-radius:99px; font-size:.72rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px }
 .biz-title{ font-family:'Plus Jakarta Sans',sans-serif; font-size:1.6rem; font-weight:900; color:var(--ink); letter-spacing:-.02em; line-height:1.1; margin-bottom:5px }
 html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif }
 .biz-title-hi{ font-size:1rem; color:var(--indigo); font-weight:700; font-family:'Noto Sans Devanagari',sans-serif; margin-bottom:8px }
-.biz-rating-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:14px }
-.biz-rating{ display:flex; align-items:center; gap:5px; font-weight:800; color:var(--ink) }
-.biz-rating .num{ font-size:1.2rem; font-family:'Plus Jakarta Sans',sans-serif }
+.biz-rating-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; background:linear-gradient(135deg,#FFFBEB,#FFF7ED); border:1px solid #FED7AA; border-radius:11px }
+.biz-rating{ display:flex; align-items:center; gap:6px; font-weight:800; color:var(--ink) }
+.biz-rating .num{ font-size:1.3rem; font-family:'Plus Jakarta Sans',sans-serif; color:var(--saffron-deep) }
 .biz-rating .rc{ color:var(--muted); font-weight:600; font-size:.85rem }
-.verif-row{ display:flex; gap:5px; flex-wrap:wrap; margin-top:5px }
-.verify-pill{ display:inline-flex; align-items:center; gap:4px; background:#ECFDF5; color:#065F46; padding:3px 8px; border-radius:99px; font-size:.72rem; font-weight:800 }
+.verif-row{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto }
+.verify-pill{ display:inline-flex; align-items:center; gap:4px; background:#DCFCE7; color:#065F46; padding:5px 10px; border-radius:99px; font-size:.74rem; font-weight:800; border:1px solid #86EFAC }
 
 .usp-box{ background:linear-gradient(135deg,#FEF3C7 0%,#FFFBEB 100%); border-left:4px solid var(--saffron); padding:14px 16px; border-radius:0 10px 10px 0; margin-bottom:16px; font-size:.92rem; line-height:1.55; color:var(--ink-2) }
 
 .addr-box{ background:#F8FAFC; border-radius:10px; padding:13px 15px; margin-bottom:18px; font-size:.9rem; line-height:1.55; color:var(--ink-2) }
 .addr-box .a-label{ font-size:.72rem; font-weight:800; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; margin-bottom:4px }
 
-.cta-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-bottom:18px }
+.cta-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px }
+.cta-row .cta-btn:nth-child(3),
+.cta-row .cta-btn:nth-child(4){ font-size:.88rem }
+@media (min-width:520px){ .cta-row{ grid-template-columns:repeat(4, 1fr) } }
 .cta-btn{ display:flex; align-items:center; justify-content:center; gap:7px; padding:14px 10px; border-radius:10px; font-weight:800; font-size:.92rem; text-decoration:none; transition:.18s; border:none; cursor:pointer; font-family:inherit }
 .cta-wa{ background:#25D366; color:#fff; box-shadow:0 4px 12px rgba(37,211,102,.35) }
 .cta-wa:hover{ background:#1EBE5B; text-decoration:none; transform:translateY(-1px); color:#fff }
@@ -75,13 +90,24 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .svc-desc{ font-size:.8rem; color:var(--muted); margin-top:2px }
 .svc-price{ font-weight:800; color:var(--emerald); font-size:.88rem; white-space:nowrap }
 
-.reviews-list{ display:flex; flex-direction:column; gap:14px }
-.review{ background:#F8FAFC; border-radius:10px; padding:13px 15px; border:1px solid var(--line) }
-.review .r-head{ display:flex; align-items:center; gap:8px; margin-bottom:6px }
-.review .r-name{ font-weight:800; color:var(--ink); font-size:.92rem }
-.review .r-star{ color:#F59E0B; font-size:.88rem }
-.review .r-date{ font-size:.74rem; color:var(--muted); margin-left:auto }
-.review .r-text{ font-size:.88rem; color:var(--ink-2); line-height:1.55 }
+.reviews-list{ display:flex; flex-direction:column; gap:12px }
+.review{
+  background:#fff; border-radius:11px; padding:14px 16px;
+  border:1px solid var(--line); transition:border-color .15s;
+}
+.review:hover{ border-color:#CBD5E1 }
+.review .r-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px }
+.review .r-avatar{
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(135deg,var(--indigo),var(--indigo-deep));
+  color:#fff; font-weight:900; font-size:.9rem;
+  display:grid; place-items:center; flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.review .r-name{ font-weight:800; color:var(--ink); font-size:.95rem; line-height:1.2 }
+.review .r-meta{ display:flex; gap:6px; align-items:center; font-size:.76rem; color:var(--muted); margin-top:1px }
+.review .r-star{ color:#F59E0B; font-size:.85rem; letter-spacing:1px }
+.review .r-text{ font-size:.9rem; color:var(--ink-2); line-height:1.55; padding-left:46px }
 .review .r-reply{ background:#FFFBEB; border-left:3px solid var(--saffron); padding:8px 11px; margin-top:8px; border-radius:0 6px 6px 0; font-size:.84rem; color:var(--ink-2) }
 .review .r-reply b{ color:var(--saffron-deep); font-size:.78rem }
 
@@ -537,10 +563,14 @@ function render(){
   const thEl   = document.getElementById('galleryThumbs');
   if (photos.length){
     mainEl.innerHTML = `<img id="mainImg" src="${photos[0]}" alt="${escapeHTML(b.name)}">`;
-    thEl.innerHTML = photos.map((p, i) =>
-      `<img src="${p}" class="${i===0?'active':''}" onclick="swapImg(${i}, this)">`
-    ).join('');
-    if (photos.length === 1) thEl.style.display = 'none';
+    if (photos.length > 1){
+      thEl.innerHTML = photos.map((p, i) =>
+        `<img src="${p}" class="${i===0?'active':''}" onclick="swapImg(${i}, this)" alt="Photo ${i+1}">`
+      ).join('');
+      thEl.style.display = '';
+    } else {
+      thEl.style.display = 'none';
+    }
   } else {
     mainEl.innerHTML = `<div class="ph-fb">${b.categories?.icon || '🏪'}</div>`;
     thEl.style.display = 'none';
@@ -554,12 +584,14 @@ function render(){
     document.getElementById('bizNameHi').style.display = '';
   }
 
-  // Rating
+  // Rating (grammar-aware)
   const rEl = document.getElementById('bizRating');
   if (b.rating_avg > 0){
-    rEl.innerHTML = `<span class="num">⭐ ${Number(b.rating_avg).toFixed(1)}</span><span class="rc">(${b.rating_count} reviews)</span>`;
+    const count = b.rating_count || 0;
+    const noun = count === 1 ? 'review' : 'reviews';
+    rEl.innerHTML = `<span class="num">⭐ ${Number(b.rating_avg).toFixed(1)}</span><span class="rc">(${count} ${noun})</span>`;
   } else {
-    rEl.innerHTML = '<span style="color:var(--muted);font-weight:600;font-size:.85rem">No reviews yet</span>';
+    rEl.innerHTML = '<span style="color:var(--muted);font-weight:600;font-size:.85rem">⭐ No reviews yet</span>';
   }
 
   // Verification badges
@@ -672,16 +704,24 @@ async function loadReviews(bizId){
   if (!data || !data.length) return;
   document.getElementById('reviewCount').textContent = `(${data.length})`;
   document.getElementById('reviewsList').innerHTML = data.map(r => {
-    const stars = '⭐'.repeat(r.rating);
+    const stars = '⭐'.repeat(r.rating) + '<span style="opacity:.25">' + '⭐'.repeat(5 - r.rating) + '</span>';
     const date = new Date(r.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    const name = (r.customer_name || 'Anonymous').trim();
+    const initial = name.charAt(0).toUpperCase() || '?';
     return `<div class="review">
       <div class="r-head">
-        <span class="r-name">${escapeHTML(r.customer_name || 'Anonymous')}</span>
-        <span class="r-star">${stars}</span>
-        <span class="r-date">${date}</span>
+        <div class="r-avatar">${initial}</div>
+        <div style="flex:1;min-width:0">
+          <div class="r-name">${escapeHTML(name)}</div>
+          <div class="r-meta">
+            <span class="r-star">${stars}</span>
+            <span>·</span>
+            <span>${date}</span>
+          </div>
+        </div>
       </div>
       ${r.text ? `<div class="r-text">${escapeHTML(r.text)}</div>` : ''}
-      ${r.owner_reply ? `<div class="r-reply"><b>Owner reply:</b><br>${escapeHTML(r.owner_reply)}</div>` : ''}
+      ${r.owner_reply ? `<div class="r-reply" style="margin-left:46px"><b>Owner reply:</b><br>${escapeHTML(r.owner_reply)}</div>` : ''}
     </div>`;
   }).join('');
 }
