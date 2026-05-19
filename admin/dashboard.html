@@ -169,11 +169,13 @@
     return;
   }
 
-  // Show admin name
-  const { data: adminRow } = await c.from('admin_users').select('display_name, role').eq('auth_user_id', user.user.id).maybeSingle();
-  if (adminRow){
-    document.getElementById('adminName').textContent = adminRow.display_name || 'Admin';
-  }
+  // Show admin name (via SECURITY DEFINER RPC to bypass RLS)
+  try {
+    const { data: profile } = await c.rpc('get_admin_profile');
+    if (profile && profile.length > 0 && profile[0].display_name){
+      document.getElementById('adminName').textContent = profile[0].display_name;
+    }
+  } catch(e){ /* fall back to default "Admin" */ }
 
   // Fetch stats
   const { data: stats, error: statsErr } = await c.rpc('get_admin_stats');
