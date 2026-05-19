@@ -362,15 +362,27 @@ async function loadBusiness(){
       services_json, status,
       verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
       rating_avg, rating_count, view_count,
-      categories(slug, name, name_hi, icon),
+      category_id, sub_category_id,
       geo_cities(name, name_hi),
       geo_localities(name, name_hi)
     `)
     .eq('slug', slug)
     .eq('status', 'active')
-    .single();
+    .maybeSingle();
 
+  if (error){ console.error('Business fetch error:', error); }
   if (error || !data){ showNotFound(); return; }
+
+  // Fetch category name/icon separately (avoids ambiguous FK embed)
+  if (data.category_id){
+    const { data: cat } = await c.from('categories')
+      .select('slug, name, name_hi, icon')
+      .eq('id', data.sub_category_id || data.category_id)
+      .maybeSingle();
+    if (cat) data.categories = cat;
+  }
+  if (!data.categories) data.categories = { slug:'', name:'', icon:'🏪' };
+
   BIZ = data;
   render();
 
