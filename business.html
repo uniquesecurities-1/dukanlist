@@ -117,6 +117,118 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .flag-link{ display:inline-block; margin-top:14px; font-size:.78rem; color:var(--muted); text-decoration:underline; cursor:pointer }
 .flag-link:hover{ color:var(--danger) }
 
+/* ===== Lightbox (photo viewer) ===== */
+.lightbox{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.96);
+  display:none; align-items:center; justify-content:center;
+  z-index:1000; padding:20px;
+  animation:fadeIn .2s ease;
+}
+.lightbox.show{ display:flex }
+.lightbox-img{
+  max-width:95vw; max-height:88vh;
+  object-fit:contain; border-radius:8px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  cursor:default;
+}
+.lightbox-close{
+  position:absolute; top:20px; right:20px;
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(255,255,255,.15); color:#fff;
+  border:none; font-size:1.6rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(8px); transition:.15s;
+}
+.lightbox-close:hover{ background:rgba(255,255,255,.30); transform:scale(1.05) }
+.lightbox-prev, .lightbox-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:48px; height:48px; border-radius:50%;
+  background:rgba(255,255,255,.15); color:#fff;
+  border:none; font-size:2rem; cursor:pointer; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(8px); transition:.15s;
+}
+.lightbox-prev{ left:20px } .lightbox-next{ right:20px }
+.lightbox-prev:hover, .lightbox-next:hover{ background:rgba(255,255,255,.30); transform:translateY(-50%) scale(1.05) }
+.lightbox-counter{
+  position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+  background:rgba(255,255,255,.15); color:#fff;
+  padding:6px 14px; border-radius:99px;
+  font-size:.85rem; font-weight:700; backdrop-filter:blur(8px);
+}
+.gallery .main img{ cursor:zoom-in !important }
+@media (max-width:560px){
+  .lightbox-close{ top:12px; right:12px }
+  .lightbox-prev{ left:8px } .lightbox-next{ right:8px }
+  .lightbox-prev, .lightbox-next, .lightbox-close{ width:40px; height:40px }
+}
+
+/* ===== Open Now / Closed indicator ===== */
+.open-status{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 11px; border-radius:99px;
+  font-size:.78rem; font-weight:800;
+  margin-left:auto;
+}
+.open-status.open{
+  background:#DCFCE7; color:#065F46;
+  border:1px solid #86EFAC;
+}
+.open-status.closed{
+  background:#FEE2E2; color:#991B1B;
+  border:1px solid #FECACA;
+}
+.open-status .dot{
+  width:7px; height:7px; border-radius:50%;
+  background:currentColor;
+  animation:pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot{
+  0%, 100% { opacity:1 }
+  50% { opacity:.4 }
+}
+
+/* ===== Admin Verified premium badge ===== */
+.admin-verified-badge{
+  display:flex; align-items:center; gap:10px;
+  background:linear-gradient(135deg,#1E40AF,#1E1B4B);
+  color:#fff; padding:10px 14px; border-radius:11px;
+  font-size:.85rem; font-weight:700;
+  margin-bottom:14px;
+  box-shadow:0 4px 14px rgba(30,64,175,.3);
+}
+.admin-verified-badge .av-icon{
+  width:32px; height:32px; border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:grid; place-items:center; font-size:1.2rem;
+  flex-shrink:0;
+}
+.admin-verified-badge .av-text{
+  font-weight:800; letter-spacing:.01em;
+}
+.admin-verified-badge .av-sub{
+  font-size:.72rem; opacity:.85; font-weight:600;
+  margin-top:1px;
+}
+
+/* ===== Distance indicator ===== */
+.distance-pill{
+  display:inline-flex; align-items:center; gap:5px;
+  background:#EEF2FF; color:#3730A3;
+  padding:4px 11px; border-radius:99px;
+  font-size:.76rem; font-weight:700;
+  border:1px solid #C7D2FE;
+}
+
+/* ===== Review submission loading ===== */
+.review-submitting{
+  background:#F8FAFC; border-radius:10px;
+  padding:16px; text-align:center;
+  color:var(--muted); font-size:.9rem;
+}
+.review-submitting .spinner{ margin-right:8px }
+
 /* Multi-category badges */
 .cat-badges{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px }
 .cat-badge{
@@ -214,12 +326,15 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="thumbs" id="galleryThumbs"></div>
         </div>
         <div class="biz-meta-card">
+          <div id="adminVerified" style="display:none"></div>
           <span class="biz-cat-pill" id="bizCatPill"></span>
           <div class="cat-badges" id="catBadges"></div>
           <h1 class="biz-title" id="bizName"></h1>
           <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
           <div class="biz-rating-row">
             <div class="biz-rating" id="bizRating"></div>
+            <div id="openStatus"></div>
+            <div id="distancePill"></div>
             <div class="verif-row" id="verifRow"></div>
           </div>
           <div class="usp-box" id="uspBox" style="display:none"></div>
@@ -284,6 +399,15 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
     </div>
 
   </div>
+</div>
+
+<!-- Lightbox overlay (photo viewer) -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()" role="dialog" aria-label="Photo viewer">
+  <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()" aria-label="Close">×</button>
+  <button class="lightbox-prev" onclick="event.stopPropagation(); lightboxPrev()" aria-label="Previous photo">‹</button>
+  <button class="lightbox-next" onclick="event.stopPropagation(); lightboxNext()" aria-label="Next photo">›</button>
+  <img id="lightboxImg" class="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
 <!-- Mobile sticky bottom CTA (Call + WhatsApp always reachable) -->
@@ -584,14 +708,51 @@ function render(){
     document.getElementById('bizNameHi').style.display = '';
   }
 
-  // Rating (grammar-aware)
+  // Rating (grammar-aware + animated counter)
   const rEl = document.getElementById('bizRating');
   if (b.rating_avg > 0){
     const count = b.rating_count || 0;
     const noun = count === 1 ? 'review' : 'reviews';
-    rEl.innerHTML = `<span class="num">⭐ ${Number(b.rating_avg).toFixed(1)}</span><span class="rc">(${count} ${noun})</span>`;
+    rEl.innerHTML = `<span class="num">⭐ <span id="ratingNum">0.0</span></span><span class="rc">(${count} ${noun})</span>`;
+    // Animate the rating number 0 → target
+    animateNumber(document.getElementById('ratingNum'), Number(b.rating_avg), 1000);
   } else {
     rEl.innerHTML = '<span style="color:var(--muted);font-weight:600;font-size:.85rem">⭐ No reviews yet</span>';
+  }
+
+  // Admin Verified premium badge
+  if (b.verified_visit){
+    const av = document.getElementById('adminVerified');
+    av.innerHTML = `
+      <div class="admin-verified-badge">
+        <div class="av-icon">🛡️</div>
+        <div>
+          <div class="av-text">Admin Verified</div>
+          <div class="av-sub">Personally verified by DukanList team</div>
+        </div>
+      </div>`;
+    av.style.display = '';
+  }
+
+  // Open Now / Closed status
+  const openInfo = getOpenStatus(b.hours_json);
+  if (openInfo){
+    const el = document.getElementById('openStatus');
+    el.innerHTML = `<span class="open-status ${openInfo.open ? 'open' : 'closed'}">
+      <span class="dot"></span>${openInfo.label}
+    </span>`;
+  }
+
+  // Distance from user (if business has lat/lng)
+  if (b.lat && b.lng){
+    getDistance(Number(b.lat), Number(b.lng)).then(dist => {
+      if (dist == null) return;
+      const distStr = dist < 1
+        ? Math.round(dist * 1000) + ' m away'
+        : dist.toFixed(1) + ' km away';
+      document.getElementById('distancePill').innerHTML =
+        `<span class="distance-pill">📍 ${distStr}</span>`;
+    });
   }
 
   // Verification badges
@@ -644,6 +805,9 @@ function render(){
   content.style.display = '';
   content.classList.add('fade-in');
 
+  // Bind lightbox to gallery (after DOM populated)
+  bindLightbox();
+
   // Sticky bottom CTA (mobile)
   const stickyBar = document.getElementById('stickyCtaBar');
   const stickyCall = document.getElementById('stickyCall');
@@ -661,6 +825,141 @@ function swapImg(idx, el){
   document.getElementById('mainImg').src = photos[idx];
   document.querySelectorAll('.gallery .thumbs img').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
+}
+
+// ====== Lightbox (photo viewer) ======
+let LIGHTBOX_IDX = 0;
+function openLightbox(idx){
+  const photos = (BIZ && BIZ.photos) || [];
+  if (!photos.length) return;
+  LIGHTBOX_IDX = idx || 0;
+  document.getElementById('lightboxImg').src = photos[LIGHTBOX_IDX];
+  document.getElementById('lightboxImg').alt = (BIZ.name || '') + ' photo ' + (LIGHTBOX_IDX + 1);
+  document.getElementById('lightboxCounter').textContent = (LIGHTBOX_IDX + 1) + ' / ' + photos.length;
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  // Show/hide nav based on photo count
+  const showNav = photos.length > 1;
+  document.querySelector('.lightbox-prev').style.display = showNav ? '' : 'none';
+  document.querySelector('.lightbox-next').style.display = showNav ? '' : 'none';
+  document.getElementById('lightboxCounter').style.display = showNav ? '' : 'none';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function lightboxPrev(){
+  const photos = (BIZ && BIZ.photos) || [];
+  if (!photos.length) return;
+  LIGHTBOX_IDX = (LIGHTBOX_IDX - 1 + photos.length) % photos.length;
+  document.getElementById('lightboxImg').src = photos[LIGHTBOX_IDX];
+  document.getElementById('lightboxCounter').textContent = (LIGHTBOX_IDX + 1) + ' / ' + photos.length;
+}
+function lightboxNext(){
+  const photos = (BIZ && BIZ.photos) || [];
+  if (!photos.length) return;
+  LIGHTBOX_IDX = (LIGHTBOX_IDX + 1) % photos.length;
+  document.getElementById('lightboxImg').src = photos[LIGHTBOX_IDX];
+  document.getElementById('lightboxCounter').textContent = (LIGHTBOX_IDX + 1) + ' / ' + photos.length;
+}
+// Keyboard navigation for lightbox
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('lightbox').classList.contains('show')) return;
+  if (e.key === 'Escape') closeLightbox();
+  else if (e.key === 'ArrowLeft') lightboxPrev();
+  else if (e.key === 'ArrowRight') lightboxNext();
+});
+// Wire up main image click → lightbox (after render)
+function bindLightbox(){
+  const mainImg = document.getElementById('mainImg');
+  if (mainImg){
+    mainImg.addEventListener('click', () => openLightbox(0));
+  }
+  document.querySelectorAll('.gallery .thumbs img').forEach((thumb, i) => {
+    thumb.addEventListener('dblclick', () => openLightbox(i));
+  });
+}
+
+// ====== Animated number counter ======
+function animateNumber(el, target, duration){
+  if (!el) return;
+  duration = duration || 1000;
+  const start = 0;
+  const startTime = performance.now();
+  function tick(now){
+    const elapsed = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - elapsed, 3); // ease-out cubic
+    const current = start + (target - start) * eased;
+    el.textContent = current.toFixed(1);
+    if (elapsed < 1) requestAnimationFrame(tick);
+    else el.textContent = target.toFixed(1);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ====== Open Now / Closed status ======
+function getOpenStatus(hoursJson){
+  if (!hoursJson || typeof hoursJson !== 'object' || !Object.keys(hoursJson).length) return null;
+  const now = new Date();
+  const dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+  const todayKey = dayKeys[now.getDay()];
+  const entry = hoursJson[todayKey];
+  if (!entry){
+    return { open: false, label: 'Hours not set' };
+  }
+  if (entry.closed){
+    return { open: false, label: 'Closed today' };
+  }
+  if (!entry.open || !entry.close){
+    return { open: false, label: 'Closed' };
+  }
+  const [oh, om] = entry.open.split(':').map(Number);
+  const [ch, cm] = entry.close.split(':').map(Number);
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const opens = oh * 60 + om;
+  const closes = ch * 60 + cm;
+  if (cur >= opens && cur < closes){
+    return { open: true, label: 'Open now · Closes ' + entry.close };
+  }
+  if (cur < opens){
+    return { open: false, label: 'Closed · Opens ' + entry.open };
+  }
+  return { open: false, label: 'Closed for today' };
+}
+
+// ====== Distance from user (Haversine + Geolocation) ======
+function haversineKm(lat1, lon1, lat2, lon2){
+  const R = 6371;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2) ** 2
+          + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+function getDistance(bizLat, bizLng){
+  return new Promise((resolve) => {
+    if (!navigator.geolocation){ resolve(null); return; }
+    // Use cached position if available within 5 min
+    const cached = sessionStorage.getItem('user_geo');
+    if (cached){
+      try{
+        const { lat, lng, t } = JSON.parse(cached);
+        if (Date.now() - t < 5 * 60 * 1000){
+          return resolve(haversineKm(lat, lng, bizLat, bizLng));
+        }
+      }catch(_) {}
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        sessionStorage.setItem('user_geo', JSON.stringify({ lat, lng, t: Date.now() }));
+        resolve(haversineKm(lat, lng, bizLat, bizLng));
+      },
+      () => resolve(null),
+      { timeout: 5000, maximumAge: 5 * 60 * 1000 }
+    );
+  });
 }
 
 function renderHours(h){
@@ -787,7 +1086,18 @@ async function submitReview(){
   }
 
   const btn = document.getElementById('submitReviewBtn');
-  btn.disabled = true; btn.textContent = '⏳ Submitting...';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+  // Show a subtle loading row on the modal
+  let loadingRow = document.getElementById('reviewLoadingRow');
+  if (!loadingRow){
+    loadingRow = document.createElement('div');
+    loadingRow.id = 'reviewLoadingRow';
+    loadingRow.className = 'review-submitting';
+    loadingRow.innerHTML = '<span class="spinner"></span> Posting your review...';
+    btn.parentElement.insertAdjacentElement('beforebegin', loadingRow);
+  }
 
   try {
     const hash = await sha256Hex('+91' + phone);
@@ -801,9 +1111,10 @@ async function submitReview(){
     });
     if (error){ throw error; }
 
+    if (loadingRow) loadingRow.remove();
     okEl.textContent = '✓ Thank you! Your review is live.';
     okEl.style.display = 'block';
-    btn.textContent = 'Submitted ✓'; btn.disabled = true;
+    btn.innerHTML = '<span>Submitted ✓</span>';
 
     setTimeout(() => {
       closeReviewModal();
@@ -812,6 +1123,7 @@ async function submitReview(){
       location.reload();
     }, 1500);
   } catch(e){
+    if (loadingRow) loadingRow.remove();
     btn.disabled = false; btn.innerHTML = '<span>Submit ✓</span>';
     const msg = (e.message || '').includes('duplicate') || (e.message || '').includes('unique')
       ? 'You have already reviewed this shop from this number.'
