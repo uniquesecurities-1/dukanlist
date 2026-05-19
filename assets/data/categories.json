@@ -1,21 +1,129 @@
 {
-  "version": "1.0",
-  "updated": "2026-05-18",
-  "categories": [
-    { "slug": "doctor",      "name": "Doctors & Clinics",        "name_hi": "डॉक्टर एवं क्लिनिक",      "icon": "🩺", "color": "#0EA5E9", "examples": "Physician, dentist, eye, ENT, pediatric" },
-    { "slug": "pharmacy",    "name": "Medical Store / Pharmacy", "name_hi": "मेडिकल स्टोर",            "icon": "💊", "color": "#10B981", "examples": "Chemist, pharmacy, surgical, ortho" },
-    { "slug": "lawyer",      "name": "Lawyers & Notaries",       "name_hi": "वकील एवं नोटरी",          "icon": "⚖️", "color": "#7C2D12", "examples": "Advocate, notary, court, registration" },
-    { "slug": "ca",          "name": "CA / Tax Consultants",     "name_hi": "CA / टैक्स कंसल्टेंट",      "icon": "🧮", "color": "#1E40AF", "examples": "GST, ITR, audit, accounts" },
-    { "slug": "carpenter",   "name": "Carpenter (Lakdi-Mistri)", "name_hi": "बढ़ई / लकड़ी का मिस्त्री",  "icon": "🔨", "color": "#92400E", "examples": "Furniture, door, window, custom work" },
-    { "slug": "plumber",     "name": "Plumber",                  "name_hi": "प्लंबर / नलसाज़",          "icon": "🚰", "color": "#0891B2", "examples": "Water, sewage, RO, geyser" },
-    { "slug": "electrician", "name": "Electrician",              "name_hi": "इलेक्ट्रीशियन",           "icon": "⚡", "color": "#F59E0B", "examples": "Wiring, fan, AC, inverter repair" },
-    { "slug": "used-car",    "name": "Second-hand Car Dealers",  "name_hi": "सेकंड हैंड कार",           "icon": "🚗", "color": "#7C3AED", "examples": "Used cars, exchange, finance" },
-    { "slug": "new-car",     "name": "New Car / Bike Showroom",  "name_hi": "नई कार / बाइक",           "icon": "🚙", "color": "#DB2777", "examples": "Authorized dealers, EVs" },
-    { "slug": "restaurant",  "name": "Restaurants & Dhaba",      "name_hi": "रेस्टोरेंट / ढाबा",         "icon": "🍴", "color": "#DC2626", "examples": "Dine-in, takeaway, dhaba, fast food" },
-    { "slug": "sweets",      "name": "Sweets & Caterers",        "name_hi": "मिठाई / केटरर",           "icon": "🍬", "color": "#F97316", "examples": "Halwai, marriage caterers, snacks" },
-    { "slug": "grocery",     "name": "Grocery / Kirana Store",   "name_hi": "किराना स्टोर",            "icon": "🛒", "color": "#16A34A", "examples": "FMCG, daily essentials" },
-    { "slug": "clothes",     "name": "Clothes / Tailor",         "name_hi": "कपड़ा / दर्ज़ी",           "icon": "👔", "color": "#A855F7", "examples": "Garments, tailoring, alterations" },
-    { "slug": "jewellery",   "name": "Jewellery",                "name_hi": "जौहरी / सोना-चाँदी",       "icon": "💍", "color": "#D97706", "examples": "Gold, silver, diamond, repair" },
-    { "slug": "salon",       "name": "Salon / Beauty Parlour",   "name_hi": "सैलून / ब्यूटी पार्लर",    "icon": "💇", "color": "#EC4899", "examples": "Mens salon, ladies parlour, bridal" }
+  "version": "2.0",
+  "updated": "2026-05-19",
+  "note": "Fallback hierarchy. Live data fetched from Supabase categories table when available.",
+  "parents": [
+    {
+      "slug": "healthcare", "name": "Healthcare & Medical", "name_hi": "स्वास्थ्य एवं चिकित्सा", "icon": "🏥", "color": "#0EA5E9",
+      "subs": [
+        { "slug": "doctor", "name": "Doctors & Clinics", "name_hi": "डॉक्टर एवं क्लिनिक", "icon": "🩺" },
+        { "slug": "pharmacy", "name": "Medical Store / Pharmacy", "name_hi": "मेडिकल स्टोर", "icon": "💊" },
+        { "slug": "dentist", "name": "Dentist / Dental Clinic", "name_hi": "डेंटिस्ट / दांत डॉक्टर", "icon": "🦷" },
+        { "slug": "pathology-lab", "name": "Pathology Lab", "name_hi": "पैथोलॉजी लैब", "icon": "🧪" },
+        { "slug": "physiotherapist", "name": "Physiotherapist", "name_hi": "फिजियोथेरेपिस्ट", "icon": "🧑‍⚕️" },
+        { "slug": "hospital", "name": "Hospital / Nursing Home", "name_hi": "अस्पताल / नर्सिंग होम", "icon": "🏨" },
+        { "slug": "ayurveda", "name": "Ayurvedic Doctor", "name_hi": "आयुर्वेदिक डॉक्टर", "icon": "🌿" },
+        { "slug": "homeopathy", "name": "Homeopathy Doctor", "name_hi": "होम्योपैथी डॉक्टर", "icon": "⚪" },
+        { "slug": "eye-care", "name": "Eye Care / Optometrist", "name_hi": "नेत्र चिकित्सक / चश्मा", "icon": "👓" },
+        { "slug": "veterinary", "name": "Veterinary / Pet Doctor", "name_hi": "पशु चिकित्सक", "icon": "🐾" }
+      ]
+    },
+    {
+      "slug": "financial-services", "name": "Financial Services", "name_hi": "वित्तीय सेवाएं", "icon": "💰", "color": "#1E40AF",
+      "subs": [
+        { "slug": "mutual-fund-distributor", "name": "Mutual Fund Distributor", "name_hi": "म्यूचुअल फंड डिस्ट्रीब्यूटर", "icon": "📊" },
+        { "slug": "stock-broker", "name": "Stock Broker / Sub-Broker", "name_hi": "स्टॉक ब्रोकर / सब ब्रोकर", "icon": "📈" },
+        { "slug": "ca", "name": "CA / Tax Consultants", "name_hi": "CA / टैक्स कंसल्टेंट", "icon": "🧮" },
+        { "slug": "tax-consultant", "name": "Tax Consultant (ITR / GST)", "name_hi": "टैक्स कंसल्टेंट", "icon": "🧾" },
+        { "slug": "financial-advisor", "name": "Financial Advisor / Planner", "name_hi": "फाइनेंशियल एडवाइजर", "icon": "💼" },
+        { "slug": "loan-agent", "name": "Loan Agent / DSA", "name_hi": "लोन एजेंट", "icon": "🏦" }
+      ]
+    },
+    {
+      "slug": "insurance", "name": "Insurance", "name_hi": "बीमा", "icon": "🛡️", "color": "#047857",
+      "subs": [
+        { "slug": "insurance-life", "name": "Insurance Advisor — Life", "name_hi": "जीवन बीमा सलाहकार", "icon": "❤️" },
+        { "slug": "insurance-health", "name": "Insurance Advisor — Health", "name_hi": "स्वास्थ्य बीमा सलाहकार", "icon": "🏥" },
+        { "slug": "insurance-general", "name": "Insurance Advisor — General", "name_hi": "सामान्य बीमा सलाहकार", "icon": "🚙" }
+      ]
+    },
+    {
+      "slug": "home-services", "name": "Home Services", "name_hi": "घरेलू सेवाएं", "icon": "🔧", "color": "#92400E",
+      "subs": [
+        { "slug": "carpenter", "name": "Carpenter (Lakdi-Mistri)", "name_hi": "बढ़ई / लकड़ी का मिस्त्री", "icon": "🔨" },
+        { "slug": "plumber", "name": "Plumber", "name_hi": "प्लंबर / नलसाज़", "icon": "🚰" },
+        { "slug": "electrician", "name": "Electrician", "name_hi": "इलेक्ट्रीशियन", "icon": "⚡" },
+        { "slug": "painter", "name": "Painter (House / Commercial)", "name_hi": "पेंटर / रंगाई", "icon": "🎨" },
+        { "slug": "ac-repair", "name": "AC / Fridge Repair", "name_hi": "AC / फ्रिज मरम्मत", "icon": "❄️" },
+        { "slug": "ro-repair", "name": "RO / Water Purifier", "name_hi": "RO / वाटर प्यूरिफायर", "icon": "💧" },
+        { "slug": "pest-control", "name": "Pest Control", "name_hi": "पेस्ट कंट्रोल", "icon": "🐜" },
+        { "slug": "maid-service", "name": "Maid / Cook Service", "name_hi": "मेड / कुक सेवा", "icon": "🧹" },
+        { "slug": "cleaning-service", "name": "Cleaning Service", "name_hi": "क्लीनिंग सर्विस", "icon": "🧽" },
+        { "slug": "packers-movers", "name": "Packers & Movers", "name_hi": "पैकर्स एंड मूवर्स", "icon": "📦" }
+      ]
+    },
+    {
+      "slug": "automotive", "name": "Automotive", "name_hi": "ऑटोमोटिव", "icon": "🚗", "color": "#7C3AED",
+      "subs": [
+        { "slug": "used-car", "name": "Second-hand Car Dealers", "name_hi": "सेकंड हैंड कार डीलर", "icon": "🚗" },
+        { "slug": "new-car", "name": "New Car / Bike Showroom", "name_hi": "नई कार / बाइक शोरूम", "icon": "🚙" },
+        { "slug": "mechanic-2w", "name": "Mechanic — 2 Wheeler", "name_hi": "मैकेनिक — दोपहिया", "icon": "🏍️" },
+        { "slug": "mechanic-4w", "name": "Mechanic — 4 Wheeler", "name_hi": "मैकेनिक — चारपहिया", "icon": "🚙" },
+        { "slug": "car-service", "name": "Car Service Station", "name_hi": "कार सर्विस सेंटर", "icon": "🔧" },
+        { "slug": "tyre-shop", "name": "Tyre Shop", "name_hi": "टायर शॉप", "icon": "🛞" },
+        { "slug": "spare-parts", "name": "Auto Spare Parts", "name_hi": "ऑटो स्पेयर पार्ट्स", "icon": "⚙️" },
+        { "slug": "battery-shop", "name": "Battery Shop", "name_hi": "बैटरी की दुकान", "icon": "🔋" },
+        { "slug": "car-wash", "name": "Car / Bike Wash", "name_hi": "कार / बाइक वॉश", "icon": "🚿" }
+      ]
+    },
+    {
+      "slug": "food-beverage", "name": "Food & Beverage", "name_hi": "खाद्य एवं पेय", "icon": "🍴", "color": "#DC2626",
+      "subs": [
+        { "slug": "restaurant", "name": "Restaurants & Dhaba", "name_hi": "रेस्टोरेंट एवं ढाबा", "icon": "🍴" },
+        { "slug": "sweets", "name": "Sweets & Caterers", "name_hi": "मिठाई एवं केटरर", "icon": "🍬" },
+        { "slug": "bakery", "name": "Bakery / Cake Shop", "name_hi": "बेकरी / केक शॉप", "icon": "🎂" },
+        { "slug": "tiffin-service", "name": "Tiffin / Mess Service", "name_hi": "टिफिन सर्विस / मेस", "icon": "🍱" },
+        { "slug": "cafe", "name": "Cafe / Coffee Shop", "name_hi": "कैफे / कॉफी शॉप", "icon": "☕" },
+        { "slug": "juice-corner", "name": "Juice / Shake Corner", "name_hi": "जूस / शेक कॉर्नर", "icon": "🥤" },
+        { "slug": "ice-cream", "name": "Ice Cream Parlour", "name_hi": "आइसक्रीम पार्लर", "icon": "🍦" }
+      ]
+    },
+    {
+      "slug": "retail-shopping", "name": "Retail & Shopping", "name_hi": "रिटेल / दुकान", "icon": "🛍️", "color": "#16A34A",
+      "subs": [
+        { "slug": "grocery", "name": "Grocery / Kirana Store", "name_hi": "किराना स्टोर", "icon": "🛒" },
+        { "slug": "clothes", "name": "Clothes / Tailor", "name_hi": "कपड़ा / दर्ज़ी", "icon": "👔" },
+        { "slug": "jewellery", "name": "Jewellery", "name_hi": "जौहरी / सोना-चाँदी", "icon": "💍" },
+        { "slug": "mobile-shop", "name": "Mobile / Recharge Shop", "name_hi": "मोबाइल / रिचार्ज शॉप", "icon": "📱" },
+        { "slug": "electronics", "name": "Electronics / Appliances", "name_hi": "इलेक्ट्रॉनिक्स", "icon": "📺" },
+        { "slug": "footwear", "name": "Footwear / Shoes", "name_hi": "जूते / चप्पल", "icon": "👞" },
+        { "slug": "stationery", "name": "Stationery / Books", "name_hi": "स्टेशनरी / किताबें", "icon": "📚" },
+        { "slug": "gift-shop", "name": "Gift Shop / Cards", "name_hi": "गिफ्ट शॉप", "icon": "🎁" },
+        { "slug": "general-store", "name": "General Store", "name_hi": "जनरल स्टोर", "icon": "🏪" }
+      ]
+    },
+    {
+      "slug": "beauty-wellness", "name": "Beauty & Wellness", "name_hi": "सौंदर्य एवं स्वास्थ्य", "icon": "💇", "color": "#EC4899",
+      "subs": [
+        { "slug": "salon", "name": "Salon / Beauty Parlour", "name_hi": "सैलून / ब्यूटी पार्लर", "icon": "💇" },
+        { "slug": "gym", "name": "Gym / Fitness Center", "name_hi": "जिम / फिटनेस सेंटर", "icon": "💪" },
+        { "slug": "yoga-center", "name": "Yoga / Meditation Center", "name_hi": "योग केंद्र", "icon": "🧘" },
+        { "slug": "spa", "name": "Spa / Massage Center", "name_hi": "स्पा / मसाज सेंटर", "icon": "💆" },
+        { "slug": "mehndi-artist", "name": "Mehndi / Henna Artist", "name_hi": "मेहंदी आर्टिस्ट", "icon": "🌿" }
+      ]
+    },
+    {
+      "slug": "education", "name": "Education & Training", "name_hi": "शिक्षा एवं प्रशिक्षण", "icon": "🎓", "color": "#4F46E5",
+      "subs": [
+        { "slug": "tuition-coaching", "name": "Tuition / Coaching Center", "name_hi": "ट्यूशन / कोचिंग", "icon": "✏️" },
+        { "slug": "music-dance", "name": "Music / Dance Classes", "name_hi": "संगीत / नृत्य क्लास", "icon": "🎵" },
+        { "slug": "computer-classes", "name": "Computer / IT Classes", "name_hi": "कंप्यूटर क्लासेस", "icon": "💻" },
+        { "slug": "english-speaking", "name": "English Speaking Classes", "name_hi": "अंग्रेजी भाषा क्लास", "icon": "🗣️" },
+        { "slug": "driving-school", "name": "Driving School", "name_hi": "ड्राइविंग स्कूल", "icon": "🚦" }
+      ]
+    },
+    {
+      "slug": "professional-services", "name": "Professional Services", "name_hi": "पेशेवर सेवाएं", "icon": "👔", "color": "#1F2937",
+      "subs": [
+        { "slug": "lawyer", "name": "Lawyers & Notaries", "name_hi": "वकील एवं नोटरी", "icon": "⚖️" },
+        { "slug": "architect", "name": "Architect / Civil Engineer", "name_hi": "आर्किटेक्ट / इंजीनियर", "icon": "📐" },
+        { "slug": "interior-designer", "name": "Interior Designer", "name_hi": "इंटीरियर डिज़ाइनर", "icon": "🛋️" },
+        { "slug": "property-dealer", "name": "Property Dealer / Real Estate", "name_hi": "प्रॉपर्टी डीलर", "icon": "🏘️" },
+        { "slug": "photographer", "name": "Photographer / Videographer", "name_hi": "फोटोग्राफर", "icon": "📷" },
+        { "slug": "wedding-planner", "name": "Wedding / Event Planner", "name_hi": "वेडिंग प्लानर", "icon": "💐" },
+        { "slug": "event-management", "name": "Event Management", "name_hi": "इवेंट मैनेजमेंट", "icon": "🎪" },
+        { "slug": "printing-press", "name": "Printing Press / Visiting Cards", "name_hi": "प्रिंटिंग प्रेस", "icon": "🖨️" }
+      ]
+    }
   ]
 }

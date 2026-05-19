@@ -9,6 +9,78 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  /* ===== Multi-category chip widget ===== */
+  .cat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 12px;
+    min-height: 38px;
+    padding: 8px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 10px;
+    background: #fafafa;
+  }
+  .cat-chips:empty::before {
+    content: attr(data-empty);
+    color: #9ca3af;
+    font-size: 13px;
+    font-style: italic;
+    padding: 4px 6px;
+  }
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px 6px 6px;
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .cat-chip.primary {
+    background: #FFFBEB;
+    border-color: #F59E0B;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+  }
+  .cat-chip .chip-star {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 2px;
+    line-height: 1;
+  }
+  .cat-chip .chip-star:hover { transform: scale(1.2); }
+  .cat-chip .chip-name { white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+  .cat-chip .chip-parent { color: #6b7280; font-size: 11px; font-weight: 400; margin-left: 2px; }
+  .cat-chip .chip-remove {
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 14px;
+    padding: 0 4px;
+    line-height: 1;
+    border-radius: 50%;
+  }
+  .cat-chip .chip-remove:hover { color: #dc2626; background: #fee2e2; }
+  .cat-helper {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .cat-helper b { color: #F59E0B; }
+  .cat-counter {
+    display: inline-block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+  .cat-counter.full { color: #dc2626; }
+</style>
 </head>
 <body>
 
@@ -121,12 +193,31 @@
       <span data-i18n-hi>अपनी दुकान के बारे में बताएं।</span>
     </div>
 
+    <!-- ===== MULTI-CATEGORY SELECTOR ===== -->
     <div class="form-group">
-      <label><span data-i18n-en>Business Category</span><span data-i18n-hi>व्यवसाय श्रेणी</span><span class="req">*</span></label>
-      <select id="categoryId" class="select">
-        <option value="" data-i18n-en="— Select category —" data-i18n-hi="— श्रेणी चुनें —">— Select category —</option>
+      <label>
+        <span data-i18n-en>Business Categories</span><span data-i18n-hi>व्यवसाय श्रेणियाँ</span>
+        <span class="req">*</span>
+        <span class="cat-counter" id="catCounter">0 / 5</span>
+      </label>
+
+      <!-- Selected chips -->
+      <div id="selectedCatsList" class="cat-chips"
+           data-empty="Add 1-5 categories from below ↓">
+      </div>
+
+      <!-- Add-category dropdown -->
+      <select id="catSelect" class="select" onchange="handleAddCategory(event)">
+        <option value="" data-i18n-en="+ Add a category" data-i18n-hi="+ श्रेणी जोड़ें">+ Add a category</option>
+        <!-- optgroups + options populated by JS -->
       </select>
+
+      <div class="cat-helper">
+        <span data-i18n-en>Select 1 to 5 categories. First one becomes <b>Primary ⭐</b>. Tap a chip's ⭐ to change primary, or ✕ to remove.</span>
+        <span data-i18n-hi>1 से 5 श्रेणियाँ चुनें। पहली <b>प्राइमरी ⭐</b> बनती है। बदलने के लिए ⭐ या हटाने के लिए ✕ क्लिक करें।</span>
+      </div>
     </div>
+
     <div class="form-group">
       <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span><span class="req">*</span></label>
       <input id="bizName" class="input" type="text" placeholder="e.g. Sharma Carpentry Works" maxlength="80">
@@ -359,7 +450,6 @@ async function handleSendOTP(){
     errEl.style.display = 'flex';
     return;
   }
-  // Success — show OTP block
   STATE.phone = OTP.cleanMobile(mobile);
   document.getElementById('otpToMobile').textContent = STATE.phone;
   document.getElementById('otpToMobileHi').textContent = STATE.phone;
@@ -416,7 +506,6 @@ async function handleVerifyOTP(){
     return;
   }
   STATE.user = res.user;
-  // Pre-fill WhatsApp with same as mobile
   document.getElementById('whatsapp').placeholder = STATE.phone;
   await loadCategoriesIntoSelect();
   await loadStatesIntoSelect();
@@ -424,44 +513,204 @@ async function handleVerifyOTP(){
 }
 
 // ============================================================
-// STEP 2 — Business details
+// STEP 2 — Multi-category selector + business details
 // ============================================================
+
+// In-memory state for chip widget
+const CAT_STATE = {
+  catsById: {},       // id → { id, slug, name, name_hi, icon, parent_slug, parent_name }
+  selected: [],       // array of category IDs in selection order
+  primaryId: null     // ID of category marked PRIMARY
+};
+
+const MAX_CATS = 5;
+
 async function loadCategoriesIntoSelect(){
-  try{
-    const r = await fetch('/assets/data/categories.json', { cache:'no-cache' });
-    const data = await r.json();
-    const c = ShopDB.client;
-    let cats = data.categories;
-    // Get real IDs from Supabase
-    if (c){
-      const { data: dbCats } = await c.from('categories').select('id, slug, name, name_hi, icon').eq('active', true).order('sort_order');
-      if (dbCats && dbCats.length) cats = dbCats;
+  const sel = document.getElementById('catSelect');
+  // Wipe options (keep first placeholder)
+  while (sel.options.length > 1) sel.remove(1);
+
+  const c = ShopDB.client;
+  let parents = [];
+
+  // Try Supabase first (source of truth)
+  if (c){
+    try{
+      const { data: rows, error } = await c.from('categories')
+        .select('id, slug, name, name_hi, icon, color, parent_id, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (error) throw error;
+      // Build parent → subs tree
+      const byId = {};
+      rows.forEach(r => { byId[r.id] = r; });
+      const topLevel = rows.filter(r => !r.parent_id);
+      parents = topLevel.map(p => ({
+        ...p,
+        subs: rows.filter(r => r.parent_id === p.id)
+      }));
+    }catch(e){
+      console.warn('Supabase categories fetch failed, falling back to JSON', e);
     }
-    const sel = document.getElementById('categoryId');
-    cats.forEach(cat => {
+  }
+
+  // Fallback to bundled categories.json
+  if (!parents.length){
+    try{
+      const r = await fetch('/assets/data/categories.json', { cache:'no-cache' });
+      const data = await r.json();
+      // Synthesize id from slug (negative numbers so they never collide with real DB ids)
+      let fakeId = -1;
+      parents = (data.parents || []).map(p => {
+        const pid = fakeId--;
+        return {
+          id: pid, slug: p.slug, name: p.name, name_hi: p.name_hi, icon: p.icon,
+          subs: (p.subs || []).map(s => ({
+            id: fakeId--, slug: s.slug, name: s.name, name_hi: s.name_hi, icon: s.icon,
+            parent_id: pid
+          }))
+        };
+      });
+    }catch(e){ console.error('Categories load fail', e); return; }
+  }
+
+  // Build cache + optgroups
+  parents.forEach(p => {
+    const og = document.createElement('optgroup');
+    og.label = (p.icon || '') + '  ' + p.name + (p.name_hi ? ' / ' + p.name_hi : '');
+    p.subs.forEach(s => {
+      CAT_STATE.catsById[s.id] = {
+        id: s.id,
+        slug: s.slug,
+        name: s.name,
+        name_hi: s.name_hi || '',
+        icon: s.icon || '',
+        parent_id: p.id,
+        parent_slug: p.slug,
+        parent_name: p.name,
+        parent_icon: p.icon || ''
+      };
       const opt = document.createElement('option');
-      opt.value = cat.id || cat.slug;
-      opt.textContent = (cat.icon || '') + ' ' + cat.name + (cat.name_hi ? ' / ' + cat.name_hi : '');
-      sel.appendChild(opt);
+      opt.value = String(s.id);
+      opt.textContent = (s.icon || '') + '  ' + s.name + (s.name_hi ? ' · ' + s.name_hi : '');
+      og.appendChild(opt);
     });
-  }catch(e){ console.error('Categories load fail', e); }
+    sel.appendChild(og);
+  });
+}
+
+function handleAddCategory(e){
+  const sel = e.target;
+  const id = parseInt(sel.value, 10);
+  sel.value = ''; // reset dropdown
+  if (!id) return;
+
+  if (CAT_STATE.selected.length >= MAX_CATS){
+    flashStep2Err('Maximum ' + MAX_CATS + ' categories allowed', 'अधिकतम ' + MAX_CATS + ' श्रेणियाँ चुन सकते हैं');
+    return;
+  }
+  if (CAT_STATE.selected.includes(id)){
+    flashStep2Err('Already selected', 'पहले से चुनी गई है');
+    return;
+  }
+
+  CAT_STATE.selected.push(id);
+  if (CAT_STATE.primaryId === null) CAT_STATE.primaryId = id;
+  renderChips();
+}
+
+function setPrimary(id){
+  if (!CAT_STATE.selected.includes(id)) return;
+  CAT_STATE.primaryId = id;
+  renderChips();
+}
+
+function removeCat(id){
+  const idx = CAT_STATE.selected.indexOf(id);
+  if (idx < 0) return;
+  CAT_STATE.selected.splice(idx, 1);
+  if (CAT_STATE.primaryId === id){
+    CAT_STATE.primaryId = CAT_STATE.selected.length ? CAT_STATE.selected[0] : null;
+  }
+  renderChips();
+}
+
+function renderChips(){
+  const list = document.getElementById('selectedCatsList');
+  const counter = document.getElementById('catCounter');
+  list.innerHTML = '';
+
+  CAT_STATE.selected.forEach(id => {
+    const cat = CAT_STATE.catsById[id];
+    if (!cat) return;
+    const isPrimary = (id === CAT_STATE.primaryId);
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip' + (isPrimary ? ' primary' : '');
+    chip.innerHTML =
+      '<span class="chip-star" title="' + (isPrimary ? 'Primary category' : 'Set as primary') + '" data-id="' + id + '" data-act="primary">' +
+        (isPrimary ? '⭐' : '☆') +
+      '</span>' +
+      '<span class="chip-name">' + (cat.icon || '') + ' ' + escapeHtml(cat.name) +
+        '<span class="chip-parent"> · ' + escapeHtml(cat.parent_name) + '</span>' +
+      '</span>' +
+      '<span class="chip-remove" title="Remove" data-id="' + id + '" data-act="remove">✕</span>';
+    list.appendChild(chip);
+  });
+
+  // Counter
+  const n = CAT_STATE.selected.length;
+  counter.textContent = n + ' / ' + MAX_CATS;
+  counter.classList.toggle('full', n >= MAX_CATS);
+}
+
+// Delegated chip clicks
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-act]');
+  if (!t) return;
+  const id = parseInt(t.dataset.id, 10);
+  const act = t.dataset.act;
+  if (act === 'primary') setPrimary(id);
+  else if (act === 'remove') removeCat(id);
+});
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+function flashStep2Err(en, hi){
+  const errEl = document.getElementById('step2Err');
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  errEl.textContent = (lang === 'hi' && hi) ? hi : en;
+  errEl.style.display = 'flex';
+  clearTimeout(flashStep2Err._t);
+  flashStep2Err._t = setTimeout(() => { errEl.style.display = 'none'; }, 3000);
 }
 
 function handleStep2(){
   const errEl = document.getElementById('step2Err');
   errEl.style.display = 'none';
-  const cat = document.getElementById('categoryId').value;
-  const name = document.getElementById('bizName').value.trim();
+
+  if (CAT_STATE.selected.length === 0){
+    return showErr(errEl, 'Please select at least 1 category');
+  }
+  if (CAT_STATE.primaryId === null){
+    return showErr(errEl, 'Please mark one category as Primary (tap the star)');
+  }
+
+  const name  = document.getElementById('bizName').value.trim();
   const owner = document.getElementById('ownerName').value.trim();
-  if (!cat) { errEl.textContent = 'Please select a category'; errEl.style.display='flex'; return; }
-  if (name.length < 3) { errEl.textContent = 'Shop name must be at least 3 characters'; errEl.style.display='flex'; return; }
-  if (owner.length < 3) { errEl.textContent = 'Owner name required'; errEl.style.display='flex'; return; }
-  STATE.data.categoryId = cat;
-  STATE.data.name       = name;
-  STATE.data.nameHi     = document.getElementById('bizNameHi').value.trim();
-  STATE.data.ownerName  = owner;
-  STATE.data.whatsapp   = document.getElementById('whatsapp').value.trim() || STATE.phone;
-  STATE.data.email      = document.getElementById('email').value.trim();
+  if (name.length < 3)  return showErr(errEl, 'Shop name must be at least 3 characters');
+  if (owner.length < 3) return showErr(errEl, 'Owner name required');
+
+  STATE.data.categoryIds        = CAT_STATE.selected.slice();
+  STATE.data.primaryCategoryId  = CAT_STATE.primaryId;
+  STATE.data.name      = name;
+  STATE.data.nameHi    = document.getElementById('bizNameHi').value.trim();
+  STATE.data.ownerName = owner;
+  STATE.data.whatsapp  = document.getElementById('whatsapp').value.trim() || STATE.phone;
+  STATE.data.email     = document.getElementById('email').value.trim();
   goToStep(3);
 }
 
@@ -472,7 +721,6 @@ async function loadStatesIntoSelect(){
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
   const states = await Geo.loadStates();
   if (!states.length){
-    // Fallback static list (in case Supabase not yet wired)
     Geo.fillSelect(document.getElementById('stateId'),
       [{id:1,name:'Haryana',name_hi:'हरियाणा'},{id:2,name:'Punjab',name_hi:'पंजाब'},{id:3,name:'Rajasthan',name_hi:'राजस्थान'},{id:4,name:'Delhi',name_hi:'दिल्ली'},{id:5,name:'Uttar Pradesh',name_hi:'उत्तर प्रदेश'}],
       '— Select state —', lang);
@@ -507,7 +755,6 @@ async function onCityChange(){
   if (!cityId) return;
   const locs = await Geo.loadLocalities(cityId);
   Geo.fillSelect(document.getElementById('localityId'), locs, '— Optional locality —', lang);
-  // Auto-fill pincode from first option if only one
   const cityOpt = document.querySelector('#cityId option:checked');
   if (cityOpt && cityOpt.dataset.pincodes){
     const pins = cityOpt.dataset.pincodes.split(',').filter(Boolean);
@@ -559,7 +806,7 @@ function handleStep3(){
 function showErr(el, msg){ el.textContent = msg; el.style.display = 'flex'; }
 
 // ============================================================
-// STEP 4 — USP + final submit
+// STEP 4 — USP + final submit (calls register_business_v2)
 // ============================================================
 async function handleSubmit(){
   const errEl = document.getElementById('step4Err');
@@ -578,8 +825,17 @@ async function handleSubmit(){
     btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>'; return;
   }
 
-  const { data, error } = await c.rpc('register_business', {
-    p_category_id  : +STATE.data.categoryId,
+  // Sanity: ensure all selected IDs are real DB ids (positive ints).
+  // If user got here from offline JSON fallback, the IDs are negative — block submission.
+  const badIds = STATE.data.categoryIds.filter(id => !Number.isInteger(id) || id <= 0);
+  if (badIds.length){
+    showErr(errEl, 'Categories not loaded from server. Please refresh the page and try again.');
+    btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>'; return;
+  }
+
+  const { data, error } = await c.rpc('register_business_v2', {
+    p_category_ids        : STATE.data.categoryIds,
+    p_primary_category_id : STATE.data.primaryCategoryId,
     p_name         : STATE.data.name,
     p_name_hi      : STATE.data.nameHi || null,
     p_owner_name   : STATE.data.ownerName,
