@@ -260,7 +260,17 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   </div>
 </div>
 
-<footer class="site">
+<!-- Mobile sticky bottom CTA (Call + WhatsApp always reachable) -->
+<div class="sticky-cta-bar" id="stickyCtaBar" style="display:none">
+  <a class="cta-btn cta-call" id="stickyCall" href="#">
+    📞 <span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span>
+  </a>
+  <a class="cta-btn cta-wa" id="stickyWa" href="#" target="_blank" rel="noopener">
+    💬 WhatsApp
+  </a>
+</div>
+
+<footer class="site" style="margin-bottom:60px">
   © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
 </footer>
 
@@ -351,6 +361,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/nav.js" defer></script>
 <script>
 function setLang(lang){
   if (lang!=='en'&&lang!=='hi') lang='en';
@@ -600,6 +611,17 @@ function render(){
   const content = document.getElementById('bizContent');
   content.style.display = '';
   content.classList.add('fade-in');
+
+  // Sticky bottom CTA (mobile)
+  const stickyBar = document.getElementById('stickyCtaBar');
+  const stickyCall = document.getElementById('stickyCall');
+  const stickyWa = document.getElementById('stickyWa');
+  if (stickyCall) stickyCall.href = 'tel:' + b.mobile;
+  if (stickyWa)   stickyWa.href = `https://wa.me/${wa}?text=${waMsg}`;
+  if (stickyBar)  stickyBar.style.display = '';
+  document.body.classList.add('has-sticky-cta');
+  if (stickyCall) stickyCall.addEventListener('click', () => logLead('call'));
+  if (stickyWa)   stickyWa.addEventListener('click', () => logLead('whatsapp'));
 }
 
 function swapImg(idx, el){

@@ -370,3 +370,205 @@ body{ animation: fadeIn .25s ease-out }
 /* ============================================================
    END POLISH PACK
    ============================================================ */
+
+
+/* ============================================================
+   MOBILE-FIRST PACK — Hamburger nav, sticky CTAs, touch targets
+   ============================================================ */
+
+/* ----- Hamburger menu (mobile) ----- */
+.hamburger{
+  display: none;
+  width: 40px; height: 40px;
+  border: none; background: rgba(255,255,255,.10);
+  color: #fff; border-radius: 9px;
+  font-size: 1.2rem; cursor: pointer;
+  align-items: center; justify-content: center;
+  font-family: inherit;
+  transition: background .15s;
+}
+.hamburger:hover{ background: rgba(255,255,255,.18) }
+.hamburger:active{ transform: scale(.95) }
+.hamburger-icon{
+  display: inline-flex; flex-direction: column; gap: 4px;
+}
+.hamburger-icon span{
+  width: 18px; height: 2px; background: #fff;
+  border-radius: 2px; transition: transform .2s, opacity .2s;
+}
+.hamburger.open .hamburger-icon span:nth-child(1){ transform: translateY(6px) rotate(45deg) }
+.hamburger.open .hamburger-icon span:nth-child(2){ opacity: 0 }
+.hamburger.open .hamburger-icon span:nth-child(3){ transform: translateY(-6px) rotate(-45deg) }
+
+/* Mobile nav drawer (slide-in from right) */
+@media (max-width: 720px) {
+  .hamburger{ display: flex }
+  .nav-links{
+    position: fixed; top: 60px; right: 0;
+    width: 80vw; max-width: 280px; min-height: calc(100vh - 60px);
+    background: var(--indigo-deep);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0; padding: 20px 16px;
+    transform: translateX(100%);
+    transition: transform .25s ease;
+    box-shadow: -8px 0 30px rgba(0,0,0,.4);
+    z-index: 49;
+    overflow-y: auto;
+  }
+  .nav-links.open{ transform: translateX(0) }
+  .nav-links a{
+    padding: 14px 16px; font-size: 1rem;
+    border-radius: 10px; width: 100%;
+    text-align: left; min-height: 48px;
+    display: flex; align-items: center;
+  }
+  .nav-links a:hover{ background: rgba(255,255,255,.10) }
+  .nav-cta{ margin-top: 12px; text-align: center; justify-content: center }
+  .lang-toggle{ margin: 0 0 16px; align-self: center }
+
+  /* Backdrop when menu open */
+  .nav-backdrop{
+    display: none;
+    position: fixed; inset: 60px 0 0 0;
+    background: rgba(0,0,0,.5); z-index: 48;
+    animation: fadeIn .2s ease;
+  }
+  .nav-backdrop.show{ display: block }
+}
+
+/* ----- Touch target sizes (44px minimum, Apple HIG) ----- */
+.btn, button.btn,
+.nav-cta,
+.cta-btn {
+  min-height: 44px;
+}
+.input, input.input, select.select, textarea.textarea {
+  min-height: 44px;
+  font-size: 16px; /* prevents iOS zoom on focus */
+}
+/* OTP input — keep larger */
+.otp-input { min-height: 56px; font-size: 1.4rem }
+
+/* ----- Mobile search bar (stack on small screens) ----- */
+@media (max-width: 680px) {
+  .search-card{
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  .search-bar{
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+}
+
+/* ----- Sticky bottom CTA (for business profile, etc.) ----- */
+.sticky-cta-bar{
+  display: none;
+}
+@media (max-width: 760px) {
+  .sticky-cta-bar{
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap: 8px;
+    z-index: 40;
+    box-shadow: 0 -4px 18px rgba(0,0,0,.08);
+  }
+  .sticky-cta-bar .cta-btn{
+    flex: 1; padding: 12px 8px; font-size: .9rem;
+    min-height: 48px;
+  }
+  /* Body padding so content not hidden by sticky bar */
+  body.has-sticky-cta{ padding-bottom: 72px }
+}
+
+/* ----- Card grid mobile improvements ----- */
+@media (max-width: 560px) {
+  /* Search results: 1 column instead of 2 (focuses attention) */
+  .biz-grid{
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  /* Category browse: 2 col on small phones */
+  .cats-grid{
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ----- Mobile typography refinement ----- */
+@media (max-width: 480px) {
+  body{ font-size: 15px }
+  h1.title{ font-size: 1.35rem }
+  .subtitle{ font-size: .88rem; margin-bottom: 18px }
+  .card-title{ font-size: .98rem }
+  .card-sub{ font-size: .82rem }
+  .alert{ font-size: .85rem; padding: 10px 12px }
+  .help, .opt{ font-size: .76rem }
+}
+
+/* ----- Form row → single column on mobile ----- */
+@media (max-width: 560px) {
+  .form-row{
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* ----- Better tap area for icon-only buttons ----- */
+.icon-btn{
+  width: 40px; height: 40px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  border-radius: 50%; cursor: pointer;
+  transition: background .15s;
+}
+.icon-btn:hover{ background: rgba(0,0,0,.06) }
+.icon-btn:active{ transform: scale(.92) }
+
+/* ----- Safer modal on mobile ----- */
+@media (max-width: 480px) {
+  .modal-card, [class*="modal"] > div:first-child {
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    border-radius: 14px 14px 0 0 !important;
+    margin-top: auto;
+  }
+  .modal-overlay{ align-items: flex-end !important; padding: 0 !important }
+}
+
+/* ----- Better scroll for horizontal lists (admin tables, photo strip) ----- */
+.scroll-x{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.scroll-x::-webkit-scrollbar{ height: 5px }
+.scroll-x::-webkit-scrollbar-thumb{
+  background: var(--line); border-radius: 99px;
+}
+
+/* ----- Disable text selection on UI elements ----- */
+.btn, .nav-links a, .cta-btn, .icon-btn, .hamburger,
+.lang-toggle button, .step, .vbadge, .verify-pill {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ----- Tap highlight color (subtle brand) ----- */
+* { -webkit-tap-highlight-color: rgba(255,107,26,.15) }
+
+/* ----- Safe-area padding for notched phones ----- */
+@supports (padding: max(0px)) {
+  .topbar{ padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)) }
+  footer.site{ padding-bottom: max(24px, calc(24px + env(safe-area-inset-bottom))) }
+}
+
+/* ============================================================
+   END MOBILE-FIRST PACK
+   ============================================================ */
