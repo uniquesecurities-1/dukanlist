@@ -417,6 +417,74 @@ function showNotFound(){
   document.getElementById('notFound').style.display = '';
 }
 
+// ====== Schema.org LocalBusiness JSON-LD for rich Google snippets ======
+function injectSchemaOrg(b){
+  const url = location.origin + '/business.html?slug=' + b.slug;
+  const photos = (b.photos && b.photos.length) ? b.photos : [];
+  const cat = b.categories || {};
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": url + "#business",
+    "name": b.name,
+    "url": url,
+    "description": b.usp_text || ('Local business — ' + (cat.name || '')),
+    "telephone": '+91' + (b.mobile || '').replace(/[^\d]/g, ''),
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": [b.address_line1, b.address_line2].filter(Boolean).join(', '),
+      "addressLocality": b.geo_cities && b.geo_cities.name ? b.geo_cities.name : '',
+      "postalCode": b.pincode || '',
+      "addressCountry": "IN"
+    }
+  };
+
+  if (b.lat && b.lng){
+    schema.geo = { "@type": "GeoCoordinates", "latitude": b.lat, "longitude": b.lng };
+  }
+  if (photos.length) schema.image = photos;
+  if (b.email) schema.email = b.email;
+
+  // Aggregate rating (only if has reviews)
+  if (b.rating_avg > 0 && b.rating_count > 0){
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": Number(b.rating_avg).toFixed(1),
+      "reviewCount": b.rating_count,
+      "bestRating": "5",
+      "worstRating": "1"
+    };
+  }
+
+  // Opening hours (if business has set them)
+  if (b.hours_json && typeof b.hours_json === 'object'){
+    const dayMap = { mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday', fri:'Friday', sat:'Saturday', sun:'Sunday' };
+    const hours = [];
+    Object.keys(b.hours_json).forEach(d => {
+      const entry = b.hours_json[d];
+      if (entry && !entry.closed && entry.open && entry.close && dayMap[d]){
+        hours.push({
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": dayMap[d],
+          "opens": entry.open,
+          "closes": entry.close
+        });
+      }
+    });
+    if (hours.length) schema.openingHoursSpecification = hours;
+  }
+
+  // Inject as JSON-LD script tag
+  const existing = document.getElementById('schema-org-ld');
+  if (existing) existing.remove();
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = 'schema-org-ld';
+  script.textContent = JSON.stringify(schema, null, 2);
+  document.head.appendChild(script);
+}
+
 function render(){
   const b = BIZ;
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
@@ -427,6 +495,9 @@ function render(){
   document.getElementById('ogTitle').content = b.name;
   document.getElementById('ogDesc').content = (b.usp_text || '').slice(0,160);
   document.getElementById('canonicalLink').href = location.origin + '/business.html?slug=' + b.slug;
+
+  // Schema.org LocalBusiness JSON-LD (rich Google snippets)
+  injectSchemaOrg(b);
 
   // Gallery
   const photos = b.photos || [];
