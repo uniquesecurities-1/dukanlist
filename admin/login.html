@@ -7,50 +7,88 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Admin Login — DukanList</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:radial-gradient(ellipse at top, #1E293B 0%, #0F172A 70%);
     min-height:100vh;display:flex;align-items:center;justify-content:center;
-    padding:20px;color:#f1f5f9;
+    padding:20px;color:#f1f5f9;letter-spacing:-0.01em;
   }
   .login-card{
-    background:white;color:#0F172A;border-radius:16px;
-    padding:32px 28px;width:100%;max-width:400px;
-    box-shadow:0 25px 50px rgba(0,0,0,0.5);
+    background:white;color:#0F172A;border-radius:18px;
+    padding:36px 32px;width:100%;max-width:420px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
   }
-  .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:20px;font-weight:800}
-  .brand .badge{font-size:11px;font-weight:700;background:#6366F1;color:white;padding:3px 8px;border-radius:6px;letter-spacing:0.5px}
-  h1{font-size:24px;margin:18px 0 6px;font-weight:800}
-  .sub{font-size:14px;color:#64748b;margin-bottom:22px}
-  label{display:block;font-size:13px;font-weight:600;color:#334155;margin-bottom:6px}
+  .brand{
+    display:flex;align-items:center;gap:12px;margin-bottom:6px;
+    font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.025em;
+  }
+  .brand .badge{
+    font-size:10px;font-weight:800;background:#0F172A;color:white;
+    padding:3px 9px;border-radius:6px;letter-spacing:0.08em;
+  }
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-size:24px;margin:18px 0 6px;font-weight:800;letter-spacing:-0.025em;
+  }
+  .sub{font-size:14px;color:#64748b;margin-bottom:24px;line-height:1.55}
+  label{
+    display:block;font-size:12px;font-weight:700;color:#475569;
+    margin-bottom:7px;text-transform:uppercase;letter-spacing:0.06em;
+  }
   .input{
     width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;
-    font-size:16px;outline:none;font-family:inherit;transition:border-color .15s;
+    font-size:15px;outline:none;font-family:inherit;transition:all .15s;
+    background:#fafafa;
   }
-  .input:focus{border-color:#6366F1;box-shadow:0 0 0 3px rgba(99,102,241,0.15)}
+  .input:focus{border-color:#0F172A;background:#fff;box-shadow:0 0 0 3px rgba(15,23,42,0.08)}
   .help{font-size:12px;color:#94a3b8;margin-top:6px}
   .btn{
-    width:100%;padding:13px 16px;background:#6366F1;color:white;border:none;
-    border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;
-    margin-top:14px;transition:background .15s;font-family:inherit;
+    width:100%;padding:13px 16px;background:#0F172A;color:white;border:none;
+    border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
+    margin-top:14px;transition:all .15s;font-family:inherit;letter-spacing:-0.01em;
   }
-  .btn:hover:not(:disabled){background:#4F46E5}
+  .btn:hover:not(:disabled){background:#1E293B;transform:translateY(-1px);box-shadow:0 8px 24px rgba(15,23,42,0.3)}
   .btn:disabled{background:#94a3b8;cursor:not-allowed}
-  .btn-ghost{background:transparent;color:#6366F1;border:1.5px solid #e2e8f0;margin-top:8px}
-  .btn-ghost:hover:not(:disabled){background:#f1f5f9}
-  .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:flex;gap:8px}
+  .btn-ghost{background:transparent;color:#0F172A;border:1.5px solid #e2e8f0;margin-top:8px}
+  .btn-ghost:hover:not(:disabled){background:#f1f5f9;border-color:#cbd5e1}
+  .alert{padding:11px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:flex;gap:8px;line-height:1.5}
   .alert.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
   .alert.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
   .alert.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+  .alert.warn{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
   .otp-input{
-    text-align:center;letter-spacing:8px;font-size:22px;font-weight:700;
+    text-align:center;letter-spacing:12px;font-size:24px;font-weight:800;
+    font-family:'Inter',monospace;
   }
   .form-group{margin-bottom:14px}
-  a{color:#6366F1;text-decoration:none;font-weight:600}
-  a:hover{text-decoration:underline}
-  .footer{text-align:center;margin-top:18px;font-size:12px;color:#94a3b8}
+  a{color:#0F172A;text-decoration:none;font-weight:700;border-bottom:1px solid transparent;transition:.15s}
+  a:hover{border-bottom-color:#0F172A}
+  .footer{text-align:center;margin-top:20px;font-size:12px;color:#94a3b8}
+
+  /* MFA QR code styles */
+  .qr-wrap{
+    background:#fafafa;border:1.5px solid #e2e8f0;border-radius:12px;
+    padding:18px;margin:14px 0;text-align:center;
+  }
+  .qr-wrap svg{ max-width:200px;height:auto;display:block;margin:0 auto }
+  .qr-secret{
+    margin-top:12px;padding:10px 12px;background:#fff;border:1px dashed #cbd5e1;
+    border-radius:8px;font-family:'Inter',monospace;font-size:12px;
+    word-break:break-all;color:#475569;font-weight:600;letter-spacing:.05em;
+  }
+  .qr-secret-label{font-size:11px;color:#94a3b8;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+
+  /* Step indicator */
+  .step-badge{
+    display:inline-block;background:#FEF3C7;color:#92400E;padding:3px 10px;
+    border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.05em;
+    text-transform:uppercase;margin-bottom:10px;
+  }
+  .step-badge.green{background:#DCFCE7;color:#166534}
+  .step-badge.purple{background:#EDE9FE;color:#5B21B6}
 </style>
 </head>
 <body>
@@ -58,39 +96,79 @@
 <div class="login-card">
   <div class="brand">
     <span>🛡️</span>
-    <span>Dukan<em style="font-style:normal;color:#6366F1">List</em></span>
+    <span>Dukan<em style="font-style:normal;color:#0F172A">List</em></span>
     <span class="badge">ADMIN</span>
   </div>
 
-  <h1>Admin Login</h1>
-  <p class="sub">Mobile OTP-based access. Admin role required.</p>
+  <h1 id="hTitle">Admin Login</h1>
+  <p class="sub" id="hSub">Email + Password + 2FA. Bank-level security.</p>
 
-  <!-- Phone block -->
-  <div id="phoneBlock">
+  <!-- ===== STEP 1: Email + Password ===== -->
+  <div id="stepPassword">
     <div class="form-group">
-      <label for="phone">Admin Mobile Number</label>
-      <input id="phone" class="input" type="tel" placeholder="+91 9541223377" inputmode="numeric" maxlength="13" autofocus>
-      <div class="help">Registered admin mobile only</div>
+      <label for="email">Admin Email</label>
+      <input id="email" class="input" type="email" placeholder="you@example.com" autocomplete="username" autofocus>
     </div>
-    <div class="alert error" id="phoneErr" style="display:none"></div>
-    <button class="btn" id="sendBtn" onclick="handleSendOTP()">Send OTP →</button>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="help">Forgot? Email Supabase project owner to reset.</div>
+    </div>
+    <div class="alert error" id="loginErr" style="display:none"></div>
+    <button class="btn" id="loginBtn" onclick="handleLogin()">Continue →</button>
   </div>
 
-  <!-- OTP block -->
-  <div id="otpBlock" style="display:none">
+  <!-- ===== STEP 2A: MFA ENROLL (first-time) ===== -->
+  <div id="stepEnroll" style="display:none">
+    <div class="step-badge purple">FIRST-TIME SETUP</div>
+    <p class="sub" style="margin-bottom:14px">
+      Scan this QR with <b>Google Authenticator</b>, <b>Microsoft Authenticator</b>, <b>Authy</b>,
+      or any TOTP app. Then enter the 6-digit code.
+    </p>
+
+    <div class="qr-wrap">
+      <div id="qrContainer"></div>
+      <div class="qr-secret-label">Or enter secret manually:</div>
+      <div class="qr-secret" id="qrSecret">—</div>
+    </div>
+
     <div class="form-group">
-      <label for="otp">6-digit OTP</label>
-      <input id="otp" class="input otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="------">
-      <div class="help">
-        Sent to <b id="phoneSent"></b>.
-        <a href="#" onclick="changePhone(event)">Change</a>
+      <label for="enrollCode">6-digit code from app</label>
+      <input id="enrollCode" class="input otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="------" autocomplete="one-time-code">
+    </div>
+
+    <div class="alert error" id="enrollErr" style="display:none"></div>
+    <button class="btn" id="enrollBtn" onclick="handleEnroll()">Verify & Enable 2FA →</button>
+    <button class="btn btn-ghost" onclick="goBack()">← Cancel</button>
+  </div>
+
+  <!-- ===== STEP 2B: MFA VERIFY (returning user) ===== -->
+  <div id="stepVerify" style="display:none">
+    <div class="step-badge green">2FA REQUIRED</div>
+    <p class="sub" style="margin-bottom:14px">
+      Open your authenticator app and enter the 6-digit code for <b>DukanList Admin</b>.
+    </p>
+
+    <div class="form-group">
+      <label for="verifyCode">6-digit code</label>
+      <input id="verifyCode" class="input otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="------" autocomplete="one-time-code">
+    </div>
+
+    <div class="alert error" id="verifyErr" style="display:none"></div>
+    <button class="btn" id="verifyBtn" onclick="handleVerify()">Verify →</button>
+    <button class="btn btn-ghost" onclick="goBack()">← Use different account</button>
+  </div>
+
+  <!-- ===== LOCKOUT SCREEN ===== -->
+  <div id="stepLocked" style="display:none">
+    <div class="alert warn">
+      <span>🔒</span>
+      <div>
+        <b>Account temporarily locked.</b><br>
+        Too many failed attempts. Please try again in <span id="lockTimer">30</span> minutes.
       </div>
     </div>
-    <div class="alert error" id="otpErr" style="display:none"></div>
-    <button class="btn" id="verifyBtn" onclick="handleVerifyOTP()">Verify & Login →</button>
-    <button class="btn btn-ghost" id="resendBtn" onclick="handleResend()" disabled>
-      Resend OTP <span id="resendTmr"></span>
-    </button>
+    <button class="btn btn-ghost" onclick="goBack()">← Back to login</button>
   </div>
 
   <div class="footer">
@@ -100,102 +178,277 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
-<script src="/assets/js/otp.js"></script>
 <script>
-let state = { phone: '' };
-let resendCounter = 0, resendInterval = null;
+'use strict';
+const c = ShopDB.client;
 
-async function handleSendOTP(){
-  const btn = document.getElementById('sendBtn');
-  const mobile = document.getElementById('phone').value.trim();
-  const errEl = document.getElementById('phoneErr');
+// State
+let CURRENT_FACTOR_ID = null;
+let CURRENT_CHALLENGE_ID = null;
+let LOGIN_EMAIL = '';
+
+// =========================================================
+// STEP 1: Email + Password login
+// =========================================================
+async function handleLogin(){
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+  const errEl = document.getElementById('loginErr');
   errEl.style.display = 'none';
-  if (!OTP.isValidIndianMobile(mobile)){
-    errEl.textContent = 'Enter a valid 10-digit Indian mobile';
-    errEl.style.display = 'flex'; return;
-  }
-  btn.disabled = true; btn.textContent = '⏳ Sending...';
-  const res = await OTP.sendOTP(mobile);
-  btn.disabled = false; btn.textContent = 'Send OTP →';
-  if (!res.ok){
-    errEl.textContent = res.error || 'Failed to send OTP';
-    errEl.style.display = 'flex'; return;
-  }
-  state.phone = OTP.cleanMobile(mobile);
-  document.getElementById('phoneSent').textContent = state.phone;
-  document.getElementById('phoneBlock').style.display = 'none';
-  document.getElementById('otpBlock').style.display = '';
-  document.getElementById('otp').focus();
-  startResendTimer();
-}
 
-function startResendTimer(){
-  resendCounter = 30;
-  const btn = document.getElementById('resendBtn');
-  const tmr = document.getElementById('resendTmr');
-  btn.disabled = true;
-  if (resendInterval) clearInterval(resendInterval);
-  resendInterval = setInterval(() => {
-    resendCounter--;
-    tmr.textContent = '(' + resendCounter + 's)';
-    if (resendCounter <= 0){
-      clearInterval(resendInterval);
-      btn.disabled = false; tmr.textContent = '';
+  if (!email || !email.includes('@')){
+    errEl.textContent = 'Enter a valid email';
+    errEl.style.display = 'flex'; return;
+  }
+  if (!password || password.length < 6){
+    errEl.textContent = 'Enter your password (min 6 chars)';
+    errEl.style.display = 'flex'; return;
+  }
+
+  // Pre-login lockout check
+  try{
+    const { data: lockUntil } = await c.rpc('check_admin_lockout', { p_email: email });
+    if (lockUntil){
+      const mins = Math.ceil((new Date(lockUntil) - new Date()) / 60000);
+      showLocked(mins);
+      return;
     }
-  }, 1000);
-}
+  }catch(e){ /* RPC may not exist yet — non-blocking */ }
 
-async function handleResend(){
-  const res = await OTP.sendOTP(state.phone);
-  if (res.ok) startResendTimer();
-}
+  btn.disabled = true; btn.textContent = '⏳ Signing in...';
 
-function changePhone(e){
-  e.preventDefault();
-  document.getElementById('phoneBlock').style.display = '';
-  document.getElementById('otpBlock').style.display = 'none';
-  document.getElementById('phone').focus();
-}
+  const { data, error } = await c.auth.signInWithPassword({ email, password });
 
-async function handleVerifyOTP(){
-  const btn = document.getElementById('verifyBtn');
-  const token = document.getElementById('otp').value.trim();
-  const errEl = document.getElementById('otpErr');
-  errEl.style.display = 'none';
-  if (!/^\d{6}$/.test(token)){
-    errEl.textContent = 'Enter the 6-digit OTP';
-    errEl.style.display = 'flex'; return;
-  }
-  btn.disabled = true; btn.textContent = '⏳ Verifying...';
-  const res = await OTP.verifyOTP(state.phone, token);
-  if (!res.ok){
-    btn.disabled = false; btn.textContent = 'Verify & Login →';
-    errEl.textContent = res.error || 'Wrong OTP';
+  if (error){
+    btn.disabled = false; btn.textContent = 'Continue →';
+    // Record failed attempt
+    try { await c.rpc('record_admin_login_attempt', { p_email: email, p_success: false }); } catch(e){}
+    errEl.textContent = error.message.includes('Invalid') ? 'Wrong email or password' : (error.message || 'Login failed');
     errEl.style.display = 'flex'; return;
   }
 
-  // OTP verified — now check admin role
-  btn.textContent = '⏳ Checking admin role...';
-  const c = ShopDB.client;
-  const { data: isAdmin, error } = await c.rpc('is_admin');
-  if (error || !isAdmin){
-    btn.disabled = false; btn.textContent = 'Verify & Login →';
-    errEl.innerHTML = '<span>🚫</span><div><b>Not authorized.</b> Your mobile is not registered as admin. Contact super-admin.</div>';
-    errEl.style.display = 'flex';
-    // Sign out (since not admin)
+  LOGIN_EMAIL = email;
+
+  // Check admin role
+  const { data: isAdmin } = await c.rpc('is_admin');
+  if (!isAdmin){
     await c.auth.signOut();
+    btn.disabled = false; btn.textContent = 'Continue →';
+    errEl.innerHTML = '<span>🚫</span><div><b>Not authorized.</b> This account is not registered as admin.</div>';
+    errEl.style.display = 'flex';
+    try { await c.rpc('record_admin_login_attempt', { p_email: email, p_success: false }); } catch(e){}
     return;
   }
 
-  // Update last_login_at (best effort, ignore errors)
-  try{
-    await c.from('admin_users').update({ last_login_at: new Date().toISOString() })
-      .eq('auth_user_id', res.user.id);
-  }catch(e){ /* ignore */ }
+  // Check MFA enrollment status
+  const { data: aalData } = await c.auth.mfa.getAuthenticatorAssuranceLevel();
+  const { data: factorsData } = await c.auth.mfa.listFactors();
+  const totpFactor = (factorsData.totp || [])[0];
 
-  // All good — redirect to admin dashboard
-  window.location.href = '/admin/dashboard.html';
+  if (!totpFactor){
+    // No factor enrolled yet → first-time setup flow
+    await startEnrollment();
+    return;
+  }
+
+  // Factor exists → check current AAL
+  if (aalData.currentLevel === 'aal2'){
+    // Already at aal2 — go straight to dashboard
+    try { await c.rpc('record_admin_login_attempt', { p_email: email, p_success: true }); } catch(e){}
+    goToDashboard();
+    return;
+  }
+
+  // Need to verify MFA
+  CURRENT_FACTOR_ID = totpFactor.id;
+  await startMfaChallenge();
 }
+
+// =========================================================
+// STEP 2A: Enroll new TOTP factor (first-time)
+// =========================================================
+async function startEnrollment(){
+  showStep('stepEnroll');
+
+  const { data, error } = await c.auth.mfa.enroll({
+    factorType: 'totp',
+    friendlyName: 'DukanList Admin'
+  });
+
+  if (error){
+    document.getElementById('enrollErr').textContent = 'Failed to start enrollment: ' + error.message;
+    document.getElementById('enrollErr').style.display = 'flex';
+    return;
+  }
+
+  CURRENT_FACTOR_ID = data.id;
+  // QR code is provided as data URI image
+  const qrSvgOrImg = data.totp.qr_code;
+  const qrHost = document.getElementById('qrContainer');
+  if (qrSvgOrImg.startsWith('data:image')){
+    qrHost.innerHTML = '<img src="' + qrSvgOrImg + '" alt="QR Code" style="max-width:200px;width:100%">';
+  } else {
+    qrHost.innerHTML = qrSvgOrImg;
+  }
+  document.getElementById('qrSecret').textContent = data.totp.secret;
+  document.getElementById('enrollCode').focus();
+}
+
+async function handleEnroll(){
+  const btn = document.getElementById('enrollBtn');
+  const code = document.getElementById('enrollCode').value.trim();
+  const errEl = document.getElementById('enrollErr');
+  errEl.style.display = 'none';
+
+  if (!/^\d{6}$/.test(code)){
+    errEl.textContent = 'Enter the 6-digit code from your authenticator app';
+    errEl.style.display = 'flex'; return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ Verifying...';
+
+  // Challenge then verify in one go
+  const { data: ch, error: chErr } = await c.auth.mfa.challenge({ factorId: CURRENT_FACTOR_ID });
+  if (chErr){
+    btn.disabled = false; btn.textContent = 'Verify & Enable 2FA →';
+    errEl.textContent = chErr.message; errEl.style.display = 'flex'; return;
+  }
+
+  const { error } = await c.auth.mfa.verify({
+    factorId: CURRENT_FACTOR_ID,
+    challengeId: ch.id,
+    code: code
+  });
+
+  if (error){
+    btn.disabled = false; btn.textContent = 'Verify & Enable 2FA →';
+    errEl.textContent = 'Wrong code. Check your authenticator app and try again.';
+    errEl.style.display = 'flex'; return;
+  }
+
+  // Success! 2FA enrolled and verified
+  try { await c.rpc('record_admin_login_attempt', { p_email: LOGIN_EMAIL, p_success: true }); } catch(e){}
+  goToDashboard();
+}
+
+// =========================================================
+// STEP 2B: Verify existing factor (return visit)
+// =========================================================
+async function startMfaChallenge(){
+  showStep('stepVerify');
+  const { data, error } = await c.auth.mfa.challenge({ factorId: CURRENT_FACTOR_ID });
+  if (error){
+    document.getElementById('verifyErr').textContent = 'Failed to start challenge: ' + error.message;
+    document.getElementById('verifyErr').style.display = 'flex'; return;
+  }
+  CURRENT_CHALLENGE_ID = data.id;
+  document.getElementById('verifyCode').focus();
+}
+
+async function handleVerify(){
+  const btn = document.getElementById('verifyBtn');
+  const code = document.getElementById('verifyCode').value.trim();
+  const errEl = document.getElementById('verifyErr');
+  errEl.style.display = 'none';
+
+  if (!/^\d{6}$/.test(code)){
+    errEl.textContent = 'Enter the 6-digit code';
+    errEl.style.display = 'flex'; return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ Verifying...';
+
+  const { error } = await c.auth.mfa.verify({
+    factorId: CURRENT_FACTOR_ID,
+    challengeId: CURRENT_CHALLENGE_ID,
+    code: code
+  });
+
+  if (error){
+    btn.disabled = false; btn.textContent = 'Verify →';
+    try { await c.rpc('record_admin_login_attempt', { p_email: LOGIN_EMAIL, p_success: false }); } catch(e){}
+    errEl.textContent = 'Wrong code. Try again.';
+    errEl.style.display = 'flex'; return;
+  }
+
+  try { await c.rpc('record_admin_login_attempt', { p_email: LOGIN_EMAIL, p_success: true }); } catch(e){}
+  goToDashboard();
+}
+
+// =========================================================
+// Helpers
+// =========================================================
+function showStep(id){
+  ['stepPassword','stepEnroll','stepVerify','stepLocked'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = (s === id) ? '' : 'none';
+  });
+  // Adjust title
+  const titles = {
+    stepPassword: ['Admin Login', 'Email + Password + 2FA. Bank-level security.'],
+    stepEnroll:   ['Enable 2FA', 'Set up two-factor authentication. One-time, 60 seconds.'],
+    stepVerify:   ['Two-Factor Code', 'Enter the 6-digit code from your authenticator app.'],
+    stepLocked:   ['Account Locked', 'Too many failed attempts.']
+  };
+  if (titles[id]){
+    document.getElementById('hTitle').textContent = titles[id][0];
+    document.getElementById('hSub').textContent  = titles[id][1];
+  }
+}
+
+function showLocked(mins){
+  showStep('stepLocked');
+  document.getElementById('lockTimer').textContent = String(mins);
+}
+
+async function goBack(){
+  // Sign out current session, return to step 1
+  try { await c.auth.signOut(); } catch(e){}
+  LOGIN_EMAIL = '';
+  CURRENT_FACTOR_ID = null;
+  CURRENT_CHALLENGE_ID = null;
+  document.getElementById('password').value = '';
+  document.getElementById('enrollCode').value = '';
+  document.getElementById('verifyCode').value = '';
+  showStep('stepPassword');
+}
+
+async function goToDashboard(){
+  // Update last_login_at (best effort)
+  try{
+    const u = (await c.auth.getUser()).data.user;
+    if (u){
+      await c.from('admin_users')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('auth_user_id', u.id);
+    }
+  }catch(e){ /* ignore */ }
+  window.location.href = '/admin/dashboard';
+}
+
+// Enter-key submit shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const visStep = ['stepPassword','stepEnroll','stepVerify'].find(s => {
+    const el = document.getElementById(s);
+    return el && el.style.display !== 'none';
+  });
+  if (visStep === 'stepPassword') handleLogin();
+  else if (visStep === 'stepEnroll') handleEnroll();
+  else if (visStep === 'stepVerify') handleVerify();
+});
+
+// On load: if already aal2 logged in, jump to dashboard
+(async () => {
+  try{
+    const { data: aalData } = await c.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aalData && aalData.currentLevel === 'aal2'){
+      const { data: isAdmin } = await c.rpc('is_admin');
+      if (isAdmin) goToDashboard();
+    }
+  }catch(e){ /* ignore */ }
+})();
 </script>
 
 </body>
