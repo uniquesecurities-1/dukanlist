@@ -175,6 +175,9 @@
          We'll reject if elapsed < 3 sec. -->
     <input type="hidden" id="form_loaded_at" value="">
 
+    <!-- Cloudflare Turnstile widget (invisible — appears only if challenged) -->
+    <div id="turnstile-widget" style="margin-top:10px"></div>
+
     <div class="alert error" id="phoneErr" style="display:none"></div>
     <button class="btn btn-pri btn-block" onclick="handleStep1()" id="continueBtn">
       <span data-i18n-en>Continue →</span>
@@ -430,6 +433,16 @@ function setLang(lang){
   document.getElementById('langBtnHi').classList.toggle('active', lang === 'hi');
 }
 function loadSavedLang(){ setLang(localStorage.getItem('shop_lang') || 'en'); }
+
+// ============================================================
+// CLOUDFLARE TURNSTILE CONFIG
+// ============================================================
+// To enable: paste your Cloudflare Turnstile Site Key below.
+// Leave empty string '' to disable (honeypot + time-trap still work).
+// Get key at: https://dash.cloudflare.com → Turnstile → your site
+const TURNSTILE_SITE_KEY = '0x4AAAAAADTCiaNcPhC1u7gW';   // Cloudflare Turnstile — DukanList Registration widget
+let TURNSTILE_TOKEN = '';
+let TURNSTILE_WIDGET_ID = null;
 
 // ============================================================
 // REGISTRATION STATE
@@ -832,7 +845,19 @@ async function handleSubmit(){
   STATE.data.uspHi = document.getElementById('uspHi').value.trim();
 
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.innerHTML = '<span>⏳ Submitting...</span>';
+  btn.disabled = true; btn.innerHTML = '<span>⏳ Verifying...</span>';
+
+  // ===== CAPTCHA verification (Cloudflare Turnstile, if enabled) =====
+  if (TURNSTILE_SITE_KEY){
+    const token = await getTurnstileToken();
+    const tsOk = await verifyTurnstile(token);
+    if (!tsOk){
+      btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>';
+      return showErr(errEl, 'CAPTCHA verification failed. Please refresh and try again.');
+    }
+  }
+
+  btn.innerHTML = '<span>⏳ Submitting...</span>';
 
   const c = ShopDB.client;
   if (!c){
@@ -899,12 +924,83 @@ async function handleSubmit(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+// ============================================================
+// CLOUDFLARE TURNSTILE — invisible CAPTCHA
+// ============================================================
+function loadTurnstile(){
+  if (!TURNSTILE_SITE_KEY) return;     // not configured → skip
+  // Inject script if not present
+  if (!document.getElementById('cf-turnstile-script')){
+    const s = document.createElement('script');
+    s.id = 'cf-turnstile-script';
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+}
+
+// Called by Turnstile script once it's loaded
+window.onTurnstileLoad = function(){
+  if (!window.turnstile || !TURNSTILE_SITE_KEY) return;
+  const host = document.getElementById('turnstile-widget');
+  if (!host) return;
+  TURNSTILE_WIDGET_ID = window.turnstile.render(host, {
+    sitekey: TURNSTILE_SITE_KEY,
+    size: 'invisible',
+    callback: function(token){ TURNSTILE_TOKEN = token; },
+    'error-callback': function(){ TURNSTILE_TOKEN = ''; },
+    'expired-callback': function(){ TURNSTILE_TOKEN = ''; }
+  });
+};
+
+// Get a fresh Turnstile token (must be called BEFORE submit)
+async function getTurnstileToken(){
+  if (!TURNSTILE_SITE_KEY) return 'skipped';  // not configured → allow
+  if (!window.turnstile || TURNSTILE_WIDGET_ID == null) return null;
+  return new Promise((resolve) => {
+    try {
+      window.turnstile.reset(TURNSTILE_WIDGET_ID);
+      // Re-render forces a new token via callback
+      const checkToken = setInterval(() => {
+        if (TURNSTILE_TOKEN){
+          clearInterval(checkToken);
+          resolve(TURNSTILE_TOKEN);
+        }
+      }, 200);
+      // Timeout safety
+      setTimeout(() => { clearInterval(checkToken); resolve(TURNSTILE_TOKEN || null); }, 7000);
+    } catch(e){
+      console.warn('Turnstile token fetch failed', e);
+      resolve(null);
+    }
+  });
+}
+
+// Verify Turnstile token via backend
+async function verifyTurnstile(token){
+  if (!TURNSTILE_SITE_KEY) return true;   // not configured → bypass
+  if (!token) return false;
+  try {
+    const resp = await fetch('/api/verify-turnstile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token })
+    });
+    const data = await resp.json();
+    return !!data.success;
+  } catch(e){
+    console.warn('Turnstile verify endpoint failed', e);
+    return false;
+  }
+}
+
 // Boot
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedLang();
   // Anti-bot: record when the form loaded (humans take >3s to fill anything)
   const stamp = document.getElementById('form_loaded_at');
   if (stamp) stamp.value = String(Date.now());
+  loadTurnstile();   // load Cloudflare Turnstile if Site Key configured
   goToStep(1);
 });
 </script>
