@@ -161,6 +161,20 @@
       </div>
     </div>
 
+    <!-- Honeypot — hidden from real users, bots fill it.
+         Visually invisible + off-screen + tabindex=-1 + autocomplete="off".
+         If this field has a value at submit, we silently reject. -->
+    <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none">
+      <label for="hp_website">Website (leave blank)</label>
+      <input id="hp_website" name="website" type="text" tabindex="-1" autocomplete="off" value="">
+      <label for="hp_company">Company (leave blank)</label>
+      <input id="hp_company" name="company" type="text" tabindex="-1" autocomplete="off" value="">
+    </div>
+
+    <!-- Form load timestamp — bots submit too fast (< 2 sec).
+         We'll reject if elapsed < 3 sec. -->
+    <input type="hidden" id="form_loaded_at" value="">
+
     <div class="alert error" id="phoneErr" style="display:none"></div>
     <button class="btn btn-pri btn-block" onclick="handleStep1()" id="continueBtn">
       <span data-i18n-en>Continue →</span>
@@ -448,11 +462,37 @@ function goToStep(n){
 // ============================================================
 // STEP 1 — Quick Info (mobile only, NO OTP — WhatsApp verification later)
 // ============================================================
+// ===== BOT DETECTION =====
+function isBotSubmission(){
+  // Honeypot: if hidden fields are filled, it's a bot
+  const hp1 = (document.getElementById('hp_website')?.value || '').trim();
+  const hp2 = (document.getElementById('hp_company')?.value || '').trim();
+  if (hp1 !== '' || hp2 !== ''){
+    console.warn('[antibot] honeypot triggered');
+    return true;
+  }
+  // Time-trap: if form was loaded < 3 seconds ago, suspicious
+  const loadedAt = parseInt(document.getElementById('form_loaded_at')?.value || '0', 10);
+  if (loadedAt > 0 && (Date.now() - loadedAt) < 3000){
+    console.warn('[antibot] too fast — submission within 3 seconds of page load');
+    return true;
+  }
+  return false;
+}
+
 async function handleStep1(){
   const btn = document.getElementById('continueBtn');
   const mobileRaw = document.getElementById('phone').value.trim();
   const errEl = document.getElementById('phoneErr');
   errEl.style.display = 'none';
+
+  // Anti-bot
+  if (isBotSubmission()){
+    // Silent rejection — show generic error to avoid teaching bot how to bypass
+    errEl.textContent = 'Something went wrong. Please refresh and try again.';
+    errEl.style.display = 'flex';
+    return;
+  }
 
   // Validate 10-digit Indian mobile
   const mobile = mobileRaw.replace(/[^\d]/g, '');
@@ -780,6 +820,12 @@ function showErr(el, msg){ el.textContent = msg; el.style.display = 'flex'; }
 async function handleSubmit(){
   const errEl = document.getElementById('step4Err');
   errEl.style.display = 'none';
+
+  // Anti-bot check again at final submit (defense in depth)
+  if (isBotSubmission()){
+    return showErr(errEl, 'Something went wrong. Please refresh and try again.');
+  }
+
   const usp = document.getElementById('usp').value.trim();
   if (usp.length < 20) return showErr(errEl, 'USP must be at least 20 characters — tell us why customers choose you');
   STATE.data.usp   = usp;
@@ -856,6 +902,9 @@ async function handleSubmit(){
 // Boot
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedLang();
+  // Anti-bot: record when the form loaded (humans take >3s to fill anything)
+  const stamp = document.getElementById('form_loaded_at');
+  if (stamp) stamp.value = String(Date.now());
   goToStep(1);
 });
 </script>
