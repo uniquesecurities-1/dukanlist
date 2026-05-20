@@ -78,6 +78,58 @@
   .btn-approve:hover:not(:disabled){background:#059669}
   .btn-reject{background:#EF4444;color:white}
   .btn-reject:hover:not(:disabled){background:#DC2626}
+  .btn-danger-hard{
+    background:#7F1D1D; color:white;
+    border:1px solid #450A0A;
+  }
+  .btn-danger-hard:hover:not(:disabled){background:#450A0A;box-shadow:0 4px 14px rgba(127,29,29,.4)}
+
+  /* Confirm modal */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center;
+    z-index:2000; padding:16px;
+  }
+  .modal-backdrop.show{display:flex}
+  .modal-box{
+    background:white; border-radius:14px;
+    max-width:480px; width:100%;
+    padding:24px;
+    box-shadow:0 24px 60px rgba(0,0,0,.3);
+  }
+  .modal-box h2{
+    font-size:18px; font-weight:800; color:#7F1D1D;
+    margin-bottom:6px;
+  }
+  .modal-box .modal-warn{
+    background:#FEF2F2; border-left:3px solid #DC2626;
+    padding:12px 14px; border-radius:8px;
+    color:#7F1D1D; font-size:13px; line-height:1.55;
+    margin:12px 0;
+  }
+  .modal-box .modal-stats{
+    background:#F8FAFC; border-radius:8px;
+    padding:12px; font-size:12px; color:#475569;
+    margin:12px 0; line-height:1.6;
+  }
+  .modal-box .modal-stats b{ color:#0F172A }
+  .modal-box label{
+    font-size:12px; font-weight:700; color:#475569;
+    display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em;
+  }
+  .modal-box input[type=text]{
+    width:100%; padding:10px 12px;
+    border:2px solid #E2E8F0; border-radius:8px;
+    font-size:14px; font-family:inherit;
+  }
+  .modal-box input[type=text]:focus{
+    outline:none; border-color:#DC2626;
+  }
+  .modal-box .modal-actions{
+    display:flex; gap:10px; margin-top:18px; justify-content:flex-end;
+  }
   .btn-secondary{background:white;color:#475569;border:1.5px solid #e2e8f0}
   .btn-secondary:hover:not(:disabled){background:#f8fafc}
   .btn:disabled{opacity:0.6;cursor:not-allowed}
@@ -156,6 +208,43 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- ===== DELETE CONFIRMATION MODAL ===== -->
+<div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal-box">
+    <h2>🗑 Delete Shop Permanently</h2>
+    <div style="font-size:13px;color:#475569;line-height:1.55">
+      You are about to permanently delete <b id="deleteBizName" style="color:#0F172A"></b>.
+    </div>
+
+    <div class="modal-warn">
+      <b>⚠ This action cannot be undone.</b><br>
+      Everything below will be permanently erased from the database:
+      <ul style="margin:6px 0 0 18px;padding:0">
+        <li>Shop profile + all categories</li>
+        <li>All reviews from customers</li>
+        <li>All lead clicks (calls, WhatsApp, directions)</li>
+        <li>All photos in Storage</li>
+        <li>Any flags or moderation history</li>
+      </ul>
+    </div>
+
+    <div class="modal-stats" id="deleteStats" style="display:none"></div>
+
+    <label>Type the shop name to confirm:</label>
+    <input type="text" id="deleteConfirmInput" placeholder="" oninput="onDeleteConfirmInput(event)" autocomplete="off">
+    <div style="font-size:11px;color:#94A3B8;margin-top:4px">
+      Expected: <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px"><span id="deleteBizNameHint"></span></code>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger-hard" id="deleteConfirmBtn" onclick="confirmDeleteBusiness()" disabled>
+        🗑 Delete Permanently
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
@@ -288,6 +377,7 @@ function bizCard(b, kind){
         </a>
         <a class="btn btn-secondary" href="tel:+${(b.mobile||'').replace(/[^\\d]/g,'')}" title="Call shopkeeper">📞 Call</a>
         <button class="btn btn-reject" onclick="rejectBusiness('${b.id}','${escapeJs(b.name)}')">✕ Reject / Ban</button>
+        <button class="btn btn-danger-hard" onclick="deleteBusiness('${b.id}','${escapeJs(b.name)}')" title="Permanently delete shop + all data">🗑️ Delete Permanently</button>
         <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(b.slug)}" target="_blank">👁️ View Public Profile</a>
         <a class="btn btn-secondary" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/editor?table=businesses&filter=id::eq::${b.id}" target="_blank">🗄️ Edit in DB</a>
       </div>
@@ -338,6 +428,91 @@ async function rejectBusiness(id, name){
   document.getElementById('biz-' + id)?.remove();
   await loadPending();
   await loadFlaggedBiz();
+}
+
+async function deleteBusiness(id, name){
+  // Show custom confirmation modal — type-to-confirm pattern
+  const modal = document.getElementById('deleteModal');
+  document.getElementById('deleteBizName').textContent = name;
+  document.getElementById('deleteBizNameHint').textContent = name;
+  document.getElementById('deleteConfirmInput').value = '';
+  document.getElementById('deleteConfirmBtn').disabled = true;
+
+  modal.dataset.bizId = id;
+  modal.dataset.bizName = name;
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById('deleteConfirmInput').focus(), 100);
+}
+
+function onDeleteConfirmInput(e){
+  const expected = document.getElementById('deleteModal').dataset.bizName || '';
+  const typed = e.target.value;
+  document.getElementById('deleteConfirmBtn').disabled = (typed !== expected);
+}
+
+function closeDeleteModal(){
+  document.getElementById('deleteModal').classList.remove('show');
+}
+
+async function confirmDeleteBusiness(){
+  const modal = document.getElementById('deleteModal');
+  const id = modal.dataset.bizId;
+  const name = modal.dataset.bizName;
+  const btn = document.getElementById('deleteConfirmBtn');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Deleting...';
+
+  // Step 1: Call RPC to hard-delete + get photo URLs back
+  const { data, error } = await C.rpc('admin_delete_business', { p_business_id: id });
+  if (error){
+    btn.disabled = false;
+    btn.textContent = '🗑 Delete Permanently';
+    toast('Delete failed: ' + error.message, 'error');
+    return;
+  }
+
+  // Step 2: Clean up photos from Supabase Storage (if any)
+  let photoNote = '';
+  if (data && Array.isArray(data.photos_to_cleanup) && data.photos_to_cleanup.length){
+    const paths = data.photos_to_cleanup
+      .map(url => extractStoragePath(url))
+      .filter(Boolean);
+    if (paths.length){
+      try {
+        const { error: storErr } = await C.storage.from('shop-photos').remove(paths);
+        if (storErr){
+          console.warn('Storage cleanup partial:', storErr);
+          photoNote = ' (storage cleanup needs manual review)';
+        } else {
+          photoNote = ' · ' + paths.length + ' photo(s) cleaned';
+        }
+      } catch (e){
+        console.warn('Storage cleanup exception:', e);
+        photoNote = ' (storage cleanup failed)';
+      }
+    }
+  }
+
+  closeDeleteModal();
+
+  // Step 3: Toast + refresh
+  toast('🗑 "' + name + '" deleted permanently' + photoNote, 'success');
+  document.getElementById('biz-' + id)?.remove();
+  await loadPending();
+  await loadFlaggedBiz();
+  await loadFlags();
+}
+
+// Extract storage object path from public URL
+// e.g. https://xxx.supabase.co/storage/v1/object/public/shop-photos/<biz-id>/photo1.jpg
+// returns: <biz-id>/photo1.jpg
+function extractStoragePath(url){
+  if (!url) return null;
+  const marker = '/shop-photos/';
+  const idx = String(url).indexOf(marker);
+  if (idx < 0) return null;
+  return String(url).slice(idx + marker.length);
 }
 
 async function resolveFlag(id, action){
