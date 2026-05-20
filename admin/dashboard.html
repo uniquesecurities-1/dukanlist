@@ -86,7 +86,8 @@
   </div>
   <nav class="nav">
     <a href="/admin/dashboard.html" class="active">📊 Dashboard</a>
-    <a href="/admin/moderation.html">⚖️ Moderation</a>
+    <a href="/admin/moderation.html">⚖️ Moderation <span id="pendingBadge" style="display:none;background:#F59E0B;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:4px"></span></a>
+    <a href="/admin/bulk-upload.html">📥 Bulk Add</a>
     <a href="/" target="_blank">🌐 Public Site</a>
     <span class="logout" onclick="logout()">⎋ Logout</span>
   </nav>
@@ -185,6 +186,13 @@
     renderKPIs(stats);
     document.getElementById('qlPending').textContent = stats.pending || 0;
     document.getElementById('qlFlagged').textContent = stats.flags_pending || 0;
+
+    // Pending count badge in nav
+    const badge = document.getElementById('pendingBadge');
+    if (stats.pending > 0){
+      badge.textContent = stats.pending;
+      badge.style.display = 'inline-block';
+    }
   }
 
   // Fetch recent registrations

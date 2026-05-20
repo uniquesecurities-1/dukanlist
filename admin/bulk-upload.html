@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Bulk Upload — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📥</text></svg>">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .badge{font-size:10px;font-weight:700;background:#6366F1;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .nav{display:flex;gap:6px;align-items:center}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600;transition:all .15s}
+  .nav a:hover{background:rgba(255,255,255,0.1);color:white}
+  .nav a.active{background:#6366F1;color:white}
+  .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
+  .logout:hover{background:rgba(255,255,255,0.1);color:white}
+
+  .main{max-width:1100px;margin:24px auto;padding:0 20px}
+  .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
+  .page-sub{font-size:14px;color:#64748b;margin-bottom:20px}
+
+  .section{background:white;padding:22px;border-radius:12px;margin-bottom:18px;border:1px solid #e2e8f0}
+  .section h2{font-size:16px;font-weight:700;margin-bottom:12px;color:#0F172A}
+
+  .help-block{background:#EFF6FF;border-left:3px solid #3B82F6;padding:12px 14px;border-radius:8px;font-size:13px;color:#1E40AF;line-height:1.6;margin-bottom:14px}
+  .help-block code{background:#DBEAFE;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:12px}
+
+  textarea{width:100%;min-height:240px;padding:14px;font-family:'SF Mono','Monaco',Consolas,monospace;font-size:13px;border:1.5px solid #e2e8f0;border-radius:10px;resize:vertical;line-height:1.5;background:#fafafa;color:#0F172A}
+  textarea:focus{outline:none;border-color:#6366F1;background:#fff}
+
+  .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+  .form-group label{display:block;font-size:13px;font-weight:700;color:#475569;margin-bottom:6px}
+  select,input{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;background:#fff}
+  select:focus,input:focus{outline:none;border-color:#6366F1}
+
+  .btn{padding:10px 18px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-size:14px;transition:all .15s;font-family:inherit}
+  .btn-primary{background:#6366F1;color:white}
+  .btn-primary:hover:not(:disabled){background:#4F46E5}
+  .btn-secondary{background:#E5E7EB;color:#374151}
+  .btn-secondary:hover:not(:disabled){background:#D1D5DB}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* Preview table */
+  .preview-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+  .preview-table th{background:#F1F5F9;padding:8px 10px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid #E2E8F0;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  .preview-table td{padding:8px 10px;border-bottom:1px solid #E5E7EB;color:#1F2937}
+  .preview-table tr.ok td{background:#F0FDF4}
+  .preview-table tr.err td{background:#FEF2F2}
+  .row-status{font-weight:700;font-size:11px}
+  .row-status.ok{color:#15803D}
+  .row-status.err{color:#B91C1C}
+
+  /* Toast */
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:none;color:white}
+  .toast.show{display:block}
+  .toast.success{background:#10B981}
+  .toast.error{background:#EF4444}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🛡️ DukanList <span class="badge">ADMIN</span></div>
+  <nav class="nav">
+    <a href="/admin/dashboard.html">📊 Dashboard</a>
+    <a href="/admin/moderation.html">⚖️ Moderation</a>
+    <a href="/admin/bulk-upload.html" class="active">📥 Bulk Add</a>
+    <a href="/" target="_blank">🌐 Public Site</a>
+    <span class="logout" onclick="logout()">⎋ Logout</span>
+  </nav>
+</header>
+
+<div class="main">
+  <h1 class="page-title">📥 Bulk Upload — Self-Onboard 50-100 Shops</h1>
+  <p class="page-sub">Paste shop data from Excel / WhatsApp / paper notes. We'll validate and bulk-register all in one go. Admin-added shops go straight to <b>active + verified</b>.</p>
+
+  <!-- ===== HELP BLOCK ===== -->
+  <div class="section">
+    <h2>📋 Format Instructions</h2>
+    <div class="help-block">
+      <strong>Paste tab-separated or pipe-separated rows</strong>, one shop per line.<br><br>
+      <strong>Format:</strong> <code>Shop Name | Owner Name | Mobile (10-digit) | Category Slug | Address | Pincode | USP (optional)</code><br><br>
+      <strong>Example:</strong><br>
+      <code>Sharma Mutual Funds | Rajesh Sharma | 9876543210 | mutual-fund-distributor | Main Bazaar Road, Mandi Dabwali | 125104 | 20+ years experience, AMFI registered</code><br><br>
+      <strong>City &amp; State below applies to ALL pasted shops</strong> (you'll set it once).
+    </div>
+
+    <!-- ===== DEFAULTS ===== -->
+    <h2 style="margin-top:18px">🌍 Default Location (applies to all rows)</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>State <span style="color:#DC2626">*</span></label>
+        <select id="defState" onchange="onStateChange()">
+          <option value="">— Select state —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>District <span style="color:#DC2626">*</span></label>
+        <select id="defDistrict" onchange="onDistrictChange()">
+          <option value="">— Select district —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>City <span style="color:#DC2626">*</span></label>
+        <select id="defCity">
+          <option value="">— Select city —</option>
+        </select>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#64748b;margin-top:-4px;margin-bottom:14px">
+      All shops in this batch will use the location above. Pincode comes per-row from your pasted data.
+    </div>
+
+    <!-- ===== PASTE DATA ===== -->
+    <h2 style="margin-top:18px">📋 Paste Shop Data</h2>
+    <textarea id="dataInput" placeholder="Sharma Mutual Funds | Rajesh Sharma | 9876543210 | mutual-fund-distributor | Main Bazaar Road | 125104 | 20+ years AMFI registered
+Singla Pharmacy | Vinod Singla | 9988776655 | pharmacy | Near IndusInd Bank | 125104 | 24x7 home delivery
+Krishna Sweets | Krishna Lal | 9123456789 | sweets | Chotala Road | 125104 | Pure ghee, no chemicals"></textarea>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="previewData()">👁 Preview &amp; Validate</button>
+      <button class="btn btn-secondary" onclick="clearData()">🗑 Clear</button>
+      <button class="btn btn-secondary" onclick="loadSample()">📝 Load Sample (3 shops)</button>
+    </div>
+  </div>
+
+  <!-- ===== PREVIEW ===== -->
+  <div class="section" id="previewSection" style="display:none">
+    <h2>👁 Preview <span id="previewCount" style="font-size:13px;color:#64748b;font-weight:500"></span></h2>
+    <div style="overflow-x:auto;margin:12px 0">
+      <table class="preview-table" id="previewTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Shop Name</th>
+            <th>Owner</th>
+            <th>Mobile</th>
+            <th>Category</th>
+            <th>Pincode</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary" onclick="confirmUpload()" id="uploadBtn">✓ Upload Valid Rows to Database</button>
+  </div>
+
+  <!-- ===== RESULTS ===== -->
+  <div class="section" id="resultsSection" style="display:none">
+    <h2>📊 Upload Results</h2>
+    <div id="resultsBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+const c = ShopDB.client;
+let ALL_CATS = {};        // slug → { id, name, parent_id }
+let ALL_CITIES = [];      // [{id, name}]
+let PREVIEW_DATA = [];    // parsed rows
+
+async function init(){
+  // Auth check
+  const { data: { user } } = await c.auth.getUser();
+  if (!user){
+    window.location.href = '/admin/login.html';
+    return;
+  }
+  // Verify admin
+  try{
+    const { data: profile } = await c.rpc('get_admin_profile');
+    if (!profile || !profile.length){
+      alert('Admin access required');
+      window.location.href = '/';
+      return;
+    }
+  }catch(e){
+    alert('Admin auth check failed: ' + e.message);
+    return;
+  }
+
+  // Load categories (sub-categories only — those linked to a parent)
+  const { data: cats } = await c.from('categories')
+    .select('id, slug, name, parent_id, active')
+    .eq('active', true)
+    .order('name');
+  if (cats){
+    cats.forEach(cat => { ALL_CATS[cat.slug] = cat; });
+  }
+
+  // Load states
+  const { data: states } = await c.from('geo_states')
+    .select('id, name')
+    .eq('active', true)
+    .order('name');
+  if (states){
+    const sel = document.getElementById('defState');
+    states.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id; opt.textContent = s.name;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+async function onStateChange(){
+  const stateId = +document.getElementById('defState').value;
+  const distSel = document.getElementById('defDistrict');
+  const citySel = document.getElementById('defCity');
+  distSel.innerHTML = '<option value="">— Select district —</option>';
+  citySel.innerHTML = '<option value="">— Select city —</option>';
+  if (!stateId) return;
+  const { data } = await c.from('geo_districts')
+    .select('id, name')
+    .eq('state_id', stateId)
+    .eq('active', true)
+    .order('name');
+  if (data){
+    data.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id; opt.textContent = d.name;
+      distSel.appendChild(opt);
+    });
+  }
+}
+
+async function onDistrictChange(){
+  const distId = +document.getElementById('defDistrict').value;
+  const citySel = document.getElementById('defCity');
+  citySel.innerHTML = '<option value="">— Select city —</option>';
+  if (!distId) return;
+  const { data } = await c.from('geo_cities')
+    .select('id, name')
+    .eq('district_id', distId)
+    .eq('active', true)
+    .order('name');
+  if (data){
+    data.forEach(ci => {
+      const opt = document.createElement('option');
+      opt.value = ci.id; opt.textContent = ci.name;
+      citySel.appendChild(opt);
+    });
+  }
+}
+
+function loadSample(){
+  document.getElementById('dataInput').value =
+`Sharma Mutual Funds | Rajesh Sharma | 9876543210 | mutual-fund-distributor | Main Bazaar Road, Near IndusInd Bank | 125104 | 20+ years experience, AMFI registered
+Singla Pharmacy | Vinod Singla | 9988776655 | pharmacy | Aastha Hospital Street | 125104 | 24x7 home delivery, branded medicines
+Krishna Sweets | Krishna Lal | 9123456789 | sweets | Chotala Road | 125104 | Pure ghee mithai, no chemicals`;
+}
+
+function clearData(){
+  document.getElementById('dataInput').value = '';
+  document.getElementById('previewSection').style.display = 'none';
+  document.getElementById('resultsSection').style.display = 'none';
+}
+
+function parseRow(line, lineNo){
+  // Try pipe first, fall back to tab
+  let parts = line.split('|').map(p => p.trim());
+  if (parts.length < 6) parts = line.split('\t').map(p => p.trim());
+  if (parts.length < 6) return { ok:false, error:'Not enough columns (need 6+: Name|Owner|Mobile|Category|Address|Pincode)', line: lineNo };
+
+  const [name, owner, mobile, catSlug, address, pincode, usp] = parts;
+  const errors = [];
+
+  if (!name || name.length < 3) errors.push('Shop name too short');
+  if (!owner || owner.length < 3) errors.push('Owner name too short');
+  const mobileDigits = (mobile||'').replace(/[^\d]/g,'');
+  const tenDig = mobileDigits.length === 12 && mobileDigits.startsWith('91') ? mobileDigits.slice(2) : mobileDigits;
+  if (!/^[6-9]\d{9}$/.test(tenDig)) errors.push('Invalid mobile (need valid 10-digit Indian)');
+  if (!ALL_CATS[catSlug]) errors.push('Unknown category slug: ' + catSlug);
+  if (!address || address.length < 5) errors.push('Address too short');
+  if (!/^\d{6}$/.test(pincode||'')) errors.push('Pincode must be 6 digits');
+
+  return {
+    ok: errors.length === 0,
+    error: errors.join('; '),
+    line: lineNo,
+    data: {
+      name: name,
+      owner_name: owner,
+      mobile: '91' + tenDig,
+      primary_category_id: ALL_CATS[catSlug] ? ALL_CATS[catSlug].id : null,
+      address: address,
+      pincode: pincode,
+      usp: usp || 'Trusted local business in our area.'
+    }
+  };
+}
+
+function previewData(){
+  const stateId = +document.getElementById('defState').value;
+  const distId  = +document.getElementById('defDistrict').value;
+  const cityId  = +document.getElementById('defCity').value;
+  if (!stateId || !distId || !cityId){
+    toast('Please select state, district, and city first', 'error');
+    return;
+  }
+
+  const text = document.getElementById('dataInput').value.trim();
+  if (!text){ toast('Paste some shop data first', 'error'); return; }
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  PREVIEW_DATA = lines.map((l, i) => parseRow(l, i + 1));
+
+  // Apply defaults
+  PREVIEW_DATA.forEach(r => {
+    if (r.data){
+      r.data.state_id    = stateId;
+      r.data.district_id = distId;
+      r.data.city_id     = cityId;
+    }
+  });
+
+  const body = document.getElementById('previewBody');
+  const okCount = PREVIEW_DATA.filter(r => r.ok).length;
+  const errCount = PREVIEW_DATA.length - okCount;
+  document.getElementById('previewCount').textContent =
+    '· ' + okCount + ' valid · ' + errCount + ' with errors';
+
+  body.innerHTML = PREVIEW_DATA.map(r => `
+    <tr class="${r.ok ? 'ok' : 'err'}">
+      <td>${r.line}</td>
+      <td>${r.ok ? escapeHtml(r.data.name) : '—'}</td>
+      <td>${r.ok ? escapeHtml(r.data.owner_name) : '—'}</td>
+      <td>${r.ok ? r.data.mobile : '—'}</td>
+      <td>${r.ok ? findCatSlug(r.data.primary_category_id) : '—'}</td>
+      <td>${r.ok ? r.data.pincode : '—'}</td>
+      <td><span class="row-status ${r.ok?'ok':'err'}">${r.ok ? '✓ Ready' : '✕ ' + escapeHtml(r.error)}</span></td>
+    </tr>
+  `).join('');
+
+  document.getElementById('previewSection').style.display = '';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('uploadBtn').disabled = okCount === 0;
+  document.getElementById('uploadBtn').textContent = '✓ Upload ' + okCount + ' Valid Rows to Database';
+}
+
+function findCatSlug(id){
+  for (const [slug, cat] of Object.entries(ALL_CATS)){
+    if (cat.id === id) return slug;
+  }
+  return '—';
+}
+
+async function confirmUpload(){
+  const valid = PREVIEW_DATA.filter(r => r.ok).map(r => r.data);
+  if (!valid.length){ toast('No valid rows to upload', 'error'); return; }
+  if (!confirm('Upload ' + valid.length + ' shops to live database? They will go live immediately as verified active shops.')) return;
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.textContent = '⏳ Uploading...';
+
+  const { data, error } = await c.rpc('admin_bulk_register', { p_shops: valid });
+
+  if (error){
+    btn.disabled = false; btn.textContent = '✓ Upload Valid Rows to Database';
+    toast('Upload failed: ' + error.message, 'error');
+    return;
+  }
+
+  // Show results
+  const sec = document.getElementById('resultsSection');
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = `
+    <div style="display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="padding:14px 18px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;flex:1;min-width:160px">
+        <div style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase">Success</div>
+        <div style="font-size:28px;font-weight:800;color:#15803D">${data.success_count || 0}</div>
+      </div>
+      <div style="padding:14px 18px;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;flex:1;min-width:160px">
+        <div style="font-size:11px;color:#991B1B;font-weight:700;text-transform:uppercase">Failed</div>
+        <div style="font-size:28px;font-weight:800;color:#B91C1C">${data.failed_count || 0}</div>
+      </div>
+    </div>
+    <table class="preview-table">
+      <thead><tr><th>Shop</th><th>Status</th><th>Note</th></tr></thead>
+      <tbody>
+        ${(data.results || []).map(r => `
+          <tr class="${r.status === 'success' ? 'ok' : 'err'}">
+            <td>${escapeHtml(r.name)}</td>
+            <td><span class="row-status ${r.status === 'success' ? 'ok' : 'err'}">${r.status === 'success' ? '✓ Created' : '✕ Failed'}</span></td>
+            <td>${escapeHtml(r.error || r.business_id || '')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  sec.style.display = '';
+  toast('Uploaded ' + data.success_count + ' shops, ' + data.failed_count + ' failed', data.failed_count ? 'error' : 'success');
+
+  btn.disabled = false; btn.textContent = '✓ Upload Valid Rows to Database';
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function toast(msg, kind){
+  const el = document.getElementById('toast');
+  el.className = 'toast show ' + (kind || 'success');
+  el.textContent = msg;
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+async function logout(){
+  await c.auth.signOut();
+  window.location.href = '/admin/login.html';
+}
+
+init();
+</script>
+</body>
+</html>

@@ -113,6 +113,7 @@
   <nav class="nav">
     <a href="/admin/dashboard.html">📊 Dashboard</a>
     <a href="/admin/moderation.html" class="active">⚖️ Moderation</a>
+    <a href="/admin/bulk-upload.html">📥 Bulk Add</a>
     <a href="/" target="_blank">🌐 Public Site</a>
     <span class="logout" onclick="logout()">⎋ Logout</span>
   </nav>
@@ -239,6 +240,23 @@ async function loadFlags(){
   document.getElementById('list-flags').innerHTML = data.map(f => flagItem(f)).join('');
 }
 
+function buildVerifyWaLink(b){
+  // Strip non-digits + ensure 91 prefix
+  let num = String(b.mobile || '').replace(/[^\d]/g, '');
+  if (num.length === 10) num = '91' + num;
+  const ownerName = b.owner_name || 'Shop Owner';
+  const shopName = b.name || 'your shop';
+  const msg =
+    'Namaste ' + ownerName + ' ji!\n\n' +
+    'Main DukanList se baat kar raha hu. Aapne *' + shopName + '* ' +
+    'apni dukaan register ki hai. Hum aapki listing verify karna chahte hain.\n\n' +
+    '1) Kya yeh aap hi ne register kiya hai?\n' +
+    '2) Kya dukaan ka actual address yahi hai?\n\n' +
+    'Confirm karne ke baad hum profile activate kar denge.\n\n' +
+    'Thanks!\nDukanList Team';
+  return 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+}
+
 function bizCard(b, kind){
   const statusCls = 'status-' + (b.status || 'pending');
   return `
@@ -263,7 +281,12 @@ function bizCard(b, kind){
       ${kind === 'flagged' ? `<div class="biz-field" style="background:#fef2f2"><div class="lbl" style="color:#991b1b">Flag Count</div><div class="val" style="color:#991b1b;font-weight:700">${b.flagged_count} community flags</div></div>` : ''}
 
       <div class="biz-actions">
-        <button class="btn btn-approve" onclick="approveBusiness('${b.id}','${escapeJs(b.name)}')">✓ Approve</button>
+        <button class="btn btn-approve" onclick="approveBusiness('${b.id}','${escapeJs(b.name)}')">✓ Approve &amp; Activate</button>
+        <a class="btn" style="background:#25D366;color:white" href="${buildVerifyWaLink(b)}" target="_blank" rel="noopener" title="WhatsApp shopkeeper for verification">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24z"/></svg>
+          WhatsApp Verify
+        </a>
+        <a class="btn btn-secondary" href="tel:+${(b.mobile||'').replace(/[^\\d]/g,'')}" title="Call shopkeeper">📞 Call</a>
         <button class="btn btn-reject" onclick="rejectBusiness('${b.id}','${escapeJs(b.name)}')">✕ Reject / Ban</button>
         <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(b.slug)}" target="_blank">👁️ View Public Profile</a>
         <a class="btn btn-secondary" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/editor?table=businesses&filter=id::eq::${b.id}" target="_blank">🗄️ Edit in DB</a>

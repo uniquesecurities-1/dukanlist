@@ -130,56 +130,42 @@
     <span data-i18n-hi id="stepNameHi">मोबाइल वेरिफिकेशन</span>
   </div>
 
-  <!-- ================================ STEP 1: MOBILE OTP ================================ -->
+  <!-- ================================ STEP 1: QUICK INFO (no OTP) ================================ -->
   <div class="card" id="step1" style="margin-top:18px">
     <div class="card-title">
-      <span data-i18n-en>📱 Verify Your Mobile</span>
-      <span data-i18n-hi>📱 अपना मोबाइल वेरिफाई करें</span>
+      <span data-i18n-en>📱 Your Contact Info</span>
+      <span data-i18n-hi>📱 आपका संपर्क</span>
     </div>
     <div class="card-sub">
-      <span data-i18n-en>We'll send a 6-digit OTP via SMS. Mobile becomes your login.</span>
-      <span data-i18n-hi>हम SMS पर 6 अंकों का OTP भेजेंगे। यही मोबाइल आपका लॉगिन होगा।</span>
+      <span data-i18n-en>We'll verify your shop via WhatsApp after submission — no OTP needed!</span>
+      <span data-i18n-hi>सबमिट करने के बाद हम WhatsApp पर वेरिफाई करेंगे — कोई OTP नहीं!</span>
     </div>
 
-    <div id="phoneBlock">
-      <div class="form-group">
-        <label><span data-i18n-en>Mobile Number</span><span data-i18n-hi>मोबाइल नंबर</span><span class="req">*</span></label>
-        <div class="input-icon">
-          <span class="ico">📞</span>
-          <input id="phone" class="input keep-en" type="tel" placeholder="+91 9541223377" inputmode="numeric" maxlength="13">
-        </div>
-        <div class="help">
-          <span data-i18n-en>10-digit Indian mobile. +91 added automatically.</span>
-          <span data-i18n-hi>10 अंकों का भारतीय मोबाइल। +91 अपने आप लग जाएगा।</span>
-        </div>
+    <div class="alert info" style="margin-bottom:14px">
+      <span class="a-icon">💡</span>
+      <div>
+        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 9541223377</b>. We'll personally verify your shop and activate it within 24 hours.</span>
+        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 9541223377</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपकी दुकान personally वेरिफाई करके 24 घंटे में activate कर देंगे।</span>
       </div>
-      <div class="alert info" id="otpInfo" style="display:none"></div>
-      <div class="alert error" id="phoneErr" style="display:none"></div>
-      <button class="btn btn-pri btn-block" onclick="handleSendOTP()" id="sendOtpBtn">
-        <span data-i18n-en>Send OTP →</span>
-        <span data-i18n-hi>OTP भेजें →</span>
-      </button>
     </div>
 
-    <div id="otpBlock" style="display:none">
-      <div class="form-group">
-        <label><span data-i18n-en>Enter 6-digit OTP</span><span data-i18n-hi>6 अंकों का OTP डालें</span><span class="req">*</span></label>
-        <input id="otp" class="otp-input keep-en" type="text" maxlength="6" inputmode="numeric" placeholder="------">
-        <div class="help">
-          <span data-i18n-en>Sent to <b id="otpToMobile" class="keep-en"></b>. <a href="#" onclick="changePhone(event)">Change</a></span>
-          <span data-i18n-hi><b id="otpToMobileHi" class="keep-en"></b> पर भेजा गया। <a href="#" onclick="changePhone(event)">बदलें</a></span>
-        </div>
+    <div class="form-group">
+      <label><span data-i18n-en>Mobile Number</span><span data-i18n-hi>मोबाइल नंबर</span><span class="req">*</span></label>
+      <div class="input-icon">
+        <span class="ico">📞</span>
+        <input id="phone" class="input keep-en" type="tel" placeholder="9541223377" inputmode="numeric" maxlength="10">
       </div>
-      <div class="alert error" id="otpErr" style="display:none"></div>
-      <button class="btn btn-pri btn-block" onclick="handleVerifyOTP()" id="verifyOtpBtn">
-        <span data-i18n-en>Verify &amp; Continue →</span>
-        <span data-i18n-hi>वेरिफाई और आगे बढ़ें →</span>
-      </button>
-      <button class="btn btn-ghost btn-block" onclick="handleResendOTP()" id="resendBtn" style="margin-top:8px" disabled>
-        <span data-i18n-en>Resend OTP</span><span data-i18n-hi>OTP फिर भेजें</span>
-        <span id="resendTimer" style="margin-left:6px;font-size:.85em;opacity:.7"></span>
-      </button>
+      <div class="help">
+        <span data-i18n-en>10-digit Indian mobile. We'll WhatsApp you for verification.</span>
+        <span data-i18n-hi>10 अंकों का भारतीय मोबाइल। हम WhatsApp करेंगे।</span>
+      </div>
     </div>
+
+    <div class="alert error" id="phoneErr" style="display:none"></div>
+    <button class="btn btn-pri btn-block" onclick="handleStep1()" id="continueBtn">
+      <span data-i18n-en>Continue →</span>
+      <span data-i18n-hi>आगे बढ़ें →</span>
+    </button>
   </div>
 
   <!-- ================================ STEP 2: BUSINESS DETAILS ================================ -->
@@ -353,25 +339,58 @@
     </div>
   </div>
 
-  <!-- ================================ SUCCESS ================================ -->
+  <!-- ================================ SUCCESS — Pending Review + WhatsApp Verify ================================ -->
   <div class="card" id="successCard" style="margin-top:18px;display:none;text-align:center">
-    <div style="font-size:4rem;margin-bottom:8px">🎉</div>
+    <div style="font-size:4rem;margin-bottom:8px">✅</div>
     <div class="card-title" style="font-size:1.5rem">
-      <span data-i18n-en>Registration Successful!</span>
-      <span data-i18n-hi>रजिस्ट्रेशन सफल!</span>
+      <span data-i18n-en>Registration Received!</span>
+      <span data-i18n-hi>रजिस्ट्रेशन प्राप्त हुआ!</span>
     </div>
-    <p style="color:var(--muted);margin-bottom:18px">
-      <span data-i18n-en class="block">Your shop is registered. Now upload at least 1 photo to activate your listing — only takes 30 seconds.</span>
-      <span data-i18n-hi class="block">आपकी दुकान रजिस्टर हो गई। अब कम से कम 1 फोटो अपलोड करें — सिर्फ 30 सेकंड।</span>
+    <p style="color:var(--muted);margin-bottom:14px;line-height:1.6">
+      <span data-i18n-en class="block">Your shop is in our review queue. <b style="color:var(--ink)">One last step</b> — WhatsApp us to activate within 24 hours.</span>
+      <span data-i18n-hi class="block">आपकी दुकान review queue में है। <b style="color:var(--ink)">एक आखिरी कदम</b> — WhatsApp करके 24 घंटे में चालू करवाएं।</span>
     </p>
-    <a href="/panel/photos.html" class="btn btn-pri btn-block">
-      <span data-i18n-en>📸 Upload Shop Photo Now →</span>
-      <span data-i18n-hi>📸 दुकान की फोटो अपलोड करें →</span>
+
+    <!-- Pending Status Pill -->
+    <div style="display:inline-block;background:#FEF3C7;color:#92400E;padding:6px 14px;border-radius:99px;font-weight:800;font-size:.85rem;margin-bottom:16px">
+      ⏳ <span data-i18n-en>Pending Verification</span><span data-i18n-hi>वेरिफिकेशन बाकी है</span>
+    </div>
+
+    <!-- BIG WhatsApp CTA -->
+    <a id="successWaBtn" href="#" target="_blank" rel="noopener" class="btn btn-block" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-size:1.05rem;padding:18px 24px;border-radius:14px;font-weight:800;box-shadow:0 8px 24px rgba(37,211,102,.4);margin-bottom:10px">
+      <span style="display:inline-flex;align-items:center;gap:10px;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+        <span data-i18n-en>Verify Now via WhatsApp →</span>
+        <span data-i18n-hi>WhatsApp से वेरिफाई करें →</span>
+      </span>
     </a>
-    <a href="/panel/dashboard.html" class="btn btn-ghost btn-block" style="margin-top:8px">
-      <span data-i18n-en>Skip — Go to Dashboard</span>
-      <span data-i18n-hi>स्किप — डैशबोर्ड पर जाएं</span>
-    </a>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:18px">
+      <span data-i18n-en>Tap above — opens WhatsApp with a pre-filled message to our team</span>
+      <span data-i18n-hi>ऊपर tap करें — हमारी टीम को pre-filled message जाएगा</span>
+    </div>
+
+    <!-- Secondary CTA — share & explore -->
+    <div style="border-top:1px dashed var(--line);padding-top:14px;margin-top:8px">
+      <div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">
+        <span data-i18n-en>While you wait:</span>
+        <span data-i18n-hi>जब तक wait करें:</span>
+      </div>
+      <a href="/browse.html" class="btn btn-ghost btn-block" style="margin-bottom:8px">
+        <span data-i18n-en>👀 Browse other businesses</span>
+        <span data-i18n-hi>👀 दूसरी दुकानें देखें</span>
+      </a>
+      <a href="/" class="btn btn-ghost btn-block">
+        <span data-i18n-en>🏠 Back to Home</span>
+        <span data-i18n-hi>🏠 होम पर जाएं</span>
+      </a>
+    </div>
+
+    <!-- Help block -->
+    <div style="margin-top:18px;padding:12px;background:#F8FAFC;border-radius:10px;text-align:left;font-size:.82rem;color:var(--ink-2);line-height:1.55">
+      <strong><span data-i18n-en>📞 Need help?</span><span data-i18n-hi>📞 मदद चाहिए?</span></strong><br>
+      <span data-i18n-en>Call/WhatsApp <a href="tel:+919541223377" style="color:var(--saffron-deep);font-weight:700">+91 95412 23377</a> · Mon-Sat, 10 AM – 7 PM</span>
+      <span data-i18n-hi>Call/WhatsApp <a href="tel:+919541223377" style="color:var(--saffron-deep);font-weight:700">+91 95412 23377</a> · सोम-शनि, सुबह 10 – शाम 7</span>
+    </div>
   </div>
 
 </div>
@@ -383,7 +402,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/nav.js" defer></script>
-<script src="/assets/js/otp.js"></script>
 <script src="/assets/js/geo.js"></script>
 <script>
 // ============================================================
@@ -428,89 +446,39 @@ function goToStep(n){
 }
 
 // ============================================================
-// STEP 1 — Mobile OTP
+// STEP 1 — Quick Info (mobile only, NO OTP — WhatsApp verification later)
 // ============================================================
-let resendCounter = 0;
-let resendInterval = null;
-
-async function handleSendOTP(){
-  const btn = document.getElementById('sendOtpBtn');
-  const mobile = document.getElementById('phone').value.trim();
+async function handleStep1(){
+  const btn = document.getElementById('continueBtn');
+  const mobileRaw = document.getElementById('phone').value.trim();
   const errEl = document.getElementById('phoneErr');
   errEl.style.display = 'none';
-  if (!OTP.isValidIndianMobile(mobile)) {
+
+  // Validate 10-digit Indian mobile
+  const mobile = mobileRaw.replace(/[^\d]/g, '');
+  const tenDigit = mobile.length === 12 && mobile.startsWith('91') ? mobile.slice(2) : mobile;
+  if (!/^[6-9]\d{9}$/.test(tenDigit)){
     errEl.textContent = 'Please enter a valid 10-digit Indian mobile number';
     errEl.style.display = 'flex';
     return;
   }
-  btn.disabled = true; btn.innerHTML = '<span>⏳ Sending...</span>';
-  const res = await OTP.sendOTP(mobile);
-  btn.disabled = false; btn.innerHTML = '<span>Send OTP →</span>';
-  if (!res.ok) {
-    errEl.textContent = res.error || 'Failed to send OTP. Please try again.';
+
+  STATE.phone = '91' + tenDigit;          // e.g., 919541223377
+  STATE.phoneDisplay = tenDigit;          // e.g., 9541223377
+
+  btn.disabled = true; btn.innerHTML = '<span>⏳ Loading...</span>';
+  try {
+    document.getElementById('whatsapp').placeholder = tenDigit;
+    await loadCategoriesIntoSelect();
+    await loadStatesIntoSelect();
+    btn.disabled = false; btn.innerHTML = '<span>Continue →</span>';
+    goToStep(2);
+  } catch(e){
+    console.error(e);
+    btn.disabled = false; btn.innerHTML = '<span>Continue →</span>';
+    errEl.textContent = 'Could not load form data. Please refresh and try again.';
     errEl.style.display = 'flex';
-    return;
   }
-  STATE.phone = OTP.cleanMobile(mobile);
-  document.getElementById('otpToMobile').textContent = STATE.phone;
-  document.getElementById('otpToMobileHi').textContent = STATE.phone;
-  document.getElementById('phoneBlock').style.display = 'none';
-  document.getElementById('otpBlock').style.display = '';
-  document.getElementById('otp').focus();
-  startResendTimer();
-}
-
-function startResendTimer(){
-  resendCounter = 30;
-  const btn = document.getElementById('resendBtn');
-  const tmr = document.getElementById('resendTimer');
-  btn.disabled = true;
-  if (resendInterval) clearInterval(resendInterval);
-  resendInterval = setInterval(() => {
-    resendCounter--;
-    tmr.textContent = '(' + resendCounter + 's)';
-    if (resendCounter <= 0) { clearInterval(resendInterval); btn.disabled = false; tmr.textContent = ''; }
-  }, 1000);
-}
-
-async function handleResendOTP(){
-  const res = await OTP.sendOTP(STATE.phone);
-  const info = document.getElementById('otpInfo');
-  info.style.display = 'flex';
-  info.innerHTML = '<span class="a-icon">✉️</span><div>' + (res.ok ? 'OTP resent successfully.' : (res.error || 'Failed to resend.')) + '</div>';
-  if (res.ok) startResendTimer();
-}
-
-function changePhone(e){
-  e.preventDefault();
-  document.getElementById('phoneBlock').style.display = '';
-  document.getElementById('otpBlock').style.display = 'none';
-  document.getElementById('phone').focus();
-}
-
-async function handleVerifyOTP(){
-  const btn = document.getElementById('verifyOtpBtn');
-  const token = document.getElementById('otp').value.trim();
-  const errEl = document.getElementById('otpErr');
-  errEl.style.display = 'none';
-  if (!/^\d{6}$/.test(token)) {
-    errEl.textContent = 'Enter the 6-digit OTP';
-    errEl.style.display = 'flex';
-    return;
-  }
-  btn.disabled = true; btn.innerHTML = '<span>⏳ Verifying...</span>';
-  const res = await OTP.verifyOTP(STATE.phone, token);
-  btn.disabled = false; btn.innerHTML = '<span>Verify &amp; Continue →</span>';
-  if (!res.ok) {
-    errEl.textContent = res.error || 'Wrong OTP. Try again.';
-    errEl.style.display = 'flex';
-    return;
-  }
-  STATE.user = res.user;
-  document.getElementById('whatsapp').placeholder = STATE.phone;
-  await loadCategoriesIntoSelect();
-  await loadStatesIntoSelect();
-  goToStep(2);
 }
 
 // ============================================================
@@ -834,14 +802,19 @@ async function handleSubmit(){
     btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>'; return;
   }
 
-  const { data, error } = await c.rpc('register_business_v2', {
+  // Normalise whatsapp to 91XXXXXXXXXX format
+  let waInput = (STATE.data.whatsapp || '').replace(/[^\d]/g,'');
+  if (waInput.length === 10) waInput = '91' + waInput;
+  if (!waInput) waInput = STATE.phone;
+
+  const { data, error } = await c.rpc('register_business_public', {
     p_category_ids        : STATE.data.categoryIds,
     p_primary_category_id : STATE.data.primaryCategoryId,
     p_name         : STATE.data.name,
     p_name_hi      : STATE.data.nameHi || null,
     p_owner_name   : STATE.data.ownerName,
     p_mobile       : STATE.phone,
-    p_whatsapp     : STATE.data.whatsapp || null,
+    p_whatsapp     : waInput,
     p_email        : STATE.data.email || null,
     p_address_line1: STATE.data.addr1,
     p_address_line2: STATE.data.addr2 || null,
@@ -860,7 +833,20 @@ async function handleSubmit(){
     return;
   }
 
-  // Success — store business id, show success card
+  // ==== Success — build WhatsApp verify link + show pending screen ====
+  const ADMIN_WA = '919541223377'; // Deepak ji / Navneet bhai
+  const shopName = STATE.data.name;
+  const ownerPhone = STATE.phoneDisplay;
+  const verifyMsg =
+    '🏪 New shop registration on DukanList!\n\n' +
+    'Shop Name: ' + shopName + '\n' +
+    'Owner: ' + STATE.data.ownerName + '\n' +
+    'Mobile: +91 ' + ownerPhone + '\n' +
+    'Reg ID: ' + (data || '').slice(0, 8) + '\n\n' +
+    'Please verify and activate my listing. Thank you!';
+  const waUrl = 'https://wa.me/' + ADMIN_WA + '?text=' + encodeURIComponent(verifyMsg);
+  document.getElementById('successWaBtn').href = waUrl;
+
   localStorage.setItem('shop_pending_biz', data);
   document.getElementById('step4').style.display = 'none';
   document.getElementById('successCard').style.display = '';
