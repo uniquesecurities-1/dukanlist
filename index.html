@@ -469,11 +469,12 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <!-- ===== SEARCH ===== -->
 <div class="search-wrap">
   <form class="search-card" onsubmit="handleSearch(event)" role="search">
-    <div class="field">
+    <div class="field" style="display:flex;align-items:center;gap:8px">
       <span class="ico">🔍</span>
-      <input type="text" name="q" id="searchInput" autocomplete="off"
+      <input type="text" name="q" id="searchInput" autocomplete="off" style="flex:1;border:0;background:transparent;outline:0;font:inherit;color:inherit;min-width:0"
              data-ph-en="Doctor, carpenter, mechanic..."
              data-ph-hi="डॉक्टर, मिस्त्री, मैकेनिक...">
+      <span id="voiceMicSlot"></span>
     </div>
     <div class="field">
       <span class="ico">📍</span>
@@ -496,6 +497,11 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
       <span data-i18n-hi>खोजें</span>
     </button>
   </form>
+  <label id="openNowHome" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:9px 16px;background:#fff;border:1.5px solid #E2E8F0;border-radius:99px;font-weight:700;font-size:13px;color:#0F172A;cursor:pointer;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:all .15s">
+    <input type="checkbox" id="openNowCheck" style="margin:0;cursor:pointer;accent-color:#10B981" onchange="document.getElementById('openNowHome').style.borderColor = this.checked ? '#10B981' : '#E2E8F0'; document.getElementById('openNowHome').style.background = this.checked ? '#ECFDF5' : '#fff';">
+    <span style="display:inline-flex;width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 8px rgba(16,185,129,.6)"></span>
+    <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुली दुकानें</span>
+  </label>
 </div>
 
 <!-- ===== CATEGORIES (parent buckets) ===== -->
@@ -692,6 +698,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/share.js"></script>
+<script src="/assets/js/voice.js"></script>
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
@@ -891,11 +898,20 @@ function handleSearch(e){
   e.preventDefault();
   const q = document.getElementById('searchInput').value.trim();
   const city = document.getElementById('citySelect').value;
-  const params = new URLSearchParams();
+  const openNow = document.getElementById('openNowCheck')?.checked;
+  const params =new URLSearchParams();
   if (q) params.set('q', q);
   if (city) params.set('city', city);
+  if (openNow) params.set('open', '1');
   window.location.href = '/search.html?' + params.toString();
 }
+// Inject voice-search mic when voice.js loads
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.DukanVoice && DukanVoice.supported()){
+    const slot = document.getElementById('voiceMicSlot');
+    if (slot) slot.innerHTML = DukanVoice.btn('searchInput', { size: 'md' });
+  }
+});
 
 function escapeHTML(s){
   return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));

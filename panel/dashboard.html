@@ -63,6 +63,12 @@
 
     <div class="verif-badges" id="verifBadges"></div>
 
+    <!-- Profile completeness widget -->
+    <div id="completenessWidget" style="margin-top:18px"></div>
+
+    <!-- Notifications bell + dropdown -->
+    <div id="notifWidget" style="margin-top:18px"></div>
+
     <!-- Pending photo upload alert -->
     <div class="alert warning" id="pendingPhotoAlert" style="display:none;margin-top:18px">
       <span class="a-icon">📸</span>
@@ -163,6 +169,63 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/completeness.js"></script>
+<script>
+// Lead notifications widget (loads independently — doesn't block dashboard if RPC missing)
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadNotifications, 1500);
+});
+async function loadNotifications(){
+  try {
+    const c = window.ShopDB && ShopDB.client;
+    if (!c) return;
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user) return;
+    const r = await c.rpc('my_notifications', { p_limit: 10 });
+    if (r.error) return; // RPC may not exist yet — silent
+    const items = r.data || [];
+    if (items.length === 0) return;
+    const unread = items.filter(n => !n.read_at).length;
+    const slot = document.getElementById('notifWidget');
+    if (!slot) return;
+    slot.innerHTML = '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      + '<div style="font-size:14px;font-weight:800;color:#0F172A;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:8px">'
+      + '🔔 <span>Recent Activity</span>'
+      + (unread > 0 ? ' <span style="background:#EF4444;color:#fff;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:800">' + unread + ' new</span>' : '')
+      + '</div>'
+      + (unread > 0 ? '<button onclick="markAllNotifRead()" style="background:transparent;border:0;color:#6366F1;font-size:12px;font-weight:700;cursor:pointer">Mark all read</button>' : '')
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:8px">'
+      + items.slice(0, 5).map(n => {
+          const isUnread = !n.read_at;
+          const when = timeAgo(n.created_at);
+          return '<div style="display:flex;gap:10px;padding:10px 12px;background:' + (isUnread ? '#FFFBF5' : '#F8FAFC') + ';border:1px solid ' + (isUnread ? '#FED7AA' : '#E2E8F0') + ';border-radius:10px">'
+            + '<div style="flex:1">'
+            + '<div style="font-weight:700;font-size:13px;color:#0F172A">' + escNotif(n.title) + (isUnread ? ' <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#EF4444;vertical-align:middle"></span>' : '') + '</div>'
+            + (n.body ? '<div style="font-size:12px;color:#64748b;margin-top:2px;line-height:1.4">' + escNotif(n.body) + '</div>' : '')
+            + '<div style="font-size:11px;color:#94a3b8;margin-top:4px;font-weight:600">' + when + '</div>'
+            + '</div></div>';
+        }).join('')
+      + '</div></div>';
+  } catch(_) {}
+}
+async function markAllNotifRead(){
+  const c = window.ShopDB && ShopDB.client;
+  if (!c) return;
+  await c.rpc('mark_notifications_read', { p_ids: null });
+  loadNotifications();
+}
+function escNotif(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function timeAgo(iso){
+  if (!iso) return '';
+  const d = new Date(iso), diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+</script>
 <script src="/assets/js/nav.js" defer></script>
 <script>
 function setLang(lang){
