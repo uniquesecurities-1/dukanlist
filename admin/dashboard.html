@@ -89,6 +89,7 @@
     <a href="/admin/moderation">⚖️ Moderation <span id="pendingBadge" style="display:none;background:#F59E0B;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:4px"></span></a>
     <a href="/admin/bulk-upload">📥 Bulk Add</a>
     <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
+    <a href="/admin/test-cleanup" id="navCleanup" style="display:none">🧹 Cleanup</a>
     <a href="/" target="_blank">🌐 Public Site</a>
     <span class="logout" onclick="logout()">⎋ Logout</span>
   </nav>
@@ -205,6 +206,8 @@
     if (scope && scope.is_super){
       const navAdmins = document.getElementById('navAdmins');
       if (navAdmins) navAdmins.style.display = '';
+      const navCleanup = document.getElementById('navCleanup');
+      if (navCleanup) navCleanup.style.display = '';
     }
     // Show scope info above KPIs
     if (scope && scope.role){
@@ -318,13 +321,3 @@ function escapeHtml(s){
   }[ch]));
 }
 
-async function logout(){
-  if (!confirm('Logout from admin panel?')) return;
-  const c = ShopDB.client;
-  await c.auth.signOut();
-  window.location.href = '/admin/login.html';
-}
-</script>
-
-</body>
-</html>

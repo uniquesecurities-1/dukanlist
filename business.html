@@ -1558,13 +1558,4 @@ async function submitReport(){
   }
 }
 
-function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-
-window.addEventListener('DOMContentLoaded', () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadBusiness();
-});
-</script>
-
-</body>
-</html>
+function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"

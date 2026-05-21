@@ -71,6 +71,7 @@
     <a href="/admin/moderation">⚖️ Moderation</a>
     <a href="/admin/bulk-upload" class="active">📥 Bulk Add</a>
     <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
+    <a href="/admin/test-cleanup" id="navCleanup" style="display:none">🧹 Cleanup</a>
     <a href="/" target="_blank">🌐 Public Site</a>
     <span class="logout" onclick="logout()">⎋ Logout</span>
   </nav>
@@ -187,6 +188,17 @@ async function init(){
     alert('Admin auth check failed: ' + e.message);
     return;
   }
+
+  // Reveal super-admin-only nav links
+  try {
+    const { data: scope } = await c.rpc('get_admin_scope');
+    if (scope && scope.is_super){
+      const navA = document.getElementById('navAdmins');
+      if (navA) navA.style.display = '';
+      const navC = document.getElementById('navCleanup');
+      if (navC) navC.style.display = '';
+    }
+  } catch(_){ /* non-blocking */ }
 
   // Load categories (sub-categories only — those linked to a parent)
   const { data: cats } = await c.from('categories')
@@ -403,23 +415,4 @@ async function confirmUpload(){
   btn.disabled = false; btn.textContent = '✓ Upload Valid Rows to Database';
 }
 
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-
-function toast(msg, kind){
-  const el = document.getElementById('toast');
-  el.className = 'toast show ' + (kind || 'success');
-  el.textContent = msg;
-  setTimeout(() => el.classList.remove('show'), 4000);
-}
-
-async function logout(){
-  await c.auth.signOut();
-  window.location.href = '/admin/login.html';
-}
-
-init();
-</script>
-</body>
-</html>
+function escapeHtml(s
