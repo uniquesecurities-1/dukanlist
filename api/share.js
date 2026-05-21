@@ -160,4 +160,6 @@ export default async function handler(req, res){
     console.error('share endpoint error:', err);
     res.statusCode = 500;
     res.setHeader('Content-Type', 'text/html');
-    return res.end(rende
+    return res.end(renderNotFound());
+  }
+}
