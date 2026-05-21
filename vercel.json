@@ -5,7 +5,7 @@
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/share", "destination": "/api/share" },
-    { "source": "/share/(.*)", "destination": "/api/share?slug=$1" }
+    { "source": "/share/:slug", "destination": "/api/share?slug=:slug" }
   ],
   "headers": [
     {
@@ -62,4 +62,9 @@
     {
       "source": "/manifest.webmanifest",
       "headers": [
-        { "key": "Content-Type", "value": "applic
+        { "key": "Content-Type", "value": "application/manifest+json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ]
+}
