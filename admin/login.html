@@ -112,10 +112,24 @@
     <div class="form-group">
       <label for="password">Password</label>
       <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="current-password">
-      <div class="help">Forgot? Email Supabase project owner to reset.</div>
+      <div class="help"><a href="#" onclick="showForgotForm(event)" style="color:#6366F1;font-weight:600;text-decoration:underline">Forgot password?</a></div>
     </div>
     <div class="alert error" id="loginErr" style="display:none"></div>
     <button class="btn" id="loginBtn" onclick="handleLogin()">Continue →</button>
+  </div>
+
+  <!-- ===== FORGOT PASSWORD ===== -->
+  <div id="stepForgot" style="display:none">
+    <div class="step-badge purple">PASSWORD RECOVERY</div>
+    <p class="sub" style="margin-bottom:14px">Enter your admin email. We will send a password reset link.</p>
+    <div class="form-group">
+      <label for="forgotEmail">Admin Email</label>
+      <input id="forgotEmail" class="input" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="alert error" id="forgotErr" style="display:none"></div>
+    <div class="alert success" id="forgotSuccess" style="display:none"></div>
+    <button class="btn" id="forgotBtn" onclick="handleForgot()">Send Reset Link →</button>
+    <button class="btn btn-ghost" onclick="goBackToLogin()">← Back to login</button>
   </div>
 
   <!-- ===== STEP 2A: MFA ENROLL (first-time) ===== -->
@@ -190,6 +204,49 @@ let LOGIN_EMAIL = '';
 // =========================================================
 // STEP 1: Email + Password login
 // =========================================================
+function showForgotForm(e){
+  if (e && e.preventDefault) e.preventDefault();
+  const loginEmail = document.getElementById('email').value.trim();
+  if (loginEmail) document.getElementById('forgotEmail').value = loginEmail;
+  document.getElementById('stepPassword').style.display = 'none';
+  document.getElementById('stepForgot').style.display = '';
+  document.getElementById('forgotErr').style.display = 'none';
+  document.getElementById('forgotSuccess').style.display = 'none';
+  document.getElementById('forgotEmail').focus();
+}
+function goBackToLogin(){
+  document.getElementById('stepForgot').style.display = 'none';
+  document.getElementById('stepPassword').style.display = '';
+}
+async function handleForgot(){
+  const btn = document.getElementById('forgotBtn');
+  const errEl = document.getElementById('forgotErr');
+  const okEl = document.getElementById('forgotSuccess');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+  if (!email || !email.includes('@')){
+    errEl.textContent = 'Enter a valid email address';
+    errEl.style.display = 'flex'; return;
+  }
+  btn.disabled = true; btn.textContent = 'Sending...';
+  try {
+    const { error } = await c.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/panel/reset-password.html'
+    });
+    btn.disabled = false; btn.textContent = 'Send Reset Link →';
+    if (error){
+      errEl.textContent = error.message || 'Could not send reset link';
+      errEl.style.display = 'flex'; return;
+    }
+    okEl.innerHTML = '✓ Reset link sent to <b>' + email + '</b>. Check inbox (and spam). Click the link to set a new password.';
+    okEl.style.display = 'flex';
+  } catch(e){
+    btn.disabled = false; btn.textContent = 'Send Reset Link →';
+    errEl.textContent = (e && e.message) || 'Could not send reset link';
+    errEl.style.display = 'flex';
+  }
+}
+
 async function handleLogin(){
   const btn = document.getElementById('loginBtn');
   const email = document.getElementById('email').value.trim().toLowerCase();
