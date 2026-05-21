@@ -175,64 +175,85 @@
     return;
   }
 
-  // Show admin name (via SECURITY DEFINER RPC to bypass RLS)
-  try {
-    const { data: profile } = await c.rpc('get_admin_profile');
-    if (profile && profile.length > 0 && profile[0].display_name){
-      document.getElementById('adminName').textContent = profile[0].display_name;
-    }
-  } catch(e){ /* fall back to default "Admin" */ }
-
-  // Fetch stats
-  const { data: stats, error: statsErr } = await c.rpc('get_admin_stats');
-  if (statsErr){
-    document.getElementById('kpiGrid').innerHTML = '<div class="err" style="grid-column:1/-1">Failed to load stats: ' + (statsErr.message || statsErr) + '</div>';
-  } else {
-    renderKPIs(stats);
-    document.getElementById('qlPending').textContent = stats.pending || 0;
-    document.getElementById('qlFlagged').textContent = stats.flags_pending || 0;
-
-    // Pending count badge in nav
-    const badge = document.getElementById('pendingBadge');
-    if (stats.pending > 0){
-      badge.textContent = stats.pending;
-      badge.style.display = 'inline-block';
-    }
+  // ============================================================
+  // PARALLEL RPC FETCH — each piece renders independently.
+  // A hung/slow RPC won't block the others (10s timeout each).
+  // ============================================================
+  function withTimeout(p, ms, label){
+    return Promise.race([
+      p,
+      new Promise((_, rej) => setTimeout(() => rej(new Error(label + ' timeout')), ms))
+    ]);
   }
 
-  // Show "Admins" link if super_admin
-  try {
-    const { data: scope } = await c.rpc('get_admin_scope');
-    if (scope && scope.is_super){
-      const navAdmins = document.getElementById('navAdmins');
-      if (navAdmins) navAdmins.style.display = '';
-      const navCleanup = document.getElementById('navCleanup');
-      if (navCleanup) navCleanup.style.display = '';
-    }
-    // Show scope info above KPIs
-    if (scope && scope.role){
-      const scopeBanner = document.getElementById('scopeBanner');
-      if (scopeBanner){
-        if (scope.is_super){
-          scopeBanner.innerHTML = '<b>👑 Super Admin</b> · Full access across all cities';
-          scopeBanner.style.background = 'linear-gradient(135deg,#FFFBEB,#FEF3C7)';
-          scopeBanner.style.borderColor = '#F59E0B';
-        } else if (scope.role === 'city_moderator'){
-          const cityCount = (scope.city_ids||[]).length;
-          scopeBanner.innerHTML = '<b>🏙 City Moderator</b> · You manage ' + cityCount + ' assigned ' + (cityCount === 1 ? 'city' : 'cities');
-          scopeBanner.style.background = 'linear-gradient(135deg,#EEF2FF,#E0E7FF)';
-          scopeBanner.style.borderColor = '#6366F1';
-        }
-        scopeBanner.style.display = '';
+  // Profile — non-blocking, shows admin name
+  withTimeout(c.rpc('get_admin_profile'), 8000, 'profile')
+    .then(({ data: profile }) => {
+      if (profile && profile.length > 0 && profile[0].display_name){
+        document.getElementById('adminName').textContent = profile[0].display_name;
       }
-    }
-  } catch(e){ /* non-blocking */ }
+    })
+    .catch(e => console.warn('Profile load:', e.message));
 
-  // Fetch recent registrations
-  const { data: recent } = await c.rpc('admin_list_businesses', {
+  // Stats — KPIs
+  withTimeout(c.rpc('get_admin_stats'), 10000, 'stats')
+    .then(({ data: stats, error: statsErr }) => {
+      if (statsErr || !stats){
+        document.getElementById('kpiGrid').innerHTML = '<div class="err" style="grid-column:1/-1">Failed to load stats: ' + (statsErr?.message || 'No data') + '</div>';
+        return;
+      }
+      renderKPIs(stats);
+      document.getElementById('qlPending').textContent = stats.pending || 0;
+      document.getElementById('qlFlagged').textContent = stats.flags_pending || 0;
+      const badge = document.getElementById('pendingBadge');
+      if (stats.pending > 0){
+        badge.textContent = stats.pending;
+        badge.style.display = 'inline-block';
+      }
+    })
+    .catch(e => {
+      console.warn('Stats load:', e.message);
+      document.getElementById('kpiGrid').innerHTML = '<div class="err" style="grid-column:1/-1">Stats took too long. <a href="javascript:location.reload()">Retry</a></div>';
+    });
+
+  // Scope — reveals super-admin nav links
+  withTimeout(c.rpc('get_admin_scope'), 8000, 'scope')
+    .then(({ data: scope }) => {
+      if (!scope) return;
+      if (scope.is_super){
+        const navAdmins = document.getElementById('navAdmins');
+        if (navAdmins) navAdmins.style.display = '';
+        const navCleanup = document.getElementById('navCleanup');
+        if (navCleanup) navCleanup.style.display = '';
+      }
+      if (scope.role){
+        const scopeBanner = document.getElementById('scopeBanner');
+        if (scopeBanner){
+          if (scope.is_super){
+            scopeBanner.innerHTML = '<b>👑 Super Admin</b> · Full access across all cities';
+            scopeBanner.style.background = 'linear-gradient(135deg,#FFFBEB,#FEF3C7)';
+            scopeBanner.style.borderColor = '#F59E0B';
+          } else if (scope.role === 'city_moderator'){
+            const cityCount = (scope.city_ids||[]).length;
+            scopeBanner.innerHTML = '<b>🏙 City Moderator</b> · You manage ' + cityCount + ' assigned ' + (cityCount === 1 ? 'city' : 'cities');
+            scopeBanner.style.background = 'linear-gradient(135deg,#EEF2FF,#E0E7FF)';
+            scopeBanner.style.borderColor = '#6366F1';
+          }
+          scopeBanner.style.display = '';
+        }
+      }
+    })
+    .catch(e => console.warn('Scope load:', e.message));
+
+  // Recent registrations
+  withTimeout(c.rpc('admin_list_businesses', {
     p_status: null, p_limit: 10, p_offset: 0, p_sort: 'newest'
-  });
-  renderRecent(recent || []);
+  }), 10000, 'recent')
+    .then(({ data: recent }) => renderRecent(recent || []))
+    .catch(e => {
+      console.warn('Recent load:', e.message);
+      document.getElementById('recentBiz').innerHTML = '<div class="err">Recent registrations took too long. <a href="javascript:location.reload()">Retry</a></div>';
+    });
 })();
 
 function renderKPIs(s){
@@ -290,34 +311,4 @@ function renderRecent(rows){
                 <div style="font-size:12px;color:#64748b">${escapeHtml(r.owner_name || '')} · ${escapeHtml(r.mobile || '')}</div>
               </td>
               <td style="padding:10px 12px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
-              <td style="padding:10px 12px;color:#64748b">${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</td>
-              <td style="padding:10px 12px">${statusBadge(r.status)}</td>
-              <td style="padding:10px 12px;color:#64748b">${r.photos_count} 📸</td>
-              <td style="padding:10px 12px;color:#64748b;font-size:12px">${formatDate(r.created_at)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-  document.getElementById('recentBiz').innerHTML = html;
-}
-
-function formatDate(iso){
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = (now - d) / 1000;
-  if (diff < 60) return Math.floor(diff) + 's ago';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
-  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-
+              <td style="padding:10px 12px;color:#64748b">${escapeHtm
