@@ -494,14 +494,18 @@ function isBotSubmission(){
 }
 
 async function handleStep1(){
+  console.log('[register] handleStep1 called');
   const btn = document.getElementById('continueBtn');
   const mobileRaw = document.getElementById('phone').value.trim();
   const errEl = document.getElementById('phoneErr');
   errEl.style.display = 'none';
 
-  // Anti-bot
-  if (isBotSubmission()){
-    // Silent rejection — show generic error to avoid teaching bot how to bypass
+  // Only honeypot check at Step 1 (time-trap is too aggressive for fast users)
+  // Time-trap stays on final submit (handleSubmit) — bots fill all 4 steps in <3 sec
+  const hp1 = (document.getElementById('hp_website')?.value || '').trim();
+  const hp2 = (document.getElementById('hp_company')?.value || '').trim();
+  if (hp1 !== '' || hp2 !== ''){
+    console.warn('[antibot] honeypot triggered at Step 1');
     errEl.textContent = 'Something went wrong. Please refresh and try again.';
     errEl.style.display = 'flex';
     return;
@@ -518,18 +522,22 @@ async function handleStep1(){
 
   STATE.phone = '91' + tenDigit;          // e.g., 919541223377
   STATE.phoneDisplay = tenDigit;          // e.g., 9541223377
+  console.log('[register] Mobile valid:', STATE.phone, '→ loading categories + states...');
 
   btn.disabled = true; btn.innerHTML = '<span>⏳ Loading...</span>';
   try {
     document.getElementById('whatsapp').placeholder = tenDigit;
     await loadCategoriesIntoSelect();
+    console.log('[register] Categories loaded');
     await loadStatesIntoSelect();
+    console.log('[register] States loaded');
     btn.disabled = false; btn.innerHTML = '<span>Continue →</span>';
     goToStep(2);
+    console.log('[register] Moved to Step 2');
   } catch(e){
-    console.error(e);
+    console.error('[register] handleStep1 error:', e);
     btn.disabled = false; btn.innerHTML = '<span>Continue →</span>';
-    errEl.textContent = 'Could not load form data. Please refresh and try again.';
+    errEl.textContent = 'Could not load form data: ' + (e.message || 'unknown error') + '. Please refresh and try again.';
     errEl.style.display = 'flex';
   }
 }
