@@ -177,6 +177,12 @@
   <h1 class="page-title">⚖️ Moderation Queue</h1>
   <p class="page-sub">Review pending businesses and community-flagged content</p>
 
+  <!-- ===== DEBUG INFO PANEL (always visible at top) ===== -->
+  <div id="debugPanel" style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;line-height:1.7;display:none">
+    <div style="font-weight:800;color:#0F172A;margin-bottom:6px;font-size:14px">🔍 Self-Diagnostic</div>
+    <div id="debugContent">Loading diagnostics…</div>
+  </div>
+
   <!-- Tabs -->
   <div class="tabs" id="tabs">
     <button class="tab active" data-tab="pending" onclick="switchTab('pending')">
@@ -280,14 +286,15 @@ let C = null;
       return;
     }
 
-    // Show "Admins" link if super_admin
+    // Show "Admins" link if super_admin + fill debug panel
     try {
       const { data: scope } = await C.rpc('get_admin_scope');
       if (scope && scope.is_super){
         const navAdmins = document.getElementById('navAdmins');
         if (navAdmins) navAdmins.style.display = '';
       }
-    } catch(e){ /* non-blocking */ }
+      await fillDebugPanel(scope, userResp.user);
+    } catch(e){ /* non-blocking */ console.warn('[mod] scope fetch failed', e); }
 
     // Honor URL tab param
     const params = new URLSearchParams(window.location.search);
@@ -305,6 +312,70 @@ let C = null;
     document.body.innerHTML = '<div class="err" style="margin:40px">Page init crashed: ' + (e.message || e) + '. <a href="/admin/login">Try login again</a></div>';
   }
 })();
+
+// ===== SELF-DIAGNOSTIC PANEL =====
+async function fillDebugPanel(scope, user){
+  const panel = document.getElementById('debugPanel');
+  const content = document.getElementById('debugContent');
+  if (!panel || !content) return;
+
+  // Get all status counts via direct query
+  let counts = { active: 0, pending: 0, flagged: 0, banned: 0, total: 0 };
+  let rpcSays = '—';
+  let rpcErr = null;
+  try {
+    // Count by status (anyone can query active; admin sees all via RLS)
+    const { data: allBiz, error: bizErr } = await C
+      .from('businesses')
+      .select('id, status', { count: 'exact' });
+    if (bizErr) throw bizErr;
+    if (allBiz){
+      counts.total = allBiz.length;
+      allBiz.forEach(b => {
+        if (counts[b.status] !== undefined) counts[b.status]++;
+      });
+    }
+
+    // What does the RPC return?
+    const { data: rpcData, error: rpcErrR } = await C.rpc('admin_list_businesses', {
+      p_status: 'pending', p_limit: 100, p_offset: 0, p_sort: 'newest'
+    });
+    if (rpcErrR){ rpcErr = rpcErrR.message; }
+    else { rpcSays = (rpcData?.length || 0) + ' pending shop(s)'; }
+  } catch(e){
+    rpcErr = e.message;
+  }
+
+  const scopeInfo = scope ? `
+    Role: <b>${scope.role || '?'}</b> ·
+    Cities: <b>${scope.all_cities ? 'ALL' : (scope.city_ids?.length || 0) + ' assigned'}</b> ·
+    Super: <b>${scope.is_super ? 'YES' : 'no'}</b>
+  ` : '<span style="color:#dc2626">scope unavailable (get_admin_scope RPC missing? Run db/19.)</span>';
+
+  const issueMsg = (counts.pending > 0 && rpcSays === '0 pending shop(s)')
+    ? '<div style="background:#FEF2F2;border-left:3px solid #DC2626;padding:8px 12px;border-radius:6px;margin-top:8px;color:#991B1B"><b>⚠ MISMATCH:</b> DB has ' + counts.pending + ' pending but RPC returned 0. Most likely: city scope filter excluding shop, OR db/19 not run yet. Quick fix: <code>UPDATE admin_users SET role=\\'super_admin\\', assigned_city_ids=NULL WHERE email=\\'' + (scope?.email || 'your@email') + '\\';</code></div>'
+    : '';
+
+  const rpcErrMsg = rpcErr
+    ? '<div style="background:#FEF2F2;border-left:3px solid #DC2626;padding:8px 12px;border-radius:6px;margin-top:8px;color:#991B1B"><b>⚠ RPC ERROR:</b> ' + escapeHtml(rpcErr) + '</div>'
+    : '';
+
+  content.innerHTML = `
+    <div><b>👤 Logged in:</b> ${escapeHtml(user?.email || '?')} (UID: <code style="background:#E2E8F0;padding:1px 5px;border-radius:3px;font-size:11px">${(user?.id||'?').slice(0,8)}...</code>)</div>
+    <div><b>🛡 Admin scope:</b> ${scopeInfo}</div>
+    <div><b>🗄 DB has:</b>
+       active: <b style="color:#059669">${counts.active}</b> ·
+       pending: <b style="color:#D97706">${counts.pending}</b> ·
+       flagged: <b style="color:#DC2626">${counts.flagged}</b> ·
+       banned: <b style="color:#6B7280">${counts.banned}</b> ·
+       total: <b>${counts.total}</b>
+    </div>
+    <div><b>📡 admin_list_businesses RPC says:</b> ${escapeHtml(rpcSays)}</div>
+    ${issueMsg}
+    ${rpcErrMsg}
+  `;
+  panel.style.display = '';
+}
 
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
