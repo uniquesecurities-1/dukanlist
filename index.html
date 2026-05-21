@@ -822,7 +822,7 @@ function renderFeaturedCard(b){
   // Open Now status dot (top-left)
   let openDot = '';
   if (typeof getOpenStatus === 'function' && b.hours_json){
-    const s = getOpenStatus(b.hours_json);
+    const s = getOpenStatus(b.hours_json) || {};
     if (s.isOpen){
       openDot = '<span style="position:absolute;top:9px;left:9px;background:rgba(22,163,74,.95);color:#fff;padding:3px 9px;border-radius:99px;font-size:.7rem;font-weight:800;display:inline-flex;align-items:center;gap:4px"><span style="width:6px;height:6px;background:#fff;border-radius:50%;box-shadow:0 0 6px rgba(255,255,255,.8)"></span> Open</span>';
     } else if (s.label){
