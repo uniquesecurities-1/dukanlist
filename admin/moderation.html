@@ -163,9 +163,10 @@
     <span class="badge">ADMIN</span>
   </div>
   <nav class="nav">
-    <a href="/admin/dashboard.html">📊 Dashboard</a>
-    <a href="/admin/moderation.html" class="active">⚖️ Moderation</a>
-    <a href="/admin/bulk-upload.html">📥 Bulk Add</a>
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation" class="active">⚖️ Moderation</a>
+    <a href="/admin/bulk-upload">📥 Bulk Add</a>
+    <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
     <a href="/" target="_blank">🌐 Public Site</a>
     <span class="logout" onclick="logout()">⎋ Logout</span>
   </nav>
@@ -278,6 +279,15 @@ let C = null;
       document.body.innerHTML = '<div class="err" style="margin:40px">Not authorized — your account is not an admin. <a href="/admin/login">Login as admin</a></div>';
       return;
     }
+
+    // Show "Admins" link if super_admin
+    try {
+      const { data: scope } = await C.rpc('get_admin_scope');
+      if (scope && scope.is_super){
+        const navAdmins = document.getElementById('navAdmins');
+        if (navAdmins) navAdmins.style.display = '';
+      }
+    } catch(e){ /* non-blocking */ }
 
     // Honor URL tab param
     const params = new URLSearchParams(window.location.search);
