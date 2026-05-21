@@ -153,7 +153,8 @@
 
     <div class="alert error" id="enrollErr" style="display:none"></div>
     <button class="btn" id="enrollBtn" onclick="handleEnroll()">Verify & Enable 2FA →</button>
-    <button class="btn btn-ghost" onclick="goBack()">← Cancel</button>
+    <button class="btn btn-ghost" onclick="skipMfaEnroll()" style="border-color:#FCA5A5;color:#991B1B" title="You can enable 2FA later from Settings">⏭ Skip 2FA for now</button>
+    <button class="btn btn-ghost" onclick="goBack()">← Cancel & logout</button>
   </div>
 
   <!-- ===== STEP 2B: MFA VERIFY (returning user) ===== -->
@@ -457,6 +458,17 @@ function showStep(id){
 function showLocked(mins){
   showStep('stepLocked');
   document.getElementById('lockTimer').textContent = String(mins);
+}
+
+async function skipMfaEnroll(){
+  // User chose to skip 2FA enrollment. They're already authenticated via password,
+  // and is_admin has been verified. Just redirect to dashboard.
+  // (They can enable 2FA later from admin settings.)
+  const ok = confirm('Skip 2FA setup for now?\n\n' +
+    '⚠️ Your account will only be protected by email + password.\n' +
+    'You can enable 2FA later from admin settings.\n\nProceed without 2FA?');
+  if (!ok) return;
+  location.href = '/admin/dashboard.html';
 }
 
 async function goBack(){
