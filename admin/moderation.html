@@ -166,6 +166,7 @@
     <a href="/admin/dashboard">📊 Dashboard</a>
     <a href="/admin/moderation" class="active">⚖️ Moderation</a>
     <a href="/admin/bulk-upload">📥 Bulk Add</a>
+    <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
     <a href="/" target="_blank">🌐 Public Site</a>
     <span class="logout" onclick="logout()">⎋ Logout</span>
   </nav>
@@ -265,6 +266,15 @@ let C = null;
     window.location.href = '/admin/login';
     return;
   }
+
+  // Show Admins link if super_admin
+  try {
+    const scopeRes = await C.rpc('get_admin_scope');
+    if (scopeRes && scopeRes.data && scopeRes.data.is_super){
+      const nav = document.getElementById('navAdmins');
+      if (nav) nav.style.display = '';
+    }
+  } catch(e){ /* non-blocking */ }
 
   // Honor URL tab param
   const params = new URLSearchParams(window.location.search);

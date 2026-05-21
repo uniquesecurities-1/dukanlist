@@ -431,11 +431,11 @@
       "Compassionate care, ethical practice, affordable consultation. Dr. [Name] has been the trusted choice for families in [City] for [X] years. WhatsApp-ready for second opinions and follow-up queries."
     ],
     usp: [
-      "MBBS qualified · [X]+ yrs experience · Honest diagnosis · No unnecessary tests",
-      "Specialty: [General Physician / Cardiologist / Pediatrician / etc.]",
-      "Modern clinic · Affordable fees · Walk-in & appointment · Hygienic premises",
-      "Patient-friendly consultation · Bilingual · Follow-up calls included",
-      "Trusted by [number]+ families · Empanelled with [insurance companies]"
+      "MBBS / MD · [State] Medical Council Reg No. [XXXXX] · [X]+ yrs OPD practice · [N]+ patients treated · honest diagnosis",
+      "General consultation · fever · BP · diabetes · thyroid · ECG · vaccinations · minor procedures · women & child care — full family clinic",
+      "[State Medical Council] registered · IMA member · NMC verified · evidence-based prescriptions · no unnecessary tests · ethics-first",
+      "FREE follow-up within 15 days · transparent ₹[X] consultation · family discount · home visit for elderly · senior citizen priority",
+      "Digital prescription on WhatsApp · in-house lab tie-up · video consult option · cashless insurance accepted · appointment via WhatsApp"
     ],
     faqs: [
       { q: "What is the doctor's qualification and specialty?",
@@ -466,11 +466,11 @@
       "Genuine medicines from authorised distributors only. Bill, MRP, and expiry checked at every dispense. [Pharmacy Name] has been the trusted choice in [Locality] for [X] years."
     ],
     usp: [
-      "Licensed pharmacy · Qualified pharmacist · Genuine medicines · MRP guaranteed",
-      "Home delivery within [X km] · Free above ₹[Y] · Same-day for urgent",
-      "Generic + branded options · Best price for chronic medication",
-      "Open [extended hours] · Emergency 24x7 phone support",
-      "Auto-refill reminders · WhatsApp ordering · Senior citizen discount"
+      "Licensed Drug Store · DL No. [XXXXX/XXXXX] · B.Pharm / D.Pharm pharmacist on duty · [X]+ yrs · serving since [Year]",
+      "Allopathy · Ayurveda · Homeopathy · surgical · diabetic care · OTC · baby care · cosmetics · supplements — full medical store",
+      "Genuine medicines from authorised distributors · batch + expiry on every bill · cold-chain maintained · MRP guaranteed · no fake",
+      "Free home delivery within [X km] · senior citizen 5-10% off · chronic-care monthly discount · WhatsApp prescription · refill reminders",
+      "Open [8 AM-11 PM] · 24x7 emergency phone · UPI / card / cash · GST bill · 80D-eligible bills · auto-refill SMS for chronic patients"
     ],
     faqs: [
       { q: "Do you provide home delivery?",
@@ -501,11 +501,11 @@
       "Comprehensive dental services — from teeth cleaning to full mouth rehabilitation. Free consultation, treatment plan with cost upfront, and EMI options for braces, implants, and crowns."
     ],
     usp: [
-      "BDS / MDS qualified · Modern equipment · Painless dentistry · Sterilised tools",
-      "Implants · Braces · RCT · Cleaning · Cosmetic — all under one roof",
-      "Free first consultation · EMI option · Insurance accepted",
-      "Pediatric-friendly · Family discount · Bilingual staff",
-      "Latest tech: digital X-ray · RVG · Laser · Rotary endo"
+      "BDS / MDS · Dental Council of India Reg No. [XXXXX] · [X]+ yrs chairside · [N]+ smiles transformed · IDA member",
+      "RCT · implants · braces · aligners · veneers · crowns · cleaning · whitening · pediatric · prosthodontics — full-mouth solutions",
+      "DCI registered · autoclave sterilisation · single-use needles · disposable tray setup · NABH protocol · biomedical waste compliant",
+      "FREE first consult + digital X-ray · transparent treatment plan with cost · no-cost EMI for braces & implants · cashless insurance accepted",
+      "Digital OPG · RVG · rotary endo · laser dentistry · intraoral camera · LED-cured composites · Invisalign certified · painless anesthesia"
     ],
     faqs: [
       { q: "Is the first consultation free?",
@@ -536,11 +536,11 @@
       "Quality you can trust — [Lab Name] follows international quality standards, internal QC daily, and external audit yearly. Empanelled with major insurance companies for cashless tests."
     ],
     usp: [
-      "NABL accredited · Accurate reports · Digital + printed copy · Same-day for most tests",
-      "Home sample collection · Free above ₹[X] · WhatsApp report delivery",
-      "Qualified pathologist · Modern auto-analyser · QC daily",
-      "Affordable pricing · Senior citizen discount · Health package combos",
-      "Empanelled with insurance · TPA cashless · Doctor referral discount"
+      "NABL accredited · MD Pathologist Dr. [Name] · ISO 15189 · [X]+ yrs · 200+ tests · daily internal QC + yearly external audit",
+      "Blood · urine · stool · biochemistry · hormones · thyroid · cardiac · diabetic · cancer markers · histopathology · X-ray · ECG · USG",
+      "NABL Reg No. [XXXXX] · MD-verified reports · trained phlebotomists · cold-chain transport · pre-analytical SOPs · zero error culture",
+      "FREE home collection above ₹[X] · senior citizen 15% off · doctor-referral discount · family health packages · WhatsApp PDF report",
+      "Digital reports in 6 hrs · WhatsApp + email + portal · LIS-integrated lab · barcode tracking · cashless TPA · 80D bills provided"
     ],
     faqs: [
       { q: "Do you offer home sample collection?",
@@ -571,11 +571,11 @@
       "From geriatric care to athletic injury, we customise each session. [Number]+ patients recovered fully. Home visits available for bed-ridden and elderly patients."
     ],
     usp: [
-      "BPT / MPT qualified · [X]+ yrs experience · Modern equipment · Home visits",
-      "Sports injury · Post-op rehab · Back/neck pain · Stroke recovery — all covered",
-      "Customised plan · Progress tracking · Diet & posture guidance",
-      "TENS · Ultrasound · IFT · Traction · Manual therapy",
-      "Insurance accepted · Affordable per-session rates · Family discount"
+      "BPT / MPT · IAP-registered · [X]+ yrs in rehab · [N]+ patients recovered · evidence-based protocols · ortho + neuro + sports",
+      "Back · neck · knee · shoulder · sciatica · sports injury · post-fracture · post-surgery · stroke · paralysis · pediatric · geriatric",
+      "Indian Association of Physiotherapists member · MPT-qualified · referral network with ortho & neuro surgeons · proper case notes",
+      "FREE initial assessment · written exercise plan + video demos · progress review every 5 sessions · home visit for bed-ridden / elderly",
+      "TENS · IFT · ultrasound · SWD · traction · laser · cupping · dry needling · manual therapy · insurance-cashless · WhatsApp follow-up"
     ],
     faqs: [
       { q: "What conditions do you treat?",
@@ -606,11 +606,11 @@
       "Patient safety, quality care, and family-friendly environment — three pillars of [Hospital Name]. Modern equipment, trained nursing, and round-the-clock medical officer on duty."
     ],
     usp: [
-      "[X]-bedded multi-specialty · 24x7 emergency · ICU · OT · Modern equipment",
-      "Cashless insurance · [List of empanelled insurers]",
-      "Specialty depts: [Ortho, Gynae, Pediatric, Cardio, etc.]",
-      "Ambulance 24x7 · TPA assistance · Pharmacy in-house · Lab in-house",
-      "Trusted by [number]+ patients · Senior citizen care · Ethical billing"
+      "[X]-bedded multi-specialty hospital · since [Year] · [N]+ surgeries · NABH-compliant protocols · State Health Reg No. [XXXXX]",
+      "General medicine · surgery · ortho · gynae · pediatrics · cardio · ENT · uro · neuro · derma · ICU · NICU · dialysis — under one roof",
+      "NABH-aligned · qualified consultants (MBBS/MD/MS/DNB) · trained nursing · biomedical waste compliant · infection control SOPs",
+      "FREE OPD consult days · senior citizen ward discount · transparent itemised billing · no inflated bills · BPL / corporate tie-ups",
+      "24x7 emergency + casualty · cardiac ambulance (₹[X]/km) · 50+ insurers empanelled cashless · in-house pharmacy + lab + radiology"
     ],
     faqs: [
       { q: "What specialties do you offer?",
@@ -641,11 +641,11 @@
       "From back pain to weight management, lifestyle disorders to fertility — [Clinic Name] has helped hundreds find relief through Ayurveda. Free first consultation for new patients."
     ],
     usp: [
-      "BAMS qualified · Classical Ayurveda · [X]+ yrs experience · Panchakarma facility",
-      "Root-cause treatment · Customised herbal medicines · Diet & lifestyle guidance",
-      "Chronic disease specialty · Diabetes · Arthritis · Skin · Digestive issues",
-      "Genuine herbs · GMP-certified medicines · No side effects",
-      "Online consultation · Medicine delivery pan-India · Free first consult"
+      "BAMS · CCIM / NCISM registered · Ayush Reg No. [XXXXX] · [X]+ yrs in classical Ayurveda · [N]+ chronic cases treated",
+      "Panchakarma · Vamana · Virechana · Basti · Nasya · Abhyanga · Shirodhara · Kati Basti · Janu Basti · Netra Tarpana — full Karma facility",
+      "Ministry of Ayush licensed · CCIM registered Vaidya · GMP-certified pharmacy · classical Charak / Sushruta formulations · no shortcuts",
+      "Arthritis · diabetes · psoriasis · IBS · PCOD · piles · migraine · obesity · infertility · stress — root-cause cure, not suppression",
+      "FREE first Prakriti analysis · personalised Dinacharya + diet · GMP herbs · Ayurvedic medicines couriered pan-India · WhatsApp follow-up"
     ],
     faqs: [
       { q: "What conditions do you treat with Ayurveda?",
@@ -676,11 +676,11 @@
       "Trusted by [number]+ patients for chronic ailments. We treat the person, not just the disease — your symptoms, sleep, mood, and lifestyle all matter for the right remedy."
     ],
     usp: [
-      "BHMS qualified · [X]+ yrs experience · Classical Homeopathy · Detailed case analysis",
-      "Chronic disease specialty · Skin · Hair · Allergy · PCOD · Thyroid · Migraine",
-      "No side effects · Safe for kids & elderly · Gentle long-term cure",
-      "Online consultation · Medicine couriered pan-India · WhatsApp follow-up",
-      "Empanelled with [insurance] · OPD reimbursement · Affordable fees"
+      "BHMS · Central Council of Homeopathy registered · Reg No. [XXXXX] · [X]+ yrs · classical individualised prescribing",
+      "Skin · hair fall · allergies · asthma · thyroid · PCOD · migraine · IBS · kidney stones · piles · arthritis · pediatric · ADHD · anxiety",
+      "CCH registered · BHMS-qualified · SBL / Schwabe / Reckeweg / Boiron sourced · lab-tested potency · classical Hahnemannian method",
+      "Safe for newborns, pregnant women, elderly · no steroids · no side effects · gradual taper of allopathy · long-term cure not suppression",
+      "FREE first 45-min case taking · video consultation · medicines couriered pan-India · WhatsApp follow-up · monthly progress review"
     ],
     faqs: [
       { q: "What conditions does Homeopathy treat best?",
@@ -711,11 +711,11 @@
       "Authorised stockist of [brand names]. Computerised eye testing with the latest auto-refractometer. Free first eye check-up with any spectacles purchase."
     ],
     usp: [
-      "Optometrist on-site · Computerised eye test · Free first check-up",
-      "Branded frames: Ray-Ban, Vincent Chase, Oakley, Fastrack, Lenskart",
-      "Premium lenses: Essilor, Zeiss, Crizal · Blue cut · Photochromic · Progressive",
-      "Contact lens fitting · Try-on & buy · Schedule-based fitting",
-      "Senior citizen discount · Kids check-up · Post-surgery glasses"
+      "Qualified optometrist (B.Optom) · [X]+ yrs experience · computerised auto-refractometer eye test · serving since [Year]",
+      "Spectacles · contact lenses · sunglasses · reading glasses · kids frames · sports goggles · post-cataract · low-vision aids",
+      "Authorised stockist · Ray-Ban · Oakley · Vincent Chase · Fastrack · Vogue · Carrera · Titan · Lenskart · genuine with brand warranty",
+      "FREE computerised eye test with purchase · senior citizen 10% off · kids vision screening · lifetime frame adjustment · 6-month coating warranty",
+      "Essilor · Zeiss · Crizal · blue-cut · photochromic · progressive · same-day delivery on stock power · WhatsApp prescription accepted"
     ],
     faqs: [
       { q: "Is the eye check-up free?",
@@ -750,11 +750,11 @@
       "Trusted by [number]+ families, our practice combines goal planning, asset allocation, and tax-efficient strategies. We use MFCentral, BSE Star MF, and AMC platforms — full digital, paperless onboarding."
     ],
     usp: [
-      "AMFI-registered MFD · ARN [XXXXXX] · ₹[X] cr AUM · 1000+ happy families",
-      "Goal-based SIP planning · Lumpsum advisory · Tax-saving ELSS",
-      "Partner with all top AMCs · No NFO push · No churning · Long-term focus",
-      "Free portfolio review · Risk profiling · Annual rebalancing",
-      "Paperless investment · MFCentral · BSE StarMF · 24x7 WhatsApp support"
+      "AMFI-registered MFD · ARN-[XXXXXX] · NISM-V-A certified · [X]+ yrs in markets · ₹[Y] cr AUM · [N]+ families' wealth managed",
+      "SIP · Lumpsum · ELSS · Liquid · Hybrid · Debt · NPS · SGB — every AMC, every category, one trusted advisor",
+      "Authorised partner of HDFC, ICICI, SBI, Axis, Nippon, Mirae, Kotak, Aditya Birla · ARN-tagged · AMFI-verified · No NFO push",
+      "FREE portfolio health check · Goal-based plan (child, retirement, home) · No commission games · Lifetime servicing",
+      "100% paperless onboarding · MFCentral · BSE StarMF · video KYC · WhatsApp SIP tracker · monthly statement on chat"
     ],
     faqs: [
       { q: "Are you AMFI-registered?",
@@ -785,11 +785,11 @@
       "Trusted by [number]+ traders and investors in [City]. We support clients with research reports, technical setups, fundamental views, and lifetime account servicing. Office walk-in welcome."
     ],
     usp: [
-      "SEBI-authorised · Sub-Broker for [Broker Name] · ₹[X] cr turnover · [Y]+ active clients",
-      "Free demat + trading A/c · No AMC for first year · Margin available",
-      "Equity · F&O · Currency · Commodity · IPO · MF · Bonds — all segments",
-      "Research-backed recommendations · No paid tips · Education-first approach",
-      "Walk-in office support · Same-day account opening · WhatsApp updates"
+      "SEBI-authorised AP · NSE + BSE member via [Broker Name] · [X]+ yrs in markets · ₹[Y] cr turnover · [N]+ active clients",
+      "Equity · Intraday · F&O · Currency · Commodity · IPO · Mutual Funds · SGB · NCDs · Bonds — full bouquet under one roof",
+      "Authorised Person of [Broker] · SEBI Reg [XXXXX] · NISM Series VIII (Equity Derivatives) certified · audit-trail compliant",
+      "FREE demat + trading A/c · zero AMC first year · margin funding · research calls · physical office walk-in support",
+      "Same-day e-KYC · Aadhaar OTP onboarding · TradingView + Sensibull · WhatsApp alerts · 24x7 backoffice access"
     ],
     faqs: [
       { q: "Are you SEBI-registered / authorised?",
@@ -820,11 +820,11 @@
       "Trusted tax consultant for [number]+ clients in [City]. Free initial consultation, e-mailed estimates, and post-filing support for notices. Lifetime data retention for your records."
     ],
     usp: [
-      "[X]+ yrs experience · 500+ ITRs filed · GST registered consultant · Lifetime support",
-      "ITR · GST · TDS · ROC · Audit · Bookkeeping — all under one roof",
-      "Fixed-fee packages · No hidden charges · Free first consultation",
-      "Notice handling · Refund follow-up · Tax-saving planning",
-      "Pickup & drop service · Paperless onboarding · WhatsApp updates"
+      "Income Tax Practitioner · [X]+ yrs experience · 1000+ ITRs filed · GSTN consultant · faceless assessment expert",
+      "ITR · GST · TDS · ROC · MSME · Udyam · IEC · 15CA/CB · trademark · bookkeeping — all compliance under one roof",
+      "GSTIN-registered consultant · Tax Bar Association member · CA/Advocate panel for audit & appeals · ethics-first practice",
+      "FREE first consult · transparent fixed-fee packages · no surprise bills · notice & refund follow-up included · Mar-31 deadline guaranteed",
+      "100% paperless · Tally + Zoho Books · digital signature · WhatsApp document pickup · same-day filing · cloud backup of your records"
     ],
     faqs: [
       { q: "What ITR form should I file?",
@@ -855,11 +855,11 @@
       "Trusted by [number]+ families across [City], we combine technical knowledge with empathy. Free initial consultation, written financial plan, and lifetime relationship — that's our model."
     ],
     usp: [
-      "CFP / qualified planner · [X]+ yrs experience · Goal-based planning",
-      "Asset allocation · Tax efficiency · Insurance review · Retirement",
-      "Fee-only / hybrid · Transparent · No product push · Annual review",
-      "Written financial plan · Net worth tracking · Goal calculator",
-      "Family planning · Estate succession · Will-writing guidance"
+      "CFP-certified · NISM-V-A · [X]+ yrs in personal finance · [N]+ families' wealth mapped · ₹[Y] cr assets under advisory",
+      "Goal planning · asset allocation · tax · insurance · retirement · estate · will · NRI advisory — full-stack family CFO",
+      "SEBI-registered fee-only advisor · zero commission bias · written disclosure · fiduciary duty · annual re-balancing",
+      "FREE 30-min discovery call · written financial plan · goal calculator · net worth tracker · annual review meeting",
+      "Digital plan delivery · Google Sheet dashboard · WhatsApp goal updates · life-stage roadmap · estate & will-writing guidance"
     ],
     faqs: [
       { q: "What is the difference between an advisor and a distributor?",
@@ -890,11 +890,11 @@
       "Honest loan advisory — we tell you upfront what you'll get, at what rate, with what conditions. No hidden charges, no false hopes. If you can't get a loan, we'll tell you why."
     ],
     usp: [
-      "Authorised DSA · Partner with 15+ banks/NBFCs · ₹[X] cr disbursed",
-      "Home · Business · Personal · Vehicle · LAP · Mortgage — all loans",
-      "Best rate guarantee · Paperwork handheld · Quick sanction",
-      "No upfront fee · Free eligibility check · Honest advisory",
-      "Rejected before? We can help · Bank statement analysis · CIBIL improvement"
+      "Authorised DSA · [X]+ yrs in loans · ₹[Y] cr disbursed · [N]+ sanctions · empanelled with 15+ banks & NBFCs",
+      "Home loan · LAP · personal · business · vehicle · education · gold · OD/CC · balance transfer — every loan handled",
+      "Authorised partner of HDFC, SBI, ICICI, Axis, Kotak, Bajaj Finserv, Tata Capital, IDFC First, Aditya Birla, HDB · CIBIL-certified advisor",
+      "ZERO upfront fee · FREE eligibility & CIBIL check · multi-bank rate comparison · honest pre-rejection feedback · doorstep service",
+      "Rejected by bank before? · CIBIL repair · bank-statement clean-up · digital application · same-day in-principle · WhatsApp updates"
     ],
     faqs: [
       { q: "Do I have to pay you a fee?",
@@ -925,11 +925,11 @@
       "Specialising in [tax, audit, finance, advisory], our firm handles [number]+ entities including [SMEs / start-ups / partnerships / individuals]. Free initial consultation for new engagements."
     ],
     usp: [
-      "ICAI member · CA [Name] · [X]+ yrs practice · Audit + Tax + Advisory",
-      "Pvt Ltd · LLP · Partnership · Proprietorship · Trust — all entities",
-      "Statutory audit · Tax audit · GST audit · Internal audit",
-      "ITR · GST · TDS · ROC · Trademark · IEC · FSSAI · MSME",
-      "Free initial consult · Fixed-fee packages · Confidentiality assured"
+      "ICAI member CA [Name] · M.No. [XXXXXX] · COP No. [YYYYY] · [X]+ yrs practice · audit + tax + advisory firm",
+      "Pvt Ltd · LLP · OPC · Partnership · Proprietorship · Trust · Section 8 · NGO — incorporation to closure, full lifecycle",
+      "Statutory audit · tax audit u/s 44AB · GST audit · stock audit · internal audit · concurrent · forensic — empanelled with banks & PSUs",
+      "ITR · GST · TDS · ROC · trademark · IEC · FSSAI · MSME · Udyam · DPIIT startup recognition · 80G / 12A · IND-AS",
+      "FREE first consult · written engagement letter · fixed-fee packages · confidentiality NDA · cloud DMS · WhatsApp office access"
     ],
     faqs: [
       { q: "Are you a member of ICAI?",
@@ -964,11 +964,11 @@
       "We believe term plan is the foundation of life insurance — pure protection, low cost. ULIPs and endowments are wealth products, not protection. We explain the difference and let you choose."
     ],
     usp: [
-      "IRDAI-licensed advisor · Authorised for 6+ life insurers · [X]+ yrs experience",
-      "Term plan specialist · Honest cover calculation · No ULIP push",
-      "Free policy review · Goal-based planning · Tax-saving 80C / 10(10D)",
-      "Claim support guaranteed · 24x7 family help · Online / paperless",
-      "Authorised for: Bajaj, SBI, HDFC, ICICI Pru, Tata AIA, Max"
+      "IRDAI-licensed POSP / Agent · [X]+ yrs in life insurance · [N]+ families covered · ₹[Y] cr sum assured placed",
+      "Term plan · ULIP · endowment · child plan · pension · annuity · NRI life cover · keyman insurance — every life product",
+      "Authorised for LIC, Bajaj Allianz Life, SBI Life, HDFC Life, ICICI Pru, Tata AIA, Max Life, Kotak Life · IRDAI Reg [XXXXX]",
+      "FREE policy review · honest cover calculation (10-20x income) · no ULIP push · claim handholding for the family — lifetime",
+      "100% paperless proposal · video medicals at home · WhatsApp policy bond · 80C + 10(10D) tax saving · 24x7 claim helpline"
     ],
     faqs: [
       { q: "Which type of life insurance should I buy — term, endowment, or ULIP?",
@@ -999,11 +999,11 @@
       "Trusted health insurance partner since [Year]. Our claim assistance is what makes us different — we stand with families during hospitalisation, not just at sale time."
     ],
     usp: [
-      "IRDAI-licensed · 6+ health insurers · [X]+ yrs experience",
-      "Family floater · Individual · Senior citizen · Critical illness · OPD",
-      "Cashless across 8000+ hospitals · TPA assistance · 24x7 claim help",
-      "Honest gap analysis · No mis-sell · Free policy review",
-      "Tax saving 80D up to ₹75,000 · Multi-year discount"
+      "IRDAI-licensed health insurance advisor · [X]+ yrs experience · [N]+ families covered · 100+ claims settled",
+      "Mediclaim · family floater · individual · senior citizen · critical illness · top-up · super top-up · OPD · maternity — full range",
+      "Authorised for Star Health, Niva Bupa, HDFC Ergo, ICICI Lombard, Care Health, Aditya Birla Health, ManipalCigna · IRDAI Reg [XXXXX]",
+      "FREE policy comparison · gap analysis · room-rent / co-pay decoded · honest exclusion explanation · no mis-sell guarantee",
+      "Cashless at 10,000+ hospitals · 24x7 claim helpline · TPA coordination · hospital empanelment check · 80D tax saving up to ₹75,000"
     ],
     faqs: [
       { q: "How much health cover should I have?",
@@ -1034,11 +1034,11 @@
       "Trusted by [number]+ vehicle owners and homeowners in [City]. Online instant policy, claim assistance, and 24x7 emergency support are part of our service."
     ],
     usp: [
-      "IRDAI-licensed · 5+ general insurers · [X]+ yrs experience",
-      "Motor · Home · Travel · Fire · Shop · Business — all covers",
-      "Online instant policy · WhatsApp quote · Renewal reminders",
-      "Claim assistance · 24x7 emergency · Network garage list",
-      "Best premium comparison · Honest IDV calculation · No-claim bonus"
+      "IRDAI-licensed general insurance advisor · [X]+ yrs experience · [N]+ policies issued · 500+ claims handled",
+      "Motor · two-wheeler · home · shop · fire · burglary · marine · travel · cyber · personal accident · liability — every general cover",
+      "Authorised for Bajaj Allianz, ICICI Lombard, HDFC Ergo, Tata AIG, Reliance, Future Generali, Royal Sundaram · IRDAI Reg [XXXXX]",
+      "FREE IDV calculation · NCB transfer · best-premium comparison · honest add-on advice (zero-dep, engine, RTI) · no hidden loading",
+      "Instant policy on WhatsApp · digital PDF in 5 mins · 24x7 claim helpline · network garage list · roadside assistance · renewal alerts"
     ],
     faqs: [
       { q: "What does motor insurance cover?",
@@ -1069,11 +1069,11 @@
       "Trusted by farmers and pet lovers in [City] since [Year]. Cattle artificial insemination, vaccination drives, pet wellness packages, and emergency surgery facilities."
     ],
     usp: [
-      "BVSc qualified · [X]+ yrs experience · Pets + Cattle · Surgery facility",
-      "Vaccination · Deworming · Dental · X-ray · Ultrasound · Lab",
-      "Home visits for cattle · Emergency for pets · 24x7 phone support",
-      "Pet wellness packages · Annual checkups · Diet counselling",
-      "Cattle AI · Pregnancy diagnosis · Mastitis · Reproductive care"
+      "BVSc & AH · Veterinary Council of India Reg No. [XXXXX] · [X]+ yrs · pets + cattle + poultry · surgery facility on premise",
+      "Dogs · cats · cattle · buffalo · goats · poultry · exotic birds · rabbits — vaccinations, surgery, dental, dermatology, nutrition",
+      "VCI / State Vet Council registered · sterile OT · digital X-ray · ultrasound · in-house pathology lab · ethical practice",
+      "FREE first consult for new pet · annual wellness packages · senior pet care · pet-parent counselling · diet & behaviour guidance",
+      "Cattle AI · pregnancy diagnosis · mastitis · home visit for livestock · 24x7 emergency phone · WhatsApp vaccination reminders"
     ],
     faqs: [
       { q: "What animals do you treat?",
@@ -1108,11 +1108,11 @@
       "Wood work is our passion. From traditional designs to ultra-modern interiors, we deliver craftsmanship that lasts. Free 1-year warranty on workmanship for all major work."
     ],
     usp: [
-      "Master carpenter · [X]+ yrs experience · Modular kitchen specialist",
-      "Premium plywood · Hettich / Hafele fittings · 1-year warranty",
-      "Modular kitchen · Wardrobe · Bed · Sofa · TV unit · Custom",
-      "Free site visit · Itemised quote · No advance for small work",
-      "On-time delivery · Clean workmanship · Polishing included"
+      "Master carpenter [Owner Name] · [X]+ yrs experience · [N]+ kitchens & wardrobes delivered · craftsmanship passed 3 generations",
+      "Modular kitchen · wardrobe · TV unit · bed · sofa · dining table · pooja unit · study · office furniture · doors · false ceiling",
+      "Greenply / Century BWP plywood · ISI-marked · Hettich / Hafele / Ebco hardware · Asian / Sirca polish · GST-billed materials",
+      "FREE site visit + measurement · 3D design preview · itemised quote · no advance for small work · post-installation cleanup included",
+      "1-year workmanship warranty · 10-year Hettich hardware warranty · WhatsApp daily progress photos · on-time delivery promise"
     ],
     faqs: [
       { q: "Do you provide free site visit and quotation?",
@@ -1143,11 +1143,11 @@
       "Plumbing emergencies don't wait — and neither do we. Same-day service for leaks, blockages, geyser issues. Free assessment before quoting any major work."
     ],
     usp: [
-      "Trained plumber · [X]+ yrs experience · Same-day service · No advance",
-      "Branded fittings · Jaquar · Cera · Hindware · Astral pipes",
-      "Bathroom · Kitchen · RO · Geyser · Tank cleaning",
-      "Free assessment · Itemised quote · Fair pricing · Clean work",
-      "Emergency response · WhatsApp [number] · 7-day rework guarantee"
+      "ITI / trained plumber · [X]+ yrs experience · [N]+ households served · same-day service · trusted in [Locality] since [Year]",
+      "Bathroom · kitchen · RO · geyser · CPVC piping · drainage · sewer · tank cleaning · waterproofing · sanitary fittings — full plumbing",
+      "ISI-mark certified · Jaquar / Cera / Hindware / Parryware / Kohler authorised · Astral / Supreme / Prince CPVC · GST bill provided",
+      "FREE inspection · itemised quote before work · no advance for small jobs · fair MRP-based pricing · clean cleanup after every job",
+      "24x7 emergency response · 30-min arrival in [City] · WhatsApp photo diagnosis · 7-day rework warranty · UPI payment accepted"
     ],
     faqs: [
       { q: "How fast can you reach in an emergency?",
@@ -1178,11 +1178,11 @@
       "Electricals are life-and-death matters — we treat them that way. Trained team, certified materials, and proper documentation for insurance / municipal compliance."
     ],
     usp: [
-      "Licensed electrician · [X]+ yrs experience · Residential + Commercial",
-      "ISI components only · Anchor · Havells · Polycab · Schneider",
-      "Wiring · Panel · LED · Fan · AC · Inverter · Solar",
-      "Safety-first · Proper earthing · Documented work · Compliance certificate",
-      "24x7 emergency · No advance · WhatsApp ready · 30-day workmanship warranty"
+      "Govt-licensed electrician · License No. [XXXXX] · ITI-certified · [X]+ yrs · residential + commercial + industrial wiring",
+      "House wiring · panel · MCB · RCCB · earthing · inverter · solar · fan · AC · LED · CCTV · doorbell · three-phase · motor connections",
+      "ISI-mark components only · Anchor · Havells · Polycab · Finolex · Schneider · Legrand · L&T · proper earthing · IS-732 compliant",
+      "Safety-first practice · documented work · written test certificate · insurance / municipal compliance papers · trained team only",
+      "24x7 emergency calls · no advance for small work · 30-day workmanship warranty · WhatsApp diagnosis · same-day fan/AC installation"
     ],
     faqs: [
       { q: "Are you a licensed electrician?",
@@ -1213,11 +1213,11 @@
       "Clean work guaranteed — masking tape, drop sheets, careful around switches and fixtures. Post-paint cleanup included. No splatters, no surprises."
     ],
     usp: [
-      "Trained team · [X]+ yrs experience · Branded paints · Clean finishing",
-      "Asian Paint · Berger · Nerolac · Dulux — authorised use",
-      "Interior · Exterior · Texture · POP · Waterproofing · Wallpaper",
-      "Free colour consult · Digital preview · Free shade trials",
-      "Surface prep included · 2-coat application · 1-year coating warranty"
+      "Trained painters · [X]+ yrs · master painter [Owner Name] · [N]+ homes done · serving [City] since [Year]",
+      "Interior emulsion · exterior weather-coat · texture · POP · false ceiling · wallpaper · stencil · waterproofing · enamel · wood polish",
+      "Asian Paints / Berger / Nerolac / Dulux authorised painter · ISI-mark materials · genuine MRP-billed paints · no diluted shortcuts",
+      "FREE colour consultation · digital room preview · physical shade trial on wall · drop sheets · masking · careful around fixtures",
+      "Putty + primer + 2 coats included · 1-year workmanship warranty · 3-5 yr exterior coating warranty · post-paint cleanup · GST bill"
     ],
     faqs: [
       { q: "What is the price per square foot for painting?",
@@ -1248,11 +1248,11 @@
       "Quality service + genuine parts + fair pricing. We don't recommend repairs you don't need — and we always tell you when it's cheaper to replace than repair."
     ],
     usp: [
-      "Multi-brand · LG · Samsung · Voltas · Daikin · Bluestar · Hitachi",
-      "AC · Fridge · Washing machine · Microwave · Geyser — all appliances",
-      "Free check-up · Itemised quote · Genuine spares · 90-day warranty",
-      "AMC packages · Seasonal servicing · 24x7 emergency",
-      "Trained technicians · Branded gas (R32/R410A) · Bill provided"
+      "Trained AC technician · [X]+ yrs experience · [N]+ ACs serviced · split + window + cassette + VRF · all brands handled",
+      "Window AC · split AC · cassette · VRF · fridge · washing machine · microwave · geyser · chimney — all white-goods serviced",
+      "Multi-brand authorised service · LG · Samsung · Voltas · Daikin · Bluestar · Hitachi · Carrier · Lloyd · Mitsubishi · Panasonic",
+      "FREE pickup-drop in [City] · itemised quote before work · genuine spares only · 90-day workmanship warranty · GST bill provided",
+      "Original R32 / R410A gas refill · vacuum + leak test included · AMC plans · 24x7 emergency · WhatsApp booking · same-day service"
     ],
     faqs: [
       { q: "Do you service all AC brands?",
@@ -2707,11 +2707,11 @@
       "Justice is a process — we walk it with you, ethically and effectively. From notice to judgment, we handle every step with care."
     ],
     usp: [
-      "Bar Council registered · [X]+ yrs practice · [Specialty areas]",
-      "Civil · Criminal · Family · Property · Corporate · Consumer · Tax",
-      "District + High Court · Supreme Court network · Documentation",
-      "Free initial consultation · Transparent fee · Fixed-fee packages",
-      "Mediation first · Court if necessary · Out-of-court settlement"
+      "Advocate [Name] · Bar Council of [State] Enr No. [XXXXX] · [X]+ yrs practice · [N]+ cases handled · LLB / LLM qualified",
+      "Civil · criminal · family · matrimonial · divorce · property · sale deed · will · POA · consumer · MACT · cheque bounce · 138 NI",
+      "Bar Council registered · State Bar Association member · Advocates Act 1961 compliant · attorney-client privilege guaranteed",
+      "FREE 30-min first consult · transparent fee structure · fixed-fee for documentation · no hidden charges · written engagement letter",
+      "District + High Court direct · Supreme Court senior network · digital filing · WhatsApp case updates · e-stamping · online notarisation"
     ],
     faqs: [
       { q: "What types of cases do you handle?",
