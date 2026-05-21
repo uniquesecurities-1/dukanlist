@@ -329,6 +329,21 @@ async function handleLogin(){
 async function startEnrollment(){
   showStep('stepEnroll');
 
+  // PROPER FIX: Clean up any stale UNVERIFIED factors before enrolling.
+  // Supabase's mfa.enroll() can fail or return incomplete data if an
+  // unverified factor is left over from a previous incomplete enrollment.
+  try {
+    const list = await c.auth.mfa.listFactors();
+    const allFactors = list.data?.all || [];
+    for (const f of allFactors) {
+      if (f.status !== 'verified') {
+        await c.auth.mfa.unenroll({ factorId: f.id });
+      }
+    }
+  } catch(cleanupErr) {
+    console.warn('Pre-enrollment cleanup failed (non-fatal):', cleanupErr);
+  }
+
   const { data, error } = await c.auth.mfa.enroll({
     factorType: 'totp',
     friendlyName: 'DukanList Admin'
@@ -336,6 +351,12 @@ async function startEnrollment(){
 
   if (error){
     document.getElementById('enrollErr').textContent = 'Failed to start enrollment: ' + error.message;
+    document.getElementById('enrollErr').style.display = 'flex';
+    return;
+  }
+
+  if (!data || !data.id) {
+    document.getElementById('enrollErr').textContent = 'Enrollment did not return a factor ID. Please refresh and try again.';
     document.getElementById('enrollErr').style.display = 'flex';
     return;
   }
