@@ -354,6 +354,40 @@
       <textarea id="uspHi" class="textarea" maxlength="280" placeholder="25+ साल का अनुभव। फ्री होम मेजरमेंट। कस्टम डिज़ाइन।"></textarea>
     </div>
 
+    <!-- ===== LOGIN CREDENTIALS — needed to manage your shop ===== -->
+    <div style="margin:18px 0;padding:16px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1.5px solid #3B82F6;border-radius:12px">
+      <div style="font-weight:800;color:#1E40AF;font-size:1rem;margin-bottom:6px">
+        🔐 <span data-i18n-en>Create your login</span><span data-i18n-hi>अपना लॉगिन बनाएँ</span>
+      </div>
+      <div style="font-size:.85rem;color:#1E3A8A;line-height:1.5;margin-bottom:14px">
+        <span data-i18n-en>You'll use this email + password to manage your shop, add photos, reply to reviews.</span>
+        <span data-i18n-hi>इस ईमेल + पासवर्ड से आप अपनी दुकान manage कर पाएंगे, फोटो डाल पाएंगे, reviews का जवाब दे पाएंगे।</span>
+      </div>
+
+      <div class="form-group">
+        <label><span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span><span class="req">*</span></label>
+        <div class="input-icon">
+          <span class="ico">✉️</span>
+          <input id="loginEmail" class="input keep-en" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:6px">
+        <label><span data-i18n-en>Password</span><span data-i18n-hi>पासवर्ड</span><span class="req">*</span> <span style="font-size:11px;color:#64748B;font-weight:600">(<span data-i18n-en>min 8 chars</span><span data-i18n-hi>कम से कम 8 अक्षर</span>)</span></label>
+        <div class="input-icon" style="position:relative">
+          <span class="ico">🔒</span>
+          <input id="loginPassword" class="input keep-en" type="password" placeholder="••••••••" autocomplete="new-password" style="padding-right:90px">
+          <button type="button" onclick="togglePwReg()" id="pwToggleBtnReg" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#E5E7EB;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:700;color:#374151">
+            <span data-i18n-en>Show</span><span data-i18n-hi>देखें</span>
+          </button>
+        </div>
+        <div style="font-size:11px;color:#1E3A8A;margin-top:4px">
+          <a href="#" onclick="genPw(event)" style="font-weight:700;color:#1E40AF">🎲 <span data-i18n-en>Generate strong password</span><span data-i18n-hi>मज़बूत पासवर्ड बनाएँ</span></a>
+          <span id="pwGenHint" style="margin-left:6px;color:#15803D"></span>
+        </div>
+      </div>
+    </div>
+
     <div class="alert info">
       <span class="a-icon">📸</span>
       <div>
@@ -929,6 +963,19 @@ async function handleSubmit(){
 
   const usp = document.getElementById('usp').value.trim();
   if (usp.length < 20) return showErr(errEl, 'USP must be at least 20 characters — tell us why customers choose you');
+
+  // NEW: Email + password validation
+  const loginEmail = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
+  const loginPassword = document.getElementById('loginPassword').value || '';
+  if (!loginEmail || loginEmail.indexOf('@') === -1){
+    return showErr(errEl, 'Please enter a valid email — needed to manage your shop later.');
+  }
+  if (loginPassword.length < 8){
+    return showErr(errEl, 'Password must be at least 8 characters — pick a strong one.');
+  }
+  STATE.data.loginEmail = loginEmail;
+  STATE.data.loginPassword = loginPassword;
+
   STATE.data.usp   = usp;
   STATE.data.uspHi = document.getElementById('uspHi').value.trim();
 
@@ -973,7 +1020,7 @@ async function handleSubmit(){
     p_owner_name   : STATE.data.ownerName,
     p_mobile       : STATE.phone,
     p_whatsapp     : waInput,
-    p_email        : STATE.data.email || null,
+    p_email        : STATE.data.loginEmail || STATE.data.email || null,
     p_address_line1: STATE.data.addr1,
     p_address_line2: STATE.data.addr2 || null,
     p_locality_id  : STATE.data.localityId,
@@ -990,6 +1037,30 @@ async function handleSubmit(){
     showErr(errEl, error.message || 'Could not register. Please try again.');
     return;
   }
+
+  // ==== Sign up auth user with email + password ====
+  btn.innerHTML = '<span>⏳ Creating your login...</span>';
+  let authError = null;
+  try {
+    const signUpRes = await c.auth.signUp({
+      email: STATE.data.loginEmail,
+      password: STATE.data.loginPassword,
+      options: {
+        data: { mobile: STATE.phone, business_id: data, role: 'shopkeeper' },
+        emailRedirectTo: window.location.origin + '/panel/login.html'
+      }
+    });
+    if (signUpRes.error){
+      authError = signUpRes.error.message || 'Could not create login';
+    } else if (signUpRes.data && signUpRes.data.session){
+      try { await c.rpc('claim_business_by_phone', { p_mobile: STATE.phone }); }
+      catch(claimErr){ console.warn('Auto-claim failed (non-fatal):', claimErr); }
+    }
+  } catch(e){
+    authError = e.message || 'Could not create login';
+  }
+  localStorage.setItem('shop_pending_mobile', STATE.phone);
+  if (authError){ localStorage.setItem('shop_signup_error', authError); }
 
   // ==== Success — build WhatsApp verify link + show pending screen ====
   const ADMIN_WA = '919541223377';
@@ -1012,7 +1083,7 @@ async function handleSubmit(){
 }
 
 // ============================================================
-// CLOUDFLARE TURNSTILE — invisible CAPTCHA
+// CLOUDFLARE TURNSTILE
 // ============================================================
 function loadTurnstile(){
   if (!TURNSTILE_SITE_KEY) return;
@@ -1024,40 +1095,21 @@ function loadTurnstile(){
     document.head.appendChild(s);
   }
 }
-
-window.onTurnstileLoad = function(){
-  if (!window.turnstile || !TURNSTILE_SITE_KEY) return;
-  const host = document.getElementById('turnstile-widget');
-  if (!host) return;
-  TURNSTILE_WIDGET_ID = window.turnstile.render(host, {
-    sitekey: TURNSTILE_SITE_KEY,
-    size: 'invisible',
-    callback: function(token){ TURNSTILE_TOKEN = token; },
-    'error-callback': function(){ TURNSTILE_TOKEN = ''; },
-    'expired-callback': function(){ TURNSTILE_TOKEN = ''; }
-  });
-};
-
+window.onTurnstileLoad = function(){};
 async function getTurnstileToken(){
-  if (!TURNSTILE_SITE_KEY) return 'skipped';
-  if (!window.turnstile || TURNSTILE_WIDGET_ID == null) return null;
+  if (!TURNSTILE_SITE_KEY) return null;
   return new Promise((resolve) => {
     try {
-      window.turnstile.reset(TURNSTILE_WIDGET_ID);
-      const checkToken = setInterval(() => {
-        if (TURNSTILE_TOKEN){
-          clearInterval(checkToken);
-          resolve(TURNSTILE_TOKEN);
-        }
-      }, 200);
-      setTimeout(() => { clearInterval(checkToken); resolve(TURNSTILE_TOKEN || null); }, 7000);
-    } catch(e){
-      console.warn('Turnstile token fetch failed', e);
-      resolve(null);
-    }
+      if (typeof turnstile === 'undefined') return resolve(null);
+      turnstile.render('#cf-turnstile-target', {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (token) => resolve(token),
+        'error-callback': () => resolve(null)
+      });
+      setTimeout(() => resolve(null), 8000);
+    } catch(e){ resolve(null); }
   });
 }
-
 async function verifyTurnstile(token){
   if (!TURNSTILE_SITE_KEY) return true;
   if (!token) return false;
@@ -1069,10 +1121,46 @@ async function verifyTurnstile(token){
     });
     const data = await resp.json();
     return !!data.success;
-  } catch(e){
-    console.warn('Turnstile verify endpoint failed', e);
-    return false;
+  } catch(e){ return false; }
+}
+
+// ============================================================
+// LOGIN CREDENTIALS HELPERS (step 4)
+// ============================================================
+function togglePwReg(){
+  const inp = document.getElementById('loginPassword');
+  const btn = document.getElementById('pwToggleBtnReg');
+  if (!inp || !btn) return;
+  if (inp.type === 'password'){
+    inp.type = 'text';
+    btn.innerHTML = '<span data-i18n-en>Hide</span><span data-i18n-hi>छुपाएँ</span>';
+  } else {
+    inp.type = 'password';
+    btn.innerHTML = '<span data-i18n-en>Show</span><span data-i18n-hi>देखें</span>';
   }
+}
+function genPw(e){
+  if (e && e.preventDefault) e.preventDefault();
+  const up = 'ABCDEFGHJKLMNPQRSTUVWXYZ', lo = 'abcdefghijkmnopqrstuvwxyz', di = '23456789', sy = '!@#$%&*?';
+  const all = up + lo + di + sy;
+  function pick(s){ return s[Math.floor(Math.random()*s.length)]; }
+  const arr = [pick(up), pick(up), pick(lo), pick(lo), pick(di), pick(di), pick(sy)];
+  while(arr.length < 12) arr.push(pick(all));
+  for (let i = arr.length-1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  const pw = arr.join('');
+  const inp = document.getElementById('loginPassword');
+  if (inp){
+    inp.value = pw;
+    inp.type = 'text';
+    const btn = document.getElementById('pwToggleBtnReg');
+    if (btn) btn.innerHTML = '<span data-i18n-en>Hide</span><span data-i18n-hi>छुपाएँ</span>';
+  }
+  const hint = document.getElementById('pwGenHint');
+  if (hint) hint.textContent = '✓ Copied — save it safely!';
+  try { navigator.clipboard.writeText(pw); } catch(_){}
 }
 
 // Boot

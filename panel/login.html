@@ -8,6 +8,11 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css">
+<style>
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:#64748B;padding:4px 8px}
+.pw-toggle:hover{color:#0F172A}
+</style>
 </head>
 <body>
 
@@ -34,43 +39,43 @@
     <span data-i18n-hi><span class="grad">दुकानदार</span> लॉगिन</span>
   </h1>
   <p class="subtitle">
-    <span data-i18n-en>Enter your registered mobile to receive OTP</span>
-    <span data-i18n-hi>OTP प्राप्त करने के लिए अपना रजिस्टर्ड मोबाइल डालें</span>
+    <span data-i18n-en>Sign in with your email and password</span>
+    <span data-i18n-hi>अपना ईमेल और पासवर्ड डालें</span>
   </p>
 
   <div class="card">
-    <div id="phoneBlock">
-      <div class="form-group">
-        <label><span data-i18n-en>Mobile Number</span><span data-i18n-hi>मोबाइल नंबर</span><span class="req">*</span></label>
-        <div class="input-icon">
-          <span class="ico">📞</span>
-          <input id="phone" class="input keep-en" type="tel" placeholder="+91 9541223377" inputmode="numeric" maxlength="13">
-        </div>
+    <div class="form-group">
+      <label><span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span><span class="req">*</span></label>
+      <div class="input-icon">
+        <span class="ico">✉️</span>
+        <input id="email" class="input keep-en" type="email" placeholder="you@example.com" autocomplete="email">
       </div>
-      <div class="alert error" id="phoneErr" style="display:none"></div>
-      <button class="btn btn-pri btn-block" onclick="handleSendOTP()" id="sendOtpBtn">
-        <span data-i18n-en>Send OTP →</span>
-        <span data-i18n-hi>OTP भेजें →</span>
-      </button>
     </div>
 
-    <div id="otpBlock" style="display:none">
-      <div class="form-group">
-        <label><span data-i18n-en>Enter 6-digit OTP</span><span data-i18n-hi>6 अंकों का OTP डालें</span><span class="req">*</span></label>
-        <input id="otp" class="otp-input keep-en" type="text" maxlength="6" inputmode="numeric" placeholder="------">
-        <div class="help">
-          <span data-i18n-en>Sent to <b id="otpToMobile" class="keep-en"></b>. <a href="#" onclick="changePhone(event)">Change</a></span>
-          <span data-i18n-hi><b id="otpToMobileHi" class="keep-en"></b> पर भेजा। <a href="#" onclick="changePhone(event)">बदलें</a></span>
-        </div>
+    <div class="form-group">
+      <label><span data-i18n-en>Password</span><span data-i18n-hi>पासवर्ड</span><span class="req">*</span></label>
+      <div class="input-icon pw-wrap">
+        <span class="ico">🔒</span>
+        <input id="password" class="input keep-en" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="pw-toggle" onclick="togglePw()" id="pwToggleBtn">👁</button>
       </div>
-      <div class="alert error" id="otpErr" style="display:none"></div>
-      <button class="btn btn-pri btn-block" onclick="handleVerifyOTP()" id="verifyOtpBtn">
-        <span data-i18n-en>Login →</span>
-        <span data-i18n-hi>लॉगिन करें →</span>
-      </button>
     </div>
 
-    <div style="text-align:center;margin-top:18px;font-size:.88rem;color:var(--muted)">
+    <div class="alert error" id="loginErr" style="display:none"></div>
+
+    <button class="btn btn-pri btn-block" onclick="handleLogin()" id="loginBtn">
+      <span data-i18n-en>Login →</span>
+      <span data-i18n-hi>लॉगिन →</span>
+    </button>
+
+    <div style="text-align:center;margin-top:14px;font-size:.88rem">
+      <a href="/panel/forgot-password.html" style="color:var(--saffron-deep);font-weight:600;text-decoration:none">
+        <span data-i18n-en>Forgot password?</span>
+        <span data-i18n-hi>पासवर्ड भूल गए?</span>
+      </a>
+    </div>
+
+    <div style="text-align:center;margin-top:18px;padding-top:18px;border-top:1px solid #E5E7EB;font-size:.88rem;color:var(--muted)">
       <span data-i18n-en>No account yet?</span>
       <span data-i18n-hi>अकाउंट नहीं है?</span>
       <a href="/register.html" style="font-weight:700">
@@ -79,6 +84,11 @@
       </a>
     </div>
   </div>
+
+  <p style="text-align:center;margin-top:16px;font-size:.78rem;color:var(--muted)">
+    <span data-i18n-en>Already registered your shop but no login yet? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">Claim your account</a></span>
+    <span data-i18n-hi>दुकान रजिस्टर है लेकिन लॉगिन नहीं? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">अपना अकाउंट क्लेम करें</a></span>
+  </p>
 </div>
 
 <footer class="site">
@@ -88,7 +98,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/nav.js" defer></script>
-<script src="/assets/js/otp.js"></script>
 <script>
 function setLang(lang){
   if (lang !== 'en' && lang !== 'hi') lang = 'en';
@@ -100,51 +109,78 @@ function setLang(lang){
 }
 function loadSavedLang(){ setLang(localStorage.getItem('shop_lang') || 'en'); }
 
-let CURRENT_PHONE = '';
+function togglePw(){
+  const inp = document.getElementById('password');
+  const btn = document.getElementById('pwToggleBtn');
+  if (inp.type === 'password'){ inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
 
-async function handleSendOTP(){
-  const btn = document.getElementById('sendOtpBtn');
-  const m = document.getElementById('phone').value.trim();
-  const err = document.getElementById('phoneErr');
+async function handleLogin(){
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginErr');
   err.style.display = 'none';
-  if (!OTP.isValidIndianMobile(m)) {
-    err.textContent = 'Enter a valid 10-digit Indian mobile';
+
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+
+  if (!email || email.indexOf('@') === -1){
+    err.textContent = 'Enter a valid email address';
     err.style.display = 'flex'; return;
   }
-  btn.disabled = true; btn.innerHTML = '<span>⏳ Sending...</span>';
-  const r = await OTP.sendOTP(m);
-  btn.disabled = false; btn.innerHTML = '<span>Send OTP →</span>';
-  if (!r.ok){ err.textContent = r.error || 'Failed to send OTP'; err.style.display = 'flex'; return; }
-  CURRENT_PHONE = OTP.cleanMobile(m);
-  document.getElementById('otpToMobile').textContent = CURRENT_PHONE;
-  document.getElementById('otpToMobileHi').textContent = CURRENT_PHONE;
-  document.getElementById('phoneBlock').style.display = 'none';
-  document.getElementById('otpBlock').style.display = '';
-  document.getElementById('otp').focus();
-}
+  if (!password){
+    err.textContent = 'Enter your password';
+    err.style.display = 'flex'; return;
+  }
 
-function changePhone(e){
-  e.preventDefault();
-  document.getElementById('phoneBlock').style.display = '';
-  document.getElementById('otpBlock').style.display = 'none';
-}
+  btn.disabled = true; btn.innerHTML = '<span>⏳ Signing in...</span>';
 
-async function handleVerifyOTP(){
-  const btn = document.getElementById('verifyOtpBtn');
-  const token = document.getElementById('otp').value.trim();
-  const err = document.getElementById('otpErr');
-  err.style.display = 'none';
-  if (!/^\d{6}$/.test(token)){ err.textContent = 'Enter 6-digit OTP'; err.style.display='flex'; return; }
-  btn.disabled = true; btn.innerHTML = '<span>⏳ Verifying...</span>';
-  const r = await OTP.verifyOTP(CURRENT_PHONE, token);
-  btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
-  if (!r.ok){ err.textContent = r.error || 'Wrong OTP'; err.style.display = 'flex'; return; }
-  // Success — redirect to dashboard or next URL
+  const c = ShopDB.client;
+  const { data, error } = await c.auth.signInWithPassword({ email, password });
+
+  if (error){
+    btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
+    let msg = error.message || 'Login failed';
+    if (/invalid login credentials/i.test(msg)) msg = 'Wrong email or password. Try again.';
+    if (/email not confirmed/i.test(msg)) msg = 'Please confirm your email first — check your inbox.';
+    err.textContent = msg;
+    err.style.display = 'flex'; return;
+  }
+
+  // Auto-claim: link any pending business by mobile
+  const pendingMobile = localStorage.getItem('shop_pending_mobile');
+  if (pendingMobile){
+    try {
+      await c.rpc('claim_business_by_phone', { p_mobile: pendingMobile });
+    } catch(claimErr){
+      console.warn('Claim by phone failed (non-fatal — may already be linked):', claimErr);
+    }
+    localStorage.removeItem('shop_pending_mobile');
+    localStorage.removeItem('shop_signup_error');
+  }
+
   const next = new URLSearchParams(location.search).get('next') || '/panel/dashboard.html';
   location.href = next;
 }
 
-window.addEventListener('DOMContentLoaded', loadSavedLang);
+document.addEventListener('DOMContentLoaded', function(){
+  loadSavedLang();
+  const pwInput = document.getElementById('password');
+  pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  const emInput = document.getElementById('email');
+  emInput.addEventListener('keydown', e => { if (e.key === 'Enter') pwInput.focus(); });
+
+  // If already logged in, redirect straight to dashboard
+  setTimeout(async () => {
+    const c = ShopDB.client;
+    if (!c) return;
+    const { data: { session } } = await c.auth.getSession();
+    if (session){
+      const next = new URLSearchParams(location.search).get('next') || '/panel/dashboard.html';
+      location.href = next;
+    }
+  }, 100);
+});
 </script>
 
 </body>
