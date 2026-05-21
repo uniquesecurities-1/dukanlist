@@ -286,15 +286,19 @@ let C = null;
       return;
     }
 
-    // Show "Admins" link if super_admin + fill debug panel
+    // Get admin scope (may fail if db/19 not run — non-blocking)
+    let scope = null;
     try {
-      const { data: scope } = await C.rpc('get_admin_scope');
+      const { data, error } = await C.rpc('get_admin_scope');
+      if (!error) scope = data;
       if (scope && scope.is_super){
         const navAdmins = document.getElementById('navAdmins');
         if (navAdmins) navAdmins.style.display = '';
       }
-      await fillDebugPanel(scope, userResp.user);
-    } catch(e){ /* non-blocking */ console.warn('[mod] scope fetch failed', e); }
+    } catch(e){ console.warn('[mod] scope fetch failed', e); }
+
+    // ALWAYS show debug panel — even if scope fetch failed
+    try { await fillDebugPanel(scope, userResp.user); } catch(e){ console.warn('[mod] debug panel failed', e); }
 
     // Honor URL tab param
     const params = new URLSearchParams(window.location.search);
