@@ -207,6 +207,56 @@
       <div id="hoursList"></div>
     </div>
 
+    <!-- ===== ASK FOR REVIEW (WhatsApp) ===== -->
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">
+        📣 <span data-i18n-en>Get more reviews</span><span data-i18n-hi>ज़्यादा रिव्यू पाएं</span>
+      </div>
+      <div class="card-sub">
+        <span data-i18n-en>Send a polite WhatsApp link to satisfied customers asking them to review your shop. More 5-star reviews = higher ranking on DukanList.</span>
+        <span data-i18n-hi>संतुष्ट ग्राहकों को WhatsApp से रिव्यू मांगें। अधिक 5-स्टार रिव्यू = बेहतर रैंकिंग।</span>
+      </div>
+
+      <div class="form-row" style="grid-template-columns:140px 1fr;gap:8px;align-items:end">
+        <div>
+          <label><span data-i18n-en>Country code</span><span data-i18n-hi>देश कोड</span></label>
+          <select id="askCC" class="select keep-en">
+            <option value="91" selected>+91 India</option>
+            <option value="971">+971 UAE</option>
+            <option value="1">+1 USA/Canada</option>
+            <option value="44">+44 UK</option>
+            <option value="65">+65 Singapore</option>
+          </select>
+        </div>
+        <div>
+          <label><span data-i18n-en>Customer's WhatsApp (10-digit)</span><span data-i18n-hi>ग्राहक का WhatsApp (10 अंक)</span></label>
+          <input id="askPhone" class="input keep-en" type="tel" inputmode="numeric" maxlength="10" placeholder="9876543210" autocomplete="off">
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <label><span data-i18n-en>Message (editable)</span><span data-i18n-hi>संदेश (बदल सकते हैं)</span></label>
+        <textarea id="askMsg" class="textarea" rows="4" maxlength="600" placeholder="Loading message..."></textarea>
+      </div>
+
+      <div class="alert info" id="askInfo" style="display:none;margin-top:10px;font-size:.82rem"></div>
+      <div class="alert error" id="askErr" style="display:none;margin-top:10px;font-size:.82rem"></div>
+
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-pri" type="button" onclick="generateAskLink()">
+          🔗 <span data-i18n-en>Generate Link</span><span data-i18n-hi>लिंक बनाएं</span>
+        </button>
+        <button class="btn btn-sec" type="button" id="askOpenBtn" onclick="openAskLink()" disabled>
+          💬 <span data-i18n-en>Open WhatsApp</span><span data-i18n-hi>WhatsApp खोलें</span>
+        </button>
+        <button class="btn btn-sec" type="button" id="askCopyBtn" onclick="copyAskLink()" disabled>
+          📋 <span data-i18n-en>Copy Link</span><span data-i18n-hi>लिंक कॉपी</span>
+        </button>
+      </div>
+
+      <div id="askLinkBox" style="display:none;margin-top:10px;padding:10px 12px;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;font-size:.78rem;word-break:break-all;color:#0C4A6E"></div>
+    </div>
+
     <!-- ===== ACTIONS ===== -->
     <div class="alert error" id="saveErr" style="display:none;margin-top:14px"></div>
     <div class="alert success" id="saveOk" style="display:none;margin-top:14px"></div>
@@ -648,9 +698,100 @@ function escapeHTML(s){
   return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
 
+// ============================================================
+// "Ask for Review" — WhatsApp link generator
+// ============================================================
+function profilePublicUrl(){
+  const slug = MY_BIZ && MY_BIZ.slug ? MY_BIZ.slug : '';
+  if (!slug) return location.origin + '/';
+  return 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(slug);
+}
+
+function defaultAskMessage(){
+  const shopName = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our shop';
+  const base = profilePublicUrl();
+  // profilePublicUrl already has a query (?slug=...). Use & to add review=1.
+  const sep = base.indexOf('?') >= 0 ? '&' : '?';
+  const url = base + sep + 'review=1';
+  return 'Hi! Thank you for visiting ' + shopName + '. We would love your honest feedback on DukanList. Please rate us here: ' + url;
+}
+
+function seedAskMessage(){
+  const ta = document.getElementById('askMsg');
+  if (ta && !ta.value) ta.value = defaultAskMessage();
+}
+
+function generateAskLink(){
+  const cc    = (document.getElementById('askCC').value || '91').replace(/\D/g,'');
+  const phone = (document.getElementById('askPhone').value || '').replace(/\D/g,'');
+  const msg   = document.getElementById('askMsg').value.trim() || defaultAskMessage();
+  const errEl = document.getElementById('askErr');
+  const okEl  = document.getElementById('askInfo');
+  const box   = document.getElementById('askLinkBox');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!phone || phone.length < 7){
+    errEl.textContent = 'Enter a valid mobile number (without country code).';
+    errEl.style.display = '';
+    box.style.display = '';
+    document.getElementById('askOpenBtn').disabled = true;
+    document.getElementById('askCopyBtn').disabled = true;
+    return null;
+  }
+  const full = cc + phone;
+  const url  = 'https://wa.me/' + full + '?text=' + encodeURIComponent(msg);
+  box.textContent = url;
+  box.style.display = '';
+  document.getElementById('askOpenBtn').disabled = false;
+  document.getElementById('askCopyBtn').disabled = false;
+  okEl.textContent = 'Link ready — tap "Open WhatsApp" or copy.';
+  okEl.style.display = '';
+  return url;
+}
+
+function openAskLink(){
+  const url = generateAskLink();
+  if (!url) return;
+  window.open(url, '_blank', 'noopener');
+}
+
+function copyAskLink(){
+  const url = generateAskLink();
+  if (!url) return;
+  const done = () => {
+    const ok = document.getElementById('askInfo');
+    ok.textContent = '✓ Link copied to clipboard!';
+    ok.style.display = '';
+    setTimeout(() => { ok.textContent = 'Link ready — tap "Open WhatsApp" or copy.'; }, 1800);
+  };
+  try{
+    navigator.clipboard.writeText(url).then(done, () => fallbackCopyAsk(url, done));
+  }catch(_){ fallbackCopyAsk(url, done); }
+}
+function fallbackCopyAsk(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }
+  catch(_){ alert(text); }
+  finally{ ta.remove(); }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   setLang(localStorage.getItem('shop_lang') || 'en');
   loadProfile();
+  // Seed the WhatsApp message once MY_BIZ is loaded — retry until ready
+  let tries = 0;
+  const seedTimer = setInterval(() => {
+    if (MY_BIZ){
+      seedAskMessage();
+      clearInterval(seedTimer);
+    } else if (++tries > 40){
+      clearInterval(seedTimer); // give up after ~8s
+      seedAskMessage(); // seed with fallback shop name
+    }
+  }, 200);
 });
 </script>
 

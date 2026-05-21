@@ -332,6 +332,23 @@
         <span data-i18n-hi>30 शब्दों में अपनी खासियत। ज़्यादा से ज़्यादा 280 अक्षर।</span>
       </div>
     </div>
+
+    <!-- ===== USP TEMPLATE SIDEBAR — profession-specific quick picks ===== -->
+    <div id="uspTemplateBox" style="margin:14px 0 18px;padding:14px 16px;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1.5px solid #F59E0B;border-radius:12px;display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="font-weight:800;color:#92400E;font-size:.92rem">
+          💡 <span data-i18n-en>Quick USP Templates</span><span data-i18n-hi>तैयार USP टेम्पलेट</span>
+          <span style="font-weight:600;color:#9A3412;font-size:.78rem"> — <span data-i18n-en>tap to fill</span><span data-i18n-hi>tap करें</span></span>
+        </div>
+        <span id="uspTemplateCat" style="font-size:.78rem;color:#9A3412;font-weight:700;background:#FFEDD5;padding:3px 9px;border-radius:99px"></span>
+      </div>
+      <div id="uspTemplateList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="font-size:.72rem;color:#9A3412;margin-top:8px;opacity:.85">
+        <span data-i18n-en>Click any template → it fills the text box above. Replace [brackets] with your real info.</span>
+        <span data-i18n-hi>किसी टेम्पलेट पर click करें → ऊपर भर जाएगा। [brackets] में अपनी जानकारी लिखें।</span>
+      </div>
+    </div>
+
     <div class="form-group">
       <label><span data-i18n-en>USP in Hindi</span><span data-i18n-hi>USP हिंदी में</span><span class="opt">(optional)</span></label>
       <textarea id="uspHi" class="textarea" maxlength="280" placeholder="25+ साल का अनुभव। फ्री होम मेजरमेंट। कस्टम डिज़ाइन।"></textarea>
@@ -420,6 +437,7 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/geo.js"></script>
+<script src="/assets/js/templates.js"></script>
 <script>
 // ============================================================
 // SHARED — language + nav
@@ -470,6 +488,68 @@ function goToStep(n){
   document.getElementById('stepName').textContent = STEP_NAMES_EN[n];
   document.getElementById('stepNameHi').textContent = STEP_NAMES_HI[n];
   window.scrollTo({top:0, behavior:'smooth'});
+
+  // When entering Step 4 — render USP templates for the selected primary category
+  if (n === 4) renderUspTemplates();
+}
+
+function renderUspTemplates(){
+  const box = document.getElementById('uspTemplateBox');
+  const list = document.getElementById('uspTemplateList');
+  const catTag = document.getElementById('uspTemplateCat');
+  if (!box || !list || !window.getProfileTemplates) return;
+
+  // Primary category slug + parent slug from STATE.data.primaryCategoryId
+  const primaryId = STATE.data.primaryCategoryId;
+  const primary = primaryId ? CAT_STATE.catsById[primaryId] : null;
+  if (!primary){
+    box.style.display = 'none';
+    return;
+  }
+  const subSlug = primary.slug;
+  const parentSlug = primary.parent_slug;
+  const templates = window.getProfileTemplates(subSlug, parentSlug);
+
+  const usps = (templates && templates.usp) || [];
+  if (!usps.length){
+    box.style.display = 'none';
+    return;
+  }
+
+  catTag.textContent = (primary.icon || '') + ' ' + primary.name;
+  list.innerHTML = usps.map((t, i) => `
+    <div class="usp-tpl" data-idx="${i}" style="padding:10px 12px;background:#fff;border:1px solid #FDE68A;border-radius:8px;cursor:pointer;font-size:.85rem;line-height:1.5;color:var(--ink-2);transition:.15s">
+      ${escapeHtml(t)}
+    </div>
+  `).join('');
+
+  // Bind click
+  list.querySelectorAll('.usp-tpl').forEach(el => {
+    el.addEventListener('mouseover', () => {
+      el.style.background = '#FFFBEB';
+      el.style.borderColor = '#F59E0B';
+      el.style.transform = 'translateY(-1px)';
+    });
+    el.addEventListener('mouseout', () => {
+      el.style.background = '#fff';
+      el.style.borderColor = '#FDE68A';
+      el.style.transform = '';
+    });
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.idx, 10);
+      const usp = document.getElementById('usp');
+      if (usp){
+        usp.value = usps[idx];
+        usp.focus();
+        // Pulse highlight
+        usp.style.transition = 'background .3s';
+        usp.style.background = '#FEF3C7';
+        setTimeout(() => { usp.style.background = ''; }, 600);
+      }
+    });
+  });
+
+  box.style.display = '';
 }
 
 // ============================================================

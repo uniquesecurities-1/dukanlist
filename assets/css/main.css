@@ -23,6 +23,26 @@
   --shadow-lg:0 12px 40px rgba(15,23,42,.15);
   --radius:14px;
   --radius-sm:10px;
+  /* ===== Apple-style design tokens ===== */
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:24px;
+  --space-6:32px;
+  --space-7:48px;
+  --space-8:64px;
+  --space-9:96px;
+  --space-10:128px;
+  --soft-1:0 1px 2px rgba(15,23,42,.04);
+  --soft-2:0 4px 14px rgba(15,23,42,.05);
+  --soft-3:0 10px 30px rgba(15,23,42,.06);
+  --soft-4:0 20px 50px rgba(15,23,42,.08);
+  --soft-5:0 30px 80px rgba(15,23,42,.10);
+  --ease-apple:cubic-bezier(.22,.61,.36,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --radius-lg:18px;
+  --radius-xl:22px;
 }
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 
@@ -597,4 +617,142 @@ body{ animation: fadeIn .25s ease-out }
 
 /* ============================================================
    END MOBILE-FIRST PACK
+   ============================================================ */
+
+
+/* ============================================================
+   APPLE-GRADE POLISH — Display typography, soft depth, hush
+   ============================================================ */
+
+/* Background: cream-to-white, lighter feel */
+body{ background:#FFFFFF }
+
+/* Display typography — for hero/section headlines */
+.display-1, .display-2, .display-3{
+  font-family:'Manrope', sans-serif;
+  font-weight:800;
+  letter-spacing:-.04em;
+  line-height:1.04;
+  color:var(--ink);
+}
+.display-1{ font-size:clamp(2.4rem, 7.2vw, 5.4rem) }
+.display-2{ font-size:clamp(2rem, 5.6vw, 4rem); letter-spacing:-.035em; line-height:1.06 }
+.display-3{ font-size:clamp(1.6rem, 4.2vw, 3rem); letter-spacing:-.03em; line-height:1.1 }
+html[data-lang="hi"] .display-1,
+html[data-lang="hi"] .display-2,
+html[data-lang="hi"] .display-3{ font-family:'Noto Sans Devanagari',sans-serif; letter-spacing:-.01em; line-height:1.18 }
+.display-1 .grad,
+.display-2 .grad,
+.display-3 .grad{
+  background:linear-gradient(135deg, var(--saffron) 0%, var(--saffron-deep) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+.lede{
+  font-size:clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height:1.55;
+  color:#3A4655;
+  font-weight:400;
+  max-width:680px;
+  letter-spacing:-.005em;
+}
+
+/* Apple-feel section helper */
+.section-pad{ padding:var(--space-9) var(--space-5) }
+.section-pad-lg{ padding:var(--space-10) var(--space-5) }
+@media (max-width:760px){
+  .section-pad{ padding:var(--space-7) var(--space-4) }
+  .section-pad-lg{ padding:var(--space-8) var(--space-4) }
+}
+
+/* Soft surface — cards, panels */
+.surface{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  box-shadow:var(--soft-3);
+  border:1px solid rgba(15,23,42,.04);
+  transition:transform .35s var(--ease-apple), box-shadow .35s var(--ease-apple);
+}
+.surface:hover{ transform:translateY(-2px); box-shadow:var(--soft-4) }
+
+/* Soft hover lift override (gentler than existing .lift) */
+.lift-soft{ transition:transform .35s var(--ease-apple), box-shadow .35s var(--ease-apple), border-color .25s var(--ease-apple) }
+.lift-soft:hover{ transform:translateY(-2px); box-shadow:var(--soft-4) }
+
+/* Apple-style buttons (override gradient with confident solids) */
+.btn{
+  border-radius:980px;          /* pill-style like apple.com */
+  padding:13px 26px;
+  font-weight:700;
+  font-size:.95rem;
+  letter-spacing:-.005em;
+  transition:transform .25s var(--ease-apple), box-shadow .3s var(--ease-apple), background .25s var(--ease-apple), color .25s var(--ease-apple);
+}
+.btn-pri{
+  background:linear-gradient(135deg, var(--saffron) 0%, var(--saffron-deep) 100%);
+  color:#fff;
+  box-shadow:0 8px 24px rgba(255,107,26,.28);
+}
+.btn-pri:not(:disabled):hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 36px rgba(255,107,26,.40);
+}
+.btn-sec{
+  background:#F5F5F7;
+  color:var(--ink);
+  border:none;
+  font-weight:600;
+}
+.btn-sec:hover{ background:#EAEAEC; transform:translateY(-2px); box-shadow:var(--soft-2); text-decoration:none }
+.btn-lg{ padding:16px 32px; font-size:1.02rem; min-height:52px }
+
+/* Scroll-triggered reveal — uses IntersectionObserver if present, fallback graceful */
+.reveal{
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity .8s var(--ease-apple), transform .8s var(--ease-apple);
+  will-change:opacity, transform;
+}
+.reveal.is-visible{ opacity:1; transform:translateY(0) }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1; transform:none; transition:none }
+}
+
+/* Polished images — rounded, soft */
+.rounded-img{ border-radius:var(--radius-lg); overflow:hidden }
+.rounded-img-lg{ border-radius:var(--radius-xl); overflow:hidden }
+
+/* Page heading scale refinement (title used in browse, search, etc.) */
+h1.title{
+  font-size:clamp(2.2rem, 5.5vw, 3.6rem);
+  font-weight:800;
+  letter-spacing:-.035em;
+  line-height:1.06;
+  margin-bottom:14px;
+}
+html[data-lang="hi"] h1.title{ letter-spacing:-.01em; line-height:1.18 }
+.subtitle{
+  font-size:clamp(1rem, 1.4vw, 1.15rem);
+  color:#5A6573;
+  margin-bottom:36px;
+  letter-spacing:-.005em;
+  max-width:640px;
+  line-height:1.55;
+}
+
+/* Page wrapper: more generous on Apple feel */
+.page{ max-width:1080px; padding:64px 24px }
+.page-narrow{ padding:48px 20px }
+@media (max-width:720px){
+  .page{ padding:36px 18px }
+  .page-narrow{ padding:30px 16px }
+  h1.title{ font-size:2rem }
+  .subtitle{ margin-bottom:24px }
+}
+
+/* Selection more subtle */
+::selection{ background:rgba(255,107,26,.18); color:var(--ink) }
+
+/* ============================================================
+   END APPLE-GRADE POLISH
    ============================================================ */

@@ -7,38 +7,136 @@
 <title>Search Shops — dukanlist.com</title>
 <meta name="description" content="Find local shops, services, doctors, carpenters, mechanics near you.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
-.search-bar{ background:#fff; padding:14px; border-radius:12px; box-shadow:var(--shadow-sm); display:grid; grid-template-columns:1.5fr 1fr 1fr auto; gap:8px; margin-bottom:18px }
+/* ===== Search bar (Apple-grade prominence) ===== */
+.search-bar{
+  background:#fff;
+  padding:10px;
+  border-radius:22px;
+  box-shadow:0 20px 50px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04);
+  display:grid;
+  grid-template-columns:1.6fr 1fr 1fr auto;
+  gap:8px;
+  margin-bottom:36px;
+  border:1px solid rgba(15,23,42,.04);
+  transition:box-shadow .35s cubic-bezier(.22,.61,.36,1);
+}
+.search-bar:focus-within{ box-shadow:0 30px 80px rgba(15,23,42,.10), 0 1px 3px rgba(15,23,42,.04) }
 @media (max-width:700px){ .search-bar{ grid-template-columns:1fr 1fr; gap:6px } .search-bar .search-btn{ grid-column:1/-1 } }
-.search-bar input,.search-bar select{ padding:10px 12px 10px 36px; border:1px solid var(--line); border-radius:8px; font-size:.9rem; font-family:inherit; width:100%; color:var(--ink) }
+.search-bar input,.search-bar select{
+  padding:14px 14px 14px 44px;
+  border:none;
+  background:transparent;
+  border-radius:14px;
+  font-size:.98rem;
+  font-family:inherit;
+  width:100%;
+  color:var(--ink);
+  font-weight:500;
+  letter-spacing:-.005em;
+}
+.search-bar input:focus, .search-bar select:focus{ outline:none; background:#FAFAFA }
 .search-bar .field{ position:relative }
-.search-bar .field .ico{ position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:.95rem; opacity:.6 }
-.search-bar .search-btn{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff; border:none; border-radius:8px; padding:0 18px; font-weight:800; cursor:pointer; font-family:inherit; font-size:.92rem; min-height:42px }
+.search-bar .field .ico{ position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:1.05rem; opacity:.55 }
+.search-bar .search-btn{
+  background:linear-gradient(135deg,var(--saffron),var(--saffron-deep));
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:0 26px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:.96rem;
+  min-height:50px;
+  letter-spacing:-.005em;
+  transition:transform .25s cubic-bezier(.22,.61,.36,1), box-shadow .3s cubic-bezier(.22,.61,.36,1);
+}
+.search-bar .search-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 28px rgba(255,107,26,.4) }
 
-.result-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px }
-.result-count{ font-size:.85rem; color:var(--muted); font-weight:700 }
-.result-count b{ color:var(--ink) }
+.result-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:8px }
+.result-count{ font-size:.95rem; color:#5A6573; font-weight:500; letter-spacing:-.005em }
+.result-count b{ color:var(--ink); font-weight:600 }
 
-.biz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px }
-.biz-card{ background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; transition:.18s; cursor:pointer; text-decoration:none; color:inherit; display:flex; flex-direction:column }
-.biz-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--saffron); text-decoration:none }
+/* ===== Result cards (Apple-grade) ===== */
+.biz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px }
+.biz-card{
+  background:#fff;
+  border:1px solid rgba(15,23,42,.04);
+  border-radius:20px;
+  overflow:hidden;
+  transition:transform .35s cubic-bezier(.22,.61,.36,1), box-shadow .35s cubic-bezier(.22,.61,.36,1);
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 1px 3px rgba(15,23,42,.04);
+}
+.biz-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 20px 50px rgba(15,23,42,.08);
+  text-decoration:none;
+}
 .biz-photo{ aspect-ratio:16/10; background:linear-gradient(135deg,#FAFAFA,#F1F5F9); position:relative; overflow:hidden }
-.biz-photo img{ width:100%; height:100%; object-fit:cover }
-.biz-photo .ph-fb{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; opacity:.4 }
-.biz-photo .verify{ position:absolute; top:8px; right:8px; background:rgba(5,150,105,.95); color:#fff; padding:3px 9px; border-radius:99px; font-size:.7rem; font-weight:800; backdrop-filter:blur(8px) }
-.biz-info{ padding:13px 14px; flex:1; display:flex; flex-direction:column; gap:4px }
-.biz-cat{ font-size:.72rem; color:var(--saffron-deep); font-weight:800; letter-spacing:.04em; text-transform:uppercase }
-.biz-name{ font-family:'Manrope',sans-serif; font-size:1.05rem; font-weight:800; color:var(--ink); line-height:1.2 }
-.biz-usp{ font-size:.83rem; color:var(--muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden }
-.biz-meta{ display:flex; align-items:center; gap:10px; margin-top:6px; font-size:.78rem; color:var(--muted); padding-top:8px; border-top:1px dashed var(--line) }
-.biz-meta .rating{ color:var(--ink); font-weight:700 }
+.biz-photo img{ width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.22,.61,.36,1) }
+.biz-card:hover .biz-photo img{ transform:scale(1.04) }
+.biz-photo .ph-fb{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; opacity:.35 }
+.biz-photo .verify{
+  position:absolute; top:12px; right:12px;
+  background:rgba(5,150,105,.94); color:#fff;
+  padding:5px 12px; border-radius:99px;
+  font-size:.72rem; font-weight:600;
+  backdrop-filter:blur(10px);
+  letter-spacing:-.005em;
+}
+.biz-info{ padding:18px 20px 18px; flex:1; display:flex; flex-direction:column; gap:5px }
+.biz-cat{ font-size:.76rem; color:var(--saffron-deep); font-weight:600; letter-spacing:.01em; margin-bottom:2px }
+.biz-name{ font-family:'Manrope',sans-serif; font-size:1.15rem; font-weight:700; color:var(--ink); line-height:1.25; letter-spacing:-.015em }
+.biz-usp{ font-size:.88rem; color:#5A6573; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden }
+.biz-meta{ display:flex; align-items:center; gap:10px; margin-top:10px; font-size:.82rem; color:var(--muted); padding-top:12px; border-top:1px solid rgba(15,23,42,.05) }
+.biz-meta .rating{ color:var(--ink); font-weight:600 }
 .biz-meta .loc{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
-.empty{ text-align:center; padding:50px 20px; color:var(--muted) }
-.empty .ico{ font-size:3rem; opacity:.4; margin-bottom:10px; display:block }
-.empty b{ display:block; color:var(--ink); font-size:1.05rem; margin-bottom:6px }
+.empty{ text-align:center; padding:80px 20px; color:var(--muted) }
+.empty .ico{ font-size:3.5rem; opacity:.35; margin-bottom:14px; display:block }
+.empty b{ display:block; color:var(--ink); font-size:1.2rem; margin-bottom:8px; font-weight:700; letter-spacing:-.01em }
+
+/* Open-Now toggle + card badge */
+.filter-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:-6px 0 14px }
+.open-toggle{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 13px; border-radius:99px;
+  background:#fff; border:1.5px solid var(--line);
+  font-size:.84rem; font-weight:700; color:var(--ink-2);
+  cursor:pointer; user-select:none; transition:.18s;
+}
+.open-toggle:hover{ border-color:var(--emerald-light); color:var(--ink) }
+.open-toggle .sw{
+  width:30px; height:18px; background:#E5E7EB; border-radius:99px; position:relative; transition:.18s;
+}
+.open-toggle .sw::after{
+  content:''; position:absolute; top:2px; left:2px;
+  width:14px; height:14px; background:#fff; border-radius:50%;
+  transition:.18s; box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.open-toggle.on{ border-color:var(--emerald); color:var(--emerald); background:#ECFDF5 }
+.open-toggle.on .sw{ background:var(--emerald) }
+.open-toggle.on .sw::after{ left:14px }
+
+.biz-photo .open-dot{
+  position:absolute; top:8px; left:8px;
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 9px; border-radius:99px;
+  font-size:.7rem; font-weight:800; backdrop-filter:blur(8px);
+}
+.biz-photo .open-dot.open{ background:rgba(5,150,105,.95); color:#fff }
+.biz-photo .open-dot.closed{ background:rgba(107,114,128,.92); color:#fff }
+.biz-photo .open-dot .d{ width:6px; height:6px; border-radius:50%; background:#fff }
 </style>
 </head>
 <body>
@@ -85,6 +183,14 @@
     </button>
   </form>
 
+  <div class="filter-row">
+    <button type="button" id="openNowToggle" class="open-toggle" onclick="toggleOpenNow()" aria-pressed="false">
+      <span class="sw"></span>
+      <span data-i18n-en>Open Now</span><span data-i18n-hi>अभी खुले</span>
+    </button>
+    <span id="openFilterHint" style="font-size:.78rem;color:var(--muted)"></span>
+  </div>
+
   <div class="result-head">
     <div class="result-count" id="countDisp"></div>
     <div style="font-size:.78rem;color:var(--muted)">
@@ -110,7 +216,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
+<script src="/assets/js/pwa.js" defer></script>
 <script src="/assets/js/geo.js"></script>
 <script>
 function setLang(lang){
@@ -123,6 +231,17 @@ function setLang(lang){
 }
 
 let CATEGORIES = [], CITIES = [];
+let LAST_RESULTS = [];        // last unfiltered result-set (for client-side Open-Now filter)
+let OPEN_NOW = false;          // active toggle state
+
+function toggleOpenNow(){
+  OPEN_NOW = !OPEN_NOW;
+  const btn = document.getElementById('openNowToggle');
+  btn.classList.toggle('on', OPEN_NOW);
+  btn.setAttribute('aria-pressed', OPEN_NOW ? 'true' : 'false');
+  try{ localStorage.setItem('shop_openNow', OPEN_NOW ? '1' : '0'); }catch(_){}
+  renderResults();
+}
 
 async function loadDropdowns(){
   const c = ShopDB.client;
@@ -245,23 +364,67 @@ async function runSearch(){
     return;
   }
 
-  if (!data || !data.length){
+  LAST_RESULTS = Array.isArray(data) ? data : [];
+  renderResults();
+}
+
+function renderResults(){
+  const resEl = document.getElementById('results');
+  const countEl = document.getElementById('countDisp');
+  const hint = document.getElementById('openFilterHint');
+  let rows = LAST_RESULTS.slice();
+  let filteredOutByOpen = 0;
+
+  if (OPEN_NOW){
+    const before = rows.length;
+    const anyHasHours = rows.some(b => b.hours_json && Object.keys(b.hours_json).length);
+    if (!anyHasHours){
+      // RPC didn't return hours_json for any row → can't filter client-side. Inform user.
+      const hint = document.getElementById('openFilterHint');
+      hint.textContent = '(hours data not returned by search — filter skipped)';
+    } else {
+      rows = rows.filter(b => {
+        if (!b.hours_json) return false;
+        const st = (typeof getOpenStatus === 'function') ? getOpenStatus(b.hours_json) : null;
+        return !!(st && st.isOpen);
+      });
+      filteredOutByOpen = before - rows.length;
+    }
+  }
+
+  if (!rows.length){
     countEl.textContent = '';
-    resEl.innerHTML = `
-      <div class="empty">
-        <span class="ico">🔍</span>
-        <b><span data-i18n-en>No shops found</span><span data-i18n-hi>कोई दुकान नहीं मिली</span></b>
-        <span data-i18n-en class="block">Try different keywords or browse all categories.</span>
-        <span data-i18n-hi class="block">अलग कीवर्ड्स या सभी श्रेणियाँ ब्राउज़ करें।</span>
-        <a href="/browse.html" style="display:inline-block;margin-top:10px;color:var(--saffron-deep);font-weight:700">
-          <span data-i18n-en>← Browse all categories</span><span data-i18n-hi>← सभी श्रेणियाँ</span>
-        </a>
-      </div>`;
+    if (OPEN_NOW && LAST_RESULTS.length){
+      resEl.innerHTML = `
+        <div class="empty">
+          <span class="ico">🕒</span>
+          <b><span data-i18n-en>No shops open right now</span><span data-i18n-hi>अभी कोई दुकान खुली नहीं है</span></b>
+          <span data-i18n-en class="block">Turn off "Open Now" to see all ${LAST_RESULTS.length} results.</span>
+          <span data-i18n-hi class="block">सभी ${LAST_RESULTS.length} परिणाम देखने के लिए "अभी खुले" बंद करें।</span>
+        </div>`;
+    } else {
+      resEl.innerHTML = `
+        <div class="empty">
+          <span class="ico">🔍</span>
+          <b><span data-i18n-en>No shops found</span><span data-i18n-hi>कोई दुकान नहीं मिली</span></b>
+          <span data-i18n-en class="block">Try different keywords or browse all categories.</span>
+          <span data-i18n-hi class="block">अलग कीवर्ड्स या सभी श्रेणियाँ ब्राउज़ करें।</span>
+          <a href="/browse.html" style="display:inline-block;margin-top:10px;color:var(--saffron-deep);font-weight:700">
+            <span data-i18n-en>← Browse all categories</span><span data-i18n-hi>← सभी श्रेणियाँ</span>
+          </a>
+        </div>`;
+    }
+    hint.textContent = '';
     return;
   }
 
-  countEl.innerHTML = `<b>${data.length}</b> <span data-i18n-en>shop${data.length===1?'':'s'} found</span><span data-i18n-hi>दुकान मिली</span>`;
-  resEl.innerHTML = `<div class="biz-grid stagger">${data.map(renderCard).join('')}</div>`;
+  countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>shop${rows.length===1?'':'s'} found</span><span data-i18n-hi>दुकान मिली</span>`;
+  if (OPEN_NOW && filteredOutByOpen > 0){
+    hint.textContent = '(' + filteredOutByOpen + ' hidden — closed)';
+  } else {
+    hint.textContent = '';
+  }
+  resEl.innerHTML = `<div class="biz-grid stagger">${rows.map(renderCard).join('')}</div>`;
 }
 
 function renderCard(b){
@@ -270,10 +433,20 @@ function renderCard(b){
     ? `<img src="${photo}" alt="${escapeHTML(b.name)}" loading="lazy">`
     : `<div class="ph-fb">${b.category_icon || '🏪'}</div>`;
   const verified = b.verified_score >= 3 ? '<span class="verify">✓ Verified</span>' : '';
+  // Open-Now badge (only when hours_json is present and parseable)
+  let openBadge = '';
+  if (b.hours_json && typeof getOpenStatus === 'function'){
+    const st = getOpenStatus(b.hours_json);
+    if (st){
+      openBadge = `<span class="open-dot ${st.isOpen ? 'open' : 'closed'}" title="${escapeHTML(st.label)}">
+        <span class="d"></span>${st.isOpen ? 'Open' : 'Closed'}
+      </span>`;
+    }
+  }
   const rating = b.rating_avg > 0 ? `<span class="rating">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>` : '<span style="color:var(--muted)">No reviews yet</span>';
   return `
     <a class="biz-card" href="/business.html?slug=${b.slug}">
-      <div class="biz-photo">${photoHTML}${verified}</div>
+      <div class="biz-photo">${photoHTML}${openBadge}${verified}</div>
       <div class="biz-info">
         <div class="biz-cat">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
         <div class="biz-name">${escapeHTML(b.name)}</div>
@@ -304,6 +477,14 @@ function handleSearch(e){
 
 window.addEventListener('DOMContentLoaded', async () => {
   setLang(localStorage.getItem('shop_lang') || 'en');
+  // Restore Open-Now toggle preference
+  try{
+    if (localStorage.getItem('shop_openNow') === '1'){
+      OPEN_NOW = true;
+      const btn = document.getElementById('openNowToggle');
+      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
+    }
+  }catch(_){}
   await loadDropdowns();
   runSearch();
 });

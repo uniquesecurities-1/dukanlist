@@ -10,44 +10,45 @@
 <meta property="og:description" id="ogDesc" content="">
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
 .biz-hero{
   background:
-    radial-gradient(ellipse at top left, rgba(255,107,26,.22), transparent 55%),
-    radial-gradient(ellipse at top right, rgba(30,58,138,.18), transparent 55%),
-    linear-gradient(180deg, #FFF7ED 0%, #fff 70%);
-  padding:18px 16px 24px;
-  border-bottom:1px solid var(--line);
+    radial-gradient(ellipse at top left, rgba(255,107,26,.10), transparent 55%),
+    radial-gradient(ellipse at top right, rgba(30,58,138,.06), transparent 55%),
+    linear-gradient(180deg, #FFFDF9 0%, #fff 70%);
+  padding:40px 24px 56px;
   position:relative; overflow:hidden;
 }
 .biz-hero::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:4px;
-  background:linear-gradient(90deg, var(--saffron) 0%, var(--saffron) 33%, #fff 33%, #fff 66%, var(--emerald) 66%, var(--emerald) 100%);
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,107,26,.22), transparent);
 }
 .biz-hero::after{
   content:''; position:absolute; top:-50px; right:-80px;
-  width:300px; height:300px; border-radius:50%;
-  background:radial-gradient(circle, rgba(255,107,26,.06), transparent 70%);
+  width:380px; height:380px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,107,26,.05), transparent 70%);
   pointer-events:none;
 }
-.biz-hero-wrap{ max-width:980px; margin:0 auto; position:relative; z-index:1 }
+.biz-hero-wrap{ max-width:1080px; margin:0 auto; position:relative; z-index:1 }
 .biz-back{
   display:inline-flex; align-items:center; gap:5px;
-  font-size:.82rem; color:var(--muted); font-weight:700;
-  margin-bottom:12px; text-decoration:none;
-  padding:5px 10px; background:rgba(255,255,255,.7);
+  font-size:.85rem; color:var(--muted); font-weight:500;
+  margin-bottom:22px; text-decoration:none;
+  padding:6px 14px; background:rgba(255,255,255,.8);
   border-radius:99px; backdrop-filter:blur(8px);
-  border:1px solid var(--line);
-  transition:.15s;
+  border:1px solid rgba(15,23,42,.05);
+  transition:.2s cubic-bezier(.22,.61,.36,1);
 }
-.biz-back:hover{ color:var(--ink); background:#fff; transform:translateX(-2px) }
-.biz-top{ display:grid; grid-template-columns:1fr; gap:18px; align-items:start }
-@media (min-width:760px){ .biz-top{ grid-template-columns:400px 1fr } }
+.biz-back:hover{ color:var(--ink); background:#fff; transform:translateX(-3px); box-shadow:0 4px 14px rgba(15,23,42,.05) }
+.biz-top{ display:grid; grid-template-columns:1fr; gap:28px; align-items:start }
+@media (min-width:760px){ .biz-top{ grid-template-columns:440px 1fr; gap:40px } }
 .gallery{
-  background:#fff; border:1px solid var(--line); border-radius:14px;
-  overflow:hidden; box-shadow:var(--shadow-sm);
+  background:#fff; border:1px solid rgba(15,23,42,.04); border-radius:22px;
+  overflow:hidden; box-shadow:0 20px 50px rgba(15,23,42,.06);
 }
 @media (min-width:760px){
   .gallery{ position:sticky; top:80px }
@@ -105,30 +106,27 @@
 .gallery .thumbs img.active{ opacity:1; border-color:var(--saffron); box-shadow:0 2px 8px rgba(255,107,26,.3) }
 
 .biz-meta-card{
-  background:rgba(255,255,255,.85);
-  border:1px solid var(--line); border-radius:18px;
-  padding:22px;
-  box-shadow:0 4px 24px rgba(15,23,42,.06);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(15,23,42,.04); border-radius:22px;
+  padding:32px 28px;
+  box-shadow:0 20px 50px rgba(15,23,42,.06);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 .biz-cat-pill{
   display:inline-flex; align-items:center; gap:5px;
-  background:rgba(255,107,26,.12); color:var(--saffron-deep);
-  padding:5px 13px; border-radius:99px;
-  font-size:.72rem; font-weight:800; letter-spacing:.06em;
-  text-transform:uppercase; margin-bottom:10px;
-  border:1px solid rgba(255,107,26,.25);
+  background:rgba(255,107,26,.08); color:var(--saffron-deep);
+  padding:6px 14px; border-radius:99px;
+  font-size:.78rem; font-weight:600; letter-spacing:.01em;
+  margin-bottom:18px;
+  border:1px solid rgba(255,107,26,.16);
 }
 .biz-title{
   font-family:'Manrope',sans-serif;
-  font-size:clamp(1.7rem, 4.5vw, 2.6rem);
-  font-weight:900; color:var(--ink);
-  letter-spacing:-.03em; line-height:1.05;
-  margin-bottom:6px;
-  background:linear-gradient(135deg, var(--ink) 0%, #1F2937 60%, var(--indigo) 100%);
-  -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent;
+  font-size:clamp(2rem, 5.4vw, 3.4rem);
+  font-weight:800; color:var(--ink);
+  letter-spacing:-.04em; line-height:1.04;
+  margin-bottom:10px;
 }
 html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif; line-height:1.15 }
 .biz-title-hi{
@@ -202,17 +200,19 @@ html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif; 
   transform:translateY(-1px);
 }
 
-.cta-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px }
+.cta-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px }
 .cta-row .cta-btn:nth-child(3),
 .cta-row .cta-btn:nth-child(4){ font-size:.88rem }
 @media (min-width:520px){ .cta-row{ grid-template-columns:repeat(4, 1fr) } }
 .cta-btn{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:4px; padding:13px 10px; border-radius:11px;
-  font-weight:800; font-size:.84rem; text-decoration:none;
-  transition:.18s; border:none; cursor:pointer; font-family:inherit;
-  min-height:62px;
+  gap:5px; padding:16px 12px; border-radius:14px;
+  font-weight:600; font-size:.86rem; text-decoration:none;
+  transition:transform .25s cubic-bezier(.22,.61,.36,1), box-shadow .3s cubic-bezier(.22,.61,.36,1);
+  border:none; cursor:pointer; font-family:inherit;
+  min-height:68px;
   position:relative; overflow:hidden;
+  letter-spacing:-.005em;
 }
 .cta-btn .cta-icon{ font-size:1.4rem; line-height:1 }
 .cta-btn .cta-label{ font-size:.78rem; font-weight:700; letter-spacing:.01em }
@@ -421,6 +421,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   background:currentColor;
   animation:pulse-dot 2s ease-in-out infinite;
 }
+.open-status .closes-in{ opacity:.75; font-weight:600 }
 @keyframes pulse-dot{
   0%, 100% { opacity:1 }
   50% { opacity:.4 }
@@ -783,7 +784,9 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
+<script src="/assets/js/pwa.js" defer></script>
 <script>
 function setLang(lang){
   if (lang!=='en'&&lang!=='hi') lang='en';
@@ -1041,12 +1044,15 @@ function render(){
     av.style.display = '';
   }
 
-  // Open Now / Closed status
+  // Open Now / Closed status (uses /assets/js/hours.js → getOpenStatus)
   const openInfo = getOpenStatus(b.hours_json);
   if (openInfo){
     const el = document.getElementById('openStatus');
-    el.innerHTML = `<span class="open-status ${openInfo.open ? 'open' : 'closed'}">
-      <span class="dot"></span>${openInfo.label}
+    const subtle = openInfo.isOpen && openInfo.closesIn
+      ? ` <span class="closes-in">· in ${openInfo.closesIn}</span>`
+      : '';
+    el.innerHTML = `<span class="open-status ${openInfo.isOpen ? 'open' : 'closed'}">
+      <span class="dot"></span>${openInfo.label}${subtle}
     </span>`;
   }
 
@@ -1141,6 +1147,25 @@ function render(){
   document.body.classList.add('has-sticky-cta');
   if (stickyCall) stickyCall.addEventListener('click', () => logLead('call'));
   if (stickyWa)   stickyWa.addEventListener('click', () => logLead('whatsapp'));
+
+  // If ?review=1 → auto-scroll to reviews and open Write-Review modal
+  try{
+    const _qp = new URLSearchParams(location.search);
+    if (_qp.get('review') === '1'){
+      setTimeout(() => {
+        const reviewsCard = document.getElementById('reviewsList');
+        if (reviewsCard){
+          reviewsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Slight delay so the smooth-scroll finishes before modal pops
+        setTimeout(() => {
+          if (typeof openReviewModal === 'function') openReviewModal();
+          const ph = document.getElementById('reviewPhone');
+          if (ph) ph.focus();
+        }, 450);
+      }, 250);
+    }
+  }catch(_){}
 }
 
 function swapImg(idx, el){
@@ -1221,34 +1246,8 @@ function animateNumber(el, target, duration){
 }
 
 // ====== Open Now / Closed status ======
-function getOpenStatus(hoursJson){
-  if (!hoursJson || typeof hoursJson !== 'object' || !Object.keys(hoursJson).length) return null;
-  const now = new Date();
-  const dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
-  const todayKey = dayKeys[now.getDay()];
-  const entry = hoursJson[todayKey];
-  if (!entry){
-    return { open: false, label: 'Hours not set' };
-  }
-  if (entry.closed){
-    return { open: false, label: 'Closed today' };
-  }
-  if (!entry.open || !entry.close){
-    return { open: false, label: 'Closed' };
-  }
-  const [oh, om] = entry.open.split(':').map(Number);
-  const [ch, cm] = entry.close.split(':').map(Number);
-  const cur = now.getHours() * 60 + now.getMinutes();
-  const opens = oh * 60 + om;
-  const closes = ch * 60 + cm;
-  if (cur >= opens && cur < closes){
-    return { open: true, label: 'Open now · Closes ' + entry.close };
-  }
-  if (cur < opens){
-    return { open: false, label: 'Closed · Opens ' + entry.open };
-  }
-  return { open: false, label: 'Closed for today' };
-}
+// getOpenStatus(hoursJson) is provided by /assets/js/hours.js
+// Returns { isOpen, open, label, closesIn } or null
 
 // ====== Distance from user (Haversine + Geolocation) ======
 function haversineKm(lat1, lon1, lat2, lon2){
