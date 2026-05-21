@@ -357,7 +357,7 @@ async function fillDebugPanel(scope, user){
   ` : '<span style="color:#dc2626">scope unavailable (get_admin_scope RPC missing? Run db/19.)</span>';
 
   const issueMsg = (counts.pending > 0 && rpcSays === '0 pending shop(s)')
-    ? '<div style="background:#FEF2F2;border-left:3px solid #DC2626;padding:8px 12px;border-radius:6px;margin-top:8px;color:#991B1B"><b>⚠ MISMATCH:</b> DB has ' + counts.pending + ' pending but RPC returned 0. Most likely: city scope filter excluding shop, OR db/19 not run yet. Quick fix: <code>UPDATE admin_users SET role=\\'super_admin\\', assigned_city_ids=NULL WHERE email=\\'' + (scope?.email || 'your@email') + '\\';</code></div>'
+    ? '<div style="background:#FEF2F2;border-left:3px solid #DC2626;padding:8px 12px;border-radius:6px;margin-top:8px;color:#991B1B"><b>⚠ MISMATCH:</b> DB has ' + counts.pending + ' pending but RPC returned 0. Most likely: city scope filter excluding shop, OR db/19 not run yet. Quick fix: <code>UPDATE admin_users SET role=' + "'super_admin'" + ', assigned_city_ids=NULL WHERE email=' + "'" + (scope?.email || 'your@email') + "'" + ';</code></div>'
     : '';
 
   const rpcErrMsg = rpcErr
