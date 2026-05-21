@@ -252,27 +252,48 @@
 let C = null;
 
 (async function init(){
-  C = ShopDB.client;
-  if (!C){ document.body.innerHTML = '<div class="err" style="margin:40px">Backend not configured.</div>'; return; }
+  console.log('[mod] init starting...');
+  try {
+    C = ShopDB.client;
+    console.log('[mod] C =', !!C);
+    if (!C){ document.body.innerHTML = '<div class="err" style="margin:40px">Backend not configured.</div>'; return; }
 
-  // Verify admin
-  const { data: user } = await C.auth.getUser();
-  if (!user || !user.user){ window.location.href = '/admin/login.html'; return; }
-  const { data: isAdmin } = await C.rpc('is_admin');
-  if (!isAdmin){
-    alert('Not authorized — admin access required');
-    await C.auth.signOut();
-    window.location.href = '/admin/login.html';
-    return;
+    // Verify session
+    const { data: userResp, error: userErr } = await C.auth.getUser();
+    console.log('[mod] user check:', { has_user: !!userResp?.user, err: userErr?.message });
+    if (userErr || !userResp || !userResp.user){
+      console.warn('[mod] no user — redirecting to login');
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    // Verify admin role (don't redirect on failure — show error instead, prevents loop)
+    const { data: isAdmin, error: adminErr } = await C.rpc('is_admin');
+    console.log('[mod] is_admin:', { isAdmin, err: adminErr?.message });
+    if (adminErr){
+      document.body.innerHTML = '<div class="err" style="margin:40px">Admin check failed: ' + (adminErr.message || 'unknown') + '. <a href="/admin/login">Login again</a></div>';
+      return;
+    }
+    if (!isAdmin){
+      document.body.innerHTML = '<div class="err" style="margin:40px">Not authorized — your account is not an admin. <a href="/admin/login">Login as admin</a></div>';
+      return;
+    }
+
+    // Honor URL tab param
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab && ['pending','flagged','flags'].includes(tab)) switchTab(tab);
+
+    // Load all three panels — independently so one failure doesn't break others
+    console.log('[mod] loading panels...');
+    loadPending().catch(e => console.error('[mod] loadPending failed', e));
+    loadFlaggedBiz().catch(e => console.error('[mod] loadFlaggedBiz failed', e));
+    loadFlags().catch(e => console.error('[mod] loadFlags failed', e));
+    console.log('[mod] init done');
+  } catch(e){
+    console.error('[mod] init error:', e);
+    document.body.innerHTML = '<div class="err" style="margin:40px">Page init crashed: ' + (e.message || e) + '. <a href="/admin/login">Try login again</a></div>';
   }
-
-  // Honor URL tab param
-  const params = new URLSearchParams(window.location.search);
-  const tab = params.get('tab');
-  if (tab && ['pending','flagged','flags'].includes(tab)) switchTab(tab);
-
-  // Load all three panels
-  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags()]);
 })();
 
 function switchTab(name){
