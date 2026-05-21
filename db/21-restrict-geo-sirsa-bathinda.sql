@@ -239,4 +239,3 @@ NOTIFY pgrst, 'reload schema';
 -- 4) Total localities:
 --    SELECT COUNT(*) FROM geo_localities;
 -- =====================================================
-                                      

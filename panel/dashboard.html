@@ -291,4 +291,22 @@ function renderDashboard(b){
 
 function shareProfile(e){
   e.preventDefault();
-  if (!MY_BUSINESS) 
+  if (!MY_BUSINESS) return;
+  const url = location.origin + '/business.html?slug=' + encodeURIComponent(MY_BUSINESS.slug);
+  const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us on DukanList: ${url}`;
+  if (navigator.share) {
+    navigator.share({ title: MY_BUSINESS.name, text: msg, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('Profile link copied!\n' + url);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadDashboard();
+});
+</script>
+
+</body>
+</html>

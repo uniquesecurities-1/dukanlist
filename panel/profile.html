@@ -637,4 +637,163 @@ async function saveProfile(){
   const okEl = document.getElementById('saveOk');
   errEl.style.display = okEl.style.display = 'none';
 
-  const name = document.getElementById(
+  const name = document.getElementById('bizName').value.trim();
+  const owner = document.getElementById('ownerName').value.trim();
+  if (name.length < 3){ errEl.textContent='Shop name min 3 chars'; errEl.style.display='flex'; return; }
+  if (owner.length < 3){ errEl.textContent='Owner name min 3 chars'; errEl.style.display='flex'; return; }
+  if (!MY_CATS.length){ errEl.textContent='Select at least 1 category'; errEl.style.display='flex'; return; }
+  if (!MY_CATS.some(c => c.is_primary)){ errEl.textContent='Mark one category as primary (⭐)'; errEl.style.display='flex'; return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.innerHTML = '<span>⏳ Saving...</span>';
+
+  const c = ShopDB.client;
+  // Clean FAQs — drop empty entries before save
+  const cleanFaqs = MY_FAQS
+    .map(f => ({ q: (f.q||'').trim(), a: (f.a||'').trim() }))
+    .filter(f => f.q && f.a);
+
+  const payload = {
+    name: name,
+    name_hi: document.getElementById('bizNameHi').value.trim() || null,
+    owner_name: owner,
+    whatsapp: document.getElementById('whatsapp').value.trim() || null,
+    email: document.getElementById('email').value.trim() || null,
+    usp_text: document.getElementById('usp').value.trim() || null,
+    usp_hi: document.getElementById('uspHi').value.trim() || null,
+    about_text: document.getElementById('aboutText').value.trim() || null,
+    faqs_json: cleanFaqs,
+    hours_json: collectHours()
+  };
+
+  // Update business
+  const { error: updErr } = await c.from('businesses').update(payload).eq('id', MY_BIZ.id);
+  if (updErr){
+    btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
+    errEl.textContent = 'Save failed: ' + updErr.message; errEl.style.display = 'flex'; return;
+  }
+
+  // Sync categories — delete existing junction entries, re-insert
+  const { error: delErr } = await c.from('business_categories').delete().eq('business_id', MY_BIZ.id);
+  if (delErr){
+    btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
+    errEl.textContent = 'Category update failed: ' + delErr.message; errEl.style.display='flex'; return;
+  }
+  const rows = MY_CATS.map(c => ({ business_id: MY_BIZ.id, category_id: c.category_id, is_primary: c.is_primary }));
+  const { error: insErr } = await c.from('business_categories').insert(rows);
+  if (insErr){
+    btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
+    errEl.textContent = 'Category insert failed: ' + insErr.message; errEl.style.display='flex'; return;
+  }
+
+  okEl.textContent = '✅ Profile saved. Changes are live on dukanlist.com';
+  okEl.style.display = 'flex';
+  btn.disabled = false; btn.innerHTML = '<span>💾 Save Changes</span>';
+  // Reload MY_BIZ so save reflects latest
+  Object.assign(MY_BIZ, payload);
+  setTimeout(() => { okEl.style.display = 'none'; }, 4000);
+}
+
+function escapeHTML(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+// ============================================================
+// "Ask for Review" — WhatsApp link generator
+// ============================================================
+function profilePublicUrl(){
+  const slug = MY_BIZ && MY_BIZ.slug ? MY_BIZ.slug : '';
+  if (!slug) return location.origin + '/';
+  return 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(slug);
+}
+
+function defaultAskMessage(){
+  const shopName = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our shop';
+  const base = profilePublicUrl();
+  // profilePublicUrl already has a query (?slug=...). Use & to add review=1.
+  const sep = base.indexOf('?') >= 0 ? '&' : '?';
+  const url = base + sep + 'review=1';
+  return 'Hi! Thank you for visiting ' + shopName + '. We would love your honest feedback on DukanList. Please rate us here: ' + url;
+}
+
+function seedAskMessage(){
+  const ta = document.getElementById('askMsg');
+  if (ta && !ta.value) ta.value = defaultAskMessage();
+}
+
+function generateAskLink(){
+  const cc    = (document.getElementById('askCC').value || '91').replace(/\D/g,'');
+  const phone = (document.getElementById('askPhone').value || '').replace(/\D/g,'');
+  const msg   = document.getElementById('askMsg').value.trim() || defaultAskMessage();
+  const errEl = document.getElementById('askErr');
+  const okEl  = document.getElementById('askInfo');
+  const box   = document.getElementById('askLinkBox');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!phone || phone.length < 7){
+    errEl.textContent = 'Enter a valid mobile number (without country code).';
+    errEl.style.display = '';
+    box.style.display = '';
+    document.getElementById('askOpenBtn').disabled = true;
+    document.getElementById('askCopyBtn').disabled = true;
+    return null;
+  }
+  const full = cc + phone;
+  const url  = 'https://wa.me/' + full + '?text=' + encodeURIComponent(msg);
+  box.textContent = url;
+  box.style.display = '';
+  document.getElementById('askOpenBtn').disabled = false;
+  document.getElementById('askCopyBtn').disabled = false;
+  okEl.textContent = 'Link ready — tap "Open WhatsApp" or copy.';
+  okEl.style.display = '';
+  return url;
+}
+
+function openAskLink(){
+  const url = generateAskLink();
+  if (!url) return;
+  window.open(url, '_blank', 'noopener');
+}
+
+function copyAskLink(){
+  const url = generateAskLink();
+  if (!url) return;
+  const done = () => {
+    const ok = document.getElementById('askInfo');
+    ok.textContent = '✓ Link copied to clipboard!';
+    ok.style.display = '';
+    setTimeout(() => { ok.textContent = 'Link ready — tap "Open WhatsApp" or copy.'; }, 1800);
+  };
+  try{
+    navigator.clipboard.writeText(url).then(done, () => fallbackCopyAsk(url, done));
+  }catch(_){ fallbackCopyAsk(url, done); }
+}
+function fallbackCopyAsk(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }
+  catch(_){ alert(text); }
+  finally{ ta.remove(); }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadProfile();
+  // Seed the WhatsApp message once MY_BIZ is loaded — retry until ready
+  let tries = 0;
+  const seedTimer = setInterval(() => {
+    if (MY_BIZ){
+      seedAskMessage();
+      clearInterval(seedTimer);
+    } else if (++tries > 40){
+      clearInterval(seedTimer); // give up after ~8s
+      seedAskMessage(); // seed with fallback shop name
+    }
+  }, 200);
+});
+</script>
+
+</body>
+</html>

@@ -551,4 +551,25 @@ function formatDate(iso){
   if (diff < 60) return Math.floor(diff) + 's ago';
   if (diff < 3600) return Math.floor(diff/60) + 'm ago';
   if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 6
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+function escapeJs(s){
+  return String(s == null ? '' : s).replace(/[\\'"]/g, ch => '\\' + ch);
+}
+
+async function logout(){
+  if (!confirm('Logout from admin panel?')) return;
+  await C.auth.signOut();
+  window.location.href = '/admin/login';
+}
+</script>
+
+</body>
+</html>

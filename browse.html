@@ -342,4 +342,25 @@ function renderSubTile(s, lang){
     ? (count + (lang==='hi' ? '' : ''))
     : (lang==='hi' ? '—' : '0');
   return `
-    <a class="sub-tile${cls}" href
+    <a class="sub-tile${cls}" href="/search.html?cat=${encodeURIComponent(s.slug)}">
+      <span class="s-icon">${s.icon || '🏪'}</span>
+      <span class="s-body">
+        <span class="s-name">${escapeHTML(name)}</span>
+        ${subName ? `<span class="s-sub">${escapeHTML(subName)}</span>` : ''}
+      </span>
+      <span class="s-count">${countTxt}</span>
+    </a>`;
+}
+
+function escapeHTML(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadAll();
+});
+</script>
+
+</body>
+</html>
