@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Shop View — DukanList</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;background:#f1f5f9;color:#0F172A;font-size:14px;line-height:1.5}
+  /* Top bar */
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .badge{font-size:10px;font-weight:700;background:#6366F1;color:#fff;padding:2px 7px;border-radius:5px}
+  .topbar a{color:#cbd5e1;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;transition:.15s}
+  .topbar a:hover{background:rgba(255,255,255,.1);color:#fff}
+  .logout{color:#FCA5A5;cursor:pointer}
+
+  /* Layout */
+  .main{max-width:1240px;margin:20px auto;padding:0 18px;display:grid;grid-template-columns:1fr 320px;gap:18px}
+  @media(max-width:900px){.main{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:#0F172A}
+  .card h2 .subtle{font-size:11px;color:#64748b;font-weight:600}
+  hr{border:0;border-top:1px solid #e2e8f0;margin:14px 0}
+
+  /* Status pill */
+  .pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .pill.active{background:#D1FAE5;color:#065F46}
+  .pill.pending{background:#FEF3C7;color:#92400E}
+  .pill.banned{background:#FEE2E2;color:#991B1B}
+  .pill.flagged{background:#FED7AA;color:#9A3412}
+  .pill.self_hidden{background:#E5E7EB;color:#4B5563}
+  .pill.featured{background:linear-gradient(135deg,#FFC93D,#FF8C00);color:#1A1A1A}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #cbd5e1;color:#0F172A;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:.12s}
+  .btn:hover{background:#f8fafc;border-color:#94a3b8}
+  .btn.pri{background:#6366F1;color:#fff;border-color:#6366F1}
+  .btn.pri:hover{background:#4F46E5}
+  .btn.good{background:#10B981;color:#fff;border-color:#10B981}
+  .btn.good:hover{background:#059669}
+  .btn.warn{background:#F59E0B;color:#fff;border-color:#F59E0B}
+  .btn.danger{background:#EF4444;color:#fff;border-color:#EF4444}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  .actions-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+
+  /* Form */
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+  .field label{font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em}
+  .field input[type=text], .field input[type=tel], .field input[type=number], .field textarea, .field select{
+    width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;font-family:inherit;color:#0F172A;background:#fff;
+  }
+  .field textarea{min-height:80px;resize:vertical;line-height:1.45}
+  .field input:focus, .field textarea:focus, .field select:focus{outline:0;border-color:#6366F1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.grid-2{grid-template-columns:1fr}}
+
+  /* Verification grid */
+  .verify-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .verify-tile{border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#fff;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.12s;user-select:none}
+  .verify-tile:hover{border-color:#94a3b8;background:#f8fafc}
+  .verify-tile.on{border-color:#10B981;background:#ECFDF5}
+  .verify-tile input{margin:0;cursor:pointer}
+  .verify-tile .vt-label{font-weight:700;font-size:13px;color:#0F172A}
+  .verify-tile .vt-desc{font-size:11px;color:#64748b}
+  .verify-score{margin-top:12px;padding:10px 14px;background:#F8FAFC;border-radius:10px;border:1px solid #e2e8f0;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+
+  /* Side panel */
+  .meta-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #e2e8f0;gap:10px}
+  .meta-row:last-child{border-bottom:0}
+  .meta-row .k{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:90px}
+  .meta-row .v{font-size:13px;color:#0F172A;text-align:right;word-break:break-word;font-weight:600}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+  .stat-tile{background:#F8FAFC;border:1px solid #e2e8f0;border-radius:8px;padding:8px;text-align:center}
+  .stat-tile .n{font-size:18px;font-weight:800;color:#0F172A}
+  .stat-tile .l{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:.04em;margin-top:2px}
+
+  .loader{text-align:center;padding:60px 20px;color:#64748b;font-size:14px}
+  .err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:14px;border-radius:10px;font-size:13px;font-weight:600}
+  .ok-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 12px 28px rgba(15,23,42,.25);opacity:0;transition:opacity .18s}
+  .ok-toast.show{opacity:1}
+  .ok-toast.err{background:#DC2626}
+
+  .photos-strip{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
+  .photos-strip img{height:80px;border-radius:8px;border:1px solid #e2e8f0}
+
+  .nav-back{font-size:13px;color:#64748b;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px}
+  .nav-back:hover{color:#0F172A}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span>🛡️</span>
+    <span>Dukan<em style="font-style:normal;color:#6366F1">List</em></span>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav>
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="#" onclick="logout()" class="logout">⎋ Logout</a>
+  </nav>
+</header>
+
+<div class="main" id="root">
+  <div class="loader" style="grid-column:1/-1">⏳ Loading shop…</div>
+</div>
+
+<div id="toast" class="ok-toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function logout(){ if (window.ShopDB && ShopDB.signOut) ShopDB.signOut(); else location.href = '/admin/login.html'; }
+
+var SHOP = null;
+var BIZ_ID = new URLSearchParams(location.search).get('id');
+var ROOT = document.getElementById('root');
+
+function toast(msg, isErr){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+async function init(){
+  if (!BIZ_ID){
+    ROOT.innerHTML = '<div class="err">Missing ?id=&lt;shop-uuid&gt; in URL.</div>';
+    return;
+  }
+  if (typeof ShopDB === 'undefined' || !ShopDB.client){
+    ROOT.innerHTML = '<div class="err">Backend not configured.</div>';
+    return;
+  }
+  var c = ShopDB.client;
+
+  // Auth + admin check
+  var u = await c.auth.getUser();
+  if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
+
+  var a = await c.rpc('is_admin');
+  if (a.error || !a.data){
+    alert('Admin access required.');
+    await c.auth.signOut();
+    location.href = '/admin/login.html';
+    return;
+  }
+
+  // Fetch full shop
+  var r = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (r.error || !r.data){
+    ROOT.innerHTML = '<div class="err">Failed to load shop: ' + esc(r.error?.message || 'unknown') + '</div>';
+    return;
+  }
+  SHOP = r.data;
+  render();
+}
+
+function render(){
+  var s = SHOP;
+  var statusPill = '<span class="pill ' + esc(s.status) + '">' + esc(s.status) + '</span>';
+  var featuredPill = s.featured ? ' <span class="pill featured">★ Featured</span>' : '';
+
+  ROOT.innerHTML =
+    '<div>'
+      // === Header card ===
+      + '<a class="nav-back" href="/admin/moderation">← Back to Moderation</a>'
+      + '<div class="card">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">'
+          + '<div>'
+            + '<div style="font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.02em">' + esc(s.name) + '</div>'
+            + '<div style="font-size:12px;color:#64748b;margin-top:4px">' + esc(s.category?.icon || '🏪') + ' ' + esc(s.category?.name || '—') + ' · ' + esc(s.city?.name || '—') + (s.locality ? ' · ' + esc(s.locality.name) : '') + '</div>'
+            + '<div style="margin-top:8px">' + statusPill + featuredPill + '</div>'
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'
+            + '<a class="btn sm" target="_blank" href="/business.html?slug=' + esc(s.slug) + '">🌐 View Public Page →</a>'
+            + (s.mobile ? '<a class="btn sm" href="tel:' + esc(s.mobile) + '">📞 Call ' + esc(s.mobile) + '</a>' : '')
+            + (s.whatsapp || s.mobile ? '<a class="btn sm" target="_blank" href="https://wa.me/91' + esc(s.whatsapp || s.mobile) + '">💬 WhatsApp Owner</a>' : '')
+          + '</div>'
+        + '</div>'
+        + '<hr>'
+        + '<div class="actions-row">'
+          + (s.status !== 'active'   ? '<button class="btn good"   onclick="doStatus(\'active\')">✓ Approve / Activate</button>'  : '')
+          + (s.status !== 'pending'  ? '<button class="btn warn"   onclick="doStatus(\'pending\')">⏳ Move to Pending</button>'   : '')
+          + (s.status !== 'banned'   ? '<button class="btn danger" onclick="doStatus(\'banned\')">⛔ Ban Shop</button>'           : '')
+          + '<button class="btn ' + (s.featured ? 'danger' : 'pri') + '" onclick="toggleFeatured()">' + (s.featured ? '★ Remove Featured' : '☆ Make Featured') + '</button>'
+          + '<button class="btn danger" onclick="doDelete()" style="margin-left:auto">🗑 Delete Permanently</button>'
+        + '</div>'
+      + '</div>'
+
+      // === Verification card ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🛡 Verification Badges <span class="subtle">click to toggle</span></h2>'
+        + '<div class="verify-grid">'
+          + verifyTile('verified_mobile',  '📞', 'Phone Verified',   'Owner phone number confirmed',     s.verified_mobile)
+          + verifyTile('verified_address', '📍', 'Address Verified', 'Pincode + locality cross-checked', s.verified_address)
+          + verifyTile('verified_photo',   '📸', 'Photos Verified',  'At least one real shop photo',     s.verified_photo)
+          + verifyTile('verified_visit',   '👤', 'Visit Verified',   'Personally visited by team (×2)',  s.verified_visit)
+        + '</div>'
+        + '<div class="verify-score">'
+          + '<span>Verified Score</span>'
+          + '<span id="vScore" style="font-weight:800;font-size:15px;color:#0F172A">' + (s.verified_score || 0) + ' / 5</span>'
+        + '</div>'
+      + '</div>'
+
+      // === Edit card ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>✏️ Edit Shop Details <span class="subtle">save below</span></h2>'
+        + '<form id="editForm" onsubmit="saveShop(event)">'
+          + '<div class="grid-2">'
+            + field('text', 'name', 'Shop Name', s.name)
+            + field('tel',  'mobile', 'Mobile (10 digit)', s.mobile)
+          + '</div>'
+          + '<div class="grid-2">'
+            + field('text', 'owner_name', 'Owner Name', s.owner_name)
+            + field('tel',  'whatsapp', 'WhatsApp (10 digit)', s.whatsapp)
+          + '</div>'
+          + field('textarea', 'usp_text',   'USP / Tagline (English)', s.usp_text)
+          + field('textarea', 'usp_hi',     'USP / Tagline (Hindi)',   s.usp_hi)
+          + field('textarea', 'about_text', 'About / Description',     s.about_text)
+          + '<div class="grid-2">'
+            + field('text', 'address_line1', 'Address Line 1', s.address_line1)
+            + field('text', 'address_line2', 'Address Line 2', s.address_line2)
+          + '</div>'
+          + field('text', 'pincode', 'Pincode', s.pincode)
+          + '<div style="display:flex;justify-content:flex-end;margin-top:8px">'
+            + '<button type="submit" class="btn pri">💾 Save Changes</button>'
+          + '</div>'
+        + '</form>'
+      + '</div>'
+
+      // === Photos preview ===
+      + (Array.isArray(s.photos) && s.photos.length ?
+        ('<div class="card" style="margin-top:14px">'
+          + '<h2>📸 Photos <span class="subtle">' + s.photos.length + ' total</span></h2>'
+          + '<div class="photos-strip">'
+            + s.photos.map(function(p){ return '<a href="' + esc(p) + '" target="_blank"><img src="' + esc(p) + '" alt=""></a>'; }).join('')
+          + '</div>'
+        + '</div>') : '')
+
+      // === Admin notes ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📝 Internal Admin Notes <span class="subtle">private — only admins see</span></h2>'
+        + '<textarea id="notesField" placeholder="e.g. Visited on 21-May-26, confirmed location & owner identity. Owner asked for festive banner update next month.">' + esc(s.admin_notes || '') + '</textarea>'
+        + '<div style="display:flex;justify-content:flex-end;margin-top:8px">'
+          + '<button class="btn pri" onclick="saveNotes()">💾 Save Note</button>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
+
+    // === SIDE PANEL ===
+    + '<aside>'
+      + '<div class="card">'
+        + '<h2>👤 Owner Account</h2>'
+        + metaRow('Owner Name', s.owner_name || '—')
+        + metaRow('Email', s.owner_email || '—')
+        + metaRow('Mobile', s.mobile || '—')
+        + metaRow('Auth User ID', s.owner_user_id ? (s.owner_user_id.slice(0, 8) + '…') : '—')
+      + '</div>'
+
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📊 Engagement</h2>'
+        + '<div class="stat-grid">'
+          + statTile(s.view_count, 'Views')
+          + statTile(s.leads_30d, 'Leads 30d')
+          + statTile(s.rating_count, 'Reviews')
+        + '</div>'
+        + '<div class="stat-grid" style="margin-top:8px">'
+          + statTile(s.leads_7d, 'Leads 7d')
+          + statTile((s.rating_avg||0).toFixed(1), '⭐ Avg')
+          + statTile(s.flags_pending || 0, 'Flags')
+        + '</div>'
+      + '</div>'
+
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🕒 Timeline</h2>'
+        + metaRow('Created', new Date(s.created_at).toLocaleString('en-IN'))
+        + metaRow('Last Updated', s.updated_at ? new Date(s.updated_at).toLocaleString('en-IN') : '—')
+        + metaRow('Slug', s.slug)
+        + metaRow('Shop ID', s.id.slice(0, 8) + '…')
+      + '</div>'
+
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🔗 Share Preview</h2>'
+        + '<div style="font-size:12px;color:#64748b;margin-bottom:8px">Public share URL with rich preview:</div>'
+        + '<a class="btn sm" target="_blank" style="word-break:break-all;text-align:left" href="https://dukanlist.com/share?slug=' + esc(s.slug) + '">/share?slug=' + esc(s.slug) + ' →</a>'
+      + '</div>'
+    + '</aside>';
+}
+
+function field(type, name, label, val){
+  if (type === 'textarea'){
+    return '<div class="field"><label>' + esc(label) + '</label><textarea name="' + esc(name) + '">' + esc(val || '') + '</textarea></div>';
+  }
+  return '<div class="field"><label>' + esc(label) + '</label><input type="' + esc(type) + '" name="' + esc(name) + '" value="' + esc(val || '') + '"></div>';
+}
+
+function verifyTile(key, icon, label, desc, isOn){
+  return '<label class="verify-tile' + (isOn ? ' on' : '') + '" onclick="toggleVerify(\'' + key + '\')">'
+    + '<span style="font-size:22px">' + icon + '</span>'
+    + '<div style="flex:1">'
+      + '<div class="vt-label">' + esc(label) + '</div>'
+      + '<div class="vt-desc">' + esc(desc) + '</div>'
+    + '</div>'
+    + '<input type="checkbox" ' + (isOn ? 'checked' : '') + ' style="pointer-events:none">'
+  + '</label>';
+}
+
+function metaRow(k, v){ return '<div class="meta-row"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + '</div></div>'; }
+function statTile(n, l){ return '<div class="stat-tile"><div class="n">' + esc(n) + '</div><div class="l">' + esc(l) + '</div></div>'; }
+
+// === ACTIONS ===
+async function applyPatch(patch, successMsg){
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_update_shop', { p_business_id: BIZ_ID, p_patch: patch });
+  if (r.error){
+    toast('Save failed: ' + r.error.message, true);
+    return false;
+  }
+  // Refresh SHOP from server to get recomputed score
+  var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (!fresh.error && fresh.data) SHOP = fresh.data;
+  render();
+  toast(successMsg || 'Saved');
+  return true;
+}
+
+async function toggleVerify(field){
+  var current = !!SHOP[field];
+  await applyPatch({ [field]: !current }, '✓ Verification updated');
+}
+
+async function toggleFeatured(){
+  await applyPatch({ featured: !SHOP.featured }, SHOP.featured ? 'Featured removed' : '★ Now Featured');
+}
+
+async function doStatus(newStatus){
+  if (newStatus === 'banned' && !confirm('Ban this shop? It will be hidden from the public site immediately.')) return;
+  if (newStatus === 'active' && SHOP.status === 'pending'){
+    // Use proper approve RPC so verified_visit + score also update
+    var r = await ShopDB.client.rpc('admin_approve_business', { p_business_id: BIZ_ID });
+    if (r.error){ toast('Approve failed: ' + r.error.message, true); return; }
+    toast('✓ Approved & live');
+    var fresh = await ShopDB.client.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+    if (!fresh.error && fresh.data) SHOP = fresh.data;
+    render();
+    return;
+  }
+  await applyPatch({ status: newStatus }, 'Status → ' + newStatus);
+}
+
+async function doDelete(){
+  var typed = prompt('Type DELETE to permanently remove this shop:');
+  if (typed !== 'DELETE') return;
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_delete_business', { p_business_id: BIZ_ID });
+  if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
+  toast('Shop deleted');
+  setTimeout(function(){ location.href = '/admin/moderation'; }, 1500);
+}
+
+async function saveShop(e){
+  e.preventDefault();
+  var f = document.getElementById('editForm');
+  var patch = {};
+  ['name','mobile','whatsapp','owner_name','usp_text','usp_hi','about_text','address_line1','address_line2','pincode'].forEach(function(k){
+    var v = f.querySelector('[name="' + k + '"]')?.value;
+    if (v !== undefined && v !== SHOP[k]) patch[k] = v;
+  });
+  if (Object.keys(patch).length === 0){ toast('Nothing changed'); return; }
+  await applyPatch(patch, '✓ Saved ' + Object.keys(patch).length + ' field(s)');
+}
+
+async function saveNotes(){
+  var v = document.getElementById('notesField').value;
+  await applyPatch({ admin_notes: v }, '✓ Note saved');
+}
+
+init();
+</script>
+</body>
+</html>

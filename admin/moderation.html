@@ -392,6 +392,7 @@ function bizCard(b, kind){
         <button class="btn btn-reject" onclick="rejectBusiness('${b.id}','${escapeJs(b.name)}')">✕ Reject / Ban</button>
         <button class="btn btn-danger-hard" onclick="deleteBusiness('${b.id}','${escapeJs(b.name)}')" title="Permanently delete shop + all data">🗑️ Delete Permanently</button>
         <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(b.slug)}" target="_blank">👁️ View Public Profile</a>
+        <a class="btn" style="background:#6366F1;color:#fff" href="/admin/shop?id=${b.id}" title="Comprehensive admin view + edit + verification toggles">🛡️ Admin View</a>
         <a class="btn btn-secondary" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/editor?table=businesses&filter=id::eq::${b.id}" target="_blank">🗄️ Edit in DB</a>
       </div>
     </div>
