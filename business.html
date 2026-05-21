@@ -6,8 +6,17 @@
 <meta name="theme-color" content="#FF6B1A">
 <title>Business Details — dukanlist.com</title>
 <meta name="description" id="metaDesc" content="">
-<meta property="og:title" id="ogTitle" content="">
-<meta property="og:description" id="ogDesc" content="">
+<meta property="og:type" content="business.business">
+<meta property="og:site_name" content="DukanList">
+<meta property="og:title" id="ogTitle" content="DukanList — Every Shop, One Identity">
+<meta property="og:description" id="ogDesc" content="Discover this shop on DukanList — Bharat ka local shop directory.">
+<meta property="og:image" id="ogImage" content="https://dukanlist.com/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" id="twTitle" content="DukanList — Every Shop, One Identity">
+<meta name="twitter:description" id="twDesc" content="Discover this shop on DukanList.">
+<meta name="twitter:image" id="twImage" content="https://dukanlist.com/assets/og-default.png">
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -784,6 +793,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/share.js"></script>
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
@@ -974,9 +984,18 @@ function render(){
 
   // Meta tags
   document.title = `${b.name} — ${b.categories?.name || 'Local Shop'} in ${b.geo_cities?.name || ''} | dukanlist.com`;
-  document.getElementById('metaDesc').content = (b.usp_text || `${b.name} — ${b.categories?.name} in ${b.geo_cities?.name}`).slice(0,160);
-  document.getElementById('ogTitle').content = b.name;
-  document.getElementById('ogDesc').content = (b.usp_text || '').slice(0,160);
+  const _desc = (b.usp_text || `${b.name} — ${b.categories?.name || ''} in ${b.geo_cities?.name || ''}`).slice(0,180);
+  const _title = `${b.name}${b.geo_cities?.name ? ' — ' + b.geo_cities.name : ''} · DukanList`;
+  const _img   = (Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string')
+                   ? b.photos[0]
+                   : 'https://dukanlist.com/assets/og-default.png';
+  document.getElementById('metaDesc').content = _desc;
+  document.getElementById('ogTitle').content  = _title;
+  document.getElementById('ogDesc').content   = _desc;
+  const _ogImg = document.getElementById('ogImage'); if (_ogImg) _ogImg.content = _img;
+  const _twT   = document.getElementById('twTitle'); if (_twT) _twT.content = _title;
+  const _twD   = document.getElementById('twDesc');  if (_twD) _twD.content = _desc;
+  const _twI   = document.getElementById('twImage'); if (_twI) _twI.content = _img;
   document.getElementById('canonicalLink').href = location.origin + '/business.html?slug=' + b.slug;
 
   // Schema.org LocalBusiness JSON-LD (rich Google snippets)
@@ -1409,13 +1428,19 @@ async function logLead(action){
 }
 
 function shareBiz(){
-  const url = location.href;
-  const msg = `🏪 ${BIZ.name}\n${BIZ.usp_text || ''}\n\n${url}`;
-  if (navigator.share){
-    navigator.share({ title: BIZ.name, text: msg, url });
+  if (!BIZ) return;
+  const meta = {
+    slug: BIZ.slug, id: BIZ.id, name: BIZ.name,
+    city: BIZ.city_name || BIZ.city, category: BIZ.primary_category_name || BIZ.category_name
+  };
+  if (typeof DukanShare !== 'undefined'){
+    // Native share on mobile (gives OS share sheet incl. WhatsApp), WhatsApp fallback on desktop.
+    DukanShare.native(null, meta);
   } else {
-    navigator.clipboard.writeText(url);
-    alert('Link copied:\n' + url);
+    // Library failed to load — minimal WhatsApp fallback
+    const url = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
+    const text = `Check out *${BIZ.name}* on DukanList\n\n${url}`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
   }
   logLead('share');
 }

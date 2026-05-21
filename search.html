@@ -223,6 +223,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/share.js"></script>
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
@@ -461,6 +462,7 @@ function renderCard(b){
         <div class="biz-meta">
           ${rating}
           <span class="loc">📍 ${escapeHTML(b.city_name || '')}</span>
+          ${typeof DukanShare !== 'undefined' ? DukanShare.btn({slug:b.slug, id:b.id, name:b.name, city:b.city_name, category:b.category_name}) : ''}
         </div>
       </div>
     </a>`;
