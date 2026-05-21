@@ -415,4 +415,27 @@ async function confirmUpload(){
   btn.disabled = false; btn.textContent = '✓ Upload Valid Rows to Database';
 }
 
-function escapeHtml(s
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function toast(msg, kind){
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.className = 'toast show ' + (kind || 'success');
+  el.textContent = msg;
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+async function logout(){
+  if (window.ShopDB && ShopDB.signOut) {
+    await ShopDB.signOut();
+  } else {
+    window.location.href = '/admin/login.html';
+  }
+}
+
+if (typeof init === 'function') init();
+</script>
+</body>
+</html>
