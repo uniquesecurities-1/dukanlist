@@ -185,6 +185,10 @@
       <span class="ico">📍</span>
       <select id="citySel"><option value="">All cities</option></select>
     </div>
+    <div class="field" style="max-width:140px">
+      <span class="ico">📮</span>
+      <input id="pinSel" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="Pincode" autocomplete="postal-code">
+    </div>
     <button type="submit" class="search-btn">
       <span data-i18n-en>Search</span><span data-i18n-hi>खोजें</span>
     </button>
@@ -344,10 +348,12 @@ async function runSearch(){
   const q       = params.get('q')    || '';
   const catSlug = params.get('cat')  || '';
   const cityId  = +params.get('city')|| null;
+  const pin     = (params.get('pin') || '').replace(/\D/g, '').slice(0, 6);
 
   document.getElementById('q').value = q;
   document.getElementById('catSel').value = catSlug;
   if (cityId) document.getElementById('citySel').value = cityId;
+  if (pin) document.getElementById('pinSel').value = pin;
 
   const c = ShopDB.client;
   const resEl = document.getElementById('results');
@@ -365,7 +371,8 @@ async function runSearch(){
     p_city_id : cityId,
     p_state_id: null,
     p_limit   : 50,
-    p_offset  : 0
+    p_offset  : 0,
+    p_pincode : pin || null
   });
 
   if (error){
@@ -478,9 +485,11 @@ function handleSearch(e){
   const q = document.getElementById('q').value.trim();
   const cat = document.getElementById('catSel').value;
   const city = document.getElementById('citySel').value;
+  const pin = (document.getElementById('pinSel')?.value || '').replace(/\D/g, '').slice(0, 6);
   if (q) params.set('q', q);
   if (cat) params.set('cat', cat);
   if (city) params.set('city', city);
+  if (pin && pin.length === 6) params.set('pin', pin);
   const url = '/search.html' + (params.toString() ? '?' + params.toString() : '');
   history.pushState({}, '', url);
   runSearch();

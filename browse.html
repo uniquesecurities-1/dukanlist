@@ -164,6 +164,22 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
 @media (min-width:900px){
   .parents-wrap{ display:grid; grid-template-columns:1fr 1fr; gap:18px }
 }
+/* === Mobile accordion: collapse sub-cats by default below 700px === */
+@media (max-width:700px){
+  .parent-card .sub-grid{ display:none }
+  .parent-card.expanded .sub-grid{ display:grid }
+  .parent-card .parent-header{ cursor:pointer; position:relative }
+  .parent-card .parent-header::after{
+    content:'⌄';
+    position:absolute; right:18px; top:50%;
+    transform:translateY(-50%);
+    font-size:1.6rem; color:var(--muted);
+    transition:transform .25s ease;
+    line-height:1;
+  }
+  .parent-card.expanded .parent-header::after{ transform:translateY(-50%) rotate(180deg) }
+  .parent-card .parent-header .view-all{ display:none } /* mobile: just tap header */
+}
 @media (max-width:500px){
   .sub-grid{ grid-template-columns:1fr 1fr; gap:6px; padding:10px }
   .sub-tile{ padding:9px 10px; gap:7px; min-height:46px }
@@ -308,6 +324,18 @@ function renderParents(){
   const list = document.getElementById('parentList');
   list.innerHTML = html;
   list.classList.add('stagger');
+  // Mobile accordion: tap parent header to expand its sub-cats
+  list.querySelectorAll('.parent-card').forEach(card => {
+    const header = card.querySelector('.parent-header');
+    if (!header) return;
+    header.addEventListener('click', function(ev){
+      // Allow clicking the View-all link without toggling
+      if (ev.target.closest('a.view-all')) return;
+      if (window.innerWidth > 700) return; // desktop: leave expanded
+      ev.preventDefault();
+      card.classList.toggle('expanded');
+    });
+  });
 }
 
 function renderParentCard(p, lang){

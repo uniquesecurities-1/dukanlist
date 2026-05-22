@@ -497,11 +497,16 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
       <span data-i18n-hi>खोजें</span>
     </button>
   </form>
-  <label id="openNowHome" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:9px 16px;background:#fff;border:1.5px solid #E2E8F0;border-radius:99px;font-weight:700;font-size:13px;color:#0F172A;cursor:pointer;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:all .15s">
-    <input type="checkbox" id="openNowCheck" style="margin:0;cursor:pointer;accent-color:#10B981" onchange="document.getElementById('openNowHome').style.borderColor = this.checked ? '#10B981' : '#E2E8F0'; document.getElementById('openNowHome').style.background = this.checked ? '#ECFDF5' : '#fff';">
-    <span style="display:inline-flex;width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 8px rgba(16,185,129,.6)"></span>
-    <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुली दुकानें</span>
-  </label>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px">
+    <label id="openNowHome" style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:#fff;border:1.5px solid #E2E8F0;border-radius:99px;font-weight:700;font-size:13px;color:#0F172A;cursor:pointer;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:all .15s">
+      <input type="checkbox" id="openNowCheck" style="margin:0;cursor:pointer;accent-color:#10B981" onchange="document.getElementById('openNowHome').style.borderColor = this.checked ? '#10B981' : '#E2E8F0'; document.getElementById('openNowHome').style.background = this.checked ? '#ECFDF5' : '#fff';">
+      <span style="display:inline-flex;width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 8px rgba(16,185,129,.6)"></span>
+      <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुली दुकानें</span>
+    </label>
+    <button type="button" id="installBtn" style="display:none;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,#FF6B1A,#E55100);border:0;border-radius:99px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,26,.35);font-family:inherit">
+      📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल करें</span>
+    </button>
+  </div>
 </div>
 
 <!-- ===== CATEGORIES (parent buckets) ===== -->
@@ -699,6 +704,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/voice.js"></script>
+<script src="/assets/js/install.js"></script>
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
