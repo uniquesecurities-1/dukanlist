@@ -5,7 +5,8 @@
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/share", "destination": "/api/share" },
-    { "source": "/share/:slug", "destination": "/api/share?slug=:slug" }
+    { "source": "/share/:slug", "destination": "/api/share?slug=:slug" },
+    { "source": "/local/:city/:cat", "destination": "/api/locality?city=:city&cat=:cat" }
   ],
   "headers": [
     {
