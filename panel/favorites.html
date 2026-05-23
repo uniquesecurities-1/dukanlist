@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>My Favorite Shops — DukanList</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♥</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  body{font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif}
+  .fav-hero{ text-align:center; margin:18px 0 28px }
+  .fav-hero h1{ font-size:1.7rem; font-weight:800; color:var(--ink); letter-spacing:-.02em; display:flex; align-items:center; justify-content:center; gap:8px }
+  .fav-hero p{ color:var(--muted); margin-top:6px; font-size:.95rem }
+  .fav-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px }
+  .fav-card{ background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:16px; overflow:hidden; box-shadow:0 1px 3px rgba(15,23,42,.04); text-decoration:none; color:inherit; display:flex; flex-direction:column; transition:transform .15s,box-shadow .15s; position:relative }
+  .fav-card:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(15,23,42,.08); text-decoration:none }
+  .fav-photo{ width:100%; aspect-ratio:16/10; background:linear-gradient(135deg,#FAFAFA,#F1F5F9); display:grid; place-items:center; font-size:2.4rem; opacity:.55 }
+  .fav-photo img{ width:100%; height:100%; object-fit:cover }
+  .fav-info{ padding:14px 16px; flex:1; display:flex; flex-direction:column; gap:6px }
+  .fav-name{ font-size:1.05rem; font-weight:700; color:var(--ink); line-height:1.3; letter-spacing:-.01em }
+  .fav-meta{ font-size:.82rem; color:var(--muted); font-weight:600; display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid #f1f5f9; margin-top:auto }
+  .unfav{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.96); border:0; font-size:18px; color:#EF4444; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.15); transition:.15s; display:grid; place-items:center; z-index:2 }
+  .unfav:hover{ background:#FEE2E2; transform:scale(1.08) }
+  .empty{ max-width:520px; margin:40px auto; padding:40px 28px; text-align:center; background:#fff; border:1px dashed #cbd5e1; border-radius:16px }
+  .empty .ico{ font-size:3.4rem; margin-bottom:8px; opacity:.55 }
+  .empty h2{ font-size:1.2rem; font-weight:800; color:var(--ink); margin-bottom:8px }
+  .empty p{ color:var(--muted); margin-bottom:18px; line-height:1.55 }
+  .btn-go{ display:inline-block; background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; padding:11px 24px; border-radius:99px; text-decoration:none; font-weight:700; box-shadow:0 4px 14px rgba(255,107,26,.35); font-size:.92rem }
+  .loader{ text-align:center; padding:60px 20px; color:var(--muted); font-size:.95rem }
+  .toast{ position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#0F172A; color:#fff; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; z-index:99999; box-shadow:0 8px 24px rgba(15,23,42,.25); opacity:0; transition:opacity .2s }
+  .toast.show{ opacity:1 }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><span class="logo">🏪</span><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <a href="/browse.html"><span data-i18n-en>Browse</span><span data-i18n-hi>श्रेणियाँ</span></a>
+      <a href="/search.html"><span data-i18n-en>Search</span><span data-i18n-hi>खोज</span></a>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="#" onclick="logout(event)" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="fav-hero">
+    <h1>♥ <span data-i18n-en>My Favorite Shops</span><span data-i18n-hi>मेरी पसंदीदा दुकानें</span></h1>
+    <p><span data-i18n-en>Quick access to shops you've saved.</span><span data-i18n-hi>आपके द्वारा सहेजी गई दुकानों तक त्वरित पहुँच।</span></p>
+  </div>
+
+  <div id="loading" class="loader">⏳ Loading your favorites...</div>
+
+  <div id="favGrid" class="fav-grid" style="display:none"></div>
+
+  <div id="empty" class="empty" style="display:none">
+    <div class="ico">♡</div>
+    <h2><span data-i18n-en>No favorites yet</span><span data-i18n-hi>अभी कोई पसंदीदा नहीं</span></h2>
+    <p><span data-i18n-en>Browse shops and tap the ♡ heart to save them here for one-tap access later.</span><span data-i18n-hi>दुकानें ब्राउज़ करें और ♡ हार्ट दबाकर यहाँ सहेजें।</span></p>
+    <a href="/browse.html" class="btn-go">
+      <span data-i18n-en>Browse Shops →</span><span data-i18n-hi>दुकानें देखें →</span>
+    </a>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/mobile-nav.js"></script>
+<script>
+function setLang(lang){
+  if (lang !== 'en' && lang !== 'hi') lang = 'en';
+  document.documentElement.setAttribute('data-lang', lang);
+  localStorage.setItem('shop_lang', lang);
+}
+async function logout(e){ if(e)e.preventDefault(); if(window.ShopDB&&ShopDB.signOut) await ShopDB.signOut(); else location.href='/panel/login.html'; }
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isErr ? '#DC2626' : '#0F172A';
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+async function load(){
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  const c = window.ShopDB && ShopDB.client;
+  if (!c){ showError('Backend not configured.'); return; }
+
+  // Auth check
+  const u = await c.auth.getUser();
+  if (!u || !u.data || !u.data.user){
+    location.href = '/panel/login.html?next=' + encodeURIComponent('/panel/favorites.html');
+    return;
+  }
+
+  // Fetch favorites
+  const r = await c.rpc('my_favorites');
+  document.getElementById('loading').style.display = 'none';
+
+  if (r.error){
+    showError('Could not load favorites: ' + r.error.message);
+    return;
+  }
+
+  const rows = r.data || [];
+  if (!rows.length){
+    document.getElementById('empty').style.display = '';
+    return;
+  }
+
+  const grid = document.getElementById('favGrid');
+  grid.style.display = '';
+  grid.innerHTML = rows.map(renderCard).join('');
+}
+
+function renderCard(s){
+  const photo = (s.photos && s.photos.length) ? s.photos[0] : null;
+  const rating = s.rating_avg > 0
+    ? `⭐ ${Number(s.rating_avg).toFixed(1)} <span style="color:#94a3b8">(${s.rating_count || 0})</span>`
+    : '<span style="color:#94a3b8">No reviews</span>';
+  return `
+  <div style="position:relative">
+    <button class="unfav" onclick="unfav('${esc(s.business_id)}', this)" title="Remove from favorites" aria-label="Remove from favorites">♥</button>
+    <a class="fav-card" href="/business.html?slug=${esc(s.slug)}">
+      <div class="fav-photo">${photo
+        ? `<img src="${esc(photo)}" alt="${esc(s.name)}" loading="lazy">`
+        : '🏪'}</div>
+      <div class="fav-info">
+        <div class="fav-name">${esc(s.name)}</div>
+        <div class="fav-meta">
+          <span>${rating}</span>
+          <span style="font-size:11px;color:#94a3b8">Saved ${timeAgo(s.created_at)}</span>
+        </div>
+      </div>
+    </a>
+  </div>`;
+}
+
+function timeAgo(iso){
+  if (!iso) return '';
+  const d = new Date(iso), diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 2592000) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+async function unfav(bizId, btn){
+  if (!confirm('Remove this shop from favorites?')) return;
+  const c = ShopDB.client;
+  btn.disabled = true; btn.textContent = '⏳';
+  const r = await c.rpc('toggle_favorite', { p_business_id: bizId });
+  if (r.error){
+    showToast('Could not remove: ' + r.error.message, true);
+    btn.disabled = false; btn.textContent = '♥';
+    return;
+  }
+  // Remove the card with a tiny fade
+  const card = btn.closest('div');
+  card.style.transition = 'opacity .25s, transform .25s';
+  card.style.opacity = '0';
+  card.style.transform = 'scale(.92)';
+  setTimeout(() => {
+    card.remove();
+    showToast('Removed from favorites');
+    if (!document.querySelector('#favGrid .fav-card')){
+      document.getElementById('favGrid').style.display = 'none';
+      document.getElementById('empty').style.display = '';
+    }
+  }, 280);
+}
+
+function showError(msg){
+  document.getElementById('loading').style.display = 'none';
+  const e = document.getElementById('empty');
+  e.style.display = '';
+  e.innerHTML = '<div class="ico">⚠️</div><h2>Something went wrong</h2><p>' + esc(msg) + '</p><a href="/browse.html" class="btn-go">Browse Shops →</a>';
+}
+
+load();
+</script>
+</body>
+</html>
