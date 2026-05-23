@@ -509,6 +509,36 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   </div>
 </div>
 
+<!-- ===== MMT-style category strip ===== -->
+<section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
+  <div style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:18px 8px;box-shadow:0 1px 3px rgba(15,23,42,.04)">
+    <div id="catStripScroll" style="display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+      <style>
+        #catStripScroll::-webkit-scrollbar{ display:none }
+        .cs-tile{ flex:0 0 auto;min-width:88px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px;text-decoration:none;color:#0F172A;scroll-snap-align:start;transition:transform .15s,background .15s;border-radius:12px }
+        .cs-tile:hover{ background:#FFF5EB;transform:translateY(-2px);text-decoration:none }
+        .cs-tile .cs-ico{ width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#FFF1E0,#FFE0C2);display:grid;place-items:center;font-size:1.8rem;transition:transform .2s }
+        .cs-tile:hover .cs-ico{ transform:scale(1.05) }
+        .cs-tile .cs-name{ font-size:.78rem;font-weight:700;color:#0F172A;text-align:center;line-height:1.2;letter-spacing:.01em;max-width:80px }
+        html[data-lang="hi"] .cs-tile .cs-name{ font-family:'Noto Sans Devanagari',sans-serif;font-size:.72rem }
+        @media(min-width:900px){ #catStripScroll{ justify-content:center } }
+      </style>
+      <a class="cs-tile" href="/search.html?cat=healthcare"><div class="cs-ico">🏥</div><div class="cs-name"><span data-i18n-en>Healthcare</span><span data-i18n-hi>स्वास्थ्य</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=financial-services"><div class="cs-ico">💰</div><div class="cs-name"><span data-i18n-en>Finance</span><span data-i18n-hi>वित्तीय</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=insurance"><div class="cs-ico">🛡️</div><div class="cs-name"><span data-i18n-en>Insurance</span><span data-i18n-hi>बीमा</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=home-services"><div class="cs-ico">🔧</div><div class="cs-name"><span data-i18n-en>Home Services</span><span data-i18n-hi>घरेलू सेवा</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=automotive"><div class="cs-ico">🚗</div><div class="cs-name"><span data-i18n-en>Automotive</span><span data-i18n-hi>वाहन</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=food-beverage"><div class="cs-ico">🍴</div><div class="cs-name"><span data-i18n-en>Food</span><span data-i18n-hi>खानपान</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=retail-shopping"><div class="cs-ico">🛍️</div><div class="cs-name"><span data-i18n-en>Shopping</span><span data-i18n-hi>खरीदारी</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=beauty-wellness"><div class="cs-ico">💇</div><div class="cs-name"><span data-i18n-en>Beauty</span><span data-i18n-hi>सौंदर्य</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=education"><div class="cs-ico">🎓</div><div class="cs-name"><span data-i18n-en>Education</span><span data-i18n-hi>शिक्षा</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=professional-services"><div class="cs-ico">👔</div><div class="cs-name"><span data-i18n-en>Professional</span><span data-i18n-hi>पेशेवर</span></div></a>
+      <a class="cs-tile" href="/search.html?cat=community-social"><div class="cs-ico">🤝</div><div class="cs-name"><span data-i18n-en>Community</span><span data-i18n-hi>समुदाय</span></div></a>
+      <a class="cs-tile" href="/browse.html" style="background:#FFF5EB"><div class="cs-ico" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff">⊞</div><div class="cs-name" style="color:#E55100"><span data-i18n-en>View All</span><span data-i18n-hi>सभी देखें</span></div></a>
+    </div>
+  </div>
+</section>
+
 <!-- ===== CATEGORIES (parent buckets) ===== -->
 <section id="categories">
   <div class="section-head reveal">
