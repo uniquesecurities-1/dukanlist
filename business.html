@@ -877,6 +877,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <script src="/assets/js/mobile-nav.js"></script>
 <script src="/assets/js/breadcrumbs.js"></script>
 <script src="/assets/js/recently-viewed.js"></script>
+<script src="/assets/js/login-modal.js"></script>
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
@@ -1776,10 +1777,18 @@ async function toggleFav(){
   const c = ShopDB.client;
   const u = await c.auth.getUser();
   if (!u || !u.data || !u.data.user){
-    if (confirm('Save shops by creating a free account. Login now?')){
-      location.href = '/panel/login.html?next=' + encodeURIComponent(location.pathname + location.search);
+    // In-place login modal instead of full-page redirect
+    if (window.DukanLoginModal){
+      const res = await DukanLoginModal.open({
+        title: 'Login to save shops',
+        reason: 'Save your favourite shops with one tap, sync across devices, never lose track.'
+      });
+      if (!res || !res.user) return;
+      // continue — user is now logged in
+    } else {
+      if (confirm('Login to save shops?')) location.href = '/panel/login.html?next=' + encodeURIComponent(location.pathname + location.search);
+      return;
     }
-    return;
   }
   const r = await c.rpc('toggle_favorite', { p_business_id: BIZ.id });
   if (r.error){
