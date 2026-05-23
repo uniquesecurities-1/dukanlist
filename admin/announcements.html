@@ -158,6 +158,9 @@
       <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:600">
         <input type="checkbox" id="fActive" checked> Active immediately
       </label>
+      <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:600;background:#FEF3C7;padding:4px 10px;border-radius:6px;color:#92400E">
+        <input type="checkbox" id="fPush"> 📲 Also send as mobile push notification
+      </label>
     </div>
     <div class="row-actions">
       <button class="btn" onclick="resetForm()">Reset</button>
@@ -250,7 +253,31 @@ async function createAnn(){
   const r = await ShopDB.client.rpc('admin_create_announcement', { p_data: payload });
   btn.disabled = false; btn.innerHTML = '📣 Publish announcement';
   if (r.error){ toast('Failed: ' + r.error.message, true); return; }
-  toast('✓ Published. Visible to ' + payload.target + ' now.');
+
+  // Optional: also send as push notification
+  if (document.getElementById('fPush').checked){
+    try {
+      const sess = await ShopDB.client.auth.getSession();
+      const token = sess?.data?.session?.access_token;
+      const pushRes = await fetch('/api/push-broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          title: payload.title,
+          body:  payload.body || '',
+          url:   payload.link_url || '/',
+          image: payload.image_url || undefined,
+          audience: payload.target
+        })
+      });
+      const pushBody = await pushRes.json().catch(() => ({}));
+      if (pushRes.ok) toast('✓ Published + ' + (pushBody.sent || 0) + ' push notifications sent');
+      else toast('Published but push failed: ' + (pushBody.error || pushRes.status), true);
+    } catch(e){ toast('Push error: ' + e.message, true); }
+  } else {
+    toast('✓ Published. Visible to ' + payload.target + ' now.');
+  }
+
   resetForm();
   loadList();
 }

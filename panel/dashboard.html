@@ -68,6 +68,11 @@
     <!-- Profile completeness widget -->
     <div id="completenessWidget" style="margin-top:18px"></div>
 
+    <!-- Push notifications opt-in -->
+    <div style="margin-top:18px;display:flex;justify-content:flex-end">
+      <button id="enableNotifBtn" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#0F172A;border:1.5px solid #cbd5e1;padding:8px 14px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔔 Enable notifications</button>
+    </div>
+
     <!-- Notifications bell + dropdown -->
     <div id="notifWidget" style="margin-top:18px"></div>
 
@@ -172,6 +177,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/completeness.js"></script>
+<script src="/assets/js/push.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanPush) DukanPush.attachButton('enableNotifBtn', { audience: 'shopkeeper' }); });</script>
 <script>
 // Lead notifications widget (loads independently — doesn't block dashboard if RPC missing)
 window.addEventListener('DOMContentLoaded', () => {
