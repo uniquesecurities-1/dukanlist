@@ -136,6 +136,27 @@
 
 /* Open-Now toggle + card badge */
 .filter-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:-6px 0 14px }
+
+/* View toggle (List / Map) */
+.view-toggle{ display:inline-flex; background:#F1F5F9; border-radius:10px; padding:3px; gap:0 }
+.vt-btn{ border:none; background:transparent; padding:7px 13px; font-size:.84rem; font-weight:700; color:var(--ink-2); cursor:pointer; border-radius:8px; font-family:inherit; transition:.15s }
+.vt-btn:hover{ color:var(--ink) }
+.vt-btn.active{ background:#fff; color:var(--saffron-deep); box-shadow:0 2px 6px rgba(15,23,42,.08) }
+
+/* Custom map pin & popup */
+.dl-pin{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); width:32px; height:32px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); display:grid; place-items:center; box-shadow:0 4px 10px rgba(255,107,26,.4); border:2px solid #fff }
+.dl-pin span{ transform:rotate(45deg); color:#fff; font-weight:800; font-size:13px }
+.dl-pin.featured{ background:linear-gradient(135deg,#FFC93D,#FF8C00) }
+.leaflet-popup-content-wrapper{ border-radius:14px; padding:0; overflow:hidden }
+.leaflet-popup-content{ margin:0; min-width:240px }
+.popup-card{ padding:0; font-family:inherit }
+.popup-card .pc-photo{ width:100%; height:100px; background:#f1f5f9; overflow:hidden }
+.popup-card .pc-photo img{ width:100%; height:100%; object-fit:cover }
+.popup-card .pc-body{ padding:10px 14px 12px }
+.popup-card .pc-name{ font-size:14px; font-weight:800; color:var(--ink); letter-spacing:-.01em; margin-bottom:4px }
+.popup-card .pc-meta{ font-size:11px; color:#64748b; margin-bottom:6px }
+.popup-card .pc-cta{ display:inline-block; background:var(--saffron); color:#fff; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:800; text-decoration:none }
+.popup-card .pc-cta:hover{ background:var(--saffron-deep); text-decoration:none }
 .open-toggle{
   display:inline-flex; align-items:center; gap:8px;
   padding:7px 13px; border-radius:99px;
@@ -234,18 +255,39 @@
       <span class="sw"></span>
       <span data-i18n-en>Open Now</span><span data-i18n-hi>अभी खुले</span>
     </button>
+    <button type="button" id="ratingToggle" class="open-toggle" onclick="toggleRating()" aria-pressed="false">
+      <span class="sw"></span>
+      <span data-i18n-en>⭐ 4.0+</span><span data-i18n-hi>⭐ 4.0+</span>
+    </button>
+    <button type="button" id="verifiedToggle" class="open-toggle" onclick="toggleVerified()" aria-pressed="false">
+      <span class="sw"></span>
+      <span data-i18n-en>✓ Verified</span><span data-i18n-hi>✓ वेरिफाइड</span>
+    </button>
+    <button type="button" id="dealsToggle" class="open-toggle" onclick="toggleDeals()" aria-pressed="false">
+      <span class="sw"></span>
+      <span data-i18n-en>🎁 With Offers</span><span data-i18n-hi>🎁 ऑफर्स वाले</span>
+    </button>
     <span id="openFilterHint" style="font-size:.78rem;color:var(--muted)"></span>
   </div>
 
   <div class="result-head">
     <div class="result-count" id="countDisp"></div>
-    <div style="font-size:.78rem;color:var(--muted)">
-      <span data-i18n-en>Sorted by relevance + trust score</span>
-      <span data-i18n-hi>प्रासंगिकता + ट्रस्ट स्कोर के अनुसार</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:.78rem;color:var(--muted)" id="sortHint">
+        <span data-i18n-en>Sorted by relevance + trust score</span>
+        <span data-i18n-hi>प्रासंगिकता + ट्रस्ट स्कोर के अनुसार</span>
+      </div>
+      <div class="view-toggle" role="tablist" aria-label="View toggle">
+        <button id="viewListBtn" class="vt-btn active" onclick="setView('list')" aria-pressed="true">📋 List</button>
+        <button id="viewMapBtn"  class="vt-btn" onclick="setView('map')"  aria-pressed="false">🗺️ Map</button>
+      </div>
     </div>
   </div>
 
   <div id="filterChipsSlot" style="display:none"></div>
+  <div id="mapView" style="display:none;border-radius:18px;overflow:hidden;border:1px solid rgba(15,23,42,.05);box-shadow:0 8px 28px rgba(15,23,42,.06);height:520px;background:#f1f5f9;position:relative">
+    <div id="mapLoadHint" style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem;text-align:center;padding:30px">Loading map…</div>
+  </div>
   <div id="results">
     <div class="biz-grid">
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
@@ -286,8 +328,12 @@ function setLang(lang){
 }
 
 let CATEGORIES = [], CITIES = [];
-let LAST_RESULTS = [];        // last unfiltered result-set (for client-side Open-Now filter)
+let LAST_RESULTS = [];        // last unfiltered result-set (for client-side filters)
 let OPEN_NOW = false;          // active toggle state
+let RATING_FILTER = false;     // ⭐ 4.0+
+let VERIFIED_FILTER = false;   // ✓ Verified
+let DEALS_FILTER = false;      // 🎁 With active deals
+let BIZ_WITH_DEALS = new Set(); // populated lazily
 
 function toggleOpenNow(){
   OPEN_NOW = !OPEN_NOW;
@@ -295,6 +341,44 @@ function toggleOpenNow(){
   btn.classList.toggle('on', OPEN_NOW);
   btn.setAttribute('aria-pressed', OPEN_NOW ? 'true' : 'false');
   try{ localStorage.setItem('shop_openNow', OPEN_NOW ? '1' : '0'); }catch(_){}
+  renderResults();
+}
+
+function toggleRating(){
+  RATING_FILTER = !RATING_FILTER;
+  const btn = document.getElementById('ratingToggle');
+  btn.classList.toggle('on', RATING_FILTER);
+  btn.setAttribute('aria-pressed', RATING_FILTER ? 'true' : 'false');
+  try{ localStorage.setItem('shop_ratingFilter', RATING_FILTER ? '1' : '0'); }catch(_){}
+  renderResults();
+}
+
+function toggleVerified(){
+  VERIFIED_FILTER = !VERIFIED_FILTER;
+  const btn = document.getElementById('verifiedToggle');
+  btn.classList.toggle('on', VERIFIED_FILTER);
+  btn.setAttribute('aria-pressed', VERIFIED_FILTER ? 'true' : 'false');
+  try{ localStorage.setItem('shop_verifiedFilter', VERIFIED_FILTER ? '1' : '0'); }catch(_){}
+  renderResults();
+}
+
+async function toggleDeals(){
+  DEALS_FILTER = !DEALS_FILTER;
+  const btn = document.getElementById('dealsToggle');
+  btn.classList.toggle('on', DEALS_FILTER);
+  btn.setAttribute('aria-pressed', DEALS_FILTER ? 'true' : 'false');
+  try{ localStorage.setItem('shop_dealsFilter', DEALS_FILTER ? '1' : '0'); }catch(_){}
+  if (DEALS_FILTER && BIZ_WITH_DEALS.size === 0){
+    try{
+      const ids = LAST_RESULTS.map(b => b.id);
+      if (ids.length){
+        const r = await ShopDB.client.rpc('business_deals_count', { p_business_ids: ids });
+        if (!r.error && r.data){
+          BIZ_WITH_DEALS = new Set(r.data.map(x => x.business_id));
+        }
+      }
+    } catch(e){ console.warn('deals count fetch failed', e); }
+  }
   renderResults();
 }
 
@@ -446,6 +530,12 @@ async function runSearch(){
 }
 
 function renderResults(){
+  // Sync map view if active
+  if (CURRENT_VIEW === 'map' && _mapInstance){ renderMapPins(); }
+  return _renderResultsInner();
+}
+
+function _renderResultsInner(){
   const resEl = document.getElementById('results');
   const countEl = document.getElementById('countDisp');
   const hint = document.getElementById('openFilterHint');
@@ -456,7 +546,6 @@ function renderResults(){
     const before = rows.length;
     const anyHasHours = rows.some(b => b.hours_json && Object.keys(b.hours_json).length);
     if (!anyHasHours){
-      // RPC didn't return hours_json for any row → can't filter client-side. Inform user.
       const hint = document.getElementById('openFilterHint');
       hint.textContent = '(hours data not returned by search — filter skipped)';
     } else {
@@ -467,6 +556,16 @@ function renderResults(){
       });
       filteredOutByOpen = before - rows.length;
     }
+  }
+
+  if (RATING_FILTER){
+    rows = rows.filter(b => Number(b.rating_avg) >= 4.0);
+  }
+  if (VERIFIED_FILTER){
+    rows = rows.filter(b => Number(b.verified_score) >= 3);
+  }
+  if (DEALS_FILTER && BIZ_WITH_DEALS.size){
+    rows = rows.filter(b => BIZ_WITH_DEALS.has(b.id));
   }
 
   if (!rows.length){
@@ -560,6 +659,108 @@ function renderCard(b){
     </article>`;
 }
 
+// ===== Map View =====
+let _mapInstance = null;
+let _mapPins = [];
+let _mapLeafletLoaded = false;
+let CURRENT_VIEW = 'list';
+
+function setView(v){
+  CURRENT_VIEW = v;
+  document.getElementById('viewListBtn').classList.toggle('active', v === 'list');
+  document.getElementById('viewMapBtn').classList.toggle('active', v === 'map');
+  document.getElementById('viewListBtn').setAttribute('aria-pressed', v === 'list' ? 'true' : 'false');
+  document.getElementById('viewMapBtn').setAttribute('aria-pressed', v === 'map' ? 'true' : 'false');
+  document.getElementById('results').style.display = v === 'list' ? '' : 'none';
+  document.getElementById('mapView').style.display = v === 'map' ? '' : 'none';
+  try{ localStorage.setItem('shop_view', v); }catch(_){}
+  if (v === 'map') initMap();
+}
+
+async function loadLeaflet(){
+  if (_mapLeafletLoaded) return;
+  return new Promise((resolve, reject) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    const js = document.createElement('script');
+    js.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+    js.onload = () => { _mapLeafletLoaded = true; resolve(); };
+    js.onerror = reject;
+    document.head.appendChild(js);
+  });
+}
+
+async function initMap(){
+  const hint = document.getElementById('mapLoadHint');
+  try{
+    await loadLeaflet();
+    hint.style.display = 'none';
+    if (!_mapInstance){
+      // Default centre on Mandi Dabwali (Sirsa)
+      _mapInstance = L.map('mapView', { zoomControl: true, scrollWheelZoom: true })
+        .setView([29.95, 74.7], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+      }).addTo(_mapInstance);
+    }
+    renderMapPins();
+  } catch(e){
+    hint.style.display = 'grid';
+    hint.innerHTML = '⚠️ Map failed to load. <a href="javascript:initMap()" style="color:var(--saffron-deep);font-weight:700">Retry</a>';
+  }
+}
+
+function renderMapPins(){
+  if (!_mapInstance) return;
+  // Clear existing pins
+  _mapPins.forEach(m => _mapInstance.removeLayer(m));
+  _mapPins = [];
+
+  const rows = LAST_RESULTS.filter(b => b.lat && b.lng);
+  if (!rows.length){
+    const hint = document.getElementById('mapLoadHint');
+    hint.style.display = 'grid';
+    hint.innerHTML = '📍 No shops with location data in current results. Showing all of Sirsa-Bathinda region.';
+    return;
+  }
+
+  document.getElementById('mapLoadHint').style.display = 'none';
+
+  const bounds = [];
+  rows.forEach(b => {
+    const isFeatured = !!b.is_featured;
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="dl-pin ${isFeatured ? 'featured' : ''}"><span>${b.category_icon || '🏪'}</span></div>`,
+      iconSize: [32, 40],
+      iconAnchor: [16, 38],
+      popupAnchor: [0, -34]
+    });
+    const marker = L.marker([Number(b.lat), Number(b.lng)], { icon }).addTo(_mapInstance);
+    const photo = (b.photos && b.photos[0]) || '';
+    const rating = Number(b.rating_avg) > 0 ? `⭐ ${Number(b.rating_avg).toFixed(1)} (${b.rating_count})` : 'No reviews';
+    const popupHtml = `<div class="popup-card">
+      ${photo ? `<div class="pc-photo"><img src="${escapeHTML(photo)}" alt=""></div>` : ''}
+      <div class="pc-body">
+        <div class="pc-name">${escapeHTML(b.name)}${isFeatured ? ' ⭐' : ''}</div>
+        <div class="pc-meta">${escapeHTML(b.category_name || '')} · ${escapeHTML(b.city_name || '')}<br>${rating}</div>
+        <a class="pc-cta" href="/business.html?slug=${encodeURIComponent(b.slug)}">View Shop →</a>
+      </div>
+    </div>`;
+    marker.bindPopup(popupHtml);
+    _mapPins.push(marker);
+    bounds.push([Number(b.lat), Number(b.lng)]);
+  });
+  if (bounds.length > 1){
+    _mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+  } else if (bounds.length === 1){
+    _mapInstance.setView(bounds[0], 14);
+  }
+}
+
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
 function handleSearch(e){
@@ -587,8 +788,27 @@ window.addEventListener('DOMContentLoaded', async () => {
       const btn = document.getElementById('openNowToggle');
       if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
     }
+    if (localStorage.getItem('shop_ratingFilter') === '1'){
+      RATING_FILTER = true;
+      const btn = document.getElementById('ratingToggle');
+      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
+    }
+    if (localStorage.getItem('shop_verifiedFilter') === '1'){
+      VERIFIED_FILTER = true;
+      const btn = document.getElementById('verifiedToggle');
+      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
+    }
+    if (localStorage.getItem('shop_dealsFilter') === '1'){
+      DEALS_FILTER = true;
+      const btn = document.getElementById('dealsToggle');
+      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
+    }
   }catch(_){}
   await loadDropdowns();
+  try{
+    const v = localStorage.getItem('shop_view');
+    if (v === 'map'){ setView('map'); }
+  }catch(_){}
   runSearch();
 });
 window.addEventListener('popstate', runSearch);
