@@ -246,14 +246,47 @@ async function loadDashboard(){
 
   const c = ShopDB.client;
   // Get this user's business via business_owners join
-  const { data: owners, error: ownersErr } = await c
+  let { data: owners } = await c
     .from('business_owners')
     .select('business_id')
     .eq('auth_user_id', user.id)
     .limit(1);
 
-  if (ownersErr || !owners || !owners.length){
-    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+  // Defensive auto-claim: if no link found but user has mobile in metadata,
+  // try claiming the matching business now. Handles the "registered on phone,
+  // confirmed email on laptop" case where localStorage was empty at login.
+  if (!owners || !owners.length){
+    const fallbackMobile = (user.user_metadata && user.user_metadata.mobile) || null;
+    if (fallbackMobile){
+      try { await c.rpc('claim_business_by_phone', { p_mobile: fallbackMobile }); } catch(_) {}
+      const retry = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+      owners = retry.data || [];
+    }
+  }
+
+  if (!owners || !owners.length){
+    document.getElementById('loading').innerHTML =
+      '<div style="text-align:center;padding:36px 16px">'
+      + '<div style="font-size:2.6rem;margin-bottom:6px">🔗</div>'
+      + '<div style="font-size:1.05rem;font-weight:800;color:#0F172A;margin-bottom:8px">No business linked to this account yet</div>'
+      + '<div style="color:#64748b;margin-bottom:18px;line-height:1.55;max-width:440px;margin-left:auto;margin-right:auto">Aapne registration ke time jo mobile diya tha, woh number aapke email account se link nahi hua. Manually link karne ke liye apna registered mobile niche likho:</div>'
+      + '<div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">'
+      + '<input id="linkMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile" style="padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:14px;font-family:inherit;width:180px;text-align:center">'
+      + '<button onclick="tryLinkByMobile()" style="background:#FF6B1A;color:#fff;border:0;padding:10px 18px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer">Link my shop</button>'
+      + '</div>'
+      + '<div id="linkErr" style="color:#DC2626;font-size:12px;margin-top:10px;display:none"></div>'
+      + '<div style="margin-top:14px;font-size:13px;color:#64748b">Or <a href="/register.html" style="color:#FF6B1A;font-weight:700">register a new shop</a></div>'
+      + '</div>';
+    window.tryLinkByMobile = async function(){
+      const el = document.getElementById('linkMobile');
+      const er = document.getElementById('linkErr');
+      er.style.display = 'none';
+      const m = (el.value || '').replace(/\D/g,'').slice(-10);
+      if (m.length !== 10){ er.textContent = 'Enter a valid 10-digit mobile.'; er.style.display = ''; return; }
+      const r = await c.rpc('claim_business_by_phone', { p_mobile: m });
+      if (r.error){ er.textContent = 'Could not link: ' + r.error.message; er.style.display = ''; return; }
+      location.reload();
+    };
     return;
   }
 

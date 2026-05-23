@@ -147,8 +147,13 @@ async function handleLogin(){
     err.style.display = 'flex'; return;
   }
 
-  // Auto-claim: link any pending business by mobile
-  const pendingMobile = localStorage.getItem('shop_pending_mobile');
+  // Auto-claim: link any pending business by mobile.
+  // Try localStorage first (same-browser registration). If empty, fall back to
+  // user_metadata.mobile (set during signUp) — works on any device.
+  let pendingMobile = localStorage.getItem('shop_pending_mobile');
+  if (!pendingMobile && data && data.user && data.user.user_metadata){
+    pendingMobile = data.user.user_metadata.mobile || null;
+  }
   if (pendingMobile){
     try {
       await c.rpc('claim_business_by_phone', { p_mobile: pendingMobile });
