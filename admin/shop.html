@@ -90,6 +90,18 @@
   .photos-strip img{height:80px;border-radius:8px;border:1px solid #e2e8f0}
 
   .nav-back{font-size:13px;color:#64748b;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px}
+
+  /* Edit history timeline */
+  .eh-row{padding:9px 0;border-bottom:1px dashed #e2e8f0;font-size:13px}
+  .eh-row:last-child{border-bottom:0}
+  .eh-head{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-weight:700}
+  .eh-field{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;background:#F1F5F9;color:#475569;padding:2px 7px;border-radius:5px}
+  .eh-field.sensitive{background:#FEF3C7;color:#92400E}
+  .eh-time{font-size:11px;color:#94a3b8;margin-left:auto;font-weight:500}
+  .eh-vals{font-size:12px;color:#475569;line-height:1.4;padding-left:0}
+  .eh-vals .o{color:#7F1D1D;text-decoration:line-through;text-decoration-color:rgba(127,29,29,.3);margin-right:8px}
+  .eh-vals .n{color:#065F46;font-weight:600}
+  .eh-empty{color:#94a3b8;font-size:13px;padding:8px 0;text-align:center}
   .nav-back:hover{color:#0F172A}
 
   /* Featured Modal */
@@ -181,6 +193,7 @@ async function init(){
   }
   SHOP = r.data;
   render();
+  loadEditHistory();
 }
 
 function render(){
@@ -236,6 +249,12 @@ function render(){
           + '<span>Verified Score</span>'
           + '<span id="vScore" style="font-weight:800;font-size:15px;color:#0F172A">' + (s.verified_score || 0) + ' / 5</span>'
         + '</div>'
+      + '</div>'
+
+      // === Recent Changes card ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📝 Recent Changes <span class="subtle">last 10 edits</span></h2>'
+        + '<div id="editHistory"><div style="color:#94a3b8;font-size:13px;padding:6px 0">Loading…</div></div>'
       + '</div>'
 
       // === Edit card ===
@@ -487,6 +506,35 @@ async function saveShop(e){
 async function saveNotes(){
   var v = document.getElementById('notesField').value;
   await applyPatch({ admin_notes: v }, '✓ Note saved');
+}
+
+async function loadEditHistory(){
+  var el = document.getElementById('editHistory');
+  if (!el) return;
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_get_edit_history', { p_business_id: BIZ_ID, p_limit: 10 });
+  if (r.error){
+    el.innerHTML = '<div class="eh-empty">Could not load edit history</div>';
+    return;
+  }
+  var rows = r.data || [];
+  if (!rows.length){
+    el.innerHTML = '<div class="eh-empty">No changes recorded yet</div>';
+    return;
+  }
+  el.innerHTML = rows.map(function(e){
+    var when = e.created_at ? new Date(e.created_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    var fieldCls = e.is_sensitive ? 'eh-field sensitive' : 'eh-field';
+    var role = e.edited_role === 'admin' ? '🛡 admin' : (e.edited_role === 'owner' ? '👤 owner' : 'system');
+    var reviewTag = e.triggered_review ? ' <span style="background:#EEF2FF;color:#4338CA;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:800">→ REVIEW</span>' : '';
+    return '<div class="eh-row">'
+      + '<div class="eh-head"><span class="' + fieldCls + '">' + esc(e.field_name) + '</span>'
+      + '<span style="font-size:11px;color:#64748b;font-weight:600">' + role + '</span>'
+      + reviewTag
+      + '<span class="eh-time">' + when + '</span></div>'
+      + '<div class="eh-vals"><span class="o">' + esc(e.old_value || '—') + '</span><span class="n">' + esc(e.new_value || '—') + '</span></div>'
+      + '</div>';
+  }).join('');
 }
 
 init();

@@ -666,8 +666,8 @@ async function saveProfile(){
     hours_json: collectHours()
   };
 
-  // Update business
-  const { error: updErr } = await c.from('businesses').update(payload).eq('id', MY_BIZ.id);
+  // Update business via safe RPC (handles re-review for sensitive fields)
+  const { data: updRes, error: updErr } = await c.rpc('update_my_business', { p_patch: payload });
   if (updErr){
     btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
     errEl.textContent = 'Save failed: ' + updErr.message; errEl.style.display = 'flex'; return;
@@ -686,12 +686,24 @@ async function saveProfile(){
     errEl.textContent = 'Category insert failed: ' + insErr.message; errEl.style.display='flex'; return;
   }
 
-  okEl.textContent = '✅ Profile saved. Changes are live on dukanlist.com';
+  // Determine success message based on review status
+  const pendingFields = (updRes && updRes.pending_fields) || [];
+  const wentToReview  = updRes && updRes.status === 'pending_review' && updRes.status_changed;
+  if (wentToReview){
+    okEl.innerHTML = '<b>⏳ Saved & sent for admin review</b><br>'
+      + '<span style="font-size:13px;color:#5A6573">You changed: <b>' + pendingFields.join(', ') + '</b>. '
+      + 'Your old approved version stays live on dukanlist.com until admin re-approves (usually within 24h).</span>';
+  } else if (updRes && updRes.trusted_owner && pendingFields.length){
+    okEl.innerHTML = '<b>✅ Saved & live</b> <span style="font-size:12px;color:#5A6573">(trusted owner — auto-approved)</span>';
+  } else {
+    okEl.textContent = '✅ Profile saved. Changes are live on dukanlist.com';
+  }
   okEl.style.display = 'flex';
   btn.disabled = false; btn.innerHTML = '<span>💾 Save Changes</span>';
   // Reload MY_BIZ so save reflects latest
   Object.assign(MY_BIZ, payload);
-  setTimeout(() => { okEl.style.display = 'none'; }, 4000);
+  if (updRes && updRes.status) MY_BIZ.status = updRes.status;
+  setTimeout(() => { okEl.style.display = 'none'; }, 6000);
 }
 
 function escapeHTML(s){

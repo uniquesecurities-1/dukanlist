@@ -152,6 +152,18 @@
 
   .loader{text-align:center;padding:40px;color:#64748b;font-size:14px}
   .err{color:#dc2626;text-align:center;padding:14px;background:#fef2f2;border-radius:8px;font-size:14px}
+
+/* === Pending Re-Review diff cards === */
+.edit-diff{margin-top:12px;padding:12px;background:#F8FAFC;border-radius:8px;border:1px solid #e2e8f0}
+.edit-row{padding:8px 0;border-bottom:1px dashed #e2e8f0}
+.edit-row:last-child{border-bottom:0}
+.edit-field{font-size:12px;font-weight:800;color:#0F172A;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.edit-old,.edit-new{font-size:13px;line-height:1.5;padding:6px 10px;border-radius:6px;margin-bottom:4px;word-break:break-word}
+.edit-old{background:#FEF2F2;color:#7F1D1D;border:1px solid #FECACA;text-decoration:line-through;text-decoration-color:rgba(127,29,29,.4)}
+.edit-new{background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0}
+.edit-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:middle;letter-spacing:.05em}
+.edit-tag.old{background:#991B1B;color:#fff}
+.edit-tag.new{background:#065F46;color:#fff}
 </style>
 </head>
 <body>
@@ -189,6 +201,9 @@
     <button class="tab" data-tab="flags" onclick="switchTab('flags')">
       📋 Community Flag Reports <span class="count" id="cnt-flags">—</span>
     </button>
+    <button class="tab" data-tab="edits" onclick="switchTab('edits')">
+      🔄 Pending Re-Review <span class="count" id="cnt-edits">—</span>
+    </button>
   </div>
 
   <!-- Panel: Pending Approvals -->
@@ -204,6 +219,11 @@
   <!-- Panel: Community Flag Reports -->
   <div class="panel" id="panel-flags">
     <div id="list-flags"><div class="loader">Loading flag reports...</div></div>
+  </div>
+
+  <!-- Panel: Pending Re-Review (post-approval edits) -->
+  <div class="panel" id="panel-edits">
+    <div id="list-edits"><div class="loader">Loading pending edits...</div></div>
   </div>
 
 </main>
@@ -282,10 +302,10 @@ let C = null;
   // Honor URL tab param
   const params = new URLSearchParams(window.location.search);
   const tab = params.get('tab');
-  if (tab && ['pending','flagged','flags'].includes(tab)) switchTab(tab);
+  if (tab && ['pending','flagged','flags','edits'].includes(tab)) switchTab(tab);
 
-  // Load all three panels
-  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags()]);
+  // Load all four panels
+  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
 })();
 
 function switchTab(name){
@@ -308,6 +328,52 @@ async function loadPending(){
     return;
   }
   document.getElementById('list-pending').innerHTML = data.map(b => bizCard(b, 'pending')).join('');
+}
+
+// ===== PENDING RE-REVIEW (post-approval edits) =====
+async function loadPendingEdits(){
+  const { data, error } = await C.rpc('admin_pending_edits', { p_limit: 50, p_offset: 0 });
+  if (error){
+    document.getElementById('list-edits').innerHTML = '<div class="err">Failed: ' + escapeHtml(error.message) + '<br><small>Run db/38-moderation-hardening.sql first.</small></div>';
+    return;
+  }
+  const rows = data || [];
+  document.getElementById('cnt-edits').textContent = rows.length;
+  if (!rows.length){
+    document.getElementById('list-edits').innerHTML = emptyState('✅', 'No pending edits', 'Approved shops with sensitive changes will appear here.');
+    return;
+  }
+  document.getElementById('list-edits').innerHTML = rows.map(renderPendingEditCard).join('');
+}
+
+function renderPendingEditCard(b){
+  const edits = b.recent_edits || [];
+  const diffHtml = edits.length
+    ? '<div class="edit-diff">' + edits.map(e => {
+        const oldV = escapeHtml((e.old_value || '—').substring(0, 200));
+        const newV = escapeHtml((e.new_value || '—').substring(0, 200));
+        const when = e.edited_at ? new Date(e.edited_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+        return '<div class="edit-row">'
+          + '<div class="edit-field">' + escapeHtml(e.field_name) + ' <small style="color:#94a3b8;font-weight:500">' + when + '</small></div>'
+          + '<div class="edit-old"><span class="edit-tag old">OLD</span>' + oldV + '</div>'
+          + '<div class="edit-new"><span class="edit-tag new">NEW</span>' + newV + '</div>'
+          + '</div>';
+      }).join('') + '</div>'
+    : '<div style="color:#94a3b8;font-size:13px;padding:8px 0">No detailed edit history available.</div>';
+
+  return `<div class="biz-card" style="border-left:3px solid #6366F1">
+    <div class="biz-head">
+      <div style="flex:1;min-width:0">
+        <div class="biz-name">${escapeHtml(b.name)} <span class="pill" style="background:#EEF2FF;color:#4338CA;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:6px">🔄 PENDING RE-REVIEW</span></div>
+        <div class="biz-sub">📍 ${escapeHtml(b.city_name || '—')} · Updated ${b.updated_at ? new Date(b.updated_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+      </div>
+    </div>
+    ${diffHtml}
+    <div class="biz-actions" style="margin-top:12px">
+      <a class="btn btn-primary" href="/admin/shop.html?id=${b.business_id}">⚖ Review & Approve</a>
+      <a class="btn btn-secondary" href="/business.html?slug=${b.slug}" target="_blank">🌐 Public View</a>
+    </div>
+  </div>`;
 }
 
 // ===== FLAGGED BUSINESSES =====
