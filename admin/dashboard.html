@@ -74,6 +74,53 @@
 
   /* Footer */
   .footer{text-align:center;color:#94a3b8;font-size:12px;padding:20px 0}
+
+/* === Phase 1 admin productivity styles === */
+.search-wrap{position:relative;margin-bottom:18px;z-index:50}
+.search-box{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px 16px;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:.15s}
+.search-box:focus-within{border-color:#6366F1;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+.search-box input{flex:1;border:0;outline:0;font-size:15px;font-family:inherit;background:transparent;color:#0F172A}
+.search-icon{font-size:18px;opacity:.6}
+.search-spinner{font-size:14px}
+.search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 12px 36px rgba(15,23,42,.12);max-height:480px;overflow-y:auto}
+.search-result{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit;transition:.1s}
+.search-result:hover{background:#F8FAFC}
+.search-result:last-child{border-bottom:0}
+.sr-photo{width:48px;height:48px;border-radius:8px;background:#f1f5f9;flex-shrink:0;overflow:hidden;display:grid;place-items:center;font-size:22px;opacity:.6}
+.sr-photo img{width:100%;height:100%;object-fit:cover}
+.sr-info{flex:1;min-width:0}
+.sr-name{font-weight:700;font-size:14px;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-meta{font-size:12px;color:#64748b;margin-top:2px}
+.sr-match{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:5px;flex-shrink:0;align-self:center}
+.search-empty{padding:20px;text-align:center;color:#94a3b8;font-size:13px}
+
+.section-sub{color:#94a3b8;font-size:12px;font-weight:500;margin-left:6px}
+.see-all{display:inline-block;margin-top:12px;color:#6366F1;font-size:13px;font-weight:700;text-decoration:none}
+.see-all:hover{text-decoration:underline}
+
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.task-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;text-decoration:none;color:inherit;transition:.18s;display:block;position:relative;overflow:hidden}
+.task-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,.08)}
+.task-card.urgent{border-color:#FCA5A5;background:linear-gradient(135deg,#FEF2F2 0%,#FFFFFF 60%)}
+.task-card.warn{border-color:#FCD34D;background:linear-gradient(135deg,#FFFBEB 0%,#FFFFFF 60%)}
+.task-card.calm{border-color:#A7F3D0;background:linear-gradient(135deg,#ECFDF5 0%,#FFFFFF 60%)}
+.tc-icon{font-size:22px;margin-bottom:6px}
+.tc-num{font-size:26px;font-weight:800;letter-spacing:-.02em;color:#0F172A;font-variant-numeric:tabular-nums}
+.tc-label{font-size:12px;color:#475569;font-weight:700;margin-top:2px}
+.tc-cta{font-size:11px;color:#6366F1;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
+.tc-card.urgent .tc-cta{color:#DC2626}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+@media (max-width:760px){.two-col{grid-template-columns:1fr}}
+.recent-list{display:flex;flex-direction:column;gap:8px}
+.recent-item{display:flex;gap:10px;padding:10px;border:1px solid #e2e8f0;border-radius:8px;text-decoration:none;color:inherit;transition:.12s}
+.recent-item:hover{border-color:#6366F1;background:#F8FAFC}
+.ri-photo{width:40px;height:40px;border-radius:6px;background:#f1f5f9;flex-shrink:0;overflow:hidden;display:grid;place-items:center;font-size:18px;opacity:.6}
+.ri-photo img{width:100%;height:100%;object-fit:cover}
+.ri-info{flex:1;min-width:0}
+.ri-name{font-weight:700;font-size:13px;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ri-meta{font-size:11px;color:#64748b}
+.ri-time{font-size:10px;color:#94a3b8;align-self:center;flex-shrink:0;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -104,6 +151,24 @@
 
   <!-- Scope banner — shows role + city scope -->
   <div id="scopeBanner" style="display:none;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:11px 16px;margin-bottom:18px;font-size:14px;color:#0F172A;font-weight:600"></div>
+
+  <!-- ===== Global Search ===== -->
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input id="gSearchInput" type="text" placeholder="Search shop by name, mobile, slug, email, owner…" autocomplete="off">
+      <span class="search-spinner" id="gSearchSpinner" style="display:none">⏳</span>
+    </div>
+    <div class="search-results" id="gSearchResults" style="display:none"></div>
+  </div>
+
+  <!-- ===== Today's Tasks digest ===== -->
+  <div class="section">
+    <h2 class="section-title">🎯 Today's Tasks <span class="section-sub" id="totalActionable">(loading…)</span></h2>
+    <div class="task-grid" id="taskGrid">
+      <div class="loader">Loading task digest…</div>
+    </div>
+  </div>
 
   <!-- KPI Cards -->
   <div class="grid" id="kpiGrid">
@@ -324,7 +389,137 @@ window.addEventListener('load', function(){
   if (!__dashInitFired) setTimeout(runDashboard, 100);
 });
 
+// ===== TODAY'S TASKS DIGEST =====
+async function loadDigest(){
+  const c = ShopDB.client;
+  const r = await c.rpc('admin_dashboard_digest');
+  if (r.error){
+    document.getElementById('taskGrid').innerHTML = '<div class="err">Failed to load digest: ' + escapeHtml(r.error.message) + '<br><small>If function does not exist, run db/39-admin-productivity.sql.</small></div>';
+    return;
+  }
+  const d = r.data || {};
+  const t = d.tasks || {};
+  const total = t.total_actionable || 0;
+  document.getElementById('totalActionable').textContent = total === 0 ? '🎉 All caught up!' : '(' + total + ' items need your attention)';
+
+  const cards = [
+    { icon:'⏳', num:t.pending,           label:'Pending Approvals',    cls:t.pending           > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=pending' },
+    { icon:'🔄', num:t.pending_edits,     label:'Pending Edits',         cls:t.pending_edits     > 0 ? 'warn'   : 'calm', href:'/admin/moderation.html?tab=edits' },
+    { icon:'🚩', num:t.flagged,           label:'Flagged Shops',         cls:t.flagged           > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=flagged' },
+    { icon:'📋', num:t.flags_open,        label:'Open Flag Reports',     cls:t.flags_open        > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=flags' },
+    { icon:'⭐', num:t.featured_expiring, label:'Featured Expiring (7d)', cls:t.featured_expiring > 0 ? 'warn' : 'calm', href:'/admin/featured.html' },
+    { icon:'⚠️', num:t.reports_open,      label:'Open Reports',          cls:t.reports_open      > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=flags' }
+  ];
+  document.getElementById('taskGrid').innerHTML = cards.map(c => `
+    <a class="task-card ${c.cls}" href="${c.href}">
+      <div class="tc-icon">${c.icon}</div>
+      <div class="tc-num">${c.num || 0}</div>
+      <div class="tc-label">${c.label}</div>
+      <div class="tc-cta">View →</div>
+    </a>
+  `).join('');
+
+  // Recent pending shops
+  const pending = d.recent_pending || [];
+  document.getElementById('recentPendingCount').textContent = pending.length ? '(' + pending.length + ' newest)' : '';
+  document.getElementById('recentPending').innerHTML = pending.length
+    ? '<div class="recent-list">' + pending.map(p => recentItemHtml(p, 'pending')).join('') + '</div>'
+    : '<div style="color:#94a3b8;padding:20px;text-align:center;font-size:13px">🎉 No pending shops</div>';
+
+  // Recent edits
+  const edits = d.recent_edits || [];
+  document.getElementById('recentEditsCount').textContent = edits.length ? '(' + edits.length + ' newest)' : '';
+  document.getElementById('recentEdits').innerHTML = edits.length
+    ? '<div class="recent-list">' + edits.map(e => recentEditHtml(e)).join('') + '</div>'
+    : '<div style="color:#94a3b8;padding:20px;text-align:center;font-size:13px">✓ No pending edits</div>';
+}
+
+function recentItemHtml(p, type){
+  const photo = p.photo
+    ? '<img src="' + escapeHtml(p.photo) + '" alt="">'
+    : '🏪';
+  const time = p.created_at ? timeAgo(p.created_at) : '';
+  return '<a class="recent-item" href="/admin/shop.html?id=' + escapeHtml(p.id) + '">'
+    + '<div class="ri-photo">' + photo + '</div>'
+    + '<div class="ri-info">'
+      + '<div class="ri-name">' + escapeHtml(p.name) + '</div>'
+      + '<div class="ri-meta">' + escapeHtml(p.city_name || '—') + (p.mobile ? ' · 📞 ' + escapeHtml(p.mobile) : '') + '</div>'
+    + '</div>'
+    + '<span class="ri-time">' + time + '</span>'
+    + '</a>';
+}
+
+function recentEditHtml(e){
+  const time = e.pending_edits_at ? timeAgo(e.pending_edits_at) : '';
+  const fields = (e.pending_fields || []).join(', ');
+  return '<a class="recent-item" href="/admin/moderation.html?tab=edits">'
+    + '<div class="ri-photo">🔄</div>'
+    + '<div class="ri-info">'
+      + '<div class="ri-name">' + escapeHtml(e.name) + '</div>'
+      + '<div class="ri-meta">' + escapeHtml(e.city_name || '—') + ' · Changed: ' + escapeHtml(fields) + '</div>'
+    + '</div>'
+    + '<span class="ri-time">' + time + '</span>'
+    + '</a>';
+}
+
+function timeAgo(iso){
+  const d = new Date(iso), diff = (Date.now() - d.getTime())/1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd';
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+
+// ===== GLOBAL SEARCH =====
+let _gSearchTimer = null;
+function setupGlobalSearch(){
+  const input = document.getElementById('gSearchInput');
+  const results = document.getElementById('gSearchResults');
+  const spin = document.getElementById('gSearchSpinner');
+  if (!input) return;
+  input.addEventListener('input', () => {
+    clearTimeout(_gSearchTimer);
+    const q = input.value.trim();
+    if (q.length < 2){ results.style.display='none'; return; }
+    spin.style.display = '';
+    _gSearchTimer = setTimeout(async () => {
+      const r = await ShopDB.client.rpc('admin_global_search', { p_query: q, p_limit: 12 });
+      spin.style.display='none';
+      if (r.error){ results.innerHTML = '<div class="search-empty">Search failed: ' + escapeHtml(r.error.message) + '</div>'; results.style.display='block'; return; }
+      const rows = r.data || [];
+      if (!rows.length){ results.innerHTML = '<div class="search-empty">No matches for "' + escapeHtml(q) + '"</div>'; results.style.display='block'; return; }
+      results.innerHTML = rows.map(b => {
+        const photo = b.photo ? '<img src="' + escapeHtml(b.photo) + '" alt="">' : '🏪';
+        return '<a class="search-result" href="/admin/shop.html?id=' + escapeHtml(b.id) + '">'
+          + '<div class="sr-photo">' + photo + '</div>'
+          + '<div class="sr-info">'
+            + '<div class="sr-name">' + escapeHtml(b.name) + ' <span style="font-size:11px;color:#94a3b8;font-weight:500">· ' + escapeHtml(b.status) + '</span></div>'
+            + '<div class="sr-meta">' + escapeHtml(b.city_name || '—') + ' · 📞 ' + escapeHtml(b.mobile || '—') + (b.owner_name ? ' · ' + escapeHtml(b.owner_name) : '') + '</div>'
+          + '</div>'
+          + '<span class="sr-match">' + escapeHtml(b.match_on) + '</span>'
+          + '</a>';
+      }).join('');
+      results.style.display='block';
+    }, 220);
+  });
+  // Hide results on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrap')) results.style.display='none';
+  });
+  // Show again on focus if input has text
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2 && results.innerHTML) results.style.display='block';
+  });
+}
+
 function renderKPIs(s){
+  // Boot digest + global search on first KPI render
+  if (!window.__digestBooted){
+    window.__digestBooted = true;
+    loadDigest().catch(e => console.error('Digest load failed:', e));
+    setupGlobalSearch();
+  }
   const cards = [
     { label: 'Total Businesses',  val: s.total_businesses,  cls: 'pri',     delta: '+' + (s.new_week || 0) + ' this week' },
     { label: 'Active Listings',   val: s.active,            cls: 'success', delta: 'Live on site' },

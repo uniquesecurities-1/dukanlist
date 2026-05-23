@@ -164,6 +164,23 @@
 .edit-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:middle;letter-spacing:.05em}
 .edit-tag.old{background:#991B1B;color:#fff}
 .edit-tag.new{background:#065F46;color:#fff}
+
+/* === Bulk action UI === */
+.bulk-checkbox{display:flex;align-items:center;padding:6px 4px;cursor:pointer;flex-shrink:0;margin-right:4px}
+.bulk-checkbox input{width:18px;height:18px;cursor:pointer;accent-color:#6366F1}
+.biz-card.bulk-selected{border-color:#6366F1;background:#F5F7FF;box-shadow:0 0 0 1.5px #6366F1 inset}
+.list-toolbar{display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #cbd5e1}
+.bulk-all-label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#475569;cursor:pointer}
+.bulk-all-label input{width:18px;height:18px;cursor:pointer;accent-color:#6366F1}
+.bulk-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);transition:transform .25s cubic-bezier(.4,1.4,.6,1);z-index:200;width:auto;max-width:calc(100vw - 32px)}
+.bulk-bar.show{transform:translateX(-50%) translateY(0)}
+.bulk-bar-inner{background:#0F172A;color:#fff;border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:16px;box-shadow:0 18px 50px rgba(15,23,42,.4);flex-wrap:wrap}
+.bulk-bar-info{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600}
+.bulk-bar-info strong{font-size:18px;font-weight:800}
+.bulk-bar-clear{background:transparent;border:1px solid #475569;color:#cbd5e1;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit}
+.bulk-bar-clear:hover{background:#1E293B;color:#fff}
+.bulk-bar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.bulk-bar-actions .btn{font-size:13px;padding:8px 14px}
 </style>
 </head>
 <body>
@@ -208,11 +225,17 @@
 
   <!-- Panel: Pending Approvals -->
   <div class="panel active" id="panel-pending">
+    <div class="list-toolbar">
+      <label class="bulk-all-label"><input type="checkbox" id="selAll-pending" onchange="toggleAllSelected('pending', this.checked)"> Select all on this page</label>
+    </div>
     <div id="list-pending"><div class="loader">Loading pending businesses...</div></div>
   </div>
 
   <!-- Panel: Flagged Businesses -->
   <div class="panel" id="panel-flagged">
+    <div class="list-toolbar">
+      <label class="bulk-all-label"><input type="checkbox" id="selAll-flagged" onchange="toggleAllSelected('flagged', this.checked)"> Select all on this page</label>
+    </div>
     <div id="list-flagged"><div class="loader">Loading flagged businesses...</div></div>
   </div>
 
@@ -225,6 +248,20 @@
   <div class="panel" id="panel-edits">
     <div id="list-edits"><div class="loader">Loading pending edits...</div></div>
   </div>
+
+<!-- ===== Floating Bulk Action Bar ===== -->
+<div class="bulk-bar" id="bulkBar">
+  <div class="bulk-bar-inner">
+    <div class="bulk-bar-info">
+      <strong id="bulkCount">0</strong> selected
+      <button class="bulk-bar-clear" onclick="clearBulkSelection()">Clear</button>
+    </div>
+    <div class="bulk-bar-actions">
+      <button class="btn btn-approve" onclick="performBulkAction('approve')">✓ Approve Selected</button>
+      <button class="btn btn-reject" onclick="performBulkAction('ban')">✕ Ban Selected</button>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -470,9 +507,12 @@ function buildVerifyWaLink(b){
 function bizCard(b, kind){
   const statusCls = 'status-' + (b.status || 'pending');
   return `
-    <div class="biz-card" id="biz-${b.id}">
+    <div class="biz-card" id="biz-${b.id}" data-biz-id="${b.id}">
       <div class="biz-header">
-        <div>
+        <label class="bulk-checkbox" title="Select for bulk action">
+          <input type="checkbox" class="bulk-cb" data-id="${b.id}" data-name="${escapeHtml(b.name)}" data-kind="${kind}" onchange="onBulkToggle(this)">
+        </label>
+        <div style="flex:1;min-width:0">
           <div class="biz-name">${escapeHtml(b.name)} ${b.name_hi ? '<span style="color:#94a3b8;font-size:14px">· ' + escapeHtml(b.name_hi) + '</span>' : ''}</div>
           <div class="biz-meta">👤 ${escapeHtml(b.owner_name || '—')} · 📞 ${escapeHtml(b.mobile || '—')} ${b.whatsapp && b.whatsapp !== b.mobile ? '· WA ' + escapeHtml(b.whatsapp) : ''}</div>
         </div>
@@ -662,6 +702,80 @@ function formatDate(iso){
   if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
   if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
   return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+// ===== Bulk action selection =====
+let _selectedBulk = new Map(); // id → { name, kind }
+
+function onBulkToggle(cb){
+  const id = cb.dataset.id;
+  const name = cb.dataset.name;
+  const kind = cb.dataset.kind;
+  const card = document.getElementById('biz-' + id);
+  if (cb.checked){
+    _selectedBulk.set(id, { name, kind });
+    if (card) card.classList.add('bulk-selected');
+  } else {
+    _selectedBulk.delete(id);
+    if (card) card.classList.remove('bulk-selected');
+  }
+  updateBulkBar();
+}
+
+function updateBulkBar(){
+  const bar = document.getElementById('bulkBar');
+  const cnt = document.getElementById('bulkCount');
+  if (!bar) return;
+  cnt.textContent = _selectedBulk.size;
+  bar.classList.toggle('show', _selectedBulk.size > 0);
+}
+
+function clearBulkSelection(){
+  _selectedBulk.clear();
+  document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.biz-card.bulk-selected').forEach(c => c.classList.remove('bulk-selected'));
+  document.querySelectorAll('input[id^="selAll-"]').forEach(c => c.checked = false);
+  updateBulkBar();
+}
+
+function toggleAllSelected(panelKind, checked){
+  // Iterate checkboxes inside the matching panel only
+  const panel = document.getElementById('panel-' + panelKind);
+  if (!panel) return;
+  panel.querySelectorAll('.bulk-cb').forEach(cb => {
+    if (cb.checked !== checked){
+      cb.checked = checked;
+      onBulkToggle(cb);
+    }
+  });
+}
+
+async function performBulkAction(action){
+  if (_selectedBulk.size === 0) return;
+  const ids = Array.from(_selectedBulk.keys());
+  const names = Array.from(_selectedBulk.values()).map(v => v.name).slice(0, 5);
+  const previewList = names.join(', ') + (_selectedBulk.size > 5 ? ' + ' + (_selectedBulk.size - 5) + ' more' : '');
+  const verb = action === 'approve' ? 'approve & activate' : 'ban';
+  if (!confirm(verb.toUpperCase() + ' ' + _selectedBulk.size + ' shop' + (_selectedBulk.size === 1 ? '' : 's') + '?\n\n' + previewList)) return;
+
+  const rpcName = action === 'approve' ? 'admin_bulk_approve' : 'admin_bulk_ban';
+  const params = action === 'approve' ? { p_ids: ids } : { p_ids: ids, p_reason: null };
+  const r = await C.rpc(rpcName, params);
+  if (r.error){
+    alert('Bulk action failed: ' + r.error.message);
+    return;
+  }
+  const changed = r.data?.changed_count ?? 0;
+  showToast('✓ ' + changed + ' shop' + (changed === 1 ? '' : 's') + ' updated', 'success');
+  clearBulkSelection();
+  // Reload all panels so the moved shops disappear from their old tabs
+  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
+}
+
+function showToast(msg, kind){
+  // Use existing toast() if available, else fallback
+  if (typeof toast === 'function'){ toast(msg, kind); return; }
+  alert(msg);
 }
 
 function escapeHtml(s){
