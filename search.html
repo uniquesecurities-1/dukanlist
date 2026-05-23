@@ -211,6 +211,7 @@
     </div>
   </div>
 
+  <div id="filterChipsSlot" style="display:none"></div>
   <div id="results">
     <div class="biz-grid">
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
@@ -229,6 +230,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/share.js"></script>
+<script src="/assets/js/filter-chips.js"></script>
 <script src="/assets/js/voice.js"></script>
 <script src="/assets/js/mobile-nav.js"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanVoice && DukanVoice.supported()){ const inp = document.getElementById('q'); if (inp){ const b = document.createElement('span'); b.innerHTML = DukanVoice.btn('q', { size: 'md' }); b.style.cssText = 'position:absolute;right:14px;top:50%;transform:translateY(-50%)'; const parent = inp.parentElement; if (parent){ parent.style.position = 'relative'; inp.style.paddingRight = '54px'; parent.appendChild(b); } } } });</script>
@@ -356,6 +358,25 @@ async function runSearch(){
   document.getElementById('catSel').value = catSlug;
   if (cityId) document.getElementById('citySel').value = cityId;
   if (pin) document.getElementById('pinSel').value = pin;
+
+  // Render active filter chips (above results)
+  if (window.DukanChips){
+    const rmAndSearch = (key) => () => {
+      const p = new URLSearchParams(location.search);
+      p.delete(key);
+      const url = '/search.html' + (p.toString() ? '?' + p.toString() : '');
+      history.pushState({}, '', url);
+      runSearch();
+    };
+    const cityLabel = cityId ? (document.querySelector('#citySel option[value="' + cityId + '"]')?.textContent || 'City') : null;
+    const catLabel  = catSlug ? (document.querySelector('#catSel option[value="' + catSlug + '"]')?.textContent || catSlug) : null;
+    DukanChips.render('filterChipsSlot', {
+      q:    q       ? { label: q,         remove: rmAndSearch('q') }    : null,
+      cat:  catLabel ? { label: catLabel, remove: rmAndSearch('cat') }  : null,
+      city: cityLabel ? { label: cityLabel.replace(/^.*?\s/,''), remove: rmAndSearch('city') } : null,
+      pin:  pin     ? { label: pin,       remove: rmAndSearch('pin') }  : null
+    });
+  }
 
   const c = ShopDB.client;
   const resEl = document.getElementById('results');

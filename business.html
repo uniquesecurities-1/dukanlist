@@ -582,6 +582,12 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </div>
 
 <div id="bizContent" style="display:none">
+
+  <!-- Breadcrumbs -->
+  <div style="max-width:1180px;margin:0 auto;padding:6px 24px 0">
+    <div id="breadcrumbsSlot"></div>
+  </div>
+
   <!-- HERO -->
   <section class="biz-hero">
     <div class="biz-hero-wrap">
@@ -607,8 +613,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="addr-box">
             <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
             <div class="a-text" id="addrDisp"></div>
-            <a class="a-map-link" id="addrMapLink" target="_blank" rel="noopener" href="#">
-              🗺 <span data-i18n-en>View on Google Maps</span><span data-i18n-hi>Google Maps में देखें</span>
+            <div id="mapEmbedWrap" style="margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;display:none">
+              <iframe id="mapEmbed" loading="lazy" style="width:100%;height:200px;border:0" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            </div>
+            <a class="a-map-link" id="addrMapLink" target="_blank" rel="noopener" href="#" style="margin-top:8px">
+              🗺 <span data-i18n-en>Open in Google Maps</span><span data-i18n-hi>Google Maps में खोलें</span>
             </a>
           </div>
           <div class="cta-row">
@@ -740,6 +749,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
+<!-- Recently viewed widget -->
+<section style="max-width:1140px;margin:24px auto;padding:0 18px">
+  <div id="recentlyViewedSlot" style="display:none"></div>
+</section>
+
 <!-- MMT-style sticky bottom CTA — phone + status + WhatsApp + Call -->
 <div id="mmtStickyCta" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-top:1px solid rgba(15,23,42,.08);box-shadow:0 -6px 20px rgba(15,23,42,.10);z-index:100;padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif">
   <div style="display:flex;align-items:center;gap:10px;max-width:680px;margin:0 auto">
@@ -861,6 +875,8 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/mobile-nav.js"></script>
+<script src="/assets/js/breadcrumbs.js"></script>
+<script src="/assets/js/recently-viewed.js"></script>
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
@@ -1198,6 +1214,48 @@ function render(){
 
   // Check if current user has favorited this shop (heart icon state)
   checkFavState();
+
+  // Breadcrumbs (Home > City > Category > Shop name)
+  try {
+    if (window.DukanCrumbs){
+      const cityName = (b.geo_cities && b.geo_cities.name) || '';
+      const catSlug = (b.categories && b.categories.slug) || '';
+      const catName = (b.categories && b.categories.name) || 'Shop';
+      const cityHref = cityName ? '/local/' + encodeURIComponent(cityName.toLowerCase().replace(/\s+/g,'-')) + '/' + encodeURIComponent(catSlug || 'all') : null;
+      const crumbs = [{ name: 'Home', href: '/' }];
+      if (cityName) crumbs.push({ name: cityName, href: '/search.html?city=' + (b.city_id || '') });
+      if (catName)  crumbs.push({ name: catName,  href: cityHref });
+      crumbs.push({ name: b.name });
+      DukanCrumbs.render('breadcrumbsSlot', crumbs);
+    }
+  } catch(_){}
+
+  // Recently viewed — record + render below similar
+  try {
+    if (window.DukanRecent){
+      DukanRecent.track(b);
+      DukanRecent.render('recentlyViewedSlot', { excludeSlug: b.slug });
+    }
+  } catch(_){}
+
+  // Google Maps embed (if lat/lng available)
+  try {
+    const wrap = document.getElementById('mapEmbedWrap');
+    const iframe = document.getElementById('mapEmbed');
+    if (wrap && iframe){
+      let src = null;
+      if (b.lat && b.lng){
+        src = 'https://maps.google.com/maps?q=' + b.lat + ',' + b.lng + '&z=16&output=embed';
+      } else {
+        const q = [b.name, b.address_line1, b.address_line2, (b.geo_cities && b.geo_cities.name) || '', b.pincode].filter(Boolean).join(', ');
+        if (q.length > 4) src = 'https://maps.google.com/maps?q=' + encodeURIComponent(q) + '&z=15&output=embed';
+      }
+      if (src){
+        iframe.src = src;
+        wrap.style.display = '';
+      }
+    }
+  } catch(_){}
 
   // Hours
   if (b.hours_json && typeof b.hours_json === 'object' && Object.keys(b.hours_json).length){
