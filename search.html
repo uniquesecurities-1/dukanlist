@@ -162,6 +162,20 @@
   padding:3px 9px; border-radius:99px;
   font-size:.7rem; font-weight:800; backdrop-filter:blur(8px);
 }
+
+/* Featured ribbon — golden gradient at top-left */
+.biz-photo .featured-ribbon{
+  position:absolute; top:8px; left:8px;
+  background:linear-gradient(135deg,#FFC93D,#FF8C00);
+  color:#1A1A1A;
+  padding:3px 11px; border-radius:99px;
+  font-size:.68rem; font-weight:800;
+  letter-spacing:.04em;
+  box-shadow:0 2px 8px rgba(255,140,0,.4);
+  z-index:3;
+}
+/* When both open-dot and featured-ribbon present, featured wins top-left, open-dot moves right */
+.biz-photo .featured-ribbon ~ .open-dot{ left:auto; right:8px }
 .biz-photo .open-dot.open{ background:rgba(5,150,105,.95); color:#fff }
 .biz-photo .open-dot.closed{ background:rgba(107,114,128,.92); color:#fff }
 .biz-photo .open-dot .d{ width:6px; height:6px; border-radius:50%; background:#fff }
@@ -496,6 +510,7 @@ function renderCard(b){
     ? `<img src="${photo}" alt="${escapeHTML(b.name)}" loading="lazy">`
     : `<div class="ph-fb">${b.category_icon || '🏪'}</div>`;
   const verified = b.verified_score >= 3 ? '<span class="verify">✓ Verified</span>' : '';
+  const featuredRibbon = b.is_featured ? '<span class="featured-ribbon">★ FEATURED</span>' : '';
   // Open-Now badge (only when hours_json is present and parseable)
   let openBadge = '';
   if (b.hours_json && typeof getOpenStatus === 'function'){
@@ -530,7 +545,7 @@ function renderCard(b){
   return `
     <article class="biz-card">
       <a class="biz-card-link" href="/business.html?slug=${b.slug}" aria-label="${escapeHTML(b.name)}"></a>
-      <div class="biz-photo">${photoHTML}${openBadge}${verified}</div>
+      <div class="biz-photo">${photoHTML}${openBadge}${featuredRibbon}${verified}</div>
       <div class="biz-info">
         <div class="biz-cat">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
         <div class="biz-name">${escapeHTML(b.name)}</div>

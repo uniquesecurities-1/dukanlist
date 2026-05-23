@@ -91,6 +91,23 @@
 
   .nav-back{font-size:13px;color:#64748b;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px}
   .nav-back:hover{color:#0F172A}
+
+  /* Featured Modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000;backdrop-filter:blur(4px)}
+  .modal-box{background:#fff;border-radius:14px;max-width:520px;width:100%;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+  .modal-box h3{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .modal-box .sub{font-size:13px;color:#64748b;margin-bottom:14px}
+  .alert{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:1px solid #FCD34D;color:#92400E;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:700;margin-bottom:14px}
+  .fm-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:480px){.fm-row{grid-template-columns:1fr}}
+  .fm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0}
+  .fm-history{margin-top:14px;padding-top:14px;border-top:1px dashed #e2e8f0}
+  .fm-history-h{font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .fm-history-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;color:#475569}
+  .duration-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+  .dur-chip{padding:6px 8px;text-align:center;border:1.5px solid #cbd5e1;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;transition:.12s}
+  .dur-chip:hover{border-color:#6366F1}
+  .dur-chip.active{background:#6366F1;color:#fff;border-color:#6366F1}
 </style>
 </head>
 <body>
@@ -169,7 +186,15 @@ async function init(){
 function render(){
   var s = SHOP;
   var statusPill = '<span class="pill ' + esc(s.status) + '">' + esc(s.status) + '</span>';
-  var featuredPill = s.featured ? ' <span class="pill featured">★ Featured</span>' : '';
+  var featuredPill = '';
+  if (s.featured){
+    if (s.featured_until){
+      var daysLeft = Math.max(0, Math.ceil((new Date(s.featured_until) - new Date()) / 86400000));
+      featuredPill = ' <span class="pill featured" title="Expires ' + new Date(s.featured_until).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) + '">★ Featured · ' + daysLeft + 'd left</span>';
+    } else {
+      featuredPill = ' <span class="pill featured">★ Featured · No expiry</span>';
+    }
+  }
 
   ROOT.innerHTML =
     '<div>'
@@ -193,7 +218,7 @@ function render(){
           + (s.status !== 'active'   ? '<button class="btn good"   onclick="doStatus(\'active\')">✓ Approve / Activate</button>'  : '')
           + (s.status !== 'pending'  ? '<button class="btn warn"   onclick="doStatus(\'pending\')">⏳ Move to Pending</button>'   : '')
           + (s.status !== 'banned'   ? '<button class="btn danger" onclick="doStatus(\'banned\')">⛔ Ban Shop</button>'           : '')
-          + '<button class="btn ' + (s.featured ? 'danger' : 'pri') + '" onclick="toggleFeatured()">' + (s.featured ? '★ Remove Featured' : '☆ Make Featured') + '</button>'
+          + '<button class="btn pri" onclick="openFeaturedModal()">★ ' + (s.featured ? 'Manage Featured' : 'Make Featured') + '</button>'
           + '<button class="btn danger" onclick="doDelete()" style="margin-left:auto">🗑 Delete Permanently</button>'
         + '</div>'
       + '</div>'
@@ -340,8 +365,86 @@ async function toggleVerify(field){
   await applyPatch({ [field]: !current }, '✓ Verification updated');
 }
 
-async function toggleFeatured(){
-  await applyPatch({ featured: !SHOP.featured }, SHOP.featured ? 'Featured removed' : '★ Now Featured');
+function openFeaturedModal(){
+  var m = document.getElementById('featuredModal');
+  // Pre-fill current state
+  var current = '';
+  if (SHOP.featured && SHOP.featured_until){
+    var d = new Date(SHOP.featured_until);
+    var daysLeft = Math.max(0, Math.ceil((d - new Date()) / 86400000));
+    current = '<div class="alert">★ Currently featured · expires ' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) + ' (' + daysLeft + ' days left)</div>';
+  } else if (SHOP.featured){
+    current = '<div class="alert">★ Currently featured · No expiry</div>';
+  }
+  document.getElementById('fmCurrent').innerHTML = current;
+  document.getElementById('fmDays').value = 30;
+  document.getElementById('fmAmount').value = '';
+  document.getElementById('fmMethod').value = 'cash';
+  document.getElementById('fmNotes').value = '';
+  // Show revoke button only if currently featured
+  document.getElementById('fmRevokeBtn').style.display = SHOP.featured ? 'inline-flex' : 'none';
+  // Recent payment history
+  var pays = SHOP.featured_payments || [];
+  var historyHtml = '';
+  if (pays.length){
+    historyHtml = '<div class="fm-history"><div class="fm-history-h">Recent payments</div>'
+      + pays.slice(0,3).map(function(p){
+        var status = p.revoked_at ? '<span style="color:#EF4444">Revoked</span>'
+          : (new Date(p.expires_at) > new Date() ? '<span style="color:#10B981">Active</span>' : '<span style="color:#94a3b8">Expired</span>');
+        return '<div class="fm-history-row">'
+          + '<span>' + p.days + ' days · ₹' + Number(p.amount_inr || 0).toLocaleString('en-IN') + ' · ' + (p.payment_method || '—') + '</span>'
+          + status
+          + '</div>';
+      }).join('')
+      + '</div>';
+  }
+  document.getElementById('fmHistory').innerHTML = historyHtml;
+  m.style.display = 'flex';
+}
+
+function closeFeaturedModal(){
+  document.getElementById('featuredModal').style.display = 'none';
+}
+
+async function submitFeatured(e){
+  e.preventDefault();
+  var days   = parseInt(document.getElementById('fmDays').value, 10) || 0;
+  var amount = parseFloat(document.getElementById('fmAmount').value) || 0;
+  var method = document.getElementById('fmMethod').value;
+  var notes  = document.getElementById('fmNotes').value.trim() || null;
+  if (days <= 0 || days > 730){ toast('Days must be 1\u2013730', true); return; }
+  if (amount < 0){ toast('Amount cannot be negative', true); return; }
+  var btn = document.getElementById('fmSaveBtn');
+  btn.disabled = true; btn.textContent = '\u23f3 Saving...';
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_set_featured', {
+    p_business_id: BIZ_ID,
+    p_days: days,
+    p_amount: amount,
+    p_payment_method: method,
+    p_notes: notes
+  });
+  btn.disabled = false; btn.textContent = '\u2605 Save & Mark Featured';
+  if (r.error){ toast('Failed: ' + r.error.message, true); return; }
+  toast('\u2605 Featured for ' + days + ' days (\u20b9' + amount + ')');
+  closeFeaturedModal();
+  // Reload
+  var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (!fresh.error && fresh.data) SHOP = fresh.data;
+  render();
+}
+
+async function revokeFeatured(){
+  if (!confirm('Revoke featured status now? Shop will no longer appear at top of listings.')) return;
+  var reason = prompt('Reason (optional, for audit):') || null;
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_unset_featured', { p_business_id: BIZ_ID, p_reason: reason });
+  if (r.error){ toast('Failed: ' + r.error.message, true); return; }
+  toast('Featured revoked');
+  closeFeaturedModal();
+  var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (!fresh.error && fresh.data) SHOP = fresh.data;
+  render();
 }
 
 async function doStatus(newStatus){
@@ -388,5 +491,72 @@ async function saveNotes(){
 
 init();
 </script>
+
+<!-- Featured Listing Modal -->
+<div class="modal-bg" id="featuredModal" onclick="if(event.target===this)closeFeaturedModal()">
+  <div class="modal-box">
+    <h3>★ Featured Listing</h3>
+    <div class="sub">Mark this shop as featured to boost its visibility across browse, search, and homepage.</div>
+    <div id="fmCurrent"></div>
+
+    <form onsubmit="submitFeatured(event)">
+      <div class="field">
+        <label>Duration — quick pick</label>
+        <div class="duration-grid">
+          <div class="dur-chip" onclick="setDays(7,this)">7 days</div>
+          <div class="dur-chip active" onclick="setDays(30,this)">30 days</div>
+          <div class="dur-chip" onclick="setDays(90,this)">90 days</div>
+          <div class="dur-chip" onclick="setDays(180,this)">180 days</div>
+        </div>
+      </div>
+
+      <div class="fm-row">
+        <div class="field">
+          <label>Days *</label>
+          <input id="fmDays" type="number" min="1" max="730" value="30" required>
+        </div>
+        <div class="field">
+          <label>Amount (₹) *</label>
+          <input id="fmAmount" type="number" min="0" step="0.01" placeholder="e.g. 999" required>
+        </div>
+      </div>
+
+      <div class="fm-row">
+        <div class="field">
+          <label>Payment method</label>
+          <select id="fmMethod">
+            <option value="cash">Cash</option>
+            <option value="upi">UPI</option>
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="cheque">Cheque</option>
+            <option value="complimentary">Complimentary (₹0)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Notes (optional)</label>
+          <input id="fmNotes" type="text" placeholder="e.g. Diwali campaign">
+        </div>
+      </div>
+
+      <div id="fmHistory"></div>
+
+      <div class="fm-actions">
+        <button type="button" class="btn" onclick="closeFeaturedModal()">Cancel</button>
+        <button type="button" class="btn danger" id="fmRevokeBtn" onclick="revokeFeatured()" style="display:none">Revoke Now</button>
+        <button type="submit" class="btn pri" id="fmSaveBtn">★ Save & Mark Featured</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function setDays(d, el){
+  document.getElementById('fmDays').value = d;
+  document.querySelectorAll('.dur-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+</script>
+
 </body>
 </html>

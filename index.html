@@ -858,8 +858,10 @@ async function loadFeatured(){
     let featuredRows = [];
     try {
       const fr = await c.from('businesses')
-        .select('id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,featured,mobile,whatsapp,geo_cities(name)')
-        .eq('status','active').eq('featured', true).limit(4);
+        .select('id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,featured,featured_until,mobile,whatsapp,geo_cities(name)')
+        .eq('status','active').eq('featured', true)
+        .or('featured_until.is.null,featured_until.gt.' + new Date().toISOString())
+        .limit(4);
       if (!fr.error && fr.data) featuredRows = fr.data.map(r => ({ ...r, _featured: true, city_name: r.geo_cities && r.geo_cities.name }));
     } catch(_){}
 
