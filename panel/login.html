@@ -142,7 +142,7 @@ async function handleLogin(){
     btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
     let msg = error.message || 'Login failed';
     if (/invalid login credentials/i.test(msg)) msg = 'Wrong email or password. Try again.';
-    if (/email not confirmed/i.test(msg)) msg = 'Please confirm your email first — check your inbox.';
+    if (/email not confirmed/i.test(msg)) msg = '📧 Please confirm your email first. Check INBOX and SPAM/Junk folder for an email from noreply@dukanlist.com — click the verification link, then come back here. Many providers mark new senders as spam initially.';
     err.textContent = msg;
     err.style.display = 'flex'; return;
   }

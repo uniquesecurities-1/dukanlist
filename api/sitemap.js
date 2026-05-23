@@ -52,9 +52,10 @@ function urlBlock(loc, priority, freq, lastmod){
 export default async function handler(req, res){
   try {
     // Fetch live data in parallel
-    const [categories, businesses] = await Promise.all([
+    const [categories, businesses, cities] = await Promise.all([
       fetchFromSupabase('categories?active=eq.true&select=slug,sort_order&order=sort_order'),
       fetchFromSupabase('businesses?status=eq.active&select=slug,updated_at,created_at'),
+      fetchFromSupabase('geo_cities?active=eq.true&select=name'),
     ]);
 
     const urls = [];
@@ -64,7 +65,10 @@ export default async function handler(req, res){
       urls.push(urlBlock(ORIGIN + p.path, p.priority, p.freq));
     });
 
-    // 2. Categories — each as a search filter URL
+    // 2. Hometown landing
+    urls.push(urlBlock(ORIGIN + '/dabwali.html', '0.9', 'weekly'));
+
+    // 3. Categories — each as a search filter URL
     categories.forEach(c => {
       urls.push(urlBlock(
         ORIGIN + '/search.html?cat=' + encodeURIComponent(c.slug),
@@ -73,7 +77,19 @@ export default async function handler(req, res){
       ));
     });
 
-    // 3. Business profiles (highest SEO value)
+    // 4. Locality landing pages — city × category combinations (huge SEO surface)
+    const citySlugs = cities.map(c => String(c.name || '').toLowerCase().replace(/\s+/g, '-'));
+    citySlugs.forEach(citySlug => {
+      categories.forEach(cat => {
+        urls.push(urlBlock(
+          ORIGIN + '/local/' + encodeURIComponent(citySlug) + '/' + encodeURIComponent(cat.slug),
+          '0.7',
+          'weekly'
+        ));
+      });
+    });
+
+    // 5. Business profiles (highest SEO value)
     businesses.forEach(b => {
       urls.push(urlBlock(
         ORIGIN + '/business.html?slug=' + encodeURIComponent(b.slug),
@@ -89,18 +105,4 @@ ${urls.join('\n')}
 </urlset>`;
 
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-    res.setHeader('X-Robots-Tag', 'noindex'); // don't index the sitemap itself
-    return res.status(200).send(xml);
-
-  } catch (err){
-    console.error('Sitemap generation failed:', err);
-    // Fallback: static-only sitemap
-    const fallback = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${STATIC_PAGES.map(p => urlBlock(ORIGIN + p.path, p.priority, p.freq)).join('\n')}
-</urlset>`;
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    return res.status(200).send(fallback);
-  }
-}
+    res.setHeader('Cac
