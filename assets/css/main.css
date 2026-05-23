@@ -837,3 +837,20 @@ h3{ letter-spacing:-.012em }
 /* ============================================================
    END MMT-GRADE POLISH
    ============================================================ */
+
+/* ============================================================
+   MOBILE NAV CLEANUP (applies site-wide)
+   Hide secondary nav links on phones — bottom nav has Home/Browse/Search/Register/Account
+   Top stays: Logo + Lang toggle + Register CTA only
+   ============================================================ */
+@media (max-width:560px){
+  .topbar{ padding:9px 14px }
+  .topbar-inner{ flex-wrap:nowrap !important; gap:8px }
+  .brand{ font-size:1rem; gap:8px }
+  .brand .logo{ width:32px; height:32px; font-size:1rem }
+  .brand em{ font-size:.78rem }
+  .nav-links{ gap:4px !important; flex-wrap:nowrap !important }
+  .nav-links a:not(.nav-cta){ display:none !important }
+  .nav-links .lang-toggle{ display:inline-flex !important; margin-right:0 }
+  .nav-cta{ padding:7px 13px !important; font-size:.78rem !important; white-space:nowrap }
+}
