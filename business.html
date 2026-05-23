@@ -628,6 +628,10 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               <span class="cta-icon">🔗</span>
               <span class="cta-label"><span data-i18n-en>Share</span><span data-i18n-hi>शेयर</span></span>
             </button>
+            <button class="cta-btn cta-fav" onclick="toggleFav()" id="favBtn" title="Save shop">
+              <span class="cta-icon" id="favIcon">♡</span>
+              <span class="cta-label"><span data-i18n-en>Save</span><span data-i18n-hi>सेव</span></span>
+            </button>
           </div>
           <a class="flag-link" onclick="reportBiz()">
             🚩 <span data-i18n-en>Report this listing</span><span data-i18n-hi>इसकी रिपोर्ट करें</span>
@@ -1174,6 +1178,9 @@ function render(){
   // MMT-style Similar shops
   loadSimilarShops(b);
 
+  // Check if current user has favorited this shop (heart icon state)
+  checkFavState();
+
   // Hours
   if (b.hours_json && typeof b.hours_json === 'object' && Object.keys(b.hours_json).length){
     renderHours(b.hours_json);
@@ -1582,6 +1589,58 @@ async function logLead(action){
   try{
     await c.rpc('log_lead', { p_business_id: BIZ.id, p_action: action });
   }catch(e){ console.warn(e); }
+}
+
+// ====== Favorites (heart toggle) ======
+let IS_FAVED = false;
+async function checkFavState(){
+  if (!BIZ || !BIZ.id) return;
+  const c = ShopDB.client;
+  try {
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user) return; // not logged in — leave as not-faved
+    const r = await c.from('business_favorites').select('business_id').eq('business_id', BIZ.id).eq('user_id', u.data.user.id).maybeSingle();
+    if (!r.error && r.data){ IS_FAVED = true; paintFav(); }
+  } catch(_){}
+}
+function paintFav(){
+  const ico = document.getElementById('favIcon');
+  const btn = document.getElementById('favBtn');
+  if (!ico) return;
+  ico.textContent = IS_FAVED ? '♥' : '♡';
+  if (btn){
+    btn.style.color = IS_FAVED ? '#EF4444' : '';
+    btn.style.borderColor = IS_FAVED ? '#FCA5A5' : '';
+  }
+}
+async function toggleFav(){
+  if (!BIZ || !BIZ.id) return;
+  const c = ShopDB.client;
+  const u = await c.auth.getUser();
+  if (!u || !u.data || !u.data.user){
+    if (confirm('Save shops by creating a free account. Login now?')){
+      location.href = '/panel/login.html?next=' + encodeURIComponent(location.pathname + location.search);
+    }
+    return;
+  }
+  const r = await c.rpc('toggle_favorite', { p_business_id: BIZ.id });
+  if (r.error){
+    // RPC may not be deployed yet → graceful fallback
+    if (r.error.message && r.error.message.indexOf('function') > -1){
+      alert('Save feature is being set up. Please try again later.');
+      return;
+    }
+    alert('Could not save: ' + r.error.message);
+    return;
+  }
+  IS_FAVED = !!r.data;
+  paintFav();
+  // Tiny toast
+  const t = document.createElement('div');
+  t.textContent = IS_FAVED ? '♥ Saved to your favorites' : 'Removed from favorites';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 8px 24px rgba(15,23,42,.25)';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
 }
 
 function shareBiz(){
