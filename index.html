@@ -358,12 +358,10 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   .hero p.lead{ font-size:.96rem; margin-bottom:22px; line-height:1.5 }
   .hero-ctas{ gap:8px; margin-bottom:32px }
   .hero-ctas .btn{ padding:10px 16px !important; font-size:.92rem !important; min-height:42px !important }
-  .hero-stats{ gap:24px; padding-top:24px; margin-top:0 }
-  .hero-stat b{ font-size:1.35rem }
-  .hero-stat span{ font-size:.72rem }
-
-  /* Hide 3rd & 4th hero stats — keep only Shops + Cities */
-  .hero-stat:nth-child(n+3){ display:none !important }
+  .hero-stats{ gap:18px; padding-top:22px; margin-top:0; flex-wrap:wrap; max-width:340px }
+  .hero-stat{ flex:0 0 calc(50% - 9px) }
+  .hero-stat b{ font-size:1.4rem }
+  .hero-stat span{ font-size:.7rem; margin-top:3px }
 
   /* Section padding tighter */
   section{ padding:36px 16px }
@@ -372,12 +370,16 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   .section-head p{ font-size:.88rem }
   .eyebrow{ font-size:.72rem }
 
-  /* Categories grid */
-  .cats-grid{ grid-template-columns:1fr 1fr; gap:10px }
-  .cat-card{ padding:14px 13px; min-height:70px; gap:11px; border-radius:14px }
-  .cat-card .cat-icon{ width:42px; height:42px; font-size:1.3rem; border-radius:11px }
-  .cat-card .cat-name{ font-size:.88rem }
-  .cat-card .cat-sub{ font-size:.7rem }
+  /* Categories — keep only horizontal strip on mobile; hide big grid (duplicate content) */
+  #categories .section-head,
+  #categories .cats-grid{ display:none !important }
+  #categories{ padding:14px 16px !important }
+  #categories .cats-wrap > div[style*="text-align:center"]{ margin-top:0 !important }
+  #categories .btn-sec{ display:block; padding:11px 14px; font-size:.88rem }
+
+  /* Horizontal cat strip — slightly tighter on mobile */
+  #catStrip{ margin-bottom:18px !important }
+  #catStrip > div{ padding:14px 6px !important }
 
   /* Nav */
   .nav-links{ gap:2px }
@@ -407,9 +409,11 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   #openNowHome{ padding:7px 12px !important; font-size:12px !important }
   #installBtn{ padding:7px 14px !important; font-size:12px !important }
 
-  /* CTA strip — less vertical */
-  .cta-strip{ padding:44px 16px !important }
-  .cta-strip h2{ font-size:1.5rem !important }
+  /* CTA strip — prominent, bigger heading + better breathing */
+  .cta-strip{ padding:52px 20px !important }
+  .cta-strip h2{ font-size:1.85rem !important; line-height:1.15; margin-bottom:14px }
+  .cta-strip p{ font-size:.95rem; margin-bottom:24px; padding:0 8px }
+  .cta-strip .btn-pri{ padding:13px 22px !important; font-size:.96rem !important; box-shadow:0 6px 18px rgba(255,107,26,.4) !important }
 }
 </style>
 </head>
