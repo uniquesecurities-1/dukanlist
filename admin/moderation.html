@@ -347,33 +347,75 @@ async function loadPendingEdits(){
 }
 
 function renderPendingEditCard(b){
-  const edits = b.recent_edits || [];
-  const diffHtml = edits.length
-    ? '<div class="edit-diff">' + edits.map(e => {
-        const oldV = escapeHtml((e.old_value || '—').substring(0, 200));
-        const newV = escapeHtml((e.new_value || '—').substring(0, 200));
-        const when = e.edited_at ? new Date(e.edited_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  const pending = b.pending_edits || {};
+  const live    = b.live_snapshot || {};
+  const keys = Object.keys(pending);
+
+  const diffHtml = keys.length
+    ? '<div class="edit-diff">' + keys.map(k => {
+        let oldVal = live[k];
+        let newVal = pending[k];
+        if (k === 'photos'){
+          const oldArr = Array.isArray(oldVal) ? oldVal : [];
+          const newArr = Array.isArray(newVal) ? newVal : [];
+          const photoStrip = (arr) => arr.length
+            ? '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+              + arr.slice(0,6).map(u => '<img src="' + escapeHtml(u) + '" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1">').join('')
+              + (arr.length > 6 ? '<span style="align-self:center;color:#64748b;font-size:12px">+' + (arr.length - 6) + ' more</span>' : '')
+              + '</div>'
+            : '<span style="color:#94a3b8;font-size:12px">No photos</span>';
+          return '<div class="edit-row">'
+            + '<div class="edit-field">photos</div>'
+            + '<div class="edit-old"><span class="edit-tag old">OLD (live)</span>' + photoStrip(oldArr) + '</div>'
+            + '<div class="edit-new"><span class="edit-tag new">NEW (proposed)</span>' + photoStrip(newArr) + '</div>'
+            + '</div>';
+        }
+        const oldV = escapeHtml(String(oldVal == null ? '—' : oldVal).substring(0, 300));
+        const newV = escapeHtml(String(newVal == null ? '—' : newVal).substring(0, 300));
         return '<div class="edit-row">'
-          + '<div class="edit-field">' + escapeHtml(e.field_name) + ' <small style="color:#94a3b8;font-weight:500">' + when + '</small></div>'
-          + '<div class="edit-old"><span class="edit-tag old">OLD</span>' + oldV + '</div>'
-          + '<div class="edit-new"><span class="edit-tag new">NEW</span>' + newV + '</div>'
+          + '<div class="edit-field">' + escapeHtml(k) + '</div>'
+          + '<div class="edit-old"><span class="edit-tag old">OLD (live)</span>' + oldV + '</div>'
+          + '<div class="edit-new"><span class="edit-tag new">NEW (proposed)</span>' + newV + '</div>'
           + '</div>';
       }).join('') + '</div>'
-    : '<div style="color:#94a3b8;font-size:13px;padding:8px 0">No detailed edit history available.</div>';
+    : '<div style="color:#94a3b8;font-size:13px;padding:8px 0">No pending changes.</div>';
+
+  const when = b.pending_edits_at ? new Date(b.pending_edits_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
 
   return `<div class="biz-card" style="border-left:3px solid #6366F1">
     <div class="biz-head">
       <div style="flex:1;min-width:0">
-        <div class="biz-name">${escapeHtml(b.name)} <span class="pill" style="background:#EEF2FF;color:#4338CA;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:6px">🔄 PENDING RE-REVIEW</span></div>
-        <div class="biz-sub">📍 ${escapeHtml(b.city_name || '—')} · Updated ${b.updated_at ? new Date(b.updated_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+        <div class="biz-name">${escapeHtml(b.name)} <span class="pill" style="background:#EEF2FF;color:#4338CA;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:6px">🔄 ${keys.length} PENDING CHANGE${keys.length === 1 ? '' : 'S'}</span></div>
+        <div class="biz-sub">📍 ${escapeHtml(b.city_name || '—')} · Proposed ${when}</div>
       </div>
     </div>
     ${diffHtml}
-    <div class="biz-actions" style="margin-top:12px">
-      <a class="btn btn-primary" href="/admin/shop.html?id=${b.business_id}">⚖ Review & Approve</a>
-      <a class="btn btn-secondary" href="/business.html?slug=${b.slug}" target="_blank">🌐 Public View</a>
+    <div class="biz-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="approvePendingEdits('${b.business_id}', this)">✓ Approve & Apply Changes</button>
+      <button class="btn" style="background:#EF4444;color:#fff" onclick="rejectPendingEdits('${b.business_id}', this)">✗ Reject Changes</button>
+      <a class="btn btn-secondary" href="/business.html?slug=${b.slug}" target="_blank">🌐 Public View (live)</a>
+      <a class="btn btn-secondary" href="/admin/shop.html?id=${b.business_id}">⚖ Full Admin View</a>
     </div>
   </div>`;
+}
+
+async function approvePendingEdits(bizId, btn){
+  if (!confirm('Approve all pending changes? They will go live immediately.')) return;
+  btn.disabled = true; btn.textContent = '⏳ Applying…';
+  const r = await C.rpc('admin_approve_pending_edits', { p_business_id: bizId });
+  if (r.error){ alert('Approve failed: ' + r.error.message); btn.disabled = false; btn.textContent = '✓ Approve & Apply Changes'; return; }
+  toast('✓ Changes applied & live');
+  await loadPendingEdits();
+}
+
+async function rejectPendingEdits(bizId, btn){
+  const reason = prompt('Rejection reason (optional, for audit):') || null;
+  if (reason === null && !confirm('Reject changes without a reason?')) return;
+  btn.disabled = true; btn.textContent = '⏳ Rejecting…';
+  const r = await C.rpc('admin_reject_pending_edits', { p_business_id: bizId, p_reason: reason });
+  if (r.error){ alert('Reject failed: ' + r.error.message); btn.disabled = false; btn.textContent = '✗ Reject Changes'; return; }
+  toast('Pending changes discarded');
+  await loadPendingEdits();
 }
 
 // ===== FLAGGED BUSINESSES =====

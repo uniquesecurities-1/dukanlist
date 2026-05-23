@@ -347,6 +347,14 @@ async function loadProfile(){
   }
   MY_BIZ = biz;
 
+  // ===== Merge pending_edits over live values so the form shows what the owner last typed =====
+  // (Sensitive edits live in pending_edits JSONB until admin approves them.)
+  if (MY_BIZ.pending_edits && typeof MY_BIZ.pending_edits === 'object'){
+    Object.keys(MY_BIZ.pending_edits).forEach(k => {
+      MY_BIZ[k] = MY_BIZ.pending_edits[k];
+    });
+  }
+
   // Load my categories (junction)
   const { data: cats } = await c.rpc('get_business_categories', { p_business_id: biz.id });
   MY_CATS = cats || [];
@@ -688,7 +696,7 @@ async function saveProfile(){
 
   // Determine success message based on review status
   const pendingFields = (updRes && updRes.pending_fields) || [];
-  const wentToReview  = updRes && updRes.status === 'pending_review' && updRes.status_changed;
+  const wentToReview  = updRes && updRes.has_pending === true;
   if (wentToReview){
     okEl.innerHTML = '<b>⏳ Saved & sent for admin review</b><br>'
       + '<span style="font-size:13px;color:#5A6573">You changed: <b>' + pendingFields.join(', ') + '</b>. '
