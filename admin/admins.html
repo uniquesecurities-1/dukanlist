@@ -176,6 +176,9 @@ async function loadAdmins(){
   host.innerHTML = '<div class="admin-grid">' + r.data.map(adminCard).join('') + '</div>';
 }
 
+// Cache of admin rows keyed by auth_user_id — used by delegated event handlers
+window.__adminRows = window.__adminRows || {};
+
 function adminCard(a){
   var isSuper = a.role === 'super_admin';
   var isCity = a.role === 'city_moderator';
@@ -187,31 +190,75 @@ function adminCard(a){
   else cityList = '<span style="color:#94a3b8">No cities</span>';
   var disabledPill = disabled ? ' <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:#FEE2E2;color:#991B1B">🚫 Disabled</span>' : '';
   var isSelf = a.email === MY_SCOPE.email;
-  var q = String.fromCharCode(34);
-  var uidAttr = a.auth_user_id;
-  var nameAttr = String(a.display_name || '').replace(/"/g, '&quot;');
+  // Cache full row for delegated handlers
+  window.__adminRows[a.auth_user_id] = a;
+
   var toggleBtn;
   if (isSelf){
     toggleBtn = '<span style="color:#94a3b8;font-size:11px;align-self:center">— that is you —</span>';
   } else if (disabled){
-    toggleBtn = '<button class="btn btn-sm" style="background:#10B981;color:white" onclick="toggleDisabled(' + q + uidAttr + q + ',' + q + nameAttr + q + ',true)">✓ Enable</button>';
+    toggleBtn = '<button class="btn btn-sm" style="background:#10B981;color:white" data-action="toggle-disabled" data-disabled="true">✓ Enable</button>';
   } else {
-    toggleBtn = '<button class="btn btn-sm" style="background:#F59E0B;color:white" onclick="toggleDisabled(' + q + uidAttr + q + ',' + q + nameAttr + q + ',false)">🚫 Disable</button>';
+    toggleBtn = '<button class="btn btn-sm" style="background:#F59E0B;color:white" data-action="toggle-disabled" data-disabled="false">🚫 Disable</button>';
   }
-  var removeBtn = isSelf ? '' : '<button class="btn btn-danger btn-sm" onclick="removeAdmin(' + q + uidAttr + q + ',' + q + nameAttr + q + ')">🗑 Remove</button>';
+  var removeBtn = isSelf ? '' : '<button class="btn btn-danger btn-sm" data-action="remove">🗑 Remove</button>';
   var added = a.added_at ? new Date(a.added_at).toLocaleDateString('en-IN') : '—';
   var lastLogin = a.last_login_at ? ' · Last login: ' + new Date(a.last_login_at).toLocaleDateString('en-IN') : '';
-  return '<div class="admin-card ' + cls + '" style="' + (disabled ? 'opacity:.55;background:#fef2f2' : '') + '">'
+  return '<div class="admin-card ' + cls + '" data-uid="' + escapeAttr(a.auth_user_id) + '" data-name="' + escapeAttr(a.display_name || '') + '" style="' + (disabled ? 'opacity:.55;background:#fef2f2' : '') + '">'
     + '<div class="admin-name">' + escapeHtml(a.display_name || '—') + disabledPill + '</div>'
     + '<div class="admin-email">' + escapeHtml(a.email || '—') + '</div>'
     + '<div><span class="admin-role-pill role-' + a.role + '">' + escapeHtml(a.role) + '</span></div>'
     + '<div class="admin-cities">' + cityList + '</div>'
     + '<div class="admin-cities" style="margin-top:4px;font-size:.78rem;color:#94a3b8">Added: ' + added + lastLogin + '</div>'
     + '<div class="admin-actions">'
-    +   '<button class="btn btn-secondary btn-sm" onclick="openEditModal(' + q + escapeAttr(JSON.stringify(a)) + q + ')">✏️ Edit</button>'
+    +   '<button class="btn btn-secondary btn-sm" data-action="edit">✏️ Edit</button>'
     +   toggleBtn + removeBtn
     + '</div>'
     + '</div>';
+}
+
+// One-time delegated click handler — bulletproof against escaping issues
+(function attachAdminCardHandlers(){
+  if (window.__adminCardHandlerAttached) return;
+  window.__adminCardHandlerAttached = true;
+  document.addEventListener('click', function(ev){
+    var btn = ev.target.closest('button[data-action]');
+    if (!btn) return;
+    var card = btn.closest('.admin-card[data-uid]');
+    if (!card) return;
+    var uid = card.dataset.uid;
+    var name = card.dataset.name || 'admin';
+    var action = btn.dataset.action;
+    var row = window.__adminRows[uid];
+    if (!row){ alert('Admin row not found in cache — refresh page.'); return; }
+
+    if (action === 'edit'){
+      openEditModalRow(row);
+    } else if (action === 'toggle-disabled'){
+      var currentlyDisabled = btn.dataset.disabled === 'true';
+      toggleDisabled(uid, name, currentlyDisabled);
+    } else if (action === 'remove'){
+      removeAdmin(uid, name);
+    }
+  });
+})();
+
+// Direct-row variant (no JSON string round-trip)
+function openEditModalRow(a){
+  EDIT_MODE = true;
+  document.getElementById('modalTitle').textContent = 'Edit Admin';
+  document.getElementById('m_uid').value = a.auth_user_id;
+  var em = document.getElementById('m_email'); em.value = a.email || ''; em.disabled = true;
+  document.getElementById('m_password').value = '';
+  document.getElementById('m_name').value = a.display_name || '';
+  document.getElementById('m_role').value = a.role;
+  document.getElementById('passwordGroup').style.display = 'none';
+  MY_PICKED_CITIES = (a.assigned_city_ids || []).slice();
+  document.getElementById('newUserHelp').style.display = 'none';
+  document.getElementById('saveBtn').textContent = '💾 Save Changes';
+  renderChips(); renderCityPicker(); onRoleChange();
+  document.getElementById('modalErr').style.display = 'none';
+  document.getElementById('adminModal').classList.add('show');
 }
 
 function openAddModal(){
