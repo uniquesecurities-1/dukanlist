@@ -740,15 +740,33 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
-<!-- Mobile sticky bottom CTA (Call + WhatsApp always reachable) -->
-<div class="sticky-cta-bar" id="stickyCtaBar" style="display:none">
-  <a class="cta-btn cta-call" id="stickyCall" href="#">
-    📞 <span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span>
-  </a>
-  <a class="cta-btn cta-wa" id="stickyWa" href="#" target="_blank" rel="noopener">
-    💬 WhatsApp
-  </a>
+<!-- MMT-style sticky bottom CTA — phone + status + WhatsApp + Call -->
+<div id="mmtStickyCta" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-top:1px solid rgba(15,23,42,.08);box-shadow:0 -6px 20px rgba(15,23,42,.10);z-index:100;padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif">
+  <div style="display:flex;align-items:center;gap:10px;max-width:680px;margin:0 auto">
+    <div style="flex:1;min-width:0;line-height:1.3">
+      <div style="font-size:10px;font-weight:700;color:#10B981;text-transform:uppercase;letter-spacing:.05em" id="stickyStatus">● Open · closes 9 pm</div>
+      <div style="font-size:14px;font-weight:800;color:#0F172A;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="stickyPhone">+91 — — — — — — — — — —</div>
+    </div>
+    <a id="mmtStickyWa" target="_blank" rel="noopener" href="#" style="display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;padding:11px 16px;border-radius:11px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 4px 14px rgba(37,211,102,.35);line-height:1">
+      <span style="font-size:1.05rem">💬</span>
+      <span>WhatsApp</span>
+    </a>
+    <a id="mmtStickyCall" href="#" style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;padding:11px 16px;border-radius:11px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 4px 14px rgba(255,107,26,.4);line-height:1">
+      <span style="font-size:1.05rem">📞</span>
+      <span><span data-i18n-en>Call now</span><span data-i18n-hi>कॉल</span></span>
+    </a>
+  </div>
 </div>
+<!-- Legacy stickyCtaBar IDs kept for backward compat -->
+<div id="stickyCtaBar" style="display:none">
+  <a id="stickyCall" href="#" style="display:none">.</a>
+  <a id="stickyWa" href="#" style="display:none">.</a>
+</div>
+<style>
+  /* Hide bottom mobile-nav on business detail page (only sticky CTA shown) */
+  #mobileBottomNav{ display:none !important }
+  body.has-sticky-cta{ padding-bottom: calc(76px + env(safe-area-inset-bottom)) }
+</style>
 
 <footer class="site" style="margin-bottom:60px">
   © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
@@ -1215,16 +1233,45 @@ function render(){
   // Bind lightbox to gallery (after DOM populated)
   bindLightbox();
 
-  // Sticky bottom CTA (mobile)
-  const stickyBar = document.getElementById('stickyCtaBar');
-  const stickyCall = document.getElementById('stickyCall');
-  const stickyWa = document.getElementById('stickyWa');
-  if (stickyCall) stickyCall.href = 'tel:' + b.mobile;
-  if (stickyWa)   stickyWa.href = `https://wa.me/${wa}?text=${waMsg}`;
-  if (stickyBar)  stickyBar.style.display = '';
+  // MMT-style sticky bottom CTA
+  const stickyBar = document.getElementById('mmtStickyCta');
+  const sCall = document.getElementById('mmtStickyCall');
+  const sWa = document.getElementById('mmtStickyWa');
+  const sPhone = document.getElementById('stickyPhone');
+  const sStatus = document.getElementById('stickyStatus');
+  if (sCall) sCall.href = 'tel:' + b.mobile;
+  if (sWa)   sWa.href = `https://wa.me/${wa}?text=${waMsg}`;
+  // Format phone like +91 95412 23377
+  if (sPhone && b.mobile){
+    const m = String(b.mobile).replace(/\D/g, '').slice(-10);
+    sPhone.textContent = m.length === 10 ? `+91 ${m.slice(0,5)} ${m.slice(5)}` : '+91 ' + m;
+  }
+  // Open status text
+  if (sStatus && b.hours_json && typeof getOpenStatus === 'function'){
+    try {
+      const os = getOpenStatus(b.hours_json) || {};
+      if (os.isOpen){
+        sStatus.textContent = '● Open' + (os.closesAt ? ' · closes ' + os.closesAt : '');
+        sStatus.style.color = '#10B981';
+      } else if (os.opensAt){
+        sStatus.textContent = '● Closed · opens ' + os.opensAt;
+        sStatus.style.color = '#EF4444';
+      } else {
+        sStatus.textContent = '● Closed';
+        sStatus.style.color = '#EF4444';
+      }
+    } catch(_){
+      sStatus.textContent = 'Free advice · WhatsApp ready';
+      sStatus.style.color = '#64748b';
+    }
+  } else if (sStatus){
+    sStatus.textContent = 'Free advice · WhatsApp ready';
+    sStatus.style.color = '#64748b';
+  }
+  if (stickyBar) stickyBar.style.display = '';
   document.body.classList.add('has-sticky-cta');
-  if (stickyCall) stickyCall.addEventListener('click', () => logLead('call'));
-  if (stickyWa)   stickyWa.addEventListener('click', () => logLead('whatsapp'));
+  if (sCall) sCall.addEventListener('click', () => logLead('call'));
+  if (sWa)   sWa.addEventListener('click', () => logLead('whatsapp'));
 
   // If ?review=1 → auto-scroll to reviews and open Write-Review modal
   try{
