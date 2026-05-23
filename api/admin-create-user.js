@@ -22,8 +22,11 @@ const SUPABASE_URL =
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 async function sb(path, opts = {}, jwt = null) {
+  // apikey MUST always be a project-level key (service_role).
+  // The user JWT goes in Authorization for user-scoped operations.
+  // Sending a user JWT as apikey triggers "Invalid API key".
   const headers = {
-    'apikey': jwt || SERVICE_KEY,
+    'apikey': SERVICE_KEY,
     'Authorization': `Bearer ${jwt || SERVICE_KEY}`,
     'Content-Type': 'application/json',
     ...(opts.headers || {})
