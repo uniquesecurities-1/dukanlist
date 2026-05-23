@@ -1598,10 +1598,22 @@ function injectFaqSchema(bizName, faqs){
   } catch(e){ console.warn('FAQ schema inject failed:', e); }
 }
 
+let IS_BIZ_OWNER = false;
+async function checkIsBizOwner(bizId){
+  const c = ShopDB.client; if (!c) return false;
+  try {
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user) return false;
+    const q = await c.from('business_owners').select('business_id').eq('business_id', bizId).eq('auth_user_id', u.data.user.id).maybeSingle();
+    return !q.error && !!q.data;
+  } catch(_){ return false; }
+}
+
 async function loadReviews(bizId){
   const c = ShopDB.client; if (!c) return;
+  IS_BIZ_OWNER = await checkIsBizOwner(bizId);
   const { data } = await c.from('reviews')
-    .select('customer_name, rating, text, owner_reply, owner_reply_at, created_at')
+    .select('id, customer_name, rating, text, owner_reply, owner_reply_at, created_at')
     .eq('business_id', bizId)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
@@ -1613,7 +1625,8 @@ async function loadReviews(bizId){
     const date = new Date(r.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
     const name = (r.customer_name || 'Anonymous').trim();
     const initial = name.charAt(0).toUpperCase() || '?';
-    return `<div class="review">
+    const replyDate = r.owner_reply_at ? new Date(r.owner_reply_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '';
+    return `<div class="review" data-rid="${r.id}">
       <div class="r-head">
         <div class="r-avatar">${initial}</div>
         <div style="flex:1;min-width:0">
@@ -1626,9 +1639,49 @@ async function loadReviews(bizId){
         </div>
       </div>
       ${r.text ? `<div class="r-text">${escapeHTML(r.text)}</div>` : ''}
-      ${r.owner_reply ? `<div class="r-reply" style="margin-left:46px"><b>Owner reply:</b><br>${escapeHTML(r.owner_reply)}</div>` : ''}
+      ${r.owner_reply ? `<div class="r-reply" style="margin-left:46px;background:#FFF8F0;border-left:3px solid #FF6B1A;padding:10px 14px;border-radius:0 10px 10px 0;margin-top:8px">
+        <div style="font-size:11px;color:#92400E;font-weight:700;margin-bottom:4px">🛡 OWNER REPLIED · ${replyDate}</div>
+        <div style="color:#0F172A;line-height:1.55;font-size:.92rem">${escapeHTML(r.owner_reply)}</div>
+        ${IS_BIZ_OWNER ? `<button onclick="openReplyEditor('${r.id}', ${JSON.stringify(r.owner_reply).replace(/"/g,'&quot;')})" style="background:none;border:0;color:#FF6B1A;font-size:11px;font-weight:700;margin-top:4px;cursor:pointer;padding:0">✎ Edit reply</button>` : ''}
+      </div>` : ''}
+      ${IS_BIZ_OWNER && !r.owner_reply ? `<div style="margin-left:46px;margin-top:8px">
+        <button onclick="openReplyEditor('${r.id}', '')" style="background:#FFF8F0;border:1px dashed #FED7AA;color:#92400E;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">💬 Reply as owner</button>
+      </div>` : ''}
+      <div id="replyForm_${r.id}" style="display:none;margin-left:46px;margin-top:10px;background:#FFFBF5;border:1px solid #FED7AA;border-radius:10px;padding:12px">
+        <textarea id="replyText_${r.id}" placeholder="Thank you for your review! ..." maxlength="600" rows="3" style="width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;line-height:1.5"></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:8px">
+          <button onclick="closeReplyEditor('${r.id}')" style="background:transparent;border:0;color:#64748b;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">Cancel</button>
+          <button onclick="submitReply('${r.id}')" style="background:#FF6B1A;color:#fff;border:0;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Save reply</button>
+        </div>
+        <div id="replyErr_${r.id}" style="display:none;margin-top:8px;color:#DC2626;font-size:12px"></div>
+      </div>
     </div>`;
   }).join('');
+}
+
+function openReplyEditor(reviewId, currentText){
+  const form = document.getElementById('replyForm_' + reviewId);
+  const ta = document.getElementById('replyText_' + reviewId);
+  if (!form || !ta) return;
+  ta.value = String(currentText || '').replace(/&quot;/g, '"');
+  form.style.display = '';
+  ta.focus();
+}
+function closeReplyEditor(reviewId){
+  const form = document.getElementById('replyForm_' + reviewId);
+  if (form) form.style.display = 'none';
+}
+async function submitReply(reviewId){
+  const ta = document.getElementById('replyText_' + reviewId);
+  const err = document.getElementById('replyErr_' + reviewId);
+  err.style.display = 'none';
+  const text = (ta.value || '').trim();
+  if (text.length > 0 && text.length < 5){ err.textContent = 'Reply too short.'; err.style.display = ''; return; }
+  const c = ShopDB.client;
+  const r = await c.rpc('owner_reply_to_review', { p_review_id: reviewId, p_reply_text: text || null });
+  if (r.error){ err.textContent = 'Failed: ' + r.error.message; err.style.display = ''; return; }
+  // Reload reviews to reflect change
+  if (BIZ && BIZ.id) loadReviews(BIZ.id);
 }
 
 async function logLead(action){
