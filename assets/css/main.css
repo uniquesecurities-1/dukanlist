@@ -754,5 +754,86 @@ html[data-lang="hi"] h1.title{ letter-spacing:-.01em; line-height:1.18 }
 ::selection{ background:rgba(255,107,26,.18); color:var(--ink) }
 
 /* ============================================================
-   END APPLE-GRADE POLISH
+   MMT-GRADE POLISH PASS (v2)
+   - Premium multi-layer card shadows
+   - Smoother spring-style hovers
+   - Refined typography rhythm
+   - Premium button micro-interactions
+   ============================================================ */
+
+/* Premium card elevation — stacked shadows for natural depth */
+.card{
+  border:1px solid rgba(15,23,42,.05);
+  box-shadow:
+    0 1px 2px rgba(15,23,42,.04),
+    0 6px 18px rgba(15,23,42,.05);
+  transition:transform .35s var(--ease-apple), box-shadow .35s var(--ease-apple), border-color .35s var(--ease-apple);
+}
+.card:hover{
+  border-color:rgba(15,23,42,.08);
+  box-shadow:
+    0 2px 4px rgba(15,23,42,.05),
+    0 18px 44px rgba(15,23,42,.10);
+}
+
+/* Premium biz-card elevation (search.html + clones) */
+.biz-card{
+  box-shadow:
+    0 1px 2px rgba(15,23,42,.04),
+    0 4px 14px rgba(15,23,42,.05);
+}
+.biz-card:hover{
+  transform:translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(15,23,42,.05),
+    0 22px 54px rgba(15,23,42,.10);
+}
+
+/* Refined button micro-interactions — MMT-style depth on press */
+.btn-pri{
+  background:linear-gradient(135deg,#FF7A2E 0%,var(--saffron) 50%,var(--saffron-deep) 100%);
+  box-shadow:
+    0 1px 2px rgba(229,81,0,.20),
+    0 6px 18px rgba(255,107,26,.36);
+  transition:transform .2s var(--ease-apple), box-shadow .2s var(--ease-apple), background .2s ease;
+}
+.btn-pri:not(:disabled):hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 2px 4px rgba(229,81,0,.22),
+    0 10px 26px rgba(255,107,26,.50);
+}
+.btn-pri:not(:disabled):active{ transform:translateY(0) scale(.98) }
+
+.btn-sec{
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:transform .2s var(--ease-apple), box-shadow .2s var(--ease-apple), background .2s ease, border-color .2s ease;
+}
+.btn-sec:hover{
+  transform:translateY(-1px);
+  border-color:#94A3B8;
+  box-shadow:0 4px 12px rgba(15,23,42,.08);
+}
+
+/* Refined heading typography — MMT-grade tracking */
+h1.title{ letter-spacing:-.025em; font-weight:800 }
+h2{ letter-spacing:-.018em }
+h3{ letter-spacing:-.012em }
+
+/* Input focus polish — soft ring instead of harsh border */
+.input:focus{
+  outline:none;
+  border-color:var(--saffron);
+  box-shadow:0 0 0 4px rgba(255,107,26,.10);
+}
+
+/* Subtle reveal animation for sections (used by .reveal class) */
+@keyframes mmt-fade-up{
+  from{ opacity:0; transform:translateY(12px) }
+  to{ opacity:1; transform:translateY(0) }
+}
+.reveal{ animation:mmt-fade-up .5s var(--ease-apple) both }
+
+/* ============================================================
+   END MMT-GRADE POLISH
    ============================================================ */

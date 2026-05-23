@@ -858,7 +858,7 @@ async function loadFeatured(){
     let featuredRows = [];
     try {
       const fr = await c.from('businesses')
-        .select('id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,featured,geo_cities(name)')
+        .select('id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,featured,mobile,whatsapp,geo_cities(name)')
         .eq('status','active').eq('featured', true).limit(4);
       if (!fr.error && fr.data) featuredRows = fr.data.map(r => ({ ...r, _featured: true, city_name: r.geo_cities && r.geo_cities.name }));
     } catch(_){}
@@ -905,20 +905,39 @@ function renderFeaturedCard(b){
   const rating = b.rating_avg > 0
     ? `<span style="color:var(--ink);font-weight:700">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>`
     : '<span style="color:var(--muted)">No reviews yet</span>';
+
+  // WhatsApp + Call quick-action CTAs
+  const rawWa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '');
+  const wa10  = rawWa.slice(-10);
+  const tel10 = String(b.mobile || '').replace(/\D/g, '').slice(-10);
+  const waMsg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
+  const actBase = 'flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border-radius:11px;font-size:.84rem;font-weight:700;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;border:1.5px solid transparent;line-height:1';
+  const waBtn = (wa10.length === 10)
+    ? `<a href="https://wa.me/91${wa10}?text=${waMsg}" target="_blank" rel="noopener" aria-label="WhatsApp ${escapeHTML(b.name)}" style="${actBase};background:#25D366;color:#fff" onmouseover="this.style.background='#1EAA53';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 14px rgba(37,211,102,.32)'" onmouseout="this.style.background='#25D366';this.style.transform='';this.style.boxShadow=''"><svg viewBox="0 0 32 32" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.8 5.5 2.2 7.9L.3 31.6l7.9-2.1c2.3 1.3 4.9 1.9 7.7 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.3c-2.4 0-4.8-.7-6.9-1.9l-.5-.3-4.7 1.3 1.3-4.6-.3-.5c-1.3-2.1-2-4.5-2-7 0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9c.1 7.1-5.7 13-12.7 13zm7-9.7c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.3-.6.1-.2 0-.5-.1-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.7-.9-.7h-.7c-.2 0-.6.1-1 .5s-1.3 1.3-1.3 3.2 1.4 3.7 1.6 3.9c.2.2 2.7 4.2 6.6 5.8.9.4 1.6.6 2.2.8.9.3 1.7.2 2.4.1.7-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.4-.3-.8-.5z"/></svg><span>WhatsApp</span></a>`
+    : '';
+  const callBtn = (tel10.length === 10)
+    ? `<a href="tel:+91${tel10}" aria-label="Call ${escapeHTML(b.name)}" style="${actBase};background:#fff;color:#0F172A;border-color:#cbd5e1" onmouseover="this.style.background='#F1F5F9';this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 10px rgba(15,23,42,.06)'" onmouseout="this.style.background='#fff';this.style.transform='';this.style.boxShadow=''"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>Call</span></a>`
+    : '';
+  const actionsRow = (waBtn || callBtn)
+    ? `<div style="display:flex;gap:8px;margin-top:10px;position:relative;z-index:2">${waBtn}${callBtn}</div>`
+    : '';
+
   return `
-    <a href="/business.html?slug=${encodeURIComponent(b.slug)}" style="background:#fff;border:1px solid rgba(15,23,42,.04);border-radius:18px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,.61,.36,1),box-shadow .35s cubic-bezier(.22,.61,.36,1);box-shadow:0 1px 3px rgba(15,23,42,.04)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 20px 50px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(15,23,42,.04)'">
+    <article style="position:relative;background:#fff;border:1px solid rgba(15,23,42,.04);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,.61,.36,1),box-shadow .35s cubic-bezier(.22,.61,.36,1);box-shadow:0 1px 3px rgba(15,23,42,.04)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 20px 50px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(15,23,42,.04)'">
+      <a href="/business.html?slug=${encodeURIComponent(b.slug)}" aria-label="${escapeHTML(b.name)}" style="position:absolute;inset:0;z-index:1;border-radius:inherit"></a>
       <div style="position:relative">${photoHTML}${featuredRibbon}${verified}${openDot}</div>
       <div style="padding:18px 18px 16px;display:flex;flex-direction:column;gap:5px;flex:1">
         <div style="font-size:.74rem;color:var(--saffron-deep);font-weight:600;letter-spacing:.02em">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
         <div style="font-family:'Manrope',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);line-height:1.25;letter-spacing:-.015em">${escapeHTML(b.name)}</div>
         <div style="font-size:.88rem;color:#5A6573;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escapeHTML(b.usp_text || '')}</div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.82rem;color:var(--muted);padding-top:12px;border-top:1px solid rgba(15,23,42,.05)">
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.82rem;color:var(--muted);padding-top:12px;border-top:1px solid rgba(15,23,42,.05);position:relative;z-index:2">
           ${rating}
           <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${escapeHTML(b.city_name || '')}</span>
           ${typeof DukanShare !== 'undefined' ? DukanShare.btn({slug:b.slug, id:b.id, name:b.name, city:b.city_name, category:b.category_name}) : ''}
         </div>
+        ${actionsRow}
       </div>
-    </a>`;
+    </article>`;
 }
 
 // ============================================================

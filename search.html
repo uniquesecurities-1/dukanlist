@@ -110,6 +110,26 @@
 .biz-meta .rating{ color:var(--ink); font-weight:600 }
 .biz-meta .loc{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
+/* Overlay link pattern — entire card clickable, but inner action buttons take priority */
+.biz-card{ position:relative; }
+.biz-card-link{ position:absolute; inset:0; z-index:1; border-radius:inherit; }
+.biz-card-link:focus-visible{ outline:2px solid var(--saffron); outline-offset:-2px }
+.biz-card .biz-meta, .biz-card .biz-actions{ position:relative; z-index:2 }
+
+/* Quick action buttons — MMT-style WhatsApp + Call CTA row */
+.biz-actions{ display:flex; gap:8px; margin-top:10px }
+.biz-act{
+  flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:9px 12px; border-radius:11px; font-size:.84rem; font-weight:700;
+  text-decoration:none; transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  border:1.5px solid transparent; cursor:pointer; line-height:1;
+}
+.biz-act svg{ width:14px; height:14px; flex-shrink:0 }
+.biz-act-wa{ background:#25D366; color:#fff; }
+.biz-act-wa:hover{ background:#1EAA53; text-decoration:none; transform:translateY(-1px); box-shadow:0 6px 14px rgba(37,211,102,.32) }
+.biz-act-call{ background:#fff; color:#0F172A; border-color:#cbd5e1; }
+.biz-act-call:hover{ background:#F1F5F9; text-decoration:none; transform:translateY(-1px); box-shadow:0 4px 10px rgba(15,23,42,.06) }
+
 .empty{ text-align:center; padding:80px 20px; color:var(--muted) }
 .empty .ico{ font-size:3.5rem; opacity:.35; margin-bottom:14px; display:block }
 .empty b{ display:block; color:var(--ink); font-size:1.2rem; margin-bottom:8px; font-weight:700; letter-spacing:-.01em }
@@ -487,8 +507,29 @@ function renderCard(b){
     }
   }
   const rating = b.rating_avg > 0 ? `<span class="rating">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>` : '<span style="color:var(--muted)">No reviews yet</span>';
+
+  // Quick-action CTAs — WhatsApp + Call
+  const rawWa  = String(b.whatsapp || b.mobile || '').replace(/\D/g, '');
+  const wa10   = rawWa.slice(-10);
+  const tel10  = String(b.mobile || '').replace(/\D/g, '').slice(-10);
+  const waMsg  = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
+  const waBtn  = wa10 && wa10.length === 10
+    ? `<a class="biz-act biz-act-wa" href="https://wa.me/91${wa10}?text=${waMsg}" target="_blank" rel="noopener" aria-label="WhatsApp ${escapeHTML(b.name)}">
+        <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.8 5.5 2.2 7.9L.3 31.6l7.9-2.1c2.3 1.3 4.9 1.9 7.7 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.3c-2.4 0-4.8-.7-6.9-1.9l-.5-.3-4.7 1.3 1.3-4.6-.3-.5c-1.3-2.1-2-4.5-2-7 0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9c.1 7.1-5.7 13-12.7 13zm7-9.7c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.3-.6.1-.2 0-.5-.1-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.7-.9-.7h-.7c-.2 0-.6.1-1 .5s-1.3 1.3-1.3 3.2 1.4 3.7 1.6 3.9c.2.2 2.7 4.2 6.6 5.8.9.4 1.6.6 2.2.8.9.3 1.7.2 2.4.1.7-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.4-.3-.8-.5z"/></svg>
+        <span>WhatsApp</span>
+      </a>`
+    : '';
+  const callBtn = tel10 && tel10.length === 10
+    ? `<a class="biz-act biz-act-call" href="tel:+91${tel10}" aria-label="Call ${escapeHTML(b.name)}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Call</span>
+      </a>`
+    : '';
+  const actionsRow = (waBtn || callBtn) ? `<div class="biz-actions">${waBtn}${callBtn}</div>` : '';
+
   return `
-    <a class="biz-card" href="/business.html?slug=${b.slug}">
+    <article class="biz-card">
+      <a class="biz-card-link" href="/business.html?slug=${b.slug}" aria-label="${escapeHTML(b.name)}"></a>
       <div class="biz-photo">${photoHTML}${openBadge}${verified}</div>
       <div class="biz-info">
         <div class="biz-cat">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
@@ -499,8 +540,9 @@ function renderCard(b){
           <span class="loc">📍 ${escapeHTML(b.city_name || '')}</span>
           ${typeof DukanShare !== 'undefined' ? DukanShare.btn({slug:b.slug, id:b.id, name:b.name, city:b.city_name, category:b.category_name}) : ''}
         </div>
+        ${actionsRow}
       </div>
-    </a>`;
+    </article>`;
 }
 
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
