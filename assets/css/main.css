@@ -248,8 +248,12 @@ footer.site a{ color:#FBBF24 }
 .sk-line.w-50{ width: 50% }
 .sk-line.w-70{ width: 70% }
 .sk-line.w-90{ width: 90% }
-.sk-circle { width: 44px; height: 44px; border-radius: 50% }
+.sk-circle { width: 44px; height: 44px; border-radius: 50%; display: inline-block; flex-shrink: 0 }
 .sk-square { aspect-ratio: 16/10; height: auto; border-radius: 10px }
+.sk-line.w-20{ width: 20% }
+.sk-line.w-40{ width: 40% }
+.sk-line.w-60{ width: 60% }
+.sk-line.w-80{ width: 80% }
 .sk-card{
   background: #fff;
   border: 1px solid var(--line);
@@ -258,6 +262,10 @@ footer.site a{ color:#FBBF24 }
   box-shadow: var(--shadow-sm);
 }
 .sk-card .sk-square{ margin-bottom: 10px }
+/* Respect reduced motion — pause shimmer for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .skeleton{ animation: none }
+}
 
 /* ----- Fade-in / slide-up entrance ----- */
 @keyframes fadeIn {
@@ -868,8 +876,4 @@ h3{ letter-spacing:-.012em }
 
 
 /* === Breadcrumb strip (used on search + browse) === */
-.breadcrumb-strip{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; max-width:1180px; margin:8px auto 0; padding:6px 16px; font-size:.82rem; color:var(--muted) }
-.breadcrumb-strip a{ color:var(--muted); text-decoration:none; font-weight:600 }
-.breadcrumb-strip a:hover{ color:var(--saffron-deep); text-decoration:none }
-.breadcrumb-strip .sep{ opacity:.5 }
-.breadcrumb-strip .current{ color:var(--ink); font-weight:700 }
+.breadcrumb-strip{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; max-width:1180px; margin:8px auto 0; padding:

@@ -867,6 +867,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <script src="/assets/js/voice.js"></script>
 <script src="/assets/js/install.js"></script>
 <script src="/assets/js/autocomplete.js"></script>
+<script src="/assets/js/skeleton.js"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanAutocomplete) DukanAutocomplete.attach('searchInput'); });</script>
 <script src="/assets/js/mobile-nav.js"></script>
 <script src="/assets/js/announcements.js"></script>
@@ -1154,6 +1155,8 @@ function handleSearch(e){
   const q = document.getElementById('searchInput').value.trim();
   const city = document.getElementById('citySelect').value;
   const openNow = document.getElementById('openNowCheck')?.checked;
+  // Save to recent searches
+  if (q && window.DukanAutocomplete) DukanAutocomplete.saveQuery(q);
   const params =new URLSearchParams();
   if (q) params.set('q', q);
   if (city) params.set('city', city);
@@ -1195,13 +1198,4 @@ function initReveal(){
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedLang();
   loadCategories();
-  loadStats();
-  loadFeatured();
-  loadDeals();
-  initReveal();
-});
-</script>
-
-<script src="/assets/js/city-persist.js"></script>
-</body>
-</html>
+ 

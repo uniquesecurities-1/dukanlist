@@ -270,11 +270,17 @@
 
   <div class="result-head">
     <div class="result-count" id="countDisp"></div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="font-size:.78rem;color:var(--muted)" id="sortHint">
-        <span data-i18n-en>Sorted by relevance + trust score</span>
-        <span data-i18n-hi>प्रासंगिकता + ट्रस्ट स्कोर के अनुसार</span>
-      </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <label for="sortSel" style="font-size:.78rem;color:var(--muted);font-weight:600">
+        <span data-i18n-en>Sort:</span><span data-i18n-hi>क्रम:</span>
+      </label>
+      <select id="sortSel" onchange="setSort(this.value)" style="font-size:.82rem;font-weight:600;padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#0F172A;cursor:pointer">
+        <option value="relevance">Relevance</option>
+        <option value="featured">Featured first</option>
+        <option value="rating">Highest rated</option>
+        <option value="reviews">Most reviewed</option>
+        <option value="newest">Newest</option>
+      </select>
       <div class="view-toggle" role="tablist" aria-label="View toggle">
         <button id="viewListBtn" class="vt-btn active" onclick="setView('list')" aria-pressed="true">📋 List</button>
         <button id="viewMapBtn"  class="vt-btn" onclick="setView('map')"  aria-pressed="false">🗺️ Map</button>
@@ -288,6 +294,8 @@
   </div>
   <div id="results">
     <div class="biz-grid">
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
+      <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
@@ -306,6 +314,7 @@
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/filter-chips.js"></script>
 <script src="/assets/js/autocomplete.js"></script>
+<script src="/assets/js/skeleton.js"></script>
 <script src="/assets/js/announcements.js"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanAutocomplete) DukanAutocomplete.attach('q'); });</script>
 <script src="/assets/js/voice.js"></script>
@@ -331,6 +340,52 @@ let OPEN_NOW = false;          // active toggle state
 let RATING_FILTER = false;     // ⭐ 4.0+
 let VERIFIED_FILTER = false;   // ✓ Verified
 let DEALS_FILTER = false;      // 🎁 With active deals
+let SORT_BY = 'relevance';     // relevance | featured | rating | reviews | newest
+
+function setSort(val){
+  SORT_BY = String(val || 'relevance');
+  try{ localStorage.setItem('shop_sort', SORT_BY); }catch(_){}
+  renderResults();
+}
+
+function applySort(rows){
+  if (!Array.isArray(rows) || rows.length < 2) return rows;
+  const sorted = rows.slice();
+  switch (SORT_BY){
+    case 'featured':
+      sorted.sort((a, b) => {
+        const af = a.is_featured ? 1 : 0;
+        const bf = b.is_featured ? 1 : 0;
+        if (bf !== af) return bf - af;
+        return (Number(b.rating_avg) || 0) - (Number(a.rating_avg) || 0);
+      });
+      break;
+    case 'rating':
+      sorted.sort((a, b) => {
+        const ar = Number(a.rating_avg) || 0;
+        const br = Number(b.rating_avg) || 0;
+        if (br !== ar) return br - ar;
+        return (Number(b.rating_count) || 0) - (Number(a.rating_count) || 0);
+      });
+      break;
+    case 'reviews':
+      sorted.sort((a, b) => (Number(b.rating_count) || 0) - (Number(a.rating_count) || 0));
+      break;
+    case 'newest':
+      sorted.sort((a, b) => {
+        // Prefer created_at if present, else fall back to id (serial → higher = newer)
+        const at = a.created_at ? Date.parse(a.created_at) : Number(a.id) || 0;
+        const bt = b.created_at ? Date.parse(b.created_at) : Number(b.id) || 0;
+        return bt - at;
+      });
+      break;
+    case 'relevance':
+    default:
+      // Keep server order
+      break;
+  }
+  return sorted;
+}
 let BIZ_WITH_DEALS = new Set(); // populated lazily
 
 function toggleOpenNow(){
@@ -518,7 +573,9 @@ async function runSearch(){
   const c = ShopDB.client;
   const resEl = document.getElementById('results');
   const countEl = document.getElementById('countDisp');
-  resEl.innerHTML = '<div class="empty"><span class="ico">⏳</span>Searching...</div>';
+  // Show unified skeleton while fetching
+  if (window.DukanSkeleton) resEl.innerHTML = DukanSkeleton.cards(6);
+  else resEl.innerHTML = '<div class="empty"><span class="ico">⏳</span>Searching...</div>';
 
   if (!c){
     resEl.innerHTML = `<div class="empty"><span class="ico">⚠️</span><b>Backend not configured</b>Configure Supabase URL in /assets/js/supabase-init.js</div>`;
@@ -609,6 +666,9 @@ function _renderResultsInner(){
     hint.textContent = '';
     return;
   }
+
+  // Apply sort (relevance keeps server order)
+  rows = applySort(rows);
 
   countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>shop${rows.length===1?'':'s'} found</span><span data-i18n-hi>दुकान मिली</span>`;
   if (OPEN_NOW && filteredOutByOpen > 0){
@@ -762,74 +822,4 @@ function renderMapPins(){
       ${photo ? `<div class="pc-photo"><img src="${escapeHTML(photo)}" alt=""></div>` : ''}
       <div class="pc-body">
         <div class="pc-name">${escapeHTML(b.name)}${isFeatured ? ' ⭐' : ''}</div>
-        <div class="pc-meta">${escapeHTML(b.category_name || '')} · ${escapeHTML(b.city_name || '')}<br>${rating}</div>
-        <a class="pc-cta" href="/business.html?slug=${encodeURIComponent(b.slug)}">View Shop →</a>
-      </div>
-    </div>`;
-    marker.bindPopup(popupHtml);
-    _mapPins.push(marker);
-    bounds.push([Number(b.lat), Number(b.lng)]);
-  });
-  if (bounds.length > 1){
-    _mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-  } else if (bounds.length === 1){
-    _mapInstance.setView(bounds[0], 14);
-  }
-}
-
-function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-
-function handleSearch(e){
-  e.preventDefault();
-  const params = new URLSearchParams();
-  const q = document.getElementById('q').value.trim();
-  const cat = document.getElementById('catSel').value;
-  const city = document.getElementById('citySel').value;
-  const pin = (document.getElementById('pinSel')?.value || '').replace(/\D/g, '').slice(0, 6);
-  if (q) params.set('q', q);
-  if (cat) params.set('cat', cat);
-  if (city) params.set('city', city);
-  if (pin && pin.length === 6) params.set('pin', pin);
-  const url = '/search.html' + (params.toString() ? '?' + params.toString() : '');
-  history.pushState({}, '', url);
-  runSearch();
-}
-
-window.addEventListener('DOMContentLoaded', async () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  // Restore Open-Now toggle preference
-  try{
-    if (localStorage.getItem('shop_openNow') === '1'){
-      OPEN_NOW = true;
-      const btn = document.getElementById('openNowToggle');
-      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
-    }
-    if (localStorage.getItem('shop_ratingFilter') === '1'){
-      RATING_FILTER = true;
-      const btn = document.getElementById('ratingToggle');
-      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
-    }
-    if (localStorage.getItem('shop_verifiedFilter') === '1'){
-      VERIFIED_FILTER = true;
-      const btn = document.getElementById('verifiedToggle');
-      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
-    }
-    if (localStorage.getItem('shop_dealsFilter') === '1'){
-      DEALS_FILTER = true;
-      const btn = document.getElementById('dealsToggle');
-      if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
-    }
-  }catch(_){}
-  await loadDropdowns();
-  try{
-    const v = localStorage.getItem('shop_view');
-    if (v === 'map'){ setView('map'); }
-  }catch(_){}
-  runSearch();
-});
-window.addEventListener('popstate', runSearch);
-</script>
-
-<script src="/assets/js/city-persist.js"></script>
-</body>
-</html>
+        <div class="pc-meta">${escapeHTML(b.category_name 

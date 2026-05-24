@@ -4,18 +4,48 @@
    USAGE:
      <input id="searchInput" type="text">
      <script>
-       DukanAutocomplete.attach('searchInput', {
-         onSelect: (item) => { ... }   // optional; default: navigate to /search.html
-       });
+       DukanAutocomplete.attach('searchInput');
      </script>
 
    Suggests:
+     - recent searches (when input is empty/focused)
      - matching categories (from /assets/data/categories.json)
      - matching businesses (via search_businesses RPC, limit 5)
-   Debounced 250ms. Keyboard nav: ↑ ↓ Enter Esc.
+   Debounced 250ms. Keyboard nav: arrow keys + Enter + Esc.
+
+   Recent searches API (callable from page submit handlers):
+     DukanAutocomplete.saveQuery(q)
+     DukanAutocomplete.getRecent()
+     DukanAutocomplete.clearRecent()
 ============================================================ */
 (function(global){
   'use strict';
+
+  var RS_KEY = 'dl_recent_searches';
+  var RS_MAX = 5;
+  function getRecent(){
+    try {
+      var raw = localStorage.getItem(RS_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.filter(function(s){ return typeof s === 'string' && s.trim(); }).slice(0, RS_MAX) : [];
+    } catch(_){ return []; }
+  }
+  function saveQuery(q){
+    q = String(q || '').trim();
+    if (!q || q.length < 2) return;
+    try {
+      var arr = getRecent();
+      var ql = q.toLowerCase();
+      arr = arr.filter(function(s){ return s.toLowerCase() !== ql; });
+      arr.unshift(q);
+      arr = arr.slice(0, RS_MAX);
+      localStorage.setItem(RS_KEY, JSON.stringify(arr));
+    } catch(_){}
+  }
+  function clearRecent(){
+    try { localStorage.removeItem(RS_KEY); } catch(_){}
+  }
 
   let CATS_CACHE = null;
   async function loadCats(){
@@ -23,7 +53,6 @@
     try {
       const r = await fetch('/assets/data/categories.json');
       const d = await r.json();
-      // Flatten parents + subs into a single searchable list
       const list = [];
       (d.parents || []).forEach(p => {
         list.push({ slug: p.slug, name: p.name, name_hi: p.name_hi, icon: p.icon, isParent: true });
@@ -48,15 +77,13 @@
     opts = opts || {};
     const input = document.getElementById(inputId);
     if (!input) return;
-    if (input.dataset.acAttached) return; // idempotent
+    if (input.dataset.acAttached) return;
     input.dataset.acAttached = '1';
     input.setAttribute('autocomplete', 'off');
 
-    // Position parent
     const wrap = input.parentElement;
     if (wrap && getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
 
-    // Dropdown element
     const dd = document.createElement('div');
     dd.className = 'dukan-ac-dd';
     dd.style.cssText = 'position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 14px 36px rgba(15,23,42,.12);z-index:99;max-height:60vh;overflow-y:auto;display:none;font-family:\'Plus Jakarta Sans\',\'Manrope\',-apple-system,sans-serif';
@@ -74,11 +101,13 @@
       if (!items.length){ close(); return; }
       dd.innerHTML = items.map((it, i) => {
         const isActive = i === activeIdx;
-        const subtitle = it.kind === 'cat'
-          ? (it.isParent ? 'Category' : 'Sub-category')
-          : (it.city ? '📍 ' + esc(it.city) : 'Shop');
+        let subtitle;
+        if (it.kind === 'recent') subtitle = 'Recent search';
+        else if (it.kind === 'cat') subtitle = it.isParent ? 'Category' : 'Sub-category';
+        else subtitle = it.city ? '\u{1F4CD} ' + esc(it.city) : 'Shop';
+        const icon = it.icon || (it.kind === 'cat' ? '\u{1F3F7}' : it.kind === 'recent' ? '\u{1F558}' : '\u{1F3EA}');
         return '<a href="' + esc(it.href) + '" data-i="' + i + '" style="display:flex;align-items:center;gap:10px;padding:10px 14px;text-decoration:none;color:#0F172A;border-bottom:1px solid #f1f5f9;' + (isActive ? 'background:#FFF5EB;' : '') + 'transition:background .12s">'
-          + '<span style="font-size:1.25rem;flex-shrink:0;width:30px;text-align:center">' + (it.icon || (it.kind === 'cat' ? '🏷' : '🏪')) + '</span>'
+          + '<span style="font-size:1.25rem;flex-shrink:0;width:30px;text-align:center">' + icon + '</span>'
           + '<span style="flex:1;min-width:0">'
           + '<div style="font-size:14px;font-weight:600;line-height:1.3">' + highlight(it.name, q) + '</div>'
           + '<div style="font-size:11px;color:#94a3b8;font-weight:500;margin-top:1px">' + subtitle + '</div>'
@@ -86,7 +115,22 @@
           + '<span style="color:#cbd5e1;font-size:18px">→</span>'
           + '</a>';
       }).join('');
+      if (items.length && items[0].kind === 'recent'){
+        dd.innerHTML += '<div style="padding:8px 14px;text-align:right;background:#f8fafc;border-top:1px solid #e2e8f0">'
+          + '<a href="#" data-clear-recent="1" style="font-size:11px;font-weight:700;color:#64748b;text-decoration:none;text-transform:uppercase;letter-spacing:.04em">Clear recent</a></div>';
+      }
       open();
+    }
+
+    function showRecentSearches(){
+      const recents = getRecent();
+      if (!recents.length){ items = []; close(); return; }
+      items = recents.map(s => ({
+        kind: 'recent', name: s, icon: '\u{1F558}',
+        href: '/search.html?q=' + encodeURIComponent(s)
+      }));
+      activeIdx = -1;
+      paint('');
     }
 
     async function fetchSuggestions(q){
@@ -113,7 +157,7 @@
           });
           if (!r.error && Array.isArray(r.data)){
             bizMatches = r.data.map(b => ({
-              kind: 'biz', name: b.name, icon: b.category_icon || '🏪', city: b.city_name,
+              kind: 'biz', name: b.name, icon: b.category_icon || '\u{1F3EA}', city: b.city_name,
               href: '/business.html?slug=' + encodeURIComponent(b.slug)
             }));
           }
@@ -128,15 +172,23 @@
     input.addEventListener('input', function(){
       const q = input.value;
       clearTimeout(timer);
+      if (!q.trim()){
+        lastQ = '';
+        showRecentSearches();
+        return;
+      }
       timer = setTimeout(() => fetchSuggestions(q), 250);
     });
 
     input.addEventListener('focus', function(){
-      if (items.length) open();
+      if (!input.value.trim()){
+        showRecentSearches();
+      } else if (items.length){
+        open();
+      }
     });
 
     input.addEventListener('blur', function(){
-      // delay close so click can register
       setTimeout(close, 200);
     });
 
@@ -153,7 +205,14 @@
     });
 
     dd.addEventListener('mousedown', function(e){
-      // mousedown so the click registers before blur
+      const clearLink = e.target.closest('a[data-clear-recent]');
+      if (clearLink){
+        e.preventDefault();
+        clearRecent();
+        items = [];
+        close();
+        return;
+      }
       const a = e.target.closest('a[data-i]');
       if (!a) return;
       e.preventDefault();
@@ -161,5 +220,5 @@
     });
   }
 
-  global.DukanAutocomplete = { attach };
+  global.DukanAutocomplete = { attach: attach, saveQuery: saveQuery, getRecent: getRecent, clearRecent: clearRecent };
 })(window);
