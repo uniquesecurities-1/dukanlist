@@ -344,6 +344,9 @@
 <script src="/assets/js/filter-chips.js"></script>
 <script src="/assets/js/autocomplete.js"></script>
 <script src="/assets/js/skeleton.js"></script>
+<script src="/assets/js/install-banner.js"></script>
+<script src="/assets/js/ptr.js"></script>
+<script src="/assets/js/share-app.js"></script>
 <script src="/assets/js/compare.js"></script>
 <script src="/assets/js/trust-tier.js"></script>
 <script src="/assets/js/announcements.js"></script>
@@ -1083,6 +1086,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   }catch(_){}
   runSearch();
 });
+
+// Mobile pull-to-refresh
+if (window.DukanPTR){
+  DukanPTR.attach(() => runSearch());
+}
 window.addEventListener('popstate', runSearch);
 </script>
 

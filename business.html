@@ -1586,6 +1586,30 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowLeft') lightboxPrev();
   else if (e.key === 'ArrowRight') lightboxNext();
 });
+
+// Touch swipe gestures for lightbox (mobile)
+(function(){
+  const lb = document.getElementById('lightbox');
+  if (!lb) return;
+  let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+  const MIN_SWIPE = 50;
+  lb.addEventListener('touchstart', (e) => {
+    if (!lb.classList.contains('show')) return;
+    const t = e.changedTouches[0];
+    touchStartX = t.screenX; touchStartY = t.screenY;
+  }, { passive: true });
+  lb.addEventListener('touchend', (e) => {
+    if (!lb.classList.contains('show')) return;
+    const t = e.changedTouches[0];
+    touchEndX = t.screenX; touchEndY = t.screenY;
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+    if (Math.abs(dy) > Math.abs(dx)) return;
+    if (Math.abs(dx) < MIN_SWIPE) return;
+    if (dx < 0) lightboxNext();
+    else lightboxPrev();
+  }, { passive: true });
+})();
 // Wire up main image click → lightbox (after render)
 function bindLightbox(){
   const mainImg = document.getElementById('mainImg');
@@ -2244,5 +2268,6 @@ function copyShopUrl(){
 
 <script src="/assets/js/city-persist.js"></script>
 <script src="/assets/js/trust-tier.js"></script>
+<script src="/assets/js/install-banner.js"></script>
 </body>
 </html>

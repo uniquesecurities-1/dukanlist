@@ -880,6 +880,9 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/voice.js"></script>
 <script src="/assets/js/install.js"></script>
+<script src="/assets/js/install-banner.js"></script>
+<script src="/assets/js/ptr.js"></script>
+<script src="/assets/js/share-app.js"></script>
 <script src="/assets/js/autocomplete.js"></script>
 <script src="/assets/js/skeleton.js"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanAutocomplete) DukanAutocomplete.attach('searchInput'); });</script>
@@ -1211,6 +1214,16 @@ function initReveal(){
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedLang();
   loadCategories();
+// Mobile pull-to-refresh
+if (window.DukanPTR){
+  DukanPTR.attach(async () => {
+    if (typeof loadStats === 'function') await loadStats();
+    if (typeof loadCategories === 'function') await loadCategories();
+    if (typeof loadFeatured === 'function') await loadFeatured();
+    if (typeof loadDeals === 'function') await loadDeals();
+  });
+}
+
   loadStats();
   loadFeatured();
   loadDeals();
