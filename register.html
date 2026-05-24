@@ -151,8 +151,8 @@
     <div class="alert info" style="margin-bottom:14px">
       <span class="a-icon">💡</span>
       <div>
-        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 9541223377</b>. We'll personally verify your shop and activate it within 24 hours.</span>
-        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 9541223377</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपकी दुकान personally वेरिफाई करके 24 घंटे में activate कर देंगे।</span>
+        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 95412 23377</b>. We'll personally verify your shop and activate it within 24 hours.</span>
+        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 95412 23377</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपकी दुकान को व्यक्तिगत रूप से सत्यापित करके 24 घंटे में सक्रिय कर देंगे।</span>
       </div>
     </div>
 
@@ -626,7 +626,6 @@ function isBotSubmission(){
 }
 
 async function handleStep1(){
-  console.log('[register] handleStep1 called');
   const btn = document.getElementById('continueBtn');
   const mobileRaw = document.getElementById('phone').value.trim();
   const errEl = document.getElementById('phoneErr');
@@ -654,18 +653,14 @@ async function handleStep1(){
 
   STATE.phone = '91' + tenDigit;          // e.g., 919541223377
   STATE.phoneDisplay = tenDigit;          // e.g., 9541223377
-  console.log('[register] Mobile valid:', STATE.phone, '→ loading categories + states...');
 
   btn.disabled = true; btn.innerHTML = '<span>⏳ Loading...</span>';
   try {
     document.getElementById('whatsapp').placeholder = tenDigit;
     await loadCategoriesIntoSelect();
-    console.log('[register] Categories loaded');
     await loadStatesIntoSelect();
-    console.log('[register] States loaded');
     btn.disabled = false; btn.innerHTML = '<span>Continue →</span>';
     goToStep(2);
-    console.log('[register] Moved to Step 2');
   } catch(e){
     console.error('[register] handleStep1 error:', e);
     btn.disabled = false; btn.innerHTML = '<span>Continue →</span>';
