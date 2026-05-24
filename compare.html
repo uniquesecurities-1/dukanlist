@@ -1,7 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+// i18n bootstrap — set data-lang BEFORE first paint to prevent showing both languages
+(function(){
+  try {
+    var saved = localStorage.getItem('shop_lang');
+    if (saved !== 'en' && saved !== 'hi') saved = 'en';
+    document.documentElement.setAttribute('data-lang', saved);
+    document.documentElement.setAttribute('lang', saved);
+  } catch(e) {
+    document.documentElement.setAttribute('data-lang', 'en');
+  }
+})();
+</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#FF6B1A">
 <title>Compare Shops — DukanList</title>
