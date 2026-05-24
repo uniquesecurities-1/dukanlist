@@ -74,7 +74,65 @@
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
-<style>body,h1,h2,h3,.section-head,.hero h1{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}</style>
+<style>body,h1,h2,h3,.section-head,.hero h1{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}/* ============================================================
+   SEARCH-FIRST HERO (Google/Justdial style)
+============================================================ */
+.hero-search-first{ padding:36px 24px 48px !important; text-align:center }
+.hero-search-first .hero-inner{ max-width:760px }
+.hero-search-first .hero-badge{ margin-bottom:14px }
+.hero-tag{ font-family:'Manrope',sans-serif; font-size:clamp(1.9rem,4.5vw,3.2rem); font-weight:800; letter-spacing:-.028em; line-height:1.08; color:var(--ink); margin-bottom:8px }
+.hero-tag .grad{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); -webkit-background-clip:text; background-clip:text; color:transparent }
+html[data-lang="hi"] .hero-tag{ font-family:'Noto Sans Devanagari',sans-serif }
+.hero-sub{ color:#5A6573; font-size:1rem; line-height:1.5; margin-bottom:26px; max-width:560px; margin-left:auto; margin-right:auto }
+.hero-search-card{ background:#fff; border:2px solid var(--saffron); border-radius:18px; padding:8px; box-shadow:0 8px 30px rgba(255,107,26,.18); max-width:620px; margin:0 auto 18px; transition:box-shadow .25s ease, border-color .25s ease }
+.hero-search-card:focus-within{ box-shadow:0 14px 44px rgba(255,107,26,.28); border-color:var(--saffron-deep) }
+.hsc-row{ display:flex; align-items:center; gap:8px; padding:9px 12px }
+.hsc-row + .hsc-row{ border-top:1px solid #F1F5F9 }
+.hsc-ico{ font-size:1.05rem; opacity:.6; flex-shrink:0 }
+.hsc-row input, .hsc-row select{ flex:1; border:0; outline:0; background:transparent; font:inherit; font-size:1rem; color:var(--ink); font-weight:500; min-width:0; padding:4px 0 }
+.hsc-row select{ cursor:pointer }
+.hsc-row input::placeholder{ color:#94A3B8; font-weight:400 }
+.hsc-btn{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff; border:0; border-radius:12px; padding:10px 24px; font-family:inherit; font-weight:800; font-size:.95rem; cursor:pointer; white-space:nowrap; box-shadow:0 4px 12px rgba(255,107,26,.32); transition:.18s; flex-shrink:0 }
+.hsc-btn:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(255,107,26,.45) }
+.hero-chips-wrap{ max-width:620px; margin:0 auto 16px; text-align:left }
+.hero-chips-label{ font-size:.78rem; color:#94A3B8; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; padding:0 4px }
+.hero-chips{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px }
+.hchip{ background:#fff; border:1px solid rgba(15,23,42,.08); border-radius:11px; padding:10px 6px; text-align:center; font-size:.82rem; font-weight:700; color:var(--ink); text-decoration:none; transition:.18s; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 1px 2px rgba(15,23,42,.03) }
+.hchip:hover{ background:#FFF7ED; border-color:var(--saffron); color:var(--saffron-deep); transform:translateY(-2px); text-decoration:none; box-shadow:0 6px 14px rgba(255,107,26,.15) }
+.hchip-all{ background:linear-gradient(135deg,#FAFAFA,#F1F5F9); font-weight:800 }
+.hero-extras{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:22px }
+#openNowHome{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; background:#fff; border:1.5px solid #E2E8F0; border-radius:99px; font-weight:700; font-size:.82rem; color:var(--ink); cursor:pointer; box-shadow:0 1px 3px rgba(15,23,42,.04); transition:all .15s }
+#openNowHome input{ margin:0; cursor:pointer; accent-color:var(--emerald-light) }
+#openNowHome .dot{ width:8px; height:8px; border-radius:50%; background:var(--emerald-light); box-shadow:0 0 8px rgba(16,185,129,.5) }
+#openNowHome.on{ border-color:var(--emerald-light); background:#ECFDF5 }
+#installBtn{ display:none; align-items:center; gap:8px; padding:8px 14px; background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); border:0; border-radius:99px; font-weight:700; font-size:.82rem; color:#fff; cursor:pointer; box-shadow:0 4px 12px rgba(255,107,26,.35); font-family:inherit }
+.hero-search-first .hero-stats{ display:flex; gap:32px; justify-content:center; flex-wrap:wrap; padding:18px 0 0; margin:0 auto; max-width:620px; border-top:1px solid rgba(15,23,42,.06) }
+.hero-search-first .hero-stat b{ font-size:1.45rem; display:block; font-family:'Manrope',sans-serif; font-weight:800; color:var(--ink); letter-spacing:-.02em; line-height:1.1 }
+.hero-search-first .hero-stat span{ color:var(--muted); font-size:.72rem; font-weight:600; display:block; margin-top:2px; letter-spacing:.01em }
+.hero-register-strip{ display:inline-flex; align-items:center; gap:14px; margin-top:22px; padding:10px 12px 10px 20px; background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:99px; box-shadow:0 4px 14px rgba(15,23,42,.05) }
+.hero-register-strip > span{ font-size:.92rem; font-weight:600; color:var(--ink) }
+.hero-register-strip .btn-pri{ padding:9px 18px !important; font-size:.86rem !important; min-height:auto !important; border-radius:99px }
+
+@media (max-width:560px){
+  .hero-search-first{ padding:18px 14px 26px !important }
+  .hero-tag{ font-size:1.45rem !important; line-height:1.15 }
+  .hero-sub{ font-size:.82rem; margin-bottom:18px; line-height:1.4 }
+  .hero-search-card{ border-width:1.5px; padding:6px; border-radius:14px }
+  .hsc-row{ padding:8px 10px }
+  .hsc-row input, .hsc-row select{ font-size:.92rem }
+  .hsc-btn{ padding:8px 16px; font-size:.86rem }
+  .hero-chips{ grid-template-columns:repeat(4,1fr); gap:6px }
+  .hchip{ padding:8px 4px; font-size:.72rem; border-radius:9px }
+  .hero-extras{ margin-bottom:16px; gap:6px }
+  #openNowHome, #installBtn{ padding:6px 12px; font-size:.74rem }
+  .hero-search-first .hero-stats{ gap:14px 22px; padding-top:14px }
+  .hero-search-first .hero-stat b{ font-size:1.15rem }
+  .hero-search-first .hero-stat span{ font-size:.64rem }
+  .hero-register-strip{ flex-direction:column; gap:8px; padding:14px 18px; border-radius:14px; width:100%; max-width:320px; margin-left:auto; margin-right:auto }
+  .hero-register-strip > span{ font-size:.84rem }
+  .hero-register-strip .btn-pri{ width:100% }
+}
+</style>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -459,111 +517,93 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   </div>
 </header>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
+<!-- ===== HERO (search-first) ===== -->
+<section class="hero hero-search-first">
   <div class="hero-inner">
     <span class="hero-badge">
       <span data-i18n-en>🇮🇳 Bharat's Local Directory · From Mandi Dabwali</span>
       <span data-i18n-hi>🇮🇳 भारत की लोकल डायरेक्टरी · मंडी डबवाली से</span>
     </span>
-    <h1>
-      <span data-i18n-en class="block">
-        <span class="grad">Every Shop,</span> One Identity
-      </span>
-      <span data-i18n-hi class="block">
-        <span class="grad">हर दुकान,</span> एक पहचान
-      </span>
+    <h1 class="hero-tag">
+      <span data-i18n-en>Find any shop in <span class="grad">Sirsa-Bathinda</span></span>
+      <span data-i18n-hi>सिरसा-बठिंडा की <span class="grad">हर दुकान</span> एक जगह</span>
     </h1>
-    <p class="lead">
-      <span data-i18n-en class="block">
-        Every <strong>shopkeeper</strong> in your city — discoverable in one click.
-        Doctor, carpenter, mechanic, CA, jewellery — all on <strong>one platform</strong>.
-        100% free for shopkeepers. Verified, reviewed, and trusted for customers.
-      </span>
-      <span data-i18n-hi class="block">
-        आपके शहर के <strong>हर दुकानदार</strong> की डिजिटल पहचान।
-        डॉक्टर, मिस्त्री, मैकेनिक, CA, जौहरी — सब कुछ <strong>एक ही जगह</strong>।
-        दुकानदारों के लिए 100% फ्री। ग्राहकों के लिए वेरिफाइड, रिव्यूड, ट्रस्टेड।
-      </span>
+    <p class="hero-sub">
+      <span data-i18n-en>Doctor, mechanic, grocer, salon · verified · free · one tap to call</span>
+      <span data-i18n-hi>डॉक्टर, मिस्त्री, ग्रॉसरी, सैलून · वेरिफाइड · फ्री · एक टैप पर कॉल</span>
     </p>
-    <div class="hero-ctas">
-      <a href="/register.html" class="btn btn-pri">
-        <span data-i18n-en>🏪 Register Free</span>
-        <span data-i18n-hi>🏪 फ्री रजिस्टर करें</span>
-        <span style="font-size:1.2em">→</span>
-      </a>
-      <a href="#categories" class="btn btn-sec">
-        <span data-i18n-en>🔍 Find a Shop</span>
-        <span data-i18n-hi>🔍 दुकान खोजें</span>
-      </a>
+
+    <form class="hero-search-card" onsubmit="handleSearch(event)" role="search">
+      <div class="hsc-row hsc-row-q">
+        <span class="hsc-ico">🔍</span>
+        <input type="text" name="q" id="searchInput" autocomplete="off"
+               data-ph-en="What are you looking for?"
+               data-ph-hi="क्या ढूंढना है?">
+        <span id="voiceMicSlot"></span>
+      </div>
+      <div class="hsc-row hsc-row-c">
+        <span class="hsc-ico">📍</span>
+        <select name="city" id="citySelect">
+          <option value="" data-i18n-en="Select city" data-i18n-hi="शहर चुनें">Select city</option>
+          <option value="mandi-dabwali" selected>Mandi Dabwali</option>
+          <option value="sirsa">Sirsa</option>
+          <option value="ellenabad">Ellenabad</option>
+          <option value="rania">Rania</option>
+          <option value="kalanwali">Kalanwali</option>
+          <option value="fatehabad">Fatehabad</option>
+          <option value="bathinda">Bathinda</option>
+          <option value="mansa">Mansa</option>
+          <option value="hanumangarh">Hanumangarh</option>
+          <option value="sri-ganganagar">Sri Ganganagar</option>
+        </select>
+        <button type="submit" class="hsc-btn">
+          <span data-i18n-en>Search</span><span data-i18n-hi>खोजें</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="hero-chips-wrap">
+      <div class="hero-chips-label">
+        <span data-i18n-en>Quick pick:</span><span data-i18n-hi>तुरंत चुनें:</span>
+      </div>
+      <div class="hero-chips">
+        <a href="/search.html?q=doctor" class="hchip">🏥 <span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></a>
+        <a href="/search.html?q=mechanic" class="hchip">🔧 <span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span></a>
+        <a href="/search.html?q=grocery" class="hchip">🛒 <span data-i18n-en>Grocery</span><span data-i18n-hi>किराना</span></a>
+        <a href="/search.html?q=salon" class="hchip">💇 <span data-i18n-en>Salon</span><span data-i18n-hi>सैलून</span></a>
+        <a href="/search.html?q=tutor" class="hchip">📚 <span data-i18n-en>Tutor</span><span data-i18n-hi>ट्यूटर</span></a>
+        <a href="/search.html?q=medical" class="hchip">💊 <span data-i18n-en>Medical</span><span data-i18n-hi>मेडिकल</span></a>
+        <a href="/search.html?q=bakery" class="hchip">🍰 <span data-i18n-en>Bakery</span><span data-i18n-hi>बेकरी</span></a>
+        <a href="/browse.html" class="hchip hchip-all">→ <span data-i18n-en>All</span><span data-i18n-hi>सभी</span></a>
+      </div>
     </div>
+
+    <div class="hero-extras">
+      <label id="openNowHome">
+        <input type="checkbox" id="openNowCheck" onchange="document.getElementById('openNowHome').classList.toggle('on', this.checked);">
+        <span class="dot"></span>
+        <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
+      </label>
+      <button type="button" id="installBtn" style="display:none">
+        📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
+      </button>
+    </div>
+
     <div class="hero-stats">
-      <div class="hero-stat">
-        <b id="stat-shops">—</b>
-        <span data-i18n-en>Active Shops</span>
-        <span data-i18n-hi>लाइव दुकानें</span>
-      </div>
-      <div class="hero-stat">
-        <b id="stat-cats">—</b>
-        <span data-i18n-en>Categories</span>
-        <span data-i18n-hi>श्रेणियाँ</span>
-      </div>
-      <div class="hero-stat">
-        <b id="stat-cities">—</b>
-        <span data-i18n-en>Cities Live</span>
-        <span data-i18n-hi>शहर</span>
-      </div>
-      <div class="hero-stat">
-        <b>₹0</b>
-        <span data-i18n-en>Forever Free</span>
-        <span data-i18n-hi>हमेशा फ्री</span>
-      </div>
+      <div class="hero-stat"><b id="stat-shops">—</b><span data-i18n-en>Active Shops</span><span data-i18n-hi>लाइव दुकानें</span></div>
+      <div class="hero-stat"><b id="stat-cats">—</b><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></div>
+      <div class="hero-stat"><b id="stat-cities">—</b><span data-i18n-en>Cities Live</span><span data-i18n-hi>शहर</span></div>
+      <div class="hero-stat"><b>₹0</b><span data-i18n-en>Forever Free</span><span data-i18n-hi>हमेशा फ्री</span></div>
+    </div>
+
+    <div class="hero-register-strip">
+      <span><span data-i18n-en>Are you a shopkeeper?</span><span data-i18n-hi>दुकानदार हैं?</span></span>
+      <a href="/register.html" class="btn btn-pri">
+        <span data-i18n-en>🏪 Register Free →</span><span data-i18n-hi>🏪 फ्री रजिस्टर →</span>
+      </a>
     </div>
   </div>
 </section>
-
-<!-- ===== SEARCH ===== -->
-<div class="search-wrap">
-  <form class="search-card" onsubmit="handleSearch(event)" role="search">
-    <div class="field" style="display:flex;align-items:center;gap:8px">
-      <span class="ico">🔍</span>
-      <input type="text" name="q" id="searchInput" autocomplete="off" style="flex:1;border:0;background:transparent;outline:0;font:inherit;color:inherit;min-width:0"
-             data-ph-en="Doctor, carpenter, mechanic..."
-             data-ph-hi="डॉक्टर, मिस्त्री, मैकेनिक...">
-      <span id="voiceMicSlot"></span>
-    </div>
-    <div class="field">
-      <span class="ico">📍</span>
-      <select name="city" id="citySelect">
-        <option value="" data-i18n-en="Select your city..." data-i18n-hi="अपना शहर चुनें...">Select your city...</option>
-        <option value="mandi-dabwali" selected>Mandi Dabwali</option>
-        <option value="sirsa">Sirsa</option>
-        <option value="ellenabad">Ellenabad</option>
-        <option value="rania">Rania</option>
-        <option value="kalanwali">Kalanwali</option>
-        <option value="fatehabad">Fatehabad</option>
-        <option value="bathinda">Bathinda</option>
-        <option value="mansa">Mansa</option>
-        <option value="hanumangarh">Hanumangarh</option>
-        <option value="sri-ganganagar">Sri Ganganagar</option>
-      </select>
-    </div>
-    <button type="submit" class="search-btn">
-      <span data-i18n-en>Search</span>
-      <span data-i18n-hi>खोजें</span>
-    </button>
-  </form>
-  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px">
-    <label id="openNowHome" style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:#fff;border:1.5px solid #E2E8F0;border-radius:99px;font-weight:700;font-size:13px;color:#0F172A;cursor:pointer;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:all .15s">
-      <input type="checkbox" id="openNowCheck" style="margin:0;cursor:pointer;accent-color:#10B981" onchange="document.getElementById('openNowHome').style.borderColor = this.checked ? '#10B981' : '#E2E8F0'; document.getElementById('openNowHome').style.background = this.checked ? '#ECFDF5' : '#fff';">
-      <span style="display:inline-flex;width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 8px rgba(16,185,129,.6)"></span>
-      <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुली दुकानें</span>
-    </label>
-    <button type="button" id="installBtn" style="display:none;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,#FF6B1A,#E55100);border:0;border-radius:99px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,26,.35);font-family:inherit">
-      📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल करें</span>
-    </button>
-  </div>
-</div>
 
 <!-- ===== MMT-style category strip ===== -->
 <section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
