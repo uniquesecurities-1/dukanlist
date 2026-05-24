@@ -2077,14 +2077,8 @@ function renderShopHighlights(b){
   if (!host || !grid) return;
   const tiles = [];
 
-  if ((b.verified_score || 0) >= 2){
-    const checks = [];
-    if (b.verified_mobile)  checks.push('Phone');
-    if (b.verified_address) checks.push('Address');
-    if (b.verified_photo)   checks.push('Photo');
-    if (b.verified_visit)   checks.push('Visited');
-    tiles.push({cls:'verify', emoji:'\u2705', main:'DukanList verified', sub:checks.join(' \u00b7 ')||'Trusted shop'});
-  }
+  // Note: 'DukanList verified' is already shown as the big Admin Verified
+  // banner above the highlights card — no need to duplicate it here.
 
   if (b.established_year && b.established_year > 1900){
     const years = new Date().getFullYear() - b.established_year;
