@@ -653,7 +653,7 @@ async function runSearch(){
 
 function renderResults(){
   // Sync map view if active
-  if (CURRENT_VIEW === 'map' && _mapInstance){ renderMapPins(); }
+  // Map view uses iframe — no per-result re-render needed
   return _renderResultsInner();
 }
 
