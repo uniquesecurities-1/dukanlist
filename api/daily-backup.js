@@ -40,6 +40,18 @@ const TABLES = [
 ];
 
 export default async function handler(req, res){
+  try {
+    return await runBackup(req, res);
+  } catch(e){
+    return res.status(500).json({
+      ok: false,
+      error: 'unhandled_exception',
+      detail: String(e && e.message || e)
+    });
+  }
+}
+
+async function runBackup(req, res){
   // Method gate
   if (req.method !== 'POST' && req.method !== 'GET'){
     return res.status(405).json({ error: 'POST or GET' });
@@ -69,17 +81,18 @@ export default async function handler(req, res){
       let serverTotal = null;
       const PAGE = 1000;
       while (true){
+        // Use count=estimated on first page only — fast PG planner estimate,
+        // doesn't run slow COUNT query. Subsequent pages skip count header.
+        const headers = {
+          'apikey': SERVICE_KEY,
+          'Authorization': 'Bearer ' + SERVICE_KEY,
+          'Range': from + '-' + (from + PAGE - 1),
+          'Range-Unit': 'items'
+        };
+        if (from === 0) headers['Prefer'] = 'count=estimated';
         const r = await fetch(
           SUPABASE_URL + '/rest/v1/' + t.name + '?select=' + encodeURIComponent(t.select),
-          {
-            headers: {
-              'apikey': SERVICE_KEY,
-              'Authorization': 'Bearer ' + SERVICE_KEY,
-              'Range': from + '-' + (from + PAGE - 1),
-              'Range-Unit': 'items',
-              'Prefer': 'count=exact'
-            }
-          }
+          { headers }
         );
         if (!r.ok){
           let body = null;
@@ -87,7 +100,7 @@ export default async function handler(req, res){
           errors.push({ table: t.name, status: r.status, body: (body||'').slice(0,200) });
           break;
         }
-        // Capture authoritative total from Content-Range: "0-N/TOTAL"
+        // Capture authoritative total from Content-Range: "0-N/TOTAL" on first page
         if (serverTotal === null){
           const cr = r.headers.get('content-range') || '';
           const m = cr.match(/\/(\d+)\s*$/);
@@ -140,17 +153,4 @@ export default async function handler(req, res){
 
   // Log to admin_audit_log so backups are auditable
   try {
-    await fetch(SUPABASE_URL + '/rest/v1/rpc/log_admin_action', {
-      method: 'POST',
-      headers: {
-        'apikey': SERVICE_KEY,
-        'Authorization': 'Bearer ' + SERVICE_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        p_action: 'daily_backup',
-        p_target_type: 'storage',
-        p_target_id: filename,
-        p_target_name: 'Daily DB backup',
-        p_details: {
-          size_bytes
+    await fetch(SUPABASE_URL + '
