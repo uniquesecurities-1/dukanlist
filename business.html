@@ -405,25 +405,28 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   font-size:.85rem; font-weight:700; backdrop-filter:blur(8px);
 }
 .gallery .main img{ cursor:zoom-in !important }
+/* ===== Always-applied fixes (desktop + mobile) ===== */
+
+/* Hide Google Maps iframe — often shows broken-image placeholder when Google
+   blocks the keyless embed. The 'Open in Google Maps' button below works fine. */
+#mapEmbedWrap{ display:none !important }
+
+/* CTA action grid — 6-col layout: 2 large primary buttons + 3 medium secondary.
+   Eliminates the empty 6th cell blank space that appeared with 5 buttons in 2-col grid. */
+.cta-row{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:18px }
+.cta-row > .cta-btn:nth-child(1){ grid-column:1 / 4 }   /* WhatsApp */
+.cta-row > .cta-btn:nth-child(2){ grid-column:4 / 7 }   /* Call */
+.cta-row > .cta-btn:nth-child(3){ grid-column:1 / 3 }   /* Directions */
+.cta-row > .cta-btn:nth-child(4){ grid-column:3 / 5 }   /* Share */
+.cta-row > .cta-btn:nth-child(5){ grid-column:5 / 7 }   /* Save */
+
 @media (max-width:560px){
   .lightbox-close{ top:12px; right:12px }
   .lightbox-prev{ left:8px } .lightbox-next{ right:8px }
   .lightbox-prev, .lightbox-next, .lightbox-close{ width:40px; height:40px }
 
-  /* ===== Mobile compaction — business.html ===== */
-
-  /* 1. Hide the Google Maps iframe on mobile (often shows broken-image placeholder).
-        The 'Open in Google Maps' link below already works fine. */
-  #mapEmbedWrap{ display:none !important }
-
-  /* 2. CTA action grid — 6-col layout: 2 large primary + 3 medium secondary.
-        Removes the empty 6th cell blank-space. */
-  .cta-row{ grid-template-columns:repeat(6,1fr) !important; gap:8px !important; margin-bottom:14px !important }
-  .cta-row > .cta-btn:nth-child(1){ grid-column:1 / 4 !important }   /* WhatsApp */
-  .cta-row > .cta-btn:nth-child(2){ grid-column:4 / 7 !important }   /* Call */
-  .cta-row > .cta-btn:nth-child(3){ grid-column:1 / 3 !important }   /* Directions */
-  .cta-row > .cta-btn:nth-child(4){ grid-column:3 / 5 !important }   /* Share */
-  .cta-row > .cta-btn:nth-child(5){ grid-column:5 / 7 !important }   /* Save */
+  /* ===== Mobile-only further compaction ===== */
+  .cta-row{ gap:8px !important; margin-bottom:14px !important }
   .cta-row .cta-btn{ padding:11px 6px !important; min-height:46px !important }
   .cta-row .cta-btn .cta-label{ font-size:.78rem !important }
   .cta-row .cta-btn .cta-icon{ font-size:.95rem !important }
