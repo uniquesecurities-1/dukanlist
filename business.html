@@ -531,6 +531,43 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 }
 
 /* ===== Admin Verified premium badge ===== */
+/* === Business Detail v3: review prompt modal + trust strip === */
+.rp-overlay{ position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:10000; display:none; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(2px) }
+.rp-overlay.show{ display:flex; animation:rpFade .25s ease }
+@keyframes rpFade{ from{opacity:0} to{opacity:1} }
+.rp-card{ background:#fff; border-radius:18px; max-width:440px; width:100%; padding:24px 22px; box-shadow:0 24px 60px rgba(15,23,42,.32); animation:rpSlide .3s cubic-bezier(.22,.61,.36,1); position:relative }
+@keyframes rpSlide{ from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+.rp-close{ position:absolute; top:10px; right:12px; background:transparent; border:none; font-size:24px; color:#94a3b8; cursor:pointer; line-height:1; padding:4px 8px }
+.rp-close:hover{ color:#0F172A }
+.rp-emoji{ font-size:48px; display:block; text-align:center; margin-bottom:10px }
+.rp-title{ font-family:'Manrope',sans-serif; font-size:1.2rem; font-weight:800; color:var(--ink); text-align:center; letter-spacing:-.01em; margin-bottom:6px }
+.rp-sub{ text-align:center; color:#64748b; font-size:.88rem; margin-bottom:18px; line-height:1.5 }
+.rp-stars{ display:flex; justify-content:center; gap:6px; margin-bottom:18px }
+.rp-star{ font-size:34px; cursor:pointer; color:#cbd5e1; transition:.15s; line-height:1 }
+.rp-star.active{ color:#F59E0B; transform:scale(1.1) }
+.rp-star:hover{ transform:scale(1.15) }
+.rp-input{ width:100%; padding:11px 13px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:.92rem; font-family:inherit; margin-bottom:10px; transition:.15s }
+.rp-input:focus{ outline:none; border-color:var(--saffron) }
+.rp-textarea{ width:100%; padding:11px 13px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:.92rem; font-family:inherit; margin-bottom:14px; resize:vertical; min-height:70px; transition:.15s }
+.rp-textarea:focus{ outline:none; border-color:var(--saffron) }
+.rp-actions{ display:flex; gap:10px }
+.rp-submit{ flex:1; padding:12px; background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff; border:none; border-radius:10px; font-size:.95rem; font-weight:800; cursor:pointer; font-family:inherit; transition:.15s }
+.rp-submit:hover:not(:disabled){ box-shadow:0 8px 20px rgba(255,107,26,.4); transform:translateY(-1px) }
+.rp-submit:disabled{ opacity:.5; cursor:not-allowed }
+.rp-skip{ background:transparent; border:1.5px solid #e2e8f0; color:#64748b; padding:12px 18px; border-radius:10px; font-size:.92rem; font-weight:700; cursor:pointer; font-family:inherit }
+.rp-skip:hover{ background:#f8fafc; color:#0F172A }
+.rp-success{ text-align:center; padding:30px 10px }
+.rp-success .rp-emoji{ animation:rpBounce .6s cubic-bezier(.22,.61,.36,1) }
+@keyframes rpBounce{ 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+/* Mini trust strip on detail page */
+.detail-trust-strip{ display:flex; flex-wrap:wrap; gap:6px; padding:8px 0 16px; align-items:center }
+.dt-pill{ display:inline-flex; align-items:center; gap:5px; padding:5px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:99px; font-size:.74rem; font-weight:700; color:#475569; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+.dt-pill.verified{ background:#ECFDF5; border-color:#6EE7B7; color:#065F46 }
+.dt-pill.featured{ background:#FFFBEB; border-color:#FCD34D; color:#92400E }
+.dt-pill.fast{ background:#EFF6FF; border-color:#93C5FD; color:#1E40AF }
+.dt-pill .dt-ico{ font-size:.85rem }
+
 .admin-verified-badge{
   display:flex; align-items:center; gap:10px;
   background:linear-gradient(135deg,#1E40AF,#1E1B4B);
@@ -685,6 +722,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <section class="biz-hero">
     <div class="biz-hero-wrap">
       <a href="javascript:history.back()" class="biz-back">← <span data-i18n-en>Back</span><span data-i18n-hi>वापस</span></a>
+      <div class="detail-trust-strip" id="detailTrustStrip"></div>
       <div class="biz-top">
         <div class="gallery">
           <div class="main" id="galleryMain"></div>
@@ -1314,6 +1352,9 @@ function render(){
       </div>`;
     av.style.display = '';
   }
+
+  // Detail trust strip (Business v3)
+  renderDetailTrustStrip(b);
 
   // Trust Tier badge (Bronze / Silver / Gold) — Power Features Pack
   if (typeof DukanTier !== 'undefined'){
@@ -1952,11 +1993,157 @@ async function submitReply(reviewId){
   if (BIZ && BIZ.id) loadReviews(BIZ.id);
 }
 
+async function renderDetailTrustStrip(b){
+  const host = document.getElementById('detailTrustStrip');
+  if (!host) return;
+  const pills = [];
+  if (Number(b.verified_score) >= 3) pills.push({ ico: '✓', text: 'Verified', cls: 'verified' });
+  if (b.is_featured) pills.push({ ico: '★', text: 'Featured', cls: 'featured' });
+  if (b.established_year){
+    const yrs = new Date().getFullYear() - Number(b.established_year);
+    if (yrs >= 1) pills.push({ ico: '\u{1F3DB}', text: yrs + (yrs === 1 ? ' year' : ' years') + ' established', cls: '' });
+  }
+  if (Number(b.rating_avg) >= 4 && Number(b.rating_count) >= 5){
+    pills.push({ ico: '⭐', text: Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ' reviews)', cls: '' });
+  }
+  // Quick-replies signal — if owner has any review reply
+  if (b.has_owner_replies) pills.push({ ico: '\u{1F4AC}', text: 'Replies fast', cls: 'fast' });
+
+  if (!pills.length){ host.style.display = 'none'; return; }
+  host.style.display = 'flex';
+  host.innerHTML = pills.map(p => '<span class="dt-pill ' + (p.cls || '') + '"><span class="dt-ico">' + p.ico + '</span>' + escapeHTML(p.text) + '</span>').join('');
+}
+
 async function logLead(action){
   const c = ShopDB.client; if (!c || !BIZ) return;
   try{
     await c.rpc('log_lead', { p_business_id: BIZ.id, p_action: action });
   }catch(e){ console.warn(e); }
+
+  // Business Detail v3: schedule review prompt for call + whatsapp clicks
+  if (action === 'call' || action === 'whatsapp'){
+    scheduleReviewPrompt();
+  }
+}
+
+// ============================================================
+// BUSINESS DETAIL v3: Review prompt after lead click
+// ============================================================
+let RP_RATING = 0;
+let RP_TIMER = null;
+
+function rpKey(){ return 'dl_rp_' + (BIZ && BIZ.id || ''); }
+
+function scheduleReviewPrompt(){
+  if (!BIZ || !BIZ.id) return;
+  // Don't show again if user dismissed/submitted in last 7 days
+  try {
+    const last = parseInt(localStorage.getItem(rpKey()) || '0', 10);
+    if (last > 0 && (Date.now() - last) < 7 * 24 * 3600 * 1000) return;
+  } catch(_){}
+  clearTimeout(RP_TIMER);
+  RP_TIMER = setTimeout(openReviewPrompt, 4500); // 4.5s after lead click
+}
+
+function openReviewPrompt(){
+  const overlay = document.getElementById('reviewPromptOverlay');
+  if (!overlay) return;
+  // Populate shop name
+  const nameEl = document.getElementById('rpShopName');
+  if (nameEl && BIZ && BIZ.name) nameEl.textContent = BIZ.name;
+  const nameHiEl = document.getElementById('rpShopNameHi');
+  if (nameHiEl && BIZ && BIZ.name) nameHiEl.textContent = BIZ.name + ' से';
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden', 'false');
+  // Wire star clicks (only once)
+  if (!overlay.dataset.wired){
+    document.querySelectorAll('#rpStars .rp-star').forEach(star => {
+      star.addEventListener('click', () => {
+        RP_RATING = Number(star.dataset.rating);
+        document.querySelectorAll('#rpStars .rp-star').forEach(s => {
+          s.classList.toggle('active', Number(s.dataset.rating) <= RP_RATING);
+        });
+        // Enable submit if rating + phone present
+        rpUpdateSubmitState();
+      });
+    });
+    document.getElementById('rpName').addEventListener('input', rpUpdateSubmitState);
+    document.getElementById('rpPhone').addEventListener('input', rpUpdateSubmitState);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeReviewPrompt(true); });
+    overlay.dataset.wired = '1';
+  }
+}
+
+function rpUpdateSubmitState(){
+  const phone = (document.getElementById('rpPhone').value || '').replace(/\D/g, '');
+  const name  = (document.getElementById('rpName').value || '').trim();
+  const ok = RP_RATING >= 1 && phone.length === 10 && name.length >= 2;
+  document.getElementById('rpSubmitBtn').disabled = !ok;
+}
+
+function closeReviewPrompt(skip){
+  const overlay = document.getElementById('reviewPromptOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden', 'true');
+  // Remember dismissal so we don't nag again for 7 days
+  if (skip){
+    try { localStorage.setItem(rpKey(), String(Date.now())); } catch(_){}
+  }
+}
+
+async function rpSha256(str){
+  // SHA-256 via SubtleCrypto (browser native)
+  if (!window.crypto || !window.crypto.subtle){
+    // Fallback: simple but weak (just for the 32+ char length requirement)
+    return Array.from(str).reduce((acc, c) => acc + c.charCodeAt(0).toString(16).padStart(4, '0'), '').padEnd(64, '0').slice(0, 64);
+  }
+  const buf = new TextEncoder().encode(str);
+  const hash = await window.crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function submitReviewPrompt(){
+  if (!BIZ || !BIZ.id || RP_RATING < 1) return;
+  const c = ShopDB.client;
+  const name  = (document.getElementById('rpName').value || '').trim();
+  const phone = (document.getElementById('rpPhone').value || '').replace(/\D/g, '');
+  const text  = (document.getElementById('rpText').value || '').trim();
+  if (phone.length !== 10){ alert('Enter valid 10-digit mobile'); return; }
+
+  const btn = document.getElementById('rpSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+
+  try {
+    const phoneHash = await rpSha256('+91' + phone);
+    const r = await c.rpc('submit_review', {
+      p_business_id: BIZ.id,
+      p_customer_name: name,
+      p_phone_hash: phoneHash,
+      p_rating: RP_RATING,
+      p_text: text || null
+    });
+    if (r.error) throw r.error;
+    // Mark as submitted — don't show again
+    try { localStorage.setItem(rpKey(), String(Date.now())); } catch(_){}
+    // Show success state
+    document.getElementById('rpForm').style.display = 'none';
+    document.getElementById('rpSuccess').style.display = '';
+    // Auto-close after 2.5s
+    setTimeout(() => {
+      closeReviewPrompt(false);
+      // Restore form for next shop's prompt
+      document.getElementById('rpForm').style.display = '';
+      document.getElementById('rpSuccess').style.display = 'none';
+      // Reload reviews to show the new one
+      if (typeof loadReviews === 'function') loadReviews(BIZ.id);
+    }, 2500);
+  } catch(e){
+    alert('Failed to post review: ' + (e.message || 'Unknown error'));
+    btn.disabled = false;
+    btn.textContent = 'Post review';
+  }
 }
 
 // ====== Favorites (heart toggle) ======
@@ -2268,6 +2455,37 @@ function copyShopUrl(){
 
 <script src="/assets/js/city-persist.js"></script>
 <script src="/assets/js/trust-tier.js"></script>
+<!-- Business Detail v3: Review prompt modal -->
+<div class="rp-overlay" id="reviewPromptOverlay" role="dialog" aria-hidden="true" aria-labelledby="rpTitle">
+  <div class="rp-card" id="reviewPromptCard">
+    <button class="rp-close" onclick="closeReviewPrompt()" aria-label="Close">×</button>
+    <div id="rpForm">
+      <div class="rp-emoji">⭐</div>
+      <div class="rp-title" id="rpTitle"><span data-i18n-en>Did you reach <span id="rpShopName">them</span>?</span><span data-i18n-hi>क्या आप <span id="rpShopNameHi">उनसे</span> मिल पाए?</span></div>
+      <div class="rp-sub"><span data-i18n-en>Your review helps other customers and the shop owner.</span><span data-i18n-hi>आपका रिव्यू दूसरे ग्राहकों और दुकानदार दोनों के काम आता है।</span></div>
+      <div class="rp-stars" id="rpStars" role="radiogroup" aria-label="Rate 1 to 5 stars">
+        <span class="rp-star" data-rating="1" role="radio" aria-label="1 star">★</span>
+        <span class="rp-star" data-rating="2" role="radio" aria-label="2 stars">★</span>
+        <span class="rp-star" data-rating="3" role="radio" aria-label="3 stars">★</span>
+        <span class="rp-star" data-rating="4" role="radio" aria-label="4 stars">★</span>
+        <span class="rp-star" data-rating="5" role="radio" aria-label="5 stars">★</span>
+      </div>
+      <input type="text" class="rp-input" id="rpName" placeholder="Your name (e.g., Rajesh K)" maxlength="60" autocomplete="name">
+      <input type="tel" class="rp-input" id="rpPhone" placeholder="Mobile number (10 digits, not shown publicly)" maxlength="10" inputmode="numeric" autocomplete="tel-national">
+      <textarea class="rp-textarea" id="rpText" placeholder="Optional: How was your experience? (10-200 chars)" maxlength="200"></textarea>
+      <div class="rp-actions">
+        <button class="rp-skip" onclick="closeReviewPrompt(true)"><span data-i18n-en>Skip</span><span data-i18n-hi>छोड़ें</span></button>
+        <button class="rp-submit" id="rpSubmitBtn" onclick="submitReviewPrompt()" disabled><span data-i18n-en>Post review</span><span data-i18n-hi>रिव्यू पोस्ट करें</span></button>
+      </div>
+    </div>
+    <div id="rpSuccess" class="rp-success" style="display:none">
+      <div class="rp-emoji">🙏</div>
+      <div class="rp-title"><span data-i18n-en>Thank you!</span><span data-i18n-hi>धन्यवाद!</span></div>
+      <div class="rp-sub"><span data-i18n-en>Your review helps the community grow.</span><span data-i18n-hi>आपका रिव्यू हमारे समुदाय को मजबूत करता है।</span></div>
+    </div>
+  </div>
+</div>
+
 <script src="/assets/js/install-banner.js"></script>
 </body>
 </html>
