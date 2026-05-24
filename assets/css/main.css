@@ -876,4 +876,96 @@ h3{ letter-spacing:-.012em }
 
 
 /* === Breadcrumb strip (used on search + browse) === */
-.breadcrumb-strip{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; max-width:1180px; margin:8px auto 0; padding:
+.breadcrumb-strip{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; max-width:1180px; margin:8px auto 0; padding:6px 16px; font-size:.82rem; color:var(--muted); font-weight:600 }
+.breadcrumb-strip a{ color:var(--muted); text-decoration:none; transition:color .15s }
+.breadcrumb-strip a:hover{ color:var(--saffron-deep) }
+.breadcrumb-strip .sep{ color:#cbd5e1; font-weight:500 }
+.breadcrumb-strip .current{ color:var(--ink); font-weight:700 }
+
+/* === Power Features: Filter rail on search.html desktop === */
+@media (min-width: 1024px){
+  .search-layout{ display:grid; grid-template-columns:240px minmax(0, 1fr); gap:20px; align-items:start }
+  .search-sidebar{ position:sticky; top:84px; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; box-shadow:0 1px 3px rgba(15,23,42,.04); max-height:calc(100vh - 100px); overflow-y:auto }
+  /* On desktop, hide the top filter-row chips since sidebar covers them */
+  .search-page-desktop .filter-row{ display:none }
+}
+@media (max-width: 1023px){
+  /* Mobile: sidebar hidden, chips visible (default) */
+  .search-sidebar{ display:none }
+}
+.search-sidebar h3{ font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.06em; margin:0 0 8px; display:flex; justify-content:space-between; align-items:center }
+.search-sidebar h3 a{ font-size:11px; color:var(--saffron-deep); text-decoration:none; font-weight:700; text-transform:none; letter-spacing:0 }
+.search-sidebar h3 a:hover{ text-decoration:underline }
+.search-sidebar .ss-section{ padding:12px 0; border-bottom:1px solid #f1f5f9 }
+.search-sidebar .ss-section:first-child{ padding-top:0 }
+.search-sidebar .ss-section:last-child{ border-bottom:none; padding-bottom:0 }
+.search-sidebar .ss-row{ display:flex; align-items:center; gap:8px; padding:6px 4px; cursor:pointer; border-radius:6px; transition:background .12s; font-size:13px; color:var(--ink); font-weight:500 }
+.search-sidebar .ss-row:hover{ background:#FFF5EB }
+.search-sidebar .ss-row input[type="checkbox"], .search-sidebar .ss-row input[type="radio"]{ accent-color:var(--saffron); cursor:pointer; flex-shrink:0 }
+.search-sidebar .ss-row .ss-count{ margin-left:auto; font-size:11px; color:#94a3b8; font-weight:600 }
+.search-sidebar .ss-row .ss-icon{ font-size:14px; flex-shrink:0; width:18px; text-align:center }
+.search-sidebar .ss-cat-group{ margin-bottom:8px }
+.search-sidebar .ss-cat-parent{ font-weight:700; font-size:12px; color:#0F172A; padding:6px 4px; cursor:pointer; display:flex; align-items:center; gap:6px; border-radius:6px }
+.search-sidebar .ss-cat-parent:hover{ background:#f8fafc }
+.search-sidebar .ss-cat-parent .ss-caret{ font-size:10px; transition:transform .15s; color:#94a3b8 }
+.search-sidebar .ss-cat-parent.open .ss-caret{ transform:rotate(90deg) }
+.search-sidebar .ss-cat-children{ display:none; padding-left:18px; margin-top:2px }
+.search-sidebar .ss-cat-parent.open + .ss-cat-children{ display:block }
+.search-sidebar .ss-clear{ width:100%; padding:8px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; margin-top:8px; transition:.15s }
+.search-sidebar .ss-clear:hover{ background:#FFF5EB; border-color:var(--saffron); color:var(--saffron-deep) }
+
+/* === Power Features: Compare 2 shops === */
+/* Compare picker (small inline checkbox on cards) */
+.cmp-pick{ display:inline-flex; align-items:center; gap:5px; padding:4px 8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:99px; font-size:11px; font-weight:700; color:#64748b; cursor:pointer; user-select:none; transition:.15s; line-height:1 }
+.cmp-pick:hover{ background:#FFF5EB; border-color:var(--saffron); color:var(--saffron-deep) }
+.cmp-pick input[type="checkbox"]{ accent-color:var(--saffron); cursor:pointer; margin:0 }
+.cmp-pick.cmp-selected{ background:var(--saffron); border-color:var(--saffron-deep); color:#fff }
+
+/* Sticky bottom bar */
+#dukanCompareBar{ position:fixed; left:0; right:0; bottom:0; background:#0F172A; color:#fff; box-shadow:0 -8px 28px rgba(15,23,42,.22); z-index:9999; font-family:'Plus Jakarta Sans','Manrope',sans-serif; animation:cmpSlideUp .25s ease }
+@keyframes cmpSlideUp{ from{ transform:translateY(100%) } to{ transform:translateY(0) } }
+#dukanCompareBar .cmp-inner{ max-width:1180px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap }
+#dukanCompareBar .cmp-title{ font-size:13px; font-weight:800; letter-spacing:.01em; flex-shrink:0; text-transform:uppercase }
+#dukanCompareBar .cmp-slots{ flex:1; display:flex; gap:8px; min-width:240px }
+#dukanCompareBar .cmp-slot{ flex:1; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); border-radius:10px; padding:6px 10px; min-width:0; position:relative; font-size:13px; min-height:42px }
+#dukanCompareBar .cmp-slot.empty{ background:rgba(255,255,255,.04); border:1px dashed rgba(255,255,255,.18); color:rgba(255,255,255,.5); justify-content:center; font-size:12px; font-weight:600 }
+#dukanCompareBar .cmp-slot img{ width:30px; height:30px; border-radius:6px; object-fit:cover; flex-shrink:0 }
+#dukanCompareBar .cmp-slot .cmp-ph{ width:30px; height:30px; border-radius:6px; background:rgba(255,255,255,.12); display:grid; place-items:center; font-size:16px; flex-shrink:0 }
+#dukanCompareBar .cmp-slot .cmp-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700 }
+#dukanCompareBar .cmp-slot .cmp-x{ background:none; border:none; color:rgba(255,255,255,.6); font-size:18px; cursor:pointer; padding:0 4px; line-height:1 }
+#dukanCompareBar .cmp-slot .cmp-x:hover{ color:#fff }
+#dukanCompareBar .cmp-actions{ display:flex; gap:8px; flex-shrink:0 }
+#dukanCompareBar .cmp-go{ background:var(--saffron); color:#0F172A; border:none; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:800; text-decoration:none; cursor:pointer; transition:.15s; white-space:nowrap }
+#dukanCompareBar .cmp-go:hover:not(:disabled){ background:#FFB347; transform:translateY(-1px) }
+#dukanCompareBar .cmp-go:disabled{ background:rgba(255,255,255,.12); color:rgba(255,255,255,.4); cursor:not-allowed }
+#dukanCompareBar .cmp-clear{ background:transparent; color:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.2); padding:9px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:.15s }
+#dukanCompareBar .cmp-clear:hover{ background:rgba(255,255,255,.08); color:#fff }
+
+/* Ensure page content not hidden behind bar */
+body:has(#dukanCompareBar){ padding-bottom:80px }
+@media (max-width:768px){
+  #dukanCompareBar .cmp-inner{ padding:8px 10px; gap:8px }
+  #dukanCompareBar .cmp-title{ font-size:11px; width:100%; text-align:center }
+  #dukanCompareBar .cmp-slots{ min-width:0 }
+  #dukanCompareBar .cmp-slot{ font-size:11px; padding:4px 8px; min-height:36px }
+  #dukanCompareBar .cmp-slot img, #dukanCompareBar .cmp-slot .cmp-ph{ width:24px; height:24px }
+  #dukanCompareBar .cmp-go, #dukanCompareBar .cmp-clear{ padding:7px 12px; font-size:11px }
+  body:has(#dukanCompareBar){ padding-bottom:110px }
+}
+
+/* === Power Features: Verified Shop Tiers === */
+.trust-tier{ display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:99px; font-size:10.5px; font-weight:800; letter-spacing:.02em; line-height:1.4; white-space:nowrap; vertical-align:middle; box-shadow:0 1px 2px rgba(15,23,42,.08) }
+.trust-gold{ background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%); color:#5C2C00; border:1px solid #E5A100 }
+.trust-silver{ background:linear-gradient(135deg,#E5E7EB 0%,#9CA3AF 100%); color:#1F2937; border:1px solid #6B7280 }
+.trust-bronze{ background:linear-gradient(135deg,#D1FAE5 0%,#6EE7B7 100%); color:#065F46; border:1px solid #34D399 }
+.trust-tier:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s }
+
+/* Tier roadmap card (used on owner dashboard) */
+.tier-roadmap{ background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%); border:1px solid #FCD34D; border-radius:14px; padding:18px 20px; margin:16px 0 }
+.tier-roadmap h3{ margin:0 0 8px; font-size:1rem; font-weight:800; color:#5C2C00; display:flex; align-items:center; gap:8px }
+.tier-roadmap .tr-current{ font-size:.85rem; color:#92400E; font-weight:600; margin-bottom:12px }
+.tier-roadmap .tr-next{ font-size:.85rem; color:#5C2C00; font-weight:700; margin-bottom:8px }
+.tier-roadmap ul{ margin:0; padding-left:20px; color:#78350F; font-size:.88rem; line-height:1.6 }
+.tier-roadmap ul li{ margin-bottom:3px }
+.tier-roadmap.tier-complete{ background:linear-gradient(135deg,#D1FAE5 0%,#A7F3D0 100%); border-color:#10B981 }
+.tier-roadmap.tier-complete h3, .tier-roadmap.tier-complete .tr-current{ color:#064E3B }

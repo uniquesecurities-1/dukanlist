@@ -404,28 +404,23 @@ function renderDashboard(b){
   // USP
   document.getElementById('uspDisp').textContent = b.usp_text || '— (no USP yet — add via Edit Profile)';
 
+  // Trust Tier roadmap (Power Features Pack)
+  if (typeof DukanTier !== 'undefined'){
+    renderTierRoadmap(b);
+  }
+
   document.getElementById('loading').style.display = 'none';
   document.getElementById('dashboardContent').style.display = '';
 }
 
-function shareProfile(e){
-  e.preventDefault();
-  if (!MY_BUSINESS) return;
-  const url = location.origin + '/business.html?slug=' + encodeURIComponent(MY_BUSINESS.slug);
-  const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us on DukanList: ${url}`;
-  if (navigator.share) {
-    navigator.share({ title: MY_BUSINESS.name, text: msg, url });
-  } else {
-    navigator.clipboard.writeText(url);
-    alert('Profile link copied!\n' + url);
+function renderTierRoadmap(b){
+  const result = DukanTier.compute(b);
+  let host = document.getElementById('tierRoadmapHost');
+  if (!host){
+    host = document.createElement('div');
+    host.id = 'tierRoadmapHost';
+    const usp = document.getElementById('uspDisp');
+    const anchor = usp ? usp.closest('.card, .panel, .section') || usp.parentNode : document.getElementById('dashboardContent');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(host, anchor.nextSibling);
   }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadDashboard();
-});
-</script>
-
-</body>
-</html>
+  const tierLabels = { gold:'🏅 Gold Trusted', silver:'�

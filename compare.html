@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FF6B1A">
+<title>Compare Shops — DukanList</title>
+<meta name="description" content="Compare local shops side-by-side: ratings, hours, payment methods, services and trust signals.">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="/assets/icons/logo.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/assets/css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{ font-family:'Plus Jakarta Sans','Manrope',-apple-system,BlinkMacSystemFont,sans-serif; background:#f8fafc; color:#0F172A }
+  .cmp-page{ max-width:1180px; margin:0 auto; padding:18px 16px 80px }
+  .cmp-h1{ font-size:1.7rem; font-weight:800; letter-spacing:-.02em; margin:8px 0 4px }
+  .cmp-sub{ color:#64748b; font-size:.9rem; margin-bottom:20px }
+  .cmp-grid{ display:grid; grid-template-columns:200px 1fr 1fr; background:#fff; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+  .cmp-grid > div{ padding:14px 16px; border-bottom:1px solid #f1f5f9; font-size:14px; line-height:1.5 }
+  .cmp-grid > div.cmp-label{ background:#f8fafc; color:#64748b; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center }
+  .cmp-grid > div:nth-child(3n+2), .cmp-grid > div:nth-child(3n){ border-left:1px solid #f1f5f9 }
+  .cmp-header{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:20px 16px !important; background:linear-gradient(180deg,#FFFBF5,#fff) !important }
+  .cmp-header img{ width:120px; height:120px; border-radius:12px; object-fit:cover; margin-bottom:10px; background:#f1f5f9 }
+  .cmp-header .ph{ width:120px; height:120px; border-radius:12px; background:#f1f5f9; display:grid; place-items:center; font-size:48px; margin-bottom:10px }
+  .cmp-header .name{ font-size:1.15rem; font-weight:800; letter-spacing:-.01em; margin-bottom:6px; line-height:1.25 }
+  .cmp-header .cat{ font-size:.78rem; color:#64748b; font-weight:600; margin-bottom:10px }
+  .cmp-header .view-btn{ display:inline-block; padding:8px 14px; background:var(--saffron); color:#0F172A; border-radius:8px; font-size:12px; font-weight:800; text-decoration:none; margin-top:4px }
+  .cmp-header .view-btn:hover{ background:#FFB347 }
+  .cmp-pill{ display:inline-block; padding:3px 9px; border-radius:99px; font-size:11px; font-weight:700; margin:2px 4px 2px 0; background:#f1f5f9; color:#475569 }
+  .cmp-pill.good{ background:#D1FAE5; color:#065F46 }
+  .cmp-pill.warn{ background:#FEF3C7; color:#92400E }
+  .cmp-pill.bad{ background:#FEE2E2; color:#991B1B }
+  .cmp-empty{ color:#cbd5e1; font-style:italic; font-size:13px }
+  .cmp-rating{ display:flex; align-items:baseline; gap:6px }
+  .cmp-rating b{ font-size:1.3rem; font-weight:800; color:#0F172A }
+  .cmp-hours-row{ display:flex; justify-content:space-between; padding:3px 0; font-size:13px }
+  .cmp-hours-row .day{ font-weight:600; color:#475569 }
+  .cmp-hours-row.today{ color:#0F172A; font-weight:700 }
+  .cmp-loading, .cmp-error{ text-align:center; padding:80px 20px; color:#64748b }
+  .cmp-error{ background:#FEF2F2; color:#991B1B; border-radius:12px; margin-top:20px; font-weight:600 }
+  .cmp-back{ color:#64748b; text-decoration:none; font-size:.85rem; font-weight:600 }
+  .cmp-back:hover{ color:var(--saffron-deep) }
+  @media (max-width:768px){
+    .cmp-grid{ grid-template-columns:1fr 1fr; font-size:13px }
+    .cmp-grid > div.cmp-label{ grid-column:1 / -1; padding:8px 14px; font-size:10px; border-bottom:none }
+    .cmp-grid > div.cmp-label + div{ padding-top:6px }
+    .cmp-grid > div:nth-child(3n+2){ border-left:none }
+    .cmp-header img, .cmp-header .ph{ width:96px; height:96px }
+    .cmp-header .name{ font-size:1rem }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">
+      <img src="/assets/icons/logo.svg" alt="DukanList" style="width:32px;height:32px;vertical-align:middle">
+      <span style="font-weight:800;font-size:1.05rem;color:var(--ink);margin-left:6px">DukanList</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/browse.html">Browse</a>
+      <a href="/search.html">Search</a>
+      <a href="/register.html" class="nav-cta">+ Add Shop</a>
+    </nav>
+  </div>
+</header>
+
+<main class="cmp-page">
+  <nav class="breadcrumb-strip" aria-label="breadcrumb">
+    <a href="/">🏠 Home</a><span class="sep">›</span>
+    <a href="/search.html">Search</a><span class="sep">›</span>
+    <span class="current">Compare</span>
+  </nav>
+
+  <h1 class="cmp-h1">⚖️ Compare Shops</h1>
+  <div class="cmp-sub">Side-by-side comparison of ratings, hours, payment methods and trust signals. <a class="cmp-back" href="javascript:history.back()">← Go back</a></div>
+
+  <div id="cmpContent">
+    <div class="cmp-loading">Loading comparison…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/hours.js"></script>
+<script src="/assets/js/compare.js"></script>
+<script>
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+async function init(){
+  const root = document.getElementById('cmpContent');
+  const params = new URLSearchParams(location.search);
+  const idsRaw = params.get('ids') || '';
+  const ids = idsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+  if (ids.length < 2){
+    root.innerHTML = '<div class="cmp-error">Need exactly 2 shop IDs in the URL (?ids=A,B). Pick 2 shops from the <a href="/search.html">search page</a> to compare them.</div>';
+    return;
+  }
+  if (ids.length > 2) ids.length = 2;
+
+  const c = window.ShopDB && ShopDB.client;
+  if (!c){
+    root.innerHTML = '<div class="cmp-error">Database not configured.</div>';
+    return;
+  }
+
+  // Fetch both shops
+  const { data, error } = await c.from('businesses')
+    .select('id, slug, name, mobile, whatsapp, photos, rating_avg, rating_count, verified_score, is_featured, hours_json, payment_methods, special_features, established_year, address_line, pincode, services, usp_text, lat, lng')
+    .in('id', ids);
+
+  if (error){
+    root.innerHTML = '<div class="cmp-error">Failed to load: ' + esc(error.message) + '</div>';
+    return;
+  }
+  if (!data || data.length < 2){
+    root.innerHTML = '<div class="cmp-error">One or both shops not found. They may have been removed.</div>';
+    return;
+  }
+
+  // Order by ids array
+  const shopsById = {};
+  data.forEach(s => { shopsById[String(s.id)] = s; });
+  const shops = ids.map(id => shopsById[String(id)]).filter(Boolean);
+  if (shops.length < 2){
+    root.innerHTML = '<div class="cmp-error">Could not load both shops.</div>';
+    return;
+  }
+
+  render(shops);
+}
+
+function render(shops){
+  const [a, b] = shops;
+
+  function row(label, htmlA, htmlB){
+    return '<div class="cmp-label">' + esc(label) + '</div>'
+      + '<div>' + (htmlA || '<span class="cmp-empty">—</span>') + '</div>'
+      + '<div>' + (htmlB || '<span class="cmp-empty">—</span>') + '</div>';
+  }
+
+  function rating(s){
+    const r = Number(s.rating_avg) || 0;
+    const n = Number(s.rating_count) || 0;
+    if (r <= 0) return '<span class="cmp-empty">No reviews yet</span>';
+    return '<div class="cmp-rating"><b>⭐ ' + r.toFixed(1) + '</b><span style="color:#64748b">(' + n + ' reviews)</span></div>';
+  }
+
+  function verified(s){
+    const v = Number(s.verified_score) || 0;
+    if (v >= 5) return '<span class="cmp-pill good">✓ Fully verified</span>';
+    if (v >= 3) return '<span class="cmp-pill good">✓ Verified</span>';
+    if (v >= 1) return '<span class="cmp-pill warn">Partial</span>';
+    return '<span class="cmp-pill bad">Not verified</span>';
+  }
+
+  function featured(s){
+    return s.is_featured ? '<span class="cmp-pill good">⭐ Featured</span>' : '<span class="cmp-empty">No</span>';
+  }
+
+  function payments(s){
+    const pm = Array.isArray(s.payment_methods) ? s.payment_methods : [];
+    if (!pm.length) return null;
+    const icons = { cash:'💵 Cash', upi:'📱 UPI', card:'💳 Card', netbanking:'🏦 Net Banking', wallet:'👛 Wallet', emi:'📅 EMI' };
+    return pm.map(p => '<span class="cmp-pill">' + esc(icons[String(p).toLowerCase()] || p) + '</span>').join(' ');
+  }
+
+  function features(s){
+    const f = Array.isArray(s.special_features) ? s.special_features : [];
+    if (!f.length) return null;
+    return f.map(x => '<span class="cmp-pill">' + esc(x) + '</span>').join(' ');
+  }
+
+  function services(s){
+    const sv = Array.isArray(s.services) ? s.services : [];
+    if (!sv.length) return null;
+    return sv.slice(0, 6).map(x => '<span class="cmp-pill">' + esc(typeof x === 'string' ? x : (x.name || x)) + '</span>').join(' ');
+  }
+
+  function hours(s){
+    if (!s.hours_json) return null;
+    const days = ['mon','tue','wed','thu','fri','sat','sun'];
+    const names = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' };
+    const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0
+    return days.map((d, i) => {
+      const h = s.hours_json[d];
+      const txt = (h && h.open && h.close) ? (h.open + ' – ' + h.close) : 'Closed';
+      const cls = (i === todayIdx) ? 'cmp-hours-row today' : 'cmp-hours-row';
+      return '<div class="' + cls + '"><span class="day">' + names[d] + '</span><span>' + esc(txt) + '</span></div>';
+    }).join('');
+  }
+
+  function established(s){
+    if (!s.established_year) return null;
+    const yrs = new Date().getFullYear() - Number(s.established_year);
+    return Number(s.established_year) + ' (' + (yrs > 0 ? yrs + ' year' + (yrs === 1 ? '' : 's') : 'new') + ')';
+  }
+
+  function header(s){
+    const photo = (s.photos && s.photos.length) ? s.photos[0] : null;
+    return '<div class="cmp-header">'
+      + (photo
+          ? '<img src="' + esc(photo) + '" alt="">'
+          : '<div class="ph">🏪</div>')
+      + '<div class="name">' + esc(s.name) + '</div>'
+      + (s.address_line ? '<div class="cat">📍 ' + esc(s.address_line) + '</div>' : '')
+      + '<a class="view-btn" href="/business.html?slug=' + esc(s.slug) + '">View shop →</a>'
+      + '</div>';
+  }
+
+  const html = '<div class="cmp-grid">'
+    + '<div class="cmp-label"></div>' + header(a) + header(b)
+    + row('Rating', rating(a), rating(b))
+    + row('Verified', verified(a), verified(b))
+    + row('Featured', featured(a), featured(b))
+    + row('Established', established(a), established(b))
+    + row('Phone', a.mobile ? '<a href="tel:+91' + esc(a.mobile) + '" style="color:#0F172A;text-decoration:none;font-weight:700">📞 ' + esc(a.mobile) + '</a>' : null,
+                    b.mobile ? '<a href="tel:+91' + esc(b.mobile) + '" style="color:#0F172A;text-decoration:none;font-weight:700">📞 ' + esc(b.mobile) + '</a>' : null)
+    + row('WhatsApp', a.whatsapp ? '<a href="https://wa.me/91' + esc(a.whatsapp) + '" target="_blank" rel="noopener" style="color:#25D366;text-decoration:none;font-weight:700">💬 Chat</a>' : null,
+                      b.whatsapp ? '<a href="https://wa.me/91' + esc(b.whatsapp) + '" target="_blank" rel="noopener" style="color:#25D366;text-decoration:none;font-weight:700">💬 Chat</a>' : null)
+    + row('USP', a.usp_text ? esc(a.usp_text) : null, b.usp_text ? esc(b.usp_text) : null)
+    + row('Payment methods', payments(a), payments(b))
+    + row('Special features', features(a), features(b))
+    + row('Top services', services(a), services(b))
+    + row('Pincode', a.pincode || null, b.pincode || null)
+    + row('Hours', hours(a), hours(b))
+    + '</div>';
+
+  document.getElementById('cmpContent').innerHTML = html;
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1242,6 +1242,21 @@ function render(){
     av.style.display = '';
   }
 
+  // Trust Tier badge (Bronze / Silver / Gold) — Power Features Pack
+  if (typeof DukanTier !== 'undefined'){
+    const tierHTML = DukanTier.badge(b);
+    if (tierHTML){
+      const nameEl = document.querySelector('.biz-name, h1.title, h1');
+      if (nameEl && !nameEl.dataset.tierAdded){
+        const span = document.createElement('span');
+        span.style.cssText = 'display:inline-block;margin-left:10px;vertical-align:middle';
+        span.innerHTML = tierHTML;
+        nameEl.appendChild(span);
+        nameEl.dataset.tierAdded = '1';
+      }
+    }
+  }
+
   // Open Now / Closed status (uses /assets/js/hours.js → getOpenStatus)
   const openInfo = getOpenStatus(b.hours_json);
   if (openInfo){
@@ -2138,22 +2153,4 @@ function renderShopHighlights(b){
   const url = window.location.href;
   const shareText = encodeURIComponent('Check out '+(b.name||'this shop')+' on DukanList \u2014 ' + url);
   document.getElementById('shShareWa').href = 'https://wa.me/?text=' + shareText;
-  document.getElementById('shShareFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
-
-  host.style.display = '';
-}
-
-function copyShopUrl(){
-  try {
-    navigator.clipboard.writeText(window.location.href);
-    const btn = document.querySelector('.sh-copy');
-    if (btn){ const t = btn.textContent; btn.textContent = '\u2713 Copied'; setTimeout(() => btn.textContent = t, 1500); }
-  } catch(e){
-    prompt('Copy this link:', window.location.href);
-  }
-}
-</script>
-
-<script src="/assets/js/city-persist.js"></script>
-</body>
-</html>
+  document.getElementById('shShareFb').href = 'http
