@@ -214,6 +214,16 @@
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
     </div>
 
+    <!-- ===== PEAK HOURS (Owner Insights v2) ===== -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h3>⏰ <span data-i18n-en>Peak Hours</span><span data-i18n-hi>व्यस्त समय</span></h3>
+        <span class="meta-sub"><span data-i18n-en>When customers visit your shop</span><span data-i18n-hi>ग्राहक कब आते हैं</span></span>
+      </div>
+      <div class="chart-wrap"><canvas id="peakChart"></canvas></div>
+      <div id="peakInsight" style="margin-top:10px;font-size:.85rem;color:var(--muted);text-align:center;font-weight:600"></div>
+    </div>
+
     <!-- ===== CONVERSION FUNNEL ===== -->
     <div class="an-card">
       <div class="an-card-head">
@@ -402,6 +412,7 @@ function render(d){
 
   // Daily trend chart
   drawChart(d.daily || []);
+  loadPeakHours();
 }
 
 function setVal(id, n){
@@ -509,6 +520,68 @@ function renderTips(d, biz){
       <span data-i18n-en>${t.en}</span><span data-i18n-hi>${t.hi}</span>
     </div>
   `).join('');
+}
+
+let PEAK_CHART = null;
+
+async function loadPeakHours(){
+  const c = ShopDB.client;
+  if (!c || !BIZ_ID) return;
+  try {
+    const { data, error } = await c.rpc('owner_peak_hours', { p_business_id: BIZ_ID, p_days: 30 });
+    if (error){
+      const insight = document.getElementById('peakInsight');
+      if (insight) insight.textContent = 'Run db/44-owner-peak-hours.sql to enable this chart';
+      return;
+    }
+    drawPeakChart(data && data.buckets ? data.buckets : []);
+  } catch(e){
+    console.warn('loadPeakHours failed', e);
+  }
+}
+
+function drawPeakChart(buckets){
+  if (!window.Chart) return;
+  const canvas = document.getElementById('peakChart');
+  if (!canvas) return;
+  const labels = buckets.map(b => {
+    const h = b.hour;
+    return h === 0 ? '12 AM' : h < 12 ? h + ' AM' : h === 12 ? '12 PM' : (h - 12) + ' PM';
+  });
+  const totals = buckets.map(b => Number(b.total || 0));
+  const views  = buckets.map(b => Number(b.views || 0));
+  const leads  = buckets.map(b => Number(b.leads || 0));
+  let peakIdx = 0, peakVal = 0;
+  totals.forEach((v, i) => { if (v > peakVal){ peakVal = v; peakIdx = i; } });
+  const insight = document.getElementById('peakInsight');
+  if (insight){
+    if (peakVal === 0){
+      insight.textContent = 'Not enough data yet — come back after a week of activity.';
+    } else {
+      insight.innerHTML = '\u{1F4A1} Peak hour: <b>' + labels[peakIdx] + '</b> with ' + peakVal + ' interactions in last 30 days';
+    }
+  }
+  if (PEAK_CHART){ PEAK_CHART.destroy(); }
+  const ctx = canvas.getContext('2d');
+  PEAK_CHART = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Views', data: views, backgroundColor: 'rgba(255,107,26,.55)', borderColor: '#FF6B1A', borderWidth: 1, borderRadius: 4, stack: 'a' },
+        { label: 'Leads', data: leads, backgroundColor: 'rgba(5,150,105,.75)', borderColor: '#059669', borderWidth: 1, borderRadius: 4, stack: 'a' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { stacked: true, ticks: { font: { size: 9 } }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { precision: 0, font: { size: 10 } }, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
 }
 
 function drawChart(daily){

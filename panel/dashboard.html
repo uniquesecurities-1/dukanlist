@@ -108,6 +108,15 @@
       </div>
     </div>
 
+    <!-- Smart Actions (Owner Insights v2) -->
+    <div class="card smart-actions-card" id="smartActionsCard" style="margin-bottom:18px;display:none;background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border-color:#93C5FD">
+      <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#1E40AF">
+        <span>💡</span>
+        <span data-i18n-en>Suggested Next Actions</span><span data-i18n-hi>अगले सुझाव</span>
+      </div>
+      <div id="smartActionsList" style="display:grid;gap:8px;margin-top:10px"></div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="card">
       <div class="card-title">
@@ -409,6 +418,9 @@ function renderDashboard(b){
     renderTierRoadmap(b);
   }
 
+  // Smart Actions card (Owner Insights v2)
+  renderSmartActions(b);
+
   document.getElementById('loading').style.display = 'none';
   document.getElementById('dashboardContent').style.display = '';
 }
@@ -469,6 +481,124 @@ window.addEventListener('DOMContentLoaded', () => {
   setLang(localStorage.getItem('shop_lang') || 'en');
   loadDashboard();
 });
+
+function renderSmartActions(b){
+  const list = document.getElementById('smartActionsList');
+  const card = document.getElementById('smartActionsCard');
+  if (!list || !card || !b) return;
+
+  const actions = [];
+  const photoCount = Array.isArray(b.photos) ? b.photos.length : 0;
+  const rating = Number(b.rating_avg) || 0;
+  const reviewCount = Number(b.rating_count) || 0;
+  const verified = Number(b.verified_score) || 0;
+  const hasUSP = !!(b.usp_text && b.usp_text.length > 10);
+  const hasAbout = !!(b.about_text && b.about_text.length > 50);
+  const hasHours = b.hours_json && Object.keys(b.hours_json).length > 0;
+  const hasYear = !!b.established_year;
+
+  // Generate smart action suggestions (top 3 most impactful)
+  if (photoCount < 3){
+    actions.push({
+      icon: '\u{1F4F8}',
+      title: photoCount === 0 ? 'Add your first photo' : 'Add ' + (3 - photoCount) + ' more photo' + (photoCount === 2 ? '' : 's'),
+      sub: 'Shops with 3+ photos get 2x more views',
+      href: '/panel/photos.html',
+      cta: 'Upload now'
+    });
+  }
+  if (!hasUSP){
+    actions.push({
+      icon: '\u{2728}',
+      title: 'Write your shop\'s USP',
+      sub: 'A one-line pitch that makes you stand out',
+      href: '/panel/profile.html#usp',
+      cta: 'Add USP'
+    });
+  }
+  if (!hasAbout){
+    actions.push({
+      icon: '\u{1F4D6}',
+      title: 'Write About section',
+      sub: 'Tell customers your story (50+ characters)',
+      href: '/panel/profile.html#about',
+      cta: 'Add now'
+    });
+  }
+  if (!hasHours){
+    actions.push({
+      icon: '\u{1F552}',
+      title: 'Set business hours',
+      sub: 'Customers see Open/Closed status',
+      href: '/panel/profile.html#hours',
+      cta: 'Set hours'
+    });
+  }
+  if (!hasYear){
+    actions.push({
+      icon: '\u{1F3DB}',
+      title: 'Add established year',
+      sub: 'Unlocks Gold Trusted tier eligibility',
+      href: '/panel/profile.html',
+      cta: 'Update'
+    });
+  }
+  if (reviewCount < 5 && photoCount >= 1){
+    actions.push({
+      icon: '\u{2B50}',
+      title: 'Ask customers for reviews',
+      sub: 'Print your QR code and place it at the counter',
+      href: '/panel/qr-code.html',
+      cta: 'Print QR'
+    });
+  }
+  if (rating >= 4 && reviewCount >= 5){
+    actions.push({
+      icon: '\u{1F4AC}',
+      title: 'Reply to recent reviews',
+      sub: 'Owner replies build trust with future customers',
+      href: '/panel/reviews.html',
+      cta: 'Open reviews'
+    });
+  }
+  if (verified < 3){
+    actions.push({
+      icon: '\u{1F6E1}',
+      title: 'Get DukanList verified',
+      sub: 'Verified shops appear higher in search',
+      href: 'https://wa.me/919541223377?text=' + encodeURIComponent('Please verify my shop: ' + (b.name || '')),
+      cta: 'Request verify',
+      external: true
+    });
+  }
+
+  // Always-on suggestions (low priority, only if nothing else)
+  if (actions.length < 3){
+    actions.push({
+      icon: '\u{1F381}',
+      title: 'Post a deal/offer',
+      sub: 'Attract weekend customers with a discount',
+      href: '/panel/deals.html',
+      cta: 'Post deal'
+    });
+  }
+
+  // Show top 3 only
+  const top = actions.slice(0, 3);
+  if (!top.length){
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+  list.innerHTML = top.map(a => '<a href="' + a.href + '"' + (a.external ? ' target="_blank" rel="noopener"' : '') + ' style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #BFDBFE;border-radius:10px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#3B82F6\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#BFDBFE\';this.style.transform=\'translateX(0)\'">'
+    + '<span style="font-size:1.5rem;flex-shrink:0">' + a.icon + '</span>'
+    + '<div style="flex:1;min-width:0">'
+    +   '<div style="font-weight:800;font-size:.9rem;color:#0F172A;letter-spacing:-.01em">' + escapeHTML(a.title) + '</div>'
+    +   '<div style="font-size:.78rem;color:#64748B;margin-top:2px">' + escapeHTML(a.sub) + '</div>'
+    + '</div>'
+    + '<span style="background:#1E40AF;color:#fff;padding:6px 12px;border-radius:8px;font-size:.74rem;font-weight:800;flex-shrink:0">' + a.cta + ' →</span>'
+    + '</a>').join('');
+}
 </script>
 
 <script src="/assets/js/trust-tier.js"></script>
