@@ -854,3 +854,14 @@ h3{ letter-spacing:-.012em }
   .nav-links .lang-toggle{ display:inline-flex !important; margin-right:0 }
   .nav-cta{ padding:7px 13px !important; font-size:.78rem !important; white-space:nowrap }
 }
+
+/* ============================================================
+   Stray-element defense in topbar
+   Hides any rogue child that isn't .brand, .nav-links, or .hamburger.
+   Also kills any text-node whitespace artifacts via font-size trick.
+   ============================================================ */
+.topbar-inner{ font-size:0 }
+.topbar-inner > *{ font-size:initial }
+.topbar-inner > *:not(.brand):not(.nav-links):not(.hamburger){ display:none !important }
+/* Defensive: hide any ::before/::after pseudo on topbar direct children */
+.topbar-inner::before, .topbar-inner::after{ content:none !important; display:none !important }
