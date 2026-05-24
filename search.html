@@ -271,27 +271,27 @@
   <!-- Power Features: Filter rail (desktop) + main results -->
   <div class="search-layout" id="searchLayout">
     <aside class="search-sidebar" id="searchSidebar">
-      <h3>Filters <a href="#" onclick="clearAllFilters(event)">Clear all</a></h3>
+      <h3><span data-i18n-en>Filters</span><span data-i18n-hi>फिल्टर</span> <a href="#" onclick="clearAllFilters(event)"><span data-i18n-en>Clear all</span><span data-i18n-hi>सब हटाएँ</span></a></h3>
 
       <div class="ss-section">
-        <h3>Quick filters</h3>
-        <label class="ss-row"><input type="checkbox" id="ssOpenNow" onchange="ssSyncToggle('openNow', this.checked)"><span class="ss-icon">🟢</span>Open Now</label>
-        <label class="ss-row"><input type="checkbox" id="ssVerified" onchange="ssSyncToggle('verified', this.checked)"><span class="ss-icon">✓</span>Verified</label>
-        <label class="ss-row"><input type="checkbox" id="ssDeals" onchange="ssSyncToggle('deals', this.checked)"><span class="ss-icon">🎁</span>With Offers</label>
+        <h3><span data-i18n-en>Quick filters</span><span data-i18n-hi>त्वरित फिल्टर</span></h3>
+        <label class="ss-row"><input type="checkbox" id="ssOpenNow" onchange="ssSyncToggle('openNow', this.checked)"><span class="ss-icon">🟢</span><span data-i18n-en>Open Now</span><span data-i18n-hi>अभी खुले</span></label>
+        <label class="ss-row"><input type="checkbox" id="ssVerified" onchange="ssSyncToggle('verified', this.checked)"><span class="ss-icon">✓</span><span data-i18n-en>Verified</span><span data-i18n-hi>वेरिफाइड</span></label>
+        <label class="ss-row"><input type="checkbox" id="ssDeals" onchange="ssSyncToggle('deals', this.checked)"><span class="ss-icon">🎁</span><span data-i18n-en>With Offers</span><span data-i18n-hi>ऑफर्स वाले</span></label>
       </div>
 
       <div class="ss-section">
-        <h3>Customer Rating</h3>
-        <label class="ss-row"><input type="radio" name="ssRating" value="0" checked onchange="ssSetRating(0)"><span>Any rating</span></label>
-        <label class="ss-row"><input type="radio" name="ssRating" value="4" onchange="ssSetRating(4)"><span class="ss-icon">⭐</span>4.0 &amp; above</label>
-        <label class="ss-row"><input type="radio" name="ssRating" value="3" onchange="ssSetRating(3)"><span class="ss-icon">⭐</span>3.0 &amp; above</label>
-        <label class="ss-row"><input type="radio" name="ssRating" value="2" onchange="ssSetRating(2)"><span class="ss-icon">⭐</span>2.0 &amp; above</label>
+        <h3><span data-i18n-en>Customer Rating</span><span data-i18n-hi>ग्राहक रेटिंग</span></h3>
+        <label class="ss-row"><input type="radio" name="ssRating" value="0" checked onchange="ssSetRating(0)"><span data-i18n-en>Any rating</span><span data-i18n-hi>कोई भी रेटिंग</span></label>
+        <label class="ss-row"><input type="radio" name="ssRating" value="4" onchange="ssSetRating(4)"><span class="ss-icon">⭐</span><span data-i18n-en>4.0 &amp; above</span><span data-i18n-hi>4.0 या ज़्यादा</span></label>
+        <label class="ss-row"><input type="radio" name="ssRating" value="3" onchange="ssSetRating(3)"><span class="ss-icon">⭐</span><span data-i18n-en>3.0 &amp; above</span><span data-i18n-hi>3.0 या ज़्यादा</span></label>
+        <label class="ss-row"><input type="radio" name="ssRating" value="2" onchange="ssSetRating(2)"><span class="ss-icon">⭐</span><span data-i18n-en>2.0 &amp; above</span><span data-i18n-hi>2.0 या ज़्यादा</span></label>
       </div>
 
       <div class="ss-section">
-        <h3>Categories</h3>
+        <h3><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></h3>
         <div id="ssCatList" style="max-height:280px;overflow-y:auto"></div>
-        <button type="button" class="ss-clear" onclick="clearAllFilters(event)">Reset filters</button>
+        <button type="button" class="ss-clear" onclick="clearAllFilters(event)"><span data-i18n-en>Reset filters</span><span data-i18n-hi>फिल्टर रीसेट करें</span></button>
       </div>
     </aside>
 
@@ -363,6 +363,19 @@ function setLang(lang){
   localStorage.setItem('shop_lang',lang);
   document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
   document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+  // Update <option> labels that can't have <span> children
+  setSortOptionsLang(lang);
+}
+
+function setSortOptionsLang(lang){
+  const sel = document.getElementById('sortSel');
+  if (!sel) return;
+  const labels = lang === 'hi'
+    ? { relevance:'प्रासंगिकता', featured:'फीचर्ड पहले', rating:'उच्चतम रेटिंग', reviews:'सर्वाधिक रिव्यू', newest:'नवीनतम' }
+    : { relevance:'Relevance', featured:'Featured first', rating:'Highest rated', reviews:'Most reviewed', newest:'Newest' };
+  Array.from(sel.options).forEach(o => {
+    if (labels[o.value]) o.textContent = labels[o.value];
+  });
 }
 
 let CATEGORIES = [], CITIES = [];
@@ -896,7 +909,8 @@ function populateSidebar(){
         +   '<span>' + escapeHTML(p.name) + '</span>'
         + '</div>'
         + '<div class="ss-cat-children">';
-      html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(p.slug) + '" onchange="ssToggleCat(this.value, this.checked)">All ' + escapeHTML(p.name) + '</label>';
+      const allLbl = (document.documentElement.getAttribute('data-lang') === 'hi') ? 'सभी ' : 'All ';
+      html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(p.slug) + '" onchange="ssToggleCat(this.value, this.checked)">' + allLbl + escapeHTML(p.name) + '</label>';
       subs.forEach(s => {
         html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(s.slug) + '" onchange="ssToggleCat(this.value, this.checked)"><span class="ss-icon">' + (s.icon || '') + '</span>' + escapeHTML(s.name) + '</label>';
       });

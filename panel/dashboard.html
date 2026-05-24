@@ -423,4 +423,54 @@ function renderTierRoadmap(b){
     const anchor = usp ? usp.closest('.card, .panel, .section') || usp.parentNode : document.getElementById('dashboardContent');
     if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(host, anchor.nextSibling);
   }
-  const tierLabels = { gold:'🏅 Gold Trusted', silver:'�
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  const L = (en, hi) => lang === 'hi' ? hi : en;
+  const tierLabelsEn = { gold:'\u{1F3C5} Gold Trusted', silver:'\u{1F948} Silver Verified', bronze:'✓ Verified' };
+  const tierLabelsHi = { gold:'\u{1F3C5} गोल्ड ट्रस्टेड', silver:'\u{1F948} सिल्वर वेरिफाइड', bronze:'✓ वेरिफाइड' };
+  const currentLabel = result.tier
+    ? (lang === 'hi' ? tierLabelsHi[result.tier] : tierLabelsEn[result.tier])
+    : L('Not yet verified', 'अभी वेरिफाइड नहीं');
+  if (!result.nextTier){
+    host.innerHTML = '<div class="tier-roadmap tier-complete">'
+      + '<h3>\u{1F3C6} ' + L('Top Tier Reached!', 'सर्वोच्च टीयर हासिल!') + '</h3>'
+      + '<div class="tr-current">' + L('Your shop is at', 'आपकी दुकान') + ' ' + currentLabel + '. '
+      + L('Keep delighting customers — high ratings retain this status automatically.', 'ग्राहकों को खुश रखते रहें — अच्छी रेटिंग से यह स्तर बना रहेगा।') + '</div>'
+      + '</div>';
+    return;
+  }
+  const nextLabel = result.nextTier.tier === 'gold'
+      ? L('Gold Trusted \u{1F3C5}', 'गोल्ड ट्रस्टेड \u{1F3C5}')
+      : result.nextTier.tier === 'silver'
+      ? L('Silver Verified \u{1F948}', 'सिल्वर वेरिफाइड \u{1F948}')
+      : L('Verified', 'वेरिफाइड');
+  const items = result.nextTier.missing.map(m => '<li>' + escapeHTML(m) + '</li>').join('');
+  host.innerHTML = '<div class="tier-roadmap">'
+    + '<h3>\u{1F680} ' + L('Level up your trust tier', 'अपना ट्रस्ट टीयर बढ़ाएँ') + '</h3>'
+    + '<div class="tr-current">' + L('Current tier', 'वर्तमान टीयर') + ': <b>' + currentLabel + '</b></div>'
+    + '<div class="tr-next">' + L('To reach', 'पहुँचने के लिए') + ' <b>' + nextLabel + '</b>:</div>'
+    + '<ul>' + (items || '<li>' + L('You meet all requirements — refresh in a few minutes.', 'आप सभी शर्तें पूरी कर रहे हैं — कुछ मिनट में रिफ्रेश करें।') + '</li>') + '</ul>'
+    + '</div>';
+}
+
+function shareProfile(e){
+  e.preventDefault();
+  if (!MY_BUSINESS) return;
+  const url = location.origin + '/business.html?slug=' + encodeURIComponent(MY_BUSINESS.slug);
+  const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us on DukanList: ${url}`;
+  if (navigator.share) {
+    navigator.share({ title: MY_BUSINESS.name, text: msg, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('Profile link copied!\n' + url);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadDashboard();
+});
+</script>
+
+<script src="/assets/js/trust-tier.js"></script>
+</body>
+</html>

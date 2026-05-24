@@ -56,10 +56,27 @@
     var tier = isGold ? 'gold' : (isSilver ? 'silver' : (isBronze ? 'bronze' : null));
     var label, badgeHTML;
     switch (tier){
-      case 'gold':   label = 'Gold Trusted';    badgeHTML = '<span class="trust-tier trust-gold" title="Gold Trusted Shop — top rating, 20+ reviews, 1+ year established">\u{1F3C5} Gold Trusted</span>'; break;
-      case 'silver': label = 'Silver Verified'; badgeHTML = '<span class="trust-tier trust-silver" title="Silver Verified — good rating with reviews + photos">\u{1F948} Silver Verified</span>'; break;
-      case 'bronze': label = 'Verified';        badgeHTML = '<span class="trust-tier trust-bronze" title="Verified by DukanList admin">✓ Verified</span>'; break;
-      default:       label = 'Not verified';    badgeHTML = '';
+      case 'gold':
+        label = 'Gold Trusted';
+        badgeHTML = '<span class="trust-tier trust-gold" title="Gold Trusted Shop">\u{1F3C5} '
+          + '<span data-i18n-en>Gold Trusted</span><span data-i18n-hi>गोल्ड ट्रस्टेड</span>'
+          + '</span>';
+        break;
+      case 'silver':
+        label = 'Silver Verified';
+        badgeHTML = '<span class="trust-tier trust-silver" title="Silver Verified">\u{1F948} '
+          + '<span data-i18n-en>Silver Verified</span><span data-i18n-hi>सिल्वर वेरिफाइड</span>'
+          + '</span>';
+        break;
+      case 'bronze':
+        label = 'Verified';
+        badgeHTML = '<span class="trust-tier trust-bronze" title="Verified">\u2713 '
+          + '<span data-i18n-en>Verified</span><span data-i18n-hi>वेरिफाइड</span>'
+          + '</span>';
+        break;
+      default:
+        label = 'Not verified';
+        badgeHTML = '';
     }
 
     // Roadmap to next tier

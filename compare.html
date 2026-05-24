@@ -60,25 +60,25 @@
       <span style="font-weight:800;font-size:1.05rem;color:var(--ink);margin-left:6px">DukanList</span>
     </a>
     <nav class="nav-links">
-      <a href="/browse.html">Browse</a>
-      <a href="/search.html">Search</a>
-      <a href="/register.html" class="nav-cta">+ Add Shop</a>
+      <a href="/browse.html"><span data-i18n-en>Browse</span><span data-i18n-hi>श्रेणियाँ</span></a>
+      <a href="/search.html"><span data-i18n-en>Search</span><span data-i18n-hi>खोज</span></a>
+      <a href="/register.html" class="nav-cta"><span data-i18n-en>+ Add Shop</span><span data-i18n-hi>+ दुकान जोड़ें</span></a>
     </nav>
   </div>
 </header>
 
 <main class="cmp-page">
   <nav class="breadcrumb-strip" aria-label="breadcrumb">
-    <a href="/">🏠 Home</a><span class="sep">›</span>
-    <a href="/search.html">Search</a><span class="sep">›</span>
-    <span class="current">Compare</span>
+    <a href="/">🏠 <span data-i18n-en>Home</span><span data-i18n-hi>होम</span></a><span class="sep">›</span>
+    <a href="/search.html"><span data-i18n-en>Search</span><span data-i18n-hi>खोज</span></a><span class="sep">›</span>
+    <span class="current"><span data-i18n-en>Compare</span><span data-i18n-hi>तुलना</span></span>
   </nav>
 
-  <h1 class="cmp-h1">⚖️ Compare Shops</h1>
-  <div class="cmp-sub">Side-by-side comparison of ratings, hours, payment methods and trust signals. <a class="cmp-back" href="javascript:history.back()">← Go back</a></div>
+  <h1 class="cmp-h1">⚖️ <span data-i18n-en>Compare Shops</span><span data-i18n-hi>दुकानों की तुलना</span></h1>
+  <div class="cmp-sub"><span data-i18n-en>Side-by-side comparison of ratings, hours, payment methods and trust signals.</span><span data-i18n-hi>रेटिंग, समय, भुगतान के तरीके और भरोसे के संकेत — साथ-साथ तुलना।</span> <a class="cmp-back" href="javascript:history.back()"><span data-i18n-en>← Go back</span><span data-i18n-hi>← वापस जाएँ</span></a></div>
 
   <div id="cmpContent">
-    <div class="cmp-loading">Loading comparison…</div>
+    <div class="cmp-loading"><span data-i18n-en>Loading comparison…</span><span data-i18n-hi>तुलना लोड हो रही है…</span></div>
   </div>
 </main>
 
@@ -89,6 +89,18 @@
 <script>
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
 
+// i18n helper for compare page
+function L(en, hi){
+  const lang = document.documentElement.getAttribute('data-lang') || (localStorage.getItem('shop_lang') || 'en');
+  return lang === 'hi' ? hi : en;
+}
+// Apply saved language on load
+(function(){
+  const lang = localStorage.getItem('shop_lang') || 'en';
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+})();
+
 async function init(){
   const root = document.getElementById('cmpContent');
   const params = new URLSearchParams(location.search);
@@ -96,14 +108,14 @@ async function init(){
   const ids = idsRaw.split(',').map(s => s.trim()).filter(Boolean);
 
   if (ids.length < 2){
-    root.innerHTML = '<div class="cmp-error">Need exactly 2 shop IDs in the URL (?ids=A,B). Pick 2 shops from the <a href="/search.html">search page</a> to compare them.</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('Need exactly 2 shop IDs in the URL (?ids=A,B). Pick 2 shops from the <a href="/search.html">search page</a> to compare them.', 'URL में 2 दुकानों की IDs चाहिए (?ids=A,B). तुलना के लिए <a href="/search.html">खोज पेज</a> से 2 दुकानें चुनें।') + '</div>';
     return;
   }
   if (ids.length > 2) ids.length = 2;
 
   const c = window.ShopDB && ShopDB.client;
   if (!c){
-    root.innerHTML = '<div class="cmp-error">Database not configured.</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('Database not configured.', 'डेटाबेस सेट नहीं है।') + '</div>';
     return;
   }
 
@@ -113,11 +125,11 @@ async function init(){
     .in('id', ids);
 
   if (error){
-    root.innerHTML = '<div class="cmp-error">Failed to load: ' + esc(error.message) + '</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('Failed to load: ', 'लोड नहीं हो सका: ') + esc(error.message) + '</div>';
     return;
   }
   if (!data || data.length < 2){
-    root.innerHTML = '<div class="cmp-error">One or both shops not found. They may have been removed.</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('One or both shops not found. They may have been removed.', 'एक या दोनों दुकानें नहीं मिलीं। शायद हटा दी गई हैं।') + '</div>';
     return;
   }
 
@@ -126,7 +138,7 @@ async function init(){
   data.forEach(s => { shopsById[String(s.id)] = s; });
   const shops = ids.map(id => shopsById[String(id)]).filter(Boolean);
   if (shops.length < 2){
-    root.innerHTML = '<div class="cmp-error">Could not load both shops.</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('Could not load both shops.', 'दोनों दुकानें लोड नहीं हो सकीं।') + '</div>';
     return;
   }
 
@@ -145,20 +157,20 @@ function render(shops){
   function rating(s){
     const r = Number(s.rating_avg) || 0;
     const n = Number(s.rating_count) || 0;
-    if (r <= 0) return '<span class="cmp-empty">No reviews yet</span>';
-    return '<div class="cmp-rating"><b>⭐ ' + r.toFixed(1) + '</b><span style="color:#64748b">(' + n + ' reviews)</span></div>';
+    if (r <= 0) return '<span class="cmp-empty">' + L('No reviews yet','अभी कोई रिव्यू नहीं') + '</span>';
+    return '<div class="cmp-rating"><b>⭐ ' + r.toFixed(1) + '</b><span style="color:#64748b">(' + n + ' ' + L('reviews','रिव्यू') + ')</span></div>';
   }
 
   function verified(s){
     const v = Number(s.verified_score) || 0;
-    if (v >= 5) return '<span class="cmp-pill good">✓ Fully verified</span>';
-    if (v >= 3) return '<span class="cmp-pill good">✓ Verified</span>';
-    if (v >= 1) return '<span class="cmp-pill warn">Partial</span>';
-    return '<span class="cmp-pill bad">Not verified</span>';
+    if (v >= 5) return '<span class="cmp-pill good">✓ ' + L('Fully verified','पूरी तरह वेरिफाइड') + '</span>';
+    if (v >= 3) return '<span class="cmp-pill good">✓ ' + L('Verified','वेरिफाइड') + '</span>';
+    if (v >= 1) return '<span class="cmp-pill warn">' + L('Partial','आंशिक') + '</span>';
+    return '<span class="cmp-pill bad">' + L('Not verified','वेरिफाइड नहीं') + '</span>';
   }
 
   function featured(s){
-    return s.is_featured ? '<span class="cmp-pill good">⭐ Featured</span>' : '<span class="cmp-empty">No</span>';
+    return s.is_featured ? '<span class="cmp-pill good">⭐ ' + L('Featured','फीचर्ड') + '</span>' : '<span class="cmp-empty">' + L('No','नहीं') + '</span>';
   }
 
   function payments(s){
@@ -207,26 +219,26 @@ function render(shops){
           : '<div class="ph">🏪</div>')
       + '<div class="name">' + esc(s.name) + '</div>'
       + (s.address_line ? '<div class="cat">📍 ' + esc(s.address_line) + '</div>' : '')
-      + '<a class="view-btn" href="/business.html?slug=' + esc(s.slug) + '">View shop →</a>'
+      + '<a class="view-btn" href="/business.html?slug=' + esc(s.slug) + '">' + L('View shop →','दुकान देखें →') + '</a>'
       + '</div>';
   }
 
   const html = '<div class="cmp-grid">'
     + '<div class="cmp-label"></div>' + header(a) + header(b)
-    + row('Rating', rating(a), rating(b))
-    + row('Verified', verified(a), verified(b))
-    + row('Featured', featured(a), featured(b))
-    + row('Established', established(a), established(b))
-    + row('Phone', a.mobile ? '<a href="tel:+91' + esc(a.mobile) + '" style="color:#0F172A;text-decoration:none;font-weight:700">📞 ' + esc(a.mobile) + '</a>' : null,
+    + row(L('Rating','रेटिंग'), rating(a), rating(b))
+    + row(L('Verified','वेरिफाइड'), verified(a), verified(b))
+    + row(L('Featured','फीचर्ड'), featured(a), featured(b))
+    + row(L('Established','स्थापना वर्ष'), established(a), established(b))
+    + row(L('Phone','फोन'), a.mobile ? '<a href="tel:+91' + esc(a.mobile) + '" style="color:#0F172A;text-decoration:none;font-weight:700">📞 ' + esc(a.mobile) + '</a>' : null,
                     b.mobile ? '<a href="tel:+91' + esc(b.mobile) + '" style="color:#0F172A;text-decoration:none;font-weight:700">📞 ' + esc(b.mobile) + '</a>' : null)
-    + row('WhatsApp', a.whatsapp ? '<a href="https://wa.me/91' + esc(a.whatsapp) + '" target="_blank" rel="noopener" style="color:#25D366;text-decoration:none;font-weight:700">💬 Chat</a>' : null,
+    + row(L('WhatsApp','व्हाट्सऐप'), a.whatsapp ? '<a href="https://wa.me/91' + esc(a.whatsapp) + '" target="_blank" rel="noopener" style="color:#25D366;text-decoration:none;font-weight:700">💬 Chat</a>' : null,
                       b.whatsapp ? '<a href="https://wa.me/91' + esc(b.whatsapp) + '" target="_blank" rel="noopener" style="color:#25D366;text-decoration:none;font-weight:700">💬 Chat</a>' : null)
-    + row('USP', a.usp_text ? esc(a.usp_text) : null, b.usp_text ? esc(b.usp_text) : null)
-    + row('Payment methods', payments(a), payments(b))
-    + row('Special features', features(a), features(b))
-    + row('Top services', services(a), services(b))
-    + row('Pincode', a.pincode || null, b.pincode || null)
-    + row('Hours', hours(a), hours(b))
+    + row(L('USP','खासियत'), a.usp_text ? esc(a.usp_text) : null, b.usp_text ? esc(b.usp_text) : null)
+    + row(L('Payment methods','भुगतान के तरीके'), payments(a), payments(b))
+    + row(L('Special features','विशेष सुविधाएँ'), features(a), features(b))
+    + row(L('Top services','मुख्य सेवाएँ'), services(a), services(b))
+    + row(L('Pincode','पिनकोड'), a.pincode || null, b.pincode || null)
+    + row(L('Hours','समय'), hours(a), hours(b))
     + '</div>';
 
   document.getElementById('cmpContent').innerHTML = html;
