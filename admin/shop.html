@@ -120,6 +120,11 @@
   .dur-chip{padding:6px 8px;text-align:center;border:1.5px solid #cbd5e1;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;transition:.12s}
   .dur-chip:hover{border-color:#6366F1}
   .dur-chip.active{background:#6366F1;color:#fff;border-color:#6366F1}
+
+  /* Admin payment chips */
+  .adm-pm{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:99px;border:1.5px solid #cbd5e1;background:#fff;font-size:12px;font-weight:700;color:#0F172A;cursor:pointer;user-select:none}
+  .adm-pm:has(input:checked){background:#ECFDF5;border-color:#10B981;color:#065F46}
+  .adm-pm input{accent-color:#10B981;cursor:pointer;margin:0}
 </style>
 </head>
 <body>
@@ -277,6 +282,25 @@ function render(){
             + field('text', 'address_line2', 'Address Line 2', s.address_line2)
           + '</div>'
           + field('text', 'pincode', 'Pincode', s.pincode)
+          + '<hr style="border:0;border-top:1px dashed #e2e8f0;margin:16px 0">'
+          + '<div style="font-size:13px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">✨ Shop Trust Signals</div>'
+          + '<div class="grid-2">'
+            + field('number', 'established_year', 'Established Year', s.established_year)
+            + '<div class="field"><label>Payment Methods</label>'
+              + '<div id="adminPaymentBox" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">'
+                + ['cash','upi','cards','credit','cheque','online'].map(function(k){
+                    var checked = Array.isArray(s.payment_methods) && s.payment_methods.indexOf(k) !== -1 ? 'checked' : '';
+                    var labels = {cash:'💵 Cash',upi:'📱 UPI',cards:'💳 Cards',credit:'📒 Credit',cheque:'📝 Cheque',online:'💻 Online'};
+                    return '<label class="adm-pm"><input type="checkbox" value="'+k+'" data-adm-payment '+checked+'>'+labels[k]+'</label>';
+                  }).join('')
+              + '</div>'
+            + '</div>'
+          + '</div>'
+          + '<div class="field"><label>Special Features (comma-separated, max 6)</label>'
+            + '<input type="text" name="special_features_raw" id="adminFeaturesRaw" value="'
+            + esc(Array.isArray(s.special_features) ? s.special_features.join(', ') : '')
+            + '" placeholder="Free home delivery, Bulk discount, EMI available">'
+          + '</div>'
           + '<div style="display:flex;justify-content:flex-end;margin-top:8px">'
             + '<button type="submit" class="btn pri">💾 Save Changes</button>'
           + '</div>'
@@ -499,6 +523,20 @@ async function saveShop(e){
     var v = f.querySelector('[name="' + k + '"]')?.value;
     if (v !== undefined && v !== SHOP[k]) patch[k] = v;
   });
+  // Trust signals
+  var yEl = f.querySelector('[name="established_year"]');
+  if (yEl){
+    var y = parseInt(yEl.value, 10);
+    if (!isNaN(y) && y >= 1800 && y <= 2100 && y !== SHOP.established_year) patch.established_year = y;
+    else if (yEl.value === '' && SHOP.established_year != null) patch.established_year = null;
+  }
+  var pmChecks = Array.from(document.querySelectorAll('input[data-adm-payment]:checked')).map(function(cb){ return cb.value; });
+  var pmOld = Array.isArray(SHOP.payment_methods) ? SHOP.payment_methods : [];
+  if (pmChecks.sort().join(',') !== pmOld.slice().sort().join(',')) patch.payment_methods = pmChecks;
+  var sfRaw = (document.getElementById('adminFeaturesRaw') || {}).value || '';
+  var sfArr = sfRaw.split(',').map(function(s){return s.trim();}).filter(function(s){return s.length > 0 && s.length < 60;}).slice(0, 6);
+  var sfOld = Array.isArray(SHOP.special_features) ? SHOP.special_features : [];
+  if (sfArr.sort().join('|') !== sfOld.slice().sort().join('|')) patch.special_features = sfArr;
   if (Object.keys(patch).length === 0){ toast('Nothing changed'); return; }
   await applyPatch(patch, '✓ Saved ' + Object.keys(patch).length + ' field(s)');
 }
