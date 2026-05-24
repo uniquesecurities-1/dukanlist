@@ -2023,6 +2023,19 @@ async function logLead(action){
   // Business Detail v3: schedule review prompt for call + whatsapp clicks
   if (action === 'call' || action === 'whatsapp'){
     scheduleReviewPrompt();
+    // Lead Push: fire instant browser push to shop owner (fire-and-forget)
+    try {
+      fetch('/api/lead-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          business_id: BIZ.id,
+          action: action,
+          shop_name: BIZ.name || ''
+        }),
+        keepalive: true
+      });
+    } catch(_){}
   }
 }
 
