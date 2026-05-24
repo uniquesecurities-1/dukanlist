@@ -1169,9 +1169,8 @@ function handleSearch(e){
   const q = document.getElementById('searchInput').value.trim();
   const city = document.getElementById('citySelect').value;
   const openNow = document.getElementById('openNowCheck')?.checked;
-  // Save to recent searches
-  if (q && window.DukanAutocomplete) DukanAutocomplete.saveQuery(q);
   const params =new URLSearchParams();
+  if (q && window.DukanAutocomplete) DukanAutocomplete.saveQuery(q);
   if (q) params.set('q', q);
   if (city) params.set('city', city);
   if (openNow) params.set('open', '1');
@@ -1212,4 +1211,13 @@ function initReveal(){
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedLang();
   loadCategories();
- 
+  loadStats();
+  loadFeatured();
+  loadDeals();
+  initReveal();
+});
+</script>
+
+<script src="/assets/js/city-persist.js"></script>
+</body>
+</html>
