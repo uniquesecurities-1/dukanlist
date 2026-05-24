@@ -2069,6 +2069,7 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
+<script>
 // =============== Shop Highlights renderer ===============
 function renderShopHighlights(b){
   const host = document.getElementById('shopHighlights');
@@ -2076,68 +2077,62 @@ function renderShopHighlights(b){
   if (!host || !grid) return;
   const tiles = [];
 
-  // Verified tile (only if verified_score >= 2)
   if ((b.verified_score || 0) >= 2){
     const checks = [];
     if (b.verified_mobile)  checks.push('Phone');
     if (b.verified_address) checks.push('Address');
     if (b.verified_photo)   checks.push('Photo');
     if (b.verified_visit)   checks.push('Visited');
-    tiles.push({cls:'verify', emoji:'✅', main:'DukanList verified', sub:checks.join(' · ')||'Trusted shop'});
+    tiles.push({cls:'verify', emoji:'\u2705', main:'DukanList verified', sub:checks.join(' \u00b7 ')||'Trusted shop'});
   }
 
-  // Years in business
   if (b.established_year && b.established_year > 1900){
     const years = new Date().getFullYear() - b.established_year;
-    tiles.push({cls:'years', emoji:'📅', main:'Since '+b.established_year, sub:(years>=1?years+' years serving':'New shop')});
+    tiles.push({cls:'years', emoji:'\ud83d\udcc5', main:'Since '+b.established_year, sub:(years>=1?years+' years serving':'New shop')});
   }
 
-  // Open / Closed
   if (b.hours_json && typeof getOpenStatus === 'function'){
     const st = getOpenStatus(b.hours_json);
     if (st){
-      tiles.push({cls:'open', emoji:'⏰', main: st.isOpen?'Open now':'Closed', sub: st.label||''});
+      tiles.push({cls:'open', emoji:'\u23f0', main: st.isOpen?'Open now':'Closed', sub: st.label||''});
     }
   }
 
-  // Rating
   if (Number(b.rating_avg) > 0){
-    tiles.push({cls:'rating', emoji:'⭐', main: Number(b.rating_avg).toFixed(1)+' rating', sub:(b.rating_count||0)+' review'+((b.rating_count||0)===1?'':'s')});
+    tiles.push({cls:'rating', emoji:'\u2b50', main: Number(b.rating_avg).toFixed(1)+' rating', sub:(b.rating_count||0)+' review'+((b.rating_count||0)===1?'':'s')});
   }
 
   if (!tiles.length){ host.style.display='none'; return; }
+  function esc(s){ return String(s||'').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c])); }
   grid.innerHTML = tiles.map(t =>
     '<div class="sh-tile '+t.cls+'">'
     + '<span class="sh-emoji">'+t.emoji+'</span>'
-    + '<div class="sh-text"><div class="sh-t-main">'+escapeHtml(t.main)+'</div><div class="sh-t-sub">'+escapeHtml(t.sub)+'</div></div>'
+    + '<div class="sh-text"><div class="sh-t-main">'+esc(t.main)+'</div><div class="sh-t-sub">'+esc(t.sub)+'</div></div>'
     + '</div>'
   ).join('');
 
-  // Payment modes — auto-detect from usp_text + about_text
   const text = ((b.usp_text||'')+' '+(b.about_text||'')).toLowerCase();
   const payments = [];
-  if (/\bcash\b|nakad/.test(text))   payments.push('💵 Cash');
-  if (/\bupi\b|paytm|gpay|phonepe/.test(text)) payments.push('📱 UPI');
-  if (/\bcard|credit card|debit/.test(text)) payments.push('💳 Cards');
-  if (/credit|udhaar|udhar/.test(text)) payments.push('📒 Credit');
+  if (/\bcash\b|nakad/.test(text))                payments.push('\ud83d\udcb5 Cash');
+  if (/\bupi\b|paytm|gpay|phonepe/.test(text))    payments.push('\ud83d\udcf1 UPI');
+  if (/\bcard|credit card|debit/.test(text))       payments.push('\ud83d\udcb3 Cards');
+  if (/credit|udhaar|udhar/.test(text))             payments.push('\ud83d\udcd2 Credit');
   if (payments.length){
     document.getElementById('shPaymentRow').style.display = '';
     document.getElementById('shPaymentPills').innerHTML = payments.map(p => '<span>'+p+'</span>').join('');
   }
 
-  // Special features — split usp_text on common separators
   if (b.usp_text){
-    const features = b.usp_text.split(/[·•|,]+/).map(s => s.trim()).filter(s => s.length > 3 && s.length < 50);
+    const features = b.usp_text.split(/[\u00b7\u2022|,]+/).map(s => s.trim()).filter(s => s.length > 3 && s.length < 50);
     if (features.length){
       document.getElementById('shFeatureRow').style.display = '';
       document.getElementById('shFeaturePills').innerHTML = features.slice(0,4).map(f =>
-        '<span class="sh-feature">✓ '+escapeHtml(f)+'</span>').join('');
+        '<span class="sh-feature">\u2713 '+esc(f)+'</span>').join('');
     }
   }
 
-  // Share buttons — wire WhatsApp + Facebook URLs + copy
   const url = window.location.href;
-  const shareText = encodeURIComponent('Check out '+(b.name||'this shop')+' on DukanList — ' + url);
+  const shareText = encodeURIComponent('Check out '+(b.name||'this shop')+' on DukanList \u2014 ' + url);
   document.getElementById('shShareWa').href = 'https://wa.me/?text=' + shareText;
   document.getElementById('shShareFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
 
@@ -2148,13 +2143,12 @@ function copyShopUrl(){
   try {
     navigator.clipboard.writeText(window.location.href);
     const btn = document.querySelector('.sh-copy');
-    if (btn){ const t = btn.textContent; btn.textContent = '✓ Copied'; setTimeout(() => btn.textContent = t, 1500); }
+    if (btn){ const t = btn.textContent; btn.textContent = '\u2713 Copied'; setTimeout(() => btn.textContent = t, 1500); }
   } catch(e){
     prompt('Copy this link:', window.location.href);
   }
 }
-
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+</script>
 
 </body>
 </html>
