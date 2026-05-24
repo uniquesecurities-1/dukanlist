@@ -821,7 +821,7 @@ function _renderResultsInner(){
 function renderCard(b){
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
   const photoHTML = photo
-    ? `<img src="${photo}" alt="${escapeHTML(b.name)}" loading="lazy">`
+    ? `<img src="${photo}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
     : `<div class="ph-fb">${b.category_icon || '🏪'}</div>`;
   const verified = (typeof DukanTier !== 'undefined') ? DukanTier.badge(b) : (b.verified_score >= 3 ? '<span class="verify">✓ Verified</span>' : '');
   const featuredRibbon = b.is_featured ? '<span class="featured-ribbon">★ FEATURED</span>' : '';

@@ -1075,7 +1075,7 @@ async function loadDeals(){
 
 function renderDealCard(d){
   const photo = d.image_url
-    ? `<img src="${escapeHTML(d.image_url)}" alt="${escapeHTML(d.title)}" loading="lazy" style="width:100%;height:120px;object-fit:cover">`
+    ? `<img src="${escapeHTML(d.image_url)}" alt="${escapeHTML(d.title)}" width="400" height="120" loading="lazy" decoding="async" style="width:100%;height:120px;object-fit:cover">`
     : `<div style="width:100%;height:120px;background:linear-gradient(135deg,#FED7AA,#FB923C);display:grid;place-items:center;font-size:2.5rem">🎁</div>`;
   const discTxt = d.discount_pct ? d.discount_pct + '% OFF'
                  : d.discount_text ? d.discount_text : '';
@@ -1140,7 +1140,7 @@ async function loadFeatured(){
 function renderFeaturedCard(b){
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
   const photoHTML = photo
-    ? `<img src="${photo}" alt="${escapeHTML(b.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover">`
+    ? `<img src="${photo}" alt="${escapeHTML(b.name)}" width="400" height="250" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/10;object-fit:cover">`
     : `<div style="width:100%;aspect-ratio:16/10;display:grid;place-items:center;background:linear-gradient(135deg,#FAFAFA,#F1F5F9);font-size:3rem;opacity:.5">${b.category_icon || '🏪'}</div>`;
   const verified = b.verified_score >= 3
     ? '<span style="position:absolute;top:9px;right:9px;background:rgba(5,150,105,.95);color:#fff;padding:3px 9px;border-radius:99px;font-size:.7rem;font-weight:800">✓ Verified</span>'
