@@ -20,14 +20,14 @@
     position:sticky;top:0;z-index:100;
   }
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
-  .badge{font-size:10px;font-weight:700;background:#6366F1;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
   .nav{display:flex;gap:6px;align-items:center}
   .nav a{
     color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;
     font-size:14px;font-weight:600;transition:all .15s;
   }
   .nav a:hover{background:rgba(255,255,255,0.1);color:white}
-  .nav a.active{background:#6366F1;color:white}
+  .nav a.active{background:#1E3A8A;color:white}
   .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
   .logout:hover{background:rgba(255,255,255,0.1);color:white}
 
@@ -45,7 +45,7 @@
   .kpi .label{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
   .kpi .value{font-size:28px;font-weight:800;margin-top:4px;line-height:1.1}
   .kpi .delta{font-size:12px;color:#64748b;margin-top:2px}
-  .kpi.pri{border-left:3px solid #6366F1}
+  .kpi.pri{border-left:3px solid #1E3A8A}
   .kpi.success{border-left:3px solid #10B981}
   .kpi.warn{border-left:3px solid #F59E0B}
   .kpi.danger{border-left:3px solid #EF4444}
@@ -63,7 +63,7 @@
     background:#f8fafc;border:1px solid #e2e8f0;padding:14px;border-radius:10px;
     text-decoration:none;color:#0F172A;display:block;transition:all .15s;
   }
-  .quick-link:hover{background:#eef2ff;border-color:#6366F1;transform:translateY(-1px)}
+  .quick-link:hover{background:#eef2ff;border-color:#1E3A8A;transform:translateY(-1px)}
   .quick-link .ql-icon{font-size:24px}
   .quick-link .ql-title{font-weight:700;margin-top:6px;font-size:14px}
   .quick-link .ql-desc{font-size:12px;color:#64748b;margin-top:2px}
@@ -78,7 +78,7 @@
 /* === Phase 1 admin productivity styles === */
 .search-wrap{position:relative;margin-bottom:18px;z-index:50}
 .search-box{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px 16px;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:.15s}
-.search-box:focus-within{border-color:#6366F1;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+.search-box:focus-within{border-color:#1E3A8A;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
 .search-box input{flex:1;border:0;outline:0;font-size:15px;font-family:inherit;background:transparent;color:#0F172A}
 .search-icon{font-size:18px;opacity:.6}
 .search-spinner{font-size:14px}
@@ -95,7 +95,7 @@
 .search-empty{padding:20px;text-align:center;color:#94a3b8;font-size:13px}
 
 .section-sub{color:#94a3b8;font-size:12px;font-weight:500;margin-left:6px}
-.see-all{display:inline-block;margin-top:12px;color:#6366F1;font-size:13px;font-weight:700;text-decoration:none}
+.see-all{display:inline-block;margin-top:12px;color:#1E3A8A;font-size:13px;font-weight:700;text-decoration:none}
 .see-all:hover{text-decoration:underline}
 
 .task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
@@ -107,14 +107,14 @@
 .tc-icon{font-size:22px;margin-bottom:6px}
 .tc-num{font-size:26px;font-weight:800;letter-spacing:-.02em;color:#0F172A;font-variant-numeric:tabular-nums}
 .tc-label{font-size:12px;color:#475569;font-weight:700;margin-top:2px}
-.tc-cta{font-size:11px;color:#6366F1;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
+.tc-cta{font-size:11px;color:#1E3A8A;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
 .tc-card.urgent .tc-cta{color:#DC2626}
 
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
 @media (max-width:760px){.two-col{grid-template-columns:1fr}}
 .recent-list{display:flex;flex-direction:column;gap:8px}
 .recent-item{display:flex;gap:10px;padding:10px;border:1px solid #e2e8f0;border-radius:8px;text-decoration:none;color:inherit;transition:.12s}
-.recent-item:hover{border-color:#6366F1;background:#F8FAFC}
+.recent-item:hover{border-color:#1E3A8A;background:#F8FAFC}
 .ri-photo{width:40px;height:40px;border-radius:6px;background:#f1f5f9;flex-shrink:0;overflow:hidden;display:grid;place-items:center;font-size:18px;opacity:.6}
 .ri-photo img{width:100%;height:100%;object-fit:cover}
 .ri-info{flex:1;min-width:0}
@@ -122,13 +122,15 @@
 .ri-meta{font-size:11px;color:#64748b}
 .ri-time{font-size:10px;color:#94a3b8;align-self:center;flex-shrink:0;white-space:nowrap}
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>body,h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important}</style>
 </head>
 <body>
 
 <header class="topbar">
   <div class="brand">
     <span>🛡️</span>
-    <span>Dukan<em style="font-style:normal;color:#6366F1">List</em></span>
+    <span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span>
     <span class="badge">ADMIN</span>
   </div>
   <nav class="nav">
@@ -354,7 +356,7 @@ async function runDashboard(){
               const cityCount = (scope.city_ids||[]).length;
               scopeBanner.innerHTML = '<b>🏙 City Moderator</b> · You manage ' + cityCount + ' assigned ' + (cityCount === 1 ? 'city' : 'cities');
               scopeBanner.style.background = 'linear-gradient(135deg,#EEF2FF,#E0E7FF)';
-              scopeBanner.style.borderColor = '#6366F1';
+              scopeBanner.style.borderColor = '#1E3A8A';
             }
             scopeBanner.style.display = '';
           }
@@ -543,7 +545,7 @@ function renderKPIs(s){
 function renderRecent(rows){
   if (!rows.length){
     document.getElementById('recentBiz').innerHTML =
-      '<div style="color:#64748b;text-align:center;padding:24px">No businesses registered yet. <a href="/register.html" target="_blank" style="color:#6366F1">Register the first one →</a></div>';
+      '<div style="color:#64748b;text-align:center;padding:24px">No businesses registered yet. <a href="/register.html" target="_blank" style="color:#1E3A8A">Register the first one →</a></div>';
     return;
   }
   const statusBadge = (s) => {
@@ -570,14 +572,14 @@ function renderRecent(rows){
           ${rows.map(r => `
             <tr style="border-bottom:1px solid #f1f5f9">
               <td style="padding:10px 12px">
-                <a href="/admin/shop?id=${r.id}" style="font-weight:600;color:#6366F1;text-decoration:none" title="Open Admin View">${escapeHtml(r.name)}</a>
+                <a href="/admin/shop?id=${r.id}" style="font-weight:600;color:#1E3A8A;text-decoration:none" title="Open Admin View">${escapeHtml(r.name)}</a>
                 <div style="font-size:12px;color:#64748b">${escapeHtml(r.owner_name || '')} · ${escapeHtml(r.mobile || '')}</div>
               </td>
               <td style="padding:10px 12px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
               <td style="padding:10px 12px;color:#64748b">${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</td>
               <td style="padding:10px 12px">${statusBadge(r.status)}</td>
               <td style="padding:10px 12px;color:#64748b">${r.photos_count} 📸</td>
-              <td style="padding:10px 12px;color:#64748b;font-size:12px;white-space:nowrap">${formatDate(r.created_at)} · <a href="/admin/shop?id=${r.id}" style="color:#6366F1;text-decoration:none;font-weight:700">🛡️ View</a></td>
+              <td style="padding:10px 12px;color:#64748b;font-size:12px;white-space:nowrap">${formatDate(r.created_at)} · <a href="/admin/shop?id=${r.id}" style="color:#1E3A8A;text-decoration:none;font-weight:700">🛡️ View</a></td>
             </tr>
           `).join('')}
         </tbody>

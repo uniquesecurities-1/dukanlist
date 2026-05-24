@@ -865,3 +865,11 @@ h3{ letter-spacing:-.012em }
 .topbar-inner > *:not(.brand):not(.nav-links):not(.hamburger){ display:none !important }
 /* Defensive: hide any ::before/::after pseudo on topbar direct children */
 .topbar-inner::before, .topbar-inner::after{ content:none !important; display:none !important }
+
+
+/* === Breadcrumb strip (used on search + browse) === */
+.breadcrumb-strip{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; max-width:1180px; margin:8px auto 0; padding:6px 16px; font-size:.82rem; color:var(--muted) }
+.breadcrumb-strip a{ color:var(--muted); text-decoration:none; font-weight:600 }
+.breadcrumb-strip a:hover{ color:var(--saffron-deep); text-decoration:none }
+.breadcrumb-strip .sep{ opacity:.5 }
+.breadcrumb-strip .current{ color:var(--ink); font-weight:700 }

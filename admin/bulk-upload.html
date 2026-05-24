@@ -13,7 +13,7 @@
   body{font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh;font-size:14px;line-height:1.55}
   .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
-  .badge{font-size:10px;font-weight:700;background:#6366F1;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
   .topbar nav{display:flex;gap:6px;align-items:center}
   .topbar nav a{color:#cbd5e1;text-decoration:none;padding:7px 12px;border-radius:7px;font-size:13px;font-weight:600;transition:.12s}
   .topbar nav a:hover{background:rgba(255,255,255,.1);color:#fff}
@@ -28,13 +28,13 @@
   .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
   .btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #cbd5e1;color:#0F172A;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;transition:.12s}
   .btn:hover{background:#f8fafc;border-color:#94a3b8}
-  .btn.pri{background:#6366F1;color:#fff;border-color:#6366F1}
-  .btn.pri:hover{background:#4F46E5}
+  .btn.pri{background:#1E3A8A;color:#fff;border-color:#1E3A8A}
+  .btn.pri:hover{background:#1E1B4B}
   .btn.good{background:#10B981;color:#fff;border-color:#10B981}
   .btn.danger{background:#EF4444;color:#fff;border-color:#EF4444}
   .btn:disabled{opacity:.5;cursor:not-allowed}
   textarea{width:100%;min-height:200px;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:1.55;color:#0F172A;background:#FAFAFA}
-  textarea:focus{outline:0;border-color:#6366F1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+  textarea:focus{outline:0;border-color:#1E3A8A;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
   input[type=file]{display:none}
   table.preview{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
   table.preview thead{background:#F8FAFC;position:sticky;top:0;z-index:5}
@@ -55,7 +55,7 @@
   .copy-btn{background:#25D366;color:#fff;border:0;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
   .loader-bar{display:none;height:5px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:8px 0}
   .loader-bar.show{display:block}
-  .loader-bar div{height:100%;width:30%;background:linear-gradient(90deg,#6366F1,#FF6B1A);animation:slide 1s ease-in-out infinite}
+  .loader-bar div{height:100%;width:30%;background:linear-gradient(90deg,#1E3A8A,#FF6B1A);animation:slide 1s ease-in-out infinite}
   @keyframes slide{0%{margin-left:-30%}100%{margin-left:100%}}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(15,23,42,.25);opacity:0;transition:opacity .2s}
   .toast.show{opacity:1}
@@ -65,7 +65,7 @@
 <body>
 
 <header class="topbar">
-  <div class="brand"><span>🛡️</span><span>Dukan<em style="font-style:normal;color:#6366F1">List</em></span><span class="badge">ADMIN</span></div>
+  <div class="brand"><span>🛡️</span><span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span><span class="badge">ADMIN</span></div>
   <nav>
     <a href="/admin/dashboard">📊 Dashboard</a>
     <a href="/admin/moderation">⚖️ Moderation</a>

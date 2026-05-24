@@ -222,11 +222,9 @@
 </header>
 
 <div class="page">
+<nav data-breadcrumb class="breadcrumb-strip" aria-label="breadcrumb"><a href="/">🏠 Home</a><span class="sep">›</span><span class="current">Search</span></nav>
 
-  <h1 class="title">
-    <span data-i18n-en>Find <span class="grad">Local</span> Shops</span>
-    <span data-i18n-hi><span class="grad">लोकल</span> दुकान खोजें</span>
-  </h1>
+  
 
   <form class="search-bar" onsubmit="handleSearch(event)">
     <div class="field">
@@ -814,5 +812,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 window.addEventListener('popstate', runSearch);
 </script>
 
+<script src="/assets/js/city-persist.js"></script>
 </body>
 </html>

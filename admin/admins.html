@@ -13,11 +13,11 @@
 body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
 .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .brand{font-family:'Manrope',sans-serif;font-weight:800;font-size:16px}
-.badge{font-size:10px;font-weight:700;background:#6366F1;color:white;padding:2px 7px;border-radius:5px;margin-left:8px}
+.badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;margin-left:8px}
 .nav{display:flex;gap:6px;align-items:center}
 .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600}
 .nav a:hover{background:rgba(255,255,255,0.1);color:white}
-.nav a.active{background:#6366F1;color:white}
+.nav a.active{background:#1E3A8A;color:white}
 .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
 .main{max-width:1100px;margin:24px auto;padding:0 20px}
 .page-title{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px}
@@ -31,12 +31,12 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#0F172A;min-height:
 .admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
 .admin-card{background:#fafafa;border:1.5px solid #e2e8f0;border-radius:12px;padding:16px}
 .admin-card.super{border-color:#F59E0B;background:linear-gradient(135deg,#FFFBEB,#FEF3C7)}
-.admin-card.city{border-color:#6366F1;background:linear-gradient(135deg,#EEF2FF,#E0E7FF)}
+.admin-card.city{border-color:#1E3A8A;background:linear-gradient(135deg,#EEF2FF,#E0E7FF)}
 .admin-name{font-family:'Manrope',sans-serif;font-size:1.05rem;font-weight:800;color:#0F172A}
 .admin-email{font-size:.82rem;color:#64748b;margin-top:2px}
 .admin-role-pill{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
 .role-super_admin{background:#F59E0B;color:white}
-.role-city_moderator{background:#6366F1;color:white}
+.role-city_moderator{background:#1E3A8A;color:white}
 .role-admin{background:#10B981;color:white}
 .role-moderator{background:#94A3B8;color:white}
 .admin-cities{margin-top:10px;font-size:.85rem;line-height:1.5;color:#475569}
@@ -54,8 +54,8 @@ label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:6
 .input,.select{width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:9px;font-size:14px;font-family:inherit;outline:none}
 .help-block{background:#EFF6FF;border-left:3px solid #3B82F6;padding:12px 14px;border-radius:8px;font-size:13px;color:#1E40AF;line-height:1.6;margin-bottom:14px}
 .city-chips{display:flex;flex-wrap:wrap;gap:6px;min-height:34px;padding:8px;border:1.5px dashed #cbd5e1;border-radius:9px;background:#fafafa}
-.city-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:#EEF2FF;border:1px solid #6366F1;color:#3730A3;border-radius:99px;font-size:13px;font-weight:600}
-.city-chip .x{cursor:pointer;color:#6366F1;font-weight:700;padding:0 4px}
+.city-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:#EEF2FF;border:1px solid #1E3A8A;color:#3730A3;border-radius:99px;font-size:13px;font-weight:600}
+.city-chip .x{cursor:pointer;color:#1E3A8A;font-weight:700;padding:0 4px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;z-index:3000;display:none;color:white}
 .toast.show{display:block}
 .toast.success{background:#10B981}
@@ -64,6 +64,8 @@ label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:6
 .loader{text-align:center;padding:40px;color:#64748b;font-size:14px}
 .err{color:#dc2626;text-align:center;padding:14px;background:#fef2f2;border-radius:8px;font-size:14px}
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>body,h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important}</style>
 </head>
 <body>
 <header class="topbar">

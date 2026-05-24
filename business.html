@@ -53,6 +53,9 @@
   .shop-highlights .sh-tile .sh-text .sh-t-main{ font-size:.72rem }
   .shop-highlights .sh-tile .sh-text .sh-t-sub{ font-size:.64rem }
 }
+
+/* BIZCTA_MOBILE_HIDE — sticky bottom already shows WhatsApp/Call on mobile, so hide the in-card duplicate row */
+@media (max-width:560px){ .biz-meta-card > .cta-row{display:none !important} }
 </style>
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
@@ -2151,5 +2154,6 @@ function copyShopUrl(){
 }
 </script>
 
+<script src="/assets/js/city-persist.js"></script>
 </body>
 </html>
