@@ -185,21 +185,23 @@ export default async function handler(req, res){
     if (!VAPID_PRIVATE_KEY){ res.status(500).json({ error: 'VAPID keys not configured in Vercel env' }); return; }
 
     // Auth: caller must send their own JWT in Authorization header,
-    // then we verify they are admin via SECURITY DEFINER RPC.
+    // then we verify they are SUPER ADMIN — site-wide push reaches every
+    // subscribed user across India, so only super_admin can broadcast.
+    // (Regular admins / city_moderators must NOT be able to spam globally.)
     const callerJwt = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
     if (!callerJwt){ res.status(401).json({ error: 'auth required' }); return; }
 
-    const adminCheck = await fetch(SUPABASE_URL + '/rest/v1/rpc/is_admin', {
+    const adminCheck = await fetch(SUPABASE_URL + '/rest/v1/rpc/is_super_admin', {
       method: 'POST',
       headers: {
-        'apikey': callerJwt,
+        'apikey': SERVICE_KEY,
         'Authorization': 'Bearer ' + callerJwt,
         'Content-Type': 'application/json'
       },
       body: '{}'
     });
-    const isAdminBody = await adminCheck.json().catch(() => false);
-    if (!isAdminBody){ res.status(403).json({ error: 'admin only' }); return; }
+    const isSuperBody = await adminCheck.json().catch(() => false);
+    if (!isSuperBody){ res.status(403).json({ error: 'super-admin only' }); return; }
 
     const b = req.body || {};
     const message = {

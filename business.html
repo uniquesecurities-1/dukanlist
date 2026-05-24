@@ -1002,7 +1002,7 @@ async function loadBusiness(){
       address_line1, address_line2, pincode, lat, lng,
       hours_json, usp_text, usp_hi, about_text, photos, video_url,
       services_json, faqs_json, status,
-      established_year,
+      established_year, payment_methods, special_features,
       verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
       rating_avg, rating_count, view_count,
       category_id, sub_category_id,
@@ -2105,24 +2105,31 @@ function renderShopHighlights(b){
     + '</div>'
   ).join('');
 
-  const text = ((b.usp_text||'')+' '+(b.about_text||'')).toLowerCase();
-  const payments = [];
-  if (/\bcash\b|nakad/.test(text))                payments.push('\ud83d\udcb5 Cash');
-  if (/\bupi\b|paytm|gpay|phonepe/.test(text))    payments.push('\ud83d\udcf1 UPI');
-  if (/\bcard|credit card|debit/.test(text))       payments.push('\ud83d\udcb3 Cards');
-  if (/credit|udhaar|udhar/.test(text))             payments.push('\ud83d\udcd2 Credit');
-  if (payments.length){
-    document.getElementById('shPaymentRow').style.display = '';
-    document.getElementById('shPaymentPills').innerHTML = payments.map(p => '<span>'+p+'</span>').join('');
+  // Payment methods — STRUCTURED (shopkeeper-controlled). No regex inference.
+  const pmIcons = {
+    'cash':'\ud83d\udcb5 Cash',
+    'upi':'\ud83d\udcf1 UPI',
+    'cards':'\ud83d\udcb3 Cards',
+    'credit':'\ud83d\udcd2 Credit',
+    'cheque':'\ud83d\udcdd Cheque',
+    'online':'\ud83d\udcbb Online transfer'
+  };
+  if (Array.isArray(b.payment_methods) && b.payment_methods.length){
+    const pills = b.payment_methods
+      .map(k => pmIcons[String(k).toLowerCase()] || ('\u2022 ' + k))
+      .map(p => '<span>'+esc(p)+'</span>')
+      .join('');
+    if (pills){
+      document.getElementById('shPaymentRow').style.display = '';
+      document.getElementById('shPaymentPills').innerHTML = pills;
+    }
   }
 
-  if (b.usp_text){
-    const features = b.usp_text.split(/[\u00b7\u2022|,]+/).map(s => s.trim()).filter(s => s.length > 3 && s.length < 50);
-    if (features.length){
-      document.getElementById('shFeatureRow').style.display = '';
-      document.getElementById('shFeaturePills').innerHTML = features.slice(0,4).map(f =>
-        '<span class="sh-feature">\u2713 '+esc(f)+'</span>').join('');
-    }
+  // Special features — STRUCTURED (shopkeeper-curated array). No regex split.
+  if (Array.isArray(b.special_features) && b.special_features.length){
+    document.getElementById('shFeatureRow').style.display = '';
+    document.getElementById('shFeaturePills').innerHTML = b.special_features.slice(0,6).map(f =>
+      '<span class="sh-feature">\u2713 '+esc(f)+'</span>').join('');
   }
 
   const url = window.location.href;
