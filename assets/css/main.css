@@ -969,3 +969,13 @@ body:has(#dukanCompareBar){ padding-bottom:80px }
 .tier-roadmap ul li{ margin-bottom:3px }
 .tier-roadmap.tier-complete{ background:linear-gradient(135deg,#D1FAE5 0%,#A7F3D0 100%); border-color:#10B981 }
 .tier-roadmap.tier-complete h3, .tier-roadmap.tier-complete .tr-current{ color:#064E3B }
+
+/* === Admin Pack: shared empty-state component === */
+.admin-empty{ padding:60px 20px; text-align:center; color:#94a3b8 }
+.admin-empty .ico{ font-size:48px; opacity:.4; margin-bottom:14px; display:block }
+.admin-empty .es-title{ font-size:16px; font-weight:800; color:#475569; margin-bottom:6px; font-family:'Plus Jakarta Sans',sans-serif }
+.admin-empty .es-sub{ font-size:13px; margin-bottom:18px; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.5 }
+.admin-empty .es-cta{ display:inline-block; padding:9px 18px; background:#0F172A; color:#fff; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none; cursor:pointer; border:none; font-family:inherit }
+.admin-empty .es-cta:hover{ background:#1E293B }
+.admin-empty .es-cta-secondary{ background:#fff; color:#0F172A; border:1px solid #cbd5e1; margin-left:6px }
+.admin-empty .es-cta-secondary:hover{ background:#f8fafc; border-color:#0F172A }

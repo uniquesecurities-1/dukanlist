@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Deals Moderation — Admin · DukanList</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif;background:#f1f5f9;color:#0F172A;font-size:14px;line-height:1.5}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .badge{font-size:10px;font-weight:700;background:#FFC93D;color:#0F172A;padding:2px 7px;border-radius:5px}
+  .topbar a{color:#cbd5e1;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;transition:.15s}
+  .topbar a:hover{background:rgba(255,255,255,.1);color:#fff}
+  .topbar a.active{background:rgba(255,201,61,.18);color:#FFC93D}
+
+  .main{max-width:1180px;margin:24px auto;padding:0 18px}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+  .subtitle{font-size:13px;color:#64748b;margin-bottom:18px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .tab{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:#475569;cursor:pointer;transition:.15s;font-family:inherit}
+  .tab:hover{border-color:#FFC93D;color:#0F172A}
+  .tab.active{background:#0F172A;color:#fff;border-color:#0F172A}
+  .tab .ct{margin-left:6px;font-size:11px;background:rgba(255,255,255,.18);padding:2px 6px;border-radius:99px}
+  .tab:not(.active) .ct{background:#e2e8f0;color:#64748b}
+
+  .table-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#f8fafc;text-align:left;padding:11px 14px;font-weight:800;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+  td{padding:12px 14px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover{background:#fafbff}
+  .shop-cell{font-weight:700;color:#0F172A;line-height:1.3}
+  .shop-cell a{color:#0F172A;text-decoration:none}
+  .shop-cell a:hover{color:#FF6B1A}
+  .shop-sub{font-size:11px;color:#94a3b8;font-weight:600;margin-top:2px}
+  .deal-title{font-weight:700;line-height:1.35;max-width:280px}
+  .deal-body{font-size:11px;color:#64748b;margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .pct-pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;background:#FEE2E2;color:#991B1B}
+  .status-active{color:#065F46;font-weight:700;font-size:11px}
+  .status-expired{color:#991B1B;font-weight:700;font-size:11px}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+  .btn{background:#fff;border:1px solid #cbd5e1;border-radius:7px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;color:#0F172A;font-family:inherit;transition:.12s;text-decoration:none;display:inline-block;line-height:1.3}
+  .btn:hover{background:#f8fafc;border-color:#0F172A}
+  .btn-warn{background:#FEF3C7;border-color:#FCD34D;color:#92400E}
+  .btn-warn:hover{background:#FDE68A}
+  .btn-danger{background:#FEE2E2;border-color:#FCA5A5;color:#991B1B}
+  .btn-danger:hover{background:#FECACA}
+  .btn-good{background:#D1FAE5;border-color:#6EE7B7;color:#065F46}
+  .btn-good:hover{background:#A7F3D0}
+
+  .empty-state{padding:60px 20px;text-align:center;color:#94a3b8}
+  .empty-state .ico{font-size:48px;opacity:.4;margin-bottom:14px;display:block}
+  .empty-state .es-title{font-size:16px;font-weight:800;color:#475569;margin-bottom:6px}
+  .empty-state .es-sub{font-size:13px;margin-bottom:18px;max-width:380px;margin-left:auto;margin-right:auto}
+  .empty-state .es-cta{display:inline-block;padding:9px 18px;background:#0F172A;color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none}
+  .empty-state .es-cta:hover{background:#1E293B}
+
+  .err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:14px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:16px}
+  .loader{text-align:center;padding:60px 20px;color:#64748b}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="/admin/dashboard" style="display:flex;align-items:center;gap:10px;color:#fff;padding:0">🛡️ <strong>Admin</strong> <span class="badge">Deals</span></a>
+  </div>
+  <nav style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/moderation">Moderation</a>
+    <a href="/admin/featured.html">⭐ Featured</a>
+    <a href="/admin/deals.html" class="active">🎁 Deals</a>
+    <a href="/admin/activity.html">📋 Activity</a>
+    <a href="/admin/announcements">Announcements</a>
+    <a class="logout" onclick="logout()" style="cursor:pointer;color:#FCA5A5">Logout</a>
+  </nav>
+</header>
+
+<main class="main">
+  <h1>🎁 Deals Moderation</h1>
+  <div class="subtitle">Review, hide, or delete promotional deals posted by shopkeepers.</div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-filter="all"     onclick="setFilter('all')">All <span class="ct" id="ct-all">0</span></button>
+    <button class="tab"        data-filter="active"  onclick="setFilter('active')">Active <span class="ct" id="ct-active">0</span></button>
+    <button class="tab"        data-filter="expired" onclick="setFilter('expired')">Expired <span class="ct" id="ct-expired">0</span></button>
+  </div>
+
+  <div id="content">
+    <div class="loader">Loading deals…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+const ROOT = document.getElementById('content');
+let ALL_DEALS = [];
+let FILTER = 'all';
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fmtDate(iso){
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'2-digit' });
+}
+
+async function init(){
+  const c = ShopDB.client;
+  const { data: sess } = await c.auth.getSession();
+  if (!sess.session){
+    location.href = '/admin/login.html?next=/admin/deals.html';
+    return;
+  }
+  const r = await c.rpc('admin_list_all_deals', { p_limit: 200, p_offset: 0 });
+  if (r.error){
+    ROOT.innerHTML = '<div class="err">Failed to load deals: ' + esc(r.error.message) + '<br><small style="font-weight:500;margin-top:6px;display:block">If you see "function does not exist", run db/41-trust-hardening.sql in Supabase SQL Editor first.</small></div>';
+    return;
+  }
+  ALL_DEALS = Array.isArray(r.data) ? r.data : [];
+  updateCounts();
+  render();
+}
+
+function updateCounts(){
+  document.getElementById('ct-all').textContent     = ALL_DEALS.length;
+  document.getElementById('ct-active').textContent  = ALL_DEALS.filter(d => d.is_active).length;
+  document.getElementById('ct-expired').textContent = ALL_DEALS.filter(d => !d.is_active).length;
+}
+
+function setFilter(f){
+  FILTER = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.filter === f));
+  render();
+}
+
+function render(){
+  let rows = ALL_DEALS.slice();
+  if (FILTER === 'active') rows = rows.filter(d => d.is_active);
+  else if (FILTER === 'expired') rows = rows.filter(d => !d.is_active);
+
+  if (!rows.length){
+    ROOT.innerHTML = `
+      <div class="table-wrap">
+        <div class="empty-state">
+          <span class="ico">🎁</span>
+          <div class="es-title">No deals to moderate${FILTER !== 'all' ? ' in this view' : ' yet'}</div>
+          <div class="es-sub">When shopkeepers post promotional offers from their panel, they'll appear here for review.</div>
+          ${FILTER !== 'all' ? '<button class="es-cta" onclick="setFilter(\'all\')">View all deals</button>' : ''}
+        </div>
+      </div>`;
+    return;
+  }
+
+  let html = '<div class="table-wrap"><table>'
+    + '<thead><tr>'
+    +   '<th>Shop</th>'
+    +   '<th>Deal</th>'
+    +   '<th>Discount</th>'
+    +   '<th>Valid Until</th>'
+    +   '<th>Status</th>'
+    +   '<th>Views · Clicks</th>'
+    +   '<th>Actions</th>'
+    + '</tr></thead><tbody>';
+
+  rows.forEach(d => {
+    const pct = d.discount_pct ? d.discount_pct + '% OFF' : esc(d.discount_text || '—');
+    html += '<tr>'
+      + '<td><div class="shop-cell"><a href="/admin/shop.html?id=' + esc(d.business_id) + '">' + esc(d.business_name) + '</a></div>'
+      +     '<div class="shop-sub">📍 ' + esc(d.city_name || '—') + '</div></td>'
+      + '<td><div class="deal-title">' + esc(d.title) + '</div>'
+      +     (d.body ? '<div class="deal-body">' + esc(d.body) + '</div>' : '')
+      + '</td>'
+      + '<td>' + (d.discount_pct ? '<span class="pct-pill">' + pct + '</span>' : pct) + '</td>'
+      + '<td>' + fmtDate(d.valid_until) + '</td>'
+      + '<td>' + (d.is_active ? '<span class="status-active">● Active</span>' : '<span class="status-expired">● Expired</span>') + '</td>'
+      + '<td><b>' + (d.view_count || 0) + '</b> · ' + (d.click_count || 0) + '</td>'
+      + '<td><div class="actions">'
+      +   '<a class="btn" href="/business.html?slug=' + esc(d.business_slug) + '" target="_blank">View shop</a>'
+      +   (d.is_active
+            ? '<button class="btn btn-warn" data-act="hide"    data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">Hide</button>'
+            : '<button class="btn btn-good" data-act="restore" data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">Restore</button>')
+      +   '<button class="btn btn-danger" data-act="delete" data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">Delete</button>'
+      + '</div></td>'
+      + '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  ROOT.innerHTML = html;
+
+  // Event delegation for action buttons
+  ROOT.querySelectorAll('button[data-act]').forEach(btn => {
+    btn.addEventListener('click', () => handleAction(btn.dataset.act, btn.dataset.id, btn.dataset.title));
+  });
+}
+
+async function handleAction(act, id, title){
+  const c = ShopDB.client;
+  let confirmMsg, rpcName, rpcArgs;
+  if (act === 'hide'){
+    confirmMsg = 'Hide deal "' + title + '"? It will disappear from public listings immediately.';
+    rpcName = 'admin_set_deal_hidden';
+    rpcArgs = { p_deal_id: id, p_hide: true };
+  } else if (act === 'restore'){
+    confirmMsg = 'Restore deal "' + title + '"? It will become active for 7 days.';
+    rpcName = 'admin_set_deal_hidden';
+    rpcArgs = { p_deal_id: id, p_hide: false };
+  } else if (act === 'delete'){
+    confirmMsg = 'Permanently delete deal "' + title + '"? This cannot be undone.';
+    rpcName = 'admin_delete_deal';
+    rpcArgs = { p_deal_id: id };
+  }
+  if (!confirm(confirmMsg)) return;
+  const r = await c.rpc(rpcName, rpcArgs);
+  if (r.error){
+    alert('Failed: ' + r.error.message);
+    return;
+  }
+  // Update local state + re-render
+  if (act === 'delete'){
+    ALL_DEALS = ALL_DEALS.filter(d => d.id !== id);
+  } else {
+    const d = ALL_DEALS.find(x => x.id === id);
+    if (d){
+      if (act === 'hide'){
+        d.valid_until = new Date(Date.now() - 1000).toISOString();
+        d.is_active = false;
+      } else {
+        d.valid_until = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+        d.is_active = true;
+      }
+    }
+  }
+  updateCounts();
+  render();
+}
+
+async function logout(){
+  await ShopDB.client.auth.signOut();
+  location.href = '/admin/login.html';
+}
+
+init();
+</script>
+</body>
+</html>

@@ -189,8 +189,23 @@ async function init(){
   if (!c){ toast('Backend not configured', true); return; }
   const u = await c.auth.getUser();
   if (!u?.data?.user){ location.href = '/admin/login.html'; return; }
-  const a = await c.rpc('is_admin');
-  if (a.error || !a.data){ toast('Admin only', true); setTimeout(() => location.href='/', 1500); return; }
+  // Check super_admin (announcements are super_admin only as of db/43)
+  const sa = await c.rpc('is_super_admin');
+  if (sa.error){
+    // Function may not exist yet — fall back to is_admin (legacy) but warn
+    const a = await c.rpc('is_admin');
+    if (a.error || !a.data){ toast('Admin only', true); setTimeout(() => location.href='/', 1500); return; }
+    toast('Note: run db/43-admin-pack.sql to enable super_admin gating', true);
+  } else if (!sa.data){
+    // Logged in as admin but not super_admin — show clear hint instead of just redirecting
+    document.body.innerHTML = '<div style="max-width:500px;margin:80px auto;padding:32px;background:#fff;border:1px solid #FCA5A5;border-radius:14px;box-shadow:0 4px 12px rgba(15,23,42,.06);font-family:Plus Jakarta Sans,sans-serif;text-align:center">'
+      + '<div style="font-size:48px;margin-bottom:14px">🔒</div>'
+      + '<h2 style="font-size:18px;font-weight:800;margin-bottom:8px;color:#0F172A">Super Admin Only</h2>'
+      + '<p style="color:#64748b;font-size:14px;line-height:1.55;margin-bottom:18px">Announcements broadcast to every user on the site. Only super admins can publish or edit them. Ask the site owner to grant you super_admin role if you need access.</p>'
+      + '<a href="/admin/dashboard" style="display:inline-block;padding:9px 18px;background:#0F172A;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">← Back to dashboard</a>'
+      + '</div>';
+    return;
+  }
   await loadList();
 }
 
@@ -272,43 +287,4 @@ async function createAnn(){
       });
       const pushBody = await pushRes.json().catch(() => ({}));
       if (pushRes.ok) toast('✓ Published + ' + (pushBody.sent || 0) + ' push notifications sent');
-      else toast('Published but push failed: ' + (pushBody.error || pushRes.status), true);
-    } catch(e){ toast('Push error: ' + e.message, true); }
-  } else {
-    toast('✓ Published. Visible to ' + payload.target + ' now.');
-  }
-
-  resetForm();
-  loadList();
-}
-
-function resetForm(){
-  ['fTitle','fBody','fLink','fImage','fStart','fEnd'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fLabel').value = 'Learn more';
-  document.getElementById('fType').value = 'banner';
-  document.getElementById('fColor').value = 'saffron';
-  document.getElementById('fTarget').value = 'all';
-  document.getElementById('fPriority').value = '100';
-  document.getElementById('fDismissible').checked = true;
-  document.getElementById('fActive').checked = true;
-}
-
-async function toggleActive(id, makeActive){
-  const r = await ShopDB.client.rpc('admin_update_announcement', { p_id: id, p_patch: { active: makeActive } });
-  if (r.error){ toast('Update failed: ' + r.error.message, true); return; }
-  toast(makeActive ? 'Activated' : 'Paused');
-  loadList();
-}
-
-async function deleteAnn(id){
-  if (!confirm('Permanently delete this announcement?')) return;
-  const r = await ShopDB.client.rpc('admin_delete_announcement', { p_id: id });
-  if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
-  toast('Deleted');
-  loadList();
-}
-
-init();
-</script>
-</body>
-</html>
+      else toast('Published but push failed: ' + (pushBody.error |
