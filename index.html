@@ -393,6 +393,42 @@ html[data-lang="hi"] .section-head h2{ font-family:'Noto Sans Devanagari',sans-s
   box-shadow:0 1px 2px rgba(15,23,42,.04);
 }
 .how-step:hover{ transform:translateY(-2px); box-shadow:0 20px 50px rgba(15,23,42,.08) }
+
+/* === Homepage v2: Trust signals strip === */
+.trust-strip{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:32px auto 24px; max-width:980px; padding:18px 22px; background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%); border:1px solid #FCD34D; border-radius:18px; box-shadow:0 8px 24px rgba(245,158,11,.10) }
+.trust-strip .ts-item{ display:flex; align-items:center; gap:10px; min-width:0 }
+.trust-strip .ts-icon{ font-size:24px; flex-shrink:0; width:42px; height:42px; display:grid; place-items:center; background:#fff; border-radius:10px; box-shadow:0 2px 6px rgba(245,158,11,.18) }
+.trust-strip .ts-text{ flex:1; min-width:0 }
+.trust-strip .ts-title{ font-size:.82rem; font-weight:800; color:#92400E; line-height:1.25; letter-spacing:-.01em; font-family:'Manrope',sans-serif }
+.trust-strip .ts-sub{ font-size:.7rem; color:#92400E; opacity:.75; font-weight:600; margin-top:2px }
+@media (max-width:740px){
+  .trust-strip{ grid-template-columns:1fr 1fr; gap:10px; padding:14px; margin:24px 14px 18px }
+  .trust-strip .ts-icon{ width:36px; height:36px; font-size:20px; border-radius:8px }
+  .trust-strip .ts-title{ font-size:.74rem }
+  .trust-strip .ts-sub{ font-size:.64rem }
+}
+
+/* === Homepage v2: How-it-works polish === */
+.how-step .n{
+  display:grid !important; place-items:center;
+  width:48px; height:48px; border-radius:50%;
+  background:linear-gradient(135deg,var(--saffron),var(--saffron-deep));
+  color:#fff; font-family:'Manrope',sans-serif; font-size:1.4rem; font-weight:800;
+  box-shadow:0 6px 18px rgba(255,107,26,.32);
+  margin-bottom:16px;
+  transition:transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.how-step:hover .n{ transform:scale(1.1) rotate(-8deg) }
+
+/* === Homepage v2: Featured shops carousel nav arrows on hover === */
+.featured-strip-wrap{ position:relative }
+.featured-strip-wrap .fs-nav{ position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; background:#fff; border:1px solid #e2e8f0; box-shadow:0 8px 24px rgba(15,23,42,.14); display:none; place-items:center; cursor:pointer; z-index:5; font-size:18px; color:var(--ink); font-weight:800; transition:.15s; font-family:inherit }
+.featured-strip-wrap .fs-nav:hover{ background:var(--saffron); color:#fff; border-color:transparent; box-shadow:0 8px 24px rgba(255,107,26,.4); transform:translateY(-50%) scale(1.05) }
+.featured-strip-wrap .fs-nav.fs-prev{ left:-12px }
+.featured-strip-wrap .fs-nav.fs-next{ right:-12px }
+@media (min-width:880px){
+  .featured-strip-wrap:hover .fs-nav{ display:grid }
+}
 .how-step .n{
   display:inline-flex; width:40px; height:40px; align-items:center; justify-content:center;
   background:linear-gradient(135deg,var(--indigo),var(--indigo-deep));
@@ -773,6 +809,29 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 </div>
 
 <!-- ===== HOW IT WORKS ===== -->
+
+<!-- Trust signals strip — Homepage v2 -->
+<section class="trust-strip-section" style="margin:0 auto;max-width:1180px;padding:0 18px">
+  <div class="trust-strip">
+    <div class="ts-item">
+      <div class="ts-icon">✅</div>
+      <div class="ts-text"><div class="ts-title"><span data-i18n-en>Verified Shops</span><span data-i18n-hi>वेरिफाइड दुकानें</span></div><div class="ts-sub"><span data-i18n-en>Personally checked</span><span data-i18n-hi>व्यक्तिगत जांच</span></div></div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-icon">🎁</div>
+      <div class="ts-text"><div class="ts-title"><span data-i18n-en>Free Forever</span><span data-i18n-hi>हमेशा फ्री</span></div><div class="ts-sub"><span data-i18n-en>No charges to list</span><span data-i18n-hi>लिस्टिंग चार्ज नहीं</span></div></div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-icon">⚡</div>
+      <div class="ts-text"><div class="ts-title"><span data-i18n-en>24-Hour Activation</span><span data-i18n-hi>24 घंटे में चालू</span></div><div class="ts-sub"><span data-i18n-en>Fast approval</span><span data-i18n-hi>तुरंत मंजूरी</span></div></div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-icon">📱</div>
+      <div class="ts-text"><div class="ts-title"><span data-i18n-en>One-tap Call</span><span data-i18n-hi>एक टैप पर कॉल</span></div><div class="ts-sub"><span data-i18n-en>WhatsApp + Phone</span><span data-i18n-hi>व्हाट्सऐप + फोन</span></div></div>
+    </div>
+  </div>
+</section>
+
 <section class="how">
   <div class="section-head reveal">
     <span class="eyebrow">

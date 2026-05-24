@@ -17,7 +17,20 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
-<style>body,h1,h2,h3{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}</style>
+<style>body,h1,h2,h3{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+/* === Browse v2: quick chips strip === */
+.quick-cats-browse{ display:flex; gap:8px; overflow-x:auto; padding:4px 18px 14px; margin:0 -18px 22px; scrollbar-width:none; max-width:none }
+.quick-cats-browse::-webkit-scrollbar{ display:none }
+.quick-cat-browse{ display:inline-flex; align-items:center; gap:6px; padding:9px 16px; background:#fff; border:1.5px solid #e2e8f0; border-radius:99px; font-size:.84rem; font-weight:700; color:var(--ink-2); cursor:pointer; transition:.18s; white-space:nowrap; flex-shrink:0; box-shadow:0 1px 3px rgba(15,23,42,.04); font-family:inherit; text-decoration:none }
+.quick-cat-browse:hover{ border-color:var(--saffron); color:var(--saffron-deep); transform:translateY(-1px); box-shadow:0 6px 14px rgba(255,107,26,.16); text-decoration:none }
+.quick-cat-browse .qcb-emoji{ font-size:1rem }
+
+/* === Browse v2: parent card visual polish === */
+.parent-card{ transition:transform .3s cubic-bezier(.22,.61,.36,1), box-shadow .3s cubic-bezier(.22,.61,.36,1), border-color .2s ease }
+.parent-card:hover{ transform:translateY(-3px); box-shadow:0 24px 50px rgba(15,23,42,.10), 0 4px 12px var(--p-tint, rgba(255,107,26,.08)); border-color:var(--p-color, var(--saffron)) }
+.parent-card .p-icon{ transition:transform .25s cubic-bezier(.22,.61,.36,1); box-shadow:0 4px 12px rgba(15,23,42,.08) }
+.parent-card:hover .p-icon{ transform:scale(1.06) rotate(-4deg) }
+</style>
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
 /* ======= Parent sections (Apple-grade) ======= */
@@ -224,6 +237,17 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
   </p>
 
   <!-- Live stats -->
+  <nav class="quick-cats-browse" aria-label="Popular categories">
+    <a class="quick-cat-browse" href="/search.html?cat=doctor"><span class="qcb-emoji">👩‍⚕️</span>Doctor</a>
+    <a class="quick-cat-browse" href="/search.html?cat=beauty-salon"><span class="qcb-emoji">💈</span>Salon</a>
+    <a class="quick-cat-browse" href="/search.html?cat=mechanic"><span class="qcb-emoji">🔧</span>Mechanic</a>
+    <a class="quick-cat-browse" href="/search.html?cat=grocery"><span class="qcb-emoji">🛒</span>Grocery</a>
+    <a class="quick-cat-browse" href="/search.html?cat=restaurant"><span class="qcb-emoji">🍽️</span>Restaurant</a>
+    <a class="quick-cat-browse" href="/search.html?cat=tutor"><span class="qcb-emoji">🧑‍🏫</span>Tutor</a>
+    <a class="quick-cat-browse" href="/search.html?cat=pharmacy"><span class="qcb-emoji">💊</span>Pharmacy</a>
+    <a class="quick-cat-browse" href="/search.html?cat=mutual-fund-distributor"><span class="qcb-emoji">📊</span>Mutual Funds</a>
+  </nav>
+
   <div class="stats-bar" id="statsBar" style="display:none">
     <div class="stat"><div class="num" id="stTotalCats">—</div><div class="lbl" data-i18n-en>Categories</div><div class="lbl" data-i18n-hi>श्रेणियाँ</div></div>
     <div class="stat"><div class="num" id="stTotalShops">—</div><div class="lbl" data-i18n-en>Active Shops</div><div class="lbl" data-i18n-hi>दुकानें</div></div>
