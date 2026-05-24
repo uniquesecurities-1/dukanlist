@@ -318,9 +318,9 @@
 
   <div id="filterChipsSlot" style="display:none"></div>
   <div id="mapViewWrap" style="display:none">
-    <div id="mapHintBanner" style="display:none;padding:10px 14px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;margin-bottom:10px;font-size:.85rem;color:#92400E;font-weight:600;text-align:center"></div>
+    <div id="mapHintBanner" style="padding:12px 16px;background:#EFF6FF;border:1px solid #93C5FD;border-radius:10px;margin-bottom:12px;font-size:.88rem;color:#1E40AF;font-weight:600;display:flex;align-items:center;gap:10px"><span style="font-size:18px">🗺️</span><span><b>Sirsa-Bathinda Region.</b> Shops with map coordinates will appear here. <a href="#" id="mapShopsListBtn" style="color:#1E40AF;text-decoration:underline;font-weight:700;margin-left:6px">View as list →</a></span></div>
     <div id="mapView" style="border-radius:18px;overflow:hidden;border:1px solid rgba(15,23,42,.05);box-shadow:0 8px 28px rgba(15,23,42,.06);height:520px;background:#f1f5f9;position:relative">
-      <div id="mapLoadHint" style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem;text-align:center;padding:30px;z-index:5">Loading map…</div>
+      <iframe id="mapIframe" src="" loading="lazy" style="width:100%;height:100%;border:0;display:block" title="Sirsa-Bathinda regional map"></iframe>
     </div>
   </div>
   <div id="results">
@@ -795,9 +795,6 @@ function renderCard(b){
 }
 
 // ===== Map View =====
-let _mapInstance = null;
-let _mapPins = [];
-let _mapLeafletLoaded = false;
 let CURRENT_VIEW = 'list';
 
 function setView(v){
@@ -809,239 +806,37 @@ function setView(v){
   document.getElementById('results').style.display = v === 'list' ? '' : 'none';
   document.getElementById('mapViewWrap').style.display = v === 'map' ? '' : 'none';
   try{ localStorage.setItem('shop_view', v); }catch(_){}
-  if (v === 'map'){
-    initMap();
-    // Critical: Leaflet measures container at init. If container was hidden
-    // or sidebar grid caused width change, force recalc after a paint.
-    setTimeout(() => {
-      if (_mapInstance && typeof _mapInstance.invalidateSize === 'function'){
-        _mapInstance.invalidateSize();
-      }
-    }, 150);
-  }
+  if (v === 'map') initMap();
 }
 
-async function loadLeaflet(){
-  if (_mapLeafletLoaded) return;
-  return new Promise((resolve, reject) => {
-    const css = document.createElement('link');
-    css.rel = 'stylesheet';
-    css.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(css);
-    const js = document.createElement('script');
-    js.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
-    js.onload = () => { _mapLeafletLoaded = true; resolve(); };
-    js.onerror = reject;
-    document.head.appendChild(js);
-  });
-}
+function initMap(){
+  // Lightweight iframe-based map (OpenStreetMap embed centered on Sirsa-Bathinda)
+  const iframe = document.getElementById('mapIframe');
+  if (!iframe) return;
+  if (iframe.dataset.loaded === '1') return;
 
-async function initMap(){
-  const hint = document.getElementById('mapLoadHint');
-  try{
-    await loadLeaflet();
-    hint.style.display = 'none';
-    if (!_mapInstance){
-      _mapInstance = L.map('mapView', { zoomControl: true, scrollWheelZoom: true })
-        .setView([29.95, 74.7], 11);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 19
-      }).addTo(_mapInstance);
-      // After tiles load, force recalc (handles all layout edge cases)
-      setTimeout(() => { try { _mapInstance.invalidateSize(); } catch(_){} }, 200);
-    } else {
-      // Map already exists — just recalc size in case layout changed
-      try { _mapInstance.invalidateSize(); } catch(_){}
-    }
-    renderMapPins();
-  } catch(e){
-    hint.style.display = 'grid';
-    hint.innerHTML = '⚠️ Map failed to load. <a href="javascript:initMap()" style="color:var(--saffron-deep);font-weight:700">Retry</a>';
+  // Compute bounding box for Sirsa + Bathinda + Mandi Dabwali region
+  // West, South, East, North coords (covers all our supported cities)
+  const bbox = '74.20,29.40,75.35,30.55';
+  const marker = '29.95,74.70'; // Mandi Dabwali approx center
+  iframe.src = 'https://www.openstreetmap.org/export/embed.html'
+             + '?bbox=' + bbox
+             + '&layer=mapnik'
+             + '&marker=' + marker;
+  iframe.dataset.loaded = '1';
+
+  // Wire the "View as list" link inside the banner
+  const lstBtn = document.getElementById('mapShopsListBtn');
+  if (lstBtn && !lstBtn.dataset.bound){
+    lstBtn.addEventListener('click', (e) => { e.preventDefault(); setView('list'); });
+    lstBtn.dataset.bound = '1';
   }
 }
 
 function renderMapPins(){
-  if (!_mapInstance) return;
-  // Clear existing pins
-  _mapPins.forEach(m => _mapInstance.removeLayer(m));
-  _mapPins = [];
-
-  const rows = LAST_RESULTS.filter(b => b.lat && b.lng);
-  const banner = document.getElementById('mapHintBanner');
-  const hint = document.getElementById('mapLoadHint');
-  // Always hide the overlay hint when we have a map instance
-  if (hint) hint.style.display = 'none';
-  if (!rows.length){
-    if (banner){
-      banner.innerHTML = '📍 No shops in current results have map coordinates yet. Showing regional overview — ask shopkeepers to add their location.';
-      banner.style.display = '';
-    }
-    // Reset to wide regional view so user sees something useful
-    if (_mapInstance) _mapInstance.setView([29.95, 74.7], 10);
-    return;
-  }
-  if (banner) banner.style.display = 'none';
-
-  const bounds = [];
-  rows.forEach(b => {
-    const isFeatured = !!b.is_featured;
-    const icon = L.divIcon({
-      className: '',
-      html: `<div class="dl-pin ${isFeatured ? 'featured' : ''}"><span>${b.category_icon || '🏪'}</span></div>`,
-      iconSize: [32, 40],
-      iconAnchor: [16, 38],
-      popupAnchor: [0, -34]
-    });
-    const marker = L.marker([Number(b.lat), Number(b.lng)], { icon }).addTo(_mapInstance);
-    const photo = (b.photos && b.photos[0]) || '';
-    const rating = Number(b.rating_avg) > 0 ? `⭐ ${Number(b.rating_avg).toFixed(1)} (${b.rating_count})` : 'No reviews';
-    const popupHtml = `<div class="popup-card">
-      ${photo ? `<div class="pc-photo"><img src="${escapeHTML(photo)}" alt=""></div>` : ''}
-      <div class="pc-body">
-        <div class="pc-name">${escapeHTML(b.name)}${isFeatured ? ' ⭐' : ''}</div>
-        <div class="pc-meta">${escapeHTML(b.category_name || '')} · ${escapeHTML(b.city_name || '')}<br>${rating}</div>
-        <a class="pc-cta" href="/business.html?slug=${encodeURIComponent(b.slug)}">View Shop →</a>
-      </div>
-    </div>`;
-    marker.bindPopup(popupHtml);
-    _mapPins.push(marker);
-    bounds.push([Number(b.lat), Number(b.lng)]);
-  });
-  if (bounds.length > 1){
-    _mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-  } else if (bounds.length === 1){
-    _mapInstance.setView(bounds[0], 14);
-  }
-}
-
-// ============================================================
-// POWER FEATURES: Sidebar filter rail control
-// ============================================================
-function populateSidebar(){
-  const list = document.getElementById('ssCatList');
-  if (!list || !Array.isArray(CATEGORIES) || !CATEGORIES.length) return;
-  const hasParent = CATEGORIES.some(c => c.parent_id !== undefined);
-  let html = '';
-  if (hasParent){
-    const parents = CATEGORIES.filter(c => c.parent_id == null);
-    parents.forEach(p => {
-      const subs = CATEGORIES.filter(s => s.parent_id === p.id);
-      html += '<div class="ss-cat-group">'
-        + '<div class="ss-cat-parent" onclick="ssToggleCatGroup(this)">'
-        +   '<span class="ss-caret">▶</span>'
-        +   '<span class="ss-icon">' + (p.icon || '') + '</span>'
-        +   '<span>' + escapeHTML(p.name) + '</span>'
-        + '</div>'
-        + '<div class="ss-cat-children">';
-      const allLbl = (document.documentElement.getAttribute('data-lang') === 'hi') ? 'सभी ' : 'All ';
-      html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(p.slug) + '" onchange="ssToggleCat(this.value, this.checked)">' + allLbl + escapeHTML(p.name) + '</label>';
-      subs.forEach(s => {
-        html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(s.slug) + '" onchange="ssToggleCat(this.value, this.checked)"><span class="ss-icon">' + (s.icon || '') + '</span>' + escapeHTML(s.name) + '</label>';
-      });
-      html += '</div></div>';
-    });
-  } else {
-    CATEGORIES.forEach(c => {
-      html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(c.slug) + '" onchange="ssToggleCat(this.value, this.checked)"><span class="ss-icon">' + (c.icon || '') + '</span>' + escapeHTML(c.name) + '</label>';
-    });
-  }
-  list.innerHTML = html;
-}
-
-function ssToggleCatGroup(headerEl){ headerEl.classList.toggle('open'); }
-
-function ssToggleCat(slug, checked){
-  if (!slug) return;
-  if (checked) CAT_FILTER.add(slug);
-  else CAT_FILTER.delete(slug);
-  try { localStorage.setItem('shop_catFilter', JSON.stringify(Array.from(CAT_FILTER))); } catch(_){}
-  renderResults();
-}
-
-function ssSetRating(bucket){
-  RATING_BUCKET = Number(bucket) || 0;
-  try { localStorage.setItem('shop_ratingBucket', String(RATING_BUCKET)); } catch(_){}
-  if (RATING_BUCKET === 4){
-    RATING_FILTER = true;
-    const btn = document.getElementById('ratingToggle');
-    if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
-  } else if (RATING_FILTER && RATING_BUCKET !== 4){
-    RATING_FILTER = false;
-    const btn = document.getElementById('ratingToggle');
-    if (btn){ btn.classList.remove('on'); btn.setAttribute('aria-pressed','false'); }
-  }
-  renderResults();
-}
-
-function ssSyncToggle(kind, checked){
-  if (kind === 'openNow'){
-    OPEN_NOW = !!checked;
-    const btn = document.getElementById('openNowToggle');
-    if (btn){ btn.classList.toggle('on', OPEN_NOW); btn.setAttribute('aria-pressed', OPEN_NOW ? 'true' : 'false'); }
-    try { localStorage.setItem('shop_openNow', OPEN_NOW ? '1' : '0'); } catch(_){}
-  } else if (kind === 'verified'){
-    VERIFIED_FILTER = !!checked;
-    const btn = document.getElementById('verifiedToggle');
-    if (btn){ btn.classList.toggle('on', VERIFIED_FILTER); btn.setAttribute('aria-pressed', VERIFIED_FILTER ? 'true' : 'false'); }
-    try { localStorage.setItem('shop_verifiedFilter', VERIFIED_FILTER ? '1' : '0'); } catch(_){}
-  } else if (kind === 'deals'){
-    DEALS_FILTER = !!checked;
-    const btn = document.getElementById('dealsToggle');
-    if (btn){ btn.classList.toggle('on', DEALS_FILTER); btn.setAttribute('aria-pressed', DEALS_FILTER ? 'true' : 'false'); }
-    try { localStorage.setItem('shop_dealsFilter', DEALS_FILTER ? '1' : '0'); } catch(_){}
-  }
-  renderResults();
-}
-
-function clearAllFilters(e){
-  if (e) e.preventDefault();
-  CAT_FILTER.clear();
-  RATING_BUCKET = 0;
-  OPEN_NOW = false;
-  RATING_FILTER = false;
-  VERIFIED_FILTER = false;
-  DEALS_FILTER = false;
-  try {
-    localStorage.removeItem('shop_catFilter');
-    localStorage.removeItem('shop_ratingBucket');
-    localStorage.setItem('shop_openNow', '0');
-    localStorage.setItem('shop_ratingFilter', '0');
-    localStorage.setItem('shop_verifiedFilter', '0');
-    localStorage.setItem('shop_dealsFilter', '0');
-  } catch(_){}
-  ['openNowToggle','ratingToggle','verifiedToggle','dealsToggle'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b){ b.classList.remove('on'); b.setAttribute('aria-pressed','false'); }
-  });
-  ['ssOpenNow','ssVerified','ssDeals'].forEach(id => {
-    const cb = document.getElementById(id);
-    if (cb) cb.checked = false;
-  });
-  const ratingAny = document.querySelector('input[name="ssRating"][value="0"]');
-  if (ratingAny) ratingAny.checked = true;
-  document.querySelectorAll('#ssCatList input[type="checkbox"]').forEach(cb => { cb.checked = false; });
-  document.querySelectorAll('.ss-cat-parent.open').forEach(el => el.classList.remove('open'));
-  renderResults();
-}
-
-function restoreSidebarState(){
-  try {
-    const savedCats = JSON.parse(localStorage.getItem('shop_catFilter') || '[]');
-    if (Array.isArray(savedCats)) savedCats.forEach(s => CAT_FILTER.add(s));
-    const savedBucket = Number(localStorage.getItem('shop_ratingBucket') || '0');
-    if ([0, 2, 3, 4].includes(savedBucket)) RATING_BUCKET = savedBucket;
-  } catch(_){}
-  setTimeout(() => {
-    document.querySelectorAll('#ssCatList input[type="checkbox"]').forEach(cb => {
-      if (CAT_FILTER.has(cb.value)) cb.checked = true;
-    });
-    const r = document.querySelector('input[name="ssRating"][value="' + RATING_BUCKET + '"]');
-    if (r) r.checked = true;
-    const ssOn = document.getElementById('ssOpenNow'); if (ssOn) ssOn.checked = OPEN_NOW;
-    const ssVf = document.getElementById('ssVerified'); if (ssVf) ssVf.checked = VERIFIED_FILTER;
-    const ssDl = document.getElementById('ssDeals'); if (ssDl) ssDl.checked = DEALS_FILTER;
-  }, 50);
+  // No-op for now — iframe approach doesn't support custom pins.
+  // When shops have lat/lng in future, can switch back to Leaflet OR
+  // upgrade to MapLibre GL with proper markers.
 }
 
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
