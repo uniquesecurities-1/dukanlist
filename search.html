@@ -317,8 +317,11 @@
   </div>
 
   <div id="filterChipsSlot" style="display:none"></div>
-  <div id="mapView" style="display:none;border-radius:18px;overflow:hidden;border:1px solid rgba(15,23,42,.05);box-shadow:0 8px 28px rgba(15,23,42,.06);height:520px;background:#f1f5f9;position:relative">
-    <div id="mapLoadHint" style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem;text-align:center;padding:30px">Loading map…</div>
+  <div id="mapViewWrap" style="display:none">
+    <div id="mapHintBanner" style="display:none;padding:10px 14px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;margin-bottom:10px;font-size:.85rem;color:#92400E;font-weight:600;text-align:center"></div>
+    <div id="mapView" style="border-radius:18px;overflow:hidden;border:1px solid rgba(15,23,42,.05);box-shadow:0 8px 28px rgba(15,23,42,.06);height:520px;background:#f1f5f9;position:relative">
+      <div id="mapLoadHint" style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem;text-align:center;padding:30px;z-index:5">Loading map…</div>
+    </div>
   </div>
   <div id="results">
     <div class="biz-grid">
@@ -804,9 +807,18 @@ function setView(v){
   document.getElementById('viewListBtn').setAttribute('aria-pressed', v === 'list' ? 'true' : 'false');
   document.getElementById('viewMapBtn').setAttribute('aria-pressed', v === 'map' ? 'true' : 'false');
   document.getElementById('results').style.display = v === 'list' ? '' : 'none';
-  document.getElementById('mapView').style.display = v === 'map' ? '' : 'none';
+  document.getElementById('mapViewWrap').style.display = v === 'map' ? '' : 'none';
   try{ localStorage.setItem('shop_view', v); }catch(_){}
-  if (v === 'map') initMap();
+  if (v === 'map'){
+    initMap();
+    // Critical: Leaflet measures container at init. If container was hidden
+    // or sidebar grid caused width change, force recalc after a paint.
+    setTimeout(() => {
+      if (_mapInstance && typeof _mapInstance.invalidateSize === 'function'){
+        _mapInstance.invalidateSize();
+      }
+    }, 150);
+  }
 }
 
 async function loadLeaflet(){
@@ -830,13 +842,17 @@ async function initMap(){
     await loadLeaflet();
     hint.style.display = 'none';
     if (!_mapInstance){
-      // Default centre on Mandi Dabwali (Sirsa)
       _mapInstance = L.map('mapView', { zoomControl: true, scrollWheelZoom: true })
         .setView([29.95, 74.7], 11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap',
         maxZoom: 19
       }).addTo(_mapInstance);
+      // After tiles load, force recalc (handles all layout edge cases)
+      setTimeout(() => { try { _mapInstance.invalidateSize(); } catch(_){} }, 200);
+    } else {
+      // Map already exists — just recalc size in case layout changed
+      try { _mapInstance.invalidateSize(); } catch(_){}
     }
     renderMapPins();
   } catch(e){
@@ -852,14 +868,20 @@ function renderMapPins(){
   _mapPins = [];
 
   const rows = LAST_RESULTS.filter(b => b.lat && b.lng);
+  const banner = document.getElementById('mapHintBanner');
+  const hint = document.getElementById('mapLoadHint');
+  // Always hide the overlay hint when we have a map instance
+  if (hint) hint.style.display = 'none';
   if (!rows.length){
-    const hint = document.getElementById('mapLoadHint');
-    hint.style.display = 'grid';
-    hint.innerHTML = '📍 No shops with location data in current results. Showing all of Sirsa-Bathinda region.';
+    if (banner){
+      banner.innerHTML = '📍 No shops in current results have map coordinates yet. Showing regional overview — ask shopkeepers to add their location.';
+      banner.style.display = '';
+    }
+    // Reset to wide regional view so user sees something useful
+    if (_mapInstance) _mapInstance.setView([29.95, 74.7], 10);
     return;
   }
-
-  document.getElementById('mapLoadHint').style.display = 'none';
+  if (banner) banner.style.display = 'none';
 
   const bounds = [];
   rows.forEach(b => {
