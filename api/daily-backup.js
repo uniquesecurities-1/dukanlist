@@ -31,10 +31,10 @@ const SECRET       = process.env.DIGEST_CRON_SECRET || '';
 const TABLES = [
   // table_name           : select clause (drop sensitive columns if any)
   { name: 'businesses',    select: '*' },
-  { name: 'reviews',       select: 'id,business_id,customer_name,rating,text,created_at,owner_reply,owner_replied_at' },
+  { name: 'reviews',       select: 'id,business_id,customer_name,rating,text,status,created_at,owner_reply,owner_reply_at' },
   { name: 'leads_log',     select: 'id,business_id,action,created_at,ua_summary,city_from' },
   { name: 'deals',         select: '*' },
-  { name: 'business_owners', select: 'business_id,auth_user_id,role,created_at' },
+  { name: 'business_owners', select: 'business_id,auth_user_id,role,added_at' },
   { name: 'admin_audit_log', select: '*' },
   { name: 'announcements',  select: '*' }
 ];
@@ -66,6 +66,7 @@ export default async function handler(req, res){
     try {
       let allRows = [];
       let from = 0;
+      let serverTotal = null;
       const PAGE = 1000;
       while (true){
         const r = await fetch(
@@ -75,13 +76,22 @@ export default async function handler(req, res){
               'apikey': SERVICE_KEY,
               'Authorization': 'Bearer ' + SERVICE_KEY,
               'Range': from + '-' + (from + PAGE - 1),
-              'Range-Unit': 'items'
+              'Range-Unit': 'items',
+              'Prefer': 'count=exact'
             }
           }
         );
         if (!r.ok){
-          errors.push({ table: t.name, status: r.status });
+          let body = null;
+          try { body = await r.text(); } catch(_){}
+          errors.push({ table: t.name, status: r.status, body: (body||'').slice(0,200) });
           break;
+        }
+        // Capture authoritative total from Content-Range: "0-N/TOTAL"
+        if (serverTotal === null){
+          const cr = r.headers.get('content-range') || '';
+          const m = cr.match(/\/(\d+)\s*$/);
+          if (m) serverTotal = parseInt(m[1], 10);
         }
         const rows = await r.json();
         if (!Array.isArray(rows) || rows.length === 0) break;
@@ -93,7 +103,11 @@ export default async function handler(req, res){
           break;
         }
       }
-      dump.tables[t.name] = { count: allRows.length, rows: allRows };
+      dump.tables[t.name] = {
+        count: allRows.length,
+        server_total: serverTotal,
+        rows: allRows
+      };
     } catch(e){
       errors.push({ table: t.name, error: String(e) });
     }
@@ -139,23 +153,4 @@ export default async function handler(req, res){
         p_target_id: filename,
         p_target_name: 'Daily DB backup',
         p_details: {
-          size_bytes: sizeBytes,
-          tables_dumped: Object.keys(dump.tables).length,
-          errors: errors.length,
-          ok: uploadOk
-        }
-      })
-    });
-  } catch(_){}
-
-  return res.status(uploadOk ? 200 : 500).json({
-    ok: uploadOk,
-    filename: filename,
-    size_bytes: sizeBytes,
-    size_kb: (sizeBytes / 1024).toFixed(1),
-    tables: Object.fromEntries(Object.entries(dump.tables).map(([k, v]) => [k, v.count])),
-    errors,
-    duration_ms: Date.now() - startMs,
-    upload_error: uploadErr
-  });
-}
+          size_bytes
