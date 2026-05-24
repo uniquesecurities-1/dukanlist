@@ -105,4 +105,18 @@ ${urls.join('\n')}
 </urlset>`;
 
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cac
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    res.setHeader('X-Robots-Tag', 'noindex'); // don't index the sitemap itself
+    return res.status(200).send(xml);
+
+  } catch (err){
+    console.error('Sitemap generation failed:', err);
+    // Fallback: static-only sitemap
+    const fallback = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${STATIC_PAGES.map(p => urlBlock(ORIGIN + p.path, p.priority, p.freq)).join('\n')}
+</urlset>`;
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    return res.status(200).send(fallback);
+  }
+}
