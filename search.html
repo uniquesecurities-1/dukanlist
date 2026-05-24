@@ -466,11 +466,29 @@ async function loadDropdowns(){
   }
 }
 
+// Resolve a city param that might be either a numeric ID or a slug like
+// 'bathinda' (homepage sends slug; search.html / browse.html send ID).
+// Returns the integer city_id or null.
+function resolveCityParam(raw){
+  if (!raw) return null;
+  const n = +raw;
+  if (Number.isFinite(n) && n > 0) return n;
+  const slug = String(raw).toLowerCase().trim();
+  if (!CITIES || !CITIES.length) return null;
+  const match = CITIES.find(c => {
+    if (!c || !c.name) return false;
+    const nm = String(c.name).toLowerCase().trim();
+    const nmSlug = nm.replace(/\s+/g, '-');
+    return nm === slug || nmSlug === slug || nm.includes(slug) || slug.includes(nm);
+  });
+  return match ? match.id : null;
+}
+
 async function runSearch(){
   const params = new URLSearchParams(location.search);
   const q       = params.get('q')    || '';
   const catSlug = params.get('cat')  || '';
-  const cityId  = +params.get('city')|| null;
+  const cityId  = resolveCityParam(params.get('city'));
   const pin     = (params.get('pin') || '').replace(/\D/g, '').slice(0, 6);
 
   document.getElementById('q').value = q;
