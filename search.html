@@ -839,6 +839,136 @@ function renderMapPins(){
   // upgrade to MapLibre GL with proper markers.
 }
 
+// ============================================================
+// POWER FEATURES: Sidebar filter rail control (restored)
+// ============================================================
+function populateSidebar(){
+  const list = document.getElementById('ssCatList');
+  if (!list || !Array.isArray(CATEGORIES) || !CATEGORIES.length) return;
+  const hasParent = CATEGORIES.some(c => c.parent_id !== undefined);
+  let html = '';
+  if (hasParent){
+    const parents = CATEGORIES.filter(c => c.parent_id == null);
+    parents.forEach(p => {
+      const subs = CATEGORIES.filter(s => s.parent_id === p.id);
+      html += '<div class="ss-cat-group">'
+        + '<div class="ss-cat-parent" onclick="ssToggleCatGroup(this)">'
+        +   '<span class="ss-caret">▶</span>'
+        +   '<span class="ss-icon">' + (p.icon || '') + '</span>'
+        +   '<span>' + escapeHTML(p.name) + '</span>'
+        + '</div>'
+        + '<div class="ss-cat-children">';
+      const allLbl = (document.documentElement.getAttribute('data-lang') === 'hi') ? 'सभी ' : 'All ';
+      html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(p.slug) + '" onchange="ssToggleCat(this.value, this.checked)">' + allLbl + escapeHTML(p.name) + '</label>';
+      subs.forEach(s => {
+        html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(s.slug) + '" onchange="ssToggleCat(this.value, this.checked)"><span class="ss-icon">' + (s.icon || '') + '</span>' + escapeHTML(s.name) + '</label>';
+      });
+      html += '</div></div>';
+    });
+  } else {
+    CATEGORIES.forEach(c => {
+      html += '<label class="ss-row"><input type="checkbox" value="' + escapeHTML(c.slug) + '" onchange="ssToggleCat(this.value, this.checked)"><span class="ss-icon">' + (c.icon || '') + '</span>' + escapeHTML(c.name) + '</label>';
+    });
+  }
+  list.innerHTML = html;
+}
+
+function ssToggleCatGroup(headerEl){ headerEl.classList.toggle('open'); }
+
+function ssToggleCat(slug, checked){
+  if (!slug) return;
+  if (checked) CAT_FILTER.add(slug);
+  else CAT_FILTER.delete(slug);
+  try { localStorage.setItem('shop_catFilter', JSON.stringify(Array.from(CAT_FILTER))); } catch(_){}
+  renderResults();
+}
+
+function ssSetRating(bucket){
+  RATING_BUCKET = Number(bucket) || 0;
+  try { localStorage.setItem('shop_ratingBucket', String(RATING_BUCKET)); } catch(_){}
+  if (RATING_BUCKET === 4){
+    RATING_FILTER = true;
+    const btn = document.getElementById('ratingToggle');
+    if (btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
+  } else if (RATING_FILTER && RATING_BUCKET !== 4){
+    RATING_FILTER = false;
+    const btn = document.getElementById('ratingToggle');
+    if (btn){ btn.classList.remove('on'); btn.setAttribute('aria-pressed','false'); }
+  }
+  renderResults();
+}
+
+function ssSyncToggle(kind, checked){
+  if (kind === 'openNow'){
+    OPEN_NOW = !!checked;
+    const btn = document.getElementById('openNowToggle');
+    if (btn){ btn.classList.toggle('on', OPEN_NOW); btn.setAttribute('aria-pressed', OPEN_NOW ? 'true' : 'false'); }
+    try { localStorage.setItem('shop_openNow', OPEN_NOW ? '1' : '0'); } catch(_){}
+  } else if (kind === 'verified'){
+    VERIFIED_FILTER = !!checked;
+    const btn = document.getElementById('verifiedToggle');
+    if (btn){ btn.classList.toggle('on', VERIFIED_FILTER); btn.setAttribute('aria-pressed', VERIFIED_FILTER ? 'true' : 'false'); }
+    try { localStorage.setItem('shop_verifiedFilter', VERIFIED_FILTER ? '1' : '0'); } catch(_){}
+  } else if (kind === 'deals'){
+    DEALS_FILTER = !!checked;
+    const btn = document.getElementById('dealsToggle');
+    if (btn){ btn.classList.toggle('on', DEALS_FILTER); btn.setAttribute('aria-pressed', DEALS_FILTER ? 'true' : 'false'); }
+    try { localStorage.setItem('shop_dealsFilter', DEALS_FILTER ? '1' : '0'); } catch(_){}
+  }
+  renderResults();
+}
+
+function clearAllFilters(e){
+  if (e) e.preventDefault();
+  CAT_FILTER.clear();
+  RATING_BUCKET = 0;
+  OPEN_NOW = false;
+  RATING_FILTER = false;
+  VERIFIED_FILTER = false;
+  DEALS_FILTER = false;
+  try {
+    localStorage.removeItem('shop_catFilter');
+    localStorage.removeItem('shop_ratingBucket');
+    localStorage.setItem('shop_openNow', '0');
+    localStorage.setItem('shop_ratingFilter', '0');
+    localStorage.setItem('shop_verifiedFilter', '0');
+    localStorage.setItem('shop_dealsFilter', '0');
+  } catch(_){}
+  ['openNowToggle','ratingToggle','verifiedToggle','dealsToggle'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b){ b.classList.remove('on'); b.setAttribute('aria-pressed','false'); }
+  });
+  ['ssOpenNow','ssVerified','ssDeals'].forEach(id => {
+    const cb = document.getElementById(id);
+    if (cb) cb.checked = false;
+  });
+  const ratingAny = document.querySelector('input[name="ssRating"][value="0"]');
+  if (ratingAny) ratingAny.checked = true;
+  document.querySelectorAll('#ssCatList input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.ss-cat-parent.open').forEach(el => el.classList.remove('open'));
+  renderResults();
+}
+
+function restoreSidebarState(){
+  try {
+    const savedCats = JSON.parse(localStorage.getItem('shop_catFilter') || '[]');
+    if (Array.isArray(savedCats)) savedCats.forEach(s => CAT_FILTER.add(s));
+    const savedBucket = Number(localStorage.getItem('shop_ratingBucket') || '0');
+    if ([0, 2, 3, 4].includes(savedBucket)) RATING_BUCKET = savedBucket;
+  } catch(_){}
+  setTimeout(() => {
+    document.querySelectorAll('#ssCatList input[type="checkbox"]').forEach(cb => {
+      if (CAT_FILTER.has(cb.value)) cb.checked = true;
+    });
+    const r = document.querySelector('input[name="ssRating"][value="' + RATING_BUCKET + '"]');
+    if (r) r.checked = true;
+    const ssOn = document.getElementById('ssOpenNow'); if (ssOn) ssOn.checked = OPEN_NOW;
+    const ssVf = document.getElementById('ssVerified'); if (ssVf) ssVf.checked = VERIFIED_FILTER;
+    const ssDl = document.getElementById('ssDeals'); if (ssDl) ssDl.checked = DEALS_FILTER;
+  }, 50);
+}
+
+
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
 function handleSearch(e){
