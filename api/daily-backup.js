@@ -2,11 +2,10 @@
 // api/daily-backup.js -- Daily auto-backup of critical tables
 // =====================================================
 // Triggered by Vercel cron at 03:00 IST daily (21:30 UTC previous day).
-// Exports business/review/leads/deals data as JSON and uploads to
-// Supabase Storage 'backups' bucket. Each backup is named
-// dukanlist-YYYY-MM-DD.json.
+// Exports all user-generated data tables as JSON and uploads to
+// Supabase Storage 'backups' bucket. File: dukanlist-YYYY-MM-DD.json.
 //
-// REQUIRED ENV VARS (already in Vercel from email digest):
+// REQUIRED ENV VARS:
 //   SUPABASE_URL
 //   SUPABASE_SERVICE_ROLE_KEY
 //   DIGEST_CRON_SECRET  (reused for manual trigger auth)
@@ -20,14 +19,36 @@ const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const SECRET       = process.env.DIGEST_CRON_SECRET || '';
 
+// All user-generated data tables. Static seed tables (geo_*, categories)
+// are skipped because they live in code (db/01-schema.sql) and can be
+// re-seeded if ever lost.
 const TABLES = [
-  { name: 'businesses',      select: '*' },
-  { name: 'reviews',         select: 'id,business_id,customer_name,rating,text,status,created_at,owner_reply,owner_reply_at' },
-  { name: 'leads_log',       select: 'id,business_id,action,created_at,ua_summary,city_from' },
-  { name: 'deals',           select: '*' },
-  { name: 'business_owners', select: 'business_id,auth_user_id,role,added_at' },
-  { name: 'admin_audit_log', select: '*' },
-  { name: 'announcements',   select: '*' }
+  // Core shop data
+  { name: 'businesses',          select: '*' },
+  { name: 'business_categories', select: '*' },
+  { name: 'business_owners',     select: 'business_id,auth_user_id,role,added_at' },
+  { name: 'business_edits',      select: '*' },
+
+  // User interactions
+  { name: 'reviews',             select: 'id,business_id,customer_name,rating,text,status,created_at,owner_reply,owner_reply_at' },
+  { name: 'leads_log',           select: 'id,business_id,action,created_at,ua_summary,city_from' },
+  { name: 'business_favorites',  select: '*' },
+  { name: 'business_reports',    select: '*' },
+  { name: 'flags',               select: '*' },
+
+  // Promotions / monetization
+  { name: 'deals',               select: '*' },
+  { name: 'featured_payments',   select: '*' },
+  { name: 'announcements',       select: '*' },
+
+  // Notifications
+  { name: 'push_subscriptions',  select: '*' },
+  { name: 'notifications',       select: '*' },
+
+  // Admin / governance
+  { name: 'admin_users',         select: '*' },
+  { name: 'admin_audit_log',     select: '*' },
+  { name: 'blocked_keywords',    select: '*' }
 ];
 
 export default async function handler(req, res){
