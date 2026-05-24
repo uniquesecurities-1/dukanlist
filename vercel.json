@@ -18,6 +18,10 @@
     {
       "source": "/local/:city/:cat",
       "destination": "/api/locality?city=:city&cat=:cat"
+    },
+    {
+      "source": "/:slug([a-z][a-z0-9-]{2,60})",
+      "destination": "/business.html?slug=:slug"
     }
   ],
   "headers": [
@@ -153,6 +157,10 @@
     {
       "path": "/api/send-digest",
       "schedule": "30 2 * * 1"
+    },
+    {
+      "path": "/api/daily-backup",
+      "schedule": "30 21 * * *"
     }
   ]
 }

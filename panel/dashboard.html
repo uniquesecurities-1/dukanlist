@@ -108,6 +108,13 @@
       </div>
     </div>
 
+    <!-- Shareable Stats Card -->
+    <div id="shareStatsRow" style="margin:14px 0 18px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap">
+      <button onclick="openShareStatsModal()" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(5,150,105,.28);transition:.15s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 20px rgba(5,150,105,.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(5,150,105,.28)'">
+        📤 <span data-i18n-en>Share my stats</span><span data-i18n-hi>आँकड़े साझा करें</span>
+      </button>
+    </div>
+
     <!-- Smart Actions (Owner Insights v2) -->
     <div class="card smart-actions-card" id="smartActionsCard" style="margin-bottom:18px;display:none;background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border-color:#93C5FD">
       <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#1E40AF">
@@ -599,6 +606,156 @@ function renderSmartActions(b){
     + '<span style="background:#1E40AF;color:#fff;padding:6px 12px;border-radius:8px;font-size:.74rem;font-weight:800;flex-shrink:0">' + a.cta + ' →</span>'
     + '</a>').join('');
 }
+</script>
+
+<!-- Share Stats Modal -->
+<div id="shareStatsOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:10001;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)">
+  <div style="background:#fff;border-radius:18px;max-width:520px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(15,23,42,.32);position:relative;font-family:'Plus Jakarta Sans',sans-serif">
+    <button onclick="closeShareStatsModal()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:transparent;border:none;font-size:24px;color:#94a3b8;cursor:pointer;line-height:1;padding:4px 8px">×</button>
+    <div style="font-family:'Manrope',sans-serif;font-size:1.2rem;font-weight:800;color:#0F172A;margin-bottom:6px;letter-spacing:-.01em">📤 Share Your Stats</div>
+    <div style="font-size:.88rem;color:#64748b;margin-bottom:14px;line-height:1.45">Show your network how DukanList is helping. Download or share directly on WhatsApp.</div>
+    <div id="shareStatsCanvas" style="display:flex;justify-content:center;margin-bottom:14px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button id="ssWaBtn" onclick="shareStatsToWhatsApp()" style="background:#25D366;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px">📱 Share on WhatsApp</button>
+      <button id="ssDownloadBtn" onclick="downloadStatsImage()" style="background:#0F172A;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px">⬇ Download PNG</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SHARE STATS — Generate SVG card with shop's weekly performance
+// ============================================================
+let SHARE_STATS_SVG = '';
+
+function openShareStatsModal(){
+  if (!MY_BUSINESS){ alert('Your business data is still loading. Please wait a moment.'); return; }
+  const b = MY_BUSINESS;
+  const views   = Number(b.view_count) || 0;
+  const leads   = Number(b.lead_count) || 0;
+  const rating  = Number(b.rating_avg) || 0;
+  const reviews = Number(b.rating_count) || 0;
+  const shopName = b.name || 'My Shop';
+  // Truncate long names
+  const displayName = shopName.length > 26 ? shopName.slice(0, 23) + '...' : shopName;
+
+  // Build SVG card (1200x630 — perfect for WhatsApp/OG)
+  // Saffron gradient background + white card overlay + stats
+  SHARE_STATS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FF6B1A"/>
+        <stop offset="100%" stop-color="#E55100"/>
+      </linearGradient>
+      <linearGradient id="card" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.98"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0.94"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <text x="60" y="80" font-family="Manrope, sans-serif" font-size="28" font-weight="700" fill="#fff" opacity="0.85">DukanList · Weekly Stats</text>
+    <text x="60" y="160" font-family="Manrope, sans-serif" font-size="72" font-weight="900" fill="#fff" letter-spacing="-2">${escSvg(displayName)}</text>
+    <rect x="60" y="220" width="1080" height="320" fill="url(#card)" rx="22"/>
+    <g transform="translate(120, 280)">
+      <text x="0" y="0" font-family="Manrope, sans-serif" font-size="22" font-weight="800" fill="#64748b" letter-spacing="2">VIEWS</text>
+      <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#0F172A" letter-spacing="-3">${views.toLocaleString('en-IN')}</text>
+    </g>
+    <g transform="translate(500, 280)">
+      <text x="0" y="0" font-family="Manrope, sans-serif" font-size="22" font-weight="800" fill="#64748b" letter-spacing="2">CALLS + WHATSAPP</text>
+      <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#FF6B1A" letter-spacing="-3">${leads.toLocaleString('en-IN')}</text>
+    </g>
+    <g transform="translate(880, 280)">
+      <text x="0" y="0" font-family="Manrope, sans-serif" font-size="22" font-weight="800" fill="#64748b" letter-spacing="2">RATING</text>
+      <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#F59E0B" letter-spacing="-3">${rating > 0 ? '⭐' + rating.toFixed(1) : '—'}</text>
+      <text x="0" y="135" font-family="Inter, sans-serif" font-size="20" fill="#64748b">${reviews} review${reviews === 1 ? '' : 's'}</text>
+    </g>
+    <text x="60" y="595" font-family="Manrope, sans-serif" font-size="26" font-weight="700" fill="#fff" opacity="0.9">🇮🇳 List your shop free → dukanlist.com</text>
+  </svg>`;
+
+  // Display in modal
+  const host = document.getElementById('shareStatsCanvas');
+  host.innerHTML = '<div style="max-width:100%;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.18)">' + SHARE_STATS_SVG.replace('width="1200"', 'width="100%"').replace('height="630"', 'height="auto"') + '</div>';
+
+  document.getElementById('shareStatsOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function escSvg(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function closeShareStatsModal(){
+  document.getElementById('shareStatsOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function shareStatsToWhatsApp(){
+  if (!MY_BUSINESS) return;
+  const shopName = MY_BUSINESS.name || 'My shop';
+  const views = Number(MY_BUSINESS.view_count) || 0;
+  const leads = Number(MY_BUSINESS.lead_count) || 0;
+  const msg = '🎉 ' + shopName + ' is on DukanList!\n\n👀 ' + views + ' views\n📞 ' + leads + ' calls + WhatsApp\n\nDukanList par apni dukan free list karwao:\nhttps://dukanlist.com/register';
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank', 'noopener');
+}
+
+async function downloadStatsImage(){
+  if (!SHARE_STATS_SVG){ alert('Stats not ready yet'); return; }
+  // Convert SVG to PNG using canvas
+  const btn = document.getElementById('ssDownloadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  try {
+    const blob = new Blob([SHARE_STATS_SVG], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#FF6B1A';
+    ctx.fillRect(0, 0, 1200, 630);
+    ctx.drawImage(img, 0, 0, 1200, 630);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((pngBlob) => {
+      if (!pngBlob){
+        // Fallback — direct SVG download
+        const a = document.createElement('a');
+        a.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SHARE_STATS_SVG);
+        a.download = 'dukanlist-stats-' + (MY_BUSINESS?.slug || 'shop') + '.svg';
+        a.click();
+      } else {
+        const dl = document.createElement('a');
+        dl.href = URL.createObjectURL(pngBlob);
+        dl.download = 'dukanlist-stats-' + (MY_BUSINESS?.slug || 'shop') + '.png';
+        dl.click();
+        setTimeout(() => URL.revokeObjectURL(dl.href), 1000);
+      }
+      btn.disabled = false;
+      btn.textContent = '⬇ Download PNG';
+    }, 'image/png');
+  } catch(e){
+    console.warn('PNG conversion failed, falling back to SVG download', e);
+    const a = document.createElement('a');
+    a.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SHARE_STATS_SVG);
+    a.download = 'dukanlist-stats-' + (MY_BUSINESS?.slug || 'shop') + '.svg';
+    a.click();
+    btn.disabled = false;
+    btn.textContent = '⬇ Download PNG';
+  }
+}
+
+// Close modal on outside click
+document.addEventListener('click', (e) => {
+  const overlay = document.getElementById('shareStatsOverlay');
+  if (e.target === overlay) closeShareStatsModal();
+});
 </script>
 
 <script src="/assets/js/trust-tier.js"></script>
