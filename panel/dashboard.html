@@ -1340,12 +1340,12 @@ function renderDashActivity(){
 // ============= Referral Program =============
 async function setupReferralWidget(){
   try {
-    // Get current shop slug
-    if (typeof MY_BIZ === 'undefined' || !MY_BIZ || !MY_BIZ.slug){
+    // Get current shop slug — wait for MY_BUSINESS to load
+    if (typeof MY_BUSINESS === 'undefined' || !MY_BUSINESS || !MY_BUSINESS.slug){
       setTimeout(setupReferralWidget, 800);
       return;
     }
-    const slug = MY_BIZ.slug;
+    const slug = MY_BUSINESS.slug;
     const refLink = window.location.origin + '/register.html?ref=' + encodeURIComponent(slug);
     const box = document.getElementById('referralLinkBox');
     if (box) box.textContent = refLink;
@@ -1388,9 +1388,4 @@ function shareReferralWhatsApp(){
   function init(){
     setupReferralWidget();
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-</body>
-</html>
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', i

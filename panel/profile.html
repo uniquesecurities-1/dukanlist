@@ -21,8 +21,9 @@
 .hours-row .closed-cb{font-size:.8rem;color:var(--muted);font-weight:600}
 
 /* Template picker modal */
-.tpl-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1.5px solid #FED7AA;color:#9A3412;font-size:.82rem;font-weight:700;cursor:pointer;margin-top:6px}
-.tpl-btn:hover{background:linear-gradient(135deg,#FFEDD5,#FED7AA);transform:translateY(-1px)}
+.tpl-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;background:linear-gradient(135deg,#F97316,#EA580C);border:none;color:#fff;font-size:.92rem;font-weight:800;cursor:pointer;margin-top:10px;box-shadow:0 4px 14px rgba(249,115,22,0.35);transition:.18s;letter-spacing:.3px}
+.tpl-btn:hover{background:linear-gradient(135deg,#EA580C,#C2410C);transform:translateY(-2px);box-shadow:0 6px 18px rgba(249,115,22,0.5)}
+.tpl-hint{font-size:.78rem;color:#9A3412;background:#FFF7ED;border-left:3px solid #F97316;padding:8px 10px;margin-top:6px;border-radius:0 6px 6px 0;font-weight:600}
 .tpl-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:14px;backdrop-filter:blur(4px)}
 .tpl-modal.show{display:flex}
 .tpl-box{background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.3)}
@@ -149,9 +150,12 @@
       </div>
       <div class="form-group">
         <label><span data-i18n-en>USP (English)</span><span data-i18n-hi>USP (English)</span></label>
+        <div class="tpl-hint">
+          💡 <span data-i18n-en>Don't know what to write? Click the orange button below — we have ready-made USP templates for your profession.</span><span data-i18n-hi>क्या लिखें समझ नहीं आ रहा? नीचे ऑरेंज बटन दबाएं — आपके पेशे के लिए तैयार टेम्पलेट मौजूद हैं।</span>
+        </div>
         <textarea id="usp" class="textarea" maxlength="280" rows="3" placeholder="e.g., AMFI-registered MFD · 15+ yrs experience · 1000+ families served · Free portfolio review"></textarea>
         <button type="button" class="tpl-btn" onclick="openTemplates('usp')">
-          📋 <span data-i18n-en>Browse USP Templates</span><span data-i18n-hi>USP टेम्पलेट चुनें</span>
+          📋 <span data-i18n-en>Browse Ready-Made USP Templates (by profession)</span><span data-i18n-hi>तैयार USP टेम्पलेट देखें (पेशे के अनुसार)</span>
         </button>
       </div>
       <div class="form-group">
@@ -171,9 +175,12 @@
       </div>
       <div class="form-group">
         <label><span data-i18n-en>Your business story (max 1500 chars)</span><span data-i18n-hi>आपकी बिज़नेस कहानी</span></label>
+        <div class="tpl-hint">
+          💡 <span data-i18n-en>Use ready-made templates customised for your profession — Mutual Fund Distributor, Stock Broker, Insurance Agent, Doctor, Shop, etc. Just click the orange button and pick one.</span><span data-i18n-hi>अपने पेशे के लिए तैयार टेम्पलेट इस्तेमाल करें — Mutual Fund Distributor, Stock Broker, Insurance Agent, Doctor, Shop आदि। ऑरेंज बटन दबाकर पसंदीदा चुनें।</span>
+        </div>
         <textarea id="aboutText" class="textarea" maxlength="1500" rows="6" placeholder="Tell customers who you are, since when, what makes you special..."></textarea>
         <button type="button" class="tpl-btn" onclick="openTemplates('about')">
-          📋 <span data-i18n-en>Browse About Us Templates</span><span data-i18n-hi>About Us टेम्पलेट चुनें</span>
+          📋 <span data-i18n-en>Browse Ready-Made About Us Templates (by profession)</span><span data-i18n-hi>तैयार About Us टेम्पलेट देखें (पेशे के अनुसार)</span>
         </button>
       </div>
     </div>
@@ -770,6 +777,28 @@ async function saveProfile(){
   // Reload MY_BIZ so save reflects latest
   Object.assign(MY_BIZ, payload);
   if (updRes && updRes.status) MY_BIZ.status = updRes.status;
+
+  // ===== POST-SAVE VERIFICATION =====
+  // Re-fetch from DB to confirm trust fields actually persisted.
+  // If payment_methods don't match what user ticked, the RPC silently
+  // dropped them (db/41 not applied). Show actionable error.
+  try {
+    const { data: fresh } = await c.from('businesses')
+      .select('payment_methods, special_features, established_year')
+      .eq('id', MY_BIZ.id).maybeSingle();
+    if (fresh){
+      const expectedPM = (paymentMethods || []).sort().join(',');
+      const actualPM   = ((fresh.payment_methods || [])).map(s => String(s).toLowerCase()).sort().join(',');
+      if (expectedPM !== actualPM){
+        okEl.style.display = 'none';
+        errEl.innerHTML = '<b>⚠ Payment methods / Trust signals not saved.</b><br>'
+          + '<span style="font-size:12px">DB column not synced. Please run <code>db/47-trust-cols-ensure.sql</code> in Supabase SQL Editor, then try again. (One-time fix.)</span>';
+        errEl.style.display = 'flex';
+        return;
+      }
+    }
+  } catch(verifyErr){ console.warn('Post-save verify:', verifyErr); }
+
   setTimeout(() => { okEl.style.display = 'none'; }, 6000);
 }
 
@@ -797,82 +826,4 @@ function defaultAskMessage(){
 
 function seedAskMessage(){
   const ta = document.getElementById('askMsg');
-  if (ta && !ta.value) ta.value = defaultAskMessage();
-}
-
-function generateAskLink(){
-  const cc    = (document.getElementById('askCC').value || '91').replace(/\D/g,'');
-  const phone = (document.getElementById('askPhone').value || '').replace(/\D/g,'');
-  const msg   = document.getElementById('askMsg').value.trim() || defaultAskMessage();
-  const errEl = document.getElementById('askErr');
-  const okEl  = document.getElementById('askInfo');
-  const box   = document.getElementById('askLinkBox');
-  errEl.style.display = 'none';
-  okEl.style.display  = 'none';
-
-  if (!phone || phone.length < 7){
-    errEl.textContent = 'Enter a valid mobile number (without country code).';
-    errEl.style.display = '';
-    box.style.display = '';
-    document.getElementById('askOpenBtn').disabled = true;
-    document.getElementById('askCopyBtn').disabled = true;
-    return null;
-  }
-  const full = cc + phone;
-  const url  = 'https://wa.me/' + full + '?text=' + encodeURIComponent(msg);
-  box.textContent = url;
-  box.style.display = '';
-  document.getElementById('askOpenBtn').disabled = false;
-  document.getElementById('askCopyBtn').disabled = false;
-  okEl.textContent = 'Link ready — tap "Open WhatsApp" or copy.';
-  okEl.style.display = '';
-  return url;
-}
-
-function openAskLink(){
-  const url = generateAskLink();
-  if (!url) return;
-  window.open(url, '_blank', 'noopener');
-}
-
-function copyAskLink(){
-  const url = generateAskLink();
-  if (!url) return;
-  const done = () => {
-    const ok = document.getElementById('askInfo');
-    ok.textContent = '✓ Link copied to clipboard!';
-    ok.style.display = '';
-    setTimeout(() => { ok.textContent = 'Link ready — tap "Open WhatsApp" or copy.'; }, 1800);
-  };
-  try{
-    navigator.clipboard.writeText(url).then(done, () => fallbackCopyAsk(url, done));
-  }catch(_){ fallbackCopyAsk(url, done); }
-}
-function fallbackCopyAsk(text, done){
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); done(); }
-  catch(_){ alert(text); }
-  finally{ ta.remove(); }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadProfile();
-  // Seed the WhatsApp message once MY_BIZ is loaded — retry until ready
-  let tries = 0;
-  const seedTimer = setInterval(() => {
-    if (MY_BIZ){
-      seedAskMessage();
-      clearInterval(seedTimer);
-    } else if (++tries > 40){
-      clearInterval(seedTimer); // give up after ~8s
-      seedAskMessage(); // seed with fallback shop name
-    }
-  }, 200);
-});
-</script>
-
-</body>
-</html>
+  if (ta && !ta.value) ta.value = defaultAskMessage
