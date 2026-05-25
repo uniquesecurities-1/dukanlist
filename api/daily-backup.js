@@ -71,11 +71,28 @@ async function runBackup(req, res){
   if (req.method !== 'POST' && req.method !== 'GET'){
     return res.status(405).json({ error: 'POST or GET' });
   }
-  const isCron = !!req.headers['x-vercel-cron'];
-  const secret = req.headers['x-cron-secret'] || (req.query && req.query.secret);
-  if (!isCron && (!secret || secret !== SECRET)){
+
+  // Multi-mechanism auth — accept any of these:
+  //   1. User-Agent: vercel-cron (always set by Vercel scheduler)
+  //   2. Legacy x-vercel-cron header (older mechanism)
+  //   3. Authorization: Bearer CRON_SECRET (modern Vercel cron auth)
+  //   4. x-cron-secret header (manual PowerShell/curl testing)
+  //   5. ?secret= query param (manual browser testing)
+  const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+  const authHeader = req.headers['authorization'] || '';
+  const cronSecret = process.env.CRON_SECRET || '';
+  const xCronSec   = req.headers['x-cron-secret'] || '';
+  const querySec   = (req.query && req.query.secret) || '';
+
+  const isVercelCronUA  = userAgent.indexOf('vercel-cron') !== -1;
+  const isVercelCronHdr = !!req.headers['x-vercel-cron'];
+  const isBearerCron    = cronSecret && authHeader === ('Bearer ' + cronSecret);
+  const isManualSecret  = SECRET && (xCronSec === SECRET || querySec === SECRET);
+
+  if (!isVercelCronUA && !isVercelCronHdr && !isBearerCron && !isManualSecret){
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
   if (!SUPABASE_URL || !SERVICE_KEY){
     return res.status(500).json({ error: 'Server not configured' });
   }
