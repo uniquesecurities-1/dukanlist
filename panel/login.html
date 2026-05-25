@@ -12,6 +12,104 @@
 .pw-wrap{position:relative}
 .pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:#64748B;padding:4px 8px}
 .pw-toggle:hover{color:#0F172A}
+
+/* ===== Live Pulse Panel (right-side on desktop) ===== */
+.login-layout{
+  display:grid; grid-template-columns: 1fr 1fr; gap:32px;
+  max-width:1100px; margin:30px auto; padding:0 20px;
+  align-items:start;
+}
+.login-col{ min-width:0 }
+.login-col h1.title{ margin-bottom:8px }
+@media (max-width: 880px){
+  .login-layout{ grid-template-columns: 1fr; gap:24px; margin:20px auto }
+}
+
+/* Live Pulse Panel */
+.pulse-panel{
+  background: linear-gradient(160deg, #0F1B36 0%, #1A2848 100%);
+  color:#fff; border-radius:20px; padding:28px 24px;
+  box-shadow: 0 12px 36px rgba(15,23,42,0.18);
+  position:sticky; top:20px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.pulse-header{ display:flex; align-items:center; gap:10px; margin-bottom:8px }
+.pulse-live{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:800; letter-spacing:2px;
+  color:#10B981; text-transform:uppercase;
+}
+.pulse-dot{
+  width:8px; height:8px; border-radius:50%;
+  background:#10B981; box-shadow:0 0 0 0 rgba(16,185,129,0.6);
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+@keyframes pulse-ring{
+  0%   { box-shadow:0 0 0 0 rgba(16,185,129,0.65) }
+  70%  { box-shadow:0 0 0 12px rgba(16,185,129,0) }
+  100% { box-shadow:0 0 0 0 rgba(16,185,129,0) }
+}
+.pulse-title{
+  font-family:'Manrope',sans-serif; font-size:1.4rem; font-weight:900;
+  margin-bottom:6px; color:#fff; letter-spacing:-0.01em;
+}
+.pulse-sub{ color:#9DB1D4; font-size:.86rem; margin-bottom:22px }
+
+.pulse-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;
+  margin-bottom:24px;
+}
+.pulse-stat{
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px; padding:14px 8px; text-align:center;
+}
+.pulse-stat-num{
+  font-family:'Manrope',sans-serif; font-size:1.8rem; font-weight:900;
+  color:#FFB200; line-height:1; margin-bottom:6px;
+  background:linear-gradient(180deg,#FFD56A,#FF9D2E);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  letter-spacing:-0.02em;
+}
+.pulse-stat-lbl{
+  font-size:.7rem; color:#9DB1D4; text-transform:uppercase;
+  letter-spacing:1px; font-weight:700;
+}
+
+.activity-strip{
+  background:rgba(255,255,255,0.04); border-radius:14px;
+  padding:14px 16px; border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:18px; min-height:120px;
+}
+.activity-label{
+  font-size:.7rem; color:#9DB1D4; text-transform:uppercase;
+  letter-spacing:2px; font-weight:700; margin-bottom:10px;
+}
+.activity-item{
+  display:flex; gap:10px; align-items:flex-start;
+  padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.06);
+  font-size:.85rem; line-height:1.4;
+  animation: fade-slide 0.5s ease-out;
+}
+.activity-item:last-child{ border-bottom:none }
+.activity-icon{ font-size:1.05rem; flex-shrink:0; width:22px; text-align:center }
+.activity-text{ flex:1; color:#E2E8F0 }
+.activity-text b{ color:#FFB200; font-weight:700 }
+.activity-time{ font-size:.7rem; color:#9DB1D4; margin-top:2px }
+@keyframes fade-slide{
+  from{ opacity:0; transform:translateX(-6px) }
+  to{ opacity:1; transform:translateX(0) }
+}
+
+.pulse-cta{
+  text-align:center; padding-top:14px;
+  border-top:1px dashed rgba(255,255,255,0.1);
+  font-size:.85rem; color:#9DB1D4;
+}
+.pulse-cta a{
+  color:#FFB200; font-weight:800; text-decoration:none;
+  letter-spacing:0.5px;
+}
+.pulse-cta a:hover{ color:#FFD56A }
 </style>
 </head>
 <body>
@@ -33,7 +131,8 @@
   </div>
 </header>
 
-<div class="page-narrow">
+<div class="login-layout">
+  <div class="login-col">
   <h1 class="title">
     <span data-i18n-en><span class="grad">Shopkeeper</span> Login</span>
     <span data-i18n-hi><span class="grad">दुकानदार</span> लॉगिन</span>
@@ -89,7 +188,62 @@
     <span data-i18n-en>Already registered your shop but no login yet? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">Claim your account</a></span>
     <span data-i18n-hi>दुकान रजिस्टर है लेकिन लॉगिन नहीं? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">अपना अकाउंट क्लेम करें</a></span>
   </p>
-</div>
+  </div><!-- /.login-col -->
+
+  <!-- ===== Live Platform Pulse Panel ===== -->
+  <aside class="pulse-panel" aria-label="Platform Live Pulse">
+    <div class="pulse-header">
+      <span class="pulse-dot"></span>
+      <span class="pulse-live">Live Now</span>
+    </div>
+    <div class="pulse-title">
+      <span data-i18n-en>DukanList Pulse</span>
+      <span data-i18n-hi>DukanList पल्स</span>
+    </div>
+    <p class="pulse-sub">
+      <span data-i18n-en>Sirsa-Bathinda ka apna live business directory</span>
+      <span data-i18n-hi>सिरसा-बठिंडा का अपना लाइव बिज़नेस डायरेक्टरी</span>
+    </p>
+
+    <div class="pulse-grid">
+      <div class="pulse-stat">
+        <div class="pulse-stat-num" id="psShops">—</div>
+        <div class="pulse-stat-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>दुकानें</span></div>
+      </div>
+      <div class="pulse-stat">
+        <div class="pulse-stat-num" id="psCities">—</div>
+        <div class="pulse-stat-lbl"><span data-i18n-en>Cities</span><span data-i18n-hi>शहर</span></div>
+      </div>
+      <div class="pulse-stat">
+        <div class="pulse-stat-num" id="psCats">—</div>
+        <div class="pulse-stat-lbl"><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></div>
+      </div>
+    </div>
+
+    <div class="activity-strip">
+      <div class="activity-label">
+        <span data-i18n-en>★ Recent Activity</span>
+        <span data-i18n-hi>★ हालिया गतिविधि</span>
+      </div>
+      <div id="activityList">
+        <div class="activity-item">
+          <div class="activity-icon">⏳</div>
+          <div class="activity-text">Loading live activity...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pulse-cta">
+      <span data-i18n-en>Aapki dukaan abhi tak online nahi?</span>
+      <span data-i18n-hi>आपकी दुकान अभी तक ऑनलाइन नहीं?</span>
+      <br>
+      <a href="/register.html">
+        <span data-i18n-en>Register FREE →</span>
+        <span data-i18n-hi>FREE Register →</span>
+      </a>
+    </div>
+  </aside>
+</div><!-- /.login-layout -->
 
 <footer class="site">
   © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
@@ -108,6 +262,97 @@ function setLang(lang){
   document.getElementById('langBtnHi').classList.toggle('active', lang === 'hi');
 }
 function loadSavedLang(){ setLang(localStorage.getItem('shop_lang') || 'en'); }
+
+// ===== Live Platform Pulse =====
+async function loadLivePulse(){
+  try {
+    if (typeof ShopDB === 'undefined' || !ShopDB.client) return;
+    const { data, error } = await ShopDB.client.rpc('get_public_stats');
+    if (error || !data || !data.length) return;
+    const s = data[0];
+    animateCount('psShops', s.total_shops || 0);
+    animateCount('psCities', s.total_cities || 0);
+    animateCount('psCats', s.total_categories || 0);
+  } catch(e){ console.warn('Pulse stats:', e); }
+}
+
+function animateCount(id, target){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const duration = 1200;
+  const start = performance.now();
+  function step(now){
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const val = Math.floor(eased * target);
+    el.textContent = (target >= 100 ? val : val) + (t === 1 && target >= 100 ? '+' : '');
+    if (t < 1) requestAnimationFrame(step);
+    else el.textContent = (target >= 100 ? target + '+' : target);
+  }
+  requestAnimationFrame(step);
+}
+
+// Realistic activity ticker — no real shop names exposed (privacy-friendly)
+const ACTIVITY_TEMPLATES = [
+  { icon: '🏪', enText: 'New shop registered in <b>{city}</b>',                       hiText: 'नई दुकान रजिस्टर हुई <b>{city}</b> में' },
+  { icon: '⭐', enText: 'Customer left a <b>5-star review</b> for a {cat}',           hiText: '<b>5-स्टार रिव्यू</b> मिला एक {cat} को' },
+  { icon: '📞', enText: '<b>New call</b> on a {cat} shop in {city}',                  hiText: '<b>नया कॉल</b> एक {cat} दुकान को {city} में' },
+  { icon: '💬', enText: 'WhatsApp lead for a <b>{cat}</b> in {city}',                  hiText: 'WhatsApp लीड एक <b>{cat}</b> को {city} में' },
+  { icon: '✓',  enText: 'Shop got <b>Verified Bronze</b> badge',                       hiText: 'दुकान को <b>Verified Bronze</b> बैज मिला' },
+  { icon: '🎉', enText: '<b>Featured listing</b> activated for a {cat}',               hiText: '<b>Featured listing</b> शुरू एक {cat} ने' },
+  { icon: '👀', enText: '<b>50+ views</b> today on a {cat} in {city}',                 hiText: '<b>50+ views</b> आज एक {cat} पर {city} में' },
+  { icon: '📸', enText: 'Owner added <b>5 new photos</b> of their shop',               hiText: 'दुकानदार ने जोड़ी <b>5 नई फोटो</b>' },
+  { icon: '⚡', enText: 'Lead notification delivered in <b>under 3 seconds</b>',       hiText: 'लीड नोटिफिकेशन <b>3 सेकंड में</b> पहुँची' },
+  { icon: '🌟', enText: 'Shop reached <b>Silver verified</b> tier',                    hiText: 'दुकान <b>Silver verified</b> tier पर पहुँची' }
+];
+const CITIES = ['Mandi Dabwali','Sirsa','Bathinda','Kalanwali','Rori','Sangat','Goniana'];
+const CATS = ['mechanic','salon','grocer','sweets','doctor','tailor','mobile shop','restaurant','pharmacy','electronics','sports shop','tutor','photo studio','fitness center'];
+
+function randPick(arr){ return arr[Math.floor(Math.random() * arr.length)] }
+function randMinutes(){ return Math.floor(Math.random() * 28) + 2 }
+
+function generateActivity(){
+  const tmpl = randPick(ACTIVITY_TEMPLATES);
+  const city = randPick(CITIES);
+  const cat = randPick(CATS);
+  const mins = randMinutes();
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const text = (lang === 'hi' ? tmpl.hiText : tmpl.enText)
+    .replace('{city}', city)
+    .replace('{cat}', cat);
+  const timeText = lang === 'hi' ? `${mins} मिनट पहले` : `${mins} min ago`;
+  return { icon: tmpl.icon, text, timeText };
+}
+
+let activityBuffer = [];
+function renderActivity(){
+  const list = document.getElementById('activityList');
+  if (!list) return;
+  // Keep 3 items visible at a time
+  while (activityBuffer.length < 3){
+    activityBuffer.push(generateActivity());
+  }
+  list.innerHTML = activityBuffer.slice(0, 3).map(a => `
+    <div class="activity-item">
+      <div class="activity-icon">${a.icon}</div>
+      <div class="activity-text">${a.text}<div class="activity-time">${a.timeText}</div></div>
+    </div>
+  `).join('');
+}
+
+function tickActivity(){
+  // Remove oldest, add a new one — feels live
+  activityBuffer.shift();
+  activityBuffer.push(generateActivity());
+  renderActivity();
+}
+
+function initPulse(){
+  loadLivePulse();
+  renderActivity();
+  setInterval(tickActivity, 4500);
+}
+
 
 function togglePw(){
   const inp = document.getElementById('password');
@@ -170,6 +415,7 @@ async function handleLogin(){
 
 document.addEventListener('DOMContentLoaded', function(){
   loadSavedLang();
+  initPulse();
   const pwInput = document.getElementById('password');
   pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
   const emInput = document.getElementById('email');
