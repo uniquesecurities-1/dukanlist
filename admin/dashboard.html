@@ -210,7 +210,21 @@
 
   <!-- Recent Registrations -->
   <div class="section">
-    <h2 class="section-title">📋 Recent Registrations <span style="color:#94a3b8;font-size:12px;font-weight:500">(latest 10)</span></h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <h2 class="section-title" style="margin:0">📋 Recent Registrations <span style="color:#94a3b8;font-size:12px;font-weight:500">(latest 10)</span></h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="csvBtn10" onclick="downloadCSV(false)"
+          style="background:#10B981;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
+          title="Download these 10 shops as Excel-compatible CSV">
+          📥 Download (10)
+        </button>
+        <button id="csvBtnAll" onclick="downloadCSV(true)"
+          style="background:#1E3A8A;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
+          title="Download ALL shops (up to 500) as Excel-compatible CSV">
+          📊 Download ALL
+        </button>
+      </div>
+    </div>
     <div id="recentBiz">
       <div class="loader">Loading...</div>
     </div>
@@ -545,50 +559,180 @@ function renderKPIs(s){
 }
 
 function renderRecent(rows){
+  window._recentRows = rows || [];
+
   if (!rows.length){
     document.getElementById('recentBiz').innerHTML =
-      '<div style="color:#64748b;text-align:center;padding:24px">No businesses registered yet. <a href="/register.html" target="_blank" style="color:#1E3A8A">Register the first one →</a></div>';
+      '<div style="color:#64748b;text-align:center;padding:24px">No businesses registered yet. <a href="/register.html" target="_blank" style="color:#1E3A8A">Register the first one &rarr;</a></div>';
     return;
   }
   const statusBadge = (s) => {
     const colors = {
-      'active':'#10B981','pending':'#F59E0B','flagged':'#EF4444',
+      'active':'#10B981','pending':'#F59E0B','pending_review':'#F59E0B','flagged':'#EF4444',
       'banned':'#6B7280','self_hidden':'#94a3b8'
     };
     return `<span style="background:${colors[s]||'#94a3b8'};color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase">${s}</span>`;
   };
+
+  const verifyBadge = (score) => {
+    if (!score || score < 1) return '<span style="color:#94a3b8;font-size:11px">&mdash;</span>';
+    const s = Number(score);
+    if (s >= 5) return '<span style="background:#FBBF24;color:#78350F;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700" title="Gold tier">GOLD</span>';
+    if (s >= 3) return '<span style="background:#94a3b8;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700" title="Silver tier">SILVER</span>';
+    return '<span style="background:#A16207;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700" title="Bronze tier">BRONZE</span>';
+  };
+
+  const ratingDisplay = (avg, count) => {
+    if (!count || count === 0) return '<span style="color:#94a3b8;font-size:11px">No reviews</span>';
+    return `<span style="color:#F59E0B;font-weight:700">&#9733; ${Number(avg).toFixed(1)}</span> <span style="color:#94a3b8;font-size:11px">(${count})</span>`;
+  };
+
   const html = `
     <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:1100px">
         <thead>
           <tr style="text-align:left;background:#f8fafc;border-bottom:1px solid #e2e8f0">
-            <th style="padding:10px 12px;font-weight:600;color:#64748b">Business</th>
-            <th style="padding:10px 12px;font-weight:600;color:#64748b">Category</th>
-            <th style="padding:10px 12px;font-weight:600;color:#64748b">Location</th>
-            <th style="padding:10px 12px;font-weight:600;color:#64748b">Status</th>
-            <th style="padding:10px 12px;font-weight:600;color:#64748b">Photos</th>
-            <th style="padding:10px 12px;font-weight:600;color:#64748b">Created</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Business / Owner</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Contact</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Category</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Location</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Status</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b" title="Verified Tier (Bronze/Silver/Gold)">Verified</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Rating</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Media</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Created</th>
+            <th style="padding:10px 10px;font-weight:600;color:#64748b">Action</th>
           </tr>
         </thead>
         <tbody>
-          ${rows.map(r => `
+          ${rows.map(r => {
+            const mobile = (r.mobile || '').replace(/^91/, '');
+            const wa = (r.whatsapp || '').replace(/^91/, '');
+            const waSameAsMobile = wa && wa === mobile;
+            const flagWarn = (r.flagged_count && r.flagged_count > 0)
+              ? `<span style="background:#FEE2E2;color:#991B1B;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;margin-left:4px" title="${r.flagged_count} flag(s)">&#9888; ${r.flagged_count}</span>` : '';
+            return `
             <tr style="border-bottom:1px solid #f1f5f9">
-              <td style="padding:10px 12px">
-                <a href="/admin/shop?id=${r.id}" style="font-weight:600;color:#1E3A8A;text-decoration:none" title="Open Admin View">${escapeHtml(r.name)}</a>
-                <div style="font-size:12px;color:#64748b">${escapeHtml(r.owner_name || '')} · ${escapeHtml(r.mobile || '')}</div>
+              <td style="padding:10px 10px">
+                <a href="/admin/shop?id=${r.id}" style="font-weight:600;color:#1E3A8A;text-decoration:none" title="Open Admin View">${escapeHtml(r.name)}</a>${flagWarn}
+                <div style="font-size:11px;color:#64748b;margin-top:2px">${escapeHtml(r.owner_name || '—')}</div>
               </td>
-              <td style="padding:10px 12px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
-              <td style="padding:10px 12px;color:#64748b">${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</td>
-              <td style="padding:10px 12px">${statusBadge(r.status)}</td>
-              <td style="padding:10px 12px;color:#64748b">${r.photos_count} 📸</td>
-              <td style="padding:10px 12px;color:#64748b;font-size:12px;white-space:nowrap">${formatDate(r.created_at)} · <a href="/admin/shop?id=${r.id}" style="color:#1E3A8A;text-decoration:none;font-weight:700">🛡️ View</a></td>
+              <td style="padding:10px 10px;color:#475569;font-size:12px;white-space:nowrap">
+                <div title="Primary mobile">📞 ${escapeHtml(mobile)}</div>
+                ${wa && !waSameAsMobile ? `<div style="color:#16A34A;margin-top:2px" title="WhatsApp">💬 ${escapeHtml(wa)}</div>` : ''}
+                ${r.email ? `<div style="color:#0891B2;margin-top:2px;font-size:11px" title="Email">✉ ${escapeHtml(r.email)}</div>` : ''}
+              </td>
+              <td style="padding:10px 10px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
+              <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">
+                <div>${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</div>
+                ${r.pincode ? `<div style="color:#94a3b8;font-size:11px">PIN: ${escapeHtml(r.pincode)}</div>` : ''}
+              </td>
+              <td style="padding:10px 10px">${statusBadge(r.status)}</td>
+              <td style="padding:10px 10px">${verifyBadge(r.verified_score)}</td>
+              <td style="padding:10px 10px;font-size:12px;white-space:nowrap">${ratingDisplay(r.rating_avg, r.rating_count)}</td>
+              <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">${r.photos_count || 0} 📸</td>
+              <td style="padding:10px 10px;color:#64748b;font-size:11px;white-space:nowrap">${formatDate(r.created_at)}</td>
+              <td style="padding:10px 10px;white-space:nowrap">
+                <a href="/admin/shop?id=${r.id}" style="color:#1E3A8A;text-decoration:none;font-weight:700;font-size:12px" title="Open admin view">🛡 View</a>
+              </td>
             </tr>
-          `).join('')}
+          `}).join('')}
         </tbody>
       </table>
     </div>
+    <div style="padding:8px 4px;font-size:11px;color:#94a3b8;text-align:right">
+      Showing ${rows.length} most recent &middot; use <b>Download ALL</b> for complete export
+    </div>
   `;
   document.getElementById('recentBiz').innerHTML = html;
+}
+
+async function downloadCSV(fetchAll){
+  const btn = document.getElementById(fetchAll ? 'csvBtnAll' : 'csvBtn10');
+  const origLabel = btn ? btn.innerHTML : '';
+  if (btn){ btn.disabled = true; btn.innerHTML = '⏳ Preparing...'; }
+
+  try {
+    let rows;
+    if (fetchAll){
+      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
+      if (!c){ throw new Error('No DB client'); }
+      const { data, error } = await c.rpc('admin_list_businesses', {
+        p_status: null, p_limit: 500, p_offset: 0, p_sort: 'newest'
+      });
+      if (error) throw error;
+      rows = data || [];
+    } else {
+      rows = window._recentRows || [];
+    }
+
+    if (!rows.length){
+      alert('No shops to export.');
+      return;
+    }
+
+    const headers = [
+      'S.No', 'Business Name', 'Owner', 'Mobile', 'WhatsApp', 'Email',
+      'Category', 'City', 'State', 'Pincode',
+      'Status', 'Verified Score', 'Rating', 'Reviews', 'Photos',
+      'Flags', 'Slug', 'Shop ID', 'Created At'
+    ];
+
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return '';
+      const s = String(val);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1){
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    };
+
+    const csvRows = [headers.join(',')];
+    rows.forEach((r, idx) => {
+      const cleanMobile = (r.mobile || '').replace(/^91/, '');
+      const cleanWA = (r.whatsapp || '').replace(/^91/, '');
+      csvRows.push([
+        idx + 1,
+        escapeCSV(r.name),
+        escapeCSV(r.owner_name),
+        cleanMobile,
+        cleanWA,
+        escapeCSV(r.email),
+        escapeCSV(r.primary_cat),
+        escapeCSV(r.city_name),
+        escapeCSV(r.state_code),
+        escapeCSV(r.pincode),
+        escapeCSV(r.status),
+        r.verified_score || 0,
+        r.rating_avg ? Number(r.rating_avg).toFixed(2) : '',
+        r.rating_count || 0,
+        r.photos_count || 0,
+        r.flagged_count || 0,
+        escapeCSV(r.slug),
+        escapeCSV(r.id),
+        escapeCSV(r.created_at)
+      ].join(','));
+    });
+
+    const csv = '\ufeff' + csvRows.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const today = new Date().toISOString().slice(0, 10);
+    a.download = 'dukanlist-shops-' + today + (fetchAll ? '-all' : '-latest10') + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  } catch(e){
+    console.error('CSV download error:', e);
+    alert('Download failed: ' + (e.message || e));
+  } finally {
+    if (btn){ btn.disabled = false; btn.innerHTML = origLabel; }
+  }
 }
 
 function formatDate(iso){
