@@ -125,6 +125,229 @@
 @keyframes fade-slide-r{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 .pulse-panel-reg .pulse-foot{text-align:center;padding-top:14px;border-top:1px dashed rgba(255,255,255,0.1);font-size:.85rem;color:#9DB1D4;line-height:1.6}
 
+
+/* ===== Searchable Category Picker Modal ===== */
+.cat-open-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFFFFF 100%);
+  border: 2px dashed #FB923C;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #C2410C;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cat-open-btn:hover {
+  background: linear-gradient(135deg, #FED7AA 0%, #FFEDD5 100%);
+  border-style: solid;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(251,146,60,0.2);
+}
+.cat-open-btn-ico { font-size: 1.3rem }
+.cat-open-btn-arrow { font-size: 1.1rem; color: #FB923C; transition: transform 0.2s }
+.cat-open-btn:hover .cat-open-btn-arrow { transform: translateX(4px) }
+
+#catPickerModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  animation: catModalIn 0.25s ease-out;
+}
+#catPickerModal.open { display: flex }
+@keyframes catModalIn { from { opacity: 0 } to { opacity: 1 } }
+.cat-modal-inner {
+  background: #fff;
+  border-radius: 18px;
+  max-width: 640px;
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
+  animation: catModalSlide 0.3s ease-out;
+}
+@keyframes catModalSlide { from { transform: translateY(20px) } to { transform: translateY(0) } }
+.cat-modal-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #E2E8F0;
+}
+.cat-modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cat-modal-sub {
+  color: #64748B;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+.cat-modal-close {
+  background: #F1F5F9;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748B;
+  flex-shrink: 0;
+}
+.cat-modal-close:hover { background: #E2E8F0; color: #0F172A }
+
+.cat-search-wrap {
+  position: relative;
+}
+.cat-search-input {
+  width: 100%;
+  border: 2px solid #FB923C;
+  border-radius: 12px;
+  padding: 14px 44px 14px 44px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #FFF;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+.cat-search-input:focus { box-shadow: 0 0 0 4px rgba(251,146,60,0.15) }
+.cat-search-ico {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+.cat-search-count {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #F1F5F9;
+  color: #64748B;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cat-modal-body {
+  padding: 14px 20px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.cat-group {
+  margin-bottom: 18px;
+}
+.cat-group-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cat-group-count {
+  background: #F1F5F9;
+  color: #94A3B8;
+  padding: 1px 8px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.cat-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+.cat-tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: #0F172A;
+  font-weight: 600;
+}
+.cat-tile:hover {
+  background: #FFF7ED;
+  border-color: #FB923C;
+  transform: translateY(-1px);
+}
+.cat-tile.selected {
+  background: #DCFCE7;
+  border-color: #16A34A;
+  color: #166534;
+}
+.cat-tile.selected::after {
+  content: '✓';
+  margin-left: auto;
+  color: #16A34A;
+  font-weight: 900;
+}
+.cat-tile-ico { font-size: 1.2rem; flex-shrink: 0 }
+.cat-tile-text { flex: 1; min-width: 0; overflow: hidden }
+.cat-tile-name { font-size: 0.86rem; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.cat-tile-hi { font-size: 0.72rem; color: #64748B; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+
+.cat-empty-state {
+  text-align: center;
+  padding: 36px 20px;
+  color: #64748B;
+}
+.cat-empty-state-ico { font-size: 2.5rem; margin-bottom: 8px; opacity: 0.5 }
+.cat-empty-state-text { font-weight: 700; color: #334155; margin-bottom: 10px }
+
+.cat-modal-foot {
+  border-top: 1px solid #E2E8F0;
+  padding: 14px 20px;
+  background: #FFFBEB;
+  border-radius: 0 0 18px 18px;
+  font-size: 0.85rem;
+  color: #92400E;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cat-modal-foot a {
+  color: #C2410C;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cat-modal-foot a:hover { text-decoration: underline }
 </style>
 </head>
 <body>
@@ -254,10 +477,20 @@
            data-empty="Add 1-5 categories from below ↓">
       </div>
 
-      <!-- Add-category dropdown -->
-      <select id="catSelect" class="select" onchange="handleAddCategory(event)">
-        <option value="" data-i18n-en="+ Add a category" data-i18n-hi="+ श्रेणी जोड़ें">+ Add a category</option>
-        <!-- optgroups + options populated by JS -->
+      <!-- Open picker modal button -->
+      <button type="button" class="cat-open-btn" onclick="openCatPicker()">
+        <span style="display:flex;align-items:center;gap:10px">
+          <span class="cat-open-btn-ico">🔍</span>
+          <span>
+            <span data-i18n-en>+ Add a category</span><span data-i18n-hi>+ श्रेणी जोड़ें</span>
+          </span>
+        </span>
+        <span class="cat-open-btn-arrow">›</span>
+      </button>
+
+      <!-- Hidden select kept for legacy compatibility -->
+      <select id="catSelect" style="display:none" onchange="handleAddCategory(event)">
+        <option value=""></option>
       </select>
 
       <div class="cat-helper">
@@ -1363,6 +1596,181 @@ window.addEventListener('DOMContentLoaded', () => {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+</script>
+
+<!-- ============= Category Picker Modal ============= -->
+<div id="catPickerModal" role="dialog" aria-label="Choose a business category">
+  <div class="cat-modal-inner">
+    <div class="cat-modal-head">
+      <div class="cat-modal-title">
+        <span><span data-i18n-en>📚 Choose Your Category</span><span data-i18n-hi>📚 अपनी श्रेणी चुनें</span></span>
+        <button class="cat-modal-close" onclick="closeCatPicker()" aria-label="Close">×</button>
+      </div>
+      <div class="cat-modal-sub">
+        <span data-i18n-en>Type karke search karein ya neeche scroll karein. 158+ categories available.</span>
+        <span data-i18n-hi>टाइप करके खोजें या नीचे scroll करें। 158+ श्रेणियाँ उपलब्ध।</span>
+      </div>
+      <div class="cat-search-wrap">
+        <span class="cat-search-ico">🔍</span>
+        <input type="text" class="cat-search-input" id="catSearchInput"
+          placeholder="Try: handloom, hardware, halwai, mechanic..."
+          oninput="filterCategories(this.value)"
+          autofocus>
+        <span class="cat-search-count" id="catSearchCount">158</span>
+      </div>
+    </div>
+    <div class="cat-modal-body" id="catModalBody">
+      <div class="cat-empty-state">
+        <div class="cat-empty-state-ico">⏳</div>
+        <div class="cat-empty-state-text">Loading categories...</div>
+      </div>
+    </div>
+    <div class="cat-modal-foot">
+      <span>
+        <span data-i18n-en>🤔 Apni category nahi mil rahi?</span>
+        <span data-i18n-hi>🤔 आपकी श्रेणी नहीं मिल रही?</span>
+      </span>
+      <a href="https://wa.me/919541223377?text=Hi%2C%20DukanList%20me%20meri%20category%20nahi%20mil%20rahi%3A%20" target="_blank">
+        💬 <span data-i18n-en>WhatsApp us</span><span data-i18n-hi>WhatsApp करें</span>
+      </a>
+    </div>
+  </div>
+</div>
+<script>
+// ============= Category Picker Modal =============
+function openCatPicker(){
+  const modal = document.getElementById('catPickerModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Build tile grid from CAT_STATE.catsById
+  renderCatTiles('');
+  // Focus search input
+  setTimeout(() => {
+    const inp = document.getElementById('catSearchInput');
+    if (inp) { inp.value = ''; inp.focus(); }
+  }, 100);
+}
+
+function closeCatPicker(){
+  const modal = document.getElementById('catPickerModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on outside click
+document.addEventListener('click', function(e){
+  const modal = document.getElementById('catPickerModal');
+  if (modal && modal.classList.contains('open') && e.target === modal){
+    closeCatPicker();
+  }
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){
+    const modal = document.getElementById('catPickerModal');
+    if (modal && modal.classList.contains('open')) closeCatPicker();
+  }
+});
+
+function filterCategories(query){
+  const q = (query || '').toLowerCase().trim();
+  renderCatTiles(q);
+}
+
+function renderCatTiles(query){
+  const body = document.getElementById('catModalBody');
+  const countEl = document.getElementById('catSearchCount');
+  if (!body) return;
+
+  const allCats = Object.values(CAT_STATE.catsById || {});
+  if (!allCats.length){
+    body.innerHTML = '<div class="cat-empty-state"><div class="cat-empty-state-ico">⏳</div><div class="cat-empty-state-text">Loading categories...</div></div>';
+    return;
+  }
+
+  // Filter by query (matches name, name_hi, slug, parent_name)
+  const filtered = query
+    ? allCats.filter(c => {
+        const hay = ((c.name || '') + ' ' + (c.name_hi || '') + ' ' + (c.slug || '') + ' ' + (c.parent_name || '')).toLowerCase();
+        return hay.indexOf(query) !== -1;
+      })
+    : allCats;
+
+  if (countEl) countEl.textContent = filtered.length;
+
+  if (!filtered.length){
+    body.innerHTML = `
+      <div class="cat-empty-state">
+        <div class="cat-empty-state-ico">🤔</div>
+        <div class="cat-empty-state-text">"${query}" — Koi match nahi mila</div>
+        <div style="font-size:.82rem;color:#64748B;margin-bottom:14px">Different keyword try karein, ya WhatsApp pe humein bata dijiye.</div>
+        <a href="https://wa.me/919541223377?text=DukanList%20me%20'${encodeURIComponent(query)}'%20category%20nahi%20mil%20rahi"
+           target="_blank"
+           style="display:inline-block;background:#25D366;color:#fff;padding:10px 18px;border-radius:99px;font-weight:700;text-decoration:none;font-size:.88rem">
+          💬 Request "${escapeHTML(query)}" on WhatsApp
+        </a>
+      </div>`;
+    return;
+  }
+
+  // Group by parent
+  const groups = {};
+  filtered.forEach(c => {
+    const key = c.parent_slug || 'other';
+    if (!groups[key]) groups[key] = { name: c.parent_name || 'Other', icon: c.parent_icon || '📂', items: [] };
+    groups[key].items.push(c);
+  });
+
+  const selectedSet = new Set((CAT_STATE.selected || []).map(String));
+
+  body.innerHTML = Object.values(groups).map(g => `
+    <div class="cat-group">
+      <div class="cat-group-title">
+        <span>${g.icon} ${escapeHTML(g.name)}</span>
+        <span class="cat-group-count">${g.items.length}</span>
+      </div>
+      <div class="cat-tile-grid">
+        ${g.items.map(c => `
+          <button type="button" class="cat-tile${selectedSet.has(String(c.id)) ? ' selected' : ''}"
+            onclick="pickCatFromModal(${c.id})"
+            ${selectedSet.has(String(c.id)) ? 'disabled' : ''}>
+            <span class="cat-tile-ico">${c.icon || '📂'}</span>
+            <span class="cat-tile-text">
+              <div class="cat-tile-name">${escapeHTML(c.name)}</div>
+              ${c.name_hi ? `<div class="cat-tile-hi">${escapeHTML(c.name_hi)}</div>` : ''}
+            </span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function pickCatFromModal(id){
+  // Simulate select change for compatibility with existing handleAddCategory
+  const sel = document.getElementById('catSelect');
+  if (sel){
+    // Make sure option exists
+    let opt = sel.querySelector('option[value="' + id + '"]');
+    if (!opt){
+      opt = document.createElement('option');
+      opt.value = id;
+      sel.appendChild(opt);
+    }
+    sel.value = String(id);
+    handleAddCategory({ target: sel });
+    sel.value = '';
+  }
+  closeCatPicker();
+}
+
+// Helper used in modal templates
+function escapeHTML(s){
+  return String(s == null ? '' : s).replace(/[&<>"\']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
+}
 </script>
 </body>
 </html>

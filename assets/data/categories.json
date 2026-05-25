@@ -1,7 +1,7 @@
 {
-  "version": "2.1",
-  "updated": "2026-05-21",
-  "note": "Fallback hierarchy. Live data fetched from Supabase categories table when available.",
+  "version": "3.0",
+  "updated": "2026-05-25",
+  "note": "v3.0: Expanded to 150+ categories including handloom, utensils, hardware, halwai, agri inputs, etc.",
   "parents": [
     {
       "slug": "healthcare",
@@ -210,6 +210,72 @@
           "name": "Packers & Movers",
           "name_hi": "पैकर्स एंड मूवर्स",
           "icon": "📦"
+        },
+        {
+          "slug": "furniture-wood",
+          "name": "Furniture / Wood Works",
+          "name_hi": "फर्नीचर / लकड़ी",
+          "icon": "🪑"
+        },
+        {
+          "slug": "welding-iron",
+          "name": "Welding / Iron Works",
+          "name_hi": "वेल्डिंग / लोहार",
+          "icon": "🔥"
+        },
+        {
+          "slug": "cooler-fan-repair",
+          "name": "Cooler / Fan Repair",
+          "name_hi": "कूलर / पंखा",
+          "icon": "💨"
+        },
+        {
+          "slug": "led-lighting",
+          "name": "LED / Lighting Shop",
+          "name_hi": "LED / लाइटिंग",
+          "icon": "💡"
+        },
+        {
+          "slug": "solar-inverter",
+          "name": "Solar / Inverter / Battery",
+          "name_hi": "सोलर / इन्वर्टर",
+          "icon": "🔋"
+        },
+        {
+          "slug": "computer-laptop-repair",
+          "name": "Computer / Laptop Repair",
+          "name_hi": "कंप्यूटर रिपेयर",
+          "icon": "💻"
+        },
+        {
+          "slug": "borewell-water",
+          "name": "Borewell / Submersible Pump",
+          "name_hi": "बोरवेल / पम्प",
+          "icon": "⛲"
+        },
+        {
+          "slug": "curtain-upholstery",
+          "name": "Curtain / Upholstery / Sofa",
+          "name_hi": "पर्दा / सोफा",
+          "icon": "🛋️"
+        },
+        {
+          "slug": "carpet-mat",
+          "name": "Carpet / Mat / Durries",
+          "name_hi": "कालीन / दरी",
+          "icon": "🟫"
+        },
+        {
+          "slug": "mandap-tent",
+          "name": "Mandap / Tent House",
+          "name_hi": "टेंट हाउस",
+          "icon": "⛺"
+        },
+        {
+          "slug": "dj-sound-system",
+          "name": "DJ / Sound System / Light",
+          "name_hi": "DJ / साउंड",
+          "icon": "🔊"
         }
       ]
     },
@@ -273,6 +339,30 @@
           "name": "Car / Bike Wash",
           "name_hi": "कार / बाइक वॉश",
           "icon": "🚿"
+        },
+        {
+          "slug": "tractor-parts",
+          "name": "Tractor Parts / Spares",
+          "name_hi": "ट्रैक्टर पार्ट्स",
+          "icon": "🚜"
+        },
+        {
+          "slug": "cycle-shop",
+          "name": "Bicycle Shop / Repair",
+          "name_hi": "साइकिल की दुकान",
+          "icon": "🚲"
+        },
+        {
+          "slug": "puncture-shop",
+          "name": "Puncture / Tyre Shop",
+          "name_hi": "पंक्चर / टायर",
+          "icon": "🛞"
+        },
+        {
+          "slug": "commercial-vehicle",
+          "name": "Commercial Vehicle Parts",
+          "name_hi": "कमर्शियल व्हीकल",
+          "icon": "🚛"
         }
       ]
     },
@@ -324,6 +414,78 @@
           "name": "Ice Cream Parlour",
           "name_hi": "आइसक्रीम पार्लर",
           "icon": "🍦"
+        },
+        {
+          "slug": "halwai-mithai",
+          "name": "Halwai / Mithai Shop",
+          "name_hi": "हलवाई / मिठाई की दुकान",
+          "icon": "🍬"
+        },
+        {
+          "slug": "bakery-cake",
+          "name": "Bakery / Cake Shop",
+          "name_hi": "बेकरी / केक शॉप",
+          "icon": "🎂"
+        },
+        {
+          "slug": "dhaba-roadside",
+          "name": "Dhaba / Roadside Eatery",
+          "name_hi": "ढाबा",
+          "icon": "🍛"
+        },
+        {
+          "slug": "tea-stall",
+          "name": "Tea Stall / Chai Kiosk",
+          "name_hi": "चाय की दुकान",
+          "icon": "🫖"
+        },
+        {
+          "slug": "juice-shake",
+          "name": "Juice / Shake / Cold Drink",
+          "name_hi": "जूस / शेक",
+          "icon": "🥤"
+        },
+        {
+          "slug": "ice-cream-parlour",
+          "name": "Ice Cream Parlour",
+          "name_hi": "आइसक्रीम पार्लर",
+          "icon": "🍦"
+        },
+        {
+          "slug": "dairy-milk",
+          "name": "Dairy / Milk Shop",
+          "name_hi": "डेयरी / दूध",
+          "icon": "🥛"
+        },
+        {
+          "slug": "fruit-vegetable",
+          "name": "Fruit / Vegetable / Sabzi",
+          "name_hi": "फल-सब्ज़ी",
+          "icon": "🥬"
+        },
+        {
+          "slug": "meat-chicken",
+          "name": "Meat / Chicken / Fish Shop",
+          "name_hi": "मांस / चिकन",
+          "icon": "🍗"
+        },
+        {
+          "slug": "kirana-grocery",
+          "name": "Kirana / Grocery Store",
+          "name_hi": "किराना स्टोर",
+          "icon": "🛒"
+        },
+        {
+          "slug": "catering-service",
+          "name": "Catering Service",
+          "name_hi": "कैटरिंग सेवा",
+          "icon": "🍴"
+        },
+        {
+          "slug": "gas-agency",
+          "name": "LPG Gas Agency",
+          "name_hi": "गैस एजेंसी",
+          "icon": "🔥"
         }
       ]
     },
@@ -387,6 +549,180 @@
           "name": "General Store",
           "name_hi": "जनरल स्टोर",
           "icon": "🏪"
+        },
+        {
+          "slug": "handloom-shop",
+          "name": "Handloom / Khadi Shop",
+          "name_hi": "हथकरघा / खादी",
+          "icon": "🧵"
+        },
+        {
+          "slug": "saree-shop",
+          "name": "Saree Shop",
+          "name_hi": "साड़ी की दुकान",
+          "icon": "🥻"
+        },
+        {
+          "slug": "lehenga-bridal",
+          "name": "Lehenga / Bridal Wear",
+          "name_hi": "लहंगा / दुल्हन परिधान",
+          "icon": "👰"
+        },
+        {
+          "slug": "boutique-designer",
+          "name": "Boutique / Designer Wear",
+          "name_hi": "बूटीक / डिज़ाइनर वियर",
+          "icon": "👗"
+        },
+        {
+          "slug": "kids-wear",
+          "name": "Kids Wear",
+          "name_hi": "बच्चों के कपड़े",
+          "icon": "👶"
+        },
+        {
+          "slug": "mens-wear",
+          "name": "Men's Wear / Suiting",
+          "name_hi": "पुरुष परिधान / सूटिंग",
+          "icon": "👔"
+        },
+        {
+          "slug": "cloth-merchant",
+          "name": "Cloth Merchant / Fabric",
+          "name_hi": "कपड़ा व्यापारी",
+          "icon": "🧶"
+        },
+        {
+          "slug": "undergarment",
+          "name": "Hosiery / Undergarments",
+          "name_hi": "होज़री",
+          "icon": "👙"
+        },
+        {
+          "slug": "utensils-shop",
+          "name": "Utensils / Bartan Shop",
+          "name_hi": "बर्तन की दुकान",
+          "icon": "🍳"
+        },
+        {
+          "slug": "crockery-glassware",
+          "name": "Crockery / Glassware",
+          "name_hi": "क्रॉकरी / काँच के बर्तन",
+          "icon": "🍽️"
+        },
+        {
+          "slug": "plastic-items",
+          "name": "Plastic Items / Containers",
+          "name_hi": "प्लास्टिक सामान",
+          "icon": "🪣"
+        },
+        {
+          "slug": "pottery-shop",
+          "name": "Pottery / Mitti ke Bartan",
+          "name_hi": "मिट्टी के बर्तन",
+          "icon": "🏺"
+        },
+        {
+          "slug": "hardware-shop",
+          "name": "Hardware Shop",
+          "name_hi": "हार्डवेयर की दुकान",
+          "icon": "🔨"
+        },
+        {
+          "slug": "sanitary-bathroom",
+          "name": "Sanitary / Bathroom Fittings",
+          "name_hi": "सेनिटरी / बाथरूम",
+          "icon": "🚿"
+        },
+        {
+          "slug": "paint-shop",
+          "name": "Paint Shop",
+          "name_hi": "पेंट की दुकान",
+          "icon": "🎨"
+        },
+        {
+          "slug": "tiles-marble",
+          "name": "Tiles / Marble / Granite",
+          "name_hi": "टाइल्स / मार्बल",
+          "icon": "⬜"
+        },
+        {
+          "slug": "building-material",
+          "name": "Building Material / Cement",
+          "name_hi": "निर्माण सामग्री",
+          "icon": "🧱"
+        },
+        {
+          "slug": "footwear-shop",
+          "name": "Footwear / Shoes / Chappal",
+          "name_hi": "जूते-चप्पल",
+          "icon": "👞"
+        },
+        {
+          "slug": "watch-shop",
+          "name": "Watch Shop / Repair",
+          "name_hi": "घड़ी की दुकान",
+          "icon": "⌚"
+        },
+        {
+          "slug": "optical-shop",
+          "name": "Optical / Spectacles",
+          "name_hi": "चश्मे की दुकान",
+          "icon": "👓"
+        },
+        {
+          "slug": "jewellery-imitation",
+          "name": "Imitation Jewellery / Bangles",
+          "name_hi": "इमिटेशन ज्वेलरी",
+          "icon": "💍"
+        },
+        {
+          "slug": "bookstore",
+          "name": "Book Store / Stationery",
+          "name_hi": "किताब / स्टेशनरी",
+          "icon": "📚"
+        },
+        {
+          "slug": "photocopy-cyber",
+          "name": "Photocopy / Cyber Cafe",
+          "name_hi": "फोटोकॉपी / साइबर",
+          "icon": "🖨️"
+        },
+        {
+          "slug": "gift-stationery",
+          "name": "Gift Shop / Cards",
+          "name_hi": "गिफ्ट / कार्ड शॉप",
+          "icon": "🎁"
+        },
+        {
+          "slug": "toy-shop",
+          "name": "Toy Shop",
+          "name_hi": "खिलौने की दुकान",
+          "icon": "🧸"
+        },
+        {
+          "slug": "cosmetic-shop",
+          "name": "Cosmetic / Beauty Products",
+          "name_hi": "कॉस्मेटिक की दुकान",
+          "icon": "💄"
+        },
+        {
+          "slug": "pooja-samagri",
+          "name": "Pooja Samagri Shop",
+          "name_hi": "पूजा सामग्री",
+          "icon": "🪔"
+        },
+        {
+          "slug": "florist",
+          "name": "Florist / Flower Shop",
+          "name_hi": "फूलवाला",
+          "icon": "💐"
+        },
+        {
+          "slug": "wholesale-dealer",
+          "name": "Wholesale / Galla Mandi Dealer",
+          "name_hi": "थोक विक्रेता",
+          "icon": "📦"
         }
       ]
     },
@@ -426,6 +762,24 @@
           "name": "Mehndi / Henna Artist",
           "name_hi": "मेहंदी आर्टिस्ट",
           "icon": "🌿"
+        },
+        {
+          "slug": "beauty-parlour",
+          "name": "Beauty Parlour (Ladies)",
+          "name_hi": "ब्यूटी पार्लर",
+          "icon": "💋"
+        },
+        {
+          "slug": "mehendi-artist",
+          "name": "Mehendi / Henna Artist",
+          "name_hi": "मेहंदी आर्टिस्ट",
+          "icon": "🌿"
+        },
+        {
+          "slug": "tattoo-piercing",
+          "name": "Tattoo / Piercing Studio",
+          "name_hi": "टैटू स्टूडियो",
+          "icon": "🎨"
         }
       ]
     },
@@ -501,6 +855,12 @@
           "name": "Library / Study Center",
           "name_hi": "लाइब्रेरी / स्टडी सेंटर",
           "icon": "📚"
+        },
+        {
+          "slug": "music-class",
+          "name": "Music / Dance Class",
+          "name_hi": "संगीत / नृत्य",
+          "icon": "🎵"
         }
       ]
     },
@@ -558,6 +918,48 @@
           "name": "Printing Press / Visiting Cards",
           "name_hi": "प्रिंटिंग प्रेस",
           "icon": "🖨️"
+        },
+        {
+          "slug": "pesticide-agri",
+          "name": "Pesticide / Agri Inputs",
+          "name_hi": "कीटनाशक / कृषि",
+          "icon": "🌾"
+        },
+        {
+          "slug": "seeds-fertilizer",
+          "name": "Seeds / Fertilizer Shop",
+          "name_hi": "बीज / खाद",
+          "icon": "🌱"
+        },
+        {
+          "slug": "veterinary-doctor",
+          "name": "Veterinary Doctor",
+          "name_hi": "पशु चिकित्सक",
+          "icon": "🐄"
+        },
+        {
+          "slug": "cattle-feed",
+          "name": "Cattle Feed / Dana",
+          "name_hi": "पशु आहार",
+          "icon": "🐂"
+        },
+        {
+          "slug": "photo-studio",
+          "name": "Photo Studio / Videography",
+          "name_hi": "फोटो स्टूडियो",
+          "icon": "📸"
+        },
+        {
+          "slug": "cement-dealer",
+          "name": "Cement / Steel Dealer",
+          "name_hi": "सीमेंट / सरिया",
+          "icon": "🏗️"
+        },
+        {
+          "slug": "transport-tempo",
+          "name": "Transport / Tempo / Mini Truck",
+          "name_hi": "ट्रांसपोर्ट",
+          "icon": "🚚"
         }
       ]
     },
@@ -626,6 +1028,24 @@
           "name": "Blood Donation / Welfare Camp",
           "name_hi": "रक्तदान / कल्याण शिविर",
           "icon": "🩸"
+        },
+        {
+          "slug": "temple-mandir",
+          "name": "Temple / Mandir",
+          "name_hi": "मंदिर",
+          "icon": "🛕"
+        },
+        {
+          "slug": "masjid",
+          "name": "Masjid",
+          "name_hi": "मस्जिद",
+          "icon": "🕌"
+        },
+        {
+          "slug": "community-hall",
+          "name": "Marriage Hall / Community Hall",
+          "name_hi": "मैरिज हॉल",
+          "icon": "🏛️"
         }
       ]
     }
