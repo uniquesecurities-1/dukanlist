@@ -2500,5 +2500,103 @@ function copyShopUrl(){
 </div>
 
 <script src="/assets/js/install-banner.js"></script>
+<script>
+// ============= Customer Review Auto-Prompt =============
+(function(){
+  // When user clicks Call or WhatsApp on a business, save event for later prompt
+  function trackLead(bizId, bizName){
+    try {
+      const key = 'dl_pending_review_' + bizId;
+      const existing = JSON.parse(localStorage.getItem(key) || 'null');
+      if (existing && (Date.now() - existing.ts) < 86400000) return; // Already pending
+      localStorage.setItem(key, JSON.stringify({ ts: Date.now(), name: bizName, id: bizId }));
+    } catch(_){}
+  }
+
+  // Check pending reviews when ANY business page loads — show prompt for events >24h old
+  function checkPendingReview(){
+    try {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('dl_pending_review_'));
+      const now = Date.now();
+      for (const key of keys){
+        const data = JSON.parse(localStorage.getItem(key) || 'null');
+        if (!data) continue;
+        // Only prompt for events 24 hours - 7 days old
+        const ageMs = now - data.ts;
+        if (ageMs < 86400000 || ageMs > 604800000) {
+          if (ageMs > 604800000) localStorage.removeItem(key); // Cleanup very old
+          continue;
+        }
+        // Don't prompt for THIS business if currently viewing it
+        const currentBizId = window.BIZ ? window.BIZ.id : null;
+        if (data.id === currentBizId) continue;
+        showReviewBoosterPrompt(data);
+        break; // Show one at a time
+      }
+    } catch(_){}
+  }
+
+  function showReviewBoosterPrompt(data){
+    if (document.getElementById('reviewBoosterModal')) return;
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    const modal = document.createElement('div');
+    modal.id = 'reviewBoosterModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:rbFadeIn 0.3s';
+
+    const styleId = 'rb-style';
+    if (!document.getElementById(styleId)){
+      const s = document.createElement('style');
+      s.id = styleId;
+      s.textContent = '@keyframes rbFadeIn{from{opacity:0}to{opacity:1}} @keyframes rbStarHover{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}';
+      document.head.appendChild(s);
+    }
+
+    const headline = lang === 'hi'
+      ? 'Aapne <b>' + data.name + '</b> ko contact kiya tha. Experience kaisa raha?'
+      : 'You contacted <b>' + data.name + '</b>. How was your experience?';
+    const sub = lang === 'hi'
+      ? 'Apna rating dein (kuch likhna optional hai)'
+      : 'Give your rating (text is optional)';
+
+    modal.innerHTML =
+      '<div style="background:#fff;border-radius:20px;max-width:420px;width:100%;padding:28px 24px;box-shadow:0 20px 60px rgba(15,23,42,0.3);position:relative;text-align:center">' +
+        '<button onclick="closeReviewBooster()" style="position:absolute;top:14px;right:14px;background:#F1F5F9;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer">×</button>' +
+        '<div style="font-size:3rem;margin-bottom:8px">⭐</div>' +
+        '<h3 style="font-family:Manrope,sans-serif;font-size:1.15rem;font-weight:900;color:#0F172A;margin-bottom:6px;line-height:1.35">' + headline + '</h3>' +
+        '<p style="color:#64748B;font-size:.88rem;margin-bottom:20px">' + sub + '</p>' +
+        '<div id="rbStars" style="display:flex;justify-content:center;gap:8px;margin-bottom:18px">' +
+          [1,2,3,4,5].map(n => '<button onclick="goToReview(\'' + data.id + '\',' + n + ')" style="background:none;border:none;font-size:2rem;cursor:pointer;transition:transform .15s;padding:4px" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'\'">⭐</button>').join('') +
+        '</div>' +
+        '<button onclick="closeReviewBooster()" style="background:none;border:none;color:#64748B;font-size:.82rem;cursor:pointer">Skip for now</button>' +
+      '</div>';
+    document.body.appendChild(modal);
+  }
+
+  window.closeReviewBooster = function(){
+    const m = document.getElementById('reviewBoosterModal');
+    if (m) m.remove();
+  };
+
+  window.goToReview = function(bizId, rating){
+    // Mark as handled (remove from pending)
+    try { localStorage.removeItem('dl_pending_review_' + bizId); } catch(_){}
+    // Open the business detail page review form with pre-filled rating
+    window.location.href = '/business.html?id=' + encodeURIComponent(bizId) + '#review-' + rating;
+  };
+
+  // Hook into existing Call/WhatsApp click handlers
+  document.addEventListener('click', function(e){
+    const t = e.target.closest('[data-track-lead], a[href^="tel:"], a[href^="https://wa.me/"], a[href^="whatsapp://"]');
+    if (!t) return;
+    const biz = window.BIZ;
+    if (biz && biz.id && biz.name) trackLead(biz.id, biz.name);
+  });
+
+  // Mark this so we don't double-init
+  window.dl_pending_review_check = true;
+  // Run check after page settles
+  setTimeout(checkPendingReview, 2500);
+})();
+</script>
 </body>
 </html>

@@ -484,6 +484,27 @@
       </div>
     </div>
 
+    <!-- Referral Program widget -->
+    <div class="side-widget referral-widget" style="background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C">
+      <div class="side-widget-title" style="color:#9A3412">🎁 <span data-i18n-en>Refer & Earn</span><span data-i18n-hi>Refer & Earn</span></div>
+      <div style="font-size:.84rem;color:#7C2D12;margin-bottom:10px;line-height:1.45">
+        <span data-i18n-en>Refer <b>3 shopkeepers</b> &mdash; you BOTH get <b>6-month Featured listing FREE</b></span>
+        <span data-i18n-hi>3 दुकानदारों को refer करें &mdash; दोनों को <b>6-month Featured FREE</b></span>
+      </div>
+      <div style="background:#fff;padding:8px 10px;border-radius:8px;border:1px dashed #FB923C;font-size:.78rem;color:#0F172A;word-break:break-all;margin-bottom:8px" id="referralLinkBox">
+        Loading link...
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button onclick="shareReferralWhatsApp()" style="background:#25D366;color:#fff;border:none;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px">💬 WhatsApp</button>
+        <button onclick="copyReferralLink()" id="copyRefBtn" style="background:#0F172A;color:#fff;border:none;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit">📋 Copy</button>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #FB923C;font-size:.74rem;color:#9A3412;text-align:center">
+        <span data-i18n-en>Your referrals: </span><span data-i18n-hi>आपके referrals: </span>
+        <b id="refCounter">0</b>
+        <span style="margin-left:4px;opacity:.7">/ 3</span>
+      </div>
+    </div>
+
     <!-- Recent Activity widget -->
     <div class="side-widget">
       <div class="side-widget-title">📋 <span data-i18n-en>Your Activity (24h)</span><span data-i18n-hi>आपकी एक्टिविटी (24h)</span></div>
@@ -1312,6 +1333,63 @@ function renderDashActivity(){
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSidebarWidgets);
   else initSidebarWidgets();
+})();
+</script>
+
+<script>
+// ============= Referral Program =============
+async function setupReferralWidget(){
+  try {
+    // Get current shop slug
+    if (typeof MY_BIZ === 'undefined' || !MY_BIZ || !MY_BIZ.slug){
+      setTimeout(setupReferralWidget, 800);
+      return;
+    }
+    const slug = MY_BIZ.slug;
+    const refLink = window.location.origin + '/register.html?ref=' + encodeURIComponent(slug);
+    const box = document.getElementById('referralLinkBox');
+    if (box) box.textContent = refLink;
+    window._referralLink = refLink;
+
+    // Count referrals from localStorage clicks
+    const clicks = parseInt(localStorage.getItem('dl_ref_clicks_' + slug) || '0', 10);
+    const ctr = document.getElementById('refCounter');
+    if (ctr) ctr.textContent = clicks;
+  } catch(e){ console.warn('Referral setup:', e); }
+}
+
+function copyReferralLink(){
+  const link = window._referralLink;
+  if (!link) return;
+  try {
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById('copyRefBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Copied!';
+      btn.style.background = '#16A34A';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#0F172A'; }, 2000);
+    });
+  } catch(_){
+    prompt('Copy this link:', link);
+  }
+}
+
+function shareReferralWhatsApp(){
+  const link = window._referralLink;
+  if (!link) return;
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const message = lang === 'hi'
+    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa-Bathinda ka apna local directory. FREE registration. Aaj hi karein: ' + link
+    : 'Namaste! List your shop on DukanList — Sirsa-Bathinda ka apna local directory. FREE registration. Register today: ' + link;
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+}
+
+(function(){
+  function init(){
+    setupReferralWidget();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 </body>
