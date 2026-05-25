@@ -403,6 +403,17 @@
       </div>
     </div>
 
+    <!-- T&C acceptance checkbox -->
+    <div style="background:#FFFBEB;border:1.5px solid #F59E0B;border-radius:12px;padding:14px 16px;margin:14px 0">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.92rem;line-height:1.5;color:#1F2937">
+        <input type="checkbox" id="tcAccept" style="margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:#FF6B1A">
+        <span>
+          <span data-i18n-en>I confirm all the above information is <b>accurate and true</b>, and I agree to DukanList's <a href="/terms.html" target="_blank" style="color:#FF6B1A;font-weight:700">Terms of Service</a> and <a href="/privacy.html" target="_blank" style="color:#FF6B1A;font-weight:700">Privacy Policy</a>. I understand that submitting false information may result in account ban and legal action under Indian IT Act 2000.</span>
+          <span data-i18n-hi>मैं पुष्टि करता हूँ कि ऊपर दी गई सारी जानकारी <b>सही और सत्य</b> है, और मैं DukanList की <a href="/terms.html" target="_blank" style="color:#FF6B1A;font-weight:700">सेवा शर्तों</a> और <a href="/privacy.html" target="_blank" style="color:#FF6B1A;font-weight:700">गोपनीयता नीति</a> से सहमत हूँ। मुझे पता है कि गलत जानकारी देने पर खाता बंद हो सकता है और भारतीय IT अधिनियम 2000 के तहत कानूनी कार्यवाही हो सकती है।</span>
+        </span>
+      </label>
+    </div>
+
     <div class="alert error" id="step4Err" style="display:none"></div>
     <div class="btn-row">
       <button class="btn btn-sec" onclick="goToStep(3)"><span data-i18n-en>← Back</span><span data-i18n-hi>← पीछे</span></button>
@@ -966,6 +977,18 @@ function showErr(el, msg){ el.textContent = msg; el.style.display = 'flex'; }
 // STEP 4 — USP + final submit (calls register_business_v2)
 // ============================================================
 async function handleSubmit(){
+  // T&C acceptance gate
+  const tcEl = document.getElementById('tcAccept');
+  if (tcEl && !tcEl.checked){
+    const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+    const msg = lang === 'hi'
+      ? 'कृपया सेवा शर्तों से सहमति की पुष्टि करें (नीचे का चेकबॉक्स)'
+      : 'Please confirm Terms of Service acceptance (checkbox below)';
+    alert(msg);
+    tcEl.scrollIntoView({behavior:'smooth', block:'center'});
+    try { tcEl.parentElement.parentElement.parentElement.style.boxShadow = '0 0 0 4px rgba(245,158,11,.3)'; } catch(_){}
+    return;
+  }
   const errEl = document.getElementById('step4Err');
   errEl.style.display = 'none';
 
