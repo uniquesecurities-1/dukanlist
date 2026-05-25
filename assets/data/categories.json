@@ -753,6 +753,78 @@
           "name": "Agri Equipment / Tools Manufacturer",
           "name_hi": "कृषि उपकरण निर्माता",
           "icon": "🚜"
+        },
+        {
+          "slug": "manufacturer-metal",
+          "name": "Metal / Steel Fabrication Manufacturer",
+          "name_hi": "धातु / स्टील निर्माता",
+          "icon": "⚙️"
+        },
+        {
+          "slug": "manufacturer-plastic",
+          "name": "Plastic / Packaging Manufacturer",
+          "name_hi": "प्लास्टिक / पैकेजिंग निर्माता",
+          "icon": "🛍️"
+        },
+        {
+          "slug": "manufacturer-chemical",
+          "name": "Chemical / Industrial Manufacturer",
+          "name_hi": "रसायन / औद्योगिक निर्माता",
+          "icon": "🧪"
+        },
+        {
+          "slug": "manufacturer-leather",
+          "name": "Leather Goods Manufacturer",
+          "name_hi": "चमड़ा उत्पाद निर्माता",
+          "icon": "👜"
+        },
+        {
+          "slug": "manufacturer-paper",
+          "name": "Paper / Cardboard Manufacturer",
+          "name_hi": "कागज / कार्डबोर्ड निर्माता",
+          "icon": "📦"
+        },
+        {
+          "slug": "manufacturer-electronics",
+          "name": "Electronics / LED Manufacturer",
+          "name_hi": "इलेक्ट्रॉनिक्स / LED निर्माता",
+          "icon": "💡"
+        },
+        {
+          "slug": "manufacturer-machinery",
+          "name": "Machinery / Equipment Manufacturer",
+          "name_hi": "मशीनरी / उपकरण निर्माता",
+          "icon": "🏗️"
+        },
+        {
+          "slug": "manufacturer-construction",
+          "name": "Construction Material Manufacturer",
+          "name_hi": "निर्माण सामग्री निर्माता",
+          "icon": "🧱"
+        },
+        {
+          "slug": "manufacturer-handicraft",
+          "name": "Handicraft / Art Manufacturer",
+          "name_hi": "हस्तशिल्प निर्माता",
+          "icon": "🎨"
+        },
+        {
+          "slug": "manufacturer-spices",
+          "name": "Spices / Masala Manufacturer",
+          "name_hi": "मसाला / स्पाइस निर्माता",
+          "icon": "🌶️"
+        },
+        {
+          "slug": "manufacturer-cosmetic",
+          "name": "Cosmetic / Personal Care Manufacturer",
+          "name_hi": "कॉस्मेटिक निर्माता",
+          "icon": "💄"
+        },
+        {
+          "slug": "manufacturer-pharma",
+          "name": "Pharma / Medicine Manufacturer",
+          "name_hi": "फार्मा / दवा निर्माता",
+          "icon": "💊"
         }
       ]
     },
@@ -990,6 +1062,147 @@
           "name": "Transport / Tempo / Mini Truck",
           "name_hi": "ट्रांसपोर्ट",
           "icon": "🚚"
+        }
+      ]
+    },
+    {
+      "slug": "agri-business",
+      "name": "Agri Business / Farming",
+      "name_hi": "कृषि व्यवसाय / खेती",
+      "icon": "🌾",
+      "color": "#16A34A",
+      "subs": [
+        {
+          "slug": "aarhti-commission",
+          "name": "Aarhti / Commission Agent (Galla Mandi)",
+          "name_hi": "आढ़ती / कमीशन एजेंट (गल्ला मंडी)",
+          "icon": "🌾"
+        },
+        {
+          "slug": "pesticide-shop",
+          "name": "Pesticide / Insecticide Shop",
+          "name_hi": "कीटनाशक / दवा शॉप",
+          "icon": "🧴"
+        },
+        {
+          "slug": "fertilizer-shop",
+          "name": "Fertilizer / Khaad Shop",
+          "name_hi": "खाद / उर्वरक शॉप",
+          "icon": "🪴"
+        },
+        {
+          "slug": "seeds-shop",
+          "name": "Seeds / Beej Shop",
+          "name_hi": "बीज / सीड्स शॉप",
+          "icon": "🌱"
+        },
+        {
+          "slug": "agri-equipment-shop",
+          "name": "Agri Equipment / Implements Shop",
+          "name_hi": "कृषि उपकरण / यंत्र शॉप",
+          "icon": "🚜"
+        },
+        {
+          "slug": "tractor-dealer",
+          "name": "Tractor / Combine Harvester Dealer",
+          "name_hi": "ट्रैक्टर / हार्वेस्टर डीलर",
+          "icon": "🚜"
+        },
+        {
+          "slug": "cattle-feed-shop",
+          "name": "Cattle Feed / Pashu Aahar Shop",
+          "name_hi": "पशु आहार / दाना शॉप",
+          "icon": "🌽"
+        },
+        {
+          "slug": "dairy-farm",
+          "name": "Dairy Farm / Milk Producer",
+          "name_hi": "डेयरी फार्म / दूध उत्पादक",
+          "icon": "🐄"
+        },
+        {
+          "slug": "poultry-farm",
+          "name": "Poultry / Murgi Palan Farm",
+          "name_hi": "मुर्गी पालन / पोल्ट्री फार्म",
+          "icon": "🐔"
+        },
+        {
+          "slug": "bee-keeping",
+          "name": "Bee Keeping / Honey Producer",
+          "name_hi": "मधुमक्खी पालन / शहद",
+          "icon": "🍯"
+        },
+        {
+          "slug": "plant-nursery",
+          "name": "Plant Nursery / Saplings",
+          "name_hi": "पौधा नर्सरी / पौधे",
+          "icon": "🌿"
+        },
+        {
+          "slug": "agri-vet-doctor",
+          "name": "Veterinary / Animal Doctor",
+          "name_hi": "पशु चिकित्सक",
+          "icon": "🐾"
+        },
+        {
+          "slug": "drip-irrigation",
+          "name": "Drip Irrigation / Sprinkler Dealer",
+          "name_hi": "ड्रिप / स्प्रिंकलर डीलर",
+          "icon": "💧"
+        },
+        {
+          "slug": "cold-storage",
+          "name": "Cold Storage / Warehouse",
+          "name_hi": "कोल्ड स्टोरेज / गोदाम",
+          "icon": "❄️"
+        },
+        {
+          "slug": "agri-export",
+          "name": "Agri Trader / Exporter",
+          "name_hi": "कृषि व्यापारी / निर्यातक",
+          "icon": "📦"
+        },
+        {
+          "slug": "agri-loan-agent",
+          "name": "Agri Loan / KCC Agent",
+          "name_hi": "कृषि लोन / KCC एजेंट",
+          "icon": "💰"
+        },
+        {
+          "slug": "flour-mill",
+          "name": "Flour Mill / Atta Chakki",
+          "name_hi": "आटा चक्की / फ्लोर मिल",
+          "icon": "🌾"
+        },
+        {
+          "slug": "rice-mill",
+          "name": "Rice Mill / Chawal Mill",
+          "name_hi": "राइस मिल / चावल मिल",
+          "icon": "🍚"
+        },
+        {
+          "slug": "oil-mill",
+          "name": "Oil Mill / Tel Mill",
+          "name_hi": "तेल मिल / कोल्हू",
+          "icon": "🛢️"
+        },
+        {
+          "slug": "cotton-ginning",
+          "name": "Cotton Ginning / Kapas Factory",
+          "name_hi": "कपास जिनिंग / कॉटन फैक्ट्री",
+          "icon": "🧶"
+        },
+        {
+          "slug": "animal-husbandry",
+          "name": "Animal Husbandry / Goat / Sheep",
+          "name_hi": "पशुपालन / बकरी / भेड़",
+          "icon": "🐐"
+        },
+        {
+          "slug": "fishery",
+          "name": "Fishery / Fish Farm",
+          "name_hi": "मछली पालन / फिशरी",
+          "icon": "🐟"
         }
       ]
     },
