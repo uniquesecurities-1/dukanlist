@@ -762,6 +762,21 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
       <span data-i18n-en class="block">No active listings yet. Be the first!</span>
       <span data-i18n-hi class="block">अभी कोई लाइव लिस्टिंग नहीं। पहले बनें!</span>
     </div>
+
+    <!-- View All Shops CTA -->
+    <div id="viewAllShopsRow" style="text-align:center;margin-top:28px">
+      <a href="/search.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;padding:14px 32px;border-radius:99px;font-weight:800;text-decoration:none;font-size:1rem;box-shadow:0 6px 20px rgba(255,107,26,0.28);font-family:'Manrope',sans-serif;letter-spacing:0.3px"
+         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(255,107,26,0.4)'"
+         onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(255,107,26,0.28)'">
+        <span data-i18n-en>View All Shops</span>
+        <span data-i18n-hi>सभी दुकानें देखें</span>
+        <span id="viewAllCount" style="background:rgba(255,255,255,0.25);color:#fff;padding:3px 10px;border-radius:99px;font-size:0.78rem;font-weight:700">→</span>
+      </a>
+      <div style="margin-top:10px;font-size:0.82rem;color:var(--muted)">
+        <span data-i18n-en>Browse by category, filter by location, search by name</span>
+        <span data-i18n-hi>श्रेणी से ब्राउज़ करें, स्थान फ़िल्टर करें, नाम से खोजें</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1130,6 +1145,16 @@ async function loadFeatured(){
     const seen = new Set(featuredRows.map(f => f.id));
     const recent = (data || []).filter(r => !seen.has(r.id));
     const combined = featuredRows.concat(recent).slice(0, 8);
+
+    // Update View All button count with total active shops
+    try {
+      const { data: statsData } = await c.rpc('get_public_stats');
+      const totalShops = (statsData && statsData[0] && statsData[0].total_shops) || combined.length;
+      const countEl = document.getElementById('viewAllCount');
+      if (countEl && totalShops > 8){
+        countEl.textContent = totalShops + '+';
+      }
+    } catch(_){}
 
     if (!combined.length){ grid.innerHTML=''; empty.style.display='block'; return; }
     grid.innerHTML = combined.map(renderFeaturedCard).join('');
