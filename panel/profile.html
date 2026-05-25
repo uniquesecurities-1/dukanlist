@@ -826,4 +826,82 @@ function defaultAskMessage(){
 
 function seedAskMessage(){
   const ta = document.getElementById('askMsg');
-  if (ta && !ta.value) ta.value = defaultAskMessage
+  if (ta && !ta.value) ta.value = defaultAskMessage();
+}
+
+function generateAskLink(){
+  const cc    = (document.getElementById('askCC').value || '91').replace(/\D/g,'');
+  const phone = (document.getElementById('askPhone').value || '').replace(/\D/g,'');
+  const msg   = document.getElementById('askMsg').value.trim() || defaultAskMessage();
+  const errEl = document.getElementById('askErr');
+  const okEl  = document.getElementById('askInfo');
+  const box   = document.getElementById('askLinkBox');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!phone || phone.length < 7){
+    errEl.textContent = 'Enter a valid mobile number (without country code).';
+    errEl.style.display = '';
+    box.style.display = '';
+    document.getElementById('askOpenBtn').disabled = true;
+    document.getElementById('askCopyBtn').disabled = true;
+    return null;
+  }
+  const full = cc + phone;
+  const url  = 'https://wa.me/' + full + '?text=' + encodeURIComponent(msg);
+  box.textContent = url;
+  box.style.display = '';
+  document.getElementById('askOpenBtn').disabled = false;
+  document.getElementById('askCopyBtn').disabled = false;
+  okEl.textContent = 'Link ready — tap "Open WhatsApp" or copy.';
+  okEl.style.display = '';
+  return url;
+}
+
+function openAskLink(){
+  const url = generateAskLink();
+  if (!url) return;
+  window.open(url, '_blank', 'noopener');
+}
+
+function copyAskLink(){
+  const url = generateAskLink();
+  if (!url) return;
+  const done = () => {
+    const ok = document.getElementById('askInfo');
+    ok.textContent = '✓ Link copied to clipboard!';
+    ok.style.display = '';
+    setTimeout(() => { ok.textContent = 'Link ready — tap "Open WhatsApp" or copy.'; }, 1800);
+  };
+  try{
+    navigator.clipboard.writeText(url).then(done, () => fallbackCopyAsk(url, done));
+  }catch(_){ fallbackCopyAsk(url, done); }
+}
+function fallbackCopyAsk(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }
+  catch(_){ alert(text); }
+  finally{ ta.remove(); }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadProfile();
+  // Seed the WhatsApp message once MY_BIZ is loaded — retry until ready
+  let tries = 0;
+  const seedTimer = setInterval(() => {
+    if (MY_BIZ){
+      seedAskMessage();
+      clearInterval(seedTimer);
+    } else if (++tries > 40){
+      clearInterval(seedTimer); // give up after ~8s
+      seedAskMessage(); // seed with fallback shop name
+    }
+  }, 200);
+});
+</script>
+
+</body>
+</html>
