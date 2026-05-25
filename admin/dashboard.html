@@ -737,4 +737,70 @@ async function downloadCSV(fetchAll){
     const csvRows = [headers.join(',')];
     rows.forEach((r, idx) => {
       const cleanMobile = (r.mobile || '').replace(/^91/, '');
-      const 
+      const cleanWA = (r.whatsapp || '').replace(/^91/, '');
+      csvRows.push([
+        idx + 1,
+        escapeCSV(r.name),
+        escapeCSV(r.owner_name),
+        cleanMobile,
+        cleanWA,
+        escapeCSV(r.email),
+        escapeCSV(r.primary_cat),
+        escapeCSV(r.city_name),
+        escapeCSV(r.state_code),
+        escapeCSV(r.pincode),
+        escapeCSV(r.status),
+        r.verified_score || 0,
+        r.rating_avg ? Number(r.rating_avg).toFixed(2) : '',
+        r.rating_count || 0,
+        r.photos_count || 0,
+        r.flagged_count || 0,
+        escapeCSV(r.slug),
+        escapeCSV(r.id),
+        escapeCSV(r.created_at)
+      ].join(','));
+    });
+
+    const csv = '\ufeff' + csvRows.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const today = new Date().toISOString().slice(0, 10);
+    a.download = 'dukanlist-shops-' + today + (fetchAll ? '-all' : '-latest10') + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  } catch(e){
+    console.error('CSV download error:', e);
+    alert('Download failed: ' + (e.message || e));
+  } finally {
+    if (btn){ btn.disabled = false; btn.innerHTML = origLabel; }
+  }
+}
+
+function formatDate(iso){
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return Math.floor(diff) + 's ago';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+</script>
+
+</body>
+</html>
