@@ -723,6 +723,36 @@
           "name": "Wholesale / Galla Mandi Dealer",
           "name_hi": "थोक विक्रेता",
           "icon": "📦"
+        },
+        {
+          "slug": "manufacturer",
+          "name": "Manufacturer / Factory / Production Unit",
+          "name_hi": "निर्माता / फैक्ट्री",
+          "icon": "🏭"
+        },
+        {
+          "slug": "manufacturer-textile",
+          "name": "Textile / Garment Manufacturer",
+          "name_hi": "टेक्सटाइल / गारमेंट निर्माता",
+          "icon": "🧵"
+        },
+        {
+          "slug": "manufacturer-food",
+          "name": "Food / Snacks Manufacturer",
+          "name_hi": "खाद्य / स्नैक्स निर्माता",
+          "icon": "🍱"
+        },
+        {
+          "slug": "manufacturer-furniture",
+          "name": "Furniture Manufacturer",
+          "name_hi": "फर्नीचर निर्माता",
+          "icon": "🪑"
+        },
+        {
+          "slug": "manufacturer-agri",
+          "name": "Agri Equipment / Tools Manufacturer",
+          "name_hi": "कृषि उपकरण निर्माता",
+          "icon": "🚜"
         }
       ]
     },

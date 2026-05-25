@@ -90,12 +90,26 @@
 
 /* ===== Live Pulse Panel (Register Page) ===== */
 .register-layout{
-  display:grid; grid-template-columns: 1fr 1fr; gap:32px;
-  max-width:1200px; margin:0 auto; padding:0;
+  display:grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap:32px;
+  max-width:1280px; margin:0 auto; padding:0;
   align-items:start;
 }
+.reg-col-main{ min-width:0 }  /* allow text to flow naturally */
 @media (max-width: 980px){
   .register-layout{ grid-template-columns: 1fr; gap:24px }
+}
+/* Register-page title — smaller and tighter to fit the narrower main column */
+.reg-col-main h1.title{
+  font-size:clamp(1.9rem, 3.6vw, 2.6rem);
+  line-height:1.1;
+  letter-spacing:-.025em;
+  margin-bottom:8px;
+  word-break:normal;
+  overflow-wrap:break-word;
+}
+.reg-col-main .subtitle{
+  font-size:clamp(.92rem, 1.2vw, 1.02rem);
+  margin-bottom:18px;
 }
 .pulse-panel-reg{
   background: linear-gradient(160deg, #0F1B36 0%, #1A2848 100%);
