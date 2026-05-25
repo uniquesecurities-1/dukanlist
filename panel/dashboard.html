@@ -31,6 +31,90 @@
 </style>
 </head>
 <body>
+<!-- Welcome Modal (first-time login only) -->
+<div id="welcomeModalDL" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;padding:32px 28px;box-shadow:0 20px 60px rgba(15,23,42,0.3);position:relative;animation:welcomeIn 0.4s ease-out">
+    <button onclick="closeWelcomeModal()" style="position:absolute;top:14px;right:14px;background:#F1F5F9;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#64748B" aria-label="Close">×</button>
+    <div style="text-align:center;font-size:3rem;margin-bottom:8px">🎉</div>
+    <h2 style="font-family:'Manrope',sans-serif;font-size:1.6rem;font-weight:900;text-align:center;margin-bottom:8px;letter-spacing:-0.02em;color:#0F172A">
+      <span data-i18n-en>Welcome to DukanList!</span>
+      <span data-i18n-hi>DukanList me swagat hai!</span>
+    </h2>
+    <p style="text-align:center;color:#64748B;margin-bottom:22px;font-size:.95rem">
+      <span data-i18n-en>Aapki shop ab Sirsa-Bathinda ke saare customers tak pohunch sakti hai. Quick tour:</span>
+      <span data-i18n-hi>Aapki shop ab Sirsa-Bathinda ke saare customers tak pohunch sakti hai. Quick tour:</span>
+    </p>
+    <div style="display:grid;gap:12px;margin-bottom:24px">
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#FFF7ED;padding:12px 14px;border-radius:12px;border:1px solid #FED7AA">
+        <div style="font-size:1.5rem">📸</div>
+        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Photos add karein</b><div style="font-size:.82rem;color:#64748B">5+ photos = 3x more calls. Photos tab me jayein.</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#EFF6FF;padding:12px 14px;border-radius:12px;border:1px solid #93C5FD">
+        <div style="font-size:1.5rem">🎁</div>
+        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Deals banayein</b><div style="font-size:.82rem;color:#64748B">Special offers customers ko attract karte hain. Deals tab.</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#F0FDF4;padding:12px 14px;border-radius:12px;border:1px solid #86EFAC">
+        <div style="font-size:1.5rem">📊</div>
+        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Analytics dekhe</b><div style="font-size:.82rem;color:#64748B">Roz check karein kitne customers aaye. Analytics tab.</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;background:#FAF5FF;padding:12px 14px;border-radius:12px;border:1px solid #D8B4FE">
+        <div style="font-size:1.5rem">⭐</div>
+        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Reviews ka reply</b><div style="font-size:.82rem;color:#64748B">Customer ko reply karein. Trust badhega. Reviews tab.</div></div>
+      </div>
+    </div>
+    <button onclick="closeWelcomeModal()" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:14px;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;font-family:'Manrope',sans-serif">
+      <span data-i18n-en>Got it — Start using! →</span>
+      <span data-i18n-hi>Theek hai — Start karein! →</span>
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes welcomeIn { from{opacity:0;transform:scale(0.9) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes confettiFall { 0%{transform:translateY(-100vh) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+.streak-badge {
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#FBBF24,#F59E0B);
+  color:#78350F;padding:5px 12px;border-radius:99px;
+  font-size:.78rem;font-weight:800;letter-spacing:0.5px;
+  box-shadow:0 2px 8px rgba(245,158,11,0.3);
+  animation:streakPulse 2s ease-in-out infinite;
+}
+@keyframes streakPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+.tip-of-day-card {
+  background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);
+  border:2px solid #F59E0B;
+  border-radius:16px;
+  padding:18px 22px;
+  margin:18px 0;
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  position:relative;
+  overflow:hidden;
+}
+.tip-of-day-card::before {
+  content:'';
+  position:absolute;top:0;right:0;
+  width:120px;height:120px;
+  background:radial-gradient(circle, rgba(245,158,11,0.15), transparent 70%);
+  pointer-events:none;
+}
+.tip-of-day-card .tip-icon { font-size:2rem;flex-shrink:0;line-height:1 }
+.tip-of-day-card .tip-content { flex:1;position:relative;z-index:1 }
+.tip-of-day-card .tip-label {
+  font-size:.7rem;color:#92400E;text-transform:uppercase;
+  letter-spacing:2px;font-weight:800;margin-bottom:4px;
+}
+.tip-of-day-card .tip-text {
+  font-family:'Manrope',sans-serif;font-size:1rem;font-weight:700;
+  color:#0F172A;line-height:1.4;
+}
+.tip-of-day-card .tip-sub {
+  font-size:.82rem;color:#78350F;margin-top:4px;
+}
+</style>
+
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -60,7 +144,7 @@
         <h1 class="title" id="bizNameDisp">—</h1>
         <p class="subtitle" id="bizSubDisp">—</p>
       </div>
-      <span class="status-pill" id="statusPill">—</span>
+      <span class="status-pill" id="statusPill">—</span> <span id="streakBadge" style="display:none" class="streak-badge"></span>
     </div>
 
     <div class="verif-badges" id="verifBadges"></div>
@@ -105,6 +189,19 @@
       <div class="kpi">
         <div class="lab"><span data-i18n-en>Trust Score</span><span data-i18n-hi>ट्रस्ट स्कोर</span></div>
         <div class="val" id="kpiTrust">0<span style="font-size:.6em;color:var(--muted)">/5</span></div>
+      </div>
+    </div>
+
+    <!-- Daily Tip of the Day card -->
+    <div class="tip-of-day-card" id="tipOfDayCard">
+      <div class="tip-icon" id="tipIcon">💡</div>
+      <div class="tip-content">
+        <div class="tip-label">
+          <span data-i18n-en>Tip of the Day</span>
+          <span data-i18n-hi>Aaj Ka Tip</span>
+        </div>
+        <div class="tip-text" id="tipText">Loading...</div>
+        <div class="tip-sub" id="tipSub"></div>
       </div>
     </div>
 
@@ -759,5 +856,141 @@ document.addEventListener('click', (e) => {
 </script>
 
 <script src="/assets/js/trust-tier.js"></script>
+
+<script>
+// ============= Welcome Modal (first-time only) =============
+function openWelcomeModalIfFirstTime(){
+  try {
+    if (localStorage.getItem('dl_welcome_seen_v1')) return;
+    const modal = document.getElementById('welcomeModalDL');
+    if (modal) modal.style.display = 'flex';
+  } catch(_){}
+}
+function closeWelcomeModal(){
+  try {
+    localStorage.setItem('dl_welcome_seen_v1', '1');
+    const modal = document.getElementById('welcomeModalDL');
+    if (modal) modal.style.display = 'none';
+    // Trigger confetti for first close
+    fireConfetti();
+  } catch(_){}
+}
+
+// ============= Daily Login Streak =============
+function updateLoginStreak(){
+  try {
+    const today = new Date().toDateString();
+    const lastDate = localStorage.getItem('dl_streak_last_date_v1');
+    let streak = parseInt(localStorage.getItem('dl_streak_v1') || '0', 10);
+    if (lastDate === today) {
+      // Already counted today, just show badge
+    } else {
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = yesterday.toDateString();
+      streak = (lastDate === yStr) ? (streak + 1) : 1;
+      localStorage.setItem('dl_streak_v1', String(streak));
+      localStorage.setItem('dl_streak_last_date_v1', today);
+      // Confetti on milestones
+      if ([3, 7, 14, 30, 60, 100].indexOf(streak) !== -1) {
+        setTimeout(fireConfetti, 800);
+      }
+    }
+    const badge = document.getElementById('streakBadge');
+    if (badge && streak > 0) {
+      const emoji = streak >= 30 ? '🏆' : streak >= 7 ? '🔥' : '✨';
+      const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+      badge.innerHTML = emoji + ' ' + streak + ' ' + (lang === 'hi' ? 'din' : 'day') + ' ' + (lang === 'hi' ? 'streak' : 'streak');
+      badge.style.display = 'inline-flex';
+    }
+  } catch(_){}
+}
+
+// ============= Daily Tip Rotation =============
+const DAILY_TIPS = [
+  { icon: '📸', en: 'Shops with 5+ photos get <b>3x more calls</b>', hi: '5+ photos wali dukane <b>3x zyada calls</b> paati hain', sub: 'Photos tab me jaake upload karein' },
+  { icon: '⭐', en: '<b>Reply karne wale shopkeepers</b> ko 2x repeat customers milte hain', hi: '<b>Reply karne wale shopkeepers</b> ko 2x repeat customers milte hain', sub: 'Reviews me reply karna mat bhulein' },
+  { icon: '🎁', en: 'Weekly <b>deals/offers</b> launch karne wale shops me 40% zyada calls aate hain', hi: 'Weekly <b>deals/offers</b> launch karne wale shops me 40% zyada calls aate hain', sub: 'Deals tab pe ek offer banayein abhi' },
+  { icon: '⏰', en: 'Shop hours <b>accurate update</b> rakhein — customer galat time pe call na kare', hi: 'Shop hours <b>accurate</b> rakhein — galat time pe call na ho', sub: 'Profile tab me hours check karein' },
+  { icon: '📍', en: 'Address + landmark <b>clearly likhein</b> — customer easily pohunche', hi: 'Address + landmark <b>clearly likhein</b> — customer easily pohunche', sub: 'Profile tab me address update karein' },
+  { icon: '✅', en: 'Verified Bronze tier paane ke liye <b>3 photos + WhatsApp</b> add karein', hi: 'Verified Bronze tier ke liye <b>3 photos + WhatsApp</b> chahiye', sub: 'Trust badhega — customer zyada call karenge' },
+  { icon: '🔔', en: '<b>Push notifications enable</b> karein — instant lead alerts', hi: '<b>Push notifications enable</b> karein — instant lead alerts', sub: 'Customer ke click karte hi notification milegi' },
+  { icon: '💬', en: 'WhatsApp number bhi add karein — <b>50% customers WhatsApp</b> prefer karte hain', hi: 'WhatsApp number add karein — <b>50% customers WhatsApp</b> prefer karte hain', sub: 'Direct chat = direct sales' },
+  { icon: '🏷️', en: 'Apne shop ki <b>USP / 1-liner</b> add karein — customer ko clearly samjhe', hi: 'Apne shop ki <b>USP / 1-liner</b> add karein', sub: 'Profile tab me About section me likhein' },
+  { icon: '🎯', en: '<b>Multi-category</b> shops 2x discover hote hain search me', hi: '<b>Multi-category</b> shops 2x discover hote hain', sub: 'Apni shop ki sab services add karein' },
+  { icon: '📞', en: '<b>Call answer karne ki speed</b> matters — 1 min me reply karne wale 3x convert karte hain', hi: 'Calls turant attend karein — 3x conversion', sub: 'Phone hamesha audible rakhein dukaan par' },
+  { icon: '🌟', en: 'Happy customers ko <b>review dena yaad dilayein</b> — verbal request kaafi hai', hi: 'Happy customers se review dene ko bolein', sub: '"DukanList par review de dena bhai" — itna kaafi' },
+  { icon: '📲', en: 'WhatsApp Status pe <b>shop link share karein</b> — daily reach badhayein', hi: 'WhatsApp Status pe <b>shop link share</b> karein roz', sub: 'Direct customers aapke profile par aayenge' },
+  { icon: '🛍️', en: '<b>Festival ke around deals</b> launch karne wale shops me sales 3x hoti hai', hi: 'Festival ke time <b>special deals</b> chalayein', sub: 'Diwali, Holi, Eid, Lohri — har tyohaar pe' },
+  { icon: '🤝', en: 'Padosi shopkeepers ko bhi DukanList suggest karein — <b>community grow karega</b>', hi: 'Padosi shopkeepers ko bhi join karayein', sub: 'Aapke area ka apna directory ban jayega' },
+  { icon: '📈', en: '<b>Analytics roz check karein</b> — pata chalega kab peak hours hain', hi: '<b>Analytics roz check karein</b> peak hours pata chalega', sub: 'Analytics tab → daily trends dekhein' },
+  { icon: '🏪', en: 'Apne shop ka <b>QR code print karke counter pe lagayein</b>', hi: 'Shop ka <b>QR code print karke counter pe lagayein</b>', sub: 'Panel → QR Code tab se download karein' },
+  { icon: '💎', en: '<b>Silver tier</b> paane ke liye 5+ photos + 3 reviews + ek deal active', hi: '<b>Silver tier</b> = 5+ photos + 3 reviews + 1 deal', sub: 'Trust ka next level' },
+  { icon: '🏆', en: '<b>Gold tier</b> shops top search results me dikhte hain', hi: '<b>Gold tier</b> shops top search me dikhte hain', sub: 'Goal: 4.5+ rating + 10+ reviews + 8+ photos' },
+  { icon: '📝', en: 'Shop me <b>3-5 services / products list karein</b> — Google bhi pick karega', hi: 'Shop me <b>3-5 services list</b> karein', sub: 'Profile tab → Services section' },
+  { icon: '🕐', en: 'Sunday closed hai? <b>Clearly mark karein</b> — galat call avoid hogi', hi: 'Sunday closed? <b>Clearly mark</b> karein', sub: 'Profile → Hours → Sunday: Closed' },
+  { icon: '💌', en: '<b>Negative review aaye to professionally respond karein</b> — image badhega', hi: 'Negative review me <b>professional reply</b> dein', sub: 'Defend mat karein, solution offer karein' },
+  { icon: '🎊', en: 'Pehle 5 customers ko WhatsApp pe <b>"DukanList par hu"</b> bata dijiye', hi: 'Pehle 5 customers ko WhatsApp pe shop link bhejein', sub: 'Word-of-mouth se viral growth' },
+  { icon: '🌈', en: '<b>Shop ka exterior + interior + product</b> teen alag photos zaroor hone chahiye', hi: 'Shop ke <b>exterior + interior + product</b> photos add karein', sub: 'Customer ko complete picture mile' },
+  { icon: '🚀', en: 'Pehle hafte 10 leads chahiye? <b>Family + neighbors</b> ko link bhejein', hi: 'Pehle 10 leads ke liye <b>family + padosi</b> ko link bhejein', sub: 'Initial traction se algorithm boost karega' },
+  { icon: '⚡', en: '<b>Lightning fast loading</b> — DukanList 2 second me khulta hai pure India me', hi: '<b>DukanList 2 second me</b> khulta hai sab phones me', sub: 'Customer wait nahi karna padta' },
+  { icon: '🔒', en: 'Aapka <b>data 100% secure</b> hai — daily backup, encrypted', hi: 'Aapka <b>data secure</b> hai — daily encrypted backup', sub: 'Chinta-mukt rahein, focus shop pe' },
+  { icon: '📱', err: '', en: '<b>PWA install</b> karein phone pe — app jaisi speed milegi', hi: '<b>PWA install</b> karein — app jaisi feel', sub: 'Browser me "Add to Home Screen" option' },
+  { icon: '🎓', en: '<b>Naya customer aaye to ye 3 cheez puchhein</b> — naam, kya chahiye, kab', hi: 'Naye customer se 3 cheez puchein — naam, jarurat, time', sub: 'Personal touch = loyalty' },
+  { icon: '🌟', en: 'DukanList pe <b>active rehna</b> hi success ka key hai — daily 2 min', hi: 'DukanList pe <b>daily 2 min active</b> rahein — yahi key hai', sub: 'Streak badge dekhein — aap kar rahe ho!' }
+];
+function loadTipOfDay(){
+  try {
+    const tipEl = document.getElementById('tipText');
+    const subEl = document.getElementById('tipSub');
+    const iconEl = document.getElementById('tipIcon');
+    if (!tipEl) return;
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    const tip = DAILY_TIPS[dayOfYear % DAILY_TIPS.length];
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    tipEl.innerHTML = lang === 'hi' ? tip.hi : tip.en;
+    if (subEl) subEl.textContent = tip.sub || '';
+    if (iconEl) iconEl.textContent = tip.icon;
+  } catch(_){}
+}
+
+// ============= Confetti =============
+function fireConfetti(){
+  try {
+    const colors = ['#FF6B1A','#FFB200','#10B981','#3B82F6','#EC4899','#FBBF24'];
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;overflow:hidden';
+    for (let i = 0; i < 60; i++){
+      const p = document.createElement('div');
+      const sz = 6 + Math.random() * 8;
+      const left = Math.random() * 100;
+      const delay = Math.random() * 0.3;
+      const dur = 2 + Math.random() * 1.5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      p.style.cssText = 'position:absolute;left:' + left + '%;top:-20px;width:' + sz + 'px;height:' + sz + 'px;background:' + color + ';border-radius:' + (Math.random() > 0.5 ? '50%' : '2px') + ';animation:confettiFall ' + dur + 's ' + delay + 's ease-out forwards';
+      wrap.appendChild(p);
+    }
+    document.body.appendChild(wrap);
+    setTimeout(() => wrap.remove(), 4500);
+  } catch(_){}
+}
+
+// ============= Init all engagement features =============
+function initEngagementFeatures(){
+  // Wait for dashboardContent to be visible
+  const tryInit = () => {
+    const dash = document.getElementById('dashboardContent');
+    if (!dash || dash.style.display === 'none') {
+      setTimeout(tryInit, 500);
+      return;
+    }
+    updateLoginStreak();
+    loadTipOfDay();
+    setTimeout(openWelcomeModalIfFirstTime, 600);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryInit);
+  else tryInit();
+}
+initEngagementFeatures();
+</script>
 </body>
 </html>

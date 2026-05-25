@@ -87,6 +87,44 @@
     font-weight: 600;
   }
   .cat-counter.full { color: #dc2626; }
+
+/* ===== Live Pulse Panel (Register Page) ===== */
+.register-layout{
+  display:grid; grid-template-columns: 1fr 1fr; gap:32px;
+  max-width:1200px; margin:0 auto; padding:0;
+  align-items:start;
+}
+@media (max-width: 980px){
+  .register-layout{ grid-template-columns: 1fr; gap:24px }
+}
+.pulse-panel-reg{
+  background: linear-gradient(160deg, #0F1B36 0%, #1A2848 100%);
+  color:#fff; border-radius:20px; padding:28px 24px;
+  box-shadow: 0 12px 36px rgba(15,23,42,0.18);
+  position:sticky; top:20px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.pulse-panel-reg .pulse-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.pulse-panel-reg .pulse-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:2px;color:#10B981;text-transform:uppercase}
+.pulse-panel-reg .pulse-dot{width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 0 0 rgba(16,185,129,0.6);animation:pulse-ring-r 1.8s ease-out infinite}
+@keyframes pulse-ring-r{0%{box-shadow:0 0 0 0 rgba(16,185,129,0.65)}70%{box-shadow:0 0 0 12px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.pulse-panel-reg .pulse-title{font-family:'Manrope',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:6px;color:#fff;letter-spacing:-0.01em}
+.pulse-panel-reg .pulse-sub{color:#9DB1D4;font-size:.86rem;margin-bottom:22px}
+.pulse-panel-reg .pulse-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.pulse-panel-reg .pulse-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 8px;text-align:center}
+.pulse-panel-reg .pulse-stat-num{font-family:'Manrope',sans-serif;font-size:1.8rem;font-weight:900;line-height:1;margin-bottom:6px;background:linear-gradient(180deg,#FFD56A,#FF9D2E);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-0.02em}
+.pulse-panel-reg .pulse-stat-lbl{font-size:.7rem;color:#9DB1D4;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.pulse-panel-reg .activity-strip{background:rgba(255,255,255,0.04);border-radius:14px;padding:14px 16px;border:1px solid rgba(255,255,255,0.06);margin-bottom:18px;min-height:120px}
+.pulse-panel-reg .activity-label{font-size:.7rem;color:#9DB1D4;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:10px}
+.pulse-panel-reg .activity-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.06);font-size:.85rem;line-height:1.4;animation:fade-slide-r 0.5s ease-out}
+.pulse-panel-reg .activity-item:last-child{border-bottom:none}
+.pulse-panel-reg .activity-icon{font-size:1.05rem;flex-shrink:0;width:22px;text-align:center}
+.pulse-panel-reg .activity-text{flex:1;color:#E2E8F0}
+.pulse-panel-reg .activity-text b{color:#FFB200;font-weight:700}
+.pulse-panel-reg .activity-time{font-size:.7rem;color:#9DB1D4;margin-top:2px}
+@keyframes fade-slide-r{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.pulse-panel-reg .pulse-foot{text-align:center;padding-top:14px;border-top:1px dashed rgba(255,255,255,0.1);font-size:.85rem;color:#9DB1D4;line-height:1.6}
+
 </style>
 </head>
 <body>
@@ -112,7 +150,7 @@
   </div>
 </header>
 
-<div class="page-narrow">
+<div class="page-narrow"><div class="register-layout"><div class="reg-col-main">
 
   <h1 class="title">
     <span data-i18n-en>Register Your <span class="grad">Shop</span></span>
@@ -490,7 +528,52 @@
     </div>
   </div>
 
-</div>
+</div><!-- /.reg-col-main -->
+
+<aside class="pulse-panel-reg" aria-label="Platform Live Pulse">
+  <div class="pulse-header">
+    <span class="pulse-dot"></span>
+    <span class="pulse-live">Live Now</span>
+  </div>
+  <div class="pulse-title">
+    <span data-i18n-en>DukanList Pulse</span>
+    <span data-i18n-hi>DukanList Pulse</span>
+  </div>
+  <p class="pulse-sub">
+    <span data-i18n-en>Sirsa-Bathinda ka apna live business directory</span>
+    <span data-i18n-hi>Sirsa-Bathinda ka apna live directory</span>
+  </p>
+  <div class="pulse-grid">
+    <div class="pulse-stat">
+      <div class="pulse-stat-num" id="psShops">—</div>
+      <div class="pulse-stat-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>दुकानें</span></div>
+    </div>
+    <div class="pulse-stat">
+      <div class="pulse-stat-num" id="psCities">—</div>
+      <div class="pulse-stat-lbl"><span data-i18n-en>Cities</span><span data-i18n-hi>शहर</span></div>
+    </div>
+    <div class="pulse-stat">
+      <div class="pulse-stat-num" id="psCats">—</div>
+      <div class="pulse-stat-lbl"><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></div>
+    </div>
+  </div>
+  <div class="activity-strip">
+    <div class="activity-label">
+      <span data-i18n-en>★ Recent Activity</span>
+      <span data-i18n-hi>★ Recent Activity</span>
+    </div>
+    <div id="activityList">
+      <div class="activity-item"><div class="activity-icon">⏳</div><div class="activity-text">Loading live activity...</div></div>
+    </div>
+  </div>
+  <div class="pulse-foot">
+    <span data-i18n-en>Aap join karne wale 1000+ shopkeepers me se hain.</span>
+    <span data-i18n-hi>Aap join karne wale 1000+ shopkeepers me se hain.</span>
+    <br><b style="color:#FFB200">★ Aapka swagat hai!</b>
+  </div>
+</aside>
+
+</div><!-- /.register-layout --></div>
 
 <footer class="site">
   © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a>
@@ -1209,5 +1292,77 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+// ============= Live Platform Pulse (Register Page) =============
+(function(){
+  async function loadLivePulse(){
+    try {
+      if (typeof ShopDB === 'undefined' || !ShopDB.client) return;
+      const { data, error } = await ShopDB.client.rpc('get_public_stats');
+      if (error || !data || !data.length) return;
+      const s = data[0];
+      animateCountPulse('psShops', s.total_shops || 0);
+      animateCountPulse('psCities', s.total_cities || 0);
+      animateCountPulse('psCats', s.total_categories || 0);
+    } catch(e){ console.warn('Pulse stats:', e); }
+  }
+  function animateCountPulse(id, target){
+    const el = document.getElementById(id);
+    if (!el) return;
+    const duration = 1200;
+    const start = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const val = Math.floor(eased * target);
+      el.textContent = (target >= 100 ? val + (t < 1 ? '' : '+') : val);
+      if (t < 1) requestAnimationFrame(step);
+      else el.textContent = (target >= 100 ? target + '+' : target);
+    }
+    requestAnimationFrame(step);
+  }
+  const TEMPLATES = [
+    { icon: '🏪', en: 'New shop registered in <b>{city}</b>', hi: 'Nayi shop register hui <b>{city}</b> me' },
+    { icon: '⭐', en: 'Customer left a <b>5-star review</b> for a {cat}', hi: '<b>5-star review</b> mila ek {cat} ko' },
+    { icon: '📞', en: '<b>New call</b> on a {cat} in {city}', hi: '<b>Naya call</b> ek {cat} ko {city} me' },
+    { icon: '💬', en: 'WhatsApp lead for a <b>{cat}</b> in {city}', hi: 'WhatsApp lead ek <b>{cat}</b> ko {city} me' },
+    { icon: '✓',  en: 'Shop got <b>Verified Bronze</b> badge', hi: 'Shop ko <b>Verified Bronze</b> badge mila' },
+    { icon: '🎉', en: '<b>Featured listing</b> activated for a {cat}', hi: '<b>Featured listing</b> activate hui ek {cat} ne' },
+    { icon: '👀', en: '<b>50+ views</b> today on a {cat} in {city}', hi: '<b>50+ views</b> aaj ek {cat} ko {city} me' },
+    { icon: '📸', en: 'Owner added <b>5 new photos</b> of their shop', hi: 'Owner ne <b>5 nai photos</b> add kiya' },
+    { icon: '⚡', en: 'Lead notification delivered in <b>under 3 seconds</b>', hi: 'Lead notification <b>3 second me</b> pohunchi' },
+    { icon: '🌟', en: 'Shop reached <b>Silver verified</b> tier', hi: 'Shop <b>Silver verified</b> tier par pohunchi' }
+  ];
+  const CITIES = ['Mandi Dabwali','Sirsa','Bathinda','Kalanwali','Rori','Sangat','Goniana'];
+  const CATS = ['mechanic','salon','grocer','sweets','doctor','tailor','mobile shop','restaurant','pharmacy','electronics','sports shop','tutor','photo studio','fitness center'];
+  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)] }
+  function gen(){
+    const t = pick(TEMPLATES);
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    const text = (lang === 'hi' ? t.hi : t.en).replace('{city}', pick(CITIES)).replace('{cat}', pick(CATS));
+    const mins = Math.floor(Math.random() * 28) + 2;
+    const timeText = lang === 'hi' ? mins + ' minute pehle' : mins + ' min ago';
+    return { icon: t.icon, text, timeText };
+  }
+  let buf = [];
+  function render(){
+    const list = document.getElementById('activityList');
+    if (!list) return;
+    while (buf.length < 3) buf.push(gen());
+    list.innerHTML = buf.slice(0, 3).map(a =>
+      '<div class="activity-item"><div class="activity-icon">' + a.icon + '</div><div class="activity-text">' + a.text + '<div class="activity-time">' + a.timeText + '</div></div></div>'
+    ).join('');
+  }
+  function tick(){ buf.shift(); buf.push(gen()); render(); }
+  function init(){
+    if (!document.getElementById('psShops')) return;
+    loadLivePulse();
+    render();
+    setInterval(tick, 4500);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
 </body>
 </html>
