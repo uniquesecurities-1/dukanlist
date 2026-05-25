@@ -89,14 +89,19 @@
   .cat-counter.full { color: #dc2626; }
 
 /* ===== Live Pulse Panel (Register Page) ===== */
+/* CRITICAL: override page-narrow's 560px max-width on register page —
+   the register layout needs full desktop width to fit form + side panel.
+   Uses .register-page-wrap class (added on wrapper) for broad browser support. */
+.register-page-wrap{ max-width:1280px !important; padding:48px 24px; margin:0 auto }
 .register-layout{
-  display:grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap:32px;
-  max-width:1280px; margin:0 auto; padding:0;
+  display:grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap:36px;
+  max-width:1240px; margin:0 auto; padding:0;
   align-items:start;
 }
 .reg-col-main{ min-width:0 }  /* allow text to flow naturally */
 @media (max-width: 980px){
   .register-layout{ grid-template-columns: 1fr; gap:24px }
+  .register-page-wrap{ max-width:100% !important; padding:30px 16px }
 }
 /* Register-page title — smaller and tighter to fit the narrower main column */
 .reg-col-main h1.title{
@@ -387,7 +392,7 @@
   </div>
 </header>
 
-<div class="page-narrow"><div class="register-layout"><div class="reg-col-main">
+<div class="page-narrow register-page-wrap"><div class="register-layout"><div class="reg-col-main">
 
   <h1 class="title">
     <span data-i18n-en>Register Your <span class="grad">Shop</span></span>
