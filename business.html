@@ -893,43 +893,68 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <div id="faqList" class="faq-acc"></div>
       </div>
 
-      <!-- ALWAYS-ON FALLBACK CARDS (fill desktop right column when other cards are empty) -->
+      <!-- Compact engagement cards (always shown, polished + tight typography) -->
+      <style>
+        .rc-card{ margin-top:14px; padding:14px 16px; border-radius:13px; background:#fff; border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.03); transition:.2s }
+        .rc-card:hover{ box-shadow:0 6px 18px rgba(15,23,42,.06) }
+        .rc-card .rc-head{ display:flex; align-items:center; gap:8px; margin-bottom:6px }
+        .rc-card .rc-ico{ width:30px; height:30px; border-radius:8px; display:grid; place-items:center; font-size:.95rem; flex-shrink:0 }
+        .rc-card .rc-ttl{ font-family:'Manrope',sans-serif; font-size:.86rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.25 }
+        .rc-card .rc-sub{ font-size:.74rem; color:#64748b; margin-bottom:10px; line-height:1.45 }
+        .rc-card .rc-actions{ display:grid; gap:6px }
+        .rc-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:9px 10px; border-radius:8px; font-family:inherit; font-size:.78rem; font-weight:700; text-decoration:none; cursor:pointer; border:none; transition:.15s }
+        .rc-btn:hover{ transform:translateY(-1px); text-decoration:none }
+        .rc-btn-wa{ background:#25D366; color:#fff }
+        .rc-btn-copy{ background:#0F172A; color:#fff }
+        .rc-btn-orange{ background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; box-shadow:0 3px 8px rgba(255,107,26,.25) }
+        .rc-btn-blue{ background:#1E40AF; color:#fff }
+        .rc-btn-ghost{ background:#F1F5F9; color:#475569 }
+        .rc-card.share .rc-ico{ background:#FED7AA; color:#9A3412 }
+        .rc-card.owner .rc-ico{ background:#DBEAFE; color:#1E3A8A }
+        .rc-card.discover .rc-ico{ background:#F3E8FF; color:#6B21A8 }
+        .rc-card.share .rc-actions{ grid-template-columns:1fr 1fr }
+      </style>
 
-      <!-- Share & Spread card -->
-      <div class="card-pill share-card" style="margin-top:18px;background:linear-gradient(135deg,#FFFAF5,#FFF7ED);border-left:3px solid #FB923C">
-        <h3 style="color:#9A3412">📣 <span data-i18n-en>Like this shop? Spread the word</span><span data-i18n-hi>दुकान पसंद आई? दूसरों को बताएं</span></h3>
-        <p style="font-size:.86rem;color:#7C2D12;margin-bottom:12px;line-height:1.5"><span data-i18n-en>One share helps a local shopkeeper get 5–10 new customers. Free, takes 2 seconds.</span><span data-i18n-hi>एक share से एक स्थानीय दुकानदार को 5–10 नए customers मिलते हैं। फ्री है, 2 second लगते हैं।</span></p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <a id="rcShareWa" target="_blank" rel="noopener" style="background:#25D366;color:#fff;padding:10px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem">💬 WhatsApp</a>
-          <button onclick="copyShopUrl()" style="background:#0F172A;color:#fff;border:none;padding:10px;border-radius:9px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.86rem">🔗 Copy Link</button>
+      <!-- 1. Share this shop (compact) -->
+      <div class="rc-card share">
+        <div class="rc-head">
+          <div class="rc-ico">📣</div>
+          <div class="rc-ttl"><span data-i18n-en>Share this shop</span><span data-i18n-hi>दुकान share करें</span></div>
+        </div>
+        <div class="rc-sub"><span data-i18n-en>Help a local shopkeeper get more customers</span><span data-i18n-hi>स्थानीय दुकानदार को नए ग्राहक दिलाएं</span></div>
+        <div class="rc-actions">
+          <a id="rcShareWa" target="_blank" rel="noopener" class="rc-btn rc-btn-wa">💬 WhatsApp</a>
+          <button onclick="copyShopUrl()" class="rc-btn rc-btn-copy">🔗 <span data-i18n-en>Copy link</span><span data-i18n-hi>लिंक copy</span></button>
         </div>
       </div>
 
-      <!-- "Are you the owner?" claim card -->
-      <div class="card-pill" style="margin-top:18px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-left:3px solid #1E40AF">
-        <h3 style="color:#1E3A8A">🏪 <span data-i18n-en>Are you the owner of this shop?</span><span data-i18n-hi>क्या आप इस दुकान के मालिक हैं?</span></h3>
-        <p style="font-size:.86rem;color:#1E3A8A;margin-bottom:12px;line-height:1.5"><span data-i18n-en>Claim this listing. Add photos, hours, services & start getting customers via WhatsApp.</span><span data-i18n-hi>इस listing को claim करें। फोटो, समय, सेवाएं जोड़ें — WhatsApp पर customers पाएं।</span></p>
-        <a href="/panel/login.html" style="display:block;background:#1E40AF;color:#fff;padding:11px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem">
-          <span data-i18n-en>Claim & Manage →</span><span data-i18n-hi>Claim करें →</span>
-        </a>
+      <!-- 2. Owner / Register combined card -->
+      <div class="rc-card owner">
+        <div class="rc-head">
+          <div class="rc-ico">🏪</div>
+          <div class="rc-ttl"><span data-i18n-en>Own a shop? List it FREE</span><span data-i18n-hi>दुकान है? FREE list करें</span></div>
+        </div>
+        <div class="rc-sub"><span data-i18n-en>Verified by team · Forever free · Sirsa\u2013Bathinda customers daily</span><span data-i18n-hi>टीम वेरिफाइड · हमेशा फ्री · रोज़ Sirsa\u2013Bathinda customers</span></div>
+        <div class="rc-actions" style="grid-template-columns:1fr">
+          <a href="/register.html" class="rc-btn rc-btn-orange">
+            <span data-i18n-en>+ Register FREE</span><span data-i18n-hi>+ FREE Register करें</span>
+          </a>
+        </div>
+        <div style="text-align:center;margin-top:7px;font-size:.72rem;color:#64748b"><span data-i18n-en>Already listed? </span><span data-i18n-hi>पहले से list है? </span><a href="/panel/login.html" style="color:#1E40AF;font-weight:700;text-decoration:none"><span data-i18n-en>Claim it →</span><span data-i18n-hi>Claim करें →</span></a></div>
       </div>
 
-      <!-- Register CTA card (for visitors who run their own shops) -->
-      <div class="card-pill" style="margin-top:18px;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-left:3px solid #15803D">
-        <h3 style="color:#14532D">🎁 <span data-i18n-en>Your shop deserves a free listing too</span><span data-i18n-hi>आपकी दुकान भी मुफ्त listed होनी चाहिए</span></h3>
-        <p style="font-size:.86rem;color:#14532D;margin-bottom:12px;line-height:1.5"><span data-i18n-en>FREE forever • Verified by us • Sirsa–Bathinda customers daily</span><span data-i18n-hi>हमेशा FREE • हमारे द्वारा वेरिफाइड • रोज़ Sirsa–Bathinda के customers</span></p>
-        <a href="/register.html" style="display:block;background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;padding:11px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem;box-shadow:0 4px 12px rgba(255,107,26,0.3)">
-          <span data-i18n-en>+ Register Your Shop FREE</span><span data-i18n-hi>+ अपनी दुकान FREE list करें</span>
-        </a>
-      </div>
-
-      <!-- Browse more in this category -->
-      <div class="card-pill" id="moreInCatCard" style="margin-top:18px;display:none;background:linear-gradient(135deg,#FAF5FF,#F3E8FF);border-left:3px solid #7C3AED">
-        <h3 style="color:#5B21B6">🔍 <span data-i18n-en>Browse more like this</span><span data-i18n-hi>ऐसी और देखें</span></h3>
-        <p style="font-size:.86rem;color:#5B21B6;margin-bottom:12px;line-height:1.5"><span id="moreInCatDesc"></span></p>
-        <a id="moreInCatLink" href="#" style="display:block;background:#7C3AED;color:#fff;padding:11px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem">
-          <span data-i18n-en>View all →</span><span data-i18n-hi>सभी देखें →</span>
-        </a>
+      <!-- 3. Browse more like this (only if category known) -->
+      <div class="rc-card discover" id="moreInCatCard" style="display:none">
+        <div class="rc-head">
+          <div class="rc-ico">🔍</div>
+          <div class="rc-ttl"><span data-i18n-en>More like this</span><span data-i18n-hi>ऐसी और देखें</span></div>
+        </div>
+        <div class="rc-sub" id="moreInCatDesc"></div>
+        <div class="rc-actions" style="grid-template-columns:1fr">
+          <a id="moreInCatLink" href="#" class="rc-btn rc-btn-ghost">
+            <span data-i18n-en>View all →</span><span data-i18n-hi>सभी देखें →</span>
+          </a>
+        </div>
       </div>
     </div>
 
