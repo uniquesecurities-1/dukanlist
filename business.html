@@ -43,6 +43,16 @@
 .shop-trust-card .stc-list .stc-sub{ font-size:.74rem; color:#15803D; opacity:.85; font-weight:600 }
 .shop-trust-card .stc-foot{ margin-top:14px; padding-top:12px; border-top:1px dashed #BBF7D0; font-size:.74rem; color:#15803D; text-align:center }
 .shop-trust-card .stc-foot a{ color:#15803D; font-weight:800; text-decoration:underline }
+.visit-guide-card{ background:linear-gradient(135deg,#F8FAFC 0%,#FFFFFF 100%); border:1px solid rgba(15,23,42,.06); border-left:3px solid #1E40AF }
+.visit-guide-card h3{ color:#0F172A; margin-bottom:14px !important }
+.visit-guide-card .vg-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+@media (max-width:560px){ .visit-guide-card .vg-grid{ grid-template-columns:1fr; gap:10px } }
+.visit-guide-card .vg-row{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:#fff; border:1px solid rgba(15,23,42,.05); border-radius:10px; transition:.15s }
+.visit-guide-card .vg-row:hover{ border-color:#C7D2FE; box-shadow:0 4px 12px rgba(30,64,175,.06) }
+.visit-guide-card .vg-ico{ width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,#DBEAFE,#BFDBFE); display:grid; place-items:center; font-size:.95rem; flex-shrink:0 }
+.visit-guide-card .vg-text{ min-width:0; flex:1 }
+.visit-guide-card .vg-t-main{ font-family:'Manrope',sans-serif; font-size:.84rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.25; margin-bottom:3px }
+.visit-guide-card .vg-t-sub{ font-size:.72rem; color:#64748b; line-height:1.4; font-weight:600 }
 
 /* === Public deals card (business detail page) === */
 .deals-card{ background:linear-gradient(135deg,#FEF2F2 0%,#FFE4E6 100%); border:1.5px solid #FCA5A5 !important; border-left:4px solid #DC2626 !important }
@@ -764,7 +774,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               <li><span class="stc-ico">✓</span><span><b data-i18n-en>Admin verified</b><b data-i18n-hi>एडमिन वेरिफाइड</b><br><span class="stc-sub" data-i18n-en>Personally checked by DukanList team</span><span class="stc-sub" data-i18n-hi>DukanList टीम द्वारा जांचा गया</span></span></li>
               <li><span class="stc-ico">✓</span><span><b data-i18n-en>100% FREE listing</b><b data-i18n-hi>100% मुफ्त लिस्टिंग</b><br><span class="stc-sub" data-i18n-en>No paid rankings, no commission</span><span class="stc-sub" data-i18n-hi>कोई paid ranking नहीं, कोई commission नहीं</span></span></li>
               <li><span class="stc-ico">✓</span><span><b data-i18n-en>Owner-managed profile</b><b data-i18n-hi>मालिक द्वारा संचालित</b><br><span class="stc-sub" data-i18n-en>Real shopkeeper, real updates</span><span class="stc-sub" data-i18n-hi>असली दुकानदार, असली अपडेट</span></span></li>
-              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Sirsa\u2013Bathinda local</b><b data-i18n-hi>स्थानीय Sirsa\u2013Bathinda</b><br><span class="stc-sub" data-i18n-en>Built for our 2 districts only \u2014 no national spam</span><span class="stc-sub" data-i18n-hi>केवल 2 जिलों के लिए \u2014 कोई national spam नहीं</span></span></li>
+              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Sirsa–Bathinda local</b><b data-i18n-hi>स्थानीय Sirsa–Bathinda</b><br><span class="stc-sub" data-i18n-en>Built for our 2 districts only — no national spam</span><span class="stc-sub" data-i18n-hi>केवल 2 जिलों के लिए — कोई national spam नहीं</span></span></li>
             </ul>
             <div class="stc-foot">
               <span data-i18n-en>Got a concern? <a href="#" onclick="document.getElementById(\'reportModal\').classList.add(\'open\');return false">Report this listing</a></span>
@@ -864,6 +874,49 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           ✍ <span data-i18n-en>Write a Review</span><span data-i18n-hi>रिव्यू लिखें</span>
         </button>
       </div>
+
+      <!-- Visit Guide card (fills left column space) -->
+      <div class="card-pill visit-guide-card" style="margin-top:18px">
+        <h3 style="font-size:1rem">🧭 <span data-i18n-en>Before you visit / call</span><span data-i18n-hi>जाने / call करने से पहले</span></h3>
+        <div class="vg-grid">
+          <div class="vg-row">
+            <div class="vg-ico">⏰</div>
+            <div class="vg-text">
+              <div class="vg-t-main" data-i18n-en>Best time to reach</div>
+              <div class="vg-t-main" data-i18n-hi>संपर्क का सही समय</div>
+              <div class="vg-t-sub" id="vgBestTime" data-i18n-en>10:00 AM – 6:00 PM works for most shops</div>
+              <div class="vg-t-sub" data-i18n-hi>10:00 AM – 6:00 PM ज़्यादातर shops के लिए सही</div>
+            </div>
+          </div>
+          <div class="vg-row">
+            <div class="vg-ico">💬</div>
+            <div class="vg-text">
+              <div class="vg-t-main" data-i18n-en>WhatsApp is fastest</div>
+              <div class="vg-t-main" data-i18n-hi>WhatsApp सबसे तेज़</div>
+              <div class="vg-t-sub" data-i18n-en>Most shopkeepers reply within 30 minutes</div>
+              <div class="vg-t-sub" data-i18n-hi>ज़्यादातर दुकानदार 30 minutes में जवाब देते हैं</div>
+            </div>
+          </div>
+          <div class="vg-row">
+            <div class="vg-ico">📍</div>
+            <div class="vg-text">
+              <div class="vg-t-main" data-i18n-en>Use Google Maps</div>
+              <div class="vg-t-main" data-i18n-hi>Google Maps इस्तेमाल करें</div>
+              <div class="vg-t-sub" data-i18n-en>One tap above to get exact directions</div>
+              <div class="vg-t-sub" data-i18n-hi>ऊपर एक tap से सीधा रास्ता मिलेगा</div>
+            </div>
+          </div>
+          <div class="vg-row">
+            <div class="vg-ico">🛒</div>
+            <div class="vg-text">
+              <div class="vg-t-main" data-i18n-en>Mention DukanList</div>
+              <div class="vg-t-main" data-i18n-hi>DukanList का नाम लें</div>
+              <div class="vg-t-sub" data-i18n-en>Shopkeeper will know you found them here — better service</div>
+              <div class="vg-t-sub" data-i18n-hi>दुकानदार समझेगा कि आप यहाँ से आए हैं — बेहतर service</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div>
@@ -934,7 +987,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="rc-ico">🏪</div>
           <div class="rc-ttl"><span data-i18n-en>Own a shop? List it FREE</span><span data-i18n-hi>दुकान है? FREE list करें</span></div>
         </div>
-        <div class="rc-sub"><span data-i18n-en>Verified by team · Forever free · Sirsa\u2013Bathinda customers daily</span><span data-i18n-hi>टीम वेरिफाइड · हमेशा फ्री · रोज़ Sirsa\u2013Bathinda customers</span></div>
+        <div class="rc-sub"><span data-i18n-en>Verified by team · Forever free · Sirsa–Bathinda customers daily</span><span data-i18n-hi>टीम वेरिफाइड · हमेशा फ्री · रोज़ Sirsa–Bathinda customers</span></div>
         <div class="rc-actions" style="grid-template-columns:1fr">
           <a href="/register.html" class="rc-btn rc-btn-orange">
             <span data-i18n-en>+ Register FREE</span><span data-i18n-hi>+ FREE Register करें</span>
