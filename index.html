@@ -927,6 +927,28 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 
 <!-- ===== FEATURED SHOP OF THE WEEK ===== -->
 <section id="fsotw" style="background:linear-gradient(180deg,#FFF7ED 0%,#FFFFFF 100%);padding:50px 0;display:none">
+  <style>
+    /* Featured Shop of the Week — responsive */
+    .fsotw-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:0; min-height:320px }
+    .fsotw-grid.fsotw-no-photo{ grid-template-columns: 1fr }
+    .fsotw-photo{ background:#f8fafc; min-height:260px; max-height:420px; overflow:hidden }
+    .fsotw-photo img{ width:100%; height:100%; object-fit:cover; display:block }
+    .fsotw-body{ padding:32px 28px; display:flex; flex-direction:column; justify-content:center }
+    .fsotw-cta{ display:inline-flex; align-items:center; justify-content:center; gap:6px; background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; padding:14px 28px; border-radius:12px; font-weight:800; text-decoration:none; text-align:center; font-size:1rem; letter-spacing:.02em; box-shadow:0 4px 14px rgba(255,107,26,0.32); align-self:flex-start; transition:.18s }
+    .fsotw-cta:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(255,107,26,0.42); text-decoration:none }
+    @media (max-width: 720px){
+      .fsotw-grid{ grid-template-columns: 1fr; min-height:0 }
+      .fsotw-photo{ height:220px; min-height:220px; max-height:240px }
+      .fsotw-body{ padding:22px 20px 26px }
+      .fsotw-body h3{ font-size:1.35rem !important; line-height:1.18 !important }
+      .fsotw-body p{ font-size:.88rem !important }
+      .fsotw-cta{ width:100%; padding:14px; font-size:.95rem }
+    }
+    @media (max-width: 380px){
+      .fsotw-body{ padding:18px 16px 22px }
+      .fsotw-body h3{ font-size:1.2rem !important }
+    }
+  </style>
   <div class="section-head reveal">
     <span class="eyebrow" style="color:#E55100">⭐ <span data-i18n-en>Featured Shop of the Week</span><span data-i18n-hi>हफ़्ते का चुना हुआ शॉप</span></span>
     <h2><span data-i18n-en id="fsotwH2">Spotlight on a local legend</span><span data-i18n-hi>स्थानीय legend पर रोशनी</span></h2>
@@ -1578,9 +1600,9 @@ if (window.DukanPTR){
       const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
       const cityName = (b.geo_cities && b.geo_cities.name) || '';
       const html = `
-        <div style="display:grid;grid-template-columns:${photo ? '1fr 1fr' : '1fr'};gap:0">
-          ${photo ? `<div style="background:#f8fafc;min-height:280px"><img src="${photo}" alt="${escapeAttr(b.name)}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : ''}
-          <div style="padding:30px 26px;display:flex;flex-direction:column;justify-content:center">
+        <div class="fsotw-grid${photo ? '' : ' fsotw-no-photo'}">
+          ${photo ? `<div class="fsotw-photo"><img src="${photo}" alt="${escapeAttr(b.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : ''}
+          <div class="fsotw-body">
             <span style="font-size:.72rem;font-weight:800;color:#E55100;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">⭐ ${lang === 'hi' ? 'इस हफ़्ते का चुना हुआ' : 'Featured this week'}</span>
             <h3 style="font-size:1.65rem;font-weight:900;color:#0F172A;margin-bottom:6px;letter-spacing:-.015em;font-family:'Manrope',sans-serif">${escapeHtml(b.name)}</h3>
             ${b.owner_name ? `<div style="font-size:.86rem;color:#64748b;margin-bottom:10px">${lang === 'hi' ? 'मालिक' : 'Owner'}: <b>${escapeHtml(b.owner_name)}</b>${cityName ? ' · ' + escapeHtml(cityName) : ''}</div>` : ''}
@@ -1590,7 +1612,7 @@ if (window.DukanPTR){
               ${b.rating_count ? `<span style="font-size:.78rem;color:#64748b">${b.rating_count} ${lang === 'hi' ? 'रिव्यू' : 'reviews'}</span>` : ''}
               ${Number(b.verified_score) >= 3 ? `<span style="background:#94a3b8;color:#fff;padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:800">${Number(b.verified_score) >= 5 ? 'GOLD' : 'SILVER'} ✓</span>` : ''}
             </div>
-            <a href="/${b.slug}" style="display:inline-block;background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;padding:12px 22px;border-radius:11px;font-weight:800;text-decoration:none;text-align:center;font-size:.92rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3);align-self:flex-start">
+            <a href="/${b.slug}" class="fsotw-cta">
               ${lang === 'hi' ? 'दुकान देखें' : 'Visit Shop'} →
             </a>
           </div>
