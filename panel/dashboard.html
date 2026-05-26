@@ -484,6 +484,39 @@
       </div>
     </div>
 
+    <!-- Profile Completeness widget -->
+    <div class="side-widget" id="profCompleteWidget" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#3B82F6;display:none">
+      <div class="side-widget-title" style="color:#1E40AF">📋 <span data-i18n-en>Profile Strength</span><span data-i18n-hi>प्रोफ़ाइल मज़बूती</span></div>
+      <div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:.78rem;color:#475569;font-weight:600"><span data-i18n-en>Completeness</span><span data-i18n-hi>पूर्णता</span></span>
+          <span id="pcScoreText" style="font-size:1.4rem;font-weight:900;color:#1E40AF;line-height:1">0%</span>
+        </div>
+        <div style="height:8px;background:#E2E8F0;border-radius:99px;overflow:hidden">
+          <div id="pcBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3B82F6,#1E40AF);border-radius:99px;transition:width .5s"></div>
+        </div>
+      </div>
+      <div id="pcChecklist" style="font-size:.78rem;color:#1E3A8A;line-height:1.65"></div>
+      <a id="pcCTA" href="/panel/profile.html" style="display:block;margin-top:10px;padding:8px;background:#1E40AF;color:#fff;border-radius:8px;text-align:center;font-weight:700;text-decoration:none;font-size:.82rem">
+        <span data-i18n-en>Complete Profile →</span><span data-i18n-hi>प्रोफ़ाइल पूरा करें →</span>
+      </a>
+    </div>
+
+    <!-- Ranking Battle widget -->
+    <div class="side-widget" id="rankWidget" style="background:linear-gradient(135deg,#FAF5FF,#E9D5FF);border-color:#9333EA;display:none">
+      <div class="side-widget-title" style="color:#6B21A8">🏆 <span data-i18n-en>Your Ranking</span><span data-i18n-hi>आपकी रैंकिंग</span></div>
+      <div id="rankBody" style="font-size:.84rem;color:#581C87;line-height:1.5">
+        <div style="opacity:.6;text-align:center;padding:8px"><span data-i18n-en>Loading ranking…</span><span data-i18n-hi>लोड हो रहा है…</span></div>
+      </div>
+    </div>
+
+    <!-- Quick Reply Templates widget -->
+    <div class="side-widget" id="qrtWidget" style="background:linear-gradient(135deg,#F0FDF4,#BBF7D0);border-color:#16A34A">
+      <div class="side-widget-title" style="color:#166534">💬 <span data-i18n-en>WhatsApp Quick Replies</span><span data-i18n-hi>WhatsApp जल्दी जवाब</span></div>
+      <div style="font-size:.76rem;color:#166534;margin-bottom:8px;opacity:.8;line-height:1.4"><span data-i18n-en>Tap to copy. Customise in your own words before sending.</span><span data-i18n-hi>दबाकर copy करें। भेजने से पहले अपने शब्दों में लिखें।</span></div>
+      <div id="qrtList" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
     <!-- Referral Program widget -->
     <div class="side-widget referral-widget" style="background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C">
       <div class="side-widget-title" style="color:#9A3412">🎁 <span data-i18n-en>Refer & Earn</span><span data-i18n-hi>Refer & Earn</span></div>
@@ -704,6 +737,10 @@ async function loadDashboard(){
   MY_BUSINESS = biz;
   window.MY_BUSINESS = biz;  // expose for cross-script widgets
   renderDashboard(biz);
+  // Power widgets (panel sidebar)
+  try { renderProfileCompleteness(biz); } catch(e){ console.warn('PC widget:', e); }
+  try { loadRankingBattle(biz); }       catch(e){ console.warn('Rank widget:', e); }
+  try { renderQuickReplyTemplates(biz);} catch(e){ console.warn('QRT widget:', e); }
 
   // Load multi-cat badges
   loadCategoryBadges(biz.id);
@@ -1338,7 +1375,180 @@ function renderDashActivity(){
 </script>
 
 <script>
-// ============= Referral Program =============
+// ============= Profile Completeness Wizard =============
+function renderProfileCompleteness(b){
+  if (!b) return;
+  const checks = [
+    { key:'name',          label_en:'Shop name',         label_hi:'दुकान का नाम',    pts:8,  ok: !!(b.name && b.name.trim()) },
+    { key:'owner_name',    label_en:'Owner name',        label_hi:'मालिक का नाम',    pts:6,  ok: !!(b.owner_name && b.owner_name.trim()) },
+    { key:'mobile',        label_en:'Mobile number',     label_hi:'मोबाइल नंबर',     pts:6,  ok: !!(b.mobile && b.mobile.length >= 10) },
+    { key:'whatsapp',      label_en:'WhatsApp number',   label_hi:'WhatsApp नंबर',   pts:6,  ok: !!(b.whatsapp) },
+    { key:'email',         label_en:'Email',             label_hi:'ईमेल',           pts:4,  ok: !!(b.email) },
+    { key:'address',       label_en:'Address + Pincode', label_hi:'पता + पिनकोड',    pts:8,  ok: !!(b.address_line1 && b.pincode) },
+    { key:'usp_text',      label_en:'USP / Tagline',     label_hi:'USP / टैगलाइन',   pts:10, ok: !!(b.usp_text && b.usp_text.trim().length > 10) },
+    { key:'about_text',    label_en:'About Us story',    label_hi:'हमारे बारे में',   pts:10, ok: !!(b.about_text && b.about_text.trim().length > 50) },
+    { key:'photos',        label_en:'5+ shop photos',    label_hi:'5+ फोटो',          pts:12, ok: (Number(b.photos_count) || 0) >= 5 },
+    { key:'hours_json',    label_en:'Open hours',        label_hi:'खुलने का समय',    pts:6,  ok: !!(b.hours_json && Object.keys(b.hours_json || {}).length > 0) },
+    { key:'payment',       label_en:'Payment methods',   label_hi:'पेमेंट तरीके',     pts:6,  ok: Array.isArray(b.payment_methods) && b.payment_methods.length > 0 },
+    { key:'features',      label_en:'Special features',  label_hi:'खासियत',          pts:5,  ok: Array.isArray(b.special_features) && b.special_features.length > 0 },
+    { key:'estd_year',     label_en:'Established year',  label_hi:'स्थापना वर्ष',     pts:5,  ok: !!(b.established_year && b.established_year > 1900) },
+    { key:'faqs',          label_en:'FAQs (3+)',         label_hi:'FAQs (3+)',        pts:8,  ok: Array.isArray(b.faqs_json) && b.faqs_json.length >= 3 }
+  ];
+  const totalPts = checks.reduce((s, c) => s + c.pts, 0);
+  const earned   = checks.filter(c => c.ok).reduce((s, c) => s + c.pts, 0);
+  const score    = Math.round((earned / totalPts) * 100);
+
+  document.getElementById('profCompleteWidget').style.display = '';
+  const txt = document.getElementById('pcScoreText');
+  const bar = document.getElementById('pcBar');
+  txt.textContent = score + '%';
+  bar.style.width = score + '%';
+  if (score >= 90)      txt.style.color = '#16A34A';
+  else if (score >= 60) txt.style.color = '#1E40AF';
+  else                  txt.style.color = '#D97706';
+
+  // Show missing items only (top 4 by pts)
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const missing = checks.filter(c => !c.ok).sort((a, b) => b.pts - a.pts).slice(0, 4);
+  if (missing.length === 0){
+    document.getElementById('pcChecklist').innerHTML = '<div style="color:#16A34A;font-weight:700;text-align:center;padding:6px">🎉 ' + (lang === 'hi' ? 'सब कुछ पूरा! बहुत बढ़िया!' : 'All done! Excellent!') + '</div>';
+    document.getElementById('pcCTA').style.display = 'none';
+  } else {
+    document.getElementById('pcChecklist').innerHTML = '<div style="font-weight:700;margin-bottom:6px;font-size:.78rem">' + (lang === 'hi' ? 'अधूरा:' : 'Missing:') + '</div>' +
+      missing.map(c => '<div style="display:flex;justify-content:space-between;padding:3px 0">○ <span style="flex:1;margin-left:6px">' + (lang === 'hi' ? c.label_hi : c.label_en) + '</span> <span style="opacity:.6;font-size:.7rem">+' + c.pts + '%</span></div>').join('');
+  }
+}
+
+// ============= Ranking Battle Widget =============
+async function loadRankingBattle(b){
+  if (!b || !b.id) return;
+  const c = ShopDB.client;
+  if (!c) return;
+
+  // Get this shop's primary category + city
+  const catId = b.sub_category_id || b.category_id;
+  const cityId = b.city_id;
+  if (!catId || !cityId) return;
+
+  try {
+    const { data: peers, error } = await c.from('businesses')
+      .select('id, name, slug, verified_score, rating_count, rating_avg, photos_count')
+      .eq('city_id', cityId)
+      .eq('status', 'active')
+      .or(`sub_category_id.eq.${catId},category_id.eq.${catId}`)
+      .limit(200);
+    if (error) throw error;
+    if (!peers || peers.length < 2){
+      const widget = document.getElementById('rankWidget');
+      widget.style.display = '';
+      document.getElementById('rankBody').innerHTML = '<div style="text-align:center;padding:8px;color:#6B21A8;font-weight:600">' +
+        '<div style="font-size:1.4rem;margin-bottom:4px">🌟</div>' +
+        '<div data-i18n-en>You\'re the first in your category here!</div>' +
+        '<div data-i18n-hi>आप यहाँ अपनी category में पहले हैं!</div>' +
+        '<div style="font-size:.74rem;opacity:.7;margin-top:6px" data-i18n-en>Be the local leader. Keep your listing fresh.</div>' +
+        '<div style="font-size:.74rem;opacity:.7;margin-top:6px" data-i18n-hi>स्थानीय leader बनें। profile fresh रखें।</div></div>';
+      return;
+    }
+
+    // Score formula: (rating_count * rating_avg) + (verified_score * 10) + (photos_count * 2)
+    const scored = peers.map(p => ({
+      ...p,
+      _score: (Number(p.rating_count) || 0) * (Number(p.rating_avg) || 0) +
+              (Number(p.verified_score) || 0) * 10 +
+              (Number(p.photos_count) || 0) * 2
+    }));
+    scored.sort((a, x) => x._score - a._score);
+
+    const myIdx = scored.findIndex(p => p.id === b.id);
+    const myRank = myIdx + 1;
+    const total = scored.length;
+    const myScore = scored[myIdx] ? scored[myIdx]._score : 0;
+    const aboveMe = myIdx > 0 ? scored[myIdx - 1] : null;
+    const gap = aboveMe ? Math.ceil(aboveMe._score - myScore) : 0;
+
+    const isTop = myRank === 1;
+    const isPodium = myRank <= 3;
+    const widget = document.getElementById('rankWidget');
+    widget.style.display = '';
+
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    let html = '';
+    if (isTop){
+      html = '<div style="text-align:center;padding:4px"><div style="font-size:2rem;margin-bottom:4px">🥇</div>' +
+        '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">' + (lang === 'hi' ? '#1 — आप टॉप पर हैं!' : '#1 — You\'re the top!') + '</div>' +
+        '<div style="font-size:.78rem;color:#6B21A8;opacity:.8;margin-top:4px">' + (lang === 'hi' ? 'आपकी category में ' + total + ' shops में सबसे आगे' : 'Leading ' + total + ' shops in your category') + '</div></div>';
+    } else {
+      const medal = myRank === 2 ? '🥈' : (myRank === 3 ? '🥉' : '🏅');
+      html = '<div style="text-align:center;padding:4px">' +
+        '<div style="font-size:1.8rem;margin-bottom:4px">' + medal + '</div>' +
+        '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">#' + myRank + ' ' + (lang === 'hi' ? 'में से' : 'of') + ' ' + total + '</div>' +
+        '<div style="font-size:.78rem;color:#6B21A8;opacity:.85;margin-top:6px">' +
+        (lang === 'hi' ? 'अगला rank तक: <b>' + gap + '</b> points' : 'To next rank: <b>' + gap + '</b> points') +
+        '</div>' +
+        '<div style="font-size:.72rem;color:#6B21A8;opacity:.65;margin-top:8px;line-height:1.4">' +
+        (lang === 'hi' ? '💡 Score = reviews × rating + verification × 10 + photos × 2' : '💡 Score = reviews × rating + verification × 10 + photos × 2') +
+        '</div></div>';
+    }
+    document.getElementById('rankBody').innerHTML = html;
+  } catch(e){
+    console.warn('Rank widget error:', e);
+  }
+}
+
+// ============= Quick Reply Templates =============
+function getDefaultQRTs(){
+  return [
+    { icon:'⏰', en:'Hours', hi:'खुलने का समय',  msg_en:'Hello! 🙏 We\'re open today from [opening time] to [closing time]. Closed on [day]. See you soon!',                   msg_hi:'नमस्ते! 🙏 हम आज [opening time] से [closing time] तक खुले हैं। [day] को बंद। मिलते हैं!' },
+    { icon:'📍', en:'Location', hi:'पता',          msg_en:'Our shop is at: [address]. Google Maps: [maps link]. Easy to find — opposite [landmark].',                                msg_hi:'हमारी दुकान का पता: [address]. Google Maps: [maps link]. [landmark] के सामने।' },
+    { icon:'💰', en:'Price', hi:'कीमत',            msg_en:'Thanks for asking! The current price is ₹[X]. Bulk discount available for orders above [quantity].',                       msg_hi:'पूछने के लिए धन्यवाद! वर्तमान कीमत ₹[X] है। [quantity] से ऊपर पर bulk discount।' },
+    { icon:'✅', en:'Available', hi:'उपलब्ध',      msg_en:'Yes, [item] is currently in stock. We have [variants]. Visit anytime today, or I can reserve for you.',                    msg_hi:'हाँ, [item] अभी stock में है। [variants] उपलब्ध। आज visit करें या reserve करवाएं।' },
+    { icon:'⏳', en:'Reserved', hi:'रिज़र्व',       msg_en:'Done! I\'ve reserved it for you. Please pick up within 24 hours. Ask for [your name].',                                    msg_hi:'हो गया! मैंने आपके लिए reserve कर दिया है। 24 घंटे में लें। [your name] से पूछें।' },
+    { icon:'🚫', en:'Out of stock', hi:'स्टॉक नहीं', msg_en:'Sorry, [item] is currently out of stock. New stock arriving by [date]. I can notify you when ready — share your number?', msg_hi:'माफ़ी, [item] अभी out of stock है। [date] तक नया stock। नंबर दें — मैं notify करूँगा।' },
+    { icon:'🙏', en:'Thank you', hi:'धन्यवाद',      msg_en:'Thank you for visiting! 🙏 If you liked our service, please leave a 5-star review here: [shop-url]?review=1',               msg_hi:'visit करने के लिए धन्यवाद! 🙏 अच्छी service लगी हो तो review दें: [shop-url]?review=1' },
+    { icon:'📞', en:'Call back', hi:'वापिस कॉल',    msg_en:'Sorry, I\'m with a customer right now. Can I call you back in [X] minutes? Or share your question here — I\'ll reply ASAP.', msg_hi:'माफ़ी, अभी customer के साथ हूँ। [X] minutes में call करूँ? या यहाँ पूछें — जल्दी जवाब दूँगा।' }
+  ];
+}
+function getCustomQRTs(){
+  try { return JSON.parse(localStorage.getItem('dl_qrt_custom_v1') || '[]'); }
+  catch(_){ return []; }
+}
+function renderQuickReplyTemplates(b){
+  const defaults = getDefaultQRTs();
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const wrap = document.getElementById('qrtList');
+  if (!wrap) return;
+  const html = defaults.map((t, i) =>
+    '<button onclick="copyQRT(' + i + ')" style="background:#fff;border:1px solid #BBF7D0;color:#166534;padding:8px 10px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.78rem;font-family:inherit;text-align:left;display:flex;align-items:center;gap:6px;transition:.15s" onmouseover="this.style.background=\'#F0FDF4\'" onmouseout="this.style.background=\'#fff\'">' +
+    '<span>' + t.icon + '</span>' +
+    '<span style="flex:1">' + (lang === 'hi' ? t.hi : t.en) + '</span>' +
+    '<span style="opacity:.5;font-size:.7rem">📋</span>' +
+    '</button>'
+  ).join('');
+  wrap.innerHTML = html;
+}
+function copyQRT(idx){
+  const t = getDefaultQRTs()[idx];
+  if (!t) return;
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  let msg = (lang === 'hi' ? t.msg_hi : t.msg_en);
+  // Try to auto-fill shop URL if available
+  if (window.MY_BUSINESS && window.MY_BUSINESS.slug){
+    const url = window.location.origin + '/business.html?slug=' + encodeURIComponent(window.MY_BUSINESS.slug);
+    msg = msg.replace('[shop-url]', url);
+  }
+  try {
+    navigator.clipboard.writeText(msg).then(() => {
+      const btn = event.currentTarget;
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span>✓</span><span style="flex:1;color:#10B981">' + (lang === 'hi' ? 'कॉपी हो गया!' : 'Copied!') + '</span>';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    });
+  } catch(_){
+    prompt('Copy this message:', msg);
+  }
+}
+
+// // ============= Referral Program =============
 let __refRetries = 0;
 async function setupReferralWidget(){
   try {
