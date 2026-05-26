@@ -78,8 +78,9 @@
       <div class="ctrl-section">
         <div class="ctrl-title">✍ Text</div>
         <div class="ctrl-row">
-          <label>Headline</label>
-          <input id="ctlHeadline" type="text" maxlength="40" placeholder="Shop name / tagline">
+          <label>🔒 Firm Name (locked to registered name)</label>
+          <input id="ctlHeadline" type="text" maxlength="40" placeholder="Loading shop name..." readonly style="opacity:.85;background:rgba(15,23,42,0.4);cursor:not-allowed">
+          <div style="font-size:.68rem;color:#FBBF24;margin-top:5px;font-weight:600;line-height:1.4">⚡ <span data-i18n-en>Brand consistency — your registered firm name is always used on posters.</span><span data-i18n-hi>ब्रांड एक रहे — आपके registered firm का नाम हमेशा poster पर रहेगा।</span></div>
         </div>
         <div class="ctrl-row">
           <label>Subtitle / USP</label>
@@ -186,7 +187,7 @@ function setupUI(){
   });
   document.getElementById('ctlHeadline').value = BIZ.name || 'My Shop';
   document.getElementById('ctlTag').value = BIZ.usp_text || 'Quality service · Fair pricing · Local trust';
-  document.getElementById('ctlHeadline').addEventListener('input', render);
+  // Headline is locked to shop name — no input listener
   document.getElementById('ctlTag').addEventListener('input', render);
   document.getElementById('ctlCTA').addEventListener('change', render);
   document.querySelectorAll('.toggle-btn').forEach(b => {
@@ -297,7 +298,7 @@ async function render(){
     ctx.textAlign = 'center';
     ctx.fillText('✓ ' + tier, W - 150, 92);
   }
-  const headline = document.getElementById('ctlHeadline').value || BIZ.name || 'My Shop';
+  const headline = (BIZ && BIZ.name) ? BIZ.name : 'My Shop';
   ctx.fillStyle = theme.text;
   const headlineY = isPortrait ? H * 0.28 : 360;
   const headlineSize = isPortrait ? 96 : 84;
