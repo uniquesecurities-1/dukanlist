@@ -875,6 +875,22 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         </button>
       </div>
 
+      <!-- Public Q&A card -->
+      <div class="card-pill" id="qaCard" style="margin-top:18px">
+        <h3 style="font-size:1rem">❓ <span data-i18n-en>Questions & Answers</span><span data-i18n-hi>सवाल & जवाब</span>
+          <span id="qaCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
+        </h3>
+        <div id="qaList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+          <div id="qaEmpty" style="text-align:center;padding:18px 8px;color:var(--muted);font-size:.86rem">
+            <span data-i18n-en>No questions yet. Ask the first one!</span>
+            <span data-i18n-hi>अभी कोई सवाल नहीं — पहला पूछें!</span>
+          </div>
+        </div>
+        <button class="btn-write-review" onclick="openQAModal()">
+          ❓ <span data-i18n-en>Ask a public question</span><span data-i18n-hi>सार्वजनिक सवाल पूछें</span>
+        </button>
+      </div>
+
       <!-- Visit Guide card (fills left column space) -->
       <div class="card-pill visit-guide-card" style="margin-top:18px">
         <h3 style="font-size:1rem">🧭 <span data-i18n-en>Before you visit / call</span><span data-i18n-hi>जाने / call करने से पहले</span></h3>
@@ -1127,6 +1143,32 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </div>
 
 <!-- Report Modal -->
+<div id="qaModal" class="modal-overlay" onclick="if(event.target===this)closeQAModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeQAModal()" aria-label="Close">×</button>
+    <h3 style="font-family:'Manrope',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:6px"><span data-i18n-en>Ask a public question</span><span data-i18n-hi>सार्वजनिक सवाल पूछें</span></h3>
+    <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;line-height:1.5"><span data-i18n-en>Your question will be visible to everyone. The shop owner will answer publicly. Don\'t share personal info.</span><span data-i18n-hi>आपका सवाल सबको दिखेगा। दुकानदार जवाब सबके सामने देगा। निजी जानकारी न लिखें।</span></p>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px"><span data-i18n-en>Your name (optional)</span><span data-i18n-hi>आपका नाम (वैकल्पिक)</span></label>
+      <input id="qaAskerName" type="text" maxlength="60" placeholder="e.g., Ramesh" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.92rem;font-family:inherit">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px"><span data-i18n-en>Your mobile (kept private, only for spam-check)</span><span data-i18n-hi>आपका मोबाइल (निजी, spam-check के लिए)</span> *</label>
+      <input id="qaAskerPhone" type="tel" maxlength="13" placeholder="98XXXXXXXX" inputmode="numeric" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.92rem;font-family:inherit">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px"><span data-i18n-en>Your question</span><span data-i18n-hi>आपका सवाल</span> *</label>
+      <textarea id="qaQuestionText" rows="4" maxlength="500" placeholder="e.g., Aap weekends mein open hote ho? Home delivery available hai?" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.92rem;font-family:inherit;resize:vertical"></textarea>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:4px" id="qaCharCount">0 / 500</div>
+    </div>
+    <div id="qaErr" style="display:none;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:10px 12px;border-radius:8px;font-size:.84rem;margin-bottom:10px"></div>
+    <div id="qaOk" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;padding:10px 12px;border-radius:8px;font-size:.84rem;margin-bottom:10px"></div>
+    <button onclick="submitQA()" id="qaSubmitBtn" style="width:100%;background:linear-gradient(135deg,#1E3A8A,#1E40AF);color:#fff;border:none;padding:13px;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem">
+      📤 <span data-i18n-en>Post Question</span><span data-i18n-hi>सवाल पोस्ट करें</span>
+    </button>
+  </div>
+</div>
+
 <div id="reportModal" class="modal-overlay">
   <div class="modal-card">
     <h3>
@@ -1623,6 +1665,7 @@ function render(){
 
   // Shop Highlights — fills empty left-column space, builds trust
   try { renderShopHighlights(b); } catch(e){ console.warn('highlights render failed', e); }
+  try { loadShopQA(b.id); } catch(e){ console.warn('Q&A load failed', e); }
 
   // Hours
   if (b.hours_json && typeof b.hours_json === 'object' && Object.keys(b.hours_json).length){
@@ -2634,6 +2677,111 @@ function renderShopHighlights(b){
 
   host.style.display = '';
 }
+
+async function loadShopQA(bizId){
+  try {
+    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+    const c = ShopDB.client;
+    const { data, error } = await c.rpc('get_shop_questions', { p_business_id: bizId });
+    if (error){ console.warn('Q&A load:', error.message); return; }
+    const list = document.getElementById('qaList');
+    const cnt  = document.getElementById('qaCount');
+    const emp  = document.getElementById('qaEmpty');
+    if (!list) return;
+    if (!data || data.length === 0){
+      if (emp) emp.style.display = '';
+      if (cnt) cnt.textContent = '';
+      return;
+    }
+    if (emp) emp.style.display = 'none';
+    if (cnt) cnt.textContent = '(' + data.length + ')';
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    list.innerHTML = data.map(q => {
+      const asker = (q.asker_name && q.asker_name.trim()) || (lang === 'hi' ? 'गुमनाम' : 'Anonymous');
+      const ago = fmtAgo(q.created_at);
+      const aBlock = q.answer_text
+        ? '<div style="background:#F0FDF4;border-left:3px solid #15803D;padding:10px 12px;border-radius:0 8px 8px 0;margin-top:8px">'
+          + '<div style="font-size:.74rem;font-weight:800;color:#15803D;margin-bottom:4px">✓ ' + (lang === 'hi' ? 'दुकानदार का जवाब' : 'Owner answered') + ' · ' + fmtAgo(q.answered_at) + '</div>'
+          + '<div style="font-size:.88rem;color:#14532D;line-height:1.5">' + escapeHTML(q.answer_text) + '</div></div>'
+        : '<div style="font-size:.76rem;color:#94a3b8;margin-top:6px;font-style:italic">'
+          + (lang === 'hi' ? '⏳ जवाब का इंतज़ार' : '⏳ Awaiting owner reply') + '</div>';
+      return '<div style="padding:10px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px">'
+        + '<div style="font-size:.78rem;color:#64748b;margin-bottom:5px"><b style="color:#0F172A">' + escapeHTML(asker) + '</b> · ' + ago + '</div>'
+        + '<div style="font-size:.92rem;color:#0F172A;line-height:1.4;font-weight:600">❓ ' + escapeHTML(q.question_text) + '</div>'
+        + aBlock + '</div>';
+    }).join('');
+  } catch(e){ console.warn('Q&A load failed', e); }
+}
+function fmtAgo(iso){
+  if (!iso) return '';
+  const d = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (d < 60) return Math.floor(d) + 's ago';
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  if (d < 86400) return Math.floor(d/3600) + 'h ago';
+  if (d < 604800) return Math.floor(d/86400) + 'd ago';
+  return new Date(iso).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+function escapeHTML(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function openQAModal(){
+  const m = document.getElementById('qaModal');
+  if (m) m.classList.add('open');
+  setTimeout(() => { const t = document.getElementById('qaQuestionText'); if (t) t.focus(); }, 100);
+}
+function closeQAModal(){
+  const m = document.getElementById('qaModal');
+  if (m) m.classList.remove('open');
+}
+async function submitQA(){
+  const errEl = document.getElementById('qaErr');
+  const okEl  = document.getElementById('qaOk');
+  const btn   = document.getElementById('qaSubmitBtn');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  const name  = document.getElementById('qaAskerName').value.trim();
+  const phone = document.getElementById('qaAskerPhone').value.replace(/\D/g, '');
+  const q     = document.getElementById('qaQuestionText').value.trim();
+  if (q.length < 8){
+    errEl.textContent = 'Question must be at least 8 characters.';
+    errEl.style.display = ''; return;
+  }
+  if (phone.length < 10){
+    errEl.textContent = 'Valid mobile number required (kept private).';
+    errEl.style.display = ''; return;
+  }
+  if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client){
+    errEl.textContent = 'Service unavailable.';
+    errEl.style.display = ''; return;
+  }
+  const bizId = (typeof BIZ !== 'undefined' && BIZ && BIZ.id) ? BIZ.id : null;
+  if (!bizId){ errEl.textContent = 'Shop not loaded.'; errEl.style.display = ''; return; }
+  btn.disabled = true; btn.textContent = '⏳ Posting...';
+  try {
+    const { error } = await ShopDB.client.rpc('post_shop_question', {
+      p_business_id: bizId,
+      p_question_text: q,
+      p_asker_name: name || null,
+      p_asker_phone: phone
+    });
+    if (error) throw error;
+    okEl.textContent = '✓ Question posted! Shop owner will reply soon.';
+    okEl.style.display = '';
+    document.getElementById('qaQuestionText').value = '';
+    setTimeout(() => { closeQAModal(); loadShopQA(bizId); }, 1500);
+  } catch(e){
+    errEl.textContent = 'Failed: ' + (e.message || e);
+    errEl.style.display = '';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📤 <span data-i18n-en>Post Question</span><span data-i18n-hi>सवाल पोस्ट करें</span>';
+  }
+}
+// Char counter
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('qaQuestionText');
+  const cc = document.getElementById('qaCharCount');
+  if (ta && cc){
+    ta.addEventListener('input', () => { cc.textContent = ta.value.length + ' / 500'; });
+  }
+});
 
 function copyShopUrl(){
   try {
