@@ -277,11 +277,16 @@ GRANT EXECUTE ON FUNCTION admin_count_suspicious() TO authenticated;
 
 NOTIFY pgrst, 'reload schema';
 
+-- Verify functions were registered (DOES NOT call them — calling needs admin context)
 DO $$
-DECLARE v_count INT;
+DECLARE v_fn INT;
 BEGIN
-  SELECT COUNT(*) INTO v_count FROM admin_get_suspicious_shops();
-  RAISE NOTICE 'admin_get_suspicious_shops returned % rows (suspicious shops detected)', v_count;
+  SELECT COUNT(*) INTO v_fn FROM pg_proc
+    WHERE proname IN ('admin_get_suspicious_shops', 'admin_count_suspicious');
+  RAISE NOTICE 'Suspicious detector functions registered: % of 2', v_fn;
+  IF v_fn < 2 THEN
+    RAISE EXCEPTION 'Function registration failed — only % of 2 created', v_fn;
+  END IF;
 END $$;
 
 COMMIT;
