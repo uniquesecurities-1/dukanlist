@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>WhatsApp Status Poster — DukanList</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📱</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  body{ background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);min-height:100vh;color:#fff;font-family:'Plus Jakarta Sans',sans-serif }
+  .wrap{ max-width:1080px;margin:0 auto;padding:32px 18px }
+  h1{ font-family:'Manrope',sans-serif;font-size:1.8rem;font-weight:900;letter-spacing:-.02em;margin-bottom:6px }
+  .sub{ color:#94a3b8;margin-bottom:24px;font-size:.92rem;line-height:1.5 }
+  .layout{ display:grid;grid-template-columns:1fr;gap:24px;align-items:start }
+  @media (min-width:880px){ .layout{ grid-template-columns:1fr 380px } }
+  .canvas-wrap{ background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px;text-align:center }
+  #poster{ width:100%;max-width:540px;height:auto;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.4);display:inline-block }
+  .controls{ background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px }
+  .ctrl-title{ font-weight:800;font-size:1.05rem;margin-bottom:14px;color:#fff }
+  .ctrl-row{ margin-bottom:14px }
+  .ctrl-row label{ display:block;font-size:.74rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px }
+  .ctrl-row input, .ctrl-row select, .ctrl-row textarea{ width:100%;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px 12px;border-radius:8px;font-size:.92rem;font-family:inherit;font-weight:600 }
+  .ctrl-row input:focus, .ctrl-row select:focus, .ctrl-row textarea:focus{ outline:none;border-color:#F59E0B }
+  .theme-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:6px }
+  .theme-btn{ aspect-ratio:1/1;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:.15s;font-size:0;background-size:cover;background-position:center }
+  .theme-btn.active{ border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.25) }
+  .theme-btn:hover{ transform:translateY(-1px) }
+  .download-btn{ width:100%;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:14px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 6px 18px rgba(16,185,129,0.32);margin-bottom:8px }
+  .download-btn:hover{ transform:translateY(-1px);box-shadow:0 10px 24px rgba(16,185,129,0.42) }
+  .share-btn{ width:100%;background:#25D366;color:#fff;border:none;padding:12px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.92rem }
+  .tip{ background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:10px 12px;font-size:.78rem;color:#FBBF24;margin-top:14px;line-height:1.5 }
+  .back-link{ display:inline-flex;align-items:center;gap:6px;color:#94a3b8;text-decoration:none;font-size:.86rem;margin-bottom:16px }
+  .back-link:hover{ color:#fff }
+  .loading{ text-align:center;padding:80px 20px;color:#94a3b8 }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="/panel/dashboard" class="back-link">← Back to Dashboard</a>
+  <h1>📱 WhatsApp Status Poster</h1>
+  <p class="sub">Auto-generated 1080×1080 poster for your shop. Download → share on WhatsApp Status → free marketing across all your contacts.<br>1080×1080 साइज़ poster — Download करके WhatsApp Status पर डालें → सारे contacts तक पहुंचेगी।</p>
+
+  <div id="loading" class="loading">⏳ Loading your shop details…</div>
+
+  <div id="main" style="display:none" class="layout">
+    <div class="canvas-wrap">
+      <canvas id="poster" width="1080" height="1080"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl-title">🎨 Customise</div>
+
+      <div class="ctrl-row">
+        <label>Theme</label>
+        <div class="theme-grid" id="themeGrid"></div>
+      </div>
+
+      <div class="ctrl-row">
+        <label>Headline (1 line)</label>
+        <input id="ctlHeadline" type="text" maxlength="40" placeholder="Your shop tagline">
+      </div>
+
+      <div class="ctrl-row">
+        <label>Tagline (1-2 lines, optional)</label>
+        <textarea id="ctlTag" rows="2" maxlength="100" placeholder="Free home delivery · Bulk discount"></textarea>
+      </div>
+
+      <button class="download-btn" onclick="downloadPoster()">⬇ Download Poster (PNG)</button>
+      <button class="share-btn" onclick="sharePoster()">💬 Share on WhatsApp</button>
+
+      <div class="tip">
+        💡 <b>Pro tip:</b> Download → WhatsApp Status → All your customers + contacts see it once a day. Free marketing forever.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+let BIZ = null;
+const THEMES = [
+  { id:'orange', name:'Orange', from:'#FF6B1A', to:'#E55100', textColor:'#fff' },
+  { id:'blue',   name:'Blue',   from:'#1E40AF', to:'#0F172A', textColor:'#fff' },
+  { id:'green',  name:'Green',  from:'#16A34A', to:'#15803D', textColor:'#fff' },
+  { id:'purple', name:'Purple', from:'#7C3AED', to:'#4338CA', textColor:'#fff' },
+  { id:'diwali', name:'Diwali', from:'#FBBF24', to:'#DC2626', textColor:'#fff' },
+  { id:'dark',   name:'Dark',   from:'#0F172A', to:'#1F2937', textColor:'#FBBF24' }
+];
+let currentTheme = THEMES[0];
+
+async function load(){
+  if (typeof ShopDB === 'undefined' || !ShopDB){
+    document.getElementById('loading').textContent = 'Supabase not loaded. Please refresh.';
+    return;
+  }
+  const c = ShopDB.client;
+  try {
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user){ window.location.href = '/panel/login.html?next=/panel/wa-poster.html'; return; }
+    const uid = u.data.user.id;
+    const { data: own } = await c.from('business_owners').select('business_id').eq('auth_user_id', uid).limit(1).maybeSingle();
+    if (!own){ document.getElementById('loading').innerHTML = '❌ No shop linked to your account. <a href="/register.html" style="color:#F59E0B">Register your shop →</a>'; return; }
+    const { data: biz } = await c.from('businesses').select('*').eq('id', own.business_id).maybeSingle();
+    if (!biz){ document.getElementById('loading').textContent = 'Shop not found.'; return; }
+    BIZ = biz;
+    setupUI();
+  } catch(e){
+    document.getElementById('loading').textContent = 'Error: ' + (e.message || e);
+  }
+}
+
+function setupUI(){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main').style.display = '';
+
+  // Theme buttons
+  const grid = document.getElementById('themeGrid');
+  grid.innerHTML = THEMES.map((t, i) =>
+    `<button class="theme-btn${i === 0 ? ' active' : ''}" data-i="${i}" style="background:linear-gradient(135deg,${t.from},${t.to})" title="${t.name}"></button>`
+  ).join('');
+  grid.querySelectorAll('.theme-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      grid.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      currentTheme = THEMES[Number(b.dataset.i)];
+      render();
+    });
+  });
+
+  // Default headline + tagline from shop data
+  document.getElementById('ctlHeadline').value = BIZ.name || 'My Shop';
+  document.getElementById('ctlTag').value = BIZ.usp_text || 'Quality service · Fair pricing · Local trust';
+  document.getElementById('ctlHeadline').addEventListener('input', render);
+  document.getElementById('ctlTag').addEventListener('input', render);
+
+  render();
+}
+
+async function render(){
+  const canvas = document.getElementById('poster');
+  const ctx = canvas.getContext('2d');
+  const W = 1080, H = 1080;
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, currentTheme.from);
+  grad.addColorStop(1, currentTheme.to);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle decoration — circles
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.beginPath(); ctx.arc(900, 200, 180, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(150, 900, 220, 0, Math.PI * 2); ctx.fill();
+
+  // Top brand label
+  ctx.fillStyle = currentTheme.textColor;
+  ctx.font = '800 28px Manrope, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('📍 DukanList', 60, 90);
+  ctx.font = '600 18px Plus Jakarta Sans, sans-serif';
+  ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
+  ctx.fillText('Sirsa–Bathinda local directory', 60, 120);
+
+  // Shop name (huge headline)
+  const headline = document.getElementById('ctlHeadline').value || BIZ.name || 'My Shop';
+  ctx.fillStyle = currentTheme.textColor;
+  ctx.font = '900 78px Manrope, sans-serif';
+  ctx.textAlign = 'center';
+  wrapText(ctx, headline, W/2, 360, 920, 92);
+
+  // Tagline
+  const tag = document.getElementById('ctlTag').value || '';
+  if (tag){
+    ctx.font = '600 36px Plus Jakarta Sans, sans-serif';
+    ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.9)' : 'rgba(15,23,42,0.85)';
+    wrapText(ctx, tag, W/2, 540, 880, 50);
+  }
+
+  // Owner name
+  if (BIZ.owner_name){
+    ctx.font = '700 30px Plus Jakarta Sans, sans-serif';
+    ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.75)' : 'rgba(15,23,42,0.7)';
+    ctx.fillText('— ' + BIZ.owner_name, W/2, 680);
+  }
+
+  // QR Code
+  const url = window.location.origin + '/business.html?slug=' + encodeURIComponent(BIZ.slug || '');
+  try {
+    const qrCanvas = document.createElement('canvas');
+    await QRCode.toCanvas(qrCanvas, url, { width: 280, margin: 2, color: { dark: '#0F172A', light: '#FFFFFF' } });
+    // White rounded card behind QR
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, W/2 - 160, 760, 320, 320, 24);
+    ctx.fill();
+    ctx.drawImage(qrCanvas, W/2 - 140, 780, 280, 280);
+  } catch(_){}
+
+  // Bottom CTA
+  ctx.fillStyle = currentTheme.textColor;
+  ctx.font = '800 32px Manrope, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📞 Scan to call · Visit · Review', W/2, 1010);
+  ctx.font = '600 22px Plus Jakarta Sans, sans-serif';
+  ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
+  ctx.fillText('dukanlist.com', W/2, 1045);
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH){
+  const words = String(text).split(' ');
+  let line = '';
+  const lines = [];
+  for (let i = 0; i < words.length; i++){
+    const test = line + words[i] + ' ';
+    if (ctx.measureText(test).width > maxW && line){
+      lines.push(line.trim());
+      line = words[i] + ' ';
+    } else {
+      line = test;
+    }
+  }
+  if (line.trim()) lines.push(line.trim());
+  const startY = y - ((lines.length - 1) * lineH) / 2;
+  lines.forEach((ln, i) => ctx.fillText(ln, x, startY + i * lineH));
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function downloadPoster(){
+  const canvas = document.getElementById('poster');
+  const url = canvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dukanlist-' + (BIZ.slug || 'shop') + '-status.png';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function sharePoster(){
+  const canvas = document.getElementById('poster');
+  canvas.toBlob(blob => {
+    if (!blob) return;
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'poster.png', { type: 'image/png' })] })){
+      navigator.share({
+        files: [new File([blob], 'dukanlist-status.png', { type: 'image/png' })],
+        title: BIZ.name + ' — DukanList',
+        text: 'Find us on DukanList: ' + window.location.origin + '/' + (BIZ.slug || '')
+      });
+    } else {
+      // Fallback: download + open WhatsApp
+      downloadPoster();
+      setTimeout(() => {
+        const shopUrl = window.location.origin + '/' + (BIZ.slug || '');
+        window.open('https://wa.me/?text=' + encodeURIComponent('Find us on DukanList: ' + shopUrl), '_blank');
+      }, 500);
+    }
+  }, 'image/png');
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+else load();
+</script>
+
+</body>
+</html>

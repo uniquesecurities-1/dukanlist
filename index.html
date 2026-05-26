@@ -988,6 +988,18 @@ function dismissFestBanner(){
   </div>
 </section>
 
+<!-- ===== TOP 10 SHOPS OF THE MONTH (leaderboard) ===== -->
+<section id="top10Section" style="background:#FFFBEB;padding:50px 0;display:none">
+  <div class="section-head reveal">
+    <span class="eyebrow" style="color:#92400E">🏆 <span data-i18n-en>Top 10 Shops of the Month</span><span data-i18n-hi>महीने के टॉप 10 शॉप</span></span>
+    <h2><span data-i18n-en>Most loved by customers</span><span data-i18n-hi>ग्राहकों का सबसे ज़्यादा भरोसा</span></h2>
+    <p><span data-i18n-en>Ranked by reviews + photos + verification. Auto-updated weekly.</span><span data-i18n-hi>रिव्यू + फोटो + वेरिफिकेशन से रैंक। हर हफ़्ते अपडेट।</span></p>
+  </div>
+  <div class="cats-wrap" style="max-width:1180px;margin:0 auto;padding:0 16px">
+    <div id="top10Grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div>
+  </div>
+</section>
+
 <!-- ===== FEATURED SHOP OF THE WEEK ===== -->
 <section id="fsotw" style="background:linear-gradient(180deg,#FFF7ED 0%,#FFFFFF 100%);padding:50px 0;display:none">
   <style>
@@ -1633,7 +1645,58 @@ if (window.DukanPTR){
 
 // ============= FEATURED SHOP OF THE WEEK + TESTIMONIALS (loads after main render) =============
 (function(){
-  async function loadFSOTW(){
+  async function loadTop10(){
+    try {
+      if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+      const c = ShopDB.client;
+      const { data, error } = await c.from('businesses')
+        .select('id,slug,name,owner_name,photos,verified_score,rating_avg,rating_count,photos_count,geo_cities(name)')
+        .eq('status', 'active')
+        .order('rating_count', { ascending: false })
+        .order('rating_avg', { ascending: false })
+        .order('verified_score', { ascending: false })
+        .limit(30);
+      if (error || !data) return;
+      // Compute a "love score" client-side for stable ranking
+      const scored = data.map(b => ({
+        ...b,
+        _score: ((Number(b.rating_count) || 0) * (Number(b.rating_avg) || 0)) +
+                ((Number(b.photos_count) || 0) * 1.5) +
+                ((Number(b.verified_score) || 0) * 8)
+      })).filter(b => b._score >= 3).sort((a, b) => b._score - a._score).slice(0, 10);
+      if (scored.length < 3) return;
+      const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+      const medals = ['🥇','🥈','🥉','4','5','6','7','8','9','10'];
+      const html = scored.map((b, i) => {
+        const photo = (b.photos && b.photos[0]) || null;
+        const cityName = (b.geo_cities && b.geo_cities.name) || '';
+        const medal = i < 3 ? medals[i] : '#' + (i + 1);
+        const medalStyle = i < 3
+          ? 'background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-size:1.3rem'
+          : 'background:#F3F4F6;color:#475569;font-size:.92rem;font-weight:900';
+        return `
+          <a href="/${b.slug}" style="background:#fff;border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:.2s;border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 3px rgba(15,23,42,.04)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(217,119,6,0.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(15,23,42,.04)'">
+            <div style="aspect-ratio:16/10;background:linear-gradient(135deg,#FEF3C7,#FCD34D);position:relative;overflow:hidden">
+              ${photo ? `<img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : '<div style="height:100%;display:grid;place-items:center;font-size:3rem;opacity:.6">🏪</div>'}
+              <div style="position:absolute;top:8px;left:8px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;${medalStyle};box-shadow:0 3px 10px rgba(0,0,0,0.18);font-family:'Manrope',sans-serif">${medal}</div>
+            </div>
+            <div style="padding:12px 14px">
+              <div style="font-weight:800;color:#0F172A;font-size:.96rem;line-height:1.3;margin-bottom:3px">${escapeHtml(b.name)}</div>
+              <div style="font-size:.78rem;color:#64748b;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                ${b.rating_avg ? `<span style="color:#D97706;font-weight:800">⭐ ${Number(b.rating_avg).toFixed(1)}</span>` : ''}
+                ${b.rating_count ? `<span>${b.rating_count} reviews</span>` : ''}
+                ${cityName ? `<span>· ${escapeHtml(cityName)}</span>` : ''}
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+      document.getElementById('top10Grid').innerHTML = html;
+      document.getElementById('top10Section').style.display = '';
+    } catch(e){ console.warn('Top 10 load:', e); }
+  }
+
+    async function loadFSOTW(){
     try {
       if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
       const c = ShopDB.client;
@@ -1730,8 +1793,8 @@ if (window.DukanPTR){
 
   // Load after main page render (don't block hero)
   if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', () => { setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); });
-  } else { setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); }
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(loadTop10, 1200); setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); });
+  } else { setTimeout(loadTop10, 1200); setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); }
 })();
 </script>
 
