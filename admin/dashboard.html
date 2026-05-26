@@ -141,6 +141,7 @@
     <a href="/admin/featured.html">⭐ Featured</a>
     <a href="/admin/deals.html">🎁 Deals</a>
     <a href="/admin/activity.html">📋 Activity</a>
+    <a href="/admin/suspicious.html">🚨 Suspicious <span id="susBadge" style="display:none;background:#EF4444;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:4px"></span></a>
     <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
     <a href="/admin/test-cleanup" id="navCleanup" style="display:none">🧹 Cleanup</a>
     <a href="/" target="_blank">🌐 Public Site</a>
@@ -413,6 +414,25 @@ window.addEventListener('load', function(){
 });
 
 // ===== TODAY'S TASKS DIGEST =====
+async function loadSusBadge(){
+  try {
+    const c = ShopDB.client;
+    const { data, error } = await c.rpc('admin_count_suspicious');
+    if (error || !data || data.length === 0) return;
+    const row = data[0];
+    const high = row.high_risk || 0;
+    const med  = row.medium_risk || 0;
+    const total = (high + med);
+    const badge = document.getElementById('susBadge');
+    if (badge && total > 0){
+      badge.textContent = total;
+      badge.style.display = 'inline-block';
+      badge.style.background = high > 0 ? '#EF4444' : '#F59E0B';
+      badge.title = high + ' high risk + ' + med + ' medium risk shops detected';
+    }
+  } catch(_){ /* if RPC not deployed yet, just skip */ }
+}
+
 async function loadDigest(){
   const c = ShopDB.client;
   const r = await c.rpc('admin_dashboard_digest');
@@ -542,6 +562,7 @@ function renderKPIs(s){
     window.__digestBooted = true;
     loadDigest().catch(e => console.error('Digest load failed:', e));
     setupGlobalSearch();
+    loadSusBadge().catch(e => console.warn('Sus badge load:', e.message));
   }
   const cards = [
     { label: 'Total Businesses',  val: s.total_businesses,  cls: 'pri',     delta: '+' + (s.new_week || 0) + ' this week' },
