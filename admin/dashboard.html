@@ -565,12 +565,112 @@ function renderKPIs(s){
 
 function renderRecent(rows){
   window._recentRows = rows || [];
-
-  if (!rows.length){
-    document.getElementById('recentBiz').innerHTML =
-      '<div style="color:#64748b;text-align:center;padding:24px">No businesses registered yet. <a href="/register.html" target="_blank" style="color:#1E3A8A">Register the first one &rarr;</a></div>';
-    return;
+  // Init filter/sort state on first render
+  if (!window._filterState){
+    window._filterState = {
+      search: '',
+      statusFilter: 'all',     // all|active|pending|pending_review|flagged|banned
+      quickFilter: 'all',      // all|today|week|hasFlags|noPhotos|noReviews
+      sortKey: 'created_at',   // name|status|verified_score|rating_avg|photos_count|created_at|health
+      sortDir: 'desc',         // asc|desc
+      selected: new Set()
+    };
   }
+  // Init saved views (localStorage)
+  if (!window._savedViews){
+    try { window._savedViews = JSON.parse(localStorage.getItem('dl_admin_views') || '[]'); }
+    catch(_) { window._savedViews = []; }
+  }
+  renderRecentFiltered();
+}
+
+// Compute shop health score (0-100) based on completeness signals
+function computeHealthScore(r){
+  let s = 0;
+  // Photos: 0-2 = 5, 3-5 = 15, 6+ = 25
+  const p = r.photos_count || 0;
+  s += p === 0 ? 0 : (p < 3 ? 5 : (p < 6 ? 15 : 25));
+  // Reviews: 0 = 0, 1-3 = 8, 4-9 = 15, 10+ = 20
+  const rv = r.rating_count || 0;
+  s += rv === 0 ? 0 : (rv < 4 ? 8 : (rv < 10 ? 15 : 20));
+  // Owner name
+  if (r.owner_name && r.owner_name.trim()) s += 10;
+  // Verified score (0-5)
+  s += Math.min(15, (Number(r.verified_score) || 0) * 3);
+  // Status active
+  if (r.status === 'active') s += 10;
+  // Email present
+  if (r.email) s += 5;
+  // WhatsApp present
+  if (r.whatsapp) s += 5;
+  // Rating (good ratings boost)
+  const avg = Number(r.rating_avg) || 0;
+  if (avg >= 4) s += 10;
+  else if (avg >= 3) s += 5;
+  // Penalty for flags
+  s -= Math.min(20, (r.flagged_count || 0) * 5);
+  return Math.max(0, Math.min(100, s));
+}
+
+function renderRecentFiltered(){
+  const all = window._recentRows || [];
+  const st = window._filterState;
+  let rows = all.slice();
+
+  // Status filter
+  if (st.statusFilter !== 'all'){
+    rows = rows.filter(r => r.status === st.statusFilter);
+  }
+  // Quick filter
+  const now = Date.now();
+  if (st.quickFilter === 'today'){
+    rows = rows.filter(r => r.created_at && (now - new Date(r.created_at).getTime()) < 86400000);
+  } else if (st.quickFilter === 'week'){
+    rows = rows.filter(r => r.created_at && (now - new Date(r.created_at).getTime()) < 7*86400000);
+  } else if (st.quickFilter === 'hasFlags'){
+    rows = rows.filter(r => (r.flagged_count || 0) > 0);
+  } else if (st.quickFilter === 'noPhotos'){
+    rows = rows.filter(r => (r.photos_count || 0) === 0);
+  } else if (st.quickFilter === 'noReviews'){
+    rows = rows.filter(r => (r.rating_count || 0) === 0);
+  }
+  // Search
+  if (st.search){
+    const q = st.search.toLowerCase();
+    rows = rows.filter(r =>
+      (r.name || '').toLowerCase().includes(q) ||
+      (r.owner_name || '').toLowerCase().includes(q) ||
+      (r.mobile || '').includes(q) ||
+      (r.whatsapp || '').includes(q) ||
+      (r.email || '').toLowerCase().includes(q) ||
+      (r.primary_cat || '').toLowerCase().includes(q) ||
+      (r.city_name || '').toLowerCase().includes(q)
+    );
+  }
+  // Sort
+  const key = st.sortKey;
+  const dir = st.sortDir === 'asc' ? 1 : -1;
+  rows.sort((a, b) => {
+    let av, bv;
+    if (key === 'health'){ av = computeHealthScore(a); bv = computeHealthScore(b); }
+    else if (key === 'name'){ av = (a.name || '').toLowerCase(); bv = (b.name || '').toLowerCase(); }
+    else if (key === 'rating_avg'){ av = Number(a.rating_avg) || 0; bv = Number(b.rating_avg) || 0; }
+    else if (key === 'verified_score'){ av = Number(a.verified_score) || 0; bv = Number(b.verified_score) || 0; }
+    else if (key === 'photos_count'){ av = Number(a.photos_count) || 0; bv = Number(b.photos_count) || 0; }
+    else if (key === 'status'){ av = a.status || ''; bv = b.status || ''; }
+    else { av = a.created_at || ''; bv = b.created_at || ''; }
+    if (av < bv) return -dir;
+    if (av > bv) return dir;
+    return 0;
+  });
+
+  renderRecentTable(rows, all.length);
+}
+
+function renderRecentTable(rows, totalCount){
+  const st = window._filterState;
+
+  // STATUS badge
   const statusBadge = (s) => {
     const colors = {
       'active':'#10B981','pending':'#F59E0B','pending_review':'#F59E0B','flagged':'#EF4444',
@@ -578,7 +678,6 @@ function renderRecent(rows){
     };
     return `<span style="background:${colors[s]||'#94a3b8'};color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase">${s}</span>`;
   };
-
   const verifyBadge = (score) => {
     if (!score || score < 1) return '<span style="color:#94a3b8;font-size:11px">&mdash;</span>';
     const s = Number(score);
@@ -586,71 +685,278 @@ function renderRecent(rows){
     if (s >= 3) return '<span style="background:#94a3b8;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700" title="Silver tier">SILVER</span>';
     return '<span style="background:#A16207;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700" title="Bronze tier">BRONZE</span>';
   };
-
   const ratingDisplay = (avg, count) => {
     if (!count || count === 0) return '<span style="color:#94a3b8;font-size:11px">No reviews</span>';
     return `<span style="color:#F59E0B;font-weight:700">&#9733; ${Number(avg).toFixed(1)}</span> <span style="color:#94a3b8;font-size:11px">(${count})</span>`;
   };
+  const healthBadge = (h) => {
+    const colour = h >= 70 ? '#10B981' : (h >= 40 ? '#F59E0B' : '#EF4444');
+    const bg     = h >= 70 ? '#DCFCE7' : (h >= 40 ? '#FEF3C7' : '#FEE2E2');
+    return `<span style="background:${bg};color:${colour};padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800" title="Shop Health Score (photos+reviews+completeness)">${h}</span>`;
+  };
+
+  // SORT ICON helper
+  const sortIco = (k) => {
+    if (st.sortKey !== k) return '<span style="opacity:.3">⇅</span>';
+    return st.sortDir === 'asc' ? '<span style="color:#1E3A8A">▲</span>' : '<span style="color:#1E3A8A">▼</span>';
+  };
+  const SH = (k, label, w) => `<th data-sort="${k}" onclick="setSort('${k}')" style="padding:10px 10px;font-weight:600;color:#64748b;cursor:pointer;user-select:none;white-space:nowrap${w?';width:'+w:''}">${label} ${sortIco(k)}</th>`;
+
+  // FILTER CHIPS
+  const chip = (val, label, count) => {
+    const active = st.statusFilter === val;
+    const bg = active ? '#1E3A8A' : '#F1F5F9';
+    const fg = active ? '#fff' : '#475569';
+    return `<button onclick="setStatusFilter('${val}')" style="background:${bg};color:${fg};border:none;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">${label}${count !== undefined ? ' · ' + count : ''}</button>`;
+  };
+  const quickChip = (val, label) => {
+    const active = st.quickFilter === val;
+    const bg = active ? '#7C3AED' : '#F1F5F9';
+    const fg = active ? '#fff' : '#475569';
+    return `<button onclick="setQuickFilter('${val}')" style="background:${bg};color:${fg};border:none;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">${label}</button>`;
+  };
+
+  // Counts per status
+  const all = window._recentRows || [];
+  const cnt = (s) => all.filter(r => r.status === s).length;
+
+  const selCount = st.selected.size;
+  const bulkBar = selCount > 0
+    ? `<div style="background:#1E3A8A;color:#fff;padding:10px 16px;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+         <b>${selCount} selected</b>
+         <button onclick="bulkApproveSelected()" style="background:#10B981;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit">✓ Bulk Approve</button>
+         <button onclick="clearBulkSelection()" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit">Clear</button>
+       </div>`
+    : '';
+
+  // Saved Views UI
+  const viewsList = (window._savedViews || []).map((v, i) =>
+    `<button onclick="loadView(${i})" title="Click to load. Right-click to delete." oncontextmenu="event.preventDefault();deleteView(${i});return false" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;padding:5px 11px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">★ ${escapeHtml(v.name)}</button>`
+  ).join('');
 
   const html = `
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:1100px">
-        <thead>
-          <tr style="text-align:left;background:#f8fafc;border-bottom:1px solid #e2e8f0">
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Business / Owner</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Contact</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Category</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Location</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Status</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b" title="Verified Tier (Bronze/Silver/Gold)">Verified</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Rating</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Media</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Created</th>
-            <th style="padding:10px 10px;font-weight:600;color:#64748b">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r => {
-            const mobile = (r.mobile || '').replace(/^91/, '');
-            const wa = (r.whatsapp || '').replace(/^91/, '');
-            const waSameAsMobile = wa && wa === mobile;
-            const flagWarn = (r.flagged_count && r.flagged_count > 0)
-              ? `<span style="background:#FEE2E2;color:#991B1B;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;margin-left:4px" title="${r.flagged_count} flag(s)">&#9888; ${r.flagged_count}</span>` : '';
-            return `
-            <tr style="border-bottom:1px solid #f1f5f9">
-              <td style="padding:10px 10px">
-                <a href="/admin/shop?id=${r.id}" style="font-weight:600;color:#1E3A8A;text-decoration:none" title="Open Admin View">${escapeHtml(r.name)}</a>${flagWarn}
-                <div style="font-size:11px;color:#64748b;margin-top:2px">${escapeHtml(r.owner_name || '—')}</div>
-              </td>
-              <td style="padding:10px 10px;color:#475569;font-size:12px;white-space:nowrap">
-                <div title="Primary mobile">📞 ${escapeHtml(mobile)}</div>
-                ${wa && !waSameAsMobile ? `<div style="color:#16A34A;margin-top:2px" title="WhatsApp">💬 ${escapeHtml(wa)}</div>` : ''}
-                ${r.email ? `<div style="color:#0891B2;margin-top:2px;font-size:11px" title="Email">✉ ${escapeHtml(r.email)}</div>` : ''}
-              </td>
-              <td style="padding:10px 10px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
-              <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">
-                <div>${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</div>
-                ${r.pincode ? `<div style="color:#94a3b8;font-size:11px">PIN: ${escapeHtml(r.pincode)}</div>` : ''}
-              </td>
-              <td style="padding:10px 10px">${statusBadge(r.status)}</td>
-              <td style="padding:10px 10px">${verifyBadge(r.verified_score)}</td>
-              <td style="padding:10px 10px;font-size:12px;white-space:nowrap">${ratingDisplay(r.rating_avg, r.rating_count)}</td>
-              <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">${r.photos_count || 0} 📸</td>
-              <td style="padding:10px 10px;color:#64748b;font-size:11px;white-space:nowrap">${formatDate(r.created_at)}</td>
-              <td style="padding:10px 10px;white-space:nowrap">
-                <a href="/admin/shop?id=${r.id}" style="color:#1E3A8A;text-decoration:none;font-weight:700;font-size:12px" title="Open admin view">🛡 View</a>
-              </td>
+    ${bulkBar}
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center">
+      <input type="search" id="recentSearch" placeholder="🔍 Search name, owner, mobile, email..." value="${escapeHtml(st.search)}" oninput="setSearch(this.value)" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit">
+      <button onclick="saveCurrentView()" style="background:#F1F5F9;color:#475569;border:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" title="Save current filter combo as a named view">★ Save View</button>
+    </div>
+    ${viewsList ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center"><span style="color:#94a3b8;font-size:11px;font-weight:700">SAVED:</span>${viewsList}</div>` : ''}
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center">
+      <span style="color:#94a3b8;font-size:11px;font-weight:700">STATUS:</span>
+      ${chip('all', 'All', all.length)}
+      ${chip('active', 'Active', cnt('active'))}
+      ${chip('pending', 'Pending', cnt('pending'))}
+      ${chip('pending_review', 'Pending Review', cnt('pending_review'))}
+      ${chip('flagged', 'Flagged', cnt('flagged'))}
+      ${chip('banned', 'Banned', cnt('banned'))}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;align-items:center">
+      <span style="color:#94a3b8;font-size:11px;font-weight:700">QUICK:</span>
+      ${quickChip('all', 'Anytime')}
+      ${quickChip('today', '🕐 Today')}
+      ${quickChip('week', '📅 This Week')}
+      ${quickChip('hasFlags', '⚠ Has Flags')}
+      ${quickChip('noPhotos', '📷 No Photos')}
+      ${quickChip('noReviews', '⭐ No Reviews')}
+    </div>
+
+    ${rows.length === 0 ? `
+      <div style="color:#64748b;text-align:center;padding:30px;background:#f8fafc;border-radius:10px">
+        <div style="font-size:2rem;margin-bottom:6px;opacity:.5">🔍</div>
+        <div>No shops match the current filter.</div>
+        <button onclick="resetFilters()" style="margin-top:10px;background:#1E3A8A;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit">Reset filters</button>
+      </div>
+    ` : `
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:1280px">
+          <thead>
+            <tr style="text-align:left;background:#f8fafc;border-bottom:1px solid #e2e8f0">
+              <th style="padding:10px 6px;width:30px"><input type="checkbox" id="selectAllBox" onclick="toggleSelectAll(this.checked)" style="cursor:pointer"></th>
+              ${SH('name', 'Business / Owner')}
+              <th style="padding:10px 10px;font-weight:600;color:#64748b">Contact</th>
+              <th style="padding:10px 10px;font-weight:600;color:#64748b">Category</th>
+              <th style="padding:10px 10px;font-weight:600;color:#64748b">Location</th>
+              ${SH('status', 'Status')}
+              ${SH('verified_score', 'Verified')}
+              ${SH('rating_avg', 'Rating')}
+              ${SH('photos_count', 'Photos')}
+              ${SH('health', 'Health', '70px')}
+              ${SH('created_at', 'Created')}
+              <th style="padding:10px 10px;font-weight:600;color:#64748b" title="Quick actions">Actions</th>
             </tr>
-          `}).join('')}
-        </tbody>
-      </table>
-    </div>
-    <div style="padding:8px 4px;font-size:11px;color:#94a3b8;text-align:right">
-      Showing ${rows.length} most recent &middot; use <b>Download ALL</b> for complete export
-    </div>
+          </thead>
+          <tbody>
+            ${rows.map(r => {
+              const mobile = (r.mobile || '').replace(/^91/, '');
+              const wa = (r.whatsapp || '').replace(/^91/, '');
+              const waSameAsMobile = wa && wa === mobile;
+              const flagWarn = (r.flagged_count && r.flagged_count > 0)
+                ? `<span style="background:#FEE2E2;color:#991B1B;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;margin-left:4px" title="${r.flagged_count} flag(s)">&#9888; ${r.flagged_count}</span>` : '';
+              const isPending = r.status === 'pending' || r.status === 'pending_review';
+              const isSelected = st.selected.has(r.id);
+              const waContact = wa || mobile;
+              const waLink = waContact
+                ? `https://wa.me/91${waContact}?text=${encodeURIComponent('Namaste! DukanList admin here re: your shop ' + (r.name || '') + '.')}`
+                : null;
+              return `
+              <tr style="border-bottom:1px solid #f1f5f9${isSelected ? ';background:#EEF2FF' : ''}">
+                <td style="padding:10px 6px"><input type="checkbox" ${isSelected ? 'checked' : ''} onclick="toggleSelect('${r.id}')" style="cursor:pointer"></td>
+                <td style="padding:10px 10px">
+                  <a href="/admin/shop?id=${r.id}" style="font-weight:600;color:#1E3A8A;text-decoration:none" title="Open Admin View">${escapeHtml(r.name)}</a>${flagWarn}
+                  <div style="font-size:11px;color:#64748b;margin-top:2px">${escapeHtml(r.owner_name || '—')}</div>
+                </td>
+                <td style="padding:10px 10px;color:#475569;font-size:12px;white-space:nowrap">
+                  <div title="Primary mobile">📞 ${escapeHtml(mobile)}</div>
+                  ${wa && !waSameAsMobile ? `<div style="color:#16A34A;margin-top:2px" title="WhatsApp">💬 ${escapeHtml(wa)}</div>` : ''}
+                  ${r.email ? `<div style="color:#0891B2;margin-top:2px;font-size:11px" title="Email">✉ ${escapeHtml(r.email)}</div>` : ''}
+                </td>
+                <td style="padding:10px 10px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
+                <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">
+                  <div>${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</div>
+                  ${r.pincode ? `<div style="color:#94a3b8;font-size:11px">PIN: ${escapeHtml(r.pincode)}</div>` : ''}
+                </td>
+                <td style="padding:10px 10px">${statusBadge(r.status)}</td>
+                <td style="padding:10px 10px">${verifyBadge(r.verified_score)}</td>
+                <td style="padding:10px 10px;font-size:12px;white-space:nowrap">${ratingDisplay(r.rating_avg, r.rating_count)}</td>
+                <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">${r.photos_count || 0} 📸</td>
+                <td style="padding:10px 10px">${healthBadge(computeHealthScore(r))}</td>
+                <td style="padding:10px 10px;color:#64748b;font-size:11px;white-space:nowrap">${formatDate(r.created_at)}</td>
+                <td style="padding:10px 8px;white-space:nowrap">
+                  ${isPending ? `<button onclick="quickApprove('${r.id}', this)" title="Approve this shop now" style="background:#10B981;color:#fff;border:none;padding:5px 9px;border-radius:5px;font-weight:700;cursor:pointer;font-size:11px;font-family:inherit;margin-right:4px">✓</button>` : ''}
+                  ${waLink ? `<a href="${waLink}" target="_blank" rel="noopener" title="WhatsApp owner" style="background:#25D366;color:#fff;border:none;padding:5px 9px;border-radius:5px;font-weight:700;cursor:pointer;font-size:11px;text-decoration:none;display:inline-block;margin-right:4px">💬</a>` : ''}
+                  <a href="/admin/shop?id=${r.id}" style="background:#1E3A8A;color:#fff;border:none;padding:5px 9px;border-radius:5px;font-weight:700;cursor:pointer;font-size:11px;text-decoration:none;display:inline-block" title="Open admin view">🛡</a>
+                </td>
+              </tr>
+            `}).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:8px 4px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span>Showing <b>${rows.length}</b> of <b>${totalCount}</b> shops</span>
+        <span>Sort: <b>${st.sortKey}</b> ${st.sortDir === 'asc' ? '▲' : '▼'} · Click column headers to change.</span>
+      </div>
+    `}
   `;
   document.getElementById('recentBiz').innerHTML = html;
 }
+
+// ===== Filter/Sort state setters =====
+function setStatusFilter(v){ window._filterState.statusFilter = v; renderRecentFiltered(); }
+function setQuickFilter(v){ window._filterState.quickFilter = v; renderRecentFiltered(); }
+function setSearch(v){ window._filterState.search = v; renderRecentFiltered(); }
+function setSort(k){
+  const st = window._filterState;
+  if (st.sortKey === k) st.sortDir = st.sortDir === 'asc' ? 'desc' : 'asc';
+  else { st.sortKey = k; st.sortDir = 'desc'; }
+  renderRecentFiltered();
+}
+function resetFilters(){
+  window._filterState.search = '';
+  window._filterState.statusFilter = 'all';
+  window._filterState.quickFilter = 'all';
+  renderRecentFiltered();
+}
+
+// ===== Bulk selection =====
+function toggleSelect(id){
+  const sel = window._filterState.selected;
+  if (sel.has(id)) sel.delete(id); else sel.add(id);
+  renderRecentFiltered();
+}
+function toggleSelectAll(checked){
+  const sel = window._filterState.selected;
+  // Apply to currently visible (filtered) rows only — read from DOM is fragile; recompute.
+  const all = window._recentRows || [];
+  const st = window._filterState;
+  // Get currently filtered ids by re-running the filter without sorting (simpler: read checkboxes).
+  if (checked){
+    document.querySelectorAll('#recentBiz tbody input[type=checkbox]').forEach((cb, i) => {
+      const tr = cb.closest('tr');
+      // Find id from the View link in same row
+      const link = tr && tr.querySelector('a[href*="/admin/shop?id="]');
+      if (link){
+        const m = link.href.match(/id=([0-9a-f-]+)/);
+        if (m) sel.add(m[1]);
+      }
+    });
+  } else { sel.clear(); }
+  renderRecentFiltered();
+}
+function clearBulkSelection(){ window._filterState.selected.clear(); renderRecentFiltered(); }
+
+async function bulkApproveSelected(){
+  const sel = window._filterState.selected;
+  if (sel.size === 0) return;
+  if (!confirm('Approve ' + sel.size + ' selected shop(s)? They will become active immediately.')) return;
+  const c = ShopDB.client;
+  let ok = 0, fail = 0;
+  const ids = Array.from(sel);
+  for (const id of ids){
+    try {
+      const { error } = await c.rpc('admin_approve_business', { p_business_id: id });
+      if (error) { fail++; console.warn('Approve fail', id, error); }
+      else {
+        ok++;
+        // Update local row
+        const row = (window._recentRows || []).find(r => r.id === id);
+        if (row){ row.status = 'active'; }
+      }
+    } catch(e){ fail++; }
+  }
+  alert('Bulk approve done: ' + ok + ' succeeded, ' + fail + ' failed.');
+  sel.clear();
+  renderRecentFiltered();
+}
+
+async function quickApprove(id, btn){
+  if (btn){ btn.disabled = true; btn.innerHTML = '⏳'; }
+  try {
+    const { error } = await ShopDB.client.rpc('admin_approve_business', { p_business_id: id });
+    if (error) throw error;
+    // Update local row
+    const row = (window._recentRows || []).find(r => r.id === id);
+    if (row){ row.status = 'active'; }
+    renderRecentFiltered();
+  } catch(e){
+    alert('Approve failed: ' + (e.message || e));
+    if (btn){ btn.disabled = false; btn.innerHTML = '✓'; }
+  }
+}
+
+// ===== Saved Views (localStorage) =====
+function saveCurrentView(){
+  const st = window._filterState;
+  const name = prompt('Save this filter combo as:', '');
+  if (!name || !name.trim()) return;
+  window._savedViews.push({
+    name: name.trim().slice(0, 24),
+    search: st.search,
+    statusFilter: st.statusFilter,
+    quickFilter: st.quickFilter,
+    sortKey: st.sortKey,
+    sortDir: st.sortDir
+  });
+  try { localStorage.setItem('dl_admin_views', JSON.stringify(window._savedViews)); } catch(_){}
+  renderRecentFiltered();
+}
+function loadView(i){
+  const v = window._savedViews[i];
+  if (!v) return;
+  const st = window._filterState;
+  st.search = v.search || '';
+  st.statusFilter = v.statusFilter || 'all';
+  st.quickFilter = v.quickFilter || 'all';
+  st.sortKey = v.sortKey || 'created_at';
+  st.sortDir = v.sortDir || 'desc';
+  renderRecentFiltered();
+}
+function deleteView(i){
+  if (!confirm('Delete saved view "' + (window._savedViews[i] && window._savedViews[i].name) + '"?')) return;
+  window._savedViews.splice(i, 1);
+  try { localStorage.setItem('dl_admin_views', JSON.stringify(window._savedViews)); } catch(_){}
+  renderRecentFiltered();
+}
+
 
 // Toggle Show All / Show Latest 10
 let __showingAll = false;
