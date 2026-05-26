@@ -4,94 +4,146 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>WhatsApp Status Poster — DukanList</title>
+<title>WhatsApp Status Poster Studio — DukanList</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📱</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css">
 <style>
-  body{ background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);min-height:100vh;color:#fff;font-family:'Plus Jakarta Sans',sans-serif }
-  .wrap{ max-width:1080px;margin:0 auto;padding:32px 18px }
-  h1{ font-family:'Manrope',sans-serif;font-size:1.8rem;font-weight:900;letter-spacing:-.02em;margin-bottom:6px }
-  .sub{ color:#94a3b8;margin-bottom:24px;font-size:.92rem;line-height:1.5 }
-  .layout{ display:grid;grid-template-columns:1fr;gap:24px;align-items:start }
-  @media (min-width:880px){ .layout{ grid-template-columns:1fr 380px } }
-  .canvas-wrap{ background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px;text-align:center }
-  #poster{ width:100%;max-width:540px;height:auto;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.4);display:inline-block }
-  .controls{ background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px }
-  .ctrl-title{ font-weight:800;font-size:1.05rem;margin-bottom:14px;color:#fff }
-  .ctrl-row{ margin-bottom:14px }
-  .ctrl-row label{ display:block;font-size:.74rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px }
-  .ctrl-row input, .ctrl-row select, .ctrl-row textarea{ width:100%;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px 12px;border-radius:8px;font-size:.92rem;font-family:inherit;font-weight:600 }
-  .ctrl-row input:focus, .ctrl-row select:focus, .ctrl-row textarea:focus{ outline:none;border-color:#F59E0B }
-  .theme-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:6px }
-  .theme-btn{ aspect-ratio:1/1;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:.15s;font-size:0;background-size:cover;background-position:center }
-  .theme-btn.active{ border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.25) }
-  .theme-btn:hover{ transform:translateY(-1px) }
-  .download-btn{ width:100%;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:14px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 6px 18px rgba(16,185,129,0.32);margin-bottom:8px }
-  .download-btn:hover{ transform:translateY(-1px);box-shadow:0 10px 24px rgba(16,185,129,0.42) }
-  .share-btn{ width:100%;background:#25D366;color:#fff;border:none;padding:12px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.92rem }
-  .tip{ background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:10px 12px;font-size:.78rem;color:#FBBF24;margin-top:14px;line-height:1.5 }
-  .back-link{ display:inline-flex;align-items:center;gap:6px;color:#94a3b8;text-decoration:none;font-size:.86rem;margin-bottom:16px }
-  .back-link:hover{ color:#fff }
-  .loading{ text-align:center;padding:80px 20px;color:#94a3b8 }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{ background:radial-gradient(ellipse at top,#1E293B 0%,#0F172A 100%);min-height:100vh;color:#fff;font-family:'Plus Jakarta Sans',sans-serif }
+  .wrap{ max-width:1280px;margin:0 auto;padding:28px 18px 80px }
+  h1{ font-family:'Manrope',sans-serif;font-size:2rem;font-weight:900;letter-spacing:-.025em;margin-bottom:6px;background:linear-gradient(135deg,#FBBF24,#F97316);-webkit-background-clip:text;background-clip:text;color:transparent }
+  .sub{ color:#94a3b8;margin-bottom:24px;font-size:.94rem;line-height:1.55;max-width:680px }
+  .back-link{ display:inline-flex;align-items:center;gap:6px;color:#94a3b8;text-decoration:none;font-size:.88rem;margin-bottom:14px;font-weight:600 }
+  .back-link:hover{ color:#FBBF24 }
+  .layout{ display:grid;grid-template-columns:1fr;gap:22px;align-items:start }
+  @media (min-width:920px){ .layout{ grid-template-columns:1fr 400px } }
+  .canvas-wrap{ background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:24px;text-align:center;backdrop-filter:blur(10px) }
+  #poster{ width:100%;max-width:520px;height:auto;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,0.5);display:inline-block;background:#fff }
+  .ratio-pills{ display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap }
+  .ratio-pill{ background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#cbd5e1;padding:7px 14px;border-radius:99px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s }
+  .ratio-pill.active{ background:linear-gradient(135deg,#FBBF24,#F97316);color:#0F172A;border-color:transparent }
+  .ratio-pill:hover{ background:rgba(251,191,36,0.15);color:#fff }
+  .controls{ background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:22px;backdrop-filter:blur(10px) }
+  .ctrl-section{ margin-bottom:22px;padding-bottom:22px;border-bottom:1px dashed rgba(255,255,255,0.08) }
+  .ctrl-section:last-child{ border-bottom:none;margin-bottom:0;padding-bottom:0 }
+  .ctrl-title{ display:flex;align-items:center;gap:6px;font-family:'Manrope',sans-serif;font-weight:800;font-size:.86rem;color:#FBBF24;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px }
+  .ctrl-row{ margin-bottom:12px }
+  .ctrl-row label{ display:block;font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px }
+  .ctrl-row input, .ctrl-row select, .ctrl-row textarea{ width:100%;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 12px;border-radius:9px;font-size:.92rem;font-family:inherit;font-weight:600 }
+  .ctrl-row input:focus, .ctrl-row textarea:focus, .ctrl-row select:focus{ outline:none;border-color:#FBBF24 }
+  .theme-grid{ display:grid;grid-template-columns:repeat(4,1fr);gap:6px }
+  .theme-btn{ aspect-ratio:1/1;border:2px solid transparent;border-radius:10px;cursor:pointer;transition:.15s;font-size:0;position:relative;overflow:hidden }
+  .theme-btn.active{ border-color:#FBBF24;box-shadow:0 0 0 3px rgba(251,191,36,0.25);transform:scale(1.05) }
+  .theme-btn:hover{ transform:translateY(-2px) }
+  .toggle-grid{ display:grid;grid-template-columns:1fr 1fr;gap:8px }
+  .toggle-btn{ background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);color:#cbd5e1;padding:8px 10px;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:.15s }
+  .toggle-btn.on{ background:linear-gradient(135deg,#10B981,#059669);border-color:transparent;color:#fff }
+  .toggle-btn .tg-dot{ width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2) }
+  .toggle-btn.on .tg-dot{ background:#fff }
+  .download-btn{ width:100%;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:15px;border-radius:12px;font-weight:900;cursor:pointer;font-family:inherit;font-size:1rem;box-shadow:0 8px 22px rgba(16,185,129,0.4);margin-bottom:8px;transition:.15s }
+  .download-btn:hover{ transform:translateY(-2px) }
+  .share-btn{ width:100%;background:#25D366;color:#fff;border:none;padding:13px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.92rem;margin-bottom:8px }
+  .secondary-btn{ width:100%;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.1);padding:11px;border-radius:11px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.86rem }
+  .tip{ background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(251,191,36,0.06));border:1px solid rgba(251,191,36,0.3);border-radius:11px;padding:11px 13px;font-size:.78rem;color:#FBBF24;margin-top:14px;line-height:1.55 }
+  .tip b{ color:#fff }
+  .loading{ text-align:center;padding:100px 20px;color:#94a3b8 }
+  .badge-pro{ display:inline-block;background:linear-gradient(135deg,#FBBF24,#F97316);color:#0F172A;font-size:.64rem;font-weight:900;padding:3px 8px;border-radius:6px;letter-spacing:.06em;margin-left:6px;vertical-align:middle }
+  @media (max-width:600px){
+    h1{ font-size:1.5rem }
+    .theme-grid{ grid-template-columns:repeat(3,1fr) }
+    .toggle-grid{ grid-template-columns:1fr }
+  }
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <a href="/panel/dashboard" class="back-link">← Back to Dashboard</a>
-  <h1>📱 WhatsApp Status Poster</h1>
-  <p class="sub">Auto-generated 1080×1080 poster for your shop. Download → share on WhatsApp Status → free marketing across all your contacts.<br>1080×1080 साइज़ poster — Download करके WhatsApp Status पर डालें → सारे contacts तक पहुंचेगी।</p>
-
+  <h1>📱 Status Poster Studio <span class="badge-pro">PRO</span></h1>
+  <p class="sub">Premium poster generator for WhatsApp Status, Instagram Story & Feed. 16 themes including 6 festival modes. Pick aspect, customise, download HD PNG. Free, no watermark.</p>
   <div id="loading" class="loading">⏳ Loading your shop details…</div>
-
   <div id="main" style="display:none" class="layout">
     <div class="canvas-wrap">
+      <div class="ratio-pills">
+        <button class="ratio-pill active" data-w="1080" data-h="1080" onclick="setRatio(this,1080,1080)">📱 Status 1:1</button>
+        <button class="ratio-pill" data-w="1080" data-h="1920" onclick="setRatio(this,1080,1920)">📲 Story 9:16</button>
+        <button class="ratio-pill" data-w="1080" data-h="1350" onclick="setRatio(this,1080,1350)">📷 Insta 4:5</button>
+      </div>
       <canvas id="poster" width="1080" height="1080"></canvas>
     </div>
-
     <div class="controls">
-      <div class="ctrl-title">🎨 Customise</div>
-
-      <div class="ctrl-row">
-        <label>Theme</label>
+      <div class="ctrl-section">
+        <div class="ctrl-title">🎨 Theme (16 options)</div>
         <div class="theme-grid" id="themeGrid"></div>
       </div>
-
-      <div class="ctrl-row">
-        <label>Headline (1 line)</label>
-        <input id="ctlHeadline" type="text" maxlength="40" placeholder="Your shop tagline">
+      <div class="ctrl-section">
+        <div class="ctrl-title">✍ Text</div>
+        <div class="ctrl-row">
+          <label>Headline</label>
+          <input id="ctlHeadline" type="text" maxlength="40" placeholder="Shop name / tagline">
+        </div>
+        <div class="ctrl-row">
+          <label>Subtitle / USP</label>
+          <textarea id="ctlTag" rows="2" maxlength="120" placeholder="Free delivery · Bulk discount · Trusted"></textarea>
+        </div>
+        <div class="ctrl-row">
+          <label>Call-to-action</label>
+          <select id="ctlCTA">
+            <option value="scan">📱 Scan QR to visit shop</option>
+            <option value="call">📞 Call now</option>
+            <option value="visit">📍 Visit today</option>
+            <option value="review">⭐ Leave a review</option>
+            <option value="offer">🎁 Special offer inside</option>
+          </select>
+        </div>
       </div>
-
-      <div class="ctrl-row">
-        <label>Tagline (1-2 lines, optional)</label>
-        <textarea id="ctlTag" rows="2" maxlength="100" placeholder="Free home delivery · Bulk discount"></textarea>
+      <div class="ctrl-section">
+        <div class="ctrl-title">👁 Show / Hide</div>
+        <div class="toggle-grid">
+          <button class="toggle-btn on" data-tg="qr"><span class="tg-dot"></span>📱 QR Code</button>
+          <button class="toggle-btn on" data-tg="phone"><span class="tg-dot"></span>📞 Phone</button>
+          <button class="toggle-btn on" data-tg="owner"><span class="tg-dot"></span>👤 Owner</button>
+          <button class="toggle-btn" data-tg="rating"><span class="tg-dot"></span>⭐ Rating</button>
+          <button class="toggle-btn" data-tg="year"><span class="tg-dot"></span>📅 Since YYYY</button>
+          <button class="toggle-btn" data-tg="address"><span class="tg-dot"></span>📍 Address</button>
+          <button class="toggle-btn" data-tg="verified"><span class="tg-dot"></span>✓ Verified</button>
+          <button class="toggle-btn on" data-tg="pattern"><span class="tg-dot"></span>✨ Pattern</button>
+        </div>
       </div>
-
-      <button class="download-btn" onclick="downloadPoster()">⬇ Download Poster (PNG)</button>
+      <button class="download-btn" onclick="downloadPoster()">⬇ Download HD PNG</button>
       <button class="share-btn" onclick="sharePoster()">💬 Share on WhatsApp</button>
-
-      <div class="tip">
-        💡 <b>Pro tip:</b> Download → WhatsApp Status → All your customers + contacts see it once a day. Free marketing forever.
-      </div>
+      <button class="secondary-btn" onclick="downloadAllRatios()">📦 Download all 3 sizes</button>
+      <div class="tip">💡 <b>Pro tip:</b> Mix and match. Status for daily share, Story for Insta, Insta for feed. Try festival themes around Diwali/Holi — 2x engagement!</div>
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 let BIZ = null;
+let canvasW = 1080, canvasH = 1080;
+const STATE = {
+  toggles: { qr:true, phone:true, owner:true, rating:false, year:false, address:false, verified:false, pattern:true },
+  themeIdx: 0
+};
 const THEMES = [
-  { id:'orange', name:'Orange', from:'#FF6B1A', to:'#E55100', textColor:'#fff' },
-  { id:'blue',   name:'Blue',   from:'#1E40AF', to:'#0F172A', textColor:'#fff' },
-  { id:'green',  name:'Green',  from:'#16A34A', to:'#15803D', textColor:'#fff' },
-  { id:'purple', name:'Purple', from:'#7C3AED', to:'#4338CA', textColor:'#fff' },
-  { id:'diwali', name:'Diwali', from:'#FBBF24', to:'#DC2626', textColor:'#fff' },
-  { id:'dark',   name:'Dark',   from:'#0F172A', to:'#1F2937', textColor:'#FBBF24' }
+  { id:'orange',  name:'Orange',     from:'#FF6B1A', to:'#E55100', text:'#fff',    accent:'#FBBF24' },
+  { id:'royal',   name:'Royal Blue', from:'#1E40AF', to:'#0F172A', text:'#fff',    accent:'#FBBF24' },
+  { id:'green',   name:'Emerald',    from:'#16A34A', to:'#15803D', text:'#fff',    accent:'#FBBF24' },
+  { id:'purple',  name:'Purple',     from:'#7C3AED', to:'#4338CA', text:'#fff',    accent:'#FBBF24' },
+  { id:'diwali',  name:'Diwali',     from:'#FBBF24', to:'#DC2626', text:'#fff',    accent:'#FBBF24', fest:'diwali' },
+  { id:'holi',    name:'Holi',       from:'#EC4899', to:'#8B5CF6', text:'#fff',    accent:'#FBBF24', fest:'holi' },
+  { id:'lohri',   name:'Lohri',      from:'#DC2626', to:'#F97316', text:'#fff',    accent:'#FBBF24', fest:'lohri' },
+  { id:'india',   name:'Tricolor',   from:'#FF9933', to:'#138808', text:'#0F172A', accent:'#DC2626', fest:'india' },
+  { id:'sikh',    name:'Sikh',       from:'#F97316', to:'#0F172A', text:'#fff',    accent:'#FBBF24', fest:'sikh' },
+  { id:'xmas',    name:'Christmas',  from:'#15803D', to:'#DC2626', text:'#fff',    accent:'#FBBF24', fest:'xmas' },
+  { id:'pink',    name:'Pink',       from:'#EC4899', to:'#BE185D', text:'#fff',    accent:'#FBBF24' },
+  { id:'teal',    name:'Teal',       from:'#06B6D4', to:'#0E7490', text:'#fff',    accent:'#FBBF24' },
+  { id:'crimson', name:'Crimson',    from:'#DC2626', to:'#7F1D1D', text:'#fff',    accent:'#FBBF24' },
+  { id:'gold',    name:'Gold',       from:'#F59E0B', to:'#78350F', text:'#fff',    accent:'#FBBF24' },
+  { id:'dark',    name:'Onyx',       from:'#0F172A', to:'#1F2937', text:'#FBBF24', accent:'#FBBF24' },
+  { id:'navy',    name:'Midnight',   from:'#1E3A8A', to:'#312E81', text:'#fff',    accent:'#FBBF24' }
 ];
-let currentTheme = THEMES[0];
 
 async function load(){
   if (typeof ShopDB === 'undefined' || !ShopDB){
@@ -104,113 +156,232 @@ async function load(){
     if (!u || !u.data || !u.data.user){ window.location.href = '/panel/login.html?next=/panel/wa-poster.html'; return; }
     const uid = u.data.user.id;
     const { data: own } = await c.from('business_owners').select('business_id').eq('auth_user_id', uid).limit(1).maybeSingle();
-    if (!own){ document.getElementById('loading').innerHTML = '❌ No shop linked to your account. <a href="/register.html" style="color:#F59E0B">Register your shop →</a>'; return; }
-    const { data: biz } = await c.from('businesses').select('*').eq('id', own.business_id).maybeSingle();
+    if (!own){ document.getElementById('loading').innerHTML = '❌ No shop linked. <a href="/register.html" style="color:#FBBF24">Register your shop →</a>'; return; }
+    const { data: biz } = await c.from('businesses').select('*, geo_cities(name)').eq('id', own.business_id).maybeSingle();
     if (!biz){ document.getElementById('loading').textContent = 'Shop not found.'; return; }
     BIZ = biz;
+    if (Number(biz.rating_count) > 0) STATE.toggles.rating = true;
+    if (biz.established_year) STATE.toggles.year = true;
+    if (Number(biz.verified_score) >= 3) STATE.toggles.verified = true;
+    if (biz.pincode || biz.address_line1) STATE.toggles.address = true;
     setupUI();
   } catch(e){
     document.getElementById('loading').textContent = 'Error: ' + (e.message || e);
   }
 }
-
 function setupUI(){
   document.getElementById('loading').style.display = 'none';
   document.getElementById('main').style.display = '';
-
-  // Theme buttons
   const grid = document.getElementById('themeGrid');
   grid.innerHTML = THEMES.map((t, i) =>
-    `<button class="theme-btn${i === 0 ? ' active' : ''}" data-i="${i}" style="background:linear-gradient(135deg,${t.from},${t.to})" title="${t.name}"></button>`
+    '<button class="theme-btn' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" style="background:linear-gradient(135deg,' + t.from + ',' + t.to + ')" title="' + t.name + '"></button>'
   ).join('');
   grid.querySelectorAll('.theme-btn').forEach(b => {
     b.addEventListener('click', () => {
       grid.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
-      currentTheme = THEMES[Number(b.dataset.i)];
+      STATE.themeIdx = Number(b.dataset.i);
       render();
     });
   });
-
-  // Default headline + tagline from shop data
   document.getElementById('ctlHeadline').value = BIZ.name || 'My Shop';
   document.getElementById('ctlTag').value = BIZ.usp_text || 'Quality service · Fair pricing · Local trust';
   document.getElementById('ctlHeadline').addEventListener('input', render);
   document.getElementById('ctlTag').addEventListener('input', render);
-
+  document.getElementById('ctlCTA').addEventListener('change', render);
+  document.querySelectorAll('.toggle-btn').forEach(b => {
+    const key = b.dataset.tg;
+    if (STATE.toggles[key]) b.classList.add('on');
+    b.addEventListener('click', () => {
+      STATE.toggles[key] = !STATE.toggles[key];
+      b.classList.toggle('on');
+      render();
+    });
+  });
   render();
 }
-
+function setRatio(btn, w, h){
+  document.querySelectorAll('.ratio-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  canvasW = w; canvasH = h;
+  const canvas = document.getElementById('poster');
+  canvas.width = w; canvas.height = h;
+  render();
+}
 async function render(){
   const canvas = document.getElementById('poster');
   const ctx = canvas.getContext('2d');
-  const W = 1080, H = 1080;
-
-  // Background gradient
-  const grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, currentTheme.from);
-  grad.addColorStop(1, currentTheme.to);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Subtle decoration — circles
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  ctx.beginPath(); ctx.arc(900, 200, 180, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(150, 900, 220, 0, Math.PI * 2); ctx.fill();
-
-  // Top brand label
-  ctx.fillStyle = currentTheme.textColor;
-  ctx.font = '800 28px Manrope, sans-serif';
+  const W = canvasW, H = canvasH;
+  const theme = THEMES[STATE.themeIdx];
+  const isPortrait = H > W;
+  ctx.clearRect(0, 0, W, H);
+  if (theme.fest === 'india'){
+    ctx.fillStyle = '#FF9933'; ctx.fillRect(0, 0, W, H/3);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, H/3, W, H/3);
+    ctx.fillStyle = '#138808'; ctx.fillRect(0, 2*H/3, W, H/3);
+    ctx.strokeStyle = '#000080'; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.arc(W/2, H/2, 100, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 24; i++){
+      const ang = (i * Math.PI / 12);
+      ctx.beginPath();
+      ctx.moveTo(W/2, H/2);
+      ctx.lineTo(W/2 + Math.cos(ang) * 100, H/2 + Math.sin(ang) * 100);
+      ctx.stroke();
+    }
+  } else {
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, theme.from);
+    grad.addColorStop(1, theme.to);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (STATE.toggles.pattern && theme.fest !== 'india'){
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.beginPath(); ctx.arc(W * 0.9, H * 0.15, 180, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(W * 0.1, H * 0.85, 220, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    for (let i = 0; i < 30; i++){
+      ctx.beginPath(); ctx.arc(Math.random() * W, Math.random() * H, 2 + Math.random() * 4, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  if (STATE.toggles.pattern){
+    if (theme.fest === 'diwali'){
+      for (let i = 0; i < 8; i++){
+        const x = (W / 9) * (i + 1);
+        const y = H - 230;
+        ctx.fillStyle = '#FBBF24';
+        ctx.beginPath(); ctx.ellipse(x, y - 28, 8, 18, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#A16207';
+        ctx.beginPath(); ctx.moveTo(x - 22, y); ctx.quadraticCurveTo(x, y + 28, x + 22, y); ctx.fill();
+      }
+    } else if (theme.fest === 'holi'){
+      const colors = ['#EC4899', '#10B981', '#FBBF24', '#3B82F6', '#8B5CF6'];
+      for (let i = 0; i < 20; i++){
+        ctx.fillStyle = colors[i % colors.length] + 'aa';
+        ctx.beginPath();
+        ctx.arc(Math.random() * W, Math.random() * H, 20 + Math.random() * 40, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (theme.fest === 'lohri'){
+      ctx.fillStyle = '#FBBF24';
+      for (let i = 0; i < 40; i++){
+        ctx.beginPath(); ctx.arc(Math.random() * W, H * 0.5 + Math.random() * H * 0.5, 2 + Math.random() * 4, 0, Math.PI * 2); ctx.fill();
+      }
+    } else if (theme.fest === 'sikh'){
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.font = '120px Plus Jakarta Sans';
+      ctx.textAlign = 'center';
+      ctx.fillText('🪯', W * 0.85, H * 0.18);
+      ctx.fillText('🪯', W * 0.15, H * 0.85);
+    } else if (theme.fest === 'xmas'){
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < 30; i++){
+        ctx.beginPath(); ctx.arc(Math.random() * W, Math.random() * H, 3, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+  ctx.fillStyle = theme.text;
+  ctx.font = '800 30px Manrope, sans-serif';
   ctx.textAlign = 'left';
-  ctx.fillText('📍 DukanList', 60, 90);
+  ctx.fillText('📍 DukanList', 60, 80);
   ctx.font = '600 18px Plus Jakarta Sans, sans-serif';
-  ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
-  ctx.fillText('Sirsa–Bathinda local directory', 60, 120);
-
-  // Shop name (huge headline)
+  ctx.fillStyle = theme.text === '#fff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
+  ctx.fillText('Sirsa–Bathinda local directory', 60, 110);
+  if (STATE.toggles.verified && Number(BIZ.verified_score) >= 1){
+    const tier = Number(BIZ.verified_score) >= 5 ? 'GOLD' : (Number(BIZ.verified_score) >= 3 ? 'SILVER' : 'BRONZE');
+    const tierColor = tier === 'GOLD' ? '#FBBF24' : (tier === 'SILVER' ? '#94A3B8' : '#A16207');
+    ctx.fillStyle = tierColor;
+    roundRect(ctx, W - 240, 55, 180, 56, 28); ctx.fill();
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '900 22px Manrope, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✓ ' + tier, W - 150, 92);
+  }
   const headline = document.getElementById('ctlHeadline').value || BIZ.name || 'My Shop';
-  ctx.fillStyle = currentTheme.textColor;
-  ctx.font = '900 78px Manrope, sans-serif';
+  ctx.fillStyle = theme.text;
+  const headlineY = isPortrait ? H * 0.28 : 360;
+  const headlineSize = isPortrait ? 96 : 84;
+  ctx.font = '900 ' + headlineSize + 'px Manrope, sans-serif';
   ctx.textAlign = 'center';
-  wrapText(ctx, headline, W/2, 360, 920, 92);
-
-  // Tagline
+  wrapText(ctx, headline, W/2, headlineY, W - 80, headlineSize * 1.15);
   const tag = document.getElementById('ctlTag').value || '';
   if (tag){
-    ctx.font = '600 36px Plus Jakarta Sans, sans-serif';
-    ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.9)' : 'rgba(15,23,42,0.85)';
-    wrapText(ctx, tag, W/2, 540, 880, 50);
+    ctx.font = '600 40px Plus Jakarta Sans, sans-serif';
+    ctx.fillStyle = theme.text === '#fff' ? 'rgba(255,255,255,0.92)' : 'rgba(15,23,42,0.88)';
+    wrapText(ctx, tag, W/2, headlineY + (isPortrait ? 220 : 180), W - 120, 56);
   }
-
-  // Owner name
-  if (BIZ.owner_name){
-    ctx.font = '700 30px Plus Jakarta Sans, sans-serif';
-    ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.75)' : 'rgba(15,23,42,0.7)';
-    ctx.fillText('— ' + BIZ.owner_name, W/2, 680);
+  let infoY = isPortrait ? H * 0.52 : 660;
+  if (STATE.toggles.rating && Number(BIZ.rating_avg) > 0){
+    ctx.fillStyle = theme.accent;
+    ctx.font = '900 38px Manrope, sans-serif';
+    ctx.textAlign = 'center';
+    const stars = '★★★★★'.slice(0, Math.round(Number(BIZ.rating_avg)));
+    ctx.fillText(stars + '  ' + Number(BIZ.rating_avg).toFixed(1) + '/5  (' + (BIZ.rating_count || 0) + ' reviews)', W/2, infoY);
+    infoY += 50;
   }
-
-  // QR Code
-  const url = window.location.origin + '/business.html?slug=' + encodeURIComponent(BIZ.slug || '');
-  try {
-    const qrCanvas = document.createElement('canvas');
-    await QRCode.toCanvas(qrCanvas, url, { width: 280, margin: 2, color: { dark: '#0F172A', light: '#FFFFFF' } });
-    // White rounded card behind QR
-    ctx.fillStyle = '#fff';
-    roundRect(ctx, W/2 - 160, 760, 320, 320, 24);
-    ctx.fill();
-    ctx.drawImage(qrCanvas, W/2 - 140, 780, 280, 280);
-  } catch(_){}
-
-  // Bottom CTA
-  ctx.fillStyle = currentTheme.textColor;
-  ctx.font = '800 32px Manrope, sans-serif';
+  if (STATE.toggles.owner && BIZ.owner_name){
+    ctx.font = '700 32px Plus Jakarta Sans, sans-serif';
+    ctx.fillStyle = theme.text === '#fff' ? 'rgba(255,255,255,0.78)' : 'rgba(15,23,42,0.72)';
+    ctx.fillText('— ' + BIZ.owner_name, W/2, infoY);
+    infoY += 46;
+  }
+  if (STATE.toggles.year && BIZ.established_year){
+    const yrs = new Date().getFullYear() - BIZ.established_year;
+    ctx.font = '800 30px Manrope, sans-serif';
+    ctx.fillStyle = theme.accent;
+    ctx.fillText('🏛 Since ' + BIZ.established_year + ' · ' + yrs + ' years serving', W/2, infoY);
+    infoY += 46;
+  }
+  if (STATE.toggles.address){
+    const cityName = (BIZ.geo_cities && BIZ.geo_cities.name) || '';
+    const parts = [];
+    if (BIZ.address_line1) parts.push(BIZ.address_line1);
+    if (cityName) parts.push(cityName);
+    if (BIZ.pincode) parts.push('PIN ' + BIZ.pincode);
+    const addr = parts.join(' · ');
+    if (addr){
+      ctx.font = '600 26px Plus Jakarta Sans, sans-serif';
+      ctx.fillStyle = theme.text === '#fff' ? 'rgba(255,255,255,0.75)' : 'rgba(15,23,42,0.7)';
+      wrapText(ctx, '📍 ' + addr, W/2, infoY, W - 120, 36);
+      infoY += 56;
+    }
+  }
+  if (STATE.toggles.phone && BIZ.mobile){
+    const phone = (BIZ.mobile || '').replace(/^91/, '');
+    ctx.fillStyle = theme.accent;
+    ctx.font = '900 44px Manrope, sans-serif';
+    ctx.fillText('📞 +91 ' + phone, W/2, infoY);
+    infoY += 60;
+  }
+  if (STATE.toggles.qr){
+    const url = window.location.origin + '/' + (BIZ.slug || '');
+    try {
+      const qrCanvas = document.createElement('canvas');
+      const qrSize = isPortrait ? 320 : 280;
+      await QRCode.toCanvas(qrCanvas, url, { width: qrSize, margin: 2, color: { dark: '#0F172A', light: '#FFFFFF' } });
+      const qrX = W/2 - qrSize/2 - 20;
+      const qrY = H - qrSize - 130;
+      ctx.fillStyle = '#fff';
+      roundRect(ctx, qrX, qrY, qrSize + 40, qrSize + 40, 24); ctx.fill();
+      ctx.drawImage(qrCanvas, qrX + 20, qrY + 20, qrSize, qrSize);
+    } catch(_){}
+  }
+  const ctaOption = document.getElementById('ctlCTA').value;
+  const ctaText = {
+    scan: '📱 Scan QR · Visit · Review',
+    call: '📞 Call now — we answer fast',
+    visit: '📍 Visit us today — easy to find',
+    review: '⭐ Leave a 5-star review',
+    offer: '🎁 Special offer inside — visit now'
+  }[ctaOption];
+  ctx.fillStyle = theme.text;
+  ctx.font = '800 36px Manrope, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('📞 Scan to call · Visit · Review', W/2, 1010);
-  ctx.font = '600 22px Plus Jakarta Sans, sans-serif';
-  ctx.fillStyle = currentTheme.textColor === '#fff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
-  ctx.fillText('dukanlist.com', W/2, 1045);
+  ctx.fillText(ctaText, W/2, H - 80);
+  ctx.font = '600 24px Plus Jakarta Sans, sans-serif';
+  ctx.fillStyle = theme.text === '#fff' ? 'rgba(255,255,255,0.65)' : 'rgba(15,23,42,0.6)';
+  ctx.fillText('dukanlist.com', W/2, H - 38);
 }
-
 function wrapText(ctx, text, x, y, maxW, lineH){
   const words = String(text).split(' ');
   let line = '';
@@ -220,15 +391,12 @@ function wrapText(ctx, text, x, y, maxW, lineH){
     if (ctx.measureText(test).width > maxW && line){
       lines.push(line.trim());
       line = words[i] + ' ';
-    } else {
-      line = test;
-    }
+    } else { line = test; }
   }
   if (line.trim()) lines.push(line.trim());
   const startY = y - ((lines.length - 1) * lineH) / 2;
   lines.forEach((ln, i) => ctx.fillText(ln, x, startY + i * lineH));
 }
-
 function roundRect(ctx, x, y, w, h, r){
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -238,16 +406,30 @@ function roundRect(ctx, x, y, w, h, r){
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
-
 function downloadPoster(){
   const canvas = document.getElementById('poster');
   const url = canvas.toDataURL('image/png');
   const a = document.createElement('a');
+  const ratio = canvasW === canvasH ? 'status' : (canvasH > canvasW ? 'story' : 'insta');
   a.href = url;
-  a.download = 'dukanlist-' + (BIZ.slug || 'shop') + '-status.png';
+  a.download = 'dukanlist-' + (BIZ.slug || 'shop') + '-' + ratio + '.png';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
-
+async function downloadAllRatios(){
+  const ratios = [{w:1080,h:1080,name:'status'},{w:1080,h:1920,name:'story'},{w:1080,h:1350,name:'insta'}];
+  for (const r of ratios){
+    canvasW = r.w; canvasH = r.h;
+    const canvas = document.getElementById('poster');
+    canvas.width = r.w; canvas.height = r.h;
+    await render();
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dukanlist-' + (BIZ.slug || 'shop') + '-' + r.name + '.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    await new Promise(r => setTimeout(r, 400));
+  }
+}
 function sharePoster(){
   const canvas = document.getElementById('poster');
   canvas.toBlob(blob => {
@@ -255,11 +437,10 @@ function sharePoster(){
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'poster.png', { type: 'image/png' })] })){
       navigator.share({
         files: [new File([blob], 'dukanlist-status.png', { type: 'image/png' })],
-        title: BIZ.name + ' — DukanList',
+        title: (BIZ.name || 'My shop') + ' — DukanList',
         text: 'Find us on DukanList: ' + window.location.origin + '/' + (BIZ.slug || '')
-      });
+      }).catch(() => {});
     } else {
-      // Fallback: download + open WhatsApp
       downloadPoster();
       setTimeout(() => {
         const shopUrl = window.location.origin + '/' + (BIZ.slug || '');
@@ -268,10 +449,8 @@ function sharePoster(){
     }
   }, 'image/png');
 }
-
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
 else load();
 </script>
-
 </body>
 </html>
