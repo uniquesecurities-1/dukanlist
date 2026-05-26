@@ -679,6 +679,32 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 </section>
 
 <!-- ===== MMT-style category strip ===== -->
+<!-- ===== TRENDING SEARCHES ===== -->
+<section id="trendingSearches" style="max-width:1180px;margin:0 auto 28px;padding:0 20px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="font-size:.84rem;font-weight:800;color:#0F172A;letter-spacing:.02em">🔥 <span data-i18n-en>Trending in your area</span><span data-i18n-hi>आपके इलाके में ट्रेंडिंग</span></span>
+    <span style="font-size:.74rem;color:var(--muted)" id="trendingSubtitle"><span data-i18n-en>What people search most</span><span data-i18n-hi>लोग सबसे ज़्यादा क्या खोजते हैं</span></span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    <a href="/search.html?q=doctor" class="trend-chip">🏥 <span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></a>
+    <a href="/search.html?q=medical+store" class="trend-chip">💊 <span data-i18n-en>Pharmacy</span><span data-i18n-hi>दवाई</span></a>
+    <a href="/search.html?cat=agri-business" class="trend-chip">🌾 <span data-i18n-en>Agri Shops</span><span data-i18n-hi>कृषि शॉप</span></a>
+    <a href="/search.html?q=tractor" class="trend-chip">🚜 <span data-i18n-en>Tractor Parts</span><span data-i18n-hi>ट्रैक्टर पार्ट्स</span></a>
+    <a href="/search.html?q=mechanic" class="trend-chip">🔧 <span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span></a>
+    <a href="/search.html?q=electrician" class="trend-chip">⚡ <span data-i18n-en>Electrician</span><span data-i18n-hi>बिजली मिस्त्री</span></a>
+    <a href="/search.html?q=mobile+shop" class="trend-chip">📱 <span data-i18n-en>Mobile Shop</span><span data-i18n-hi>मोबाइल शॉप</span></a>
+    <a href="/search.html?q=salon" class="trend-chip">💇 <span data-i18n-en>Salon</span><span data-i18n-hi>सैलून</span></a>
+    <a href="/search.html?q=grocery" class="trend-chip">🛒 <span data-i18n-en>Kirana</span><span data-i18n-hi>किराना</span></a>
+    <a href="/search.html?q=clothes+tailor" class="trend-chip">👕 <span data-i18n-en>Clothes / Tailor</span><span data-i18n-hi>कपड़े / दर्जी</span></a>
+    <a href="/search.html?q=mutual+fund" class="trend-chip">📊 <span data-i18n-en>Mutual Fund</span><span data-i18n-hi>म्यूचुअल फंड</span></a>
+    <a href="/search.html?cat=community-social" class="trend-chip">🏛️ <span data-i18n-en>Community</span><span data-i18n-hi>समुदाय</span></a>
+  </div>
+  <style>
+    .trend-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #E2E8F0;color:#0F172A;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.15s;font-family:inherit}
+    .trend-chip:hover{background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C;color:#9A3412;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,0.15);text-decoration:none}
+  </style>
+</section>
+
 <section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
   <div style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:18px 8px;box-shadow:0 1px 3px rgba(15,23,42,.04)">
     <div id="catStripScroll" style="display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
@@ -896,6 +922,30 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
         💬 <span data-i18n-en>Tell us on WhatsApp</span><span data-i18n-hi>WhatsApp पर बताएं</span>
       </a>
     </div>
+  </div>
+</section>
+
+<!-- ===== FEATURED SHOP OF THE WEEK ===== -->
+<section id="fsotw" style="background:linear-gradient(180deg,#FFF7ED 0%,#FFFFFF 100%);padding:50px 0;display:none">
+  <div class="section-head reveal">
+    <span class="eyebrow" style="color:#E55100">⭐ <span data-i18n-en>Featured Shop of the Week</span><span data-i18n-hi>हफ़्ते का चुना हुआ शॉप</span></span>
+    <h2><span data-i18n-en id="fsotwH2">Spotlight on a local legend</span><span data-i18n-hi>स्थानीय legend पर रोशनी</span></h2>
+    <p><span data-i18n-en>Hand-picked weekly. Top-rated, photo-rich, customer-loved shops from our directory.</span><span data-i18n-hi>हर हफ़्ते हाथ से चुना — टॉप rated, photo-rich, customer-loved shops।</span></p>
+  </div>
+  <div class="cats-wrap" style="max-width:920px;margin:0 auto;padding:0 16px">
+    <div id="fsotwCard" style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 12px 36px rgba(15,23,42,0.08);border:1px solid #FED7AA"></div>
+  </div>
+</section>
+
+<!-- ===== CUSTOMER TESTIMONIALS ===== -->
+<section id="custTest" style="background:linear-gradient(180deg,#F0FDF4 0%,#FFFFFF 100%);padding:50px 0;display:none">
+  <div class="section-head reveal">
+    <span class="eyebrow" style="color:#15803D">💬 <span data-i18n-en>Real Customer Voices</span><span data-i18n-hi>असली ग्राहक की आवाज़</span></span>
+    <h2><span data-i18n-en>5-star reviews from local shoppers</span><span data-i18n-hi>स्थानीय ग्राहकों के 5-star रिव्यू</span></h2>
+    <p><span data-i18n-en>Real reviews from real customers across our directory.</span><span data-i18n-hi>हमारे directory के असली रिव्यू।</span></p>
+  </div>
+  <div class="cats-wrap" style="max-width:1180px;margin:0 auto;padding:0 16px">
+    <div id="custTestGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px"></div>
   </div>
 </section>
 
@@ -1435,5 +1485,170 @@ if (window.DukanPTR){
 </script>
 
 <script src="/assets/js/city-persist.js"></script>
+
+<!-- ===== LOCALITY SELECTOR (first-visit modal) ===== -->
+<div id="localityModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:10001;align-items:center;justify-content:center;padding:20px;animation:locFade .3s ease-out">
+  <div style="background:#fff;border-radius:20px;max-width:520px;width:100%;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:locSlide .3s ease-out">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:2.6rem;margin-bottom:8px">📍</div>
+      <h2 style="font-size:1.4rem;font-weight:900;color:#0F172A;margin-bottom:6px;letter-spacing:-.01em;font-family:'Manrope',sans-serif">
+        <span data-i18n-en>Pick your area</span><span data-i18n-hi>अपना इलाका चुनें</span>
+      </h2>
+      <p style="font-size:.86rem;color:#64748b;line-height:1.5">
+        <span data-i18n-en>Get shops and services near you. You can change this anytime.</span>
+        <span data-i18n-hi>अपने पास की shops देखें। कभी भी बदल सकते हैं।</span>
+      </p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">
+      <button onclick="pickLocality('mandi-dabwali','Mandi Dabwali')" class="loc-btn">🏪 Mandi Dabwali</button>
+      <button onclick="pickLocality('sirsa','Sirsa')" class="loc-btn">🏪 Sirsa</button>
+      <button onclick="pickLocality('bathinda','Bathinda')" class="loc-btn">🏪 Bathinda</button>
+      <button onclick="pickLocality('goniana','Goniana')" class="loc-btn">🏪 Goniana</button>
+      <button onclick="pickLocality('rori','Rori')" class="loc-btn">🏪 Rori</button>
+      <button onclick="pickLocality('kalanwali','Kalanwali')" class="loc-btn">🏪 Kalanwali</button>
+    </div>
+    <button onclick="pickLocality('all','All of Sirsa-Bathinda')" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3)">
+      🌐 <span data-i18n-en>Show me ALL shops</span><span data-i18n-hi>सभी shops दिखाओ</span>
+    </button>
+  </div>
+  <style>
+    @keyframes locFade{from{opacity:0}to{opacity:1}}
+    @keyframes locSlide{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .loc-btn{background:#FFF7ED;border:1.5px dashed #FB923C;color:#9A3412;padding:13px 8px;border-radius:11px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.86rem;transition:.15s}
+    .loc-btn:hover{background:linear-gradient(135deg,#FED7AA,#FFEDD5);border-style:solid;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,0.18)}
+  </style>
+</div>
+
+<script>
+// ============= LOCALITY SELECTOR =============
+(function(){
+  function showLocalityModal(){
+    document.getElementById('localityModal').style.display = 'flex';
+  }
+  window.pickLocality = function(slug, name){
+    try { localStorage.setItem('dl_locality_v1', JSON.stringify({ slug, name, picked_at: Date.now() })); } catch(_){}
+    document.getElementById('localityModal').style.display = 'none';
+    // Optional: redirect to search filtered by locality (for non-"all")
+    if (slug !== 'all'){
+      // Soft refresh — let homepage re-personalise (future enhancement)
+      // For now we just store it; site already shows Sirsa-Bathinda only.
+    }
+  };
+  // Show on first visit only
+  try {
+    const stored = localStorage.getItem('dl_locality_v1');
+    if (!stored){
+      // Slight delay so users see hero first
+      setTimeout(showLocalityModal, 2200);
+    }
+  } catch(_){}
+  // Expose for "Change locality" link
+  window.openLocalityPicker = showLocalityModal;
+})();
+
+// ============= FEATURED SHOP OF THE WEEK + TESTIMONIALS (loads after main render) =============
+(function(){
+  async function loadFSOTW(){
+    try {
+      if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+      const c = ShopDB.client;
+      // Fetch top featured shop OR top-rated fallback
+      const nowIso = new Date().toISOString();
+      let { data, error } = await c.from('businesses')
+        .select('id,slug,name,owner_name,usp_text,photos,rating_avg,rating_count,verified_score,city_id,geo_cities(name)')
+        .eq('status', 'active')
+        .gt('featured_until', nowIso)
+        .order('rating_avg', { ascending: false })
+        .order('rating_count', { ascending: false })
+        .limit(1);
+      if (error || !data || data.length === 0){
+        // Fallback: top-rated overall
+        const fb = await c.from('businesses')
+          .select('id,slug,name,owner_name,usp_text,photos,rating_avg,rating_count,verified_score,city_id,geo_cities(name)')
+          .eq('status', 'active')
+          .gte('rating_count', 1)
+          .order('rating_avg', { ascending: false })
+          .order('rating_count', { ascending: false })
+          .limit(1);
+        data = fb.data;
+      }
+      if (!data || data.length === 0) return;
+      const b = data[0];
+      const photo = (b.photos && b.photos[0]) || null;
+      const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+      const cityName = (b.geo_cities && b.geo_cities.name) || '';
+      const html = `
+        <div style="display:grid;grid-template-columns:${photo ? '1fr 1fr' : '1fr'};gap:0">
+          ${photo ? `<div style="background:#f8fafc;min-height:280px"><img src="${photo}" alt="${escapeAttr(b.name)}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : ''}
+          <div style="padding:30px 26px;display:flex;flex-direction:column;justify-content:center">
+            <span style="font-size:.72rem;font-weight:800;color:#E55100;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">⭐ ${lang === 'hi' ? 'इस हफ़्ते का चुना हुआ' : 'Featured this week'}</span>
+            <h3 style="font-size:1.65rem;font-weight:900;color:#0F172A;margin-bottom:6px;letter-spacing:-.015em;font-family:'Manrope',sans-serif">${escapeHtml(b.name)}</h3>
+            ${b.owner_name ? `<div style="font-size:.86rem;color:#64748b;margin-bottom:10px">${lang === 'hi' ? 'मालिक' : 'Owner'}: <b>${escapeHtml(b.owner_name)}</b>${cityName ? ' · ' + escapeHtml(cityName) : ''}</div>` : ''}
+            ${b.usp_text ? `<p style="font-size:.92rem;color:#475569;line-height:1.55;margin-bottom:14px;font-style:italic">"${escapeHtml(b.usp_text)}"</p>` : ''}
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+              ${b.rating_avg ? `<span style="background:#FEF3C7;color:#92400E;padding:5px 10px;border-radius:8px;font-weight:800;font-size:.86rem">⭐ ${Number(b.rating_avg).toFixed(1)}</span>` : ''}
+              ${b.rating_count ? `<span style="font-size:.78rem;color:#64748b">${b.rating_count} ${lang === 'hi' ? 'रिव्यू' : 'reviews'}</span>` : ''}
+              ${Number(b.verified_score) >= 3 ? `<span style="background:#94a3b8;color:#fff;padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:800">${Number(b.verified_score) >= 5 ? 'GOLD' : 'SILVER'} ✓</span>` : ''}
+            </div>
+            <a href="/${b.slug}" style="display:inline-block;background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;padding:12px 22px;border-radius:11px;font-weight:800;text-decoration:none;text-align:center;font-size:.92rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3);align-self:flex-start">
+              ${lang === 'hi' ? 'दुकान देखें' : 'Visit Shop'} →
+            </a>
+          </div>
+        </div>
+      `;
+      document.getElementById('fsotwCard').innerHTML = html;
+      document.getElementById('fsotw').style.display = '';
+    } catch(e){ console.warn('FSOTW load:', e); }
+  }
+
+  async function loadTestimonials(){
+    try {
+      if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+      const c = ShopDB.client;
+      const { data, error } = await c.from('reviews')
+        .select('id,customer_name,rating,text,created_at,businesses!inner(name,slug,status)')
+        .eq('status', 'active')
+        .gte('rating', 4)
+        .not('text', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (error || !data) return;
+      // Filter out reviews with very short or missing text + status check on biz
+      const good = data.filter(r => r.text && r.text.trim().length >= 30 && r.businesses && r.businesses.status === 'active').slice(0, 6);
+      if (good.length === 0) return;
+      const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+      const html = good.map(r => {
+        const stars = '⭐'.repeat(r.rating);
+        const text = r.text.length > 220 ? r.text.slice(0, 220) + '…' : r.text;
+        return `
+          <div style="background:#fff;border:1px solid #BBF7D0;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(34,197,94,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:.96rem">${stars}</div>
+            <p style="font-size:.88rem;color:#0F172A;line-height:1.5;margin:0;font-style:italic">"${escapeHtml(text)}"</p>
+            <div style="margin-top:auto;padding-top:8px;border-top:1px dashed #BBF7D0;display:flex;justify-content:space-between;align-items:center;font-size:.78rem">
+              <span style="color:#475569;font-weight:700">${escapeHtml(r.customer_name || (lang === 'hi' ? 'गुमनाम ग्राहक' : 'Anonymous customer'))}</span>
+              <a href="/${r.businesses.slug}" style="color:#15803D;text-decoration:none;font-weight:800">${escapeHtml(r.businesses.name)} →</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('custTestGrid').innerHTML = html;
+      document.getElementById('custTest').style.display = '';
+    } catch(e){ console.warn('Testimonials load:', e); }
+  }
+
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[ch]));
+  }
+  function escapeAttr(s){ return escapeHtml(s); }
+
+  // Load after main page render (don't block hero)
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); });
+  } else { setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); }
+})();
+</script>
+
 </body>
 </html>
