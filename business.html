@@ -892,6 +892,45 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <h3>❓ <span data-i18n-en>Frequently Asked Questions</span><span data-i18n-hi>आम सवाल-जवाब</span></h3>
         <div id="faqList" class="faq-acc"></div>
       </div>
+
+      <!-- ALWAYS-ON FALLBACK CARDS (fill desktop right column when other cards are empty) -->
+
+      <!-- Share & Spread card -->
+      <div class="card-pill share-card" style="margin-top:18px;background:linear-gradient(135deg,#FFFAF5,#FFF7ED);border-left:3px solid #FB923C">
+        <h3 style="color:#9A3412">📣 <span data-i18n-en>Like this shop? Spread the word</span><span data-i18n-hi>दुकान पसंद आई? दूसरों को बताएं</span></h3>
+        <p style="font-size:.86rem;color:#7C2D12;margin-bottom:12px;line-height:1.5"><span data-i18n-en>One share helps a local shopkeeper get 5–10 new customers. Free, takes 2 seconds.</span><span data-i18n-hi>एक share से एक स्थानीय दुकानदार को 5–10 नए customers मिलते हैं। फ्री है, 2 second लगते हैं।</span></p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <a id="rcShareWa" target="_blank" rel="noopener" style="background:#25D366;color:#fff;padding:10px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem">💬 WhatsApp</a>
+          <button onclick="copyShopUrl()" style="background:#0F172A;color:#fff;border:none;padding:10px;border-radius:9px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.86rem">🔗 Copy Link</button>
+        </div>
+      </div>
+
+      <!-- "Are you the owner?" claim card -->
+      <div class="card-pill" style="margin-top:18px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-left:3px solid #1E40AF">
+        <h3 style="color:#1E3A8A">🏪 <span data-i18n-en>Are you the owner of this shop?</span><span data-i18n-hi>क्या आप इस दुकान के मालिक हैं?</span></h3>
+        <p style="font-size:.86rem;color:#1E3A8A;margin-bottom:12px;line-height:1.5"><span data-i18n-en>Claim this listing. Add photos, hours, services & start getting customers via WhatsApp.</span><span data-i18n-hi>इस listing को claim करें। फोटो, समय, सेवाएं जोड़ें — WhatsApp पर customers पाएं।</span></p>
+        <a href="/panel/login.html" style="display:block;background:#1E40AF;color:#fff;padding:11px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem">
+          <span data-i18n-en>Claim & Manage →</span><span data-i18n-hi>Claim करें →</span>
+        </a>
+      </div>
+
+      <!-- Register CTA card (for visitors who run their own shops) -->
+      <div class="card-pill" style="margin-top:18px;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-left:3px solid #15803D">
+        <h3 style="color:#14532D">🎁 <span data-i18n-en>Your shop deserves a free listing too</span><span data-i18n-hi>आपकी दुकान भी मुफ्त listed होनी चाहिए</span></h3>
+        <p style="font-size:.86rem;color:#14532D;margin-bottom:12px;line-height:1.5"><span data-i18n-en>FREE forever • Verified by us • Sirsa–Bathinda customers daily</span><span data-i18n-hi>हमेशा FREE • हमारे द्वारा वेरिफाइड • रोज़ Sirsa–Bathinda के customers</span></p>
+        <a href="/register.html" style="display:block;background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;padding:11px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem;box-shadow:0 4px 12px rgba(255,107,26,0.3)">
+          <span data-i18n-en>+ Register Your Shop FREE</span><span data-i18n-hi>+ अपनी दुकान FREE list करें</span>
+        </a>
+      </div>
+
+      <!-- Browse more in this category -->
+      <div class="card-pill" id="moreInCatCard" style="margin-top:18px;display:none;background:linear-gradient(135deg,#FAF5FF,#F3E8FF);border-left:3px solid #7C3AED">
+        <h3 style="color:#5B21B6">🔍 <span data-i18n-en>Browse more like this</span><span data-i18n-hi>ऐसी और देखें</span></h3>
+        <p style="font-size:.86rem;color:#5B21B6;margin-bottom:12px;line-height:1.5"><span id="moreInCatDesc"></span></p>
+        <a id="moreInCatLink" href="#" style="display:block;background:#7C3AED;color:#fff;padding:11px;border-radius:9px;font-weight:700;text-decoration:none;text-align:center;font-size:.86rem">
+          <span data-i18n-en>View all →</span><span data-i18n-hi>सभी देखें →</span>
+        </a>
+      </div>
     </div>
 
   </div>
@@ -2491,6 +2530,29 @@ function renderShopHighlights(b){
   const shareText = encodeURIComponent('Check out '+(b.name||'this shop')+' on DukanList \u2014 ' + url);
   document.getElementById('shShareWa').href = 'https://wa.me/?text=' + shareText;
   document.getElementById('shShareFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+
+  // Wire the right-column share card too
+  const rcSh = document.getElementById('rcShareWa');
+  if (rcSh) rcSh.href = 'https://wa.me/?text=' + shareText;
+
+  // Populate "Browse more in this category" card
+  try {
+    const moreCard = document.getElementById('moreInCatCard');
+    const moreLink = document.getElementById('moreInCatLink');
+    const moreDesc = document.getElementById('moreInCatDesc');
+    const catName = (b.categories && b.categories.name) || '';
+    const catSlug = (b.categories && b.categories.slug) || '';
+    if (moreCard && moreLink && catSlug){
+      moreLink.href = '/search.html?cat=' + encodeURIComponent(catSlug);
+      if (moreDesc){
+        const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+        moreDesc.textContent = lang === 'hi'
+          ? 'अन्य ' + (catName || 'shops') + ' देखें — सभी verified'
+          : 'See other ' + (catName || 'shops') + ' — all verified';
+      }
+      moreCard.style.display = '';
+    }
+  } catch(_){}
 
   host.style.display = '';
 }
