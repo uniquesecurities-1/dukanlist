@@ -34,6 +34,15 @@
 .shop-highlights .sh-tile.verify{ background:#ECFDF5; color:#065F46 }
 .shop-highlights .sh-tile.years{ background:#EFF6FF; color:#1E40AF }
 .shop-highlights .sh-tile.open{ background:#FEF3C7; color:#92400E }
+.shop-trust-card{ margin-top:14px; background:linear-gradient(135deg,#F0FDF4,#DCFCE7); border:1px solid #BBF7D0; border-left:3px solid #16A34A; border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(15,23,42,.04) }
+.shop-trust-card .stc-title{ font-family:'Manrope',sans-serif; font-size:1rem; font-weight:800; color:#15803D; letter-spacing:-.01em; margin-bottom:12px; display:flex; align-items:center; gap:6px }
+.shop-trust-card .stc-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px }
+.shop-trust-card .stc-list li{ display:flex; gap:10px; align-items:flex-start; font-size:.84rem; color:#14532D; line-height:1.4 }
+.shop-trust-card .stc-list .stc-ico{ flex-shrink:0; width:22px; height:22px; border-radius:50%; background:#16A34A; color:#fff; display:grid; place-items:center; font-size:.74rem; font-weight:900 }
+.shop-trust-card .stc-list b{ font-weight:800; color:#14532D; font-size:.86rem }
+.shop-trust-card .stc-list .stc-sub{ font-size:.74rem; color:#15803D; opacity:.85; font-weight:600 }
+.shop-trust-card .stc-foot{ margin-top:14px; padding-top:12px; border-top:1px dashed #BBF7D0; font-size:.74rem; color:#15803D; text-align:center }
+.shop-trust-card .stc-foot a{ color:#15803D; font-weight:800; text-decoration:underline }
 
 /* === Public deals card (business detail page) === */
 .deals-card{ background:linear-gradient(135deg,#FEF2F2 0%,#FFE4E6 100%); border:1.5px solid #FCA5A5 !important; border-left:4px solid #DC2626 !important }
@@ -746,6 +755,20 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
                 <a id="shShareFb" target="_blank" rel="noopener" class="sh-share-btn sh-fb">📘 Facebook</a>
                 <button class="sh-share-btn sh-copy" onclick="copyShopUrl()">🔗 Copy link</button>
               </div>
+            </div>
+          </div>
+          <!-- Customer Confidence Card — fills desktop left column with trust signals -->
+          <div class="shop-trust-card" id="shopTrustCard">
+            <div class="stc-title">🛡️ <span data-i18n-en>Why this listing is trustworthy</span><span data-i18n-hi>यह लिस्टिंग भरोसेमंद क्यों है</span></div>
+            <ul class="stc-list">
+              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Admin verified</b><b data-i18n-hi>एडमिन वेरिफाइड</b><br><span class="stc-sub" data-i18n-en>Personally checked by DukanList team</span><span class="stc-sub" data-i18n-hi>DukanList टीम द्वारा जांचा गया</span></span></li>
+              <li><span class="stc-ico">✓</span><span><b data-i18n-en>100% FREE listing</b><b data-i18n-hi>100% मुफ्त लिस्टिंग</b><br><span class="stc-sub" data-i18n-en>No paid rankings, no commission</span><span class="stc-sub" data-i18n-hi>कोई paid ranking नहीं, कोई commission नहीं</span></span></li>
+              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Owner-managed profile</b><b data-i18n-hi>मालिक द्वारा संचालित</b><br><span class="stc-sub" data-i18n-en>Real shopkeeper, real updates</span><span class="stc-sub" data-i18n-hi>असली दुकानदार, असली अपडेट</span></span></li>
+              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Sirsa\u2013Bathinda local</b><b data-i18n-hi>स्थानीय Sirsa\u2013Bathinda</b><br><span class="stc-sub" data-i18n-en>Built for our 2 districts only \u2014 no national spam</span><span class="stc-sub" data-i18n-hi>केवल 2 जिलों के लिए \u2014 कोई national spam नहीं</span></span></li>
+            </ul>
+            <div class="stc-foot">
+              <span data-i18n-en>Got a concern? <a href="#" onclick="document.getElementById(\'reportModal\').classList.add(\'open\');return false">Report this listing</a></span>
+              <span data-i18n-hi>कुछ गलत लगा? <a href="#" onclick="document.getElementById(\'reportModal\').classList.add(\'open\');return false">रिपोर्ट करें</a></span>
             </div>
           </div>
         </div>
@@ -2392,24 +2415,41 @@ function renderShopHighlights(b){
   if (!host || !grid) return;
   const tiles = [];
 
-  // Note: 'DukanList verified' is already shown as the big Admin Verified
-  // banner above the highlights card — no need to duplicate it here.
+  // Always-shown tiles ensure left column never looks empty on desktop
 
+  // Tile 1: Established year (real data if provided, else "Listed since" from created_at)
   if (b.established_year && b.established_year > 1900){
     const years = new Date().getFullYear() - b.established_year;
     tiles.push({cls:'years', emoji:'\ud83d\udcc5', main:'Since '+b.established_year, sub:(years>=1?years+' years serving':'New shop')});
+  } else if (b.created_at){
+    const d = new Date(b.created_at);
+    const m = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+    tiles.push({cls:'years', emoji:'\ud83d\udcc5', main:'Listed '+m, sub:'On DukanList'});
   }
 
+  // Tile 2: Open/closed status if hours set, else WhatsApp readiness
   if (b.hours_json && typeof getOpenStatus === 'function'){
     const st = getOpenStatus(b.hours_json);
     if (st){
       tiles.push({cls:'open', emoji:'\u23f0', main: st.isOpen?'Open now':'Closed', sub: st.label||''});
     }
+  } else if (b.whatsapp || b.mobile){
+    tiles.push({cls:'open', emoji:'\ud83d\udcac', main:'WhatsApp ready', sub:'Direct chat'});
   }
 
+  // Tile 3: Rating (real if reviews exist, else trust tier badge)
   if (Number(b.rating_avg) > 0){
     tiles.push({cls:'rating', emoji:'\u2b50', main: Number(b.rating_avg).toFixed(1)+' rating', sub:(b.rating_count||0)+' review'+((b.rating_count||0)===1?'':'s')});
+  } else {
+    const vs = Number(b.verified_score) || 0;
+    if (vs >= 5)      tiles.push({cls:'rating', emoji:'\ud83e\udd47', main:'Gold verified', sub:'Premium trust tier'});
+    else if (vs >= 3) tiles.push({cls:'rating', emoji:'\ud83e\udd48', main:'Silver verified', sub:'Trusted listing'});
+    else if (vs >= 1) tiles.push({cls:'rating', emoji:'\ud83e\udd49', main:'Bronze listed', sub:'Building trust'});
+    else              tiles.push({cls:'rating', emoji:'\ud83c\udd95', main:'New listing', sub:'Be the first to review'});
   }
+
+  // Tile 4: Local badge — ALWAYS shown as brand assurance
+  tiles.push({cls:'verify', emoji:'\ud83d\udccd', main:'Sirsa\u2013Bathinda', sub:'Local trusted directory'});
 
   if (!tiles.length){ host.style.display='none'; return; }
   function esc(s){ return String(s||'').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c])); }
