@@ -2724,12 +2724,12 @@ function fmtAgo(iso){
 function escapeHTML(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function openQAModal(){
   const m = document.getElementById('qaModal');
-  if (m) m.classList.add('open');
+  if (m) m.classList.add('active');
   setTimeout(() => { const t = document.getElementById('qaQuestionText'); if (t) t.focus(); }, 100);
 }
 function closeQAModal(){
   const m = document.getElementById('qaModal');
-  if (m) m.classList.remove('open');
+  if (m) m.classList.remove('active');
 }
 async function submitQA(){
   const errEl = document.getElementById('qaErr');

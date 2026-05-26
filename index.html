@@ -1011,6 +1011,9 @@ function dismissFestBanner(){
     .fsotw-body{ padding:32px 28px; display:flex; flex-direction:column; justify-content:center }
     .fsotw-cta{ display:inline-flex; align-items:center; justify-content:center; gap:6px; background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; padding:14px 28px; border-radius:12px; font-weight:800; text-decoration:none; text-align:center; font-size:1rem; letter-spacing:.02em; box-shadow:0 4px 14px rgba(255,107,26,0.32); align-self:flex-start; transition:.18s }
     .fsotw-cta:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(255,107,26,0.42); text-decoration:none }
+    /* Mobile fix: hide any overlay/decoration on FSOTW photo to prevent overlap */
+    .fsotw-photo .open-status-pill, .fsotw-photo .featured-ribbon, .fsotw-photo .verified-badge { display:none !important }
+    .fsotw-photo > div[class*="badge"], .fsotw-photo > div[class*="ribbon"] { display:none !important }
     @media (max-width: 720px){
       .fsotw-grid{ grid-template-columns: 1fr; min-height:0 }
       .fsotw-photo{ height:220px; min-height:220px; max-height:240px }
