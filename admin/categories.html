@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Categories — DukanList Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  body { background:#F8FAFC; font-family:'Manrope',sans-serif }
+  .admin-nav { background:#0F172A; color:#fff; padding:12px 24px; display:flex;gap:16px;align-items:center;flex-wrap:wrap }
+  .admin-nav a { color:#cbd5e1; text-decoration:none; font-weight:600; font-size:14px; padding:6px 10px; border-radius:6px }
+  .admin-nav a.active, .admin-nav a:hover { background:#1E293B; color:#fff }
+  .admin-nav .logo { font-weight:800; color:#fff; font-size:18px }
+  .admin-nav .badge { background:#7C3AED; color:#fff; font-size:10px; padding:2px 7px; border-radius:99px; font-weight:800 }
+  .wrap { max-width:1280px; margin:24px auto; padding:0 20px }
+  h1 { font-size:1.8rem; font-weight:800; margin:0 0 6px; color:#0F172A }
+  .sub { color:#64748b; margin:0 0 18px }
+  .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center }
+  .search { flex:1; min-width:240px; padding:9px 13px; border:1px solid #E2E8F0; border-radius:8px; font-size:14px; font-family:inherit }
+  .btn { background:#1E3A8A; color:#fff; border:none; padding:9px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; font-family:inherit }
+  .btn.add { background:#10B981 }
+  .btn.danger { background:#DC2626 }
+  .btn.ghost { background:#F1F5F9; color:#475569 }
+  .stat-strip { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px }
+  .stat-pill { background:#fff; border:1px solid #E2E8F0; padding:5px 12px; border-radius:99px; font-size:12px; font-weight:700; color:#475569 }
+  .stat-pill b { color:#1E3A8A; margin-right:4px }
+  table { width:100%; background:#fff; border-collapse:collapse; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(15,23,42,.05) }
+  th, td { padding:10px 12px; text-align:left; font-size:13px; border-bottom:1px solid #F1F5F9 }
+  th { background:#F8FAFC; font-weight:700; color:#475569; font-size:12px; text-transform:uppercase; letter-spacing:.04em }
+  td .pill { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700 }
+  td .pill.parent { background:#FEF3C7; color:#92400E }
+  td .pill.sub { background:#EEF2FF; color:#3730A3 }
+  td .actions { display:flex; gap:5px; flex-wrap:nowrap }
+  td .actions button { padding:4px 8px; font-size:11px; border-radius:5px; border:none; cursor:pointer; font-weight:700 }
+  .modal-bg { position:fixed; inset:0; background:rgba(15,23,42,.55); display:none; align-items:center; justify-content:center; z-index:1000 }
+  .modal-bg.show { display:flex }
+  .modal { background:#fff; padding:24px; border-radius:14px; width:520px; max-width:92vw; max-height:90vh; overflow-y:auto }
+  .modal h3 { margin:0 0 14px; font-size:1.2rem; font-weight:800; color:#0F172A }
+  .field { margin-bottom:12px }
+  .field label { display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:4px }
+  .field input, .field textarea, .field select { width:100%; padding:8px 11px; border:1px solid #E2E8F0; border-radius:7px; font-size:13px; font-family:inherit; box-sizing:border-box }
+  .field textarea { min-height:60px; resize:vertical }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+  .toast { position:fixed; bottom:24px; right:24px; background:#0F172A; color:#fff; padding:11px 18px; border-radius:8px; font-size:13px; font-weight:600; z-index:1100; opacity:0; transition:opacity .2s }
+  .toast.show { opacity:1 }
+  .err { background:#FEF2F2; color:#B91C1C; padding:9px 12px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px }
+</style>
+</head>
+<body>
+
+<nav class="admin-nav">
+  <span class="logo">DukanList <span class="badge">ADMIN</span></span>
+  <a href="/admin/dashboard.html">Dashboard</a>
+  <a href="/admin/moderation.html">Moderation</a>
+  <a href="/admin/categories.html" class="active">Categories</a>
+  <a href="/admin/cities.html">Cities</a>
+  <a href="/admin/reviews.html">Reviews</a>
+  <a href="/admin/announcements.html">Announcements</a>
+  <a href="/admin/pucho-moderation.html">Pucho Bhai</a>
+  <a href="/admin/settings.html">⚙️ Settings</a>
+  <a href="javascript:logout()" style="margin-left:auto">Logout</a>
+</nav>
+
+<div class="wrap">
+  <h1>🏷️ Categories</h1>
+  <p class="sub">Add, edit, deactivate or delete categories. Keywords help search find the right one.</p>
+
+  <div id="err" class="err" style="display:none"></div>
+
+  <div class="stat-strip" id="stats"></div>
+
+  <div class="toolbar">
+    <input id="search" class="search" placeholder="🔍 Search by name, slug, parent or keywords…" oninput="render()">
+    <select id="filterParent" class="search" style="max-width:200px" onchange="render()">
+      <option value="">All categories</option>
+      <option value="parent">Parents only</option>
+      <option value="sub">Sub-categories only</option>
+      <option value="inactive">Inactive only</option>
+    </select>
+    <button class="btn add" onclick="openCreate()">+ New Category</button>
+  </div>
+
+  <div id="tableWrap" style="overflow-x:auto"><div style="padding:40px;text-align:center;color:#94a3b8">Loading…</div></div>
+</div>
+
+<!-- Create/Edit modal -->
+<div class="modal-bg" id="catModal" onclick="if(event.target===this)closeCat()">
+  <div class="modal">
+    <h3 id="modalTitle">New Category</h3>
+    <div id="modalErr" style="display:none" class="err"></div>
+    <input type="hidden" id="editId">
+    <div class="row2">
+      <div class="field"><label>Slug *</label><input id="fSlug" placeholder="paint-shop"></div>
+      <div class="field"><label>Icon</label><input id="fIcon" placeholder="🎨" maxlength="4"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Name (English) *</label><input id="fName" placeholder="Paint Shop"></div>
+      <div class="field"><label>Name (Hindi)</label><input id="fNameHi" placeholder="पेंट की दुकान"></div>
+    </div>
+    <div class="field">
+      <label>Parent Category</label>
+      <select id="fParent"><option value="">— None (this is a parent) —</option></select>
+    </div>
+    <div class="field">
+      <label>Keywords / Synonyms (comma-separated)</label>
+      <textarea id="fKeywords" placeholder="paint,asian paints,berger,rang,emulsion"></textarea>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="fDesc" placeholder="Short description for SEO and admin reference"></textarea>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Sort Order</label><input id="fSort" type="number" value="100"></div>
+      <div class="field" style="display:flex;align-items:center;gap:8px"><label style="margin:0">Active</label><input type="checkbox" id="fActive" checked style="width:auto"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn ghost" onclick="closeCat()">Cancel</button>
+      <button class="btn" onclick="saveCat()" id="saveBtn">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+'use strict';
+const c = ShopDB.client;
+let CATS = [];
+let BY_ID = {};
+
+function toast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isErr ? '#DC2626' : '#0F172A';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function esc(s){ if (s == null) return ''; return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function logout(){ c.auth.signOut().then(()=>location.href='/admin/login.html'); }
+
+async function init(){
+  const { data: { session } } = await c.auth.getSession();
+  if (!session) { location.href = '/admin/login.html'; return; }
+  const { data: isAdm } = await c.rpc('is_admin');
+  if (!isAdm) { alert('Admin access required'); location.href='/'; return; }
+  loadCats();
+}
+
+async function loadCats(){
+  try {
+    const { data, error } = await c.from('categories')
+      .select('id, slug, name, name_hi, icon, parent_id, keywords, description, sort_order, active, color')
+      .order('sort_order');
+    if (error) throw error;
+    CATS = data || [];
+    BY_ID = {}; CATS.forEach(x => BY_ID[x.id] = x);
+    CATS.forEach(x => { x.parent_name = x.parent_id && BY_ID[x.parent_id] ? BY_ID[x.parent_id].name : null; });
+    populateParentDropdown();
+    renderStats();
+    render();
+  } catch(e){
+    document.getElementById('err').textContent = 'Failed: ' + e.message;
+    document.getElementById('err').style.display = 'block';
+  }
+}
+
+function populateParentDropdown(){
+  const sel = document.getElementById('fParent');
+  const parents = CATS.filter(x => !x.parent_id).sort((a,b)=>a.name.localeCompare(b.name));
+  sel.innerHTML = '<option value="">— None (this is a parent) —</option>' +
+    parents.map(p => `<option value="${esc(p.slug)}">${esc(p.icon || '📦')} ${esc(p.name)}</option>`).join('');
+}
+
+function renderStats(){
+  const parents = CATS.filter(x => !x.parent_id).length;
+  const subs = CATS.filter(x => x.parent_id).length;
+  const inactive = CATS.filter(x => !x.active).length;
+  document.getElementById('stats').innerHTML =
+    `<span class="stat-pill"><b>${CATS.length}</b> total</span>` +
+    `<span class="stat-pill"><b>${parents}</b> parents</span>` +
+    `<span class="stat-pill"><b>${subs}</b> sub-categories</span>` +
+    `<span class="stat-pill"><b>${inactive}</b> inactive</span>`;
+}
+
+function render(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const f = document.getElementById('filterParent').value;
+  let rows = CATS.slice();
+  if (f === 'parent') rows = rows.filter(x => !x.parent_id);
+  else if (f === 'sub') rows = rows.filter(x => x.parent_id);
+  else if (f === 'inactive') rows = rows.filter(x => !x.active);
+  if (q) rows = rows.filter(x => {
+    const hay = ((x.name||'') + ' ' + (x.name_hi||'') + ' ' + (x.slug||'') + ' ' + (x.keywords||'') + ' ' + (x.parent_name||'')).toLowerCase();
+    return hay.indexOf(q) >= 0;
+  });
+
+  if (!rows.length) {
+    document.getElementById('tableWrap').innerHTML = '<div style="padding:40px;text-align:center;color:#94a3b8">No categories match your filter.</div>';
+    return;
+  }
+
+  const html = '<table><thead><tr>'
+    + '<th>Icon</th><th>Name</th><th>Slug</th><th>Parent</th><th>Type</th><th>Sort</th><th>Status</th><th>Actions</th>'
+    + '</tr></thead><tbody>'
+    + rows.map(r => {
+      const typeP = r.parent_id ? '<span class="pill sub">SUB</span>' : '<span class="pill parent">PARENT</span>';
+      const stat = r.active
+        ? '<span style="color:#10B981;font-weight:700">● Active</span>'
+        : '<span style="color:#94a3b8;font-weight:700">○ Inactive</span>';
+      return '<tr>'
+        + '<td style="font-size:1.4rem">' + esc(r.icon || '') + '</td>'
+        + '<td><b>' + esc(r.name) + '</b>' + (r.name_hi ? '<br><span style="color:#94a3b8;font-size:11px">' + esc(r.name_hi) + '</span>' : '') + '</td>'
+        + '<td><code style="font-size:11px;color:#475569">' + esc(r.slug) + '</code></td>'
+        + '<td style="font-size:12px;color:#64748b">' + esc(r.parent_name || '—') + '</td>'
+        + '<td>' + typeP + '</td>'
+        + '<td>' + (r.sort_order || 0) + '</td>'
+        + '<td>' + stat + '</td>'
+        + '<td class="actions">'
+          + '<button style="background:#EEF2FF;color:#3730A3" onclick="openEdit(' + r.id + ')">✏️ Edit</button>'
+          + '<button style="background:' + (r.active ? '#FEF3C7;color:#92400E' : '#DCFCE7;color:#166534') + '" onclick="toggleActive(' + r.id + ', ' + !r.active + ')">' + (r.active ? '⏸ Disable' : '▶ Enable') + '</button>'
+          + '<button style="background:#FEE2E2;color:#991B1B" onclick="deleteCat(' + r.id + ')">🗑</button>'
+        + '</td>'
+      + '</tr>';
+    }).join('')
+    + '</tbody></table>';
+  document.getElementById('tableWrap').innerHTML = html;
+}
+
+function openCreate(){
+  document.getElementById('modalTitle').textContent = 'New Category';
+  document.getElementById('editId').value = '';
+  document.getElementById('fSlug').value = '';
+  document.getElementById('fIcon').value = '📦';
+  document.getElementById('fName').value = '';
+  document.getElementById('fNameHi').value = '';
+  document.getElementById('fParent').value = '';
+  document.getElementById('fKeywords').value = '';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('fSort').value = '100';
+  document.getElementById('fActive').checked = true;
+  document.getElementById('fSlug').disabled = false;
+  document.getElementById('modalErr').style.display = 'none';
+  document.getElementById('catModal').classList.add('show');
+}
+
+function openEdit(id){
+  const r = BY_ID[id]; if (!r) return;
+  document.getElementById('modalTitle').textContent = 'Edit: ' + r.name;
+  document.getElementById('editId').value = r.id;
+  document.getElementById('fSlug').value = r.slug;
+  document.getElementById('fSlug').disabled = true; // slug not editable
+  document.getElementById('fIcon').value = r.icon || '📦';
+  document.getElementById('fName').value = r.name;
+  document.getElementById('fNameHi').value = r.name_hi || '';
+  document.getElementById('fParent').value = r.parent_id ? (BY_ID[r.parent_id]?.slug || '') : '';
+  document.getElementById('fKeywords').value = r.keywords || '';
+  document.getElementById('fDesc').value = r.description || '';
+  document.getElementById('fSort').value = r.sort_order || 100;
+  document.getElementById('fActive').checked = !!r.active;
+  document.getElementById('modalErr').style.display = 'none';
+  document.getElementById('catModal').classList.add('show');
+}
+
+function closeCat(){ document.getElementById('catModal').classList.remove('show'); }
+
+async function saveCat(){
+  const id = document.getElementById('editId').value;
+  const slug = document.getElementById('fSlug').value.trim().toLowerCase();
+  const name = document.getElementById('fName').value.trim();
+  const name_hi = document.getElementById('fNameHi').value.trim();
+  const icon = document.getElementById('fIcon').value.trim() || '📦';
+  const parent_slug = document.getElementById('fParent').value || null;
+  const keywords = document.getElementById('fKeywords').value.trim();
+  const description = document.getElementById('fDesc').value.trim();
+  const sort_order = parseInt(document.getElementById('fSort').value, 10) || 100;
+  const active = document.getElementById('fActive').checked;
+
+  const err = document.getElementById('modalErr');
+  err.style.display = 'none';
+
+  if (!name) { err.textContent = 'Name required'; err.style.display = 'block'; return; }
+  if (!id && !slug) { err.textContent = 'Slug required for new category'; err.style.display = 'block'; return; }
+  if (!id && !/^[a-z0-9-]+$/.test(slug)) { err.textContent = 'Slug must be lowercase letters, digits, hyphens only'; err.style.display = 'block'; return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+
+  try {
+    if (id) {
+      const patch = { name, name_hi, icon, keywords, description, sort_order, active };
+      const { error } = await c.rpc('admin_update_category', { p_id: parseInt(id), p_patch: patch });
+      if (error) throw error;
+      toast('✓ Updated ' + name);
+    } else {
+      const { error } = await c.rpc('admin_create_category', {
+        p_slug: slug, p_name: name, p_name_hi: name_hi || null, p_icon: icon,
+        p_parent_slug: parent_slug, p_keywords: keywords || null, p_description: description || null
+      });
+      if (error) throw error;
+      toast('✓ Created ' + name);
+    }
+    closeCat();
+    loadCats();
+  } catch(e){
+    err.textContent = e.message;
+    err.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 Save';
+  }
+}
+
+async function toggleActive(id, newState){
+  try {
+    const { error } = await c.rpc('admin_toggle_category', { p_id: id, p_active: newState });
+    if (error) throw error;
+    toast('✓ ' + (newState ? 'Activated' : 'Deactivated'));
+    loadCats();
+  } catch(e){ toast(e.message, true); }
+}
+
+async function deleteCat(id){
+  const r = BY_ID[id]; if (!r) return;
+  if (!confirm('Delete "' + r.name + '"? This cannot be undone.\n\nIf shops use this category, deletion will be blocked.')) return;
+  try {
+    const { error } = await c.rpc('admin_delete_category', { p_id: id });
+    if (error) throw error;
+    toast('✓ Deleted');
+    loadCats();
+  } catch(e){ alert(e.message); }
+}
+
+init();
+</script>
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>

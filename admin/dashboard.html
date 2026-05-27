@@ -568,21 +568,21 @@ function renderKPIs(s){
     loadSusBadge().catch(e => console.warn('Sus badge load:', e.message));
   }
   const cards = [
-    { label: 'Total Businesses',  val: s.total_businesses,  cls: 'pri',     delta: '+' + (s.new_week || 0) + ' this week' },
-    { label: 'Active Listings',   val: s.active,            cls: 'success', delta: 'Live on site' },
-    { label: 'Pending Approval',  val: s.pending,           cls: 'warn',    delta: 'Need review' },
-    { label: 'Flagged',           val: s.flagged,           cls: 'danger',  delta: s.flags_pending + ' pending flags' },
-    { label: 'Categories',        val: s.total_categories,  cls: '',        delta: s.parent_categories + ' parents · ' + s.sub_categories + ' subs' },
-    { label: 'Cities Active',     val: s.cities_active,     cls: '',        delta: s.states_active + ' states' },
-    { label: 'Leads Today',       val: s.leads_today,       cls: 'success', delta: s.leads_week + ' this week' },
-    { label: 'Reviews',           val: s.total_reviews,     cls: '',        delta: 'Avg ⭐ ' + s.avg_rating }
+    { label: 'Total Businesses',  val: s.total_businesses,  cls: 'pri',     delta: '+' + (s.new_week || 0) + ' this week', href: '/admin/moderation.html?tab=all', title: 'View all businesses' },
+    { label: 'Active Listings',   val: s.active,            cls: 'success', delta: 'Live on site', href: '/admin/moderation.html?tab=active', title: 'View active shops' },
+    { label: 'Pending Approval',  val: s.pending,           cls: 'warn',    delta: 'Need review', href: '/admin/moderation.html?tab=pending', title: 'Review pending shops' },
+    { label: 'Flagged',           val: s.flagged,           cls: 'danger',  delta: s.flags_pending + ' pending flags', href: '/admin/moderation.html?tab=flagged', title: 'Handle flagged shops' },
+    { label: 'Categories',        val: s.total_categories,  cls: '',        delta: s.parent_categories + ' parents · ' + s.sub_categories + ' subs', href: '/admin/categories.html', title: 'Manage categories' },
+    { label: 'Cities Active',     val: s.cities_active,     cls: '',        delta: s.states_active + ' states', href: '/admin/cities.html', title: 'Manage cities' },
+    { label: 'Leads Today',       val: s.leads_today,       cls: 'success', delta: s.leads_week + ' this week', href: '/admin/activity.html?tab=leads', title: 'View lead activity' },
+    { label: 'Reviews',           val: s.total_reviews,     cls: '',        delta: 'Avg ⭐ ' + s.avg_rating, href: '/admin/reviews.html', title: 'Moderate reviews' }
   ];
   const html = cards.map(k => `
-    <div class="kpi ${k.cls}">
+    <a href="${k.href}" class="kpi ${k.cls}" title="${escapeHtml(k.title)}" style="text-decoration:none;color:inherit;display:block;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 22px rgba(15,23,42,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
       <div class="label">${escapeHtml(k.label)}</div>
       <div class="value ${k.cls}">${k.val}</div>
       <div class="delta">${escapeHtml(k.delta)}</div>
-    </div>
+    </a>
   `).join('');
   document.getElementById('kpiGrid').innerHTML = html;
 }
@@ -1124,33 +1124,4 @@ async function downloadCSV(fetchAll){
       URL.revokeObjectURL(url);
     }, 200);
   } catch(e){
-    console.error('CSV download error:', e);
-    alert('Download failed: ' + (e.message || e));
-  } finally {
-    if (btn){ btn.disabled = false; btn.innerHTML = origLabel; }
-  }
-}
-
-function formatDate(iso){
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = (now - d) / 1000;
-  if (diff < 60) return Math.floor(diff) + 's ago';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
-  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+    console.error('CSV 
