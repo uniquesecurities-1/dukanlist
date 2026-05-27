@@ -1721,5 +1721,48 @@ function animateCount(elId, target){
 // Bootstrap — load each independently so one failure doesn't block others
 console.info('[pucho-bhai] bootstrap starting');
 (function bootstrap(){
-  // Each call wrapped — failures logged but don't cascade
-  try { loadCities(
+  try { loadCities().catch(function(e){ console.error('[loadCities]', e); }); }
+  catch(e){ console.error('[loadCities sync]', e); }
+
+  try { loadCategories().catch(function(e){ console.error('[loadCategories]', e); }); }
+  catch(e){ console.error('[loadCategories sync]', e); }
+
+  try { loadLeaderboard().catch(function(e){ console.error('[loadLeaderboard]', e); }); }
+  catch(e){ console.error('[loadLeaderboard sync]', e); }
+
+  setTimeout(function(){
+    var qList = document.getElementById('qList');
+    if (qList && (qList.innerHTML.indexOf('spinner') >= 0 || qList.innerHTML.trim() === '')) {
+      console.warn('[pucho-bhai] qList still empty after 3s, forcing loadQuestions');
+      try { loadQuestions(); } catch(e){ console.error('[forced loadQuestions]', e); }
+    }
+  }, 3000);
+
+  setTimeout(function(){
+    var lb = document.getElementById('lbList');
+    if (lb && lb.textContent.trim() === 'Loading\u2026') {
+      console.warn('[pucho-bhai] leaderboard still Loading after 3s, forcing');
+      try { loadLeaderboard(); } catch(e){ console.error('[forced loadLeaderboard]', e); }
+    }
+  }, 3000);
+})();
+</script>
+
+<!-- Mobile bottom nav -->
+<script>
+  if (window.innerWidth <= 768) {
+    var nav = document.createElement('nav');
+    nav.id = 'mobileBottomNav';
+    nav.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E2E8F0;display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:90;box-shadow:0 -2px 8px rgba(15,23,42,.04)';
+    nav.innerHTML =
+      '<a href="/" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🏠<div>Home</div></a>' +
+      '<a href="/browse.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">📂<div>Browse</div></a>' +
+      '<a href="/pucho-bhai.html" style="text-align:center;text-decoration:none;color:var(--pb-primary-d);font-size:.66rem;font-weight:800">💬<div>Pucho Bhai</div></a>' +
+      '<a href="/search.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🔍<div>Search</div></a>' +
+      '<a href="/panel/dashboard.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">👤<div>Account</div></a>';
+    document.body.appendChild(nav);
+  }
+</script>
+
+</body>
+</html>
