@@ -868,6 +868,33 @@ async function handleLogin(){
   location.href = next;
 }
 
+// ============= iOS/Safari compatibility checks =============
+function detectInAppBrowser(){
+  const ua = navigator.userAgent || '';
+  // Common in-app browsers on iOS that have separate storage from Safari
+  if (/FBAN|FBAV|Instagram|Line\//i.test(ua)) return 'Facebook/Instagram';
+  if (/WhatsApp/i.test(ua)) return 'WhatsApp';
+  if (/GSA\//i.test(ua) && /iPhone|iPad/i.test(ua)) return 'Google in iOS';
+  if (/Gmail/i.test(ua) && /iPhone|iPad/i.test(ua)) return 'Gmail';
+  if (/Twitter|TwitterAndroid/i.test(ua)) return 'Twitter/X';
+  if (/MicroMessenger/i.test(ua)) return 'WeChat';
+  return null;
+}
+function checkLocalStorage(){
+  try {
+    const k = '__dl_storage_test__';
+    localStorage.setItem(k, '1');
+    localStorage.removeItem(k);
+    return true;
+  } catch(e) { return false; }
+}
+function showSafariBanner(html, color){
+  const bar = document.createElement('div');
+  bar.style.cssText = 'position:sticky;top:0;z-index:200;background:' + (color || '#FEF3C7') + ';color:#7C2D12;padding:10px 14px;font-size:.86rem;line-height:1.45;font-weight:600;border-bottom:1px solid #F59E0B;text-align:center';
+  bar.innerHTML = html;
+  document.body.insertBefore(bar, document.body.firstChild);
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   loadSavedLang();
   initPulse();
@@ -876,15 +903,34 @@ document.addEventListener('DOMContentLoaded', function(){
   const emInput = document.getElementById('email');
   emInput.addEventListener('keydown', e => { if (e.key === 'Enter') pwInput.focus(); });
 
+  // iOS/Safari guards
+  const inApp = detectInAppBrowser();
+  if (inApp){
+    showSafariBanner(
+      '⚠️ <b>' + inApp + ' browser me login me dikkat aa sakti hai.</b><br>' +
+      'Right-top corner pe <b>•••</b> dabake "Open in Safari / Chrome" select karein. ' +
+      '<a href="' + location.href + '" style="color:#1E3A8A;text-decoration:underline;font-weight:800">Copy this link →</a>',
+      '#FFE4E6'
+    );
+  } else if (!checkLocalStorage()){
+    showSafariBanner(
+      '⚠️ <b>Browser ke storage me dikkat hai.</b><br>' +
+      'Aap shayad <b>Private/Incognito mode</b> me hain. Login work nahi karega. Normal mode me open karein.',
+      '#FFE4E6'
+    );
+  }
+
   // If already logged in, redirect straight to dashboard
   setTimeout(async () => {
     const c = ShopDB.client;
     if (!c) return;
-    const { data: { session } } = await c.auth.getSession();
-    if (session){
-      const next = new URLSearchParams(location.search).get('next') || '/panel/dashboard.html';
-      location.href = next;
-    }
+    try {
+      const { data: { session } } = await c.auth.getSession();
+      if (session){
+        const next = new URLSearchParams(location.search).get('next') || '/panel/dashboard.html';
+        location.href = next;
+      }
+    } catch(e){ /* getSession fails on storage-blocked Safari — banner already shown */ }
   }, 100);
 });
 </script>
