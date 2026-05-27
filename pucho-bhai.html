@@ -119,6 +119,51 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
 }
 .pb-city-tab .count { font-size:.7rem; opacity:.8; font-weight:600 }
 
+/* ===== City search + dropdown row ===== */
+.pb-city-search-row {
+  display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;
+}
+.pb-search-wrap { position:relative; flex:1; min-width:180px }
+.pb-search-icon {
+  position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  pointer-events:none; font-size:.95rem; opacity:.7;
+}
+.pb-search-wrap input {
+  width:100%; padding:10px 36px 10px 34px;
+  border:1.5px solid var(--pb-border); border-radius:11px;
+  font-size:.92rem; font-family:inherit; background:#fff; color:var(--pb-ink);
+  transition:border .15s, box-shadow .15s; box-sizing:border-box;
+}
+.pb-search-wrap input::placeholder { color:#94A3B8 }
+.pb-search-wrap input:focus {
+  outline:none; border-color:var(--pb-primary);
+  box-shadow:0 0 0 3px rgba(124,58,237,.12);
+}
+.pb-clear-btn {
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  background:#F1F5F9; border:none; width:22px; height:22px;
+  border-radius:50%; cursor:pointer; font-size:1rem; line-height:1;
+  color:#64748b; display:grid; place-items:center; padding:0;
+}
+.pb-clear-btn:hover { background:#E2E8F0; color:var(--pb-ink) }
+#cityDropdown {
+  padding:10px 12px; border:1.5px solid var(--pb-border);
+  border-radius:11px; background:#fff; font-size:.92rem;
+  font-family:inherit; cursor:pointer; min-width:170px; color:var(--pb-ink);
+  transition:border .15s;
+}
+#cityDropdown:focus { outline:none; border-color:var(--pb-primary); box-shadow:0 0 0 3px rgba(124,58,237,.12) }
+#cityNoMatch {
+  display:none; padding:8px 12px; margin-top:6px;
+  background:#FEF3C7; color:#92400E; border-radius:9px;
+  font-size:.82rem; font-weight:600; text-align:center;
+}
+@media (max-width:480px){
+  .pb-city-search-row { gap:6px }
+  #cityDropdown { width:100%; min-width:0 }
+  .pb-search-wrap { min-width:100% }
+}
+
 /* ===== Question list ===== */
 .pb-list {
   display:flex; flex-direction:column; gap:12px;
@@ -379,8 +424,26 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
       <span data-i18n-en>Select your city</span>
       <span data-i18n-hi>अपना शहर चुनें</span>
     </div>
+
+    <!-- Search input + Dropdown row -->
+    <div class="pb-city-search-row">
+      <div class="pb-search-wrap">
+        <span class="pb-search-icon">🔍</span>
+        <input type="text" id="citySearchInput" autocomplete="off"
+               placeholder="Type city name… e.g. Dabwali, Sirsa, Bathinda">
+        <button type="button" class="pb-clear-btn" id="cityClearBtn" onclick="clearCitySearch()" style="display:none" aria-label="Clear">×</button>
+      </div>
+      <select id="cityDropdown" onchange="onCityDropdownChange()" aria-label="Select city">
+        <option value="">— All Cities —</option>
+      </select>
+    </div>
+
     <div class="pb-city-tabs" id="cityTabs">
-      <div class="pb-city-tab active" data-city-id=""><span data-i18n-en>All Cities</span><span data-i18n-hi>सभी शहर</span></div>
+      <div class="pb-city-tab active" data-city-id="" data-city-name=""><span data-i18n-en>All Cities</span><span data-i18n-hi>सभी शहर</span></div>
+    </div>
+    <div id="cityNoMatch">
+      <span data-i18n-en>No city matches that search. Try a shorter name.</span>
+      <span data-i18n-hi style="display:none">कोई शहर नहीं मिला। छोटा नाम try करें।</span>
     </div>
   </div>
 
@@ -547,6 +610,7 @@ async function loadCities(){
     const el = document.createElement('div');
     el.className = 'pb-city-tab';
     el.dataset.cityId = c.id;
+    el.dataset.cityName = c.name.toLowerCase();
     const cnt = counts[c.id] || 0;
     el.innerHTML = `<span>${escapeHtml(c.name)}</span>` + (cnt>0?`<span class="count">${cnt}</span>`:'');
     el.onclick = ()=>selectCity(c.id, c.name);
@@ -561,6 +625,35 @@ async function loadCities(){
     askCity.appendChild(o);
   });
 
+  // Populate the city search dropdown (sorted alphabetically — order=name above)
+  const cityDD = document.getElementById('cityDropdown');
+  CITIES.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id;
+    const cnt = counts[c.id] || 0;
+    o.textContent = c.name + (cnt>0 ? `  (${cnt})` : '');
+    cityDD.appendChild(o);
+  });
+
+  // Wire up live search-input filter
+  const searchIn = document.getElementById('citySearchInput');
+  if (searchIn && !searchIn.__wired){
+    searchIn.__wired = true;
+    searchIn.addEventListener('input', filterCityPills);
+    // Enter key → if exactly one pill matches, select it
+    searchIn.addEventListener('keydown', e => {
+      if (e.key === 'Enter'){
+        const visible = Array.from(document.querySelectorAll('.pb-city-tab'))
+          .filter(t => t.style.display !== 'none' && t.dataset.cityId);
+        if (visible.length === 1){
+          const t = visible[0];
+          const c = CITIES.find(c => String(c.id) === t.dataset.cityId);
+          if (c){ selectCity(c.id, c.name); searchIn.value=''; filterCityPills(); }
+        }
+      }
+    });
+  }
+
   // Set default
   if (defaultCityId) {
     selectCity(defaultCityId, CITIES.find(c=>c.id===defaultCityId).name);
@@ -570,11 +663,51 @@ async function loadCities(){
   }
 }
 
+// ====== City pill filter by typed keyword ======
+function filterCityPills(){
+  const q = (document.getElementById('citySearchInput').value || '').toLowerCase().trim();
+  const clearBtn = document.getElementById('cityClearBtn');
+  if (clearBtn) clearBtn.style.display = q ? '' : 'none';
+
+  let visibleCount = 0;
+  document.querySelectorAll('.pb-city-tab').forEach(tab => {
+    const id = tab.dataset.cityId || '';
+    if (!id){
+      // "All Cities" tab — hide when searching, show otherwise
+      tab.style.display = q ? 'none' : '';
+    } else {
+      const name = tab.dataset.cityName || '';
+      const matches = !q || name.includes(q);
+      tab.style.display = matches ? '' : 'none';
+      if (matches) visibleCount++;
+    }
+  });
+  const noMatch = document.getElementById('cityNoMatch');
+  if (noMatch) noMatch.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+}
+
+function clearCitySearch(){
+  const inp = document.getElementById('citySearchInput');
+  if (inp){ inp.value=''; inp.focus(); }
+  filterCityPills();
+}
+
+function onCityDropdownChange(){
+  const v = document.getElementById('cityDropdown').value;
+  if (!v){ selectCity(null, null); return; }
+  const cityId = parseInt(v, 10);
+  const c = CITIES.find(c => c.id === cityId);
+  if (c) selectCity(c.id, c.name);
+}
+
 function selectCity(id, name){
   CURRENT_CITY = id ? {id, name} : null;
   document.querySelectorAll('.pb-city-tab').forEach(t=>{
     t.classList.toggle('active', String(t.dataset.cityId||'') === String(id||''));
   });
+  // Sync the dropdown
+  const dd = document.getElementById('cityDropdown');
+  if (dd) dd.value = id ? String(id) : '';
   // Save to persist if a real city
   if (id && name) {
     try { DukanCity.set(name.toLowerCase().replace(/\s+/g,'-')); } catch(_){}
