@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#7C3AED">
+<title>Pucho Bhai — Apne shehar mein puchho, jawab paao | dukanlist.com</title>
+<meta name="description" content="Apne shehar ka community Q&A board. Local shops, services, recommendations — apne logon se pucho, jawab paao. Mandi Dabwali, Sirsa, Bathinda & more.">
+<link rel="canonical" href="https://dukanlist.com/pucho-bhai.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dukanlist.com/pucho-bhai.html">
+<meta property="og:title" content="Pucho Bhai — Community Q&A on dukanlist.com">
+<meta property="og:description" content="Apne shehar mein puchho, local logon se jawab paao — shops, services, recommendations.">
+<meta property="og:image" content="https://dukanlist.com/assets/icons/icon-512.png">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+body { font-family:'Plus Jakarta Sans','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#F8FAFC; color:#0F172A; margin:0 }
+html[data-lang="hi"] body { font-family:'Noto Sans Devanagari','Plus Jakarta Sans',sans-serif }
+
+/* ===== Pucho Bhai theme palette (purple-pink gradient) ===== */
+:root {
+  --pb-primary: #7C3AED;       /* violet-600 */
+  --pb-primary-d: #6D28D9;
+  --pb-accent: #EC4899;        /* pink-500 */
+  --pb-tint: #F5F3FF;          /* violet-50 */
+  --pb-tint-d: #EDE9FE;
+  --pb-ink: #0F172A;
+  --pb-ink-2: #475569;
+  --pb-muted: #94A3B8;
+  --pb-border: #E2E8F0;
+}
+
+/* ===== Hero ===== */
+.pb-hero {
+  background:linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  color:#fff;
+  padding:36px 20px 70px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.pb-hero::before {
+  content:""; position:absolute; inset:0;
+  background-image:radial-gradient(circle at 20% 30%, rgba(255,255,255,.12), transparent 40%),
+                   radial-gradient(circle at 80% 70%, rgba(255,255,255,.08), transparent 45%);
+  pointer-events:none;
+}
+.pb-hero-inner { max-width:760px; margin:0 auto; position:relative; z-index:1 }
+.pb-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.18); backdrop-filter:blur(8px);
+  padding:6px 14px; border-radius:99px;
+  font-size:.74rem; font-weight:700; letter-spacing:.04em;
+  border:1px solid rgba(255,255,255,.25);
+  margin-bottom:14px;
+}
+.pb-hero h1 {
+  font-family:'Manrope',sans-serif;
+  font-size:clamp(1.85rem, 5vw, 2.6rem);
+  font-weight:800; line-height:1.1; letter-spacing:-.02em;
+  margin:0 0 10px;
+}
+html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif }
+.pb-hero p {
+  font-size:1rem; opacity:.95; max-width:540px; margin:0 auto 22px; line-height:1.5;
+}
+.pb-hero-cta {
+  display:inline-flex; align-items:center; gap:8px;
+  background:#fff; color:var(--pb-primary-d);
+  padding:13px 26px; border-radius:99px;
+  font-weight:800; font-size:1rem;
+  text-decoration:none;
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  transition:transform .15s, box-shadow .15s;
+  border:none; cursor:pointer;
+}
+.pb-hero-cta:hover { transform:translateY(-2px); box-shadow:0 16px 36px rgba(0,0,0,.22) }
+.pb-hero-stats {
+  display:flex; gap:22px; justify-content:center; margin-top:22px;
+  font-size:.82rem; opacity:.92; flex-wrap:wrap;
+}
+.pb-hero-stats b { display:block; font-size:1.4rem; font-weight:800; letter-spacing:-.02em; line-height:1 }
+
+/* ===== Main container ===== */
+.pb-wrap { max-width:980px; margin:-40px auto 60px; padding:0 16px; position:relative; z-index:2 }
+
+/* ===== City tabs ===== */
+.pb-city-card {
+  background:#fff; border-radius:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.04);
+  padding:14px 16px;
+  margin-bottom:18px;
+}
+.pb-city-label {
+  font-size:.74rem; font-weight:800; color:var(--pb-muted);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin-bottom:8px; display:flex; align-items:center; gap:6px;
+}
+.pb-city-tabs {
+  display:flex; gap:7px; overflow-x:auto; padding:2px 0; margin:0 -4px;
+  scrollbar-width:none;
+}
+.pb-city-tabs::-webkit-scrollbar { display:none }
+.pb-city-tab {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 14px; background:#F1F5F9; border:1.5px solid transparent;
+  border-radius:99px; font-size:.83rem; font-weight:700;
+  color:var(--pb-ink-2); cursor:pointer; transition:all .15s;
+  white-space:nowrap; flex-shrink:0; font-family:inherit;
+}
+.pb-city-tab:hover { background:var(--pb-tint); color:var(--pb-primary-d) }
+.pb-city-tab.active {
+  background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
+  color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.30);
+}
+.pb-city-tab .count { font-size:.7rem; opacity:.8; font-weight:600 }
+
+/* ===== Question list ===== */
+.pb-list {
+  display:flex; flex-direction:column; gap:12px;
+}
+.pb-q-card {
+  background:#fff; border-radius:16px;
+  box-shadow:0 1px 3px rgba(15,23,42,.04), 0 0 0 1px rgba(15,23,42,.04);
+  padding:16px 18px;
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.pb-q-card:hover {
+  transform:translateY(-1px);
+  box-shadow:0 12px 28px rgba(15,23,42,.08), 0 0 0 1px var(--pb-primary);
+}
+.pb-q-meta {
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  font-size:.7rem; color:var(--pb-muted); font-weight:600;
+  margin-bottom:7px;
+}
+.pb-q-meta .pb-pill {
+  padding:2px 8px; border-radius:99px;
+  background:var(--pb-tint); color:var(--pb-primary-d); font-weight:700;
+  font-size:.68rem; letter-spacing:.02em;
+}
+.pb-q-meta .pb-pill.cat { background:#FFF7ED; color:#C2410C }
+.pb-q-text {
+  font-size:1rem; font-weight:700; color:var(--pb-ink);
+  line-height:1.4; letter-spacing:-.005em;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.pb-q-foot {
+  display:flex; align-items:center; gap:14px; margin-top:10px;
+  font-size:.78rem; color:var(--pb-ink-2); font-weight:600;
+}
+.pb-q-foot span { display:inline-flex; align-items:center; gap:5px }
+.pb-q-foot .ans-yes {
+  background:#DCFCE7; color:#15803D;
+  padding:3px 9px; border-radius:99px; font-weight:700; font-size:.72rem;
+}
+.pb-q-foot .ans-no {
+  color:var(--pb-accent); font-weight:700;
+}
+
+/* ===== Empty state ===== */
+.pb-empty {
+  background:#fff; border-radius:16px;
+  padding:42px 24px; text-align:center;
+  box-shadow:0 1px 3px rgba(15,23,42,.04);
+}
+.pb-empty .e-icon { font-size:3rem; margin-bottom:10px }
+.pb-empty h3 { font-size:1.2rem; font-weight:800; margin:0 0 6px; color:var(--pb-ink) }
+.pb-empty p { font-size:.92rem; color:var(--pb-ink-2); margin:0 0 18px }
+
+/* ===== Leaderboard ===== */
+.pb-side {
+  background:#fff; border-radius:18px;
+  padding:16px 18px;
+  box-shadow:0 1px 3px rgba(15,23,42,.04);
+  margin-bottom:18px;
+}
+.pb-side h3 {
+  font-size:.92rem; font-weight:800; margin:0 0 10px;
+  display:flex; align-items:center; gap:7px; color:var(--pb-ink);
+}
+.pb-lb-row {
+  display:flex; align-items:center; gap:10px;
+  padding:7px 0; border-bottom:1px solid #F1F5F9;
+  font-size:.86rem;
+}
+.pb-lb-row:last-child { border-bottom:none }
+.pb-lb-rank {
+  width:24px; height:24px; flex-shrink:0;
+  background:#F1F5F9; color:var(--pb-ink-2);
+  border-radius:50%; display:grid; place-items:center;
+  font-size:.74rem; font-weight:800;
+}
+.pb-lb-row.top1 .pb-lb-rank { background:#FEF3C7; color:#92400E }
+.pb-lb-row.top2 .pb-lb-rank { background:#E0E7FF; color:#3730A3 }
+.pb-lb-row.top3 .pb-lb-rank { background:#FCE7F3; color:#9D174D }
+.pb-lb-name { flex:1; font-weight:700; color:var(--pb-ink) }
+.pb-lb-count { font-weight:700; color:var(--pb-primary-d); font-size:.78rem }
+.pb-lb-recent { font-size:.66rem; color:var(--pb-accent); font-weight:700; margin-left:4px }
+
+/* ===== Grid for desktop ===== */
+@media (min-width:880px) {
+  .pb-grid { display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:start }
+}
+
+/* ===== Modal ===== */
+.pb-modal {
+  position:fixed; inset:0; background:rgba(15,23,42,.65);
+  backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center;
+  z-index:200; padding:16px;
+}
+.pb-modal.active { display:flex }
+.pb-modal-card {
+  background:#fff; border-radius:20px;
+  max-width:560px; width:100%;
+  max-height:92vh; overflow-y:auto;
+  padding:22px;
+  box-shadow:0 32px 70px rgba(0,0,0,.30);
+  position:relative;
+}
+.pb-modal-close {
+  position:absolute; top:12px; right:14px;
+  width:34px; height:34px; border-radius:50%;
+  background:#F1F5F9; border:none; cursor:pointer;
+  font-size:1.2rem; color:var(--pb-ink-2);
+  display:grid; place-items:center;
+}
+.pb-modal-card h2 {
+  font-family:'Manrope',sans-serif;
+  font-size:1.3rem; font-weight:800; margin:0 0 6px;
+  letter-spacing:-.01em;
+  background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.pb-modal-card .sub { font-size:.86rem; color:var(--pb-ink-2); margin:0 0 16px }
+.pb-field { margin-bottom:12px }
+.pb-field label {
+  display:block; font-size:.78rem; font-weight:700;
+  color:var(--pb-ink-2); margin-bottom:5px;
+}
+.pb-field input, .pb-field select, .pb-field textarea {
+  width:100%; padding:11px 13px; border:1.5px solid var(--pb-border);
+  border-radius:11px; font-size:.95rem; font-family:inherit;
+  background:#fff; color:var(--pb-ink); transition:border .15s;
+  box-sizing:border-box;
+}
+.pb-field input:focus, .pb-field select:focus, .pb-field textarea:focus {
+  outline:none; border-color:var(--pb-primary);
+  box-shadow:0 0 0 3px rgba(124,58,237,.12);
+}
+.pb-field textarea { min-height:90px; resize:vertical; line-height:1.45 }
+.pb-counter { font-size:.7rem; color:var(--pb-muted); text-align:right; margin-top:3px }
+.pb-modal-btn {
+  width:100%; padding:13px;
+  background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
+  color:#fff; border:none; border-radius:12px;
+  font-weight:800; font-size:.98rem; cursor:pointer;
+  box-shadow:0 8px 22px rgba(124,58,237,.30);
+  transition:transform .15s;
+  font-family:inherit;
+}
+.pb-modal-btn:hover { transform:translateY(-1px) }
+.pb-modal-btn:disabled { opacity:.5; cursor:not-allowed; transform:none }
+.pb-err { background:#FEF2F2; color:#B91C1C; padding:9px 12px; border-radius:9px; font-size:.84rem; font-weight:600; margin-bottom:10px; display:none }
+.pb-ok { background:#F0FDF4; color:#15803D; padding:9px 12px; border-radius:9px; font-size:.84rem; font-weight:600; margin-bottom:10px; display:none }
+
+/* ===== Detail view ===== */
+.pb-detail-q {
+  background:linear-gradient(135deg, var(--pb-tint), #FFF1F2);
+  padding:18px; border-radius:14px;
+  font-size:1.04rem; font-weight:700; color:var(--pb-ink); line-height:1.45;
+  margin:0 0 14px;
+  border-left:4px solid var(--pb-primary);
+}
+.pb-detail-meta { font-size:.78rem; color:var(--pb-ink-2); margin-bottom:14px; font-weight:600 }
+.pb-replies { display:flex; flex-direction:column; gap:10px; margin-bottom:18px }
+.pb-reply {
+  background:#F8FAFC; padding:13px 15px; border-radius:12px;
+  border:1px solid var(--pb-border);
+}
+.pb-reply-text { font-size:.94rem; color:var(--pb-ink); line-height:1.5; margin:0 0 7px; white-space:pre-wrap; word-break:break-word }
+.pb-reply-meta { font-size:.74rem; color:var(--pb-muted); font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.pb-reply-meta .biz-link { color:var(--pb-primary-d); font-weight:700; text-decoration:none; background:var(--pb-tint); padding:2px 8px; border-radius:99px; font-size:.7rem }
+.pb-reply-meta .biz-link:hover { text-decoration:underline }
+.pb-reply-add-btn {
+  background:#fff; color:var(--pb-primary-d);
+  border:1.5px solid var(--pb-primary); padding:11px;
+  border-radius:11px; font-weight:700; cursor:pointer;
+  width:100%; font-family:inherit; transition:all .15s;
+}
+.pb-reply-add-btn:hover { background:var(--pb-tint) }
+
+/* ===== Topbar ===== */
+.pb-topbar {
+  background:#fff; border-bottom:1px solid var(--pb-border);
+  padding:10px 16px;
+  display:flex; align-items:center; gap:14px;
+}
+.pb-topbar a.logo { font-weight:800; color:var(--pb-ink); text-decoration:none; font-size:1.05rem; display:flex; align-items:center; gap:7px }
+.pb-topbar .right { margin-left:auto; display:flex; gap:8px; align-items:center }
+.pb-topbar .right a {
+  padding:7px 14px; border-radius:99px; background:#F1F5F9;
+  color:var(--pb-ink); text-decoration:none; font-weight:700; font-size:.82rem;
+}
+.pb-topbar .right a:hover { background:var(--pb-tint); color:var(--pb-primary-d) }
+
+@media (max-width:680px) {
+  .pb-hero { padding:28px 16px 60px }
+  .pb-hero h1 { font-size:1.7rem }
+  .pb-hero p { font-size:.92rem }
+  .pb-q-card { padding:14px 15px }
+  .pb-q-text { font-size:.95rem }
+  .pb-modal-card { padding:18px }
+}
+
+/* Bottom nav spacer for mobile */
+@media (max-width:768px) { .pb-wrap { padding-bottom:80px } }
+.pb-loading { text-align:center; padding:40px 20px; color:var(--pb-muted); font-weight:600 }
+.pb-loading .spinner { display:inline-block; width:28px; height:28px; border:3px solid #EDE9FE; border-top-color:var(--pb-primary); border-radius:50%; animation:spin .8s linear infinite }
+@keyframes spin { to { transform:rotate(360deg) } }
+</style>
+</head>
+<body>
+
+<header class="pb-topbar">
+  <a href="/" class="logo">
+    <img src="/assets/icons/logo.svg" alt="" style="width:28px;height:28px"/>
+    <span>dukanlist</span>
+  </a>
+  <span style="font-size:.78rem;color:var(--pb-muted);font-weight:600;border-left:1px solid var(--pb-border);padding-left:12px">Pucho Bhai</span>
+  <div class="right">
+    <a href="/browse.html">Browse</a>
+    <a href="/" id="langTog" onclick="event.preventDefault();toggleLang()">हिं</a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="pb-hero">
+  <div class="pb-hero-inner">
+    <div class="pb-badge">
+      <span>✦</span>
+      <span data-i18n-en>NEW · COMMUNITY Q&amp;A BOARD</span>
+      <span data-i18n-hi>नया · कम्युनिटी Q&amp;A बोर्ड</span>
+    </div>
+    <h1>
+      <span data-i18n-en>Pucho Bhai 🙏</span>
+      <span data-i18n-hi>पूछो भाई 🙏</span>
+    </h1>
+    <p>
+      <span data-i18n-en>Apne shehar mein puchho, local logon se jawab paao. Best shops, services, recommendations — sab kuch yahin.</span>
+      <span data-i18n-hi>अपने शहर में पूछो, लोकल लोगों से जवाब पाओ। सबसे अच्छी दुकानें, सेवाएँ, सलाह — सब यहीं।</span>
+    </p>
+    <button class="pb-hero-cta" onclick="openAskModal()">
+      <span style="font-size:1.2rem">💬</span>
+      <span data-i18n-en>Ask Your Question</span>
+      <span data-i18n-hi>अपना सवाल पूछें</span>
+    </button>
+    <div class="pb-hero-stats">
+      <div><b id="hs-q">—</b><span data-i18n-en>Questions</span><span data-i18n-hi>सवाल</span></div>
+      <div><b id="hs-r">—</b><span data-i18n-en>Answers</span><span data-i18n-hi>जवाब</span></div>
+      <div><b id="hs-c">—</b><span data-i18n-en>Active Cities</span><span data-i18n-hi>शहर</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN ===== -->
+<div class="pb-wrap">
+
+  <!-- City selector card -->
+  <div class="pb-city-card">
+    <div class="pb-city-label">
+      <span>📍</span>
+      <span data-i18n-en>Select your city</span>
+      <span data-i18n-hi>अपना शहर चुनें</span>
+    </div>
+    <div class="pb-city-tabs" id="cityTabs">
+      <div class="pb-city-tab active" data-city-id=""><span data-i18n-en>All Cities</span><span data-i18n-hi>सभी शहर</span></div>
+    </div>
+  </div>
+
+  <div class="pb-grid">
+    <div>
+      <!-- Question list -->
+      <div id="qList" class="pb-list"></div>
+    </div>
+
+    <aside>
+      <!-- Leaderboard -->
+      <div class="pb-side" id="lbCard">
+        <h3>🏆 <span data-i18n-en>Active Cities</span><span data-i18n-hi>सक्रिय शहर</span></h3>
+        <div id="lbList" style="font-size:.84rem;color:var(--pb-muted)">Loading…</div>
+      </div>
+      <!-- About box -->
+      <div class="pb-side">
+        <h3>💡 <span data-i18n-en>How it works</span><span data-i18n-hi>कैसे काम करता है</span></h3>
+        <ol style="margin:0;padding-left:18px;font-size:.86rem;line-height:1.6;color:var(--pb-ink-2)">
+          <li><span data-i18n-en>Ask any local question — no login.</span><span data-i18n-hi>कोई भी लोकल सवाल पूछें — बिना लॉगिन।</span></li>
+          <li><span data-i18n-en>Locals answer based on real experience.</span><span data-i18n-hi>लोकल लोग असली अनुभव से जवाब देते हैं।</span></li>
+          <li><span data-i18n-en>Find best shops, services in your area.</span><span data-i18n-hi>अपने इलाके की बेहतरीन दुकानें खोजें।</span></li>
+          <li><span data-i18n-en>Shopkeepers reply — quote their shop.</span><span data-i18n-hi>दुकानदार जवाब देकर अपनी दुकान बता सकते हैं।</span></li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ===== ASK MODAL ===== -->
+<div class="pb-modal" id="askModal" onclick="if(event.target===this)closeAsk()">
+  <div class="pb-modal-card">
+    <button class="pb-modal-close" onclick="closeAsk()">×</button>
+    <h2><span data-i18n-en>Ask a Question</span><span data-i18n-hi>सवाल पूछें</span></h2>
+    <p class="sub"><span data-i18n-en>Locals usually reply within a few hours. Be specific!</span><span data-i18n-hi>आमतौर पर कुछ घंटों में जवाब मिलता है। साफ़ लिखें!</span></p>
+    <div class="pb-err" id="askErr"></div>
+    <div class="pb-ok" id="askOk"></div>
+    <div class="pb-field">
+      <label data-i18n-en>City</label><label data-i18n-hi style="display:none">शहर</label>
+      <select id="askCity"></select>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Category (optional)</label><label data-i18n-hi style="display:none">श्रेणी (वैकल्पिक)</label>
+      <select id="askCat"><option value="">— Any —</option></select>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Question *</label><label data-i18n-hi style="display:none">आपका सवाल *</label>
+      <textarea id="askText" maxlength="500" placeholder="e.g. Mandi Dabwali mein sabse achha mobile repair shop kaunsa hai?"></textarea>
+      <div class="pb-counter"><span id="askLen">0</span> / 500</div>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Name (optional)</label><label data-i18n-hi style="display:none">आपका नाम (वैकल्पिक)</label>
+      <input id="askName" maxlength="50" placeholder="Rajesh">
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
+      <input id="askPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="10-digit mobile">
+      <div class="pb-counter"><span data-i18n-en>Only used to prevent spam — never shown publicly</span><span data-i18n-hi>केवल स्पैम रोकने के लिए — कभी सार्वजनिक नहीं</span></div>
+    </div>
+    <button class="pb-modal-btn" id="askSubmit" onclick="submitAsk()">
+      <span data-i18n-en>Post Question</span><span data-i18n-hi>सवाल भेजें</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="pb-modal" id="detailModal" onclick="if(event.target===this)closeDetail()">
+  <div class="pb-modal-card">
+    <button class="pb-modal-close" onclick="closeDetail()">×</button>
+    <div id="detailBody"><div class="pb-loading"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ===== REPLY MODAL ===== -->
+<div class="pb-modal" id="replyModal" onclick="if(event.target===this)closeReply()">
+  <div class="pb-modal-card">
+    <button class="pb-modal-close" onclick="closeReply()">×</button>
+    <h2><span data-i18n-en>Post Your Reply</span><span data-i18n-hi>अपना जवाब दें</span></h2>
+    <p class="sub" id="replyQuestionPreview" style="background:#F8FAFC;padding:10px 12px;border-radius:9px;font-style:italic;color:var(--pb-ink-2);font-weight:600"></p>
+    <div class="pb-err" id="rErr"></div>
+    <div class="pb-ok" id="rOk"></div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Reply *</label><label data-i18n-hi style="display:none">आपका जवाब *</label>
+      <textarea id="rText" maxlength="1000" placeholder="Bhai mai use karta hu, sahi service deta hai..."></textarea>
+      <div class="pb-counter"><span id="rLen">0</span> / 1000</div>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Name (optional)</label><label data-i18n-hi style="display:none">आपका नाम (वैकल्पिक)</label>
+      <input id="rName" maxlength="50" placeholder="Mukesh">
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
+      <input id="rPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="10-digit mobile">
+    </div>
+    <div class="pb-field">
+      <label>
+        <span data-i18n-en>Recommending a shop? (optional)</span>
+        <span data-i18n-hi style="display:none">कोई दुकान सुझा रहे हैं? (वैकल्पिक)</span>
+      </label>
+      <select id="rBiz"><option value="">— None —</option></select>
+      <div class="pb-counter"><span data-i18n-en>If you own a shop, you can quote it here</span><span data-i18n-hi>दुकान वाले अपनी दुकान का नाम जोड़ सकते हैं</span></div>
+    </div>
+    <button class="pb-modal-btn" id="rSubmit" onclick="submitReply()">
+      <span data-i18n-en>Post Reply</span><span data-i18n-hi>जवाब भेजें</span>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/city-persist.js"></script>
+<script>
+'use strict';
+
+const SB = ShopDB.client;
+let CURRENT_CITY = null;     // {id, name, slug?}
+let CITIES = [];
+let CATEGORIES = [];
+let ACTIVE_QUESTION_ID = null;
+let MY_BIZ_LIST = [];        // populated if logged in
+
+// ====== Lang toggle ======
+function toggleLang(){
+  const cur = document.documentElement.getAttribute('data-lang') || 'en';
+  const next = cur === 'en' ? 'hi' : 'en';
+  document.documentElement.setAttribute('data-lang', next);
+  document.querySelectorAll('[data-i18n-en]').forEach(el=>{ el.style.display = next==='en' ? '' : 'none' });
+  document.querySelectorAll('[data-i18n-hi]').forEach(el=>{ el.style.display = next==='hi' ? '' : 'none' });
+  try { localStorage.setItem('dl_lang', next) } catch(_){}
+  document.getElementById('langTog').textContent = next==='en' ? 'हिं' : 'EN';
+}
+try {
+  const saved = localStorage.getItem('dl_lang');
+  if (saved === 'hi') toggleLang();
+} catch(_){}
+
+// ====== Load city tabs ======
+async function loadCities(){
+  const { data, error } = await SB
+    .from('geo_cities')
+    .select('id, name, active')
+    .eq('active', true)
+    .order('name');
+  if (error) { console.error(error); return; }
+  CITIES = data || [];
+
+  const tabs = document.getElementById('cityTabs');
+  // populate counts asynchronously
+  const counts = {};
+  try {
+    const { data: lbData } = await SB.rpc('get_community_city_leaderboard');
+    (lbData || []).forEach(r => { counts[r.city_id] = r.question_count; });
+  } catch(_){}
+
+  // Default city from city-persist (slug-based) — map slug to id
+  let savedSlug = ''; try { savedSlug = DukanCity.get(); } catch(_){}
+  let defaultCityId = null;
+  if (savedSlug) {
+    const match = CITIES.find(c => c.name.toLowerCase().replace(/\s+/g,'-') === savedSlug);
+    if (match) defaultCityId = match.id;
+  }
+
+  CITIES.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'pb-city-tab';
+    el.dataset.cityId = c.id;
+    const cnt = counts[c.id] || 0;
+    el.innerHTML = `<span>${escapeHtml(c.name)}</span>` + (cnt>0?`<span class="count">${cnt}</span>`:'');
+    el.onclick = ()=>selectCity(c.id, c.name);
+    tabs.appendChild(el);
+  });
+
+  // Populate ask modal city dropdown
+  const askCity = document.getElementById('askCity');
+  CITIES.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id; o.textContent = c.name;
+    askCity.appendChild(o);
+  });
+
+  // Set default
+  if (defaultCityId) {
+    selectCity(defaultCityId, CITIES.find(c=>c.id===defaultCityId).name);
+    askCity.value = defaultCityId;
+  } else {
+    selectCity(null, null);  // "All"
+  }
+}
+
+function selectCity(id, name){
+  CURRENT_CITY = id ? {id, name} : null;
+  document.querySelectorAll('.pb-city-tab').forEach(t=>{
+    t.classList.toggle('active', String(t.dataset.cityId||'') === String(id||''));
+  });
+  // Save to persist if a real city
+  if (id && name) {
+    try { DukanCity.set(name.toLowerCase().replace(/\s+/g,'-')); } catch(_){}
+  }
+  loadQuestions();
+}
+
+// ====== Load categories (for ask modal) ======
+async function loadCategories(){
+  try {
+    // attempt with parent_id ordering, but graceful fallback
+    const { data, error } = await SB
+      .from('categories')
+      .select('id, name, parent_id')
+      .order('name')
+      .limit(300);
+    if (error) { console.warn(error); return; }
+    CATEGORIES = data || [];
+    const sel = document.getElementById('askCat');
+    CATEGORIES.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      sel.appendChild(o);
+    });
+  } catch(e){ console.warn(e); }
+}
+
+// ====== Load questions ======
+async function loadQuestions(){
+  const wrap = document.getElementById('qList');
+  wrap.innerHTML = '<div class="pb-loading"><div class="spinner"></div></div>';
+  try {
+    const { data, error } = await SB.rpc('get_community_questions', {
+      p_city_id: CURRENT_CITY ? CURRENT_CITY.id : null,
+      p_limit: 30, p_offset: 0
+    });
+    if (error) throw error;
+    renderQuestions(data || []);
+  } catch(e){
+    console.error(e);
+    wrap.innerHTML = `<div class="pb-empty"><div class="e-icon">⚠️</div><h3>Could not load</h3><p>${escapeHtml(e.message||'Network error')}</p></div>`;
+  }
+}
+
+function renderQuestions(rows){
+  const wrap = document.getElementById('qList');
+  if (!rows.length) {
+    const cityLabel = CURRENT_CITY ? CURRENT_CITY.name : 'any city';
+    wrap.innerHTML = `
+      <div class="pb-empty">
+        <div class="e-icon">💬</div>
+        <h3>Be the first to ask!</h3>
+        <p>No questions yet in <b>${escapeHtml(cityLabel)}</b>. Ask anything — locals are watching.</p>
+        <button class="pb-hero-cta" style="background:linear-gradient(135deg,var(--pb-primary),var(--pb-accent));color:#fff" onclick="openAskModal()">
+          💬 Ask First Question
+        </button>
+      </div>`;
+    return;
+  }
+  wrap.innerHTML = rows.map(q => {
+    const ago = timeAgo(q.created_at);
+    const hasAns = (q.reply_count || 0) > 0;
+    const ansBadge = hasAns
+      ? `<span class="ans-yes">✓ ${q.reply_count} ${q.reply_count===1?'reply':'replies'}</span>`
+      : `<span class="ans-no">⏳ Awaiting reply</span>`;
+    return `
+      <div class="pb-q-card" onclick="openDetail('${q.id}')">
+        <div class="pb-q-meta">
+          ${q.city_name ? `<span class="pb-pill">📍 ${escapeHtml(q.city_name)}</span>` : ''}
+          ${q.category_name ? `<span class="pb-pill cat">${escapeHtml(q.category_name)}</span>` : ''}
+          ${q.asker_name ? `<span>· asked by <b style="color:var(--pb-ink-2)">${escapeHtml(q.asker_name)}</b></span>` : '<span>· anonymous</span>'}
+          <span>· ${ago}</span>
+        </div>
+        <div class="pb-q-text">${escapeHtml(q.question_text)}</div>
+        <div class="pb-q-foot">
+          ${ansBadge}
+          <span>👁 ${q.view_count || 0}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ====== Stats + Leaderboard ======
+async function loadLeaderboard(){
+  const lb = document.getElementById('lbList');
+  try {
+    const { data, error } = await SB.rpc('get_community_city_leaderboard');
+    if (error) throw error;
+    if (!data || !data.length) {
+      lb.innerHTML = '<div style="font-size:.84rem;color:var(--pb-muted);text-align:center;padding:14px 0">No activity yet. Be the first!</div>';
+      return;
+    }
+    lb.innerHTML = data.map((r, i) => `
+      <div class="pb-lb-row ${i===0?'top1':i===1?'top2':i===2?'top3':''}" onclick="selectCity(${r.city_id}, '${escapeAttr(r.city_name)}');window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">
+        <div class="pb-lb-rank">${i+1}</div>
+        <div class="pb-lb-name">${escapeHtml(r.city_name)}</div>
+        <div class="pb-lb-count">${r.question_count}Q${r.recent_count>0?`<span class="pb-lb-recent">+${r.recent_count}</span>`:''}</div>
+      </div>
+    `).join('');
+    // Update hero stats
+    const totalQ = data.reduce((s,r)=>s+Number(r.question_count||0),0);
+    const totalR = data.reduce((s,r)=>s+Number(r.reply_count||0),0);
+    document.getElementById('hs-q').textContent = totalQ;
+    document.getElementById('hs-r').textContent = totalR;
+    document.getElementById('hs-c').textContent = data.length;
+  } catch(e){
+    console.error(e);
+    lb.innerHTML = '<div style="font-size:.78rem;color:#B91C1C">Leaderboard offline</div>';
+  }
+}
+
+// ====== Ask modal ======
+function openAskModal(){
+  document.getElementById('askModal').classList.add('active');
+  document.getElementById('askErr').style.display='none';
+  document.getElementById('askOk').style.display='none';
+  // Default ask-city to current city
+  if (CURRENT_CITY) document.getElementById('askCity').value = CURRENT_CITY.id;
+  // Restore phone from localStorage
+  try { document.getElementById('askPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+  try { document.getElementById('askName').value = localStorage.getItem('dl_pb_name') || ''; } catch(_){}
+}
+function closeAsk(){ document.getElementById('askModal').classList.remove('active') }
+
+document.getElementById('askText').addEventListener('input', e=>{
+  document.getElementById('askLen').textContent = e.target.value.length;
+});
+
+async function submitAsk(){
+  const btn = document.getElementById('askSubmit');
+  const err = document.getElementById('askErr');
+  const ok = document.getElementById('askOk');
+  err.style.display='none'; ok.style.display='none';
+  const cityId = parseInt(document.getElementById('askCity').value, 10);
+  const catId = document.getElementById('askCat').value ? parseInt(document.getElementById('askCat').value, 10) : null;
+  const text = document.getElementById('askText').value.trim();
+  const name = document.getElementById('askName').value.trim();
+  const phone = document.getElementById('askPhone').value.trim();
+
+  if (!cityId) { err.textContent='Please select a city'; err.style.display='block'; return; }
+  if (text.length < 10) { err.textContent='Question must be at least 10 characters'; err.style.display='block'; return; }
+  if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+  try {
+    const { data, error } = await SB.rpc('post_community_question', {
+      p_city_id: cityId,
+      p_category_id: catId,
+      p_question_text: text,
+      p_asker_name: name || null,
+      p_asker_phone: phone
+    });
+    if (error) throw error;
+    ok.textContent = '✓ Question posted! Locals will reply soon.';
+    ok.style.display='block';
+    try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
+    document.getElementById('askText').value=''; document.getElementById('askLen').textContent='0';
+    setTimeout(()=>{ closeAsk(); loadQuestions(); loadLeaderboard(); }, 1100);
+  } catch(e){
+    err.textContent = (e.message || 'Could not post').replace(/^.*?:\s*/,'');
+    err.style.display='block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Post Question</span><span data-i18n-hi style="display:none">सवाल भेजें</span>';
+  }
+}
+
+// ====== Detail view ======
+async function openDetail(qid){
+  ACTIVE_QUESTION_ID = qid;
+  const m = document.getElementById('detailModal');
+  m.classList.add('active');
+  const body = document.getElementById('detailBody');
+  body.innerHTML = '<div class="pb-loading"><div class="spinner"></div></div>';
+  try {
+    const { data, error } = await SB.rpc('get_community_question_detail', { p_id: qid });
+    if (error) throw error;
+    const q = data.question;
+    const replies = data.replies || [];
+    body.innerHTML = `
+      <div class="pb-detail-meta">
+        ${q.city_name ? `<span class="pb-pill" style="background:var(--pb-tint);color:var(--pb-primary-d);padding:2px 8px;border-radius:99px;font-weight:700;font-size:.7rem">📍 ${escapeHtml(q.city_name)}</span> · ` : ''}
+        ${q.asker_name ? `Asked by <b>${escapeHtml(q.asker_name)}</b>` : 'Asked anonymously'}
+        · ${timeAgo(q.created_at)} · 👁 ${q.view_count}
+      </div>
+      <div class="pb-detail-q">${escapeHtml(q.question_text)}</div>
+      <div style="font-size:.84rem;font-weight:800;color:var(--pb-ink-2);margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em">
+        ${replies.length} ${replies.length===1?'Reply':'Replies'}
+      </div>
+      <div class="pb-replies">
+        ${replies.length===0
+          ? `<div style="background:#FFFBEB;border:1px dashed #F59E0B;padding:14px;border-radius:11px;text-align:center;color:#92400E;font-weight:600;font-size:.88rem">⏳ No replies yet — be the first to help!</div>`
+          : replies.map(r => `
+              <div class="pb-reply">
+                <p class="pb-reply-text">${escapeHtml(r.reply_text)}</p>
+                <div class="pb-reply-meta">
+                  ${r.replier_name ? `<b>${escapeHtml(r.replier_name)}</b>` : 'Anonymous'}
+                  ${r.business_name ? `<a class="biz-link" href="/business.html?slug=${encodeURIComponent(r.business_slug||'')}" target="_blank">🏪 ${escapeHtml(r.business_name)}</a>` : ''}
+                  <span>· ${timeAgo(r.created_at)}</span>
+                </div>
+              </div>
+            `).join('')
+        }
+      </div>
+      <button class="pb-reply-add-btn" onclick="openReplyModal('${escapeAttr(q.question_text)}')">
+        💬 Post Your Reply
+      </button>
+    `;
+  } catch(e){
+    body.innerHTML = `<div class="pb-empty"><div class="e-icon">⚠️</div><h3>Could not load</h3><p>${escapeHtml(e.message||'')}</p></div>`;
+  }
+}
+function closeDetail(){ document.getElementById('detailModal').classList.remove('active'); ACTIVE_QUESTION_ID=null; }
+
+// ====== Reply modal ======
+async function openReplyModal(qpreview){
+  if (!ACTIVE_QUESTION_ID) return;
+  document.getElementById('replyModal').classList.add('active');
+  document.getElementById('replyQuestionPreview').textContent = '"' + qpreview + '"';
+  document.getElementById('rErr').style.display='none';
+  document.getElementById('rOk').style.display='none';
+  try { document.getElementById('rPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+  try { document.getElementById('rName').value = localStorage.getItem('dl_pb_name') || ''; } catch(_){}
+  // populate biz dropdown if logged in
+  await populateMyBizDropdown();
+}
+function closeReply(){ document.getElementById('replyModal').classList.remove('active') }
+
+document.getElementById('rText').addEventListener('input', e=>{
+  document.getElementById('rLen').textContent = e.target.value.length;
+});
+
+async function populateMyBizDropdown(){
+  const sel = document.getElementById('rBiz');
+  sel.innerHTML = '<option value="">— None —</option>';
+  try {
+    const user = await ShopDB.getUser();
+    if (!user) return;
+    const { data } = await SB
+      .from('businesses')
+      .select('id, name')
+      .eq('owner_id', user.id)
+      .eq('status','active')
+      .limit(10);
+    (data||[]).forEach(b=>{
+      const o = document.createElement('option');
+      o.value = b.id; o.textContent = '🏪 ' + b.name + ' (your shop)';
+      sel.appendChild(o);
+    });
+  } catch(_){}
+}
+
+async function submitReply(){
+  const btn = document.getElementById('rSubmit');
+  const err = document.getElementById('rErr');
+  const ok = document.getElementById('rOk');
+  err.style.display='none'; ok.style.display='none';
+  const text = document.getElementById('rText').value.trim();
+  const name = document.getElementById('rName').value.trim();
+  const phone = document.getElementById('rPhone').value.trim();
+  const bizId = document.getElementById('rBiz').value || null;
+
+  if (text.length < 4) { err.textContent='Reply must be at least 4 characters'; err.style.display='block'; return; }
+  if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+  try {
+    const { data, error } = await SB.rpc('post_community_reply', {
+      p_question_id: ACTIVE_QUESTION_ID,
+      p_reply_text: text,
+      p_replier_name: name || null,
+      p_replier_phone: phone,
+      p_business_id: bizId
+    });
+    if (error) throw error;
+    ok.textContent = '✓ Reply posted!';
+    ok.style.display='block';
+    try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
+    document.getElementById('rText').value=''; document.getElementById('rLen').textContent='0';
+    setTimeout(()=>{
+      closeReply();
+      if (ACTIVE_QUESTION_ID) openDetail(ACTIVE_QUESTION_ID);
+      loadQuestions();
+    }, 900);
+  } catch(e){
+    err.textContent = (e.message || 'Could not post').replace(/^.*?:\s*/,'');
+    err.style.display='block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Post Reply</span><span data-i18n-hi style="display:none">जवाब भेजें</span>';
+  }
+}
+
+// ====== Helpers ======
+function escapeHtml(s){
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
+function timeAgo(iso){
+  if (!iso) return '';
+  const t = new Date(iso).getTime();
+  const s = Math.floor((Date.now() - t)/1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60)+'m ago';
+  if (s < 86400) return Math.floor(s/3600)+'h ago';
+  if (s < 86400*7) return Math.floor(s/86400)+'d ago';
+  return new Date(iso).toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+}
+
+// Bootstrap
+(async () => {
+  await Promise.all([loadCities(), loadCategories(), loadLeaderboard()]);
+})();
+</script>
+
+<!-- Mobile bottom nav include (existing pattern) -->
+<script>
+  // Mobile bottom nav (existing pattern from other pages)
+  if (window.innerWidth <= 768) {
+    const nav = document.createElement('nav');
+    nav.id = 'mobileBottomNav';
+    nav.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E2E8F0;display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:90;box-shadow:0 -2px 8px rgba(15,23,42,.04)';
+    nav.innerHTML = `
+      <a href="/" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🏠<div>Home</div></a>
+      <a href="/browse.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">📂<div>Browse</div></a>
+      <a href="/pucho-bhai.html" style="text-align:center;text-decoration:none;color:var(--pb-primary-d);font-size:.66rem;font-weight:800">💬<div>Pucho Bhai</div></a>
+      <a href="/search.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🔍<div>Search</div></a>
+      <a href="/panel/dashboard.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">👤<div>Account</div></a>
+    `;
+    document.body.appendChild(nav);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Pucho Bhai Moderation — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif;background:#f1f5f9;color:#0F172A;font-size:14px;line-height:1.5}
+.topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.badge{font-size:10px;font-weight:700;background:#A78BFA;color:#0F172A;padding:2px 7px;border-radius:5px}
+.topbar a{color:#cbd5e1;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;transition:.15s}
+.topbar a:hover{background:rgba(255,255,255,.1);color:#fff}
+.topbar a.active{background:rgba(167,139,250,.2);color:#C4B5FD}
+.main{max-width:1180px;margin:24px auto;padding:0 18px}
+h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;color:#0F172A}
+.sub{font-size:13px;color:#64748b;margin-bottom:20px}
+
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{background:#fff;color:#475569;border:1px solid #E2E8F0;padding:9px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.12s}
+.tab:hover{background:#F1F5F9}
+.tab.active{background:#7C3AED;color:#fff;border-color:#7C3AED;box-shadow:0 4px 12px rgba(124,58,237,.25)}
+.tab .cnt{background:rgba(255,255,255,.25);padding:1px 7px;border-radius:99px;font-size:11px;margin-left:5px}
+.tab:not(.active) .cnt{background:#F1F5F9;color:#64748b}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:#fff;border-radius:10px;padding:14px;border:1px solid #E2E8F0}
+.stat .v{font-size:1.8rem;font-weight:900;line-height:1;color:#7C3AED;letter-spacing:-.02em}
+.stat .l{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-top:5px}
+
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.04);margin-bottom:14px}
+.q-row{padding:16px 18px;border-bottom:1px solid #f1f5f9}
+.q-row:last-child{border-bottom:none}
+.q-meta{font-size:11px;color:#64748b;margin-bottom:6px;display:flex;flex-wrap:wrap;gap:10px;font-weight:600}
+.q-pill{background:#F5F3FF;color:#6D28D9;padding:1px 7px;border-radius:99px;font-weight:700}
+.q-text{font-size:15px;font-weight:700;color:#0F172A;line-height:1.4;margin-bottom:5px;word-break:break-word}
+.q-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px;font-size:11.5px;color:#64748b;font-weight:600}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.btn{padding:5px 11px;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:.12s}
+.btn-flag{background:#FEF3C7;color:#92400E}
+.btn-flag:hover{background:#FDE68A}
+.btn-remove{background:#FEE2E2;color:#991B1B}
+.btn-remove:hover{background:#FECACA}
+.btn-restore{background:#D1FAE5;color:#065F46}
+.btn-restore:hover{background:#A7F3D0}
+.btn-view{background:#E0E7FF;color:#3730A3}
+.btn-view:hover{background:#C7D2FE}
+
+.status-pill{display:inline-block;padding:1px 8px;border-radius:5px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.s-active{background:#D1FAE5;color:#065F46}
+.s-flagged{background:#FEF3C7;color:#92400E}
+.s-removed{background:#FEE2E2;color:#991B1B}
+
+.empty{padding:60px 20px;text-align:center;color:#94a3b8}
+.empty .ico{font-size:54px;opacity:.5;margin-bottom:10px;display:block}
+.empty .et{font-size:17px;font-weight:800;color:#10B981;margin-bottom:5px}
+.empty .es{font-size:13px;max-width:380px;margin:0 auto;color:#64748b}
+
+.loader{text-align:center;padding:60px 20px;color:#64748b}
+.err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:14px;border-radius:9px;font-size:13px;font-weight:600;margin-bottom:14px}
+
+.reply-block{background:#F8FAFC;margin-top:8px;padding:10px 12px;border-radius:8px;border-left:3px solid #A78BFA}
+.reply-text{font-size:13px;color:#0F172A;line-height:1.45;margin-bottom:5px;word-break:break-word}
+.reply-meta{font-size:10.5px;color:#64748b;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+@media (max-width:680px){
+  .topbar{padding:10px 14px}
+  .topbar nav{order:3;width:100%;justify-content:flex-start;overflow-x:auto;display:flex;flex-wrap:nowrap}
+  .main{padding:0 12px;margin:16px auto}
+  .q-row{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="/admin/dashboard" style="display:flex;align-items:center;gap:10px;color:#fff;padding:0">🛡️ <strong>Admin</strong> <span class="badge">Pucho Bhai</span></a>
+  </div>
+  <nav style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/suspicious.html">🚨 Suspicious</a>
+    <a href="/admin/pucho-moderation.html" class="active">💬 Pucho Bhai</a>
+    <a href="/admin/activity.html">📋 Activity</a>
+    <a href="/" target="_blank">🌐 Site</a>
+  </nav>
+</header>
+
+<main class="main">
+  <h1>💬 Pucho Bhai Moderation</h1>
+  <p class="sub">Community Q&amp;A board — manage flagged or abusive content. Hide spam, restore good content.</p>
+
+  <div id="errBox"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="v" id="cntActive">—</div><div class="l">Active Q's</div></div>
+    <div class="stat"><div class="v" id="cntActiveR">—</div><div class="l">Active Replies</div></div>
+    <div class="stat"><div class="v" id="cntFlagged" style="color:#F59E0B">—</div><div class="l">Flagged</div></div>
+    <div class="stat"><div class="v" id="cntRemoved" style="color:#EF4444">—</div><div class="l">Removed</div></div>
+    <div class="stat"><div class="v" id="cnt24h">—</div><div class="l">Last 24h</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="active" onclick="setTab('active')">📥 Active <span class="cnt" id="tab-active">0</span></div>
+    <div class="tab" data-tab="flagged" onclick="setTab('flagged')">🚩 Flagged <span class="cnt" id="tab-flagged">0</span></div>
+    <div class="tab" data-tab="removed" onclick="setTab('removed')">🗑 Removed <span class="cnt" id="tab-removed">0</span></div>
+    <div class="tab" data-tab="replies" onclick="setTab('replies')">💬 All Replies <span class="cnt" id="tab-replies">0</span></div>
+  </div>
+
+  <div id="content"><div class="loader">⏳ Loading…</div></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+'use strict';
+
+const SB = ShopDB.client;
+let CURRENT_TAB = 'active';
+let ALL_QUESTIONS = [];
+let ALL_REPLIES = [];
+
+async function init(){
+  // Auth gate
+  try {
+    const u = await SB.auth.getUser();
+    if (!u || !u.data || !u.data.user){ window.location.href='/admin/login.html'; return; }
+    const ia = await SB.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); window.location.href='/admin/login.html'; return; }
+  } catch(e){
+    document.getElementById('errBox').innerHTML = '<div class="err">Auth failed: '+escapeHtml(e.message||e)+'</div>';
+    return;
+  }
+  await refresh();
+}
+
+async function refresh(){
+  document.getElementById('content').innerHTML = '<div class="loader">⏳ Loading…</div>';
+  try {
+    // Fetch all questions (admin can see all statuses)
+    const { data: qData, error: qErr } = await SB
+      .from('community_questions')
+      .select('id, city_id, asker_name, question_text, view_count, reply_count, status, created_at')
+      .order('created_at', { ascending:false })
+      .limit(300);
+    if (qErr) throw qErr;
+
+    // Fetch city names
+    const { data: cities } = await SB.from('geo_cities').select('id,name');
+    const cityMap = {};
+    (cities||[]).forEach(c=>{ cityMap[c.id] = c.name; });
+
+    ALL_QUESTIONS = (qData||[]).map(q => ({ ...q, city_name: cityMap[q.city_id] || '' }));
+
+    // Fetch all replies
+    const { data: rData, error: rErr } = await SB
+      .from('community_replies')
+      .select('id, question_id, replier_name, reply_text, business_id, status, created_at')
+      .order('created_at', { ascending:false })
+      .limit(500);
+    if (rErr) throw rErr;
+    ALL_REPLIES = rData || [];
+
+    // Update stats
+    const active = ALL_QUESTIONS.filter(q=>q.status==='active').length;
+    const flagged = ALL_QUESTIONS.filter(q=>q.status==='flagged').length;
+    const removed = ALL_QUESTIONS.filter(q=>q.status==='removed').length;
+    const activeR = ALL_REPLIES.filter(r=>r.status==='active').length;
+    const cutoff = Date.now() - 86400*1000;
+    const recent = ALL_QUESTIONS.filter(q => new Date(q.created_at).getTime() > cutoff).length;
+
+    document.getElementById('cntActive').textContent = active;
+    document.getElementById('cntActiveR').textContent = activeR;
+    document.getElementById('cntFlagged').textContent = flagged;
+    document.getElementById('cntRemoved').textContent = removed;
+    document.getElementById('cnt24h').textContent = recent;
+
+    document.getElementById('tab-active').textContent = active;
+    document.getElementById('tab-flagged').textContent = flagged;
+    document.getElementById('tab-removed').textContent = removed;
+    document.getElementById('tab-replies').textContent = ALL_REPLIES.length;
+
+    render();
+  } catch(e){
+    document.getElementById('content').innerHTML =
+      '<div class="err"><b>Failed to load.</b> '+escapeHtml(e.message||'')
+      +'<br><br>If table is missing, run <code>db/52-pucho-bhai-board.sql</code> in Supabase SQL Editor.</div>';
+  }
+}
+
+function setTab(t){
+  CURRENT_TAB = t;
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab===t));
+  render();
+}
+
+function render(){
+  const box = document.getElementById('content');
+  if (CURRENT_TAB === 'replies'){
+    renderReplies(box);
+    return;
+  }
+  const rows = ALL_QUESTIONS.filter(q => q.status === CURRENT_TAB);
+  if (!rows.length){
+    box.innerHTML = '<div class="card"><div class="empty"><span class="ico">'
+      + (CURRENT_TAB==='active'?'✅':CURRENT_TAB==='flagged'?'🚩':'🗑')
+      + '</span><div class="et">All clear!</div><div class="es">No '+CURRENT_TAB+' items to review.</div></div></div>';
+    return;
+  }
+  box.innerHTML = '<div class="card">' + rows.map(q => {
+    // attach replies for this question
+    const myReplies = ALL_REPLIES.filter(r => r.question_id === q.id);
+    return `
+      <div class="q-row">
+        <div class="q-meta">
+          ${q.city_name?`<span class="q-pill">📍 ${escapeHtml(q.city_name)}</span>`:''}
+          <span class="status-pill s-${q.status}">${q.status}</span>
+          <span>${q.asker_name?'<b>'+escapeHtml(q.asker_name)+'</b>':'anonymous'}</span>
+          <span>· ${timeAgo(q.created_at)}</span>
+          <span>· 👁 ${q.view_count}</span>
+          <span>· 💬 ${q.reply_count} replies</span>
+        </div>
+        <div class="q-text">${escapeHtml(q.question_text)}</div>
+        <div class="q-foot">
+          <span style="font-size:10.5px;color:#94a3b8">ID: ${q.id.slice(0,8)}…</span>
+          <div class="actions">
+            ${q.status!=='active'?`<button class="btn btn-restore" onclick="moderate('question','${q.id}','active')">↺ Restore</button>`:''}
+            ${q.status!=='flagged'?`<button class="btn btn-flag" onclick="moderate('question','${q.id}','flagged')">🚩 Flag</button>`:''}
+            ${q.status!=='removed'?`<button class="btn btn-remove" onclick="if(confirm('Hide this question from public?'))moderate('question','${q.id}','removed')">🗑 Remove</button>`:''}
+          </div>
+        </div>
+        ${myReplies.length ? `
+          <div style="margin-top:10px;font-size:11px;font-weight:800;color:#64748b;letter-spacing:.04em;text-transform:uppercase">Replies (${myReplies.length})</div>
+          ${myReplies.map(r=>renderReplyBlock(r)).join('')}
+        ` : ''}
+      </div>
+    `;
+  }).join('') + '</div>';
+}
+
+function renderReplies(box){
+  if (!ALL_REPLIES.length){
+    box.innerHTML = '<div class="card"><div class="empty"><span class="ico">💬</span><div class="et">No replies yet</div></div></div>';
+    return;
+  }
+  box.innerHTML = '<div class="card">' + ALL_REPLIES.map(r => `
+    <div class="q-row">
+      ${renderReplyBlock(r, true)}
+    </div>
+  `).join('') + '</div>';
+}
+
+function renderReplyBlock(r, full){
+  const qMatch = ALL_QUESTIONS.find(q => q.id === r.question_id);
+  return `
+    <div class="reply-block">
+      <div class="reply-text">${escapeHtml(r.reply_text)}</div>
+      <div class="reply-meta">
+        <span class="status-pill s-${r.status}">${r.status}</span>
+        <span>${r.replier_name?'<b>'+escapeHtml(r.replier_name)+'</b>':'anonymous'}</span>
+        ${r.business_id?'<span style="color:#7C3AED;font-weight:700">🏪 shop linked</span>':''}
+        <span>· ${timeAgo(r.created_at)}</span>
+        ${full && qMatch ? `<span style="background:#F1F5F9;padding:1px 6px;border-radius:5px;font-size:10px">on: ${escapeHtml(qMatch.question_text.slice(0,40))}…</span>` : ''}
+        <div class="actions">
+          ${r.status!=='active'?`<button class="btn btn-restore" onclick="moderate('reply','${r.id}','active')">↺</button>`:''}
+          ${r.status!=='flagged'?`<button class="btn btn-flag" onclick="moderate('reply','${r.id}','flagged')">🚩</button>`:''}
+          ${r.status!=='removed'?`<button class="btn btn-remove" onclick="if(confirm('Remove this reply?'))moderate('reply','${r.id}','removed')">🗑</button>`:''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function moderate(type, id, newStatus){
+  try {
+    const { error } = await SB.rpc('admin_moderate_community_item', {
+      p_type: type, p_id: id, p_new_status: newStatus
+    });
+    if (error) throw error;
+    await refresh();
+  } catch(e){
+    alert('Failed: ' + (e.message || e));
+  }
+}
+
+function escapeHtml(s){
+  if (s==null) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function timeAgo(iso){
+  if (!iso) return '';
+  const s = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if (s<60) return 'just now';
+  if (s<3600) return Math.floor(s/60)+'m';
+  if (s<86400) return Math.floor(s/3600)+'h';
+  return Math.floor(s/86400)+'d';
+}
+
+init();
+</script>
+</body>
+</html>

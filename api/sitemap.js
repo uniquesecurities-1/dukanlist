@@ -15,6 +15,7 @@ const STATIC_PAGES = [
   { path: '/',             priority: '1.0', freq: 'daily'   },
   { path: '/browse.html',  priority: '0.9', freq: 'daily'   },
   { path: '/search.html',  priority: '0.9', freq: 'daily'   },
+  { path: '/pucho-bhai.html', priority: '0.9', freq: 'hourly' },
   { path: '/register.html',priority: '0.8', freq: 'monthly' },
   { path: '/about.html',   priority: '0.7', freq: 'monthly' },
   { path: '/contact.html', priority: '0.7', freq: 'monthly' },

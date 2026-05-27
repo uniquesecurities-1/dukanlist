@@ -138,7 +138,8 @@ html[data-lang="hi"] .hero-tag{ font-family:'Noto Sans Devanagari',sans-serif }
   .hero-chips{ grid-template-columns:repeat(4,1fr); gap:6px }
   .hchip{ padding:8px 4px; font-size:.72rem; border-radius:9px }
   .hero-extras{ margin-bottom:16px; gap:6px }
-  #openNowHome, #installBtn{ padding:6px 12px; font-size:.74rem }
+  #openNowHome, #installBtn, #puchoBhaiPill{ padding:6px 12px !important; font-size:.74rem !important }
+  #puchoBhaiPill span:last-child{ font-size:.58rem; padding:1px 5px }
   .hero-search-first .hero-stats{
     display:grid !important;
     grid-template-columns:repeat(4,1fr) !important;
@@ -720,6 +721,10 @@ function dismissFestBanner(){
         <span class="dot"></span>
         <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
       </label>
+      <a href="/pucho-bhai.html" id="puchoBhaiPill" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;border-radius:99px;font-weight:800;font-size:.82rem;text-decoration:none;box-shadow:0 4px 12px rgba(124,58,237,.25);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(124,58,237,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(124,58,237,.25)'">
+        💬 <span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span>
+        <span style="background:rgba(255,255,255,.25);font-size:.62rem;padding:1px 6px;border-radius:99px;font-weight:800;letter-spacing:.04em">NEW</span>
+      </a>
       <button type="button" id="installBtn" style="display:none">
         📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
       </button>
@@ -885,6 +890,12 @@ function dismissFestBanner(){
   </div>
   <div class="cats-wrap">
     <div class="wn-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:1180px;margin:0 auto">
+
+      <a href="/pucho-bhai.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#DDD6FE !important;background:linear-gradient(135deg,#FAF5FF 0%,#FFF1F2 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(124,58,237,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff">💬</div><span class="wn-badge new" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff">JUST LAUNCHED</span></div>
+        <h3><span data-i18n-en>Pucho Bhai — Community Q&amp;A</span><span data-i18n-hi>पूछो भाई — कम्युनिटी Q&amp;A</span></h3>
+        <p><span data-i18n-en>Apne shehar ka local Q&amp;A board. Ask anything, locals reply — best shops, services, hidden gems. No login needed!</span><span data-i18n-hi>अपने शहर का लोकल Q&amp;A बोर्ड। पूछिए कुछ भी, लोकल लोग जवाब देंगे। बिना लॉगिन!</span></p>
+      </a>
 
       <div class="wn-card" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#FED7AA,#FB923C)">📱</div><span class="wn-badge new">PRO</span></div>
