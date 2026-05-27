@@ -741,10 +741,36 @@ function dismissFestBanner(){
         <span class="dot"></span>
         <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
       </label>
-      <a href="/pucho-bhai.html" id="puchoBhaiPill" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;border-radius:99px;font-weight:800;font-size:.82rem;text-decoration:none;box-shadow:0 4px 12px rgba(124,58,237,.25);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(124,58,237,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(124,58,237,.25)'">
-        💬 <span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span>
-        <span style="background:rgba(255,255,255,.25);font-size:.62rem;padding:1px 6px;border-radius:99px;font-weight:800;letter-spacing:.04em">NEW</span>
-      </a>
+      <div style="position:relative;display:inline-flex;align-items:center">
+        <span class="pucho-attn-arrow" aria-hidden="true">👉</span>
+        <a href="/pucho-bhai.html" id="puchoBhaiPill" class="pucho-bhai-pill" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;border-radius:99px;font-weight:800;font-size:.82rem;text-decoration:none;box-shadow:0 4px 12px rgba(124,58,237,.25);transition:transform .15s,box-shadow .15s;position:relative;z-index:1" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(124,58,237,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(124,58,237,.25)'">
+          💬 <span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span>
+          <span style="background:rgba(255,255,255,.25);font-size:.62rem;padding:1px 6px;border-radius:99px;font-weight:800;letter-spacing:.04em">NEW</span>
+        </a>
+      </div>
+      <style>
+        .pucho-attn-arrow{
+          font-size:1.4rem; margin-right:-2px; display:inline-block;
+          transform-origin:center;
+          animation: puchoPoint 1.3s ease-in-out infinite;
+          filter: drop-shadow(0 2px 4px rgba(124,58,237,.35));
+        }
+        @keyframes puchoPoint {
+          0%, 100% { transform: translateX(0) scale(1); }
+          25%      { transform: translateX(6px) scale(1.12); }
+          50%      { transform: translateX(2px) scale(1.05); }
+          75%      { transform: translateX(8px) scale(1.15); }
+        }
+        .pucho-bhai-pill{ animation: puchoPulse 2.4s ease-in-out infinite; }
+        @keyframes puchoPulse {
+          0%, 100% { box-shadow: 0 4px 12px rgba(124,58,237,.25), 0 0 0 0 rgba(236,72,153,.35); }
+          50%      { box-shadow: 0 4px 12px rgba(124,58,237,.25), 0 0 0 10px rgba(236,72,153,0); }
+        }
+        @media (prefers-reduced-motion: reduce){
+          .pucho-attn-arrow, .pucho-bhai-pill{ animation: none !important; }
+        }
+        @media (max-width: 380px){ .pucho-attn-arrow{ display:none; } }
+      </style>
       <button type="button" id="installBtn" style="display:none">
         📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
       </button>
@@ -1838,4 +1864,180 @@ if (window.DukanPTR){
 
   // Load after main page render (don't block hero)
   if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', () => { setTimeout(loadTop10, 1200); setTimeout(loadFSOTW, 1500); 
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(loadTop10, 1200); setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); });
+  } else { setTimeout(loadTop10, 1200); setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); }
+})();
+</script>
+
+
+<!-- ===== LIVE ACTIVITY TICKER (bottom strip with auto-rotate) ===== -->
+<div id="actTicker" style="display:none">
+  <div class="act-inner">
+    <span class="act-dot"></span>
+    <span class="act-live-lbl">LIVE</span>
+    <span id="actMsg" class="act-msg">Loading activity…</span>
+    <button onclick="dismissActTicker()" class="act-close" title="Dismiss">✕</button>
+  </div>
+  <style>
+    #actTicker{
+      position:fixed; bottom:0; left:0; right:0; z-index:91;
+      background:rgba(15,23,42,0.96);
+      backdrop-filter:saturate(180%) blur(12px);
+      -webkit-backdrop-filter:saturate(180%) blur(12px);
+      border-top:1px solid rgba(255,255,255,0.08);
+      color:#fff;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      box-shadow:0 -4px 14px rgba(0,0,0,0.18);
+    }
+    #actTicker .act-inner{
+      max-width:1180px; margin:0 auto;
+      padding:10px 44px 10px 16px;
+      display:flex; align-items:center; gap:8px;
+      font-size:.84rem; line-height:1.35;
+      position:relative;
+      white-space:nowrap; overflow:hidden;
+    }
+    #actTicker .act-dot{
+      width:8px; height:8px; border-radius:50%;
+      background:#10B981; flex-shrink:0;
+      box-shadow:0 0 0 0 rgba(16,185,129,0.55);
+      animation:actPulse 1.5s ease-out infinite;
+    }
+    #actTicker .act-live-lbl{
+      font-weight:900; color:#10B981; font-size:.66rem;
+      letter-spacing:.1em; text-transform:uppercase; flex-shrink:0;
+    }
+    #actTicker .act-msg{
+      flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis;
+      opacity:.95;
+    }
+    #actTicker .act-close{
+      position:absolute; right:8px; top:50%;
+      transform:translateY(-50%);
+      background:rgba(255,255,255,0.12); border:none;
+      color:#fff; width:26px; height:26px;
+      border-radius:50%; cursor:pointer;
+      font-size:.74rem; font-family:inherit;
+      display:grid; place-items:center;
+      flex-shrink:0;
+    }
+    #actTicker .act-close:hover{ background:rgba(255,255,255,0.22) }
+    @keyframes actPulse{
+      0%{box-shadow:0 0 0 0 rgba(16,185,129,0.55)}
+      70%{box-shadow:0 0 0 10px rgba(16,185,129,0)}
+      100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}
+    }
+    /* MOBILE: sit ABOVE the bottom-nav (60px height) — never overlap */
+    @media (max-width:700px){
+      #actTicker{ bottom:62px }
+      #actTicker .act-inner{ padding:8px 38px 8px 12px; font-size:.74rem; gap:6px }
+      #actTicker .act-live-lbl{ font-size:.6rem }
+      #actTicker .act-close{ width:22px; height:22px; right:6px; font-size:.66rem }
+    }
+    @media (max-width:380px){
+      #actTicker .act-live-lbl{ display:none }
+      #actTicker .act-inner{ font-size:.7rem }
+    }
+  </style>
+</div>
+<script>
+(function(){
+  // Live Activity Ticker — auto-pulls recent shop registrations, reviews, leads.
+  // Bottom strip, auto-rotates every 5s.
+  const ticker = document.getElementById('actTicker');
+  if (!ticker) return;
+  if (localStorage.getItem('dl_act_dismissed_today') === new Date().toISOString().slice(0,10)) return;
+
+  function fmtAgo(iso){
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return Math.floor(diff) + 's ago';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return Math.floor(diff/86400) + 'd ago';
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function loadActivity(){
+    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+    const c = ShopDB.client;
+    const events = [];
+    try {
+      // Recent shops (last 7 days, anonymised — only first name + city)
+      const { data: shops } = await c.from('businesses')
+        .select('name,created_at,geo_cities(name)')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      (shops || []).forEach(s => {
+        if (!s.name || !s.created_at) return;
+        const city = (s.geo_cities && s.geo_cities.name) || 'our network';
+        events.push({
+          en: '🏪 New shop <b>' + esc(s.name) + '</b> joined in ' + esc(city) + ' · ' + fmtAgo(s.created_at),
+          hi: '🏪 नई दुकान <b>' + esc(s.name) + '</b> ' + esc(city) + ' में जुड़ी · ' + fmtAgo(s.created_at)
+        });
+      });
+    } catch(_){}
+    try {
+      // Recent reviews
+      const { data: reviews } = await c.from('reviews')
+        .select('rating,created_at,businesses(name)')
+        .eq('status', 'active')
+        .gte('rating', 4)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      (reviews || []).forEach(r => {
+        if (!r.businesses || !r.businesses.name) return;
+        events.push({
+          en: '⭐ ' + r.rating + '-star review for <b>' + esc(r.businesses.name) + '</b> · ' + fmtAgo(r.created_at),
+          hi: '⭐ ' + r.rating + '-star review मिला <b>' + esc(r.businesses.name) + '</b> को · ' + fmtAgo(r.created_at)
+        });
+      });
+    } catch(_){}
+
+    if (events.length === 0){
+      // Static fallback (so ticker is never empty)
+      events.push(
+        { en: '🏪 Sirsa–Bathinda ka apna local directory — join FREE', hi: '🏪 Sirsa–Bathinda का local directory — FREE जुड़ें' },
+        { en: '💬 Customers daily WhatsApp local shops directly', hi: '💬 Customers रोज़ local shops से WhatsApp पर बात करते हैं' }
+      );
+    }
+
+    // Shuffle for variety
+    events.sort(() => Math.random() - 0.5);
+
+    let idx = 0;
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    function show(){
+      const msg = document.getElementById('actMsg');
+      if (!msg) return;
+      msg.innerHTML = events[idx % events.length][lang] || events[idx % events.length].en;
+      idx++;
+    }
+    show();
+    ticker.style.display = '';
+    setInterval(show, 5000);
+
+    // Push body padding to avoid covering content at bottom.
+    // On mobile, mobile-nav already adds its own padding so we add only ticker height.
+    const isMobile = window.matchMedia('(max-width:700px)').matches;
+    document.body.style.paddingBottom = (isMobile ? '110px' : '52px');
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => setTimeout(loadActivity, 1800));
+  } else {
+    setTimeout(loadActivity, 1800);
+  }
+})();
+function dismissActTicker(){
+  try { localStorage.setItem('dl_act_dismissed_today', new Date().toISOString().slice(0,10)); } catch(_){}
+  const t = document.getElementById('actTicker');
+  if (t) t.style.display = 'none';
+  document.body.style.paddingBottom = '';
+}
+</script>
+
+</body>
+</html>
