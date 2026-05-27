@@ -1427,6 +1427,47 @@ function handleStep3(){
 
 function showErr(el, msg){ el.textContent = msg; el.style.display = 'flex'; }
 
+// Network-friendly error helper — detects network issues + offers retry
+function showFriendlyErr(el, err, retryFn){
+  const raw = (err && (err.message || err.error_description || String(err))) || 'Unknown error';
+  let friendly = raw;
+  let isNetwork = false;
+  if (/network|fetch|failed to fetch|networkerror|err_internet|timeout|aborted/i.test(raw)){
+    isNetwork = true;
+    friendly = '⚠️ Internet connection issue. ' +
+               'Aapki net slow ya disconnect ho gayi. ' +
+               'Wi-Fi/4G check karein aur Retry dabayein.';
+  } else if (/rate.?limit/i.test(raw)){
+    friendly = '⏱ Bahut requests bhej diye. 1 minute wait karke phir try karein.';
+  } else if (/duplicate|already exists|unique/i.test(raw)){
+    friendly = 'Yeh email/mobile pehle se registered hai. Login karein ya alag use karein.';
+  } else if (/captcha|turnstile/i.test(raw)){
+    friendly = 'CAPTCHA verification fail huyi. Page refresh karke phir try karein.';
+  }
+  el.innerHTML = '';
+  el.textContent = friendly;
+  if (retryFn){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '🔄 Retry';
+    btn.style.cssText = 'margin-left:10px;background:#1E3A8A;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.84rem';
+    btn.onclick = function(){
+      el.style.display = 'none';
+      retryFn();
+    };
+    el.appendChild(btn);
+  }
+  if (isNetwork){
+    const small = document.createElement('div');
+    small.style.cssText = 'font-size:.74rem;color:#7C2D12;margin-top:6px;line-height:1.4;width:100%';
+    small.innerHTML = 'Tip: Wi-Fi off karke 4G se try karein, ya browser change karke (Chrome recommended) try karein.';
+    el.appendChild(small);
+  }
+  el.style.display = 'flex';
+  el.style.flexWrap = 'wrap';
+  el.style.alignItems = 'center';
+}
+
 // ============================================================
 // STEP 4 — USP + final submit (calls register_business_v2)
 // ============================================================
@@ -1502,29 +1543,55 @@ async function handleSubmit(){
   if (waInput.length === 10) waInput = '91' + waInput;
   if (!waInput) waInput = STATE.phone;
 
-  const { data, error } = await c.rpc('register_business_public', {
-    p_category_ids        : STATE.data.categoryIds,
-    p_primary_category_id : STATE.data.primaryCategoryId,
-    p_name         : STATE.data.name,
-    p_name_hi      : STATE.data.nameHi || null,
-    p_owner_name   : STATE.data.ownerName,
-    p_mobile       : STATE.phone,
-    p_whatsapp     : waInput,
-    p_email        : STATE.data.loginEmail || STATE.data.email || null,
-    p_address_line1: STATE.data.addr1,
-    p_address_line2: STATE.data.addr2 || null,
-    p_locality_id  : STATE.data.localityId,
-    p_city_id      : STATE.data.cityId,
-    p_district_id  : STATE.data.districtId,
-    p_state_id     : STATE.data.stateId,
-    p_pincode      : STATE.data.pincode,
-    p_usp_text     : STATE.data.usp,
-    p_usp_hi       : STATE.data.uspHi || null
-  });
+  // Retry-aware RPC call with up to 2 retries on network errors
+  async function doRegister(){
+    return await c.rpc('register_business_public', {
+      p_category_ids        : STATE.data.categoryIds,
+      p_primary_category_id : STATE.data.primaryCategoryId,
+      p_name         : STATE.data.name,
+      p_name_hi      : STATE.data.nameHi || null,
+      p_owner_name   : STATE.data.ownerName,
+      p_mobile       : STATE.phone,
+      p_whatsapp     : waInput,
+      p_email        : STATE.data.loginEmail || STATE.data.email || null,
+      p_address_line1: STATE.data.addr1,
+      p_address_line2: STATE.data.addr2 || null,
+      p_locality_id  : STATE.data.localityId,
+      p_city_id      : STATE.data.cityId,
+      p_district_id  : STATE.data.districtId,
+      p_state_id     : STATE.data.stateId,
+      p_pincode      : STATE.data.pincode,
+      p_usp_text     : STATE.data.usp,
+      p_usp_hi       : STATE.data.uspHi || null
+    });
+  }
+
+  let data, error;
+  let attempts = 0;
+  const MAX_ATTEMPTS = 3;
+  while (attempts < MAX_ATTEMPTS){
+    attempts++;
+    try {
+      const result = await doRegister();
+      data = result.data; error = result.error;
+      // If success OR non-network error, break
+      if (!error || !/network|fetch/i.test(error.message || '')) break;
+    } catch(e){
+      error = e;
+      if (!/network|fetch/i.test(e.message || '')) break;
+    }
+    // Brief pause before retry
+    if (attempts < MAX_ATTEMPTS){
+      btn.innerHTML = '<span>🔄 Retry ' + (attempts+1) + '/' + MAX_ATTEMPTS + '...</span>';
+      await new Promise(r => setTimeout(r, 1200));
+    }
+  }
 
   if (error){
     btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>';
-    showErr(errEl, error.message || 'Could not register. Please try again.');
+    showFriendlyErr(errEl, error, function(){
+      btn.click();  // Retry by re-clicking submit
+    });
     return;
   }
 
