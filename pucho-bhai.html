@@ -494,6 +494,23 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
   font-family:inherit;
 }
 .pb-report-btn-inline:hover { opacity:1 }
+
+/* ===== Vote buttons (thumbs up/down) ===== */
+.pb-vote-row { display:inline-flex; gap:6px; align-items:center; margin-right:auto }
+.pb-vote-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:4px 11px; border-radius:99px;
+  background:#F1F5F9; border:1.5px solid transparent;
+  font-size:.76rem; font-weight:700;
+  color:#475569; cursor:pointer; font-family:inherit;
+  transition:all .15s;
+}
+.pb-vote-btn:hover { background:#E2E8F0; transform:scale(1.04) }
+.pb-vote-btn .vc { font-size:.78rem; font-weight:800; min-width:14px; text-align:center }
+.pb-vote-btn.helpful.voted   { background:#D1FAE5; color:#065F46; border-color:#10B981; box-shadow:0 2px 6px rgba(16,185,129,.20) }
+.pb-vote-btn.unhelpful.voted { background:#FEE2E2; color:#991B1B; border-color:#EF4444; box-shadow:0 2px 6px rgba(239,68,68,.20) }
+.pb-vote-btn:active { transform:scale(0.96) }
+
 .pb-report-reasons {
   display:flex; flex-direction:column; gap:6px; margin-bottom:12px;
 }
@@ -1337,17 +1354,31 @@ async function openDetail(qid){
       <div class="pb-replies">
         ${replies.length===0
           ? `<div style="background:#FFFBEB;border:1px dashed #F59E0B;padding:14px;border-radius:11px;text-align:center;color:#92400E;font-weight:600;font-size:.88rem">⏳ No replies yet — be the first to help!</div>`
-          : replies.map(r => `
-              <div class="pb-reply ${r.is_best ? 'best-reply' : ''}" style="${r.is_best ? 'margin-top:18px' : ''}">
+          : replies.map(r => {
+              const myVote = getMyVoteState(r.id);
+              return `
+              <div class="pb-reply ${r.is_best ? 'best-reply' : ''}" data-reply-id="${r.id}" style="${r.is_best ? 'margin-top:18px' : ''}">
                 <p class="pb-reply-text">${escapeHtml(r.reply_text)}</p>
                 <div class="pb-reply-meta">
+                  <div class="pb-vote-row">
+                    <button class="pb-vote-btn helpful ${myVote==='helpful'?'voted':''}"
+                            onclick="votePuchoReply('${r.id}','helpful')"
+                            title="Helpful — this answer is useful">
+                      👍 <span class="vc">${r.helpful_count || 0}</span>
+                    </button>
+                    <button class="pb-vote-btn unhelpful ${myVote==='unhelpful'?'voted':''}"
+                            onclick="votePuchoReply('${r.id}','unhelpful')"
+                            title="Not helpful — this answer doesn't solve">
+                      👎 <span class="vc">${r.unhelpful_count || 0}</span>
+                    </button>
+                  </div>
                   ${r.replier_name ? `<b>${escapeHtml(r.replier_name)}</b>` : 'Anonymous'}
                   ${r.business_name ? `<a class="biz-link" href="/business.html?slug=${encodeURIComponent(r.business_slug||'')}" target="_blank">🏪 ${escapeHtml(r.business_name)}</a>` : ''}
                   <span>· ${timeAgo(r.created_at)}</span>
                   <button class="pb-report-btn-inline" onclick="openReportModal('reply','${r.id}')" title="Report this reply">🚩</button>
                 </div>
               </div>
-            `).join('')
+            `; }).join('')
         }
       </div>
       <button class="pb-reply-add-btn" onclick="openReplyModal('${escapeAttr(q.question_text)}')">
@@ -1359,6 +1390,77 @@ async function openDetail(qid){
   }
 }
 function closeDetail(){ document.getElementById('detailModal').classList.remove('active'); ACTIVE_QUESTION_ID=null; }
+
+// ====== Reply voting (thumbs up/down) ======
+const PB_VOTE_STORAGE_KEY = 'dl_pb_my_votes';
+
+function getAllMyVotes(){
+  try { return JSON.parse(localStorage.getItem(PB_VOTE_STORAGE_KEY) || '{}'); } catch(_){ return {}; }
+}
+function getMyVoteState(replyId){
+  const all = getAllMyVotes();
+  return all[replyId] || null;
+}
+function setMyVoteState(replyId, voteType){
+  const all = getAllMyVotes();
+  if (voteType) all[replyId] = voteType;
+  else delete all[replyId];
+  try { localStorage.setItem(PB_VOTE_STORAGE_KEY, JSON.stringify(all)); } catch(_){}
+}
+
+async function votePuchoReply(replyId, voteType){
+  let phone = '';
+  try { phone = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+  if (!phone || phone.replace(/[^0-9]/g,'').length < 10){
+    phone = prompt('Enter your 10-digit mobile to vote:\n(only used to prevent fake votes — never shown publicly)') || '';
+    if (!phone) return;
+    if (phone.replace(/[^0-9]/g,'').length < 10){
+      alert('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    try { localStorage.setItem('dl_pb_phone', phone); } catch(_){}
+  }
+
+  // Optimistic UI tweak — disable both buttons momentarily
+  const wrap = document.querySelector('[data-reply-id="' + replyId + '"]');
+  if (wrap){
+    wrap.querySelectorAll('.pb-vote-btn').forEach(b => b.disabled = true);
+  }
+
+  try {
+    const { data, error } = await SB.rpc('vote_pucho_reply', {
+      p_reply_id: replyId,
+      p_vote_type: voteType,
+      p_voter_phone: phone
+    });
+    if (error) throw error;
+
+    // Save my vote state
+    setMyVoteState(replyId, data.my_vote);
+
+    // Update UI
+    if (wrap){
+      const h = wrap.querySelector('.pb-vote-btn.helpful');
+      const u = wrap.querySelector('.pb-vote-btn.unhelpful');
+      if (h){
+        h.querySelector('.vc').textContent = data.helpful_count || 0;
+        h.classList.toggle('voted', data.my_vote === 'helpful');
+      }
+      if (u){
+        u.querySelector('.vc').textContent = data.unhelpful_count || 0;
+        u.classList.toggle('voted', data.my_vote === 'unhelpful');
+      }
+    }
+  } catch(e){
+    console.error('[votePuchoReply]', e);
+    const msg = (e && e.message ? e.message : 'Could not vote').replace(/^.*?:\s*/,'');
+    alert('Vote failed: ' + msg);
+  } finally {
+    if (wrap){
+      wrap.querySelectorAll('.pb-vote-btn').forEach(b => b.disabled = false);
+    }
+  }
+}
 
 // ====== Report modal ======
 let REPORT_TARGET = null;     // { type, id }
