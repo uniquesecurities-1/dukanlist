@@ -760,11 +760,15 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
     </div>
     <div class="pb-field">
       <label>
-        <span data-i18n-en>Recommending a shop? (optional)</span>
-        <span data-i18n-hi style="display:none">कोई दुकान सुझा रहे हैं? (वैकल्पिक)</span>
+        <span data-i18n-en>Recommending a shop, practice or organization? (optional)</span>
+        <span data-i18n-hi style="display:none">कोई दुकान, प्रैक्टिस या संस्था सुझा रहे हैं? (वैकल्पिक)</span>
       </label>
       <select id="rBiz"><option value="">— None —</option></select>
-      <div class="pb-counter"><span data-i18n-en>If you own a shop, you can quote it here</span><span data-i18n-hi>दुकान वाले अपनी दुकान का नाम जोड़ सकते हैं</span></div>
+      <div class="pb-counter"><span data-i18n-en>If you own one listed on DukanList, you can quote it here</span><span data-i18n-hi>आपकी कोई listing है तो यहाँ जोड़ सकते हैं</span></div>
+    </div>
+    <div style="background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:8px 11px;border-radius:9px;font-size:.74rem;font-weight:600;margin-bottom:10px;line-height:1.45">
+      <span data-i18n-en>⚠️ You cannot reply to your own question. Self-promotion via fake replies will get your number blocked.</span>
+      <span data-i18n-hi style="display:none">⚠️ अपने ही सवाल का जवाब आप नहीं दे सकते। फेक रिप्लाई से self-promotion पर नंबर block हो जाएगा।</span>
     </div>
     <button class="pb-modal-btn" id="rSubmit" onclick="submitReply()">
       <span data-i18n-en>Post Reply</span><span data-i18n-hi>जवाब भेजें</span>
@@ -1491,8 +1495,11 @@ async function submitReply(){
     }, 900);
   } catch(e){
     console.error('[submitReply] failure:', e);
-    err.textContent = (e && e.message ? e.message : 'Could not post — try again').replace(/^.*?:\s*/,'');
+    const cleanMsg = (e && e.message ? e.message : 'Could not post — try again').replace(/^.*?:\s*/,'');
+    err.textContent = cleanMsg;
     err.style.display='block';
+    // Loud alert too — user must see what went wrong
+    alert('❌ Reply could not be posted:\n\n' + cleanMsg + '\n\nIf this keeps happening, check internet or contact admin.');
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<span data-i18n-en>Post Reply</span><span data-i18n-hi style="display:none">जवाब भेजें</span>';
