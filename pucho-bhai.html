@@ -1718,12 +1718,8 @@ function animateCount(elId, target){
   requestAnimationFrame(tick);
 }
 
-// Bootstrap — load cities, categories, leaderboard on page load
-(async () => {
-  try {
-    await Promise.all([loadCities(), loadCategories(), loadLeaderboard()]);
-  } catch(e) {
-    console.error('[bootstrap]', e);
-  }
-})();
-<
+// Bootstrap — load each independently so one failure doesn't block others
+console.info('[pucho-bhai] bootstrap starting');
+(function bootstrap(){
+  // Each call wrapped — failures logged but don't cascade
+  try { loadCities(
