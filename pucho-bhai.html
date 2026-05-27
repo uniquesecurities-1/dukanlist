@@ -265,6 +265,32 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
   background:#DCFCE7; color:#15803D;
   padding:3px 9px; border-radius:99px; font-weight:700; font-size:.72rem;
 }
+.pb-q-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  padding:2px 8px; border-radius:99px;
+  font-size:.65rem; font-weight:800; letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.pb-q-badge.pin     { background:#FEF3C7; color:#92400E }
+.pb-q-badge.solved  { background:#D1FAE5; color:#065F46 }
+.pb-q-badge.best    { background:linear-gradient(135deg,#FDE68A,#F59E0B); color:#78350F; box-shadow:0 4px 10px rgba(245,158,11,.25) }
+.pb-reply.best-reply {
+  background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+  border:1.5px solid #F59E0B;
+  position:relative;
+}
+.pb-reply.best-reply::before {
+  content:'🏆 BEST ANSWER';
+  position:absolute; top:-10px; left:12px;
+  background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff;
+  padding:3px 10px; border-radius:99px;
+  font-size:.62rem; font-weight:800; letter-spacing:.06em;
+  box-shadow:0 4px 10px rgba(245,158,11,.35);
+}
+.pb-q-card.pinned {
+  border-left:3px solid #F59E0B;
+  background:linear-gradient(135deg,#FFFBEB 0%,#fff 30%);
+}
 .pb-q-foot .ans-no {
   color:var(--pb-accent); font-weight:700;
 }
@@ -1156,9 +1182,13 @@ function renderQuestions(rows){
     const ansBadge = hasAns
       ? `<span class="ans-yes">✓ ${q.reply_count} ${q.reply_count===1?'reply':'replies'}</span>`
       : `<span class="ans-no">⏳ Awaiting reply</span>`;
+    const pinBadge = q.is_pinned ? '<span class="pb-q-badge pin">📌 Pinned</span>' : '';
+    const solvedBadge = q.is_resolved ? '<span class="pb-q-badge solved">✅ Solved</span>' : '';
+    const cardClass = q.is_pinned ? 'pb-q-card pinned' : 'pb-q-card';
     return `
-      <div class="pb-q-card" onclick="openDetail('${q.id}')">
+      <div class="${cardClass}" onclick="openDetail('${q.id}')">
         <div class="pb-q-meta">
+          ${pinBadge}${solvedBadge}
           ${q.city_name ? `<span class="pb-pill">📍 ${escapeHtml(q.city_name)}</span>` : ''}
           ${q.category_name ? `<span class="pb-pill cat">${escapeHtml(q.category_name)}</span>` : ''}
           ${q.asker_name ? `<span>· asked by <b style="color:var(--pb-ink-2)">${escapeHtml(q.asker_name)}</b></span>` : '<span>· anonymous</span>'}
@@ -1282,6 +1312,8 @@ async function openDetail(qid){
     const replies = data.replies || [];
     body.innerHTML = `
       <div class="pb-detail-meta">
+        ${q.is_pinned ? '<span class="pb-q-badge pin">📌 Pinned</span> ' : ''}
+        ${q.is_resolved ? '<span class="pb-q-badge solved">✅ Solved</span> ' : ''}
         ${q.city_name ? `<span class="pb-pill" style="background:var(--pb-tint);color:var(--pb-primary-d);padding:2px 8px;border-radius:99px;font-weight:700;font-size:.7rem">📍 ${escapeHtml(q.city_name)}</span> · ` : ''}
         ${q.asker_name ? `Asked by <b>${escapeHtml(q.asker_name)}</b>` : 'Asked anonymously'}
         · ${timeAgo(q.created_at)} · 👁 ${q.view_count}
@@ -1297,7 +1329,7 @@ async function openDetail(qid){
         ${replies.length===0
           ? `<div style="background:#FFFBEB;border:1px dashed #F59E0B;padding:14px;border-radius:11px;text-align:center;color:#92400E;font-weight:600;font-size:.88rem">⏳ No replies yet — be the first to help!</div>`
           : replies.map(r => `
-              <div class="pb-reply">
+              <div class="pb-reply ${r.is_best ? 'best-reply' : ''}" style="${r.is_best ? 'margin-top:18px' : ''}">
                 <p class="pb-reply-text">${escapeHtml(r.reply_text)}</p>
                 <div class="pb-reply-meta">
                   ${r.replier_name ? `<b>${escapeHtml(r.replier_name)}</b>` : 'Anonymous'}

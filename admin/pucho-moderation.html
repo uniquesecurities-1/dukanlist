@@ -50,6 +50,14 @@ h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;color:
 .btn-restore:hover{background:#A7F3D0}
 .btn-view{background:#E0E7FF;color:#3730A3}
 .btn-view:hover{background:#C7D2FE}
+.btn-pin{background:#FEF3C7;color:#92400E}
+.btn-pin:hover{background:#FDE68A}
+.btn-solve{background:#D1FAE5;color:#065F46}
+.btn-solve:hover{background:#A7F3D0}
+.btn-edit{background:#E0E7FF;color:#3730A3}
+.btn-edit:hover{background:#C7D2FE}
+.btn-hard{background:#7F1D1D;color:#fff}
+.btn-hard:hover{background:#991B1B}
 
 .status-pill{display:inline-block;padding:1px 8px;border-radius:5px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .s-active{background:#D1FAE5;color:#065F46}
@@ -150,7 +158,7 @@ async function refresh(){
     // Fetch all questions (admin can see all statuses)
     const { data: qData, error: qErr } = await SB
       .from('community_questions')
-      .select('id, city_id, asker_name, question_text, view_count, reply_count, status, created_at')
+      .select('id, city_id, asker_name, question_text, view_count, reply_count, status, is_pinned, is_resolved, pinned_at, created_at')
       .order('created_at', { ascending:false })
       .limit(300);
     if (qErr) throw qErr;
@@ -165,7 +173,7 @@ async function refresh(){
     // Fetch all replies
     const { data: rData, error: rErr } = await SB
       .from('community_replies')
-      .select('id, question_id, replier_name, reply_text, business_id, status, created_at')
+      .select('id, question_id, replier_name, reply_text, business_id, status, is_best, created_at')
       .order('created_at', { ascending:false })
       .limit(500);
     if (rErr) throw rErr;
@@ -245,6 +253,8 @@ function render(){
     return `
       <div class="q-row">
         <div class="q-meta">
+          ${q.is_pinned?'<span style="background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:99px;font-weight:800;font-size:10px">📌 PINNED</span>':''}
+          ${q.is_resolved?'<span style="background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:99px;font-weight:800;font-size:10px">✅ SOLVED</span>':''}
           ${q.city_name?`<span class="q-pill">📍 ${escapeHtml(q.city_name)}</span>`:''}
           <span class="status-pill s-${q.status}">${q.status}</span>
           <span>${q.asker_name?'<b>'+escapeHtml(q.asker_name)+'</b>':'anonymous'}</span>
@@ -256,9 +266,13 @@ function render(){
         <div class="q-foot">
           <span style="font-size:10.5px;color:#94a3b8">ID: ${q.id.slice(0,8)}…</span>
           <div class="actions">
+            <button class="btn btn-pin" onclick="adminPin('${q.id}', ${!q.is_pinned})" title="${q.is_pinned?'Unpin':'Pin to top'}">${q.is_pinned?'📌 Pinned ✓':'📌 Pin'}</button>
+            <button class="btn btn-solve" onclick="adminResolve('${q.id}', ${!q.is_resolved})" title="${q.is_resolved?'Mark unsolved':'Mark solved'}">${q.is_resolved?'✅ Solved ✓':'✅ Solve'}</button>
+            <button class="btn btn-edit" onclick="adminEditQuestion('${q.id}')" title="Edit text">✏️ Edit</button>
             ${q.status!=='active'?`<button class="btn btn-restore" onclick="moderate('question','${q.id}','active')">↺ Restore</button>`:''}
             ${q.status!=='flagged'?`<button class="btn btn-flag" onclick="moderate('question','${q.id}','flagged')">🚩 Flag</button>`:''}
-            ${q.status!=='removed'?`<button class="btn btn-remove" onclick="if(confirm('Hide this question from public?'))moderate('question','${q.id}','removed')">🗑 Remove</button>`:''}
+            ${q.status!=='removed'?`<button class="btn btn-remove" onclick="if(confirm('Hide this question from public?'))moderate('question','${q.id}','removed')">🗑 Hide</button>`:''}
+            <button class="btn btn-hard" onclick="adminHardDelete('question','${q.id}')" title="Permanent delete from DB">💥</button>
           </div>
         </div>
         ${myReplies.length ? `
@@ -284,8 +298,10 @@ function renderReplies(box){
 
 function renderReplyBlock(r, full){
   const qMatch = ALL_QUESTIONS.find(q => q.id === r.question_id);
+  const bestStyle = r.is_best ? 'border-left:3px solid #F59E0B;background:linear-gradient(135deg,#FFFBEB,#FEF3C7)' : '';
   return `
-    <div class="reply-block">
+    <div class="reply-block" style="${bestStyle}">
+      ${r.is_best ? '<div style="display:inline-block;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.04em;margin-bottom:5px">🏆 BEST ANSWER</div>' : ''}
       <div class="reply-text">${escapeHtml(r.reply_text)}</div>
       <div class="reply-meta">
         <span class="status-pill s-${r.status}">${r.status}</span>
@@ -294,9 +310,12 @@ function renderReplyBlock(r, full){
         <span>· ${timeAgo(r.created_at)}</span>
         ${full && qMatch ? `<span style="background:#F1F5F9;padding:1px 6px;border-radius:5px;font-size:10px">on: ${escapeHtml(qMatch.question_text.slice(0,40))}…</span>` : ''}
         <div class="actions">
+          <button class="btn ${r.is_best?'btn-restore':'btn-edit'}" onclick="adminMarkBest('${r.id}', ${!r.is_best})" title="${r.is_best?'Unmark best':'Mark as Best Answer'}">${r.is_best?'🏆 ✓':'🏆 Best'}</button>
+          <button class="btn btn-edit" onclick="adminEditReply('${r.id}')" title="Edit text">✏️</button>
           ${r.status!=='active'?`<button class="btn btn-restore" onclick="moderate('reply','${r.id}','active')">↺</button>`:''}
           ${r.status!=='flagged'?`<button class="btn btn-flag" onclick="moderate('reply','${r.id}','flagged')">🚩</button>`:''}
-          ${r.status!=='removed'?`<button class="btn btn-remove" onclick="if(confirm('Remove this reply?'))moderate('reply','${r.id}','removed')">🗑</button>`:''}
+          ${r.status!=='removed'?`<button class="btn btn-remove" onclick="if(confirm('Hide this reply?'))moderate('reply','${r.id}','removed')">🗑</button>`:''}
+          <button class="btn btn-remove" style="background:#7F1D1D" onclick="adminHardDelete('reply','${r.id}')" title="Permanent delete">💥</button>
         </div>
       </div>
     </div>
@@ -379,6 +398,68 @@ async function unbanUser(phoneHash){
     if (error) throw error;
     await refresh();
   } catch(e){ alert('Failed: ' + (e.message || e)); }
+}
+
+async function adminPin(id, pinned){
+  try {
+    const { error } = await SB.rpc('admin_pin_pucho_question', { p_id: id, p_pinned: pinned });
+    if (error) throw error;
+    await refresh();
+  } catch(e){ alert('Pin failed: ' + (e.message || e)); }
+}
+
+async function adminResolve(id, resolved){
+  try {
+    const { error } = await SB.rpc('admin_resolve_pucho_question', { p_id: id, p_resolved: resolved });
+    if (error) throw error;
+    await refresh();
+  } catch(e){ alert('Resolve failed: ' + (e.message || e)); }
+}
+
+async function adminMarkBest(replyId, isBest){
+  try {
+    const { error } = await SB.rpc('admin_mark_best_reply', { p_reply_id: replyId, p_is_best: isBest });
+    if (error) throw error;
+    await refresh();
+  } catch(e){ alert('Mark best failed: ' + (e.message || e)); }
+}
+
+async function adminEditQuestion(id){
+  const q = ALL_QUESTIONS.find(x => x.id === id);
+  if (!q) return;
+  const newText = prompt('Edit question text (10-500 chars):\n\nCurrent:\n' + q.question_text, q.question_text);
+  if (newText === null) return;
+  if (newText.trim().length < 10){ alert('Too short (min 10 chars)'); return; }
+  try {
+    const { error } = await SB.rpc('admin_edit_pucho_question', { p_id: id, p_new_text: newText.trim() });
+    if (error) throw error;
+    await refresh();
+  } catch(e){ alert('Edit failed: ' + (e.message || e)); }
+}
+
+async function adminEditReply(id){
+  const r = ALL_REPLIES.find(x => x.id === id);
+  if (!r) return;
+  const newText = prompt('Edit reply text (4-1000 chars):\n\nCurrent:\n' + r.reply_text, r.reply_text);
+  if (newText === null) return;
+  if (newText.trim().length < 4){ alert('Too short (min 4 chars)'); return; }
+  try {
+    const { error } = await SB.rpc('admin_edit_pucho_reply', { p_id: id, p_new_text: newText.trim() });
+    if (error) throw error;
+    await refresh();
+  } catch(e){ alert('Edit failed: ' + (e.message || e)); }
+}
+
+async function adminHardDelete(type, id){
+  const label = type === 'question' ? 'Question (and ALL its replies)' : 'Reply';
+  if (!confirm('⚠️ PERMANENTLY DELETE this ' + label + ' from the database?\n\nThis CANNOT be undone. Reports will also be cleaned up.\n\nProceed?')) return;
+  if (!confirm('Are you absolutely sure? Type-confirm not needed but this is the final warning.')) return;
+  try {
+    const { error } = await SB.rpc('admin_permanently_delete_pucho', { p_type: type, p_id: id });
+    if (error) throw error;
+    alert('✓ Permanently deleted.');
+    await refresh();
+  } catch(e){ alert('Delete failed: ' + (e.message || e)); }
 }
 
 async function moderate(type, id, newStatus){
