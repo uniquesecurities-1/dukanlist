@@ -111,6 +111,8 @@ h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;color:
     <div class="tab" data-tab="flagged" onclick="setTab('flagged')">🚩 Flagged <span class="cnt" id="tab-flagged">0</span></div>
     <div class="tab" data-tab="removed" onclick="setTab('removed')">🗑 Removed <span class="cnt" id="tab-removed">0</span></div>
     <div class="tab" data-tab="replies" onclick="setTab('replies')">💬 All Replies <span class="cnt" id="tab-replies">0</span></div>
+    <div class="tab" data-tab="reports" onclick="setTab('reports')" style="border-color:#FECACA">🚨 User Reports <span class="cnt" id="tab-reports" style="background:#FEE2E2;color:#991B1B">0</span></div>
+    <div class="tab" data-tab="blacklist" onclick="setTab('blacklist')">⛔ Blacklist <span class="cnt" id="tab-blacklist">0</span></div>
   </div>
 
   <div id="content"><div class="loader">⏳ Loading…</div></div>
@@ -125,6 +127,8 @@ const SB = ShopDB.client;
 let CURRENT_TAB = 'active';
 let ALL_QUESTIONS = [];
 let ALL_REPLIES = [];
+let ALL_REPORTS = [];
+let ALL_BLACKLIST = [];
 
 async function init(){
   // Auth gate
@@ -186,6 +190,20 @@ async function refresh(){
     document.getElementById('tab-removed').textContent = removed;
     document.getElementById('tab-replies').textContent = ALL_REPLIES.length;
 
+    // Fetch reports (graceful if RPC missing)
+    try {
+      const { data: repData } = await SB.rpc('admin_get_pucho_reports', { p_limit: 100 });
+      ALL_REPORTS = repData || [];
+    } catch(_){ ALL_REPORTS = []; }
+    document.getElementById('tab-reports').textContent = ALL_REPORTS.length;
+
+    // Fetch blacklist (graceful if RPC missing)
+    try {
+      const { data: blData } = await SB.rpc('admin_list_pucho_blacklist');
+      ALL_BLACKLIST = blData || [];
+    } catch(_){ ALL_BLACKLIST = []; }
+    document.getElementById('tab-blacklist').textContent = ALL_BLACKLIST.length;
+
     render();
   } catch(e){
     document.getElementById('content').innerHTML =
@@ -204,6 +222,14 @@ function render(){
   const box = document.getElementById('content');
   if (CURRENT_TAB === 'replies'){
     renderReplies(box);
+    return;
+  }
+  if (CURRENT_TAB === 'reports'){
+    renderReports(box);
+    return;
+  }
+  if (CURRENT_TAB === 'blacklist'){
+    renderBlacklist(box);
     return;
   }
   const rows = ALL_QUESTIONS.filter(q => q.status === CURRENT_TAB);
@@ -275,6 +301,84 @@ function renderReplyBlock(r, full){
       </div>
     </div>
   `;
+}
+
+function renderReports(box){
+  if (!ALL_REPORTS.length){
+    box.innerHTML = '<div class="card"><div class="empty"><span class="ico">🎉</span><div class="et">No reports</div><div class="es">No users have reported any content. Community is clean!</div></div></div>';
+    return;
+  }
+  box.innerHTML = '<div class="card">' + ALL_REPORTS.map(r => {
+    const preview = (r.preview_text || '').slice(0, 200);
+    const isFlagged = r.current_status === 'flagged';
+    const isRemoved = r.current_status === 'removed';
+    return `
+      <div class="q-row">
+        <div class="q-meta">
+          <span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:99px;font-weight:800">🚨 ${r.report_count} reports</span>
+          <span class="q-pill">${r.target_type === 'question' ? '❓ Question' : '💬 Reply'}</span>
+          <span class="status-pill s-${r.current_status}">${r.current_status || 'unknown'}</span>
+          <span>· latest ${timeAgo(r.latest_report)}</span>
+        </div>
+        <div class="q-text">${escapeHtml(preview)}${preview.length >= 200 ? '…' : ''}</div>
+        <div class="q-foot">
+          <span style="font-size:10.5px;color:#94a3b8">ID: ${r.target_id.slice(0,8)}…</span>
+          <div class="actions">
+            ${!isFlagged ? `<button class="btn btn-flag" onclick="moderate('${r.target_type}','${r.target_id}','flagged')">🚩 Flag</button>` : ''}
+            ${!isRemoved ? `<button class="btn btn-remove" onclick="if(confirm('Remove this item?'))moderate('${r.target_type}','${r.target_id}','removed')">🗑 Remove</button>` : ''}
+            <button class="btn btn-remove" style="background:#7F1D1D" onclick="if(confirm('BAN this user permanently?\\nAll their content will be removed.\\nProceed?'))banUser('${r.target_type}','${r.target_id}')">⛔ Ban User</button>
+            ${(isFlagged || isRemoved) ? `<button class="btn btn-restore" onclick="moderate('${r.target_type}','${r.target_id}','active')">↺ Restore</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') + '</div>';
+}
+
+function renderBlacklist(box){
+  if (!ALL_BLACKLIST.length){
+    box.innerHTML = '<div class="card"><div class="empty"><span class="ico">⛔</span><div class="et">Blacklist empty</div><div class="es">No phone numbers banned yet.</div></div></div>';
+    return;
+  }
+  box.innerHTML = '<div class="card">' + ALL_BLACKLIST.map(b => `
+    <div class="q-row">
+      <div class="q-meta">
+        <span style="background:#374151;color:#fff;padding:2px 8px;border-radius:99px;font-weight:800">⛔ BANNED</span>
+        <span>· ${timeAgo(b.banned_at)}</span>
+      </div>
+      <div class="q-text" style="font-family:'SF Mono',monospace;font-size:13px;color:#475569">
+        Hash: ${b.phone_hash.slice(0,32)}…
+      </div>
+      <div class="q-foot">
+        <span style="color:#64748b;font-style:italic">${escapeHtml(b.reason || 'No reason given')}</span>
+        <div class="actions">
+          <button class="btn btn-restore" onclick="if(confirm('Unban this number?'))unbanUser('${b.phone_hash}')">↺ Unban</button>
+        </div>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+async function banUser(type, id){
+  const reason = prompt('Ban reason (optional):') || 'Spam';
+  try {
+    const { error } = await SB.rpc('admin_blacklist_pucho_phone', {
+      p_type: type, p_id: id, p_reason: reason
+    });
+    if (error) throw error;
+    alert('✓ User banned and their content removed.');
+    await refresh();
+  } catch(e){ alert('Failed: ' + (e.message || e)); }
+}
+
+async function unbanUser(phoneHash){
+  try {
+    const { error } = await SB.rpc('admin_unblacklist_pucho_phone', {
+      p_phone_hash: phoneHash
+    });
+    if (error) throw error;
+    await refresh();
+  } catch(e){ alert('Failed: ' + (e.message || e)); }
 }
 
 async function moderate(type, id, newStatus){

@@ -333,6 +333,33 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
 .pb-reply-meta { font-size:.74rem; color:var(--pb-muted); font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
 .pb-reply-meta .biz-link { color:var(--pb-primary-d); font-weight:700; text-decoration:none; background:var(--pb-tint); padding:2px 8px; border-radius:99px; font-size:.7rem }
 .pb-reply-meta .biz-link:hover { text-decoration:underline }
+
+/* ===== Report buttons ===== */
+.pb-report-btn {
+  background:transparent; border:1px solid #FECACA; color:#B91C1C;
+  padding:4px 12px; border-radius:99px; font-size:.72rem; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:.12s;
+}
+.pb-report-btn:hover { background:#FEF2F2; color:#991B1B }
+.pb-report-btn-inline {
+  background:transparent; border:none; cursor:pointer;
+  font-size:.78rem; padding:1px 4px; margin-left:auto;
+  opacity:.5; transition:opacity .15s;
+  font-family:inherit;
+}
+.pb-report-btn-inline:hover { opacity:1 }
+.pb-report-reasons {
+  display:flex; flex-direction:column; gap:6px; margin-bottom:12px;
+}
+.pb-report-reason {
+  background:#F8FAFC; border:1.5px solid var(--pb-border);
+  padding:9px 12px; border-radius:9px;
+  font-size:.86rem; font-weight:600; color:var(--pb-ink-2);
+  cursor:pointer; font-family:inherit; text-align:left;
+  transition:.12s;
+}
+.pb-report-reason:hover { background:var(--pb-tint); border-color:var(--pb-primary); color:var(--pb-primary-d) }
+.pb-report-reason.selected { background:var(--pb-tint); border-color:var(--pb-primary); color:var(--pb-primary-d) }
 .pb-reply-add-btn {
   background:#fff; color:var(--pb-primary-d);
   border:1.5px solid var(--pb-primary); padding:11px;
@@ -514,6 +541,42 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
   <div class="pb-modal-card">
     <button class="pb-modal-close" onclick="closeDetail()">×</button>
     <div id="detailBody"><div class="pb-loading"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ===== REPORT MODAL ===== -->
+<div class="pb-modal" id="reportModal" onclick="if(event.target===this)closeReportModal()">
+  <div class="pb-modal-card" style="max-width:440px">
+    <button class="pb-modal-close" onclick="closeReportModal()">×</button>
+    <h2 style="background:linear-gradient(135deg,#EF4444,#F97316);-webkit-background-clip:text;background-clip:text;color:transparent">
+      <span data-i18n-en>🚩 Report Content</span><span data-i18n-hi>🚩 Report करें</span>
+    </h2>
+    <p class="sub"><span data-i18n-en>Help keep the community clean. Tell us what's wrong:</span><span data-i18n-hi>कम्युनिटी साफ़ रखें। बताइए क्या गलत है:</span></p>
+    <div class="pb-err" id="repErr"></div>
+    <div class="pb-ok" id="repOk"></div>
+
+    <div class="pb-report-reasons" id="repReasons">
+      <button type="button" class="pb-report-reason" data-reason="Spam or advertising">🚫 Spam / advertising</button>
+      <button type="button" class="pb-report-reason" data-reason="Abusive language or harassment">😡 Abusive / offensive</button>
+      <button type="button" class="pb-report-reason" data-reason="Misleading or false info">❌ Misleading / false</button>
+      <button type="button" class="pb-report-reason" data-reason="Adult or inappropriate content">🔞 Adult content</button>
+      <button type="button" class="pb-report-reason" data-reason="Scam / fraud attempt">💸 Scam / fraud</button>
+      <button type="button" class="pb-report-reason" data-reason="Off-topic / irrelevant">🤷 Off-topic</button>
+    </div>
+
+    <div class="pb-field">
+      <label data-i18n-en>Your Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
+      <input id="repPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="10-digit mobile">
+      <div class="pb-counter"><span data-i18n-en>Used only to prevent fake reports — never shown</span><span data-i18n-hi>केवल फेक रिपोर्ट रोकने के लिए</span></div>
+    </div>
+
+    <button class="pb-modal-btn" id="repSubmit" onclick="submitReport()" disabled style="background:linear-gradient(135deg,#EF4444,#F97316)">
+      <span data-i18n-en>Submit Report</span><span data-i18n-hi>Report भेजें</span>
+    </button>
+    <div style="font-size:.72rem;color:var(--pb-muted);margin-top:10px;text-align:center;line-height:1.4">
+      <span data-i18n-en>After 3 unique reports, content auto-hides for admin review.</span>
+      <span data-i18n-hi>3 अलग-अलग reports के बाद content अपने आप hide हो जाएगा।</span>
+    </div>
   </div>
 </div>
 
@@ -896,6 +959,9 @@ async function openDetail(qid){
         · ${timeAgo(q.created_at)} · 👁 ${q.view_count}
       </div>
       <div class="pb-detail-q">${escapeHtml(q.question_text)}</div>
+      <div style="display:flex;justify-content:flex-end;margin:-8px 0 14px">
+        <button class="pb-report-btn" onclick="openReportModal('question','${q.id}')" title="Report this question">🚩 Report</button>
+      </div>
       <div style="font-size:.84rem;font-weight:800;color:var(--pb-ink-2);margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em">
         ${replies.length} ${replies.length===1?'Reply':'Replies'}
       </div>
@@ -909,6 +975,7 @@ async function openDetail(qid){
                   ${r.replier_name ? `<b>${escapeHtml(r.replier_name)}</b>` : 'Anonymous'}
                   ${r.business_name ? `<a class="biz-link" href="/business.html?slug=${encodeURIComponent(r.business_slug||'')}" target="_blank">🏪 ${escapeHtml(r.business_name)}</a>` : ''}
                   <span>· ${timeAgo(r.created_at)}</span>
+                  <button class="pb-report-btn-inline" onclick="openReportModal('reply','${r.id}')" title="Report this reply">🚩</button>
                 </div>
               </div>
             `).join('')
@@ -923,6 +990,68 @@ async function openDetail(qid){
   }
 }
 function closeDetail(){ document.getElementById('detailModal').classList.remove('active'); ACTIVE_QUESTION_ID=null; }
+
+// ====== Report modal ======
+let REPORT_TARGET = null;     // { type, id }
+let REPORT_REASON = null;
+
+function openReportModal(type, id){
+  REPORT_TARGET = { type, id };
+  REPORT_REASON = null;
+  document.getElementById('reportModal').classList.add('active');
+  document.getElementById('repErr').style.display='none';
+  document.getElementById('repOk').style.display='none';
+  document.getElementById('repSubmit').disabled = true;
+  document.querySelectorAll('.pb-report-reason').forEach(b => {
+    b.classList.remove('selected');
+    b.onclick = () => {
+      document.querySelectorAll('.pb-report-reason').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      REPORT_REASON = b.dataset.reason;
+      document.getElementById('repSubmit').disabled = false;
+    };
+  });
+  try { document.getElementById('repPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+}
+function closeReportModal(){
+  document.getElementById('reportModal').classList.remove('active');
+  REPORT_TARGET = null; REPORT_REASON = null;
+}
+
+async function submitReport(){
+  if (!REPORT_TARGET || !REPORT_REASON) return;
+  const btn = document.getElementById('repSubmit');
+  const err = document.getElementById('repErr');
+  const ok = document.getElementById('repOk');
+  err.style.display='none'; ok.style.display='none';
+  const phone = document.getElementById('repPhone').value.trim();
+  if (phone.replace(/[^0-9]/g,'').length < 10){
+    err.textContent='Valid 10-digit mobile required';
+    err.style.display='block';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const { error } = await SB.rpc('report_community_item', {
+      p_type: REPORT_TARGET.type,
+      p_id: REPORT_TARGET.id,
+      p_reason: REPORT_REASON,
+      p_reporter_phone: phone
+    });
+    if (error) throw error;
+    ok.textContent = '✓ Thanks! Report submitted. Admin will review shortly.';
+    ok.style.display='block';
+    try { localStorage.setItem('dl_pb_phone', phone); } catch(_){}
+    setTimeout(closeReportModal, 1400);
+  } catch(e){
+    err.textContent = (e.message || 'Could not submit').replace(/^.*?:\s*/,'');
+    err.style.display='block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Submit Report</span><span data-i18n-hi style="display:none">Report भेजें</span>';
+  }
+}
 
 // ====== Reply modal ======
 async function openReplyModal(qpreview){
