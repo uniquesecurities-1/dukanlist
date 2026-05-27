@@ -970,7 +970,7 @@ function renderPopularCats(){
     + '<span data-i18n-hi style="display:none">लोकप्रिय श्रेणियाँ</span>'
     + '</div>'
     + popular.map(c =>
-        `<button type="button" class="pb-cat-chip" onclick="pickCategory(${c.id}, ${JSON.stringify(c.name)})">${escapeHtml(c.name)}</button>`
+        `<button type="button" class="pb-cat-chip" onclick="pickCategory(${c.id})">${escapeHtml(c.name)}</button>`
       ).join('');
   // Apply current i18n state to the newly-inserted spans
   const cur = document.documentElement.getAttribute('data-lang') || 'en';
@@ -978,7 +978,11 @@ function renderPopularCats(){
   box.querySelectorAll('[data-i18n-hi]').forEach(el => el.style.display = cur==='hi' ? '' : 'none');
 }
 
-function pickCategory(id, name){
+function pickCategory(id){
+  // Lookup the category from global CATEGORIES (avoids HTML-quoting bugs in onclick)
+  const c = CATEGORIES.find(x => Number(x.id) === Number(id));
+  if (!c){ console.warn('pickCategory: id not found', id); return; }
+  const name = c.name;
   const inp = document.getElementById('askCatInput');
   inp.value = name;
   document.getElementById('askCat').value = id;
@@ -1008,11 +1012,23 @@ function clearAskCat(){
 
 function filterCategoryResults(){
   const inp = document.getElementById('askCatInput');
+  const hiddenInp = document.getElementById('askCat');
   const q = (inp.value || '').trim().toLowerCase();
   const results = document.getElementById('askCatResults');
   const popular = document.getElementById('askCatPopular');
   const clearBtn = document.getElementById('askCatClear');
   const hint = document.getElementById('askCatHint');
+
+  // If previously selected, check if input still matches that category exactly.
+  // If user typed something different, clear the hidden id (stale otherwise).
+  if (hiddenInp.value){
+    const sel = CATEGORIES.find(c => Number(c.id) === Number(hiddenInp.value));
+    if (sel && inp.value !== sel.name){
+      hiddenInp.value = '';
+      hint.textContent = '';
+      hint.classList.remove('err');
+    }
+  }
 
   // When empty: show popular, hide results
   if (!q){
@@ -1061,7 +1077,7 @@ function filterCategoryResults(){
         ? escapeHtml(en.slice(0,i)) + '<mark>' + escapeHtml(en.slice(i, i+q.length)) + '</mark>' + escapeHtml(en.slice(i+q.length))
         : escapeHtml(en);
       const hiPart = c.name_hi ? '<span class="hi-name">· ' + escapeHtml(c.name_hi) + '</span>' : '';
-      return `<div class="pb-cat-row" data-idx="${idx}" onclick="pickCategory(${c.id}, ${JSON.stringify(en)})"><span>${highlighted}${hiPart}</span><span style="color:var(--pb-primary);font-size:1rem">→</span></div>`;
+      return `<div class="pb-cat-row" data-idx="${idx}" onclick="pickCategory(${c.id})"><span>${highlighted}${hiPart}</span><span style="color:var(--pb-primary);font-size:1rem">→</span></div>`;
     }).join('');
   }
   results.classList.add('active');
@@ -1085,7 +1101,7 @@ function catPickerKeydown(e){
     const target = CAT_KBD_INDEX >= 0 ? CAT_LAST_RESULTS[CAT_KBD_INDEX] : CAT_LAST_RESULTS[0];
     if (target){
       e.preventDefault();
-      pickCategory(target.c.id, target.c.name);
+      pickCategory(target.c.id);
     }
   } else if (e.key === 'Escape'){
     results.classList.remove('active');
@@ -1211,19 +1227,23 @@ async function submitAsk(){
   const err = document.getElementById('askErr');
   const ok = document.getElementById('askOk');
   err.style.display='none'; ok.style.display='none';
-  const cityId = parseInt(document.getElementById('askCity').value, 10);
-  const catId = document.getElementById('askCat').value ? parseInt(document.getElementById('askCat').value, 10) : null;
-  const text = document.getElementById('askText').value.trim();
-  const name = document.getElementById('askName').value.trim();
-  const phone = document.getElementById('askPhone').value.trim();
 
-  if (!cityId) { err.textContent='Please select a city'; err.style.display='block'; return; }
-  if (text.length < 10) { err.textContent='Question must be at least 10 characters'; err.style.display='block'; return; }
-  if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Posting...';
   try {
+    const cityIdRaw = document.getElementById('askCity').value;
+    const cityId = parseInt(cityIdRaw, 10);
+    const catRaw = document.getElementById('askCat').value;
+    const catId = (catRaw && /^\d+$/.test(String(catRaw).trim())) ? parseInt(catRaw, 10) : null;
+    const text = document.getElementById('askText').value.trim();
+    const name = document.getElementById('askName').value.trim();
+    const phone = document.getElementById('askPhone').value.trim();
+
+    if (!cityId) { err.textContent='Please select a city first'; err.style.display='block'; return; }
+    if (text.length < 10) { err.textContent='Question must be at least 10 characters'; err.style.display='block'; return; }
+    if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Posting…';
+
     const { data, error } = await SB.rpc('post_community_question', {
       p_city_id: cityId,
       p_category_id: catId,
@@ -1236,11 +1256,11 @@ async function submitAsk(){
     ok.style.display='block';
     try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
     document.getElementById('askText').value=''; document.getElementById('askLen').textContent='0';
-    // Full reset of category picker
     clearAskCat();
     setTimeout(()=>{ closeAsk(); loadQuestions(); loadLeaderboard(); }, 1100);
   } catch(e){
-    err.textContent = (e.message || 'Could not post').replace(/^.*?:\s*/,'');
+    console.error('[submitAsk] failure:', e);
+    err.textContent = (e && e.message ? e.message : 'Could not post — please try again.').replace(/^.*?:\s*/,'');
     err.style.display='block';
   } finally {
     btn.disabled = false;
@@ -1413,7 +1433,7 @@ async function submitReply(){
   if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
 
   btn.disabled = true;
-  btn.textContent = 'Posting...';
+  btn.textContent = 'Posting…';
   try {
     const { data, error } = await SB.rpc('post_community_reply', {
       p_question_id: ACTIVE_QUESTION_ID,
@@ -1433,7 +1453,8 @@ async function submitReply(){
       loadQuestions();
     }, 900);
   } catch(e){
-    err.textContent = (e.message || 'Could not post').replace(/^.*?:\s*/,'');
+    console.error('[submitReply] failure:', e);
+    err.textContent = (e && e.message ? e.message : 'Could not post — try again').replace(/^.*?:\s*/,'');
     err.style.display='block';
   } finally {
     btn.disabled = false;
