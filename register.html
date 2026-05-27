@@ -1040,7 +1040,7 @@ async function loadCategoriesIntoSelect(){
   if (c){
     try{
       const { data: rows, error } = await c.from('categories')
-        .select('id, slug, name, name_hi, icon, color, parent_id, sort_order')
+        .select('id, slug, name, name_hi, icon, color, parent_id, sort_order, keywords, description')
         .eq('active', true)
         .order('sort_order');
       if (error) throw error;
@@ -1710,10 +1710,10 @@ function renderCatTiles(query){
     return;
   }
 
-  // Filter by query (matches name, name_hi, slug, parent_name)
+  // Filter by query (matches name, name_hi, slug, parent_name, keywords, description)
   const filtered = query
     ? allCats.filter(c => {
-        const hay = ((c.name || '') + ' ' + (c.name_hi || '') + ' ' + (c.slug || '') + ' ' + (c.parent_name || '')).toLowerCase();
+        const hay = ((c.name || '') + ' ' + (c.name_hi || '') + ' ' + (c.slug || '') + ' ' + (c.parent_name || '') + ' ' + (c.keywords || '') + ' ' + (c.description || '')).toLowerCase();
         return hay.indexOf(query) !== -1;
       })
     : allCats;

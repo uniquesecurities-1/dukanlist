@@ -959,7 +959,7 @@ async function loadCategories(){
     // attempt with parent_id ordering, but graceful fallback
     const { data, error } = await SB
       .from('categories')
-      .select('id, name, name_hi, parent_id')
+      .select('id, name, name_hi, parent_id, keywords, description')
       .order('name')
       .limit(500);
     if (error) { console.warn(error); return; }
@@ -1072,16 +1072,21 @@ function filterCategoryResults(){
   popular.style.display = 'none';
   clearBtn.style.display = '';
 
-  // Score matches: exact > prefix > word-start > substring (across name + name_hi)
+  // Score matches: exact > prefix > word-start > substring (across name + name_hi + keywords + description)
   const matches = [];
   for (const c of CATEGORIES){
     const en = (c.name || '').toLowerCase();
     const hi = (c.name_hi || '').toLowerCase();
+    const kw = (c.keywords || '').toLowerCase();
+    const desc = (c.description || '').toLowerCase();
     let score = 0;
     if (en === q || hi === q) score = 100;
     else if (en.startsWith(q) || hi.startsWith(q)) score = 80;
     else if (en.includes(' '+q) || hi.includes(' '+q)) score = 60;
-    else if (en.includes(q) || hi.includes(q)) score = 40;
+    else if (en.includes(q) || hi.includes(q)) score = 50;
+    // Keyword/synonym match — lower priority than name match but still findable
+    else if (kw.includes(q)) score = 45;
+    else if (desc.includes(q)) score = 30;
     if (score > 0) matches.push({ c, score });
   }
   matches.sort((a,b) => b.score - a.score || a.c.name.length - b.c.name.length);
