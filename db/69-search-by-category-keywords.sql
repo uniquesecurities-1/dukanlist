@@ -56,7 +56,7 @@ RETURNS TABLE (
   hours_json      JSONB,
   rating_avg      NUMERIC,
   rating_count    INT,
-  verified_score  INT,
+  verified_score  SMALLINT,
   match_rank      REAL
 )
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public
@@ -167,4 +167,4 @@ BEGIN
   RAISE NOTICE '✓ search_businesses("medical store") returned % results', v_n;
 END $$;
 
-COMMIT;
+COM
