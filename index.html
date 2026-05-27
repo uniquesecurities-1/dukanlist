@@ -741,35 +741,103 @@ function dismissFestBanner(){
         <span class="dot"></span>
         <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
       </label>
-      <div style="position:relative;display:inline-flex;align-items:center">
-        <span class="pucho-attn-arrow" aria-hidden="true">👉</span>
+      <div class="pucho-attn-wrap">
+        <!-- Floating "TRY!" tag with rotation + bounce -->
+        <span class="pucho-try-tag" aria-hidden="true">
+          <span data-i18n-en>TRY!</span><span data-i18n-hi style="display:none">देखो!</span>
+        </span>
+        <!-- Custom SVG curved arrow — bright orange, hand-drawn style -->
+        <svg class="pucho-arrow-svg" aria-hidden="true" viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="puchoArrowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F59E0B"/>
+              <stop offset="100%" stop-color="#EF4444"/>
+            </linearGradient>
+          </defs>
+          <path d="M 5 8 Q 15 30, 35 32 L 30 27 M 35 32 L 30 37"
+                stroke="url(#puchoArrowGrad)" stroke-width="4.5"
+                fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <a href="/pucho-bhai.html" id="puchoBhaiPill" class="pucho-bhai-pill" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;border-radius:99px;font-weight:800;font-size:.82rem;text-decoration:none;box-shadow:0 4px 12px rgba(124,58,237,.25);transition:transform .15s,box-shadow .15s;position:relative;z-index:1" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(124,58,237,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(124,58,237,.25)'">
           💬 <span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span>
           <span style="background:rgba(255,255,255,.25);font-size:.62rem;padding:1px 6px;border-radius:99px;font-weight:800;letter-spacing:.04em">NEW</span>
         </a>
       </div>
       <style>
-        .pucho-attn-arrow{
-          font-size:1.4rem; margin-right:-2px; display:inline-block;
-          transform-origin:center;
-          animation: puchoPoint 1.3s ease-in-out infinite;
-          filter: drop-shadow(0 2px 4px rgba(124,58,237,.35));
+        .pucho-attn-wrap{
+          position:relative;
+          display:inline-flex;
+          align-items:center;
+          gap:0;
+          padding-top:26px;   /* room for floating TRY tag above */
+          padding-left:48px;  /* room for curved arrow to the left */
         }
-        @keyframes puchoPoint {
-          0%, 100% { transform: translateX(0) scale(1); }
-          25%      { transform: translateX(6px) scale(1.12); }
-          50%      { transform: translateX(2px) scale(1.05); }
-          75%      { transform: translateX(8px) scale(1.15); }
+        /* Floating yellow "TRY!" tag above the pill */
+        .pucho-try-tag{
+          position:absolute;
+          top:0;
+          left:38px;
+          background:linear-gradient(135deg,#FCD34D,#F59E0B);
+          color:#7C2D12;
+          font-weight:900;
+          font-size:.66rem;
+          letter-spacing:.08em;
+          padding:3px 9px;
+          border-radius:99px;
+          box-shadow:0 3px 10px rgba(245,158,11,.45), 0 1px 2px rgba(0,0,0,.08);
+          transform-origin:center bottom;
+          animation: puchoTryWiggle 1.6s ease-in-out infinite;
+          white-space:nowrap;
+          border:1.5px solid #fff;
         }
-        .pucho-bhai-pill{ animation: puchoPulse 2.4s ease-in-out infinite; }
+        .pucho-try-tag::after{
+          content:'';
+          position:absolute;
+          bottom:-4px;
+          left:50%;
+          transform:translateX(-50%) rotate(45deg);
+          width:7px; height:7px;
+          background:#F59E0B;
+          border-bottom:1.5px solid #fff;
+          border-right:1.5px solid #fff;
+        }
+        @keyframes puchoTryWiggle{
+          0%, 100% { transform:rotate(-6deg) translateY(0) scale(1); }
+          25%      { transform:rotate(6deg)  translateY(-3px) scale(1.08); }
+          50%      { transform:rotate(-4deg) translateY(0) scale(1.04); }
+          75%      { transform:rotate(8deg)  translateY(-2px) scale(1.1); }
+        }
+        /* Curved SVG arrow */
+        .pucho-arrow-svg{
+          position:absolute;
+          left:0;
+          top:50%;
+          transform:translateY(-50%);
+          width:46px;
+          height:38px;
+          filter: drop-shadow(0 3px 8px rgba(245,158,11,.5));
+          animation: puchoArrowDance 1.4s ease-in-out infinite;
+        }
+        @keyframes puchoArrowDance{
+          0%, 100% { transform:translateY(-50%) translateX(0) scale(1); opacity:.95; }
+          50%      { transform:translateY(-50%) translateX(5px) scale(1.12); opacity:1; }
+        }
+        /* Pulsing pink-magenta glow on the pill */
+        .pucho-bhai-pill{ animation: puchoPulse 2s ease-in-out infinite; }
         @keyframes puchoPulse {
-          0%, 100% { box-shadow: 0 4px 12px rgba(124,58,237,.25), 0 0 0 0 rgba(236,72,153,.35); }
-          50%      { box-shadow: 0 4px 12px rgba(124,58,237,.25), 0 0 0 10px rgba(236,72,153,0); }
+          0%, 100% { box-shadow: 0 4px 12px rgba(124,58,237,.3), 0 0 0 0 rgba(236,72,153,.55); }
+          50%      { box-shadow: 0 4px 12px rgba(124,58,237,.3), 0 0 0 14px rgba(236,72,153,0); }
         }
+        /* Respect reduced motion */
         @media (prefers-reduced-motion: reduce){
-          .pucho-attn-arrow, .pucho-bhai-pill{ animation: none !important; }
+          .pucho-try-tag, .pucho-arrow-svg, .pucho-bhai-pill{ animation:none !important; }
         }
-        @media (max-width: 380px){ .pucho-attn-arrow{ display:none; } }
+        /* Compact on narrow screens but keep visible */
+        @media (max-width: 480px){
+          .pucho-attn-wrap{ padding-left:42px; padding-top:24px }
+          .pucho-arrow-svg{ width:40px; height:34px }
+          .pucho-try-tag{ font-size:.6rem; padding:2px 7px; left:34px }
+        }
       </style>
       <button type="button" id="installBtn" style="display:none">
         📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
