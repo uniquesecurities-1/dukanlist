@@ -80,21 +80,32 @@ export default async function handler(req, res) {
 
   const cleanEmail = String(new_email).toLowerCase().trim();
 
-  // 4. Look up business → owner_id
+  // 4. Look up business + linked auth_user_id via business_owners table
   const bizLookup = await sb(
-    `/rest/v1/businesses?id=eq.${encodeURIComponent(business_id)}&select=id,owner_id,name`,
+    `/rest/v1/businesses?id=eq.${encodeURIComponent(business_id)}&select=id,name`,
     { method: 'GET' }
   );
   if (!bizLookup.ok || !Array.isArray(bizLookup.data) || bizLookup.data.length === 0) {
-    return res.status(404).json({ error: 'Business not found' });
-  }
-  const biz = bizLookup.data[0];
-  if (!biz.owner_id) {
-    return res.status(400).json({
-      error: 'This business has no linked owner account yet.',
-      hint: 'Owner must register first, or use claim-by-phone flow.'
+    return res.status(404).json({
+      error: 'Business not found',
+      hint: 'Check that business_id is correct',
+      received: business_id
     });
   }
+  const biz = bizLookup.data[0];
+
+  // Look up owner via business_owners table (one-to-one for shopkeepers)
+  const ownerLookup = await sb(
+    `/rest/v1/business_owners?business_id=eq.${encodeURIComponent(business_id)}&select=auth_user_id&auth_user_id=not.is.null&limit=1`,
+    { method: 'GET' }
+  );
+  if (!ownerLookup.ok || !Array.isArray(ownerLookup.data) || ownerLookup.data.length === 0) {
+    return res.status(400).json({
+      error: 'This business has no linked auth account yet.',
+      hint: 'Owner must register (sign up + confirm email) before email can be updated. Or use the claim-by-phone flow first.'
+    });
+  }
+  biz.owner_id = ownerLookup.data[0].auth_user_id;
 
   // 5. Check email isn't already used by someone else
   const emailCheck = await sb(
