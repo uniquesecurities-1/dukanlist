@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#7C3AED">
-<title>Pucho Bhai — Apne shehar mein puchho, jawab paao | dukanlist.com</title>
-<meta name="description" content="Apne shehar ka community Q&A board. Local shops, services, recommendations — apne logon se pucho, jawab paao. Mandi Dabwali, Sirsa, Bathinda & more.">
+<title>Pucho Bhai — Ask Your City | dukanlist.com</title>
+<meta name="description" content="Pucho Bhai — your city's community Q&A board. Ask about local shops, services, recommendations — get answers from locals. Mandi Dabwali, Sirsa, Bathinda &amp; more.">
 <link rel="canonical" href="https://dukanlist.com/pucho-bhai.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dukanlist.com/pucho-bhai.html">
 <meta property="og:title" content="Pucho Bhai — Community Q&A on dukanlist.com">
-<meta property="og:description" content="Apne shehar mein puchho, local logon se jawab paao — shops, services, recommendations.">
+<meta property="og:description" content="Ask anything about your city and get answers from real locals — best shops, services and recommendations.">
 <meta property="og:image" content="https://dukanlist.com/assets/icons/icon-512.png">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -425,7 +425,7 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
       <span data-i18n-hi>पूछो भाई 🙏</span>
     </h1>
     <p>
-      <span data-i18n-en>Apne shehar mein puchho, local logon se jawab paao. Best shops, services, recommendations — sab kuch yahin.</span>
+      <span data-i18n-en>Ask anything about your city — locals reply with real answers. Best shops, services and recommendations, all in one place.</span>
       <span data-i18n-hi>अपने शहर में पूछो, लोकल लोगों से जवाब पाओ। सबसे अच्छी दुकानें, सेवाएँ, सलाह — सब यहीं।</span>
     </p>
     <button class="pb-hero-cta" onclick="openAskModal()">
@@ -457,7 +457,7 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
       <div class="pb-search-wrap">
         <span class="pb-search-icon">🔍</span>
         <input type="text" id="citySearchInput" autocomplete="off"
-               placeholder="Type city name… e.g. Dabwali, Sirsa, Bathinda">
+               data-ph-en="Type city name… e.g. Dabwali, Sirsa, Bathinda" data-ph-hi="शहर लिखें… जैसे डबवाली, सिरसा, बठिंडा" placeholder="Type city name… e.g. Dabwali, Sirsa, Bathinda">
         <button type="button" class="pb-clear-btn" id="cityClearBtn" onclick="clearCitySearch()" style="display:none" aria-label="Clear">×</button>
       </div>
       <select id="cityDropdown" onchange="onCityDropdownChange()" aria-label="Select city">
@@ -514,20 +514,26 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
     </div>
     <div class="pb-field">
       <label data-i18n-en>Category (optional)</label><label data-i18n-hi style="display:none">श्रेणी (वैकल्पिक)</label>
-      <select id="askCat"><option value="">— Any —</option></select>
+      <input id="askCatInput" list="catList" autocomplete="off"
+             data-ph-en="Type to search e.g. Karyana, Mobile, Doctor…"
+             data-ph-hi="लिखें: किराना, मोबाइल, डॉक्टर…"
+             placeholder="Type to search e.g. Karyana, Mobile, Doctor…">
+      <datalist id="catList"></datalist>
+      <input type="hidden" id="askCat" value="">
+      <div id="askCatHint" style="font-size:.7rem;color:var(--pb-primary-d);margin-top:4px;font-weight:600;min-height:14px"></div>
     </div>
     <div class="pb-field">
       <label data-i18n-en>Your Question *</label><label data-i18n-hi style="display:none">आपका सवाल *</label>
-      <textarea id="askText" maxlength="500" placeholder="e.g. Mandi Dabwali mein sabse achha mobile repair shop kaunsa hai?"></textarea>
+      <textarea id="askText" maxlength="500" data-ph-en="e.g. Best mobile repair shop in Mandi Dabwali?" data-ph-hi="उदाहरण: मंडी डबवाली में सबसे अच्छी मोबाइल रिपेयर शॉप कौन सी है?" placeholder="e.g. Best mobile repair shop in Mandi Dabwali?"></textarea>
       <div class="pb-counter"><span id="askLen">0</span> / 500</div>
     </div>
     <div class="pb-field">
       <label data-i18n-en>Your Name (optional)</label><label data-i18n-hi style="display:none">आपका नाम (वैकल्पिक)</label>
-      <input id="askName" maxlength="50" placeholder="Rajesh">
+      <input id="askName" maxlength="50" data-ph-en="Rajesh" data-ph-hi="राजेश" placeholder="Rajesh">
     </div>
     <div class="pb-field">
       <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
-      <input id="askPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="10-digit mobile">
+      <input id="askPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
       <div class="pb-counter"><span data-i18n-en>Only used to prevent spam — never shown publicly</span><span data-i18n-hi>केवल स्पैम रोकने के लिए — कभी सार्वजनिक नहीं</span></div>
     </div>
     <button class="pb-modal-btn" id="askSubmit" onclick="submitAsk()">
@@ -566,16 +572,16 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
 
     <div class="pb-field">
       <label data-i18n-en>Your Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
-      <input id="repPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="10-digit mobile">
+      <input id="repPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
       <div class="pb-counter"><span data-i18n-en>Used only to prevent fake reports — never shown</span><span data-i18n-hi>केवल फेक रिपोर्ट रोकने के लिए</span></div>
     </div>
 
     <button class="pb-modal-btn" id="repSubmit" onclick="submitReport()" disabled style="background:linear-gradient(135deg,#EF4444,#F97316)">
-      <span data-i18n-en>Submit Report</span><span data-i18n-hi>Report भेजें</span>
+      <span data-i18n-en>Submit Report</span><span data-i18n-hi>रिपोर्ट भेजें</span>
     </button>
     <div style="font-size:.72rem;color:var(--pb-muted);margin-top:10px;text-align:center;line-height:1.4">
       <span data-i18n-en>After 3 unique reports, content auto-hides for admin review.</span>
-      <span data-i18n-hi>3 अलग-अलग reports के बाद content अपने आप hide हो जाएगा।</span>
+      <span data-i18n-hi>3 अलग-अलग रिपोर्ट के बाद कंटेंट अपने आप छुप जाएगा।</span>
     </div>
   </div>
 </div>
@@ -590,16 +596,16 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
     <div class="pb-ok" id="rOk"></div>
     <div class="pb-field">
       <label data-i18n-en>Your Reply *</label><label data-i18n-hi style="display:none">आपका जवाब *</label>
-      <textarea id="rText" maxlength="1000" placeholder="Bhai mai use karta hu, sahi service deta hai..."></textarea>
+      <textarea id="rText" maxlength="1000" data-ph-en="I have used them — really good service…" data-ph-hi="मैंने इनसे सेवा ली है, बहुत अच्छी service देते हैं…" placeholder="I have used them — really good service…"></textarea>
       <div class="pb-counter"><span id="rLen">0</span> / 1000</div>
     </div>
     <div class="pb-field">
       <label data-i18n-en>Your Name (optional)</label><label data-i18n-hi style="display:none">आपका नाम (वैकल्पिक)</label>
-      <input id="rName" maxlength="50" placeholder="Mukesh">
+      <input id="rName" maxlength="50" data-ph-en="Mukesh" data-ph-hi="मुकेश" placeholder="Mukesh">
     </div>
     <div class="pb-field">
       <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
-      <input id="rPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="10-digit mobile">
+      <input id="rPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
     </div>
     <div class="pb-field">
       <label>
@@ -635,6 +641,11 @@ function toggleLang(){
   document.documentElement.setAttribute('data-lang', next);
   document.querySelectorAll('[data-i18n-en]').forEach(el=>{ el.style.display = next==='en' ? '' : 'none' });
   document.querySelectorAll('[data-i18n-hi]').forEach(el=>{ el.style.display = next==='hi' ? '' : 'none' });
+  // Swap data-ph-* placeholders on inputs/textareas
+  document.querySelectorAll('[data-ph-en]').forEach(el => {
+    const key = 'data-ph-' + next;
+    if (el.hasAttribute(key)) el.placeholder = el.getAttribute(key);
+  });
   try { localStorage.setItem('dl_lang', next) } catch(_){}
   document.getElementById('langTog').textContent = next==='en' ? 'हिं' : 'EN';
 }
@@ -789,13 +800,39 @@ async function loadCategories(){
       .limit(300);
     if (error) { console.warn(error); return; }
     CATEGORIES = data || [];
-    const sel = document.getElementById('askCat');
+    const dl = document.getElementById('catList');
     CATEGORIES.forEach(c => {
       const o = document.createElement('option');
-      o.value = c.id; o.textContent = c.name;
-      sel.appendChild(o);
+      o.value = c.name;     // what shows in autocomplete dropdown
+      o.dataset.id = c.id;
+      dl.appendChild(o);
     });
+    // Wire input → resolve to category id
+    const inp = document.getElementById('askCatInput');
+    if (inp && !inp.__wired){
+      inp.__wired = true;
+      inp.addEventListener('input', resolveCategoryInput);
+      inp.addEventListener('blur', resolveCategoryInput);
+    }
   } catch(e){ console.warn(e); }
+}
+
+function resolveCategoryInput(){
+  const inp = document.getElementById('askCatInput');
+  const hidden = document.getElementById('askCat');
+  const hint = document.getElementById('askCatHint');
+  const val = (inp.value || '').trim().toLowerCase();
+  if (!val){ hidden.value=''; hint.textContent=''; return; }
+  // Exact match first
+  let match = CATEGORIES.find(c => c.name.toLowerCase() === val);
+  if (!match){
+    // Partial match (starts with)
+    const partials = CATEGORIES.filter(c => c.name.toLowerCase().includes(val));
+    if (partials.length === 1) match = partials[0];
+  }
+  hidden.value = match ? match.id : '';
+  hint.textContent = match ? '✓ ' + match.name : (val.length > 1 ? '⚠ No exact match — pick from list' : '');
+  hint.style.color = match ? 'var(--pb-primary-d)' : '#B91C1C';
 }
 
 // ====== Load questions ======
@@ -890,6 +927,13 @@ function openAskModal(){
   document.getElementById('askOk').style.display='none';
   // Default ask-city to current city
   if (CURRENT_CITY) document.getElementById('askCity').value = CURRENT_CITY.id;
+  // Reset category picker
+  const catInp = document.getElementById('askCatInput');
+  const catHid = document.getElementById('askCat');
+  const catHint = document.getElementById('askCatHint');
+  if (catInp) catInp.value = '';
+  if (catHid) catHid.value = '';
+  if (catHint) catHint.textContent = '';
   // Restore phone from localStorage
   try { document.getElementById('askPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
   try { document.getElementById('askName').value = localStorage.getItem('dl_pb_name') || ''; } catch(_){}
@@ -930,6 +974,10 @@ async function submitAsk(){
     ok.style.display='block';
     try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
     document.getElementById('askText').value=''; document.getElementById('askLen').textContent='0';
+    // Clear category picker too
+    const ci = document.getElementById('askCatInput'); if (ci) ci.value='';
+    const ch = document.getElementById('askCat'); if (ch) ch.value='';
+    const cht = document.getElementById('askCatHint'); if (cht) cht.textContent='';
     setTimeout(()=>{ closeAsk(); loadQuestions(); loadLeaderboard(); }, 1100);
   } catch(e){
     err.textContent = (e.message || 'Could not post').replace(/^.*?:\s*/,'');
@@ -1049,7 +1097,7 @@ async function submitReport(){
     err.style.display='block';
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<span data-i18n-en>Submit Report</span><span data-i18n-hi style="display:none">Report भेजें</span>';
+    btn.innerHTML = '<span data-i18n-en>Submit Report</span><span data-i18n-hi style="display:none">रिपोर्ट भेजें</span>';
   }
 }
 
