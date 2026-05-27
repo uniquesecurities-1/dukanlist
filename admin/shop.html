@@ -319,9 +319,8 @@ function render(){
         + '<div style="position:relative">'
           + '<input type="text" id="catAddInput" autocomplete="off"'
           + ' placeholder="🔍 Search to add — e.g. mobile, doctor, kirana, organic, bank"'
-          + ' style="width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .15s"'
-          + ' onfocus="this.style.borderColor=\'#1E3A8A\'" onblur="this.style.borderColor=\'#E2E8F0\'">'
-          + '<div id="catSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #1E3A8A;border-radius:10px;max-height:240px;overflow-y:auto;z-index:20;box-shadow:0 12px 28px rgba(15,23,42,.12)"></div>'
+          + ' style="width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .15s">'
+          + '<div id="catSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #1E3A8A;border-radius:10px;max-height:320px;overflow-y:auto;z-index:200;box-shadow:0 12px 28px rgba(15,23,42,.18)"></div>'
         + '</div>'
         + '<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:14px">'
           + '<span id="catStatus" style="font-size:12px;color:#64748b"></span>'
@@ -653,13 +652,26 @@ async function loadCategoryEditor(){
   if (inp){
     inp.addEventListener('input', filterCatSearch);
     inp.addEventListener('focus', filterCatSearch);
+    inp.addEventListener('click', filterCatSearch);  // also on click
+    // Border colour change on focus/blur
+    inp.addEventListener('focus', function(){ inp.style.borderColor = '#1E3A8A'; });
+    inp.addEventListener('blur',  function(){ inp.style.borderColor = '#E2E8F0'; });
     // Close on outside click
     document.addEventListener('click', function(ev){
       if (!ev.target.closest('#catAddInput') && !ev.target.closest('#catSearchResults')){
-        document.getElementById('catSearchResults').style.display = 'none';
+        var r = document.getElementById('catSearchResults');
+        if (r) r.style.display = 'none';
       }
     });
+    // Inject row-hover CSS once
+    if (!document.getElementById('catPickRowCss')){
+      var st = document.createElement('style');
+      st.id = 'catPickRowCss';
+      st.textContent = '.cat-pick-row:hover{background:#F5F3FF !important}';
+      document.head.appendChild(st);
+    }
   }
+  console.info('[catEditor] loaded:', CAT_LIST.length, 'master categories,', CURRENT_CATS.length, 'currently assigned');
 }
 
 function renderCatChips(){
@@ -689,27 +701,49 @@ function filterCatSearch(){
   var inp = document.getElementById('catAddInput');
   var results = document.getElementById('catSearchResults');
   if (!inp || !results) return;
-  var q = (inp.value || '').toLowerCase().trim();
-  if (!q){
-    results.style.display = 'none';
-    return;
-  }
-  var selected = new Set(CURRENT_CATS.map(function(c){ return c.id; }));
-  var matches = CAT_LIST.filter(function(c){
-    if (selected.has(c.id)) return false;
-    var hay = ((c.name||'') + ' ' + (c.name_hi||'') + ' ' + (c.slug||'') + ' ' + (c.parent_name||'') + ' ' + (c.keywords||'') + ' ' + (c.description||'')).toLowerCase();
-    return hay.indexOf(q) !== -1;
-  }).slice(0, 10);
 
-  if (!matches.length){
-    results.innerHTML = '<div style="padding:12px;color:#94a3b8;font-size:13px;font-style:italic">No match. Try different keyword.</div>';
+  // If categories not loaded yet, show loader
+  if (!CAT_LIST || !CAT_LIST.length){
+    results.innerHTML = '<div style="padding:14px;color:#dc2626;font-size:13px;font-weight:600">⚠️ Categories list not loaded yet. Reload the page if this persists.</div>';
     results.style.display = 'block';
     return;
   }
-  results.innerHTML = matches.map(function(c){
-    return '<div onclick="addCat(' + c.id + ')" style="padding:10px 14px;cursor:pointer;font-size:13.5px;border-bottom:1px solid #f1f5f9;transition:.1s" onmouseover="this.style.background=\'#F5F3FF\'" onmouseout="this.style.background=\'#fff\'">'
+
+  var q = (inp.value || '').toLowerCase().trim();
+  var selected = new Set(CURRENT_CATS.map(function(c){ return c.id; }));
+  var pool;
+
+  if (!q){
+    // Browse mode — show first 20 unselected categories alphabetically
+    pool = CAT_LIST
+      .filter(function(c){ return !selected.has(c.id); })
+      .sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); })
+      .slice(0, 20);
+  } else {
+    pool = CAT_LIST.filter(function(c){
+      if (selected.has(c.id)) return false;
+      var hay = ((c.name||'') + ' ' + (c.name_hi||'') + ' ' + (c.slug||'') + ' ' + (c.parent_name||'') + ' ' + (c.keywords||'') + ' ' + (c.description||'')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    }).slice(0, 20);
+  }
+
+  if (!pool.length){
+    results.innerHTML = '<div style="padding:14px;color:#94a3b8;font-size:13px;font-style:italic">'
+      + (q ? 'No match for "' + esc(q) + '". Try different keyword.' : 'All categories already selected.')
+      + '</div>';
+    results.style.display = 'block';
+    return;
+  }
+
+  var headerHtml = !q
+    ? '<div style="padding:8px 14px;background:#F8FAFC;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #E2E8F0">Browse all (' + CAT_LIST.length + ') · type to filter</div>'
+    : '<div style="padding:8px 14px;background:#F8FAFC;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #E2E8F0">' + pool.length + ' match' + (pool.length===1?'':'es') + '</div>';
+
+  results.innerHTML = headerHtml + pool.map(function(c){
+    return '<div class="cat-pick-row" onclick="addCat(' + c.id + ')" style="padding:10px 14px;cursor:pointer;font-size:13.5px;border-bottom:1px solid #f1f5f9;transition:background .12s">'
       + '<b>' + esc(c.name) + '</b>'
       + (c.parent_name ? '<span style="color:#94a3b8;font-weight:500;font-size:11.5px"> · ' + esc(c.parent_name) + '</span>' : '')
+      + (c.name_hi ? '<span style="color:#94a3b8;font-weight:500;font-size:11px"> · ' + esc(c.name_hi) + '</span>' : '')
       + '</div>';
   }).join('');
   results.style.display = 'block';
@@ -853,3 +887,4 @@ function setDays(d, el){
 <script src="/assets/js/admin-auto-logout.js"></script>
 </body>
 </html>
+                                                                                                        
