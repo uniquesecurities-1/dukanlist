@@ -41,7 +41,27 @@
 
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+
+<!-- ===== Apple / iOS PWA support ===== -->
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon-180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/assets/icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-touch-icon-152.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DukanList">
+<meta name="format-detection" content="telephone=no">
+
+<!-- iOS launch splash screens (per device) -->
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/iphone-se.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/iphone-678.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/iphone-x.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/iphone-12-13.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/iphone-pro-max.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/iphone-14-pro-max.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/ipad.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="/assets/icons/splash/ipad-pro.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
 
 <!-- Schema.org JSON-LD for rich Google results -->
 <script type="application/ld+json">
@@ -1220,6 +1240,7 @@ function dismissFestBanner(){
 <script src="/assets/js/voice.js"></script>
 <script src="/assets/js/install.js"></script>
 <script src="/assets/js/install-banner.js"></script>
+<script src="/assets/js/ios-install.js" defer></script>
 <script src="/assets/js/ptr.js"></script>
 <script src="/assets/js/share-app.js"></script>
 <script src="/assets/js/autocomplete.js"></script>
@@ -1913,59 +1934,4 @@ if (window.DukanPTR){
         .select('rating,created_at,businesses(name)')
         .eq('status', 'active')
         .gte('rating', 4)
-        .order('created_at', { ascending: false })
-        .limit(3);
-      (reviews || []).forEach(r => {
-        if (!r.businesses || !r.businesses.name) return;
-        events.push({
-          en: '⭐ ' + r.rating + '-star review for <b>' + esc(r.businesses.name) + '</b> · ' + fmtAgo(r.created_at),
-          hi: '⭐ ' + r.rating + '-star review मिला <b>' + esc(r.businesses.name) + '</b> को · ' + fmtAgo(r.created_at)
-        });
-      });
-    } catch(_){}
-
-    if (events.length === 0){
-      // Static fallback (so ticker is never empty)
-      events.push(
-        { en: '🏪 Sirsa–Bathinda ka apna local directory — join FREE', hi: '🏪 Sirsa–Bathinda का local directory — FREE जुड़ें' },
-        { en: '💬 Customers daily WhatsApp local shops directly', hi: '💬 Customers रोज़ local shops से WhatsApp पर बात करते हैं' }
-      );
-    }
-
-    // Shuffle for variety
-    events.sort(() => Math.random() - 0.5);
-
-    let idx = 0;
-    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-    function show(){
-      const msg = document.getElementById('actMsg');
-      if (!msg) return;
-      msg.innerHTML = events[idx % events.length][lang] || events[idx % events.length].en;
-      idx++;
-    }
-    show();
-    ticker.style.display = '';
-    setInterval(show, 5000);
-
-    // Push body padding to avoid covering content at bottom.
-    // On mobile, mobile-nav already adds its own padding so we add only ticker height.
-    const isMobile = window.matchMedia('(max-width:700px)').matches;
-    document.body.style.paddingBottom = (isMobile ? '110px' : '52px');
-  }
-
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', () => setTimeout(loadActivity, 1800));
-  } else {
-    setTimeout(loadActivity, 1800);
-  }
-})();
-function dismissActTicker(){
-  try { localStorage.setItem('dl_act_dismissed_today', new Date().toISOString().slice(0,10)); } catch(_){}
-  const t = document.getElementById('actTicker');
-  if (t) t.style.display = 'none';
-  document.body.style.paddingBottom = '';
-}
-</script>
-
-</body>
-</html>
+        
