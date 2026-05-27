@@ -380,7 +380,9 @@ function render(){
       + '<div class="card">'
         + '<h2>👤 Owner Account</h2>'
         + metaRow('Owner Name', s.owner_name || '—')
-        + metaRow('Email', s.owner_email || '—')
+        + '<div class="meta-row"><span class="ml">Email</span><span class="mv">' + esc(s.owner_email || '—')
+          + (s.owner_user_id ? ' <button type="button" onclick="openEmailEdit()" title="Change owner email" style="background:#EEF2FF;color:#3730A3;border:none;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;margin-left:6px;font-family:inherit">✏️ Change</button>' : '')
+          + '</span></div>'
         + metaRow('Mobile', s.mobile || '—')
         + metaRow('Auth User ID', s.owner_user_id ? (s.owner_user_id.slice(0, 8) + '…') : '—')
       + '</div>'
@@ -937,6 +939,58 @@ async function addReviewByAdmin(){
   }
 }
 
+// ====== Change Owner Email ======
+async function openEmailEdit(){
+  if (!SHOP || !SHOP.owner_user_id){
+    alert('This shop has no linked owner account yet.');
+    return;
+  }
+  var newEmail = prompt(
+    'Change owner email for ' + SHOP.name + '\n\n' +
+    'Current: ' + (SHOP.owner_email || '(none)') + '\n\n' +
+    'Enter NEW email address:\n' +
+    '(auto-confirms — no verification needed)',
+    SHOP.owner_email || ''
+  );
+  if (!newEmail) return;
+  newEmail = newEmail.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)){
+    alert('Invalid email format');
+    return;
+  }
+  if (newEmail === SHOP.owner_email){
+    alert('Same email — no change made');
+    return;
+  }
+  if (!confirm('Update owner email to:\n\n' + newEmail + '\n\nShopkeeper will need to use this new email to log in.\n\nProceed?')) return;
+
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+
+    toast('⏳ Updating email...');
+    var r = await fetch('/api/admin-update-shop-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ business_id: BIZ_ID, new_email: newEmail })
+    });
+    var data = await r.json();
+    if (!r.ok){
+      var msg = data.error || ('HTTP ' + r.status);
+      if (data.hint) msg += '\n\n' + data.hint;
+      if (data.details) msg += '\n\nDetails: ' + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details));
+      alert('Email update failed:\n\n' + msg);
+      return;
+    }
+    toast('✓ Email updated to ' + newEmail);
+    SHOP.owner_email = newEmail;
+    render();
+  } catch(e){
+    alert('Network error: ' + (e.message || e));
+  }
+}
+
 init();
 </script>
 
@@ -945,67 +999,4 @@ init();
   <div class="modal-box">
     <h3>★ Featured Listing</h3>
     <div class="sub">Mark this shop as featured to boost its visibility across browse, search, and homepage.</div>
-    <div id="fmCurrent"></div>
-
-    <form onsubmit="submitFeatured(event)">
-      <div class="field">
-        <label>Duration — quick pick</label>
-        <div class="duration-grid">
-          <div class="dur-chip" onclick="setDays(7,this)">7 days</div>
-          <div class="dur-chip active" onclick="setDays(30,this)">30 days</div>
-          <div class="dur-chip" onclick="setDays(90,this)">90 days</div>
-          <div class="dur-chip" onclick="setDays(180,this)">180 days</div>
-        </div>
-      </div>
-
-      <div class="fm-row">
-        <div class="field">
-          <label>Days *</label>
-          <input id="fmDays" type="number" min="1" max="730" value="30" required>
-        </div>
-        <div class="field">
-          <label>Amount (₹) *</label>
-          <input id="fmAmount" type="number" min="0" step="0.01" placeholder="e.g. 999" required>
-        </div>
-      </div>
-
-      <div class="fm-row">
-        <div class="field">
-          <label>Payment method</label>
-          <select id="fmMethod">
-            <option value="cash">Cash</option>
-            <option value="upi">UPI</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="cheque">Cheque</option>
-            <option value="complimentary">Complimentary (₹0)</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Notes (optional)</label>
-          <input id="fmNotes" type="text" placeholder="e.g. Diwali campaign">
-        </div>
-      </div>
-
-      <div id="fmHistory"></div>
-
-      <div class="fm-actions">
-        <button type="button" class="btn" onclick="closeFeaturedModal()">Cancel</button>
-        <button type="button" class="btn danger" id="fmRevokeBtn" onclick="revokeFeatured()" style="display:none">Revoke Now</button>
-        <button type="submit" class="btn pri" id="fmSaveBtn">★ Save & Mark Featured</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-function setDays(d, el){
-  document.getElementById('fmDays').value = d;
-  document.querySelectorAll('.dur-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-}
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+    <div id="
