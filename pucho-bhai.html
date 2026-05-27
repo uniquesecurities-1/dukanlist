@@ -775,13 +775,22 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
       <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
       <input id="rPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
     </div>
-    <div class="pb-field">
+    <div class="pb-field" style="position:relative">
       <label>
         <span data-i18n-en>Recommending a shop, practice or organization? (optional)</span>
         <span data-i18n-hi style="display:none">कोई दुकान, प्रैक्टिस या संस्था सुझा रहे हैं? (वैकल्पिक)</span>
       </label>
-      <select id="rBiz"><option value="">— None —</option></select>
-      <div class="pb-counter"><span data-i18n-en>If you own one listed on DukanList, you can quote it here</span><span data-i18n-hi>आपकी कोई listing है तो यहाँ जोड़ सकते हैं</span></div>
+      <input id="rBizSearch" type="text" autocomplete="off" data-ph-en="Type shop / doctor / organization name to search…" data-ph-hi="दुकान / डॉक्टर / संस्था का नाम लिखें…" placeholder="Type shop / doctor / organization name to search…" style="width:100%;padding:9px 11px;border:1px solid #E5E7EB;border-radius:8px;font-size:.88rem">
+      <input type="hidden" id="rBiz" value="">
+      <div id="rBizResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:#fff;border:1px solid #E5E7EB;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:240px;overflow-y:auto;margin-top:3px"></div>
+      <div id="rBizPicked" style="display:none;margin-top:6px;padding:7px 10px;background:#ECFDF5;border:1px solid #10B981;border-radius:7px;font-size:.78rem;font-weight:600;color:#065F46">
+        <span id="rBizPickedLabel"></span>
+        <span style="cursor:pointer;float:right;color:#DC2626" onclick="clearBizPick()">✕ remove</span>
+      </div>
+      <div class="pb-counter">
+        <span data-i18n-en>Search any DukanList shop and tag it. Helpful for the asker!</span>
+        <span data-i18n-hi style="display:none">DukanList पर कोई भी दुकान खोज कर tag करें। पूछने वाले को मदद मिलेगी!</span>
+      </div>
     </div>
     <div style="background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:8px 11px;border-radius:9px;font-size:.74rem;font-weight:600;margin-bottom:10px;line-height:1.45">
       <span data-i18n-en>⚠️ You cannot reply to your own question. Self-promotion via fake replies will get your number blocked.</span>
@@ -1542,130 +1551,111 @@ document.getElementById('rText').addEventListener('input', e=>{
   document.getElementById('rLen').textContent = e.target.value.length;
 });
 
+// Reset the biz search field (called when opening modal)
 async function populateMyBizDropdown(){
-  const sel = document.getElementById('rBiz');
-  sel.innerHTML = '<option value="">— None —</option>';
+  document.getElementById('rBiz').value = '';
+  document.getElementById('rBizSearch').value = '';
+  document.getElementById('rBizResults').style.display = 'none';
+  document.getElementById('rBizPicked').style.display = 'none';
+  // If logged in, prefetch user's own shops as default suggestions
   try {
     const user = await ShopDB.getUser();
-    if (!user) return;
-    const { data } = await SB
-      .from('businesses')
-      .select('id, name')
-      .eq('owner_id', user.id)
-      .eq('status','active')
-      .limit(10);
-    (data||[]).forEach(b=>{
-      const o = document.createElement('option');
-      o.value = b.id; o.textContent = '🏪 ' + b.name + ' (your shop)';
-      sel.appendChild(o);
-    });
-  } catch(_){}
+    if (user) {
+      const { data } = await SB
+        .from('businesses')
+        .select('id, name, city')
+        .eq('owner_id', user.id)
+        .eq('status','active')
+        .limit(10);
+      window._myShops = data || [];
+    } else {
+      window._myShops = [];
+    }
+  } catch(_){ window._myShops = []; }
 }
 
-async function submitReply(){
-  const btn = document.getElementById('rSubmit');
-  const err = document.getElementById('rErr');
-  const ok = document.getElementById('rOk');
-  err.style.display='none'; ok.style.display='none';
-  const text = document.getElementById('rText').value.trim();
-  const name = document.getElementById('rName').value.trim();
-  const phone = document.getElementById('rPhone').value.trim();
-  const bizId = document.getElementById('rBiz').value || null;
-
-  if (text.length < 4) { err.textContent='Reply must be at least 4 characters'; err.style.display='block'; return; }
-  if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Posting…';
-  try {
-    const { data, error } = await SB.rpc('post_community_reply', {
-      p_question_id: ACTIVE_QUESTION_ID,
-      p_reply_text: text,
-      p_replier_name: name || null,
-      p_replier_phone: phone,
-      p_business_id: bizId
-    });
-    if (error) throw error;
-    ok.textContent = '✓ Reply posted!';
-    ok.style.display='block';
-    try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
-    document.getElementById('rText').value=''; document.getElementById('rLen').textContent='0';
-    setTimeout(()=>{
-      closeReply();
-      if (ACTIVE_QUESTION_ID) openDetail(ACTIVE_QUESTION_ID);
-      loadQuestions();
-    }, 900);
-  } catch(e){
-    console.error('[submitReply] failure:', e);
-    const cleanMsg = (e && e.message ? e.message : 'Could not post — try again').replace(/^.*?:\s*/,'');
-    err.textContent = cleanMsg;
-    err.style.display='block';
-    // Loud alert too — user must see what went wrong
-    alert('❌ Reply could not be posted:\n\n' + cleanMsg + '\n\nIf this keeps happening, check internet or contact admin.');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<span data-i18n-en>Post Reply</span><span data-i18n-hi style="display:none">जवाब भेजें</span>';
-  }
+// Clear picked business
+function clearBizPick(){
+  document.getElementById('rBiz').value = '';
+  document.getElementById('rBizPicked').style.display = 'none';
+  document.getElementById('rBizSearch').value = '';
+  document.getElementById('rBizSearch').focus();
 }
 
-// ====== Helpers ======
-function escapeHtml(s){
-  if (s == null) return '';
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+// Pick a business from search results
+function pickBiz(id, name, city){
+  document.getElementById('rBiz').value = id;
+  document.getElementById('rBizSearch').value = '';
+  document.getElementById('rBizResults').style.display = 'none';
+  const lbl = document.getElementById('rBizPickedLabel');
+  lbl.textContent = '✓ Tagged: ' + name + (city ? ' (' + city + ')' : '');
+  document.getElementById('rBizPicked').style.display = 'block';
 }
 
-function animateCount(elId, target){
-  const el = document.getElementById(elId);
-  if (!el) return;
-  target = Number(target) || 0;
-  if (target === 0){ el.textContent = '0'; return; }
-  const start = performance.now();
-  const dur = Math.min(900, 200 + target * 18);  // longer for bigger numbers
-  const initial = Number(el.textContent) || 0;
-  function tick(now){
-    const t = Math.min(1, (now - start) / dur);
-    const eased = 1 - Math.pow(1 - t, 3);  // easeOutCubic
-    const val = Math.round(initial + (target - initial) * eased);
-    el.textContent = val.toLocaleString('en-IN');
-    if (t < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
-function timeAgo(iso){
-  if (!iso) return '';
-  const t = new Date(iso).getTime();
-  const s = Math.floor((Date.now() - t)/1000);
-  if (s < 60) return 'just now';
-  if (s < 3600) return Math.floor(s/60)+'m ago';
-  if (s < 86400) return Math.floor(s/3600)+'h ago';
-  if (s < 86400*7) return Math.floor(s/86400)+'d ago';
-  return new Date(iso).toLocaleDateString('en-IN', {day:'numeric',month:'short'});
-}
+// Live search businesses as user types
+let _bizSearchTimer = null;
+function setupBizSearch(){
+  const inp = document.getElementById('rBizSearch');
+  if (!inp || inp._wired) return;
+  inp._wired = true;
 
-// Bootstrap
-(async () => {
-  await Promise.all([loadCities(), loadCategories(), loadLeaderboard()]);
-})();
-</script>
+  inp.addEventListener('input', e => {
+    const q = (e.target.value || '').trim();
+    clearTimeout(_bizSearchTimer);
+    const box = document.getElementById('rBizResults');
 
-<!-- Mobile bottom nav include (existing pattern) -->
-<script>
-  // Mobile bottom nav (existing pattern from other pages)
-  if (window.innerWidth <= 768) {
-    const nav = document.createElement('nav');
-    nav.id = 'mobileBottomNav';
-    nav.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E2E8F0;display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:90;box-shadow:0 -2px 8px rgba(15,23,42,.04)';
-    nav.innerHTML = `
-      <a href="/" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🏠<div>Home</div></a>
-      <a href="/browse.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">📂<div>Browse</div></a>
-      <a href="/pucho-bhai.html" style="text-align:center;text-decoration:none;color:var(--pb-primary-d);font-size:.66rem;font-weight:800">💬<div>Pucho Bhai</div></a>
-      <a href="/search.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🔍<div>Search</div></a>
-      <a href="/panel/dashboard.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">👤<div>Account</div></a>
-    `;
-    document.body.appendChild(nav);
-  }
-</script>
+    // Helper to render rows with data attributes (event delegation safe)
+    const renderRow = (b, label) => {
+      const safeName = escapeHtml(b.name || '');
+      const safeCity = escapeHtml(b.city || '');
+      return `<div class="biz-row" data-id="${escapeHtml(b.id)}" data-name="${safeName}" data-city="${safeCity}" style="padding:8px 11px;cursor:pointer;border-bottom:1px solid #F3F4F6;font-size:.83rem">🏪 ${safeName}${safeCity ? ' <span style="color:#9CA3AF;font-size:.72rem">— '+safeCity+'</span>' : ''}</div>`;
+    };
 
-</body>
-</html>
+    // Show own shops when empty + logged in
+    if (!q) {
+      const own = window._myShops || [];
+      if (own.length === 0) { box.style.display = 'none'; return; }
+      box.innerHTML = '<div style="padding:6px 11px;font-size:.7rem;font-weight:700;color:#6B7280;background:#F9FAFB;border-bottom:1px solid #E5E7EB">YOUR SHOPS</div>' +
+        own.map(b => renderRow(b)).join('');
+      box.style.display = 'block';
+      return;
+    }
+
+    if (q.length < 2) { box.style.display = 'none'; return; }
+
+    _bizSearchTimer = setTimeout(async () => {
+      box.innerHTML = '<div style="padding:10px 11px;color:#6B7280;font-size:.8rem">🔍 Searching…</div>';
+      box.style.display = 'block';
+      try {
+        const { data, error } = await SB
+          .from('businesses')
+          .select('id, name, city')
+          .ilike('name', '%' + q.replace(/[%_]/g,'') + '%')
+          .eq('status','active')
+          .order('verified', { ascending: false })
+          .limit(12);
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          box.innerHTML = '<div style="padding:10px 11px;color:#9CA3AF;font-size:.8rem">No shop found matching "' + escapeHtml(q) + '"</div>';
+          return;
+        }
+        box.innerHTML = data.map(b => renderRow(b)).join('');
+      } catch(err){
+        console.error('[bizSearch]', err);
+        box.innerHTML = '<div style="padding:10px 11px;color:#DC2626;font-size:.78rem">Search failed — try again</div>';
+      }
+    }, 250);
+  });
+
+  // Event delegation for picking rows (safe against quotes in names)
+  const box = document.getElementById('rBizResults');
+  box.addEventListener('click', e => {
+    const row = e.target.closest('.biz-row');
+    if (!row) return;
+    pickBiz(row.dataset.id, row.dataset.name, row.dataset.city || '');
+  });
+  box.addEventListener('mouseover', e => {
+    const row = e.target.closest('.biz-row');
+    if (row) row.style.background = '#FFF7ED';
+  });
+  box.addEventListener('mouse

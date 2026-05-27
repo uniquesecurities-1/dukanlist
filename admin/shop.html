@@ -202,6 +202,8 @@ async function init(){
   SHOP = r.data;
   render();
   loadEditHistory();
+  setTimeout(loadCategoryEditor, 100);
+  setTimeout(loadReviewsForAdmin, 100);
 }
 
 function render(){
@@ -336,6 +338,32 @@ function render(){
             + s.photos.map(function(p){ return '<a href="' + esc(p) + '" target="_blank"><img src="' + esc(p) + '" alt=""></a>'; }).join('')
           + '</div>'
         + '</div>') : '')
+
+      // === Reviews CRUD (admin) ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>⭐ Customer Reviews <span class="subtle">add offline feedback · edit typos · remove spam</span></h2>'
+        + '<div id="reviewsList" style="margin-top:8px"><div style="color:#94a3b8;font-size:13px;font-style:italic;padding:8px 0">Loading reviews…</div></div>'
+        + '<div style="margin-top:14px;padding-top:14px;border-top:1px dashed #E2E8F0">'
+          + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+            + '<b style="font-size:13px;color:#1E3A8A">➕ Add Review (offline feedback)</b>'
+            + '<span style="font-size:11px;color:#94a3b8">— for paper / WhatsApp feedback you want recorded</span>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 110px;gap:8px;margin-bottom:8px">'
+            + '<input type="text" id="adminRevName" placeholder="Customer name (optional)" maxlength="60" style="padding:9px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px">'
+            + '<select id="adminRevRating" style="padding:9px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px">'
+              + '<option value="5">⭐⭐⭐⭐⭐ 5</option>'
+              + '<option value="4">⭐⭐⭐⭐ 4</option>'
+              + '<option value="3">⭐⭐⭐ 3</option>'
+              + '<option value="2">⭐⭐ 2</option>'
+              + '<option value="1">⭐ 1</option>'
+            + '</select>'
+          + '</div>'
+          + '<textarea id="adminRevText" placeholder="Review text — what the customer said" maxlength="600" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px"></textarea>'
+          + '<div style="display:flex;justify-content:flex-end">'
+            + '<button class="btn pri" onclick="addReviewByAdmin()">➕ Add Review</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
 
       // === Admin notes ===
       + '<div class="card" style="margin-top:14px">'
@@ -534,8 +562,6 @@ async function doDelete(){
   if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
   toast('Shop deleted');
   setTimeout(function(){ location.href = '/admin/moderation'; }, 1500);
-  // Load admin category editor
-  setTimeout(loadCategoryEditor, 100);
 }
 
 async function saveShop(e){
@@ -812,6 +838,102 @@ async function saveShopCategories(){
     toast('✗ ' + msg, true);
     alert('Could not save categories:\n\n' + msg);
     if (st) st.textContent = '';
+  }
+}
+
+
+// ====== Reviews CRUD (admin) ======
+async function loadReviewsForAdmin(){
+  var box = document.getElementById('reviewsList');
+  if (!box) return;
+  try {
+    var r = await ShopDB.client.rpc('admin_list_business_reviews', { p_business_id: BIZ_ID });
+    if (r.error) throw r.error;
+    var rows = r.data || [];
+    if (!rows.length){
+      box.innerHTML = '<div style="color:#94a3b8;font-size:13px;font-style:italic;padding:8px 0">No reviews yet — add one below if needed.</div>';
+      return;
+    }
+    box.innerHTML = rows.map(function(rv){
+      var stars = '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating);
+      var when = rv.created_at ? new Date(rv.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+      var statusBadge = rv.status === 'flagged' ? ' <span style="background:#FEE2E2;color:#991B1B;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:800">FLAGGED</span>' : '';
+      var ridSafe = String(rv.id).replace(/[^a-zA-Z0-9-]/g, '');
+      return '<div style="padding:10px 12px;background:#FAFAFA;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:8px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:5px">'
+          + '<div><span style="color:#F59E0B;font-size:13px;font-weight:700">' + stars + '</span>'
+          + ' <b style="font-size:13px;color:#0F172A">' + esc(rv.customer_name || 'Customer') + '</b>' + statusBadge + '</div>'
+          + '<div style="display:flex;gap:6px">'
+            + '<button class="btn" style="padding:4px 9px;font-size:11px" onclick="startEditReview(\'' + ridSafe + '\')">✏️ Edit</button>'
+            + '<button class="btn" style="padding:4px 9px;font-size:11px;background:#FEE2E2;color:#991B1B;border-color:#FECACA" onclick="deleteReviewByAdmin(\'' + ridSafe + '\')">🗑 Delete</button>'
+          + '</div>'
+        + '</div>'
+        + '<div id="rv-view-' + ridSafe + '">'
+          + '<div style="font-size:13px;color:#334155;line-height:1.5;margin-top:4px">' + esc(rv.text || '') + '</div>'
+          + '<div style="font-size:11px;color:#94a3b8;margin-top:5px">' + when + (rv.owner_reply ? ' · 💬 owner replied' : '') + '</div>'
+        + '</div>'
+        + '<div id="rv-edit-' + ridSafe + '" style="display:none;margin-top:6px">'
+          + '<div style="display:grid;grid-template-columns:1fr 110px;gap:6px;margin-bottom:6px">'
+            + '<input type="text" id="ev-name-' + ridSafe + '" value="' + esc(rv.customer_name || '') + '" placeholder="Name" style="padding:7px 9px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px">'
+            + '<select id="ev-rating-' + ridSafe + '" style="padding:7px 9px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px">'
+              + [5,4,3,2,1].map(function(n){ return '<option value="' + n + '"' + (rv.rating === n ? ' selected':'') + '>' + '⭐'.repeat(n) + ' ' + n + '</option>'; }).join('')
+            + '</select>'
+          + '</div>'
+          + '<textarea id="ev-text-' + ridSafe + '" maxlength="600" style="width:100%;min-height:55px;padding:7px 9px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical">' + esc(rv.text || '') + '</textarea>'
+          + '<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px">'
+            + '<button class="btn" style="padding:5px 11px;font-size:11px" onclick="cancelEditReview(\'' + ridSafe + '\')">Cancel</button>'
+            + '<button class="btn pri" style="padding:5px 11px;font-size:11px" onclick="saveEditReview(\'' + ridSafe + '\')">💾 Save</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  } catch(e){
+    console.error('[loadReviewsForAdmin]', e);
+    box.innerHTML = '<div style="color:#dc2626;font-size:12px;padding:8px 0">Failed to load reviews: ' + esc(e.message || '') + '<br><span style="color:#94a3b8;font-size:11px">Run db/66 in Supabase if you see "function not found".</span></div>';
+  }
+}
+function startEditReview(id){
+  document.getElementById('rv-view-' + id).style.display = 'none';
+  document.getElementById('rv-edit-' + id).style.display = 'block';
+}
+function cancelEditReview(id){
+  document.getElementById('rv-view-' + id).style.display = 'block';
+  document.getElementById('rv-edit-' + id).style.display = 'none';
+}
+async function saveEditReview(id){
+  var name = document.getElementById('ev-name-' + id).value.trim();
+  var rating = parseInt(document.getElementById('ev-rating-' + id).value, 10);
+  var text = document.getElementById('ev-text-' + id).value.trim();
+  if (text.length < 3){ alert('Review text needed (3+ chars)'); return; }
+  try {
+    var r = await ShopDB.client.rpc('admin_edit_review', { p_review_id: id, p_rating: rating, p_text: text, p_reviewer_name: name });
+    if (r.error) throw r.error;
+    toast('✓ Review updated'); loadReviewsForAdmin();
+  } catch(e){ alert('Edit failed: ' + (e.message || '')); }
+}
+async function deleteReviewByAdmin(id){
+  if (!confirm('Delete this review permanently? Cannot be undone.')) return;
+  try {
+    var r = await ShopDB.client.rpc('admin_delete_review', { p_review_id: id });
+    if (r.error) throw r.error;
+    toast('✓ Review deleted'); loadReviewsForAdmin();
+  } catch(e){ alert('Delete failed: ' + (e.message || '')); }
+}
+async function addReviewByAdmin(){
+  var name = document.getElementById('adminRevName').value.trim();
+  var rating = parseInt(document.getElementById('adminRevRating').value, 10);
+  var text = document.getElementById('adminRevText').value.trim();
+  if (text.length < 3){ alert('Review text needed (3+ chars)'); return; }
+  try {
+    var r = await ShopDB.client.rpc('admin_add_review', { p_business_id: BIZ_ID, p_rating: rating, p_text: text, p_reviewer_name: name });
+    if (r.error) throw r.error;
+    toast('✓ Review added');
+    document.getElementById('adminRevName').value = '';
+    document.getElementById('adminRevText').value = '';
+    document.getElementById('adminRevRating').value = '5';
+    loadReviewsForAdmin();
+  } catch(e){
+    alert('Add failed: ' + (e.message || '') + (e.message && e.message.indexOf('function') >= 0 ? '\n\nRun db/66-admin-review-crud.sql in Supabase.' : ''));
   }
 }
 
