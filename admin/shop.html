@@ -310,6 +310,25 @@ function render(){
         + '</form>'
       + '</div>'
 
+      // === Category editor (multi-select with primary) ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🏷️ Categories <span class="subtle">tap ⭐ to set primary · ✕ to remove · up to 5</span></h2>'
+        + '<div id="catChipsBox" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:36px;padding:8px;background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:10px">'
+          + '<div style="font-size:13px;color:#94a3b8">Loading current categories…</div>'
+        + '</div>'
+        + '<div style="position:relative">'
+          + '<input type="text" id="catAddInput" autocomplete="off"'
+          + ' placeholder="🔍 Search to add — e.g. mobile, doctor, kirana, organic, bank"'
+          + ' style="width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .15s"'
+          + ' onfocus="this.style.borderColor=\'#1E3A8A\'" onblur="this.style.borderColor=\'#E2E8F0\'">'
+          + '<div id="catSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #1E3A8A;border-radius:10px;max-height:240px;overflow-y:auto;z-index:20;box-shadow:0 12px 28px rgba(15,23,42,.12)"></div>'
+        + '</div>'
+        + '<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:14px">'
+          + '<span id="catStatus" style="font-size:12px;color:#64748b"></span>'
+          + '<button type="button" class="btn pri" onclick="saveShopCategories()">💾 Save Categories</button>'
+        + '</div>'
+      + '</div>'
+
       // === Photos preview ===
       + (Array.isArray(s.photos) && s.photos.length ?
         ('<div class="card" style="margin-top:14px">'
@@ -516,6 +535,8 @@ async function doDelete(){
   if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
   toast('Shop deleted');
   setTimeout(function(){ location.href = '/admin/moderation'; }, 1500);
+  // Load admin category editor
+  setTimeout(loadCategoryEditor, 100);
 }
 
 async function saveShop(e){
@@ -576,6 +597,188 @@ async function loadEditHistory(){
       + '<div class="eh-vals"><span class="o">' + esc(e.old_value || '—') + '</span><span class="n">' + esc(e.new_value || '—') + '</span></div>'
       + '</div>';
   }).join('');
+}
+
+// ====== Category Editor (admin) ======
+var CAT_LIST = [];                    // master list { id, slug, name, name_hi, parent_name, keywords, description }
+var CURRENT_CATS = [];                // [{ id, name, is_primary }]
+
+async function loadCategoryEditor(){
+  var c = ShopDB.client;
+  var box = document.getElementById('catChipsBox');
+  if (!box) return;
+
+  // Fetch master list
+  try {
+    var rr = await c.from('categories')
+      .select('id, slug, name, name_hi, parent_id, keywords, description')
+      .eq('active', true)
+      .order('sort_order');
+    if (rr.error) throw rr.error;
+    var byId = {};
+    (rr.data || []).forEach(function(r){ byId[r.id] = r; });
+    (rr.data || []).forEach(function(r){
+      if (r.parent_id && byId[r.parent_id]) r.parent_name = byId[r.parent_id].name;
+    });
+    CAT_LIST = rr.data || [];
+  } catch(e){
+    box.innerHTML = '<div style="font-size:12px;color:#dc2626">Could not load categories list: ' + esc(e.message || '') + '</div>';
+    return;
+  }
+
+  // Fetch current shop categories
+  try {
+    var bc = await c.from('business_categories')
+      .select('category_id, is_primary')
+      .eq('business_id', BIZ_ID);
+    if (bc.error) throw bc.error;
+    CURRENT_CATS = (bc.data || []).map(function(b){
+      var cat = CAT_LIST.find(function(x){ return x.id === b.category_id; });
+      return cat ? { id: cat.id, name: cat.name, parent_name: cat.parent_name || '', is_primary: !!b.is_primary } : null;
+    }).filter(Boolean);
+    // Sort: primary first, then by name
+    CURRENT_CATS.sort(function(a,b){
+      if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+  } catch(e){
+    box.innerHTML = '<div style="font-size:12px;color:#dc2626">Could not load shop categories: ' + esc(e.message || '') + '</div>';
+    return;
+  }
+
+  renderCatChips();
+
+  // Wire search input
+  var inp = document.getElementById('catAddInput');
+  if (inp){
+    inp.addEventListener('input', filterCatSearch);
+    inp.addEventListener('focus', filterCatSearch);
+    // Close on outside click
+    document.addEventListener('click', function(ev){
+      if (!ev.target.closest('#catAddInput') && !ev.target.closest('#catSearchResults')){
+        document.getElementById('catSearchResults').style.display = 'none';
+      }
+    });
+  }
+}
+
+function renderCatChips(){
+  var box = document.getElementById('catChipsBox');
+  if (!box) return;
+  if (!CURRENT_CATS.length){
+    box.innerHTML = '<div style="font-size:13px;color:#94a3b8;font-style:italic">No categories assigned. Search below to add (up to 5).</div>';
+    return;
+  }
+  box.innerHTML = CURRENT_CATS.map(function(c){
+    var bg = c.is_primary ? 'linear-gradient(135deg,#FEF3C7,#FDE68A)' : '#F1F5F9';
+    var border = c.is_primary ? '#F59E0B' : '#CBD5E1';
+    var star = c.is_primary ? '⭐' : '☆';
+    var starTitle = c.is_primary ? 'Primary category' : 'Tap to make primary';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:' + bg + ';border:1.5px solid ' + border + ';border-radius:99px;font-size:13px;font-weight:700;color:#0F172A">'
+      + '<button type="button" title="' + starTitle + '" onclick="setPrimaryCat(' + c.id + ')" style="background:transparent;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1">' + star + '</button>'
+      + '<span>' + esc(c.name) + (c.parent_name ? '<span style="color:#94a3b8;font-weight:500;font-size:11px"> · ' + esc(c.parent_name) + '</span>' : '') + '</span>'
+      + '<button type="button" title="Remove" onclick="removeCat(' + c.id + ')" style="background:transparent;border:none;cursor:pointer;color:#64748b;font-size:14px;padding:0 0 0 2px;line-height:1">✕</button>'
+      + '</span>';
+  }).join('');
+  // Status
+  var st = document.getElementById('catStatus');
+  if (st) st.textContent = CURRENT_CATS.length + ' selected · ' + CURRENT_CATS.filter(function(c){return c.is_primary;}).length + ' primary';
+}
+
+function filterCatSearch(){
+  var inp = document.getElementById('catAddInput');
+  var results = document.getElementById('catSearchResults');
+  if (!inp || !results) return;
+  var q = (inp.value || '').toLowerCase().trim();
+  if (!q){
+    results.style.display = 'none';
+    return;
+  }
+  var selected = new Set(CURRENT_CATS.map(function(c){ return c.id; }));
+  var matches = CAT_LIST.filter(function(c){
+    if (selected.has(c.id)) return false;
+    var hay = ((c.name||'') + ' ' + (c.name_hi||'') + ' ' + (c.slug||'') + ' ' + (c.parent_name||'') + ' ' + (c.keywords||'') + ' ' + (c.description||'')).toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }).slice(0, 10);
+
+  if (!matches.length){
+    results.innerHTML = '<div style="padding:12px;color:#94a3b8;font-size:13px;font-style:italic">No match. Try different keyword.</div>';
+    results.style.display = 'block';
+    return;
+  }
+  results.innerHTML = matches.map(function(c){
+    return '<div onclick="addCat(' + c.id + ')" style="padding:10px 14px;cursor:pointer;font-size:13.5px;border-bottom:1px solid #f1f5f9;transition:.1s" onmouseover="this.style.background=\'#F5F3FF\'" onmouseout="this.style.background=\'#fff\'">'
+      + '<b>' + esc(c.name) + '</b>'
+      + (c.parent_name ? '<span style="color:#94a3b8;font-weight:500;font-size:11.5px"> · ' + esc(c.parent_name) + '</span>' : '')
+      + '</div>';
+  }).join('');
+  results.style.display = 'block';
+}
+
+function addCat(catId){
+  if (CURRENT_CATS.length >= 5){
+    alert('Maximum 5 categories. Remove one before adding more.');
+    return;
+  }
+  var cat = CAT_LIST.find(function(x){ return x.id === catId; });
+  if (!cat) return;
+  // If no primary, make this primary
+  var hasPrimary = CURRENT_CATS.some(function(c){ return c.is_primary; });
+  CURRENT_CATS.push({ id: cat.id, name: cat.name, parent_name: cat.parent_name || '', is_primary: !hasPrimary });
+  renderCatChips();
+  // Reset search
+  var inp = document.getElementById('catAddInput');
+  if (inp){ inp.value=''; inp.focus(); }
+  document.getElementById('catSearchResults').style.display = 'none';
+}
+
+function removeCat(catId){
+  var wasPrimary = false;
+  CURRENT_CATS = CURRENT_CATS.filter(function(c){
+    if (c.id === catId){ wasPrimary = c.is_primary; return false; }
+    return true;
+  });
+  // If primary removed, mark first as new primary
+  if (wasPrimary && CURRENT_CATS.length) CURRENT_CATS[0].is_primary = true;
+  renderCatChips();
+}
+
+function setPrimaryCat(catId){
+  CURRENT_CATS.forEach(function(c){ c.is_primary = (c.id === catId); });
+  // Re-sort with primary first
+  CURRENT_CATS.sort(function(a,b){
+    if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  renderCatChips();
+}
+
+async function saveShopCategories(){
+  if (!CURRENT_CATS.length){
+    alert('At least 1 category required.');
+    return;
+  }
+  var primary = CURRENT_CATS.find(function(c){ return c.is_primary; });
+  if (!primary){ primary = CURRENT_CATS[0]; primary.is_primary = true; }
+  var ids = CURRENT_CATS.map(function(c){ return c.id; });
+  var st = document.getElementById('catStatus');
+  if (st) st.textContent = 'Saving...';
+  try {
+    var r = await ShopDB.client.rpc('admin_set_business_categories', {
+      p_business_id: BIZ_ID,
+      p_category_ids: ids,
+      p_primary_category_id: primary.id
+    });
+    if (r.error) throw r.error;
+    toast('✓ Categories saved');
+    if (st) st.textContent = '✓ Saved · ' + ids.length + ' total';
+  } catch(e){
+    console.error('[saveShopCategories]', e);
+    var msg = e.message || 'save failed';
+    toast('✗ ' + msg, true);
+    alert('Could not save categories:\n\n' + msg);
+    if (st) st.textContent = '';
+  }
 }
 
 init();
