@@ -543,5 +543,22 @@ document.addEventListener('keydown', (e) => {
 })();
 </script>
 
+
+<!-- ====== Auto-logout notice (handles ?reason=auto_logout) ====== -->
+<script>
+(function(){
+  try {
+    const p = new URLSearchParams(location.search);
+    if (p.get('reason') === 'auto_logout') {
+      const n = document.createElement('div');
+      n.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:99999;background:#FEF3C7;border:1.5px solid #F59E0B;color:#92400E;padding:11px 18px;border-radius:99px;font-family:"Plus Jakarta Sans",sans-serif;font-weight:700;font-size:.86rem;box-shadow:0 6px 18px rgba(0,0,0,.10)';
+      n.textContent = '⏱️ You were logged out due to inactivity. Please sign in again.';
+      document.body.appendChild(n);
+      setTimeout(function(){ n.style.opacity='0'; n.style.transition='opacity .5s'; }, 6000);
+      setTimeout(function(){ n.remove(); }, 6800);
+    }
+  } catch(_){}
+})();
+</script>
 </body>
 </html>
