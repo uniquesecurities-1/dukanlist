@@ -674,17 +674,16 @@ async function loadDashboard(){
     .eq('auth_user_id', user.id)
     .limit(1);
 
-  // Defensive auto-claim: if no link found but user has mobile in metadata,
-  // try claiming the matching business now. Handles the "registered on phone,
-  // confirmed email on laptop" case where localStorage was empty at login.
-  if (!owners || !owners.length){
-    const fallbackMobile = (user.user_metadata && user.user_metadata.mobile) || null;
-    if (fallbackMobile){
-      try { await c.rpc('claim_business_by_phone', { p_mobile: fallbackMobile }); } catch(_) {}
-      const retry = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
-      owners = retry.data || [];
-    }
-  }
+  // SECURITY FIX (2026-05-27): Silent auto-claim removed.
+  // Previously we silently called claim_business_by_phone(metadata.mobile) here,
+  // which meant: if a shopkeeper's phone happened to be on multiple unlinked
+  // business_owners rows (test data, re-registrations, shared firm number, etc.),
+  // login would grab whichever shop matched first.
+  // After a delete, the *next* shop with same phone would silently get claimed.
+  // This was a confidentiality risk — anyone signing up with a phone they don't
+  // own could claim a shop registered with that phone.
+  // Now: no auto-link. User MUST use the explicit "Link my shop" UI below,
+  // and the server-side claim RPC refuses ambiguous matches.
 
   if (!owners || !owners.length){
     document.getElementById('loading').innerHTML =
@@ -705,6 +704,27 @@ async function loadDashboard(){
       er.style.display = 'none';
       const m = (el.value || '').replace(/\D/g,'').slice(-10);
       if (m.length !== 10){ er.textContent = 'Enter a valid 10-digit mobile.'; er.style.display = ''; return; }
+
+      // Preview: show shop name before linking so user can confirm
+      try {
+        const preview = await c.rpc('preview_claim_by_phone', { p_mobile: m });
+        if (preview.error) throw preview.error;
+        const matches = preview.data || [];
+        if (matches.length === 0){
+          er.textContent = 'No shop found for this mobile, or already claimed.';
+          er.style.display = ''; return;
+        }
+        if (matches.length > 1){
+          er.innerHTML = 'Multiple shops registered with this mobile — for safety, please contact admin to link manually.<br><small>Shops found: ' + matches.map(x=>x.name).join(', ') + '</small>';
+          er.style.display = ''; return;
+        }
+        const shopName = matches[0].name || 'this shop';
+        if (!confirm('Link your account to "' + shopName + '"?\n\nThis will become your shop dashboard. Confirm only if this is YOUR shop.')) return;
+      } catch(e){
+        // Fall through if preview RPC not deployed yet — still safe because RPC checks
+        console.warn('preview_claim_by_phone unavailable, falling through:', e?.message);
+      }
+
       const r = await c.rpc('claim_business_by_phone', { p_mobile: m });
       if (r.error){ er.textContent = 'Could not link: ' + r.error.message; er.style.display = ''; return; }
       location.reload();
@@ -1544,38 +1564,4 @@ function fillReferral(slug){
 }
 
 function copyReferralLink(){
-  const link = window._referralLink;
-  if (!link) return;
-  try {
-    navigator.clipboard.writeText(link).then(() => {
-      const btn = document.getElementById('copyRefBtn');
-      const orig = btn.innerHTML;
-      btn.innerHTML = '✓ Copied!';
-      btn.style.background = '#16A34A';
-      setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#0F172A'; }, 2000);
-    });
-  } catch(_){
-    prompt('Copy this link:', link);
-  }
-}
-
-function shareReferralWhatsApp(){
-  const link = window._referralLink;
-  if (!link) return;
-  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-  const message = lang === 'hi'
-    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa-Bathinda ka apna local directory. FREE registration. Aaj hi karein: ' + link
-    : 'Namaste! List your shop on DukanList — Sirsa-Bathinda ka apna local directory. FREE registration. Register today: ' + link;
-  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
-}
-
-(function(){
-  function init(){
-    setupReferralWidget();
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-</body>
-</html>
+  const
