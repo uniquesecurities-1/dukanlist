@@ -301,6 +301,65 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
 }
 .pb-field textarea { min-height:90px; resize:vertical; line-height:1.45 }
 .pb-counter { font-size:.7rem; color:var(--pb-muted); text-align:right; margin-top:3px }
+
+/* ===== Pro category picker ===== */
+.pb-cat-picker { position:relative }
+.pb-cat-clear {
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  background:#F1F5F9; border:none; width:24px; height:24px;
+  border-radius:50%; cursor:pointer; font-size:1.1rem; line-height:1;
+  color:#64748b; display:grid; place-items:center; padding:0; font-family:inherit;
+}
+.pb-cat-clear:hover { background:#FECACA; color:#B91C1C }
+.pb-cat-results {
+  margin-top:6px; max-height:240px; overflow-y:auto;
+  border:1.5px solid var(--pb-primary); border-radius:11px;
+  background:#fff; box-shadow:0 8px 20px rgba(124,58,237,.12);
+  display:none;
+}
+.pb-cat-results.active { display:block }
+.pb-cat-row {
+  padding:10px 14px; cursor:pointer; font-size:.92rem;
+  font-weight:600; color:var(--pb-ink);
+  border-bottom:1px solid #F8FAFC;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  transition:background .12s;
+}
+.pb-cat-row:last-child { border-bottom:none }
+.pb-cat-row:hover, .pb-cat-row.kbd-active {
+  background:var(--pb-tint); color:var(--pb-primary-d);
+}
+.pb-cat-row mark {
+  background:#FEF3C7; color:#92400E;
+  padding:0 2px; border-radius:3px; font-weight:800;
+}
+.pb-cat-row .hi-name { color:var(--pb-muted); font-size:.78rem; font-weight:500; margin-left:4px }
+.pb-cat-popular {
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;
+}
+.pb-cat-popular .pb-cat-chip {
+  padding:6px 12px; background:#F5F3FF;
+  border:1.5px solid #E0E7FF; border-radius:99px;
+  font-size:.78rem; font-weight:700; color:var(--pb-primary-d);
+  cursor:pointer; font-family:inherit; transition:.12s; white-space:nowrap;
+}
+.pb-cat-popular .pb-cat-chip:hover {
+  background:var(--pb-primary); color:#fff; border-color:var(--pb-primary);
+  transform:translateY(-1px);
+}
+.pb-cat-popular-label {
+  width:100%; font-size:.7rem; font-weight:800; color:var(--pb-muted);
+  letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px;
+}
+.pb-cat-hint {
+  font-size:.78rem; color:var(--pb-primary-d);
+  margin-top:6px; font-weight:700; min-height:14px;
+}
+.pb-cat-hint.err { color:#B91C1C }
+@media (max-width:480px){
+  .pb-cat-results { max-height:200px }
+  .pb-cat-row { padding:11px 12px; font-size:.9rem }
+}
 .pb-modal-btn {
   width:100%; padding:13px;
   background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
@@ -514,13 +573,20 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
     </div>
     <div class="pb-field">
       <label data-i18n-en>Category (optional)</label><label data-i18n-hi style="display:none">श्रेणी (वैकल्पिक)</label>
-      <input id="askCatInput" list="catList" autocomplete="off"
-             data-ph-en="Type to search e.g. Karyana, Mobile, Doctor…"
-             data-ph-hi="लिखें: किराना, मोबाइल, डॉक्टर…"
-             placeholder="Type to search e.g. Karyana, Mobile, Doctor…">
-      <datalist id="catList"></datalist>
+      <div class="pb-cat-picker">
+        <input id="askCatInput" autocomplete="off"
+               data-ph-en="🔍 Search e.g. Karyana, Mobile, Doctor…"
+               data-ph-hi="🔍 खोजें: किराना, मोबाइल, डॉक्टर…"
+               placeholder="🔍 Search e.g. Karyana, Mobile, Doctor…"
+               oninput="filterCategoryResults()"
+               onfocus="filterCategoryResults()"
+               onkeydown="catPickerKeydown(event)">
+        <button type="button" class="pb-cat-clear" id="askCatClear" onclick="clearAskCat()" style="display:none" aria-label="Clear">×</button>
+      </div>
+      <div id="askCatResults" class="pb-cat-results"></div>
+      <div id="askCatPopular" class="pb-cat-popular"></div>
       <input type="hidden" id="askCat" value="">
-      <div id="askCatHint" style="font-size:.7rem;color:var(--pb-primary-d);margin-top:4px;font-weight:600;min-height:14px"></div>
+      <div id="askCatHint" class="pb-cat-hint"></div>
     </div>
     <div class="pb-field">
       <label data-i18n-en>Your Question *</label><label data-i18n-hi style="display:none">आपका सवाल *</label>
@@ -795,45 +861,174 @@ async function loadCategories(){
     // attempt with parent_id ordering, but graceful fallback
     const { data, error } = await SB
       .from('categories')
-      .select('id, name, parent_id')
+      .select('id, name, name_hi, parent_id')
       .order('name')
-      .limit(300);
+      .limit(500);
     if (error) { console.warn(error); return; }
     CATEGORIES = data || [];
-    const dl = document.getElementById('catList');
-    CATEGORIES.forEach(c => {
-      const o = document.createElement('option');
-      o.value = c.name;     // what shows in autocomplete dropdown
-      o.dataset.id = c.id;
-      dl.appendChild(o);
-    });
-    // Wire input → resolve to category id
-    const inp = document.getElementById('askCatInput');
-    if (inp && !inp.__wired){
-      inp.__wired = true;
-      inp.addEventListener('input', resolveCategoryInput);
-      inp.addEventListener('blur', resolveCategoryInput);
-    }
+    renderPopularCats();
   } catch(e){ console.warn(e); }
 }
 
-function resolveCategoryInput(){
-  const inp = document.getElementById('askCatInput');
-  const hidden = document.getElementById('askCat');
-  const hint = document.getElementById('askCatHint');
-  const val = (inp.value || '').trim().toLowerCase();
-  if (!val){ hidden.value=''; hint.textContent=''; return; }
-  // Exact match first
-  let match = CATEGORIES.find(c => c.name.toLowerCase() === val);
-  if (!match){
-    // Partial match (starts with)
-    const partials = CATEGORIES.filter(c => c.name.toLowerCase().includes(val));
-    if (partials.length === 1) match = partials[0];
+// ====== Pro category picker ======
+// Popular category seed names — looked up against CATEGORIES at render
+const POPULAR_CAT_HINTS = [
+  'Karyana', 'Grocery', 'Mobile', 'Doctor', 'Salon', 'Beauty',
+  'Restaurant', 'Cafe', 'Mechanic', 'Tailor', 'Sweets', 'Bakery',
+  'Pharmacy', 'Hospital', 'Electrician', 'Plumber', 'Hardware', 'Garments'
+];
+let CAT_KBD_INDEX = -1;     // keyboard nav highlight index
+let CAT_LAST_RESULTS = [];  // last filtered list
+
+function renderPopularCats(){
+  const box = document.getElementById('askCatPopular');
+  if (!box || !CATEGORIES.length) return;
+  // Find first matching CATEGORY for each hint (case-insensitive substring)
+  const seen = new Set();
+  const popular = [];
+  for (const hint of POPULAR_CAT_HINTS){
+    const lc = hint.toLowerCase();
+    const found = CATEGORIES.find(c => !seen.has(c.id) && (c.name||'').toLowerCase().includes(lc));
+    if (found){ popular.push(found); seen.add(found.id); }
+    if (popular.length >= 8) break;
   }
-  hidden.value = match ? match.id : '';
-  hint.textContent = match ? '✓ ' + match.name : (val.length > 1 ? '⚠ No exact match — pick from list' : '');
-  hint.style.color = match ? 'var(--pb-primary-d)' : '#B91C1C';
+  if (!popular.length){ box.style.display='none'; return; }
+  box.innerHTML = '<div class="pb-cat-popular-label">'
+    + '<span data-i18n-en>Popular categories</span>'
+    + '<span data-i18n-hi style="display:none">लोकप्रिय श्रेणियाँ</span>'
+    + '</div>'
+    + popular.map(c =>
+        `<button type="button" class="pb-cat-chip" onclick="pickCategory(${c.id}, ${JSON.stringify(c.name)})">${escapeHtml(c.name)}</button>`
+      ).join('');
+  // Apply current i18n state to the newly-inserted spans
+  const cur = document.documentElement.getAttribute('data-lang') || 'en';
+  box.querySelectorAll('[data-i18n-en]').forEach(el => el.style.display = cur==='en' ? '' : 'none');
+  box.querySelectorAll('[data-i18n-hi]').forEach(el => el.style.display = cur==='hi' ? '' : 'none');
 }
+
+function pickCategory(id, name){
+  const inp = document.getElementById('askCatInput');
+  inp.value = name;
+  document.getElementById('askCat').value = id;
+  const hint = document.getElementById('askCatHint');
+  hint.innerHTML = '✓ <b>' + escapeHtml(name) + '</b>';
+  hint.classList.remove('err');
+  document.getElementById('askCatClear').style.display = '';
+  document.getElementById('askCatResults').classList.remove('active');
+  document.getElementById('askCatResults').innerHTML = '';
+  document.getElementById('askCatPopular').style.display = 'none';
+  CAT_KBD_INDEX = -1;
+}
+
+function clearAskCat(){
+  document.getElementById('askCatInput').value = '';
+  document.getElementById('askCat').value = '';
+  const hint = document.getElementById('askCatHint');
+  hint.textContent = '';
+  hint.classList.remove('err');
+  document.getElementById('askCatClear').style.display = 'none';
+  document.getElementById('askCatResults').classList.remove('active');
+  document.getElementById('askCatResults').innerHTML = '';
+  document.getElementById('askCatPopular').style.display = '';
+  CAT_KBD_INDEX = -1;
+  document.getElementById('askCatInput').focus();
+}
+
+function filterCategoryResults(){
+  const inp = document.getElementById('askCatInput');
+  const q = (inp.value || '').trim().toLowerCase();
+  const results = document.getElementById('askCatResults');
+  const popular = document.getElementById('askCatPopular');
+  const clearBtn = document.getElementById('askCatClear');
+  const hint = document.getElementById('askCatHint');
+
+  // When empty: show popular, hide results
+  if (!q){
+    results.classList.remove('active');
+    results.innerHTML = '';
+    popular.style.display = '';
+    clearBtn.style.display = 'none';
+    document.getElementById('askCat').value = '';
+    hint.textContent = '';
+    hint.classList.remove('err');
+    CAT_KBD_INDEX = -1;
+    return;
+  }
+
+  popular.style.display = 'none';
+  clearBtn.style.display = '';
+
+  // Score matches: exact > prefix > word-start > substring (across name + name_hi)
+  const matches = [];
+  for (const c of CATEGORIES){
+    const en = (c.name || '').toLowerCase();
+    const hi = (c.name_hi || '').toLowerCase();
+    let score = 0;
+    if (en === q || hi === q) score = 100;
+    else if (en.startsWith(q) || hi.startsWith(q)) score = 80;
+    else if (en.includes(' '+q) || hi.includes(' '+q)) score = 60;
+    else if (en.includes(q) || hi.includes(q)) score = 40;
+    if (score > 0) matches.push({ c, score });
+  }
+  matches.sort((a,b) => b.score - a.score || a.c.name.length - b.c.name.length);
+  const top = matches.slice(0, 12);
+  CAT_LAST_RESULTS = top;
+  CAT_KBD_INDEX = -1;
+
+  if (!top.length){
+    results.innerHTML = '<div class="pb-cat-row" style="color:#94a3b8;cursor:default;font-style:italic;justify-content:flex-start">No category matches &quot;'
+      + escapeHtml(q) + '&quot; — try simpler keywords (e.g. mobile, grocery, doctor)</div>';
+    hint.textContent = '';
+  } else {
+    results.innerHTML = top.map((m, idx) => {
+      const c = m.c;
+      const en = c.name || '';
+      const lcEn = en.toLowerCase();
+      const i = lcEn.indexOf(q);
+      const highlighted = i >= 0
+        ? escapeHtml(en.slice(0,i)) + '<mark>' + escapeHtml(en.slice(i, i+q.length)) + '</mark>' + escapeHtml(en.slice(i+q.length))
+        : escapeHtml(en);
+      const hiPart = c.name_hi ? '<span class="hi-name">· ' + escapeHtml(c.name_hi) + '</span>' : '';
+      return `<div class="pb-cat-row" data-idx="${idx}" onclick="pickCategory(${c.id}, ${JSON.stringify(en)})"><span>${highlighted}${hiPart}</span><span style="color:var(--pb-primary);font-size:1rem">→</span></div>`;
+    }).join('');
+  }
+  results.classList.add('active');
+}
+
+function catPickerKeydown(e){
+  const results = document.getElementById('askCatResults');
+  if (!results.classList.contains('active') || !CAT_LAST_RESULTS.length) return;
+  const rows = results.querySelectorAll('.pb-cat-row[data-idx]');
+  if (e.key === 'ArrowDown'){
+    e.preventDefault();
+    CAT_KBD_INDEX = Math.min(CAT_KBD_INDEX + 1, rows.length - 1);
+    rows.forEach((r,i) => r.classList.toggle('kbd-active', i === CAT_KBD_INDEX));
+    if (rows[CAT_KBD_INDEX]) rows[CAT_KBD_INDEX].scrollIntoView({ block:'nearest' });
+  } else if (e.key === 'ArrowUp'){
+    e.preventDefault();
+    CAT_KBD_INDEX = Math.max(CAT_KBD_INDEX - 1, 0);
+    rows.forEach((r,i) => r.classList.toggle('kbd-active', i === CAT_KBD_INDEX));
+    if (rows[CAT_KBD_INDEX]) rows[CAT_KBD_INDEX].scrollIntoView({ block:'nearest' });
+  } else if (e.key === 'Enter'){
+    const target = CAT_KBD_INDEX >= 0 ? CAT_LAST_RESULTS[CAT_KBD_INDEX] : CAT_LAST_RESULTS[0];
+    if (target){
+      e.preventDefault();
+      pickCategory(target.c.id, target.c.name);
+    }
+  } else if (e.key === 'Escape'){
+    results.classList.remove('active');
+  }
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.pb-cat-picker');
+  const results = document.getElementById('askCatResults');
+  if (!wrap || !results) return;
+  if (!wrap.contains(e.target) && !results.contains(e.target)){
+    results.classList.remove('active');
+  }
+});
 
 // ====== Load questions ======
 async function loadQuestions(){
@@ -927,13 +1122,8 @@ function openAskModal(){
   document.getElementById('askOk').style.display='none';
   // Default ask-city to current city
   if (CURRENT_CITY) document.getElementById('askCity').value = CURRENT_CITY.id;
-  // Reset category picker
-  const catInp = document.getElementById('askCatInput');
-  const catHid = document.getElementById('askCat');
-  const catHint = document.getElementById('askCatHint');
-  if (catInp) catInp.value = '';
-  if (catHid) catHid.value = '';
-  if (catHint) catHint.textContent = '';
+  // Reset category picker (full reset to show popular chips again)
+  clearAskCat();
   // Restore phone from localStorage
   try { document.getElementById('askPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
   try { document.getElementById('askName').value = localStorage.getItem('dl_pb_name') || ''; } catch(_){}
@@ -974,10 +1164,8 @@ async function submitAsk(){
     ok.style.display='block';
     try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
     document.getElementById('askText').value=''; document.getElementById('askLen').textContent='0';
-    // Clear category picker too
-    const ci = document.getElementById('askCatInput'); if (ci) ci.value='';
-    const ch = document.getElementById('askCat'); if (ch) ch.value='';
-    const cht = document.getElementById('askCatHint'); if (cht) cht.textContent='';
+    // Full reset of category picker
+    clearAskCat();
     setTimeout(()=>{ closeAsk(); loadQuestions(); loadLeaderboard(); }, 1100);
   } catch(e){
     err.textContent = (e.message || 'Could not post').replace(/^.*?:\s*/,'');
