@@ -463,19 +463,21 @@ async function loadDigest(){
     </a>
   `).join('');
 
-  // Recent pending shops
-  const pending = d.recent_pending || [];
-  document.getElementById('recentPendingCount').textContent = pending.length ? '(' + pending.length + ' newest)' : '';
-  document.getElementById('recentPending').innerHTML = pending.length
-    ? '<div class="recent-list">' + pending.map(p => recentItemHtml(p, 'pending')).join('') + '</div>'
-    : '<div style="color:#94a3b8;padding:20px;text-align:center;font-size:13px">🎉 No pending shops</div>';
+  // Recent pending shops + edits (these sections are optional — null-safe)
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
 
-  // Recent edits
+  const pending = d.recent_pending || [];
+  setText('recentPendingCount', pending.length ? '(' + pending.length + ' newest)' : '');
+  setHtml('recentPending', pending.length
+    ? '<div class="recent-list">' + pending.map(p => recentItemHtml(p, 'pending')).join('') + '</div>'
+    : '<div style="color:#94a3b8;padding:20px;text-align:center;font-size:13px">🎉 No pending shops</div>');
+
   const edits = d.recent_edits || [];
-  document.getElementById('recentEditsCount').textContent = edits.length ? '(' + edits.length + ' newest)' : '';
-  document.getElementById('recentEdits').innerHTML = edits.length
+  setText('recentEditsCount', edits.length ? '(' + edits.length + ' newest)' : '');
+  setHtml('recentEdits', edits.length
     ? '<div class="recent-list">' + edits.map(e => recentEditHtml(e)).join('') + '</div>'
-    : '<div style="color:#94a3b8;padding:20px;text-align:center;font-size:13px">✓ No pending edits</div>';
+    : '<div style="color:#94a3b8;padding:20px;text-align:center;font-size:13px">✓ No pending edits</div>');
 }
 
 function recentItemHtml(p, type){
@@ -859,13 +861,32 @@ function renderRecentTable(rows, totalCount){
       </div>
     `}
   `;
+  // Preserve focus + cursor position on the search input (re-render destroys it)
+  var _wasSearchFocused = (document.activeElement && document.activeElement.id === 'recentSearch');
+  var _searchSelStart = _wasSearchFocused ? document.activeElement.selectionStart : null;
+  var _searchSelEnd   = _wasSearchFocused ? document.activeElement.selectionEnd   : null;
+
   document.getElementById('recentBiz').innerHTML = html;
+
+  if (_wasSearchFocused){
+    var inp = document.getElementById('recentSearch');
+    if (inp){
+      inp.focus();
+      try { inp.setSelectionRange(_searchSelStart, _searchSelEnd); } catch(_){}
+    }
+  }
 }
 
 // ===== Filter/Sort state setters =====
 function setStatusFilter(v){ window._filterState.statusFilter = v; renderRecentFiltered(); }
 function setQuickFilter(v){ window._filterState.quickFilter = v; renderRecentFiltered(); }
-function setSearch(v){ window._filterState.search = v; renderRecentFiltered(); }
+// Debounced search so we don't re-render the whole table on every keystroke
+var _searchDebounceTimer = null;
+function setSearch(v){
+  window._filterState.search = v;
+  clearTimeout(_searchDebounceTimer);
+  _searchDebounceTimer = setTimeout(renderRecentFiltered, 180);
+}
 function setSort(k){
   const st = window._filterState;
   if (st.sortKey === k) st.sortDir = st.sortDir === 'asc' ? 'desc' : 'asc';
@@ -1101,35 +1122,4 @@ async function downloadCSV(fetchAll){
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 200);
-  } catch(e){
-    console.error('CSV download error:', e);
-    alert('Download failed: ' + (e.message || e));
-  } finally {
-    if (btn){ btn.disabled = false; btn.innerHTML = origLabel; }
-  }
-}
-
-function formatDate(iso){
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = (now - d) / 1000;
-  if (diff < 60) return Math.floor(diff) + 's ago';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
-  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+    }, 200)
