@@ -1,7 +1,7 @@
 {
-  "version": "3.0",
-  "updated": "2026-05-25",
-  "note": "v3.0: Expanded to 150+ categories including handloom, utensils, hardware, halwai, agri inputs, etc.",
+  "version": "3.1",
+  "updated": "2026-05-27",
+  "note": "v3.1: Added Building & Construction Material parent with 13 subs (paint, hardware, cement, chuna, sariya, tiles, sanitary, plywood, sand, pipes, electrical hardware, doors/windows, POP)",
   "parents": [
     {
       "slug": "healthcare",
@@ -623,36 +623,6 @@
           "icon": "🏺"
         },
         {
-          "slug": "hardware-shop",
-          "name": "Hardware Shop",
-          "name_hi": "हार्डवेयर की दुकान",
-          "icon": "🔨"
-        },
-        {
-          "slug": "sanitary-bathroom",
-          "name": "Sanitary / Bathroom Fittings",
-          "name_hi": "सेनिटरी / बाथरूम",
-          "icon": "🚿"
-        },
-        {
-          "slug": "paint-shop",
-          "name": "Paint Shop",
-          "name_hi": "पेंट की दुकान",
-          "icon": "🎨"
-        },
-        {
-          "slug": "tiles-marble",
-          "name": "Tiles / Marble / Granite",
-          "name_hi": "टाइल्स / मार्बल",
-          "icon": "⬜"
-        },
-        {
-          "slug": "building-material",
-          "name": "Building Material / Cement",
-          "name_hi": "निर्माण सामग्री",
-          "icon": "🧱"
-        },
-        {
           "slug": "footwear-shop",
           "name": "Footwear / Shoes / Chappal",
           "name_hi": "जूते-चप्पल",
@@ -825,6 +795,92 @@
           "name": "Pharma / Medicine Manufacturer",
           "name_hi": "फार्मा / दवा निर्माता",
           "icon": "💊"
+        }
+      ]
+    },
+    {
+      "slug": "construction-material",
+      "name": "Building & Construction Material",
+      "name_hi": "भवन निर्माण सामग्री",
+      "icon": "🧱",
+      "subs": [
+        {
+          "slug": "paint-shop",
+          "name": "Paint Shop",
+          "name_hi": "पेंट की दुकान",
+          "icon": "🎨"
+        },
+        {
+          "slug": "hardware-shop",
+          "name": "Hardware Shop",
+          "name_hi": "हार्डवेयर की दुकान",
+          "icon": "🔩"
+        },
+        {
+          "slug": "building-material",
+          "name": "Cement / Building Material",
+          "name_hi": "सीमेंट / निर्माण सामग्री",
+          "icon": "🏗️"
+        },
+        {
+          "slug": "chuna-lime",
+          "name": "Chuna / Lime / White-wash Material",
+          "name_hi": "चूना / कली / सफेदी सामग्री",
+          "icon": "🪣"
+        },
+        {
+          "slug": "sariya-tmt",
+          "name": "Sariya / TMT / Steel Bars",
+          "name_hi": "सरिया / टीएमटी / स्टील",
+          "icon": "⛓️"
+        },
+        {
+          "slug": "tiles-marble",
+          "name": "Tiles / Marble / Granite",
+          "name_hi": "टाइल्स / मार्बल / ग्रेनाइट",
+          "icon": "🟧"
+        },
+        {
+          "slug": "sanitary-bathroom",
+          "name": "Sanitary / Bathroom Fittings",
+          "name_hi": "सेनेटरी / बाथरूम फिटिंग",
+          "icon": "🚿"
+        },
+        {
+          "slug": "plywood-laminate",
+          "name": "Plywood, Laminate & Ply",
+          "name_hi": "प्लाइवुड / लैमिनेट",
+          "icon": "🪵"
+        },
+        {
+          "slug": "sand-gravel",
+          "name": "Sand / Bajri / Gravel Supplier",
+          "name_hi": "रेत / बजरी / रोड़ी",
+          "icon": "🏖️"
+        },
+        {
+          "slug": "pipes-fittings",
+          "name": "Pipes & Fittings (PVC/CPVC)",
+          "name_hi": "पाइप / फिटिंग",
+          "icon": "🚰"
+        },
+        {
+          "slug": "electrical-hardware",
+          "name": "Electrical Hardware (Wire/Switch/MCB)",
+          "name_hi": "इलेक्ट्रिकल हार्डवेयर",
+          "icon": "⚡"
+        },
+        {
+          "slug": "doors-windows-grills",
+          "name": "Doors, Windows & Grills",
+          "name_hi": "दरवाजे / खिड़की / ग्रिल",
+          "icon": "🚪"
+        },
+        {
+          "slug": "pop-false-ceiling",
+          "name": "POP / False Ceiling Material",
+          "name_hi": "POP / सीलिंग सामग्री",
+          "icon": "🏠"
         }
       ]
     },
