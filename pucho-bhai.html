@@ -118,6 +118,67 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
   color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.30);
 }
 .pb-city-tab .count { font-size:.7rem; opacity:.8; font-weight:600 }
+.pb-city-tab mark { background:#FEF3C7; color:#92400E; padding:0 2px; border-radius:3px; font-weight:800 }
+.pb-city-tab.active { animation: pillPulse .4s ease-out }
+
+/* ===== Animations ===== */
+@keyframes pillPulse {
+  0%   { transform:scale(1);     box-shadow:0 0 0 0 rgba(124,58,237,.45) }
+  50%  { transform:scale(1.06);  box-shadow:0 0 0 8px rgba(124,58,237,0) }
+  100% { transform:scale(1);     box-shadow:0 4px 12px rgba(124,58,237,.30) }
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px) }
+  to   { opacity:1; transform:translateY(0) }
+}
+
+@keyframes fadeIn {
+  from { opacity:0 } to { opacity:1 }
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(40px) scale(.96) }
+  to   { opacity:1; transform:translateY(0) scale(1) }
+}
+
+@keyframes heroShine {
+  0%, 100% { background-position: 0% 50% }
+  50%      { background-position: 100% 50% }
+}
+
+@keyframes ctaWiggle {
+  0%, 100% { transform: translateY(0) }
+  50%      { transform: translateY(-3px) }
+}
+
+/* Hero entrance stagger */
+.pb-hero { background-size:200% 200%; animation: heroShine 14s ease-in-out infinite }
+.pb-badge      { animation: fadeUp .55s ease-out .05s both }
+.pb-hero h1    { animation: fadeUp .65s ease-out .15s both }
+.pb-hero p     { animation: fadeUp .65s ease-out .25s both }
+.pb-hero-cta   { animation: fadeUp .65s ease-out .35s both, ctaWiggle 2.4s ease-in-out 1.5s infinite }
+.pb-hero-stats { animation: fadeUp .65s ease-out .45s both }
+
+/* Question cards fade-in stagger */
+.pb-q-card { animation: fadeUp .4s ease-out both }
+.pb-q-card:nth-child(1) { animation-delay:.02s }
+.pb-q-card:nth-child(2) { animation-delay:.06s }
+.pb-q-card:nth-child(3) { animation-delay:.10s }
+.pb-q-card:nth-child(4) { animation-delay:.14s }
+.pb-q-card:nth-child(5) { animation-delay:.18s }
+.pb-q-card:nth-child(6) { animation-delay:.22s }
+.pb-q-card:nth-child(n+7) { animation-delay:.26s }
+
+/* Modal slide-up */
+.pb-modal.active .pb-modal-card { animation: slideUp .35s cubic-bezier(.22,.61,.36,1) both }
+
+/* Submit success pulse — applied via JS */
+.pb-ok.shown { animation: fadeUp .35s ease-out both }
+
+/* Counter target — used by JS animateCount() */
+.hero-stat-anim { display:inline-block }
+
 
 /* ===== City search + dropdown row ===== */
 .pb-city-search-row {
@@ -511,17 +572,15 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
       <span data-i18n-hi>अपना शहर चुनें</span>
     </div>
 
-    <!-- Search input + Dropdown row -->
+    <!-- Search input -->
     <div class="pb-city-search-row">
       <div class="pb-search-wrap">
         <span class="pb-search-icon">🔍</span>
         <input type="text" id="citySearchInput" autocomplete="off"
-               data-ph-en="Type city name… e.g. Dabwali, Sirsa, Bathinda" data-ph-hi="शहर लिखें… जैसे डबवाली, सिरसा, बठिंडा" placeholder="Type city name… e.g. Dabwali, Sirsa, Bathinda">
+               data-ph-en="Search city e.g. Dabwali, Sirsa, Bathinda — even type in Hindi" data-ph-hi="शहर खोजें… जैसे डबवाली, सिरसा, बठिंडा" placeholder="Search city e.g. Dabwali, Sirsa, Bathinda — even type in Hindi"
+               onkeydown="cityPickerKeydown(event)">
         <button type="button" class="pb-clear-btn" id="cityClearBtn" onclick="clearCitySearch()" style="display:none" aria-label="Clear">×</button>
       </div>
-      <select id="cityDropdown" onchange="onCityDropdownChange()" aria-label="Select city">
-        <option value="">— All Cities —</option>
-      </select>
     </div>
 
     <div class="pb-city-tabs" id="cityTabs">
@@ -724,7 +783,7 @@ try {
 async function loadCities(){
   const { data, error } = await SB
     .from('geo_cities')
-    .select('id, name, active')
+    .select('id, name, name_hi, active')
     .eq('active', true)
     .order('name');
   if (error) { console.error(error); return; }
@@ -751,8 +810,10 @@ async function loadCities(){
     el.className = 'pb-city-tab';
     el.dataset.cityId = c.id;
     el.dataset.cityName = c.name.toLowerCase();
+    el.dataset.cityNameHi = (c.name_hi || '').toLowerCase();
+    el.dataset.cityCount = counts[c.id] || 0;
     const cnt = counts[c.id] || 0;
-    el.innerHTML = `<span>${escapeHtml(c.name)}</span>` + (cnt>0?`<span class="count">${cnt}</span>`:'');
+    el.innerHTML = `<span class="city-name">${escapeHtml(c.name)}</span>` + (cnt>0?`<span class="count">${cnt}</span>`:'');
     el.onclick = ()=>selectCity(c.id, c.name);
     tabs.appendChild(el);
   });
@@ -763,16 +824,6 @@ async function loadCities(){
     const o = document.createElement('option');
     o.value = c.id; o.textContent = c.name;
     askCity.appendChild(o);
-  });
-
-  // Populate the city search dropdown (sorted alphabetically — order=name above)
-  const cityDD = document.getElementById('cityDropdown');
-  CITIES.forEach(c => {
-    const o = document.createElement('option');
-    o.value = c.id;
-    const cnt = counts[c.id] || 0;
-    o.textContent = c.name + (cnt>0 ? `  (${cnt})` : '');
-    cityDD.appendChild(o);
   });
 
   // Wire up live search-input filter
@@ -815,12 +866,28 @@ function filterCityPills(){
     if (!id){
       // "All Cities" tab — hide when searching, show otherwise
       tab.style.display = q ? 'none' : '';
-    } else {
-      const name = tab.dataset.cityName || '';
-      const matches = !q || name.includes(q);
-      tab.style.display = matches ? '' : 'none';
-      if (matches) visibleCount++;
+      return;
     }
+    const enName = tab.dataset.cityName || '';
+    const hiName = tab.dataset.cityNameHi || '';
+    const cnt = parseInt(tab.dataset.cityCount || '0', 10);
+    const matches = !q || enName.includes(q) || hiName.includes(q);
+    tab.style.display = matches ? '' : 'none';
+    // Render highlighted name on EN side, plain otherwise
+    const nameEl = tab.querySelector('.city-name');
+    if (nameEl){
+      const origName = tab.dataset.cityNameOrig || nameEl.textContent;
+      if (!tab.dataset.cityNameOrig) tab.dataset.cityNameOrig = origName;
+      if (q && enName.includes(q)){
+        const i = enName.indexOf(q);
+        nameEl.innerHTML = escapeHtml(origName.slice(0,i))
+          + '<mark>' + escapeHtml(origName.slice(i, i+q.length)) + '</mark>'
+          + escapeHtml(origName.slice(i+q.length));
+      } else {
+        nameEl.textContent = origName;
+      }
+    }
+    if (matches) visibleCount++;
   });
   const noMatch = document.getElementById('cityNoMatch');
   if (noMatch) noMatch.style.display = (q && visibleCount === 0) ? 'block' : 'none';
@@ -832,12 +899,20 @@ function clearCitySearch(){
   filterCityPills();
 }
 
-function onCityDropdownChange(){
-  const v = document.getElementById('cityDropdown').value;
-  if (!v){ selectCity(null, null); return; }
-  const cityId = parseInt(v, 10);
-  const c = CITIES.find(c => c.id === cityId);
-  if (c) selectCity(c.id, c.name);
+// city-picker keyboard: Enter picks single match
+function cityPickerKeydown(e){
+  if (e.key === 'Enter'){
+    const visible = Array.from(document.querySelectorAll('.pb-city-tab'))
+      .filter(t => t.style.display !== 'none' && t.dataset.cityId);
+    if (visible.length === 1){
+      e.preventDefault();
+      const t = visible[0];
+      const c = CITIES.find(c => String(c.id) === t.dataset.cityId);
+      if (c){ selectCity(c.id, c.name); clearCitySearch(); }
+    }
+  } else if (e.key === 'Escape'){
+    clearCitySearch();
+  }
 }
 
 function selectCity(id, name){
@@ -845,9 +920,6 @@ function selectCity(id, name){
   document.querySelectorAll('.pb-city-tab').forEach(t=>{
     t.classList.toggle('active', String(t.dataset.cityId||'') === String(id||''));
   });
-  // Sync the dropdown
-  const dd = document.getElementById('cityDropdown');
-  if (dd) dd.value = id ? String(id) : '';
   // Save to persist if a real city
   if (id && name) {
     try { DukanCity.set(name.toLowerCase().replace(/\s+/g,'-')); } catch(_){}
@@ -1103,12 +1175,12 @@ async function loadLeaderboard(){
         <div class="pb-lb-count">${r.question_count}Q${r.recent_count>0?`<span class="pb-lb-recent">+${r.recent_count}</span>`:''}</div>
       </div>
     `).join('');
-    // Update hero stats
+    // Update hero stats with count-up animation
     const totalQ = data.reduce((s,r)=>s+Number(r.question_count||0),0);
     const totalR = data.reduce((s,r)=>s+Number(r.reply_count||0),0);
-    document.getElementById('hs-q').textContent = totalQ;
-    document.getElementById('hs-r').textContent = totalR;
-    document.getElementById('hs-c').textContent = data.length;
+    animateCount('hs-q', totalQ);
+    animateCount('hs-r', totalR);
+    animateCount('hs-c', data.length);
   } catch(e){
     console.error(e);
     lb.innerHTML = '<div style="font-size:.78rem;color:#B91C1C">Leaderboard offline</div>';
@@ -1373,6 +1445,24 @@ async function submitReply(){
 function escapeHtml(s){
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function animateCount(elId, target){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  target = Number(target) || 0;
+  if (target === 0){ el.textContent = '0'; return; }
+  const start = performance.now();
+  const dur = Math.min(900, 200 + target * 18);  // longer for bigger numbers
+  const initial = Number(el.textContent) || 0;
+  function tick(now){
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3);  // easeOutCubic
+    const val = Math.round(initial + (target - initial) * eased);
+    el.textContent = val.toLocaleString('en-IN');
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
 function timeAgo(iso){
