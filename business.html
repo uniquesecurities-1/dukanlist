@@ -686,25 +686,18 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <style id="mobile-biz-priority">
 
 /* ============================================================
-   MOBILE BUSINESS DETAIL — Customer-value first
-   User feedback: "real info chhup gayi, bikhrav jyada"
-   Strategy: meta-card (name/USP/address/CTAs) FIRST on mobile,
-            hide redundant trust-card, compact highlights
+   MOBILE BUSINESS DETAIL — light cleanup (no reorder)
+   Keep gallery/photos in their original visible position.
+   Just hide the redundant "Why trustworthy" card + compact stuff.
 ============================================================ */
 @media (max-width: 760px){
-  /* Reorder: meta-card above gallery, highlights/trust collapsed */
-  .biz-top{ display:flex !important; flex-direction:column !important; gap:14px !important }
-  .biz-top .biz-meta-card{ order:1 !important }
-  .biz-top .gallery{ order:2 !important; position:static !important }
-
   /* HIDE the redundant "Why this listing is trustworthy" card on mobile —
      same info is conveyed by the Admin Verified pill + verif-row badges */
   .shop-trust-card{ display:none !important }
 
-  /* Compact Shop Highlights on mobile — collapse to essentials */
+  /* Compact Shop Highlights on mobile (don't hide — keep but smaller) */
   .shop-highlights{ padding:12px 14px !important; margin-top:10px !important }
-  .shop-highlights .sh-title{ font-size:.9rem !important; margin-bottom:8px !important }
-  .shop-highlights .sh-grid{ grid-template-columns:1fr 1fr !important; gap:8px !important }
+  .shop-highlights .sh-title{ font-size:.92rem !important; margin-bottom:8px !important }
   .shop-highlights .sh-row-label{ font-size:.72rem !important }
   .shop-highlights .sh-pills{ gap:4px !important }
   .shop-highlights .sh-share-row{ margin-top:8px !important; padding-top:8px !important }
@@ -712,14 +705,8 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   /* USP gets a stronger visual on mobile — it's the unique value */
   .usp-box{ font-size:.94rem !important; padding:12px 14px !important }
 
-  /* Address: tighter card, less padding */
+  /* Address: tighter card */
   .addr-box{ padding:12px !important; margin-top:10px !important }
-
-  /* Hide map embed on mobile initially — saves space, user can tap Open in Maps */
-  .biz-meta-card #mapEmbedWrap{ display:none !important }
-
-  /* Tighten trust strip on mobile — already small but make it inline */
-  .detail-trust-strip{ padding:4px 0 10px !important; gap:4px !important }
 
   /* Show hours prominently if present (was buried) */
   #openStatus{ font-size:.88rem !important; font-weight:700 !important }
@@ -2971,3 +2958,4 @@ function copyShopUrl(){
 </script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
