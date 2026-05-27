@@ -150,12 +150,11 @@
       </div>
       <div class="form-group">
         <label><span data-i18n-en>USP (English)</span><span data-i18n-hi>USP (English)</span></label>
-        <div class="tpl-hint">
-          💡 <span data-i18n-en>Don't know what to write? Click the orange button below — we have ready-made USP templates for your profession.</span><span data-i18n-hi>क्या लिखें समझ नहीं आ रहा? नीचे ऑरेंज बटन दबाएं — आपके पेशे के लिए तैयार टेम्पलेट मौजूद हैं।</span>
-        </div>
-        <textarea id="usp" class="textarea" maxlength="280" rows="3" placeholder="e.g., AMFI-registered MFD · 15+ yrs experience · 1000+ families served · Free portfolio review"></textarea>
+        <!-- ===== Supersonic Simple USP Picker — tap to add ===== -->
+        <div id="simpleUspPicker" class="su-picker"></div>
+        <textarea id="usp" class="textarea" maxlength="280" rows="3" placeholder="Pick from above ↑ or type your own"></textarea>
         <button type="button" class="tpl-btn" onclick="openTemplates('usp')">
-          📋 <span data-i18n-en>Browse Ready-Made USP Templates (by profession)</span><span data-i18n-hi>तैयार USP टेम्पलेट देखें (पेशे के अनुसार)</span>
+          📋 <span data-i18n-en>+ Category-specific templates</span><span data-i18n-hi>+ Category के template</span>
         </button>
       </div>
       <div class="form-group">
@@ -356,6 +355,29 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/templates.js"></script>
+<script src="/assets/js/usp-simple.js"></script>
+<style>
+/* ===== Supersonic Simple USP Picker (mirrored from register.html) ===== */
+.su-picker { background:linear-gradient(135deg,#FAF5FF 0%,#FFF7ED 100%); border:1.5px solid #DDD6FE; border-radius:14px; padding:14px 14px 12px; margin:0 0 12px }
+.su-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:8px; flex-wrap:wrap }
+.su-title { font-size:.9rem; font-weight:800; color:#5B21B6 }
+.su-count { font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:99px; background:#7C3AED; color:#fff }
+.su-themes { display:flex; gap:6px; overflow-x:auto; padding:2px 0 8px; margin:0 -4px; scrollbar-width:none }
+.su-themes::-webkit-scrollbar { display:none }
+.su-theme-chip { flex-shrink:0; white-space:nowrap; background:#fff; border:1.5px solid #E2E8F0; padding:6px 12px; border-radius:99px; font-size:.78rem; font-weight:700; color:#475569; cursor:pointer; font-family:inherit; transition:.15s }
+.su-theme-chip:hover { background:#F5F3FF; border-color:#A78BFA }
+.su-theme-chip.active { background:linear-gradient(135deg,#7C3AED,#EC4899); color:#fff; border-color:transparent; box-shadow:0 3px 10px rgba(124,58,237,.25) }
+.su-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:7px; margin-top:4px }
+.su-pill { display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid #E5E7EB; padding:9px 11px; border-radius:11px; cursor:pointer; font-family:inherit; text-align:left; transition:.15s; min-height:44px }
+.su-pill:hover { border-color:#A78BFA; background:#FAF5FF; transform:translateY(-1px); box-shadow:0 4px 10px rgba(124,58,237,.10) }
+.su-pill.selected { background:linear-gradient(135deg,#EDE9FE,#FCE7F3); border-color:#7C3AED; box-shadow:0 4px 12px rgba(124,58,237,.20) }
+.su-pill .su-emo { font-size:1.1rem; flex-shrink:0 }
+.su-pill .su-txt { flex:1; font-size:.82rem; font-weight:600; color:#0F172A; line-height:1.3 }
+.su-pill .su-tick { margin-left:auto; color:#7C3AED; font-weight:900; font-size:.95rem }
+.su-clear { margin-top:10px; background:transparent; border:1px solid #FECACA; color:#B91C1C; padding:5px 12px; border-radius:99px; font-size:.74rem; font-weight:700; cursor:pointer; font-family:inherit }
+.su-clear:hover { background:#FEF2F2 }
+@media (max-width:540px){ .su-grid { grid-template-columns: 1fr 1fr } .su-pill { min-height:40px; padding:7px 9px } .su-pill .su-txt { font-size:.78rem } }
+</style>
 <script src="/assets/js/nav.js" defer></script>
 <script>
 function setLang(lang){
@@ -438,6 +460,16 @@ function populateFields(){
   document.getElementById('usp').value = MY_BIZ.usp_text || '';
   document.getElementById('uspHi').value = MY_BIZ.usp_hi || '';
   document.getElementById('aboutText').value = MY_BIZ.about_text || '';
+
+  // Render Supersonic Simple USP picker — universal common-man friendly templates
+  if (window.renderSimpleUspPicker) {
+    const lang = document.documentElement.getAttribute('data-lang') === 'hi' ? 'hi' : 'en';
+    window.renderSimpleUspPicker({
+      container: document.getElementById('simpleUspPicker'),
+      target: document.getElementById('usp'),
+      lang: lang
+    });
+  }
 
   // FAQ — array or null/empty
   MY_FAQS = Array.isArray(MY_BIZ.faqs_json) ? MY_BIZ.faqs_json.slice() : [];

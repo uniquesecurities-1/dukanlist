@@ -17,6 +17,94 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
+  /* ===== Supersonic Simple USP Picker ===== */
+  .su-picker {
+    background: linear-gradient(135deg,#FAF5FF 0%,#FFF7ED 100%);
+    border: 1.5px solid #DDD6FE;
+    border-radius: 14px;
+    padding: 14px 14px 12px;
+    margin: 0 0 12px;
+  }
+  .su-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; gap:8px; flex-wrap:wrap;
+  }
+  .su-title {
+    font-size:.9rem; font-weight:800; color:#5B21B6;
+    letter-spacing:-.005em;
+  }
+  .su-count {
+    font-size:.72rem; font-weight:700; padding:3px 9px;
+    border-radius:99px; background:#7C3AED; color:#fff;
+  }
+  .su-themes {
+    display:flex; gap:6px; overflow-x:auto; padding:2px 0 8px;
+    margin:0 -4px; scrollbar-width:none;
+  }
+  .su-themes::-webkit-scrollbar { display:none }
+  .su-theme-chip {
+    flex-shrink:0; white-space:nowrap;
+    background:#fff; border:1.5px solid #E2E8F0;
+    padding:6px 12px; border-radius:99px;
+    font-size:.78rem; font-weight:700;
+    color:#475569; cursor:pointer; font-family:inherit;
+    transition:.15s;
+  }
+  .su-theme-chip:hover { background:#F5F3FF; border-color:#A78BFA }
+  .su-theme-chip.active {
+    background:linear-gradient(135deg,#7C3AED,#EC4899);
+    color:#fff; border-color:transparent;
+    box-shadow:0 3px 10px rgba(124,58,237,.25);
+  }
+  .su-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap:7px;
+    margin-top:4px;
+  }
+  .su-pill {
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:1.5px solid #E5E7EB;
+    padding:9px 11px; border-radius:11px;
+    cursor:pointer; font-family:inherit;
+    text-align:left;
+    transition:.15s; min-height:44px;
+  }
+  .su-pill:hover {
+    border-color:#A78BFA; background:#FAF5FF;
+    transform:translateY(-1px);
+    box-shadow:0 4px 10px rgba(124,58,237,.10);
+  }
+  .su-pill.selected {
+    background:linear-gradient(135deg,#EDE9FE,#FCE7F3);
+    border-color:#7C3AED;
+    box-shadow:0 4px 12px rgba(124,58,237,.20);
+  }
+  .su-pill .su-emo {
+    font-size:1.1rem; flex-shrink:0;
+  }
+  .su-pill .su-txt {
+    flex:1; font-size:.82rem; font-weight:600;
+    color:#0F172A; line-height:1.3;
+  }
+  .su-pill .su-tick {
+    margin-left:auto; color:#7C3AED;
+    font-weight:900; font-size:.95rem;
+  }
+  .su-clear {
+    margin-top:10px;
+    background:transparent; border:1px solid #FECACA;
+    color:#B91C1C; padding:5px 12px;
+    border-radius:99px; font-size:.74rem; font-weight:700;
+    cursor:pointer; font-family:inherit;
+  }
+  .su-clear:hover { background:#FEF2F2 }
+  @media (max-width:540px){
+    .su-grid { grid-template-columns: 1fr 1fr }
+    .su-pill { min-height:40px; padding:7px 9px }
+    .su-pill .su-txt { font-size:.78rem }
+  }
+
   /* ===== Multi-category chip widget ===== */
   .cat-chips {
     display: flex;
@@ -623,15 +711,24 @@
 
     <div class="form-group">
       <label><span data-i18n-en>Your USP / About</span><span data-i18n-hi>आपकी USP / परिचय</span><span class="req">*</span></label>
-      <textarea id="usp" class="textarea" maxlength="280" placeholder="e.g. 25+ years experience in furniture work. Free home measurement. Custom designs."></textarea>
+
+      <!-- ===== SUPERSONIC USP PICKER — universal, common-man friendly ===== -->
+      <div id="simpleUspPicker" class="su-picker"></div>
+
+      <textarea id="usp" class="textarea" maxlength="280" placeholder="Pick 3-5 from above ↑ or type your own"></textarea>
       <div class="help">
-        <span data-i18n-en>30-word elevator pitch. Max 280 chars.</span>
-        <span data-i18n-hi>30 शब्दों में अपनी खासियत। ज़्यादा से ज़्यादा 280 अक्षर।</span>
+        <span data-i18n-en>Pick from above ↑ OR write your own. Max 280 characters.</span>
+        <span data-i18n-hi>ऊपर से चुनें ↑ या खुद लिखें। ज़्यादा से ज़्यादा 280 अक्षर।</span>
       </div>
     </div>
 
-    <!-- ===== USP TEMPLATE SIDEBAR — profession-specific quick picks ===== -->
-    <div id="uspTemplateBox" style="margin:14px 0 18px;padding:14px 16px;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1.5px solid #F59E0B;border-radius:12px;display:none">
+    <!-- ===== Category-specific USP templates (secondary, collapsible) ===== -->
+    <details style="margin:6px 0 14px">
+      <summary style="cursor:pointer;font-size:.82rem;color:#64748B;font-weight:600;padding:6px 0">
+        <span data-i18n-en>+ Show category-specific templates</span>
+        <span data-i18n-hi>+ Category के template देखें</span>
+      </summary>
+    <div id="uspTemplateBox" style="margin:8px 0 0;padding:14px 16px;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1.5px solid #F59E0B;border-radius:12px;display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <div style="font-weight:800;color:#92400E;font-size:.92rem">
           💡 <span data-i18n-en>Quick USP Templates</span><span data-i18n-hi>तैयार USP टेम्पलेट</span>
@@ -645,6 +742,7 @@
         <span data-i18n-hi>किसी टेम्पलेट पर click करें → ऊपर भर जाएगा। [brackets] में अपनी जानकारी लिखें।</span>
       </div>
     </div>
+    </details>
 
     <div class="form-group">
       <label><span data-i18n-en>USP in Hindi</span><span data-i18n-hi>USP हिंदी में</span><span class="opt">(optional)</span></label>
@@ -836,6 +934,7 @@
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/geo.js"></script>
 <script src="/assets/js/templates.js"></script>
+<script src="/assets/js/usp-simple.js"></script>
 <script>
 // ============================================================
 // SHARED — language + nav
@@ -888,7 +987,18 @@ function goToStep(n){
   window.scrollTo({top:0, behavior:'smooth'});
 
   // When entering Step 4 — render USP templates for the selected primary category
-  if (n === 4) renderUspTemplates();
+  if (n === 4) {
+    renderUspTemplates();
+    // Also render the universal Simple USP picker
+    if (window.renderSimpleUspPicker) {
+      const lang = document.documentElement.getAttribute('data-lang') === 'hi' ? 'hi' : 'en';
+      window.renderSimpleUspPicker({
+        container: document.getElementById('simpleUspPicker'),
+        target: document.getElementById('usp'),
+        lang: lang
+      });
+    }
+  }
 }
 
 function renderUspTemplates(){
