@@ -149,7 +149,16 @@
     line-height: 1;
   }
   .cat-chip .chip-star:hover { transform: scale(1.2); }
-  .cat-chip .chip-name { white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+  .cat-chip .chip-name {
+    white-space: normal;             /* allow wrap on long names */
+    word-break: break-word;
+    max-width: 280px;                /* desktop — fits 'Banking Correspondent / Bank Mitra' */
+    line-height: 1.25;
+  }
+  @media (max-width: 540px) {
+    .cat-chip .chip-name { max-width: 220px; font-size: .88rem }
+    .cat-chip { align-items: flex-start }  /* stop star from looking off-centre */
+  }
   .cat-chip .chip-parent { color: #6b7280; font-size: 11px; font-weight: 400; margin-left: 2px; }
   .cat-chip .chip-remove {
     cursor: pointer;
@@ -1263,7 +1272,7 @@ function renderChips(){
       '<span class="chip-star" title="' + (isPrimary ? 'Primary category' : 'Set as primary') + '" data-id="' + id + '" data-act="primary">' +
         (isPrimary ? '⭐' : '☆') +
       '</span>' +
-      '<span class="chip-name">' + (cat.icon || '') + ' ' + escapeHtml(cat.name) +
+      '<span class="chip-name" title="' + escapeHtml(cat.name + (cat.parent_name ? ' · ' + cat.parent_name : '')) + '">' + (cat.icon || '') + ' ' + escapeHtml(cat.name) +
         '<span class="chip-parent"> · ' + escapeHtml(cat.parent_name) + '</span>' +
       '</span>' +
       '<span class="chip-remove" title="Remove" data-id="' + id + '" data-act="remove">✕</span>';
