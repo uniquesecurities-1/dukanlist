@@ -714,89 +714,96 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 </style>
 <style id="biz-premium-bottom">
-/* Premium Reviews empty state */
-.rev-premium-empty{
-  background:transparent;
+/* ====== Corporate-clean Reviews empty state ====== */
+.rev-clean-empty{
+  text-align:center;
+  padding:28px 16px 20px;
+}
+.rce-icon{
+  margin:0 auto 14px;
+  width:48px; height:48px;
+  display:flex; align-items:center; justify-content:center;
+}
+.rce-title{
+  font-family:'Manrope','Plus Jakarta Sans','Inter',sans-serif;
+  font-size:1.02rem;
+  font-weight:700;
+  color:#0F172A;
+  letter-spacing:-0.01em;
+  margin-bottom:6px;
+  line-height:1.35;
+}
+.rce-sub{
+  font-family:'Inter','Manrope',sans-serif;
+  font-size:.84rem;
+  font-weight:400;
+  color:#64748b;
+  line-height:1.5;
+  max-width:300px;
+  margin:0 auto;
+}
+
+/* ====== Corporate-clean Q&A empty state ====== */
+.qa-clean-empty{
   padding:4px 0;
 }
-.rev-pe-summary{
-  display:flex; gap:14px; align-items:center;
-  padding:14px 12px;
-  background:#FAEEDA;
-  border-radius:12px;
-  margin-bottom:10px;
-}
-.rev-pe-score{ text-align:center; flex-shrink:0 }
-.rev-pe-num{
-  font-size:30px; font-weight:800; line-height:1; color:#412402;
-  font-family:'Manrope',sans-serif;
-}
-.rev-pe-sub{ font-size:10px; color:#854F0B; margin-top:3px; font-weight:600 }
-.rev-pe-bars{ flex:1; display:flex; flex-direction:column; gap:4px }
-.rev-pe-bar{
-  display:flex; align-items:center; gap:5px;
-  font-size:10px; color:#854F0B; font-weight:600;
-}
-.rev-pe-bar span:first-child{ min-width:18px; text-align:right }
-.rev-pe-track{
-  flex:1; height:5px;
-  background:rgba(0,0,0,0.08);
-  border-radius:99px; overflow:hidden;
-}
-.rev-pe-fill{
-  height:100%; background:#EF9F27;
-  border-radius:99px; transition:width .3s;
-}
-.rev-pe-bar b{ min-width:14px; text-align:right; font-weight:700 }
-
-.rev-pe-note{
-  display:flex; gap:10px; align-items:flex-start;
-  padding:11px 12px;
-  background:#F8FAFC;
-  border-radius:10px;
-  border:1px solid #E2E8F0;
-}
-.rev-pe-ico{ font-size:20px; flex-shrink:0 }
-.rev-pe-title{ font-size:13px; font-weight:700; color:#0F172A; margin-bottom:2px }
-.rev-pe-msg{ font-size:11.5px; color:#475569; line-height:1.45 }
-
-/* Premium Q&A empty state */
-.qa-premium-empty{
-  padding:0;
-  display:flex; flex-direction:column; gap:8px;
-}
-.qa-pe-reply{
-  padding:8px 11px;
+.qce-reply{
+  display:flex; align-items:center; gap:6px;
+  padding:9px 12px;
   background:#ECFDF5;
   border-radius:9px;
-  font-size:11.5px; color:#065F46; font-weight:600;
-  display:flex; align-items:center; gap:6px;
+  font-family:'Inter','Manrope',sans-serif;
+  font-size:.78rem;
+  font-weight:500;
+  color:#065F46;
+  margin-bottom:14px;
+  letter-spacing:0.01em;
 }
-.qa-pe-label{
-  font-size:10px; color:#94a3b8; font-weight:800;
-  letter-spacing:0.5px; margin-top:4px; padding:0 2px;
+.qce-reply svg{ color:#10B981; flex-shrink:0 }
+.qce-reply b{ font-weight:700; color:#047857 }
+.qce-label{
+  font-family:'Inter','Manrope',sans-serif;
+  font-size:.65rem;
+  font-weight:700;
+  color:#94a3b8;
+  letter-spacing:0.1em;
+  margin-bottom:10px;
+  text-transform:uppercase;
 }
-.qa-pe-sample{
-  display:flex; align-items:center; gap:8px;
-  padding:10px 12px;
+.qce-chips{
+  display:flex; flex-wrap:wrap; gap:7px;
+}
+.qce-chip{
+  font-family:'Inter','Manrope',sans-serif;
+  font-size:.82rem;
+  font-weight:500;
+  color:#1E3A8A;
   background:#fff;
   border:1px solid #E2E8F0;
-  border-radius:9px;
-  text-align:left;
+  border-radius:99px;
+  padding:8px 14px;
   cursor:pointer;
-  font-family:inherit;
-  width:100%;
-  transition:all .15s;
+  transition:all .15s ease;
+  white-space:nowrap;
+  letter-spacing:-0.005em;
 }
-.qa-pe-sample:hover{
+.qce-chip:hover, .qce-chip:active{
+  background:#1E3A8A;
+  color:#fff;
   border-color:#1E3A8A;
-  background:#F8FAFC;
+  transform:translateY(-1px);
+  box-shadow:0 3px 8px rgba(30,58,138,0.18);
 }
-.qa-pe-ico{ font-size:14px; flex-shrink:0 }
-.qa-pe-text{ font-size:12.5px; line-height:1.4; flex:1; color:#334155; font-weight:500 }
-.qa-pe-arrow{ font-size:12px; color:#94a3b8 }
 
-/* Make shop-highlights tiles color-coded with rich icon look */
+/* ====== Card heading typography polish ====== */
+.card-pill h3{
+  font-family:'Manrope','Plus Jakarta Sans','Inter',sans-serif;
+  font-weight:800;
+  letter-spacing:-0.01em;
+  color:#0F172A;
+}
+
+/* ====== Color-coded Shop Highlights tiles (kept from previous) ====== */
 .sh-tile{
   position:relative;
   border-radius:11px !important;
@@ -997,26 +1004,10 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <span id="reviewCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
         </h3>
         <div class="reviews-list" id="reviewsList">
-          <div class="rev-premium-empty">
-            <div class="rev-pe-summary">
-              <div class="rev-pe-score">
-                <div class="rev-pe-num">—</div>
-                <div class="rev-pe-sub" data-i18n-en="No rating yet" data-i18n-hi="अभी कोई rating नहीं">No rating yet</div>
-              </div>
-              <div class="rev-pe-bars">
-                <div class="rev-pe-bar"><span>5</span>★<div class="rev-pe-track"><div class="rev-pe-fill" style="width:0%"></div></div><b>0</b></div>
-                <div class="rev-pe-bar"><span>4</span>★<div class="rev-pe-track"><div class="rev-pe-fill" style="width:0%"></div></div><b>0</b></div>
-                <div class="rev-pe-bar"><span>3</span>★<div class="rev-pe-track"><div class="rev-pe-fill" style="width:0%"></div></div><b>0</b></div>
-                <div class="rev-pe-bar"><span>1-2</span>★<div class="rev-pe-track"><div class="rev-pe-fill" style="width:0%"></div></div><b>0</b></div>
-              </div>
-            </div>
-            <div class="rev-pe-note">
-              <span class="rev-pe-ico">👥</span>
-              <div>
-                <div class="rev-pe-title" data-i18n-en="Help your neighbours decide" data-i18n-hi="पड़ोसियों की मदद करें">Help your neighbours decide</div>
-                <div class="rev-pe-msg" data-i18n-en="Aapka 1 honest review 10 customers ko sahi shop chunne me madad karta hai." data-i18n-hi="आपका 1 honest review 10 customers को सही shop चुनने में मदद करता है।">Aapka 1 honest review 10 customers ko sahi shop chunne me madad karta hai.</div>
-              </div>
-            </div>
+          <div class="rev-clean-empty">
+            <div class="rce-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+            <div class="rce-title" data-i18n-en="Be the first to share your experience" data-i18n-hi="अपना अनुभव सबसे पहले शेयर करें">Be the first to share your experience</div>
+            <div class="rce-sub" data-i18n-en="Honest reviews help your neighbourhood discover trusted shops" data-i18n-hi="ईमानदार reviews पड़ोसियों को भरोसेमंद दुकानें खोजने में मदद करते हैं">Honest reviews help your neighbourhood discover trusted shops</div>
           </div>
         </div>
         <button class="btn-write-review" onclick="openReviewModal()">
@@ -1030,24 +1021,19 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <span id="qaCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
         </h3>
         <div id="qaList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
-          <div id="qaEmpty" class="qa-premium-empty">
-            <div class="qa-pe-reply">⚡ <span data-i18n-en="Owner usually replies within 2 hours" data-i18n-hi="मालिक आमतौर पर 2 घंटे में जवाब देते हैं">Owner usually replies within <b>2 hours</b></span></div>
-            <div class="qa-pe-label" data-i18n-en="Popular questions — tap to ask" data-i18n-hi="लोकप्रिय सवाल — tap to ask">POPULAR QUESTIONS &mdash; TAP TO ASK</div>
-            <button type="button" class="qa-pe-sample" onclick="prefillQA('Sunday timings kya hain?')">
-              <span class="qa-pe-ico">🕐</span>
-              <span class="qa-pe-text">Sunday timings kya hain?</span>
-              <span class="qa-pe-arrow">→</span>
-            </button>
-            <button type="button" class="qa-pe-sample" onclick="prefillQA('Home visit possible hai?')">
-              <span class="qa-pe-ico">🏠</span>
-              <span class="qa-pe-text">Home visit possible hai?</span>
-              <span class="qa-pe-arrow">→</span>
-            </button>
-            <button type="button" class="qa-pe-sample" onclick="prefillQA('Aap konsi services dete hain detail me?')">
-              <span class="qa-pe-ico">📋</span>
-              <span class="qa-pe-text">Services kya kya hain?</span>
-              <span class="qa-pe-arrow">→</span>
-            </button>
+          <div id="qaEmpty" class="qa-clean-empty">
+            <div class="qce-reply">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span data-i18n-en="Owner usually replies within 2 hours" data-i18n-hi="मालिक आमतौर पर 2 घंटे में जवाब देते हैं">Owner replies within <b>~2 hours</b></span>
+            </div>
+            <div class="qce-label" data-i18n-en="Tap a question to ask it instantly" data-i18n-hi="कोई सवाल tap करके तुरंत पूछें">TAP TO ASK</div>
+            <div class="qce-chips">
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Sunday timings kya hain?">Sunday timings?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Home visit possible hai?">Home visit?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Aap konsi services dete hain detail me?">Services list?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Payment methods kya kya accept karte ho?">Payment options?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Pricing range kya hai? Approximate cost?">Pricing?</button>
+            </div>
           </div>
         </div>
         <button class="btn-write-review" onclick="openQAModal()">
