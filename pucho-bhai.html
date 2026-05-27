@@ -1669,6 +1669,43 @@ function setupBizSearch(){
 }
 setupBizSearch();
 
+
+// ====== Helpers (utility functions used throughout the page) ======
+function escapeHtml(s){
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
+
+function timeAgo(iso){
+  if (!iso) return '';
+  const t = new Date(iso).getTime();
+  const s = Math.floor((Date.now() - t)/1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60)+'m ago';
+  if (s < 86400) return Math.floor(s/3600)+'h ago';
+  if (s < 86400*7) return Math.floor(s/86400)+'d ago';
+  return new Date(iso).toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+}
+
+function animateCount(elId, target){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  target = Number(target) || 0;
+  if (target === 0){ el.textContent = '0'; return; }
+  const start = performance.now();
+  const dur = Math.min(900, 200 + target * 18);
+  const initial = Number(el.textContent) || 0;
+  function tick(now){
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const val = Math.round(initial + (target - initial) * eased);
+    el.textContent = val.toLocaleString('en-IN');
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 // Bootstrap — load cities, categories, leaderboard on page load
 (async () => {
   try {
