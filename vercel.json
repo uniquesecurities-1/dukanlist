@@ -171,4 +171,13 @@
     }
   ],
   "crons": [
- 
+    {
+      "path": "/api/send-digest",
+      "schedule": "30 2 * * 1"
+    },
+    {
+      "path": "/api/daily-backup",
+      "schedule": "30 21 * * *"
+    }
+  ]
+}
