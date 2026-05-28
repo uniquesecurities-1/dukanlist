@@ -320,26 +320,56 @@ function setLang(lang){
 try { setLang(localStorage.getItem('shop_lang') || 'en'); } catch(_){}
 
 async function loadCert(){
+  try {
+    return await _loadCertInner();
+  } catch(e){
+    console.error('[trust-certificate] fatal:', e);
+    showErr('Could not load your certificate: ' + (e && e.message ? e.message : 'Unknown error') + '. Please refresh.');
+  }
+}
+
+async function _loadCertInner(){
   const user = await ShopDB.requireAuth();
   if (!user) return;
 
   const c = ShopDB.client;
 
   // Find linked business
-  const { data: owners } = await c.from('business_owners')
+  const { data: owners, error: ownErr } = await c.from('business_owners')
     .select('business_id').eq('auth_user_id', user.id).limit(1);
+  if (ownErr){
+    console.error('[trust-certificate] business_owners query failed:', ownErr);
+    showErr('Could not look up your business: ' + ownErr.message);
+    return;
+  }
   if (!owners || !owners.length){
     showErr('No business linked to this account. Please complete registration first.');
     return;
   }
 
   const bizId = owners[0].business_id;
-  const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, status, created_at, verified_score, rating_avg, rating_count, sub_category_id, category_id, geo_cities(name)')
-    .eq('id', bizId).maybeSingle();
+  let biz = null, error = null;
+  // Try full select with rating columns; if that fails (e.g. column not yet
+  // synced on the deployed schema cache), fall back to minimal select.
+  try {
+    const res = await c.from('businesses')
+      .select('id, slug, name, owner_name, owner_role, status, created_at, rating_avg, rating_count, sub_category_id, category_id, geo_cities(name)')
+      .eq('id', bizId).maybeSingle();
+    biz = res.data; error = res.error;
+  } catch(e){
+    error = e;
+  }
+  if (error || !biz){
+    console.warn('[trust-certificate] full select failed, falling back:', error);
+    const res2 = await c.from('businesses')
+      .select('id, slug, name, owner_name, owner_role, status, created_at, sub_category_id, category_id, geo_cities(name)')
+      .eq('id', bizId).maybeSingle();
+    biz = res2.data; error = res2.error;
+  }
 
   if (error || !biz){
-    showErr('Could not load your listing. Please try again.');
+    console.error('[trust-certificate] businesses query failed:', error);
+    showErr('Could not load your listing: ' + (error && error.message ? error.message : 'no data') + '. Please try again.');
     return;
   }
 
@@ -375,27 +405,4 @@ async function loadCert(){
     }
   } else {
     document.getElementById('cCat').textContent = biz.name;
-    if (biz.geo_cities && biz.geo_cities.name) document.getElementById('cCity').textContent = biz.geo_cities.name;
-  }
-
-  // Year + ID + Date
-  const created = biz.created_at ? new Date(biz.created_at) : new Date();
-  document.getElementById('cYear').textContent = created.getFullYear();
-  const shortId = (biz.id || '').slice(0, 8).toUpperCase();
-  document.getElementById('cId').textContent = 'DL-' + shortId;
-  document.getElementById('cId2').textContent = 'DL-' + shortId;
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('cDate').textContent = dateStr;
-  document.getElementById('cDate2').textContent = dateStr;
-
-  // ===== LIVE RATING (replaces founder signature) =====
-  const ratingAvg = parseFloat(biz.rating_avg || 0);
-  const ratingCnt = parseInt(biz.rating_count || 0, 10);
-  const starsEl   = document.getElementById('cStars');
-  const numEl     = document.getElementById('cRatingNum');
-  const countEl   = document.getElementById('cRatingCount');
-  if (ratingCnt > 0 && ratingAvg > 0){
-    const filled = Math.round(ratingAvg);
-    const empty  = 5 - filled;
-    starsEl.innerHTML = '★'.repeat(filled) + '<span class="empty
+    if (biz.geo_cities && biz.geo_cities.name) documen
