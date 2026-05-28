@@ -59,15 +59,27 @@ async function fetchBusiness(field, value){
 }
 
 function renderHtml(biz, targetUrl){
-  // ----- SHOP-FIRST title (no "DukanList" suffix). Brand only via og:site_name.
+  // ----- SHOP-FIRST title with star rating
   const name = biz.name || 'Local Shop';
   const city = biz.geo_cities && biz.geo_cities.name ? biz.geo_cities.name : '';
   const locality = biz.geo_localities && biz.geo_localities.name ? biz.geo_localities.name : '';
   const place = [locality, city].filter(Boolean).join(', ');
-  const title = truncate(place ? (name + ' · ' + place) : name, 90);
+  const ratingAvg = Number(biz.rating_avg) || 0;
+  const ratingCount = Number(biz.rating_count) || 0;
+  const hasRating = ratingCount > 0 && ratingAvg > 0;
+  const ratingStr = hasRating
+    ? ('\u2b50 ' + ratingAvg.toFixed(1) + ' (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')')
+    : '';
 
-  // ----- SHOP-FIRST description
+  // Title: 'Shop Name  *  4.5  *  Mandi Dabwali'
+  let titleParts = [name];
+  if (hasRating) titleParts.push('\u2b50 ' + ratingAvg.toFixed(1));
+  if (place)     titleParts.push(place);
+  const title = truncate(titleParts.join(' \u00b7 '), 100);
+
+  // ----- SHOP-FIRST description with rating up front
   let descParts = [];
+  if (ratingStr) descParts.push(ratingStr + '.');
   if (biz.usp_text)         descParts.push(biz.usp_text);
   else if (biz.about_text)  descParts.push(biz.about_text);
   if (biz.owner_name && biz.mobile){
@@ -76,7 +88,7 @@ function renderHtml(biz, targetUrl){
     descParts.push('Call +91-' + biz.mobile + '.');
   }
   if (place) descParts.push(place + '.');
-  if (!descParts.length) descParts.push(name + ' — your local shop. Tap to view photos, ratings & contact.');
+  if (!descParts.length) descParts.push(name + ' \u2014 your local shop. Tap to view photos, ratings & contact.');
   const desc = truncate(descParts.join(' '), 200);
 
   // ----- IMAGE: shop-branded OG card → first photo → static fallback

@@ -129,12 +129,14 @@
   }
 
   function drawStars(ctx, ratingAvg, ratingCount, cx, cy) {
-    if (!ratingCount || ratingCount <= 0) return;
-    var avg = Math.max(0, Math.min(5, ratingAvg || 0));
+    var hasRating = ratingCount && ratingCount > 0 && ratingAvg > 0;
+    var avg = hasRating ? Math.max(0, Math.min(5, ratingAvg || 0)) : 0;
 
     var starSize = 28;
     var starGap = 6;
-    var labelText = ' ' + avg.toFixed(1) + '  (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')';
+    var labelText = hasRating
+      ? ' ' + avg.toFixed(1) + '  (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')'
+      : '  Be the first to review';
 
     ctx.font = '700 22px Manrope, system-ui, sans-serif';
     var labelW = ctx.measureText(labelText).width;
@@ -142,14 +144,14 @@
     var x = cx - totalW / 2;
     var y = cy;
 
-    // 5 stars
+    // 5 stars — outline-only if no rating
     for (var i = 0; i < 5; i++) {
-      var filled = i < Math.round(avg);
+      var filled = hasRating && i < Math.round(avg);
       drawStar(ctx, x + i * (starSize + starGap) + starSize / 2, y, starSize / 2,
         filled ? COLORS.gold : '#E2E8F0');
     }
 
-    ctx.fillStyle = COLORS.inkSoft;
+    ctx.fillStyle = hasRating ? COLORS.inkSoft : COLORS.inkMuted;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(labelText, x + (starSize * 5) + (starGap * 4), y);
@@ -307,12 +309,11 @@
         // Shop name — the HERO
         var nameBottom = drawShopName(ctx, opts.name || 'Local Shop');
 
-        // Rating row (only if reviews exist)
+        // Rating row — ALWAYS rendered. drawStars handles 0-review case
+        // with outline stars + "Be the first to review" label.
         var cursorY = nameBottom + 30;
-        if (opts.ratingCount && opts.ratingCount > 0) {
-          drawStars(ctx, opts.ratingAvg, opts.ratingCount, W / 2, cursorY);
-          cursorY += 50;
-        }
+        drawStars(ctx, opts.ratingAvg, opts.ratingCount, W / 2, cursorY);
+        cursorY += 50;
 
         // City + locality
         drawLocation(ctx, opts.city, opts.locality, cursorY + 20);
