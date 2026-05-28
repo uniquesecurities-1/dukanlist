@@ -372,11 +372,14 @@ async function handleFiles(files){
   }
 
   if (uploaded > 0){
+    // SECURITY: photo upload no longer auto-activates a pending business.
+    // RPC now only sets verified_photo=TRUE flag. Admin must approve via
+    // moderation page before listing goes live. This restores the admin gate.
     if (MY_BIZ.status === 'pending'){
-      const { error: actErr } = await c.rpc('activate_business_after_photos', { p_business_id: MY_BIZ.id });
-      if (!actErr) MY_BIZ.status = 'active';
+      try { await c.rpc('activate_business_after_photos', { p_business_id: MY_BIZ.id }); } catch(_){}
     }
-    okEl.innerHTML = '<span class="a-icon">🎉</span><div>' + uploaded + ' photo' + (uploaded > 1 ? 's' : '') + ' uploaded!' + (failed > 0 ? ' (' + failed + ' failed)' : '') + '</div>';
+    const stillPending = (MY_BIZ.status === 'pending');
+    okEl.innerHTML = '<span class="a-icon">🎉</span><div>' + uploaded + ' photo' + (uploaded > 1 ? 's' : '') + ' uploaded!' + (failed > 0 ? ' (' + failed + ' failed)' : '') + (stillPending ? '<br><small style="color:#92400E;font-weight:600">⏳ Listing abhi admin review me hai — approve hote hi live ho jaayegi.</small>' : '') + '</div>';
     okEl.style.display = 'flex';
     renderState();
   } else if (failed > 0){
