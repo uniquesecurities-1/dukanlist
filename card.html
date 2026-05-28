@@ -428,8 +428,11 @@ async function loadCard(){
     return;
   }
   var c = ShopDB.client;
+  // Use minimal query (no FK joins) to avoid 400 errors from
+  // ambiguous category FK on businesses table. Fetch category
+  // separately if needed (faster + safer pattern, same as dashboard).
   var query = c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, geo_cities(name, state_id), categories!businesses_sub_category_id_fkey(name)');
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, geo_cities(name)');
   if (slug) query = query.eq('slug', slug);
   else      query = query.eq('id', id);
 
@@ -442,6 +445,16 @@ async function loadCard(){
   if (b.status !== 'active'){
     document.getElementById('content').innerHTML = '<div class="state"><div class="ico">⏳</div><div>This card is not active yet.<br><small>The business is pending verification.</small></div></div>';
     return;
+  }
+
+  // Fetch category name separately (avoids FK ambiguity)
+  var catName = '';
+  var primaryCatId = b.sub_category_id || b.category_id;
+  if (primaryCatId){
+    try {
+      var catRes = await c.from('categories').select('name').eq('id', primaryCatId).maybeSingle();
+      if (catRes && catRes.data) catName = catRes.data.name;
+    } catch(_){}
   }
 
   // Build display data
@@ -459,7 +472,7 @@ async function loadCard(){
     last_name:     lastName,
     role:          b.owner_role || '',
     business_name: b.name,
-    category_name: b.categories ? b.categories.name : '',
+    category_name: catName,
     mobile:        b.mobile,
     whatsapp:      b.whatsapp,
     email:         b.email,
