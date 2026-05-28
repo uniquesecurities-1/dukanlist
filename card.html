@@ -518,7 +518,7 @@ function render(d){
     + (d.mobile ? '<a class="qa" href="tel:+91' + escapeHtml(d.mobile) + '"><span class="qa-ico">📞</span>Call</a>' : '<span></span>')
     + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + escapeHtml(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
     + (mapsUrl ? '<a class="qa" href="' + escapeHtml(mapsUrl) + '" target="_blank"><span class="qa-ico">📍</span>Directions</a>' : '')
-    + '<a class="qa" href="' + escapeHtml(d.website || ('https://dukanlist.com/' + d.slug)) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
+    + '<a class="qa" href="' + escapeHtml('/business.html?slug=' + encodeURIComponent(d.slug || '')) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
     + '</div>';
 
   document.getElementById('content').innerHTML = html;
