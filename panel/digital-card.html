@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Business Card — DukanList</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Manrope:wght@500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  body{ background:#F1F5F9 }
+  .page{ max-width:1180px; margin:0 auto; padding:22px 16px 60px }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px }
+  @media (max-width:880px){ .grid{ grid-template-columns:1fr } }
+
+  .intro{
+    background:linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+    color:#fff; border-radius:14px; padding:20px 22px; margin-bottom:22px;
+  }
+  .intro h1{ font-family:'Plus Jakarta Sans',sans-serif; font-size:1.4rem; font-weight:900; margin:0 0 4px }
+  .intro p{ color:rgba(255,255,255,.85); font-size:.92rem; line-height:1.55; margin:0 }
+
+  .panel{
+    background:#fff; border-radius:14px; padding:22px;
+    box-shadow:0 4px 14px rgba(15,23,42,.06); border:1px solid #E2E8F0;
+  }
+  .panel h2{ font-size:1.05rem; font-weight:800; margin:0 0 14px; color:#0F172A; display:flex; align-items:center; gap:8px }
+
+  /* Theme picker */
+  .theme-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px }
+  .theme-chip{
+    cursor:pointer; padding:8px 14px; border-radius:99px;
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:.8rem;
+    border:2px solid transparent; transition:.15s;
+  }
+  .theme-chip.theme-navy{ background:linear-gradient(135deg,#0B1E3F,#1E3A8A); color:#fff }
+  .theme-chip.theme-medical{ background:linear-gradient(135deg,#ECFEFF,#BAE6FD); color:#075985 }
+  .theme-chip.theme-legal{ background:linear-gradient(135deg,#18181B,#000); color:#fff }
+  .theme-chip.theme-finance{ background:linear-gradient(135deg,#1E40AF,#312E81); color:#fff }
+  .theme-chip.theme-vibrant{ background:linear-gradient(135deg,#C2410C,#FF6B1A); color:#fff }
+  .theme-chip.active{ border-color:#FF6B1A; transform:translateY(-1px); box-shadow:0 6px 12px rgba(15,23,42,.15) }
+
+  /* Sharing actions */
+  .share-cta{
+    display:flex; align-items:center; gap:10px; width:100%;
+    padding:14px 18px; border-radius:11px; border:none; cursor:pointer;
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:.96rem;
+    color:#fff; margin-bottom:10px; transition:transform .12s, box-shadow .12s;
+    justify-content:center;
+  }
+  .share-cta.wa{ background:#25D366; box-shadow:0 8px 18px -4px rgba(37,211,102,.4) }
+  .share-cta.wa:hover{ transform:translateY(-2px); box-shadow:0 12px 24px -4px rgba(37,211,102,.55) }
+  .share-cta.copy{ background:#1E3A8A; box-shadow:0 8px 18px -4px rgba(30,58,138,.4) }
+  .share-cta.copy:hover{ transform:translateY(-2px); box-shadow:0 12px 24px -4px rgba(30,58,138,.55) }
+  .share-cta.preview{ background:#fff; color:#0F172A; border:1.5px solid #CBD5E1; box-shadow:none }
+  .share-cta.preview:hover{ background:#F8FAFC; transform:translateY(-1px) }
+
+  /* Link box */
+  .link-box{
+    background:#F1F5F9; border:1.5px dashed #CBD5E1; border-radius:10px;
+    padding:12px 14px; font-family:monospace; font-size:.8rem; color:#0F172A;
+    word-break:break-all; margin:14px 0 8px;
+  }
+
+  /* Card iframe preview */
+  .preview-wrap{
+    background:linear-gradient(180deg,#F1F5F9 0%,#E2E8F0 100%);
+    border-radius:14px; padding:24px 16px; min-height:480px;
+    display:flex; align-items:flex-start; justify-content:center;
+  }
+  .preview-iframe{
+    width:100%; max-width:420px; height:580px; border:0;
+    background:transparent;
+  }
+
+  /* Help section */
+  .help-box{
+    background:#FEF3C7; border-left:4px solid #F59E0B; border-radius:8px;
+    padding:14px 16px; margin-top:14px; font-size:.86rem; color:#78350F; line-height:1.55;
+  }
+  .help-box b{ color:#92400E }
+
+  .err-box{
+    background:#FEE2E2; border-left:4px solid #DC2626; border-radius:8px;
+    padding:12px 14px; color:#991B1B; font-size:.88rem; margin-bottom:14px; display:none;
+  }
+
+  .stats-row{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;
+  }
+  .stat{
+    background:#F8FAFC; padding:10px 12px; border-radius:10px; text-align:center;
+    border:1px solid #E2E8F0;
+  }
+  .stat-val{ font-size:1.2rem; font-weight:800; color:#0F172A; font-family:'Plus Jakarta Sans',sans-serif }
+  .stat-lbl{ font-size:.68rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-top:2px }
+
+  /* Step list */
+  .steps{ list-style:none; padding:0; margin:0; counter-reset:step-counter }
+  .steps li{
+    counter-increment:step-counter; padding:8px 0 8px 38px; position:relative;
+    font-size:.86rem; color:#334155; line-height:1.55;
+  }
+  .steps li::before{
+    content:counter(step-counter); position:absolute; left:0; top:8px;
+    width:26px; height:26px; border-radius:50%; background:#1E3A8A; color:#fff;
+    font-weight:800; font-size:.74rem; display:grid; place-items:center;
+  }
+  .steps li b{ color:#0F172A }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/panel/dashboard.html" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <a href="/panel/dashboard.html">Dashboard</a>
+      <a href="/panel/profile.html">Profile</a>
+      <a href="#" onclick="ShopDB.signOut()" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="intro">
+    <h1>📇 Your Digital Business Card</h1>
+    <p>Ek tap mein samne wale ke phone book mein save — naam, mobile, WhatsApp, email, address. <b>WhatsApp par share karo, viral karwao</b> — har share par DukanList ki bhi pehchaan.</p>
+  </div>
+
+  <div id="errBox" class="err-box"></div>
+
+  <div class="grid">
+
+    <!-- LEFT: Customize + Share -->
+    <div>
+      <div class="panel">
+        <h2>🎨 Pick a theme</h2>
+        <div class="theme-row" id="themeRow">
+          <span class="theme-chip theme-navy active" data-theme="navy" onclick="setTheme('navy')">Imperial Navy</span>
+          <span class="theme-chip theme-medical" data-theme="medical" onclick="setTheme('medical')">Medical Sky</span>
+          <span class="theme-chip theme-legal" data-theme="legal" onclick="setTheme('legal')">Legal Black</span>
+          <span class="theme-chip theme-finance" data-theme="finance" onclick="setTheme('finance')">Finance Blue</span>
+          <span class="theme-chip theme-vibrant" data-theme="vibrant" onclick="setTheme('vibrant')">Vibrant Orange</span>
+        </div>
+        <p style="color:#64748b;font-size:.78rem;margin:0;line-height:1.5">
+          Theme is automatically picked based on your role (Doctor → Medical, CA → Finance, etc.). Override here if you want.
+        </p>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>🚀 Share your card</h2>
+        <button class="share-cta wa" onclick="shareWhatsApp()">
+          <span style="font-size:1.3rem">💬</span>
+          <span>Send via WhatsApp</span>
+        </button>
+        <button class="share-cta copy" onclick="copyLink()">
+          <span style="font-size:1.3rem">🔗</span>
+          <span id="copyBtnLabel">Copy card link</span>
+        </button>
+        <button class="share-cta preview" onclick="openCardInNewTab()">
+          <span style="font-size:1.3rem">👁</span>
+          <span>Open card in new tab</span>
+        </button>
+
+        <div style="font-size:.72rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:14px">Your Card Link:</div>
+        <div class="link-box" id="cardLinkBox">—</div>
+
+        <div class="help-box">
+          <b>💡 Kaise kaam karta hai?</b>
+          <ol class="steps" style="margin-top:8px">
+            <li>Aap <b>WhatsApp button</b> daboge → message + link compose hoga</li>
+            <li>Customer ko bhejo → woh link pe click karega</li>
+            <li>Card khulega — naam, photo, contact sab dikhega</li>
+            <li>Customer "<b>📥 Save to Contacts</b>" daboga</li>
+            <li>Aapki saari details ek tap mein uske phone book mein save!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live Preview -->
+    <div>
+      <div class="panel">
+        <h2>👀 Live preview <span style="font-size:.72rem;color:#94a3b8;font-weight:600;margin-left:auto">(what customers will see)</span></h2>
+        <div class="preview-wrap">
+          <iframe id="previewFrame" class="preview-iframe" src="about:blank" loading="lazy"></iframe>
+        </div>
+        <p style="color:#64748b;font-size:.78rem;margin:14px 0 0;line-height:1.5">
+          Data is pulled from your DukanList listing. Update name, mobile, email, address on the <a href="/panel/profile.html" style="color:#1E3A8A;font-weight:700">Edit Profile</a> page and it'll auto-reflect here.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+var BIZ = null;
+var CURRENT_THEME = 'navy';
+
+function showErr(msg){
+  var el = document.getElementById('errBox');
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+function pickAutoTheme(role, catName){
+  var r = (role || '').toLowerCase() + ' ' + (catName || '').toLowerCase();
+  if (/doctor|hospital|clinic|dentist|medical|pharma/.test(r)) return 'medical';
+  if (/advocate|lawyer|legal/.test(r)) return 'legal';
+  if (/chartered|tax|broker|mutual|insurance|financial|bank/.test(r)) return 'finance';
+  return 'navy';
+}
+
+function setTheme(t){
+  CURRENT_THEME = t;
+  document.querySelectorAll('.theme-chip').forEach(function(c){
+    c.classList.toggle('active', c.dataset.theme === t);
+  });
+  refreshPreview();
+}
+
+function getCardUrl(){
+  if (!BIZ || !BIZ.slug) return '';
+  var url = location.origin + '/card/' + BIZ.slug;
+  if (CURRENT_THEME && CURRENT_THEME !== pickAutoTheme(BIZ.owner_role, BIZ.cat_name)){
+    url += '?theme=' + CURRENT_THEME;
+  }
+  return url;
+}
+
+function refreshPreview(){
+  var frame = document.getElementById('previewFrame');
+  var url = getCardUrl();
+  if (!url){ return; }
+  frame.src = url;
+  document.getElementById('cardLinkBox').textContent = url;
+}
+
+function shareWhatsApp(){
+  if (!BIZ){ return; }
+  var url = getCardUrl();
+  var firstName = (BIZ.owner_name || BIZ.name || '').split(/\s+/)[0];
+  var msg = 'Namaste! 🙏 Mera digital business card — ek tap me apne phone me save kar lijiye 👇\n\n'
+          + url
+          + '\n\n— ' + firstName + (BIZ.name ? ' (' + BIZ.name + ')' : '');
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+async function copyLink(){
+  var url = getCardUrl();
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+    var lbl = document.getElementById('copyBtnLabel');
+    var orig = lbl.textContent;
+    lbl.textContent = '✓ Copied!';
+    setTimeout(function(){ lbl.textContent = orig; }, 1800);
+  } catch(e){
+    prompt('Copy this link:', url);
+  }
+}
+
+function openCardInNewTab(){
+  var url = getCardUrl();
+  if (url) window.open(url, '_blank');
+}
+
+async function init(){
+  var user = await ShopDB.requireAuth();
+  if (!user) return;
+  var c = ShopDB.client;
+
+  var ownRes = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+  if (ownRes.error || !ownRes.data || !ownRes.data.length){
+    showErr('No business linked to this account. Complete registration or link your shop from the dashboard.');
+    return;
+  }
+  var bizId = ownRes.data[0].business_id;
+  var bizRes = await c.from('businesses')
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, status, verified_score, sub_category_id, category_id')
+    .eq('id', bizId).maybeSingle();
+  if (bizRes.error || !bizRes.data){
+    showErr('Could not load your listing. Please refresh.');
+    return;
+  }
+  BIZ = bizRes.data;
+  if (BIZ.status !== 'active'){
+    showErr('Your listing is in "' + BIZ.status + '" status. The card will work once your listing is active (admin verified).');
+  }
+
+  // Fetch category name (for theme auto-pick)
+  var primaryCatId = BIZ.sub_category_id || BIZ.category_id;
+  if (primaryCatId){
+    var cat = await c.from('categories').select('name').eq('id', primaryCatId).maybeSingle();
+    if (cat.data) BIZ.cat_name = cat.data.name;
+  }
+
+  // Auto-pick theme
+  CURRENT_THEME = pickAutoTheme(BIZ.owner_role, BIZ.cat_name);
+  document.querySelectorAll('.theme-chip').forEach(function(c){
+    c.classList.toggle('active', c.dataset.theme === CURRENT_THEME);
+  });
+
+  refreshPreview();
+}
+
+init();
+</script>
+</body>
+</html>

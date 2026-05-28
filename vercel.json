@@ -28,6 +28,10 @@
       "destination": "/welcome-pro.html"
     },
     {
+      "source": "/card/:slug",
+      "destination": "/card.html?slug=:slug"
+    },
+    {
       "source": "/:slug([a-z][a-z0-9-]{4,60})",
       "destination": "/business.html?slug=:slug"
     }
