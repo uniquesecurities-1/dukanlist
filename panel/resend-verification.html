@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FF6B1A">
+<meta name="robots" content="noindex,nofollow">
+<title>Resend Verification Email — DukanList</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  .wrap{ max-width:520px; margin:40px auto; padding:0 18px }
+  .card{ background:#fff; border:1px solid #E2E8F0; border-radius:18px; padding:30px 26px; box-shadow:0 12px 32px rgba(15,23,42,.08) }
+  h1{ font-family:'Manrope',sans-serif; font-size:1.55rem; font-weight:900; color:#0F172A; margin-bottom:6px; letter-spacing:-0.01em }
+  .sub{ color:#64748b; font-size:.95rem; line-height:1.55; margin-bottom:22px }
+  .field{ margin-bottom:14px }
+  .field label{ display:block; font-size:.8rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px }
+  .field input{ width:100%; padding:13px 14px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:15px; font-family:inherit }
+  .field input:focus{ outline:none; border-color:#FF6B1A; box-shadow:0 0 0 3px rgba(255,107,26,.12) }
+  .submit{ width:100%; padding:14px 16px; background:#FF6B1A; color:#fff; border:0; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer; font-family:inherit; transition:background .15s }
+  .submit:hover:not(:disabled){ background:#E55A0A }
+  .submit:disabled{ opacity:.6; cursor:not-allowed }
+  .msg{ margin-top:14px; padding:12px 14px; border-radius:10px; font-size:.92rem; line-height:1.55; display:none }
+  .msg.ok{ background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; display:block }
+  .msg.err{ background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; display:block }
+  .hints{ background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px 16px; margin-top:18px; font-size:.85rem; line-height:1.6; color:#475569 }
+  .hints b{ color:#0F172A }
+  .links{ text-align:center; margin-top:18px; font-size:.88rem; color:#64748b }
+  .links a{ color:#1E3A8A; font-weight:700; text-decoration:none }
+  .links a:hover{ text-decoration:underline }
+</style>
+</head>
+<body>
+<div class="topbar" style="background:#0F172A;color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+  <a href="/" style="color:#fff;text-decoration:none;font-weight:800;display:flex;align-items:center;gap:8px;font-size:1.05rem">
+    <img src="/assets/icons/logo.svg" alt="" width="28" height="28">
+    DukanList
+  </a>
+  <a href="/panel/login.html" style="color:#cbd5e1;text-decoration:none;font-size:.9rem;font-weight:600">← Back to login</a>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div style="font-size:2.4rem;margin-bottom:6px;text-align:center">📧</div>
+    <h1>Resend Verification Email</h1>
+    <p class="sub">Email nahi mili? Spam folder me bhi nahi? <b>No problem.</b> Apna registered email niche daalein — hum ek fresh verification link bhej denge.</p>
+
+    <form id="resendForm" onsubmit="event.preventDefault(); doResend();">
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      </div>
+      <button type="submit" id="submitBtn" class="submit">📧 Send verification email</button>
+      <div id="msg" class="msg"></div>
+    </form>
+
+    <div class="hints">
+      <b>💡 Pro tips:</b>
+      <ul style="margin:8px 0 0 18px;padding:0;line-height:1.7">
+        <li>Inbox aur <b>Spam / Junk</b> folder dono check karein</li>
+        <li>Sender hoga: <code style="background:#fff;padding:1px 6px;border-radius:4px;font-size:.85em;border:1px solid #E2E8F0">noreply@dukanlist.com</code></li>
+        <li>Subject me <b>"DukanList"</b> ya <b>"verify"</b> search karein</li>
+        <li>Email aane me 1–2 minute lag sakte hain</li>
+        <li>Spam me ho to <b>"Not Spam"</b> mark karein</li>
+        <li>Already verified? <a href="/panel/forgot-password.html">Password reset</a> karein — wo bhi auto-confirm karta hai</li>
+      </ul>
+    </div>
+
+    <div class="links">
+      Still stuck? <a href="https://wa.me/919541223377?text=Email%20verification%20me%20issue%20hai" target="_blank">WhatsApp us</a> aur hum manual verify kar denge.
+    </div>
+  </div>
+
+  <div class="links" style="margin-top:18px">
+    <a href="/panel/login.html">← Login</a>
+    &nbsp; · &nbsp;
+    <a href="/register.html">Register new shop</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+let _lastSentAt = 0;
+const COOLDOWN_MS = 30000;
+
+async function doResend(){
+  const inp = document.getElementById('email');
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('msg');
+  msg.className = 'msg'; msg.textContent = '';
+
+  const email = (inp.value || '').trim().toLowerCase();
+  if (!email || email.indexOf('@') === -1){
+    msg.className = 'msg err';
+    msg.textContent = '⚠ Valid email address daalein.';
+    return;
+  }
+
+  const now = Date.now();
+  if (now - _lastSentAt < COOLDOWN_MS){
+    const left = Math.ceil((COOLDOWN_MS - (now - _lastSentAt)) / 1000);
+    msg.className = 'msg err';
+    msg.textContent = '⏳ Thoda ruk jaiye — ' + left + ' second baad dobara try karein.';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ Sending…';
+  try {
+    if (typeof ShopDB === 'undefined' || !ShopDB.client) throw new Error('App not ready — refresh karein');
+    const c = ShopDB.client;
+    const { error } = await c.auth.resend({ type: 'signup', email: email });
+    if (error) throw error;
+    _lastSentAt = now;
+    msg.className = 'msg ok';
+    msg.innerHTML = '✓ <b>Verification email bhej di gayi hai</b> <span style="opacity:.8">' + escapeHtml(email) + '</span> par. Inbox + Spam dono check karein. 1–2 minute lag sakte hain.';
+    btn.textContent = '✓ Sent — Inbox check karein';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '📧 Resend again'; }, COOLDOWN_MS);
+  } catch(e){
+    btn.disabled = false; btn.textContent = '📧 Send verification email';
+    let m = (e && e.message) || 'Could not send';
+    if (/rate.?limit/i.test(m)) m = 'Bahut zyada requests — 5 minute ruk jaiye phir try karein.';
+    else if (/already.?confirm/i.test(m)) m = '✓ Ye email pehle hi verified hai. Seedha login karein.';
+    else if (/user.?not.?found|email.?not.?found/i.test(m)) m = 'Is email se koi account nahi mila. Pehle register karein.';
+    msg.className = 'msg err';
+    msg.textContent = '⚠ ' + m;
+  }
+}
+
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Pre-fill email from query string ?email=foo@bar.com (linked from register/login pages)
+(function prefillEmail(){
+  try {
+    const q = new URLSearchParams(location.search).get('email');
+    if (q && q.indexOf('@') !== -1) document.getElementById('email').value = q;
+  } catch(_){}
+})();
+</script>
+</body>
+</html>

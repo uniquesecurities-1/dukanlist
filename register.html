@@ -879,6 +879,9 @@
         <span data-i18n-en>Check your <b>INBOX</b> and <b>SPAM / Junk folder</b> for an email from <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:.8rem">noreply@dukanlist.com</code> — click the verification link to activate login. New senders often land in Spam initially.</span>
         <span data-i18n-hi>अपना <b>INBOX</b> और <b>SPAM/जंक</b> फोल्डर दोनों जाँचें — <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:.8rem">noreply@dukanlist.com</code> से एक ईमेल आएगी। वेरिफिकेशन लिंक पर क्लिक करते ही लॉगिन चालू हो जाएगा। नए senders अक्सर शुरुआत में Spam में चले जाते हैं।</span>
       </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #FED7AA;font-size:.83rem;text-align:center">
+        <a id="resendVerifyLink" href="/panel/resend-verification.html" style="color:#1E3A8A;font-weight:700;text-decoration:none">📧 Didn't receive email? Resend →</a>
+      </div>
     </div>
 
     <!-- BIG WhatsApp CTA -->
@@ -1674,6 +1677,14 @@ async function handleSubmit(){
     'Please verify and activate my listing. Thank you!';
   const waUrl = 'https://wa.me/' + ADMIN_WA + '?text=' + encodeURIComponent(verifyMsg);
   document.getElementById('successWaBtn').href = waUrl;
+
+  // Pre-fill resend link with the email user just registered with
+  try {
+    const rLink = document.getElementById('resendVerifyLink');
+    if (rLink && STATE.data.loginEmail){
+      rLink.href = '/panel/resend-verification.html?email=' + encodeURIComponent(STATE.data.loginEmail);
+    }
+  } catch(_){}
 
   localStorage.setItem('shop_pending_biz', data);
   document.getElementById('step4').style.display = 'none';
