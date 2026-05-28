@@ -42,7 +42,7 @@ function truncate(s, n){
 
 async function fetchBusiness(field, value){
   const url = SUPABASE_URL + '/rest/v1/businesses' +
-    '?select=name,slug,id,usp_text,about_text,photos,rating_avg,rating_count,geo_cities(name)' +
+    '?select=name,slug,id,usp_text,about_text,photos,rating_avg,rating_count,mobile,owner_name,og_image_url,geo_cities(name),geo_localities(name)' +
     '&' + field + '=eq.' + encodeURIComponent(value) +
     '&status=eq.active' +
     '&limit=1';
@@ -59,22 +59,34 @@ async function fetchBusiness(field, value){
 }
 
 function renderHtml(biz, targetUrl){
-  // Build OG fields
-  const name = biz.name || 'Shop on DukanList';
+  // ----- SHOP-FIRST title (no "DukanList" suffix). Brand only via og:site_name.
+  const name = biz.name || 'Local Shop';
   const city = biz.geo_cities && biz.geo_cities.name ? biz.geo_cities.name : '';
-  const titleSuffix = city ? (' — ' + city + ' · DukanList') : ' · DukanList';
-  const title = truncate(name + titleSuffix, 90);
+  const locality = biz.geo_localities && biz.geo_localities.name ? biz.geo_localities.name : '';
+  const place = [locality, city].filter(Boolean).join(', ');
+  const title = truncate(place ? (name + ' · ' + place) : name, 90);
 
-  let desc = '';
-  if (biz.usp_text)        desc = biz.usp_text;
-  else if (biz.about_text) desc = biz.about_text;
-  else                     desc = 'Discover ' + name + ' on DukanList — Bharat ka local shop directory. Every Shop, One Identity.';
-  desc = truncate(desc, 180);
+  // ----- SHOP-FIRST description
+  let descParts = [];
+  if (biz.usp_text)         descParts.push(biz.usp_text);
+  else if (biz.about_text)  descParts.push(biz.about_text);
+  if (biz.owner_name && biz.mobile){
+    descParts.push('Call ' + biz.owner_name + ' at +91-' + biz.mobile + '.');
+  } else if (biz.mobile){
+    descParts.push('Call +91-' + biz.mobile + '.');
+  }
+  if (place) descParts.push(place + '.');
+  if (!descParts.length) descParts.push(name + ' — your local shop. Tap to view photos, ratings & contact.');
+  const desc = truncate(descParts.join(' '), 200);
 
+  // ----- IMAGE: shop-branded OG card → first photo → static fallback
   let image = DEFAULT_OG_IMAGE;
-  // Use first photo if present (publicly accessible Supabase Storage URL)
-  if (biz.photos && Array.isArray(biz.photos) && biz.photos.length && typeof biz.photos[0] === 'string'){
+  let imageType = 'image/png';
+  if (biz.og_image_url && typeof biz.og_image_url === 'string'){
+    image = biz.og_image_url;
+  } else if (biz.photos && Array.isArray(biz.photos) && biz.photos.length && typeof biz.photos[0] === 'string'){
     image = biz.photos[0];
+    imageType = 'image/jpeg';
   }
 
   const canonical = SITE_ORIGIN + targetUrl;
@@ -94,6 +106,9 @@ function renderHtml(biz, targetUrl){
 '<meta property="og:description" content="' + escapeAttr(desc) + '">\n' +
 '<meta property="og:url" content="' + escapeAttr(canonical) + '">\n' +
 '<meta property="og:image" content="' + escapeAttr(image) + '">\n' +
+'<meta property="og:image:type" content="' + escapeAttr(imageType) + '">\n' +
+'<meta property="og:image:width" content="1200">\n' +
+'<meta property="og:image:height" content="630">\n' +
 '<meta property="og:image:alt" content="' + escapeAttr(name) + '">\n' +
 '<meta property="og:locale" content="en_IN">\n' +
 // Twitter card

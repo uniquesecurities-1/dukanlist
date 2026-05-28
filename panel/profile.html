@@ -356,6 +356,7 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/templates.js"></script>
 <script src="/assets/js/usp-simple.js"></script>
+<script src="/assets/js/og-card-generator.js"></script>
 <style>
 /* ===== Supersonic Simple USP Picker (mirrored from register.html) ===== */
 .su-picker { background:linear-gradient(135deg,#FAF5FF 0%,#FFF7ED 100%); border:1.5px solid #DDD6FE; border-radius:14px; padding:14px 14px 12px; margin:0 0 12px }
@@ -830,6 +831,36 @@ async function saveProfile(){
       }
     }
   } catch(verifyErr){ console.warn('Post-save verify:', verifyErr); }
+
+  // ===== REGENERATE SHARE CARD (shop-branded OG image) =====
+  // Fire-and-forget so save UI doesn't block. Failures are silent.
+  try {
+    if (window.OGCard && MY_BIZ && MY_BIZ.id){
+      var primaryCat = (MY_CATS || []).find(function(x){ return x.is_primary; }) || (MY_CATS || [])[0];
+      var catIcon = primaryCat && primaryCat.icon ? primaryCat.icon : '\ud83c\udfea';
+      var catName = primaryCat && primaryCat.name ? primaryCat.name : '';
+      var cityName = (MY_BIZ.geo_cities && MY_BIZ.geo_cities.name) || MY_BIZ.city_name || '';
+      var localityName = (MY_BIZ.geo_localities && MY_BIZ.geo_localities.name) || MY_BIZ.locality_name || '';
+
+      OGCard.refresh(c, {
+        id:           MY_BIZ.id,
+        name:         MY_BIZ.name,
+        owner_name:   MY_BIZ.owner_name,
+        mobile:       MY_BIZ.mobile,
+        city_name:    cityName,
+        locality_name: localityName,
+        rating_avg:   MY_BIZ.rating_avg,
+        rating_count: MY_BIZ.rating_count,
+        category_icon: catIcon,
+        category_name: catName,
+        usp_text:     MY_BIZ.usp_text
+      }).then(function(r){
+        console.info('[og-card] regenerated:', r && r.publicUrl);
+      }).catch(function(e){
+        console.warn('[og-card] regen failed (non-fatal):', e && e.message);
+      });
+    }
+  } catch(ogErr){ console.warn('[og-card] hook error:', ogErr); }
 
   setTimeout(() => { okEl.style.display = 'none'; }, 6000);
 }
