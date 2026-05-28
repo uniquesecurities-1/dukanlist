@@ -750,6 +750,53 @@ function dismissFestBanner(){
         </span>
         <span class="pucho-mega-new">NEW</span>
       </a>
+      <a href="/pro" class="pro-entry-pill" id="proEntryPill" title="For Doctors, CAs, Lawyers, Principals & all Professionals">
+        <span class="pro-pill-ico">🎖️</span>
+        <span class="pro-pill-text">
+          <b data-i18n-en>For Doctors / Pros</b><b data-i18n-hi>Doctors / Pro</b>
+          <span class="pro-pill-cta" data-i18n-en>→ Listed with dignity</span><span class="pro-pill-cta" data-i18n-hi>→ सम्मान के साथ</span>
+        </span>
+      </a>
+      <style>
+        .pro-entry-pill{
+          display:inline-flex; align-items:center; gap:8px;
+          padding:9px 16px 9px 12px;
+          background:linear-gradient(135deg,#1E3A8A 0%,#3730A3 60%,#FF6B1A 100%);
+          background-size:180% 180%;
+          color:#fff !important;
+          border-radius:99px;
+          font-family:'Manrope',sans-serif; font-weight:800; font-size:.86rem;
+          text-decoration:none !important;
+          box-shadow:0 4px 14px rgba(30,58,138,.30), 0 0 0 2px rgba(255,255,255,.40);
+          transition:.25s;
+          animation:proPillBob 3.2s ease-in-out infinite;
+          letter-spacing:-.005em;
+          white-space:nowrap;
+        }
+        .pro-entry-pill:hover{
+          transform:translateY(-2px) scale(1.03);
+          box-shadow:0 8px 22px rgba(30,58,138,.45), 0 0 0 2px rgba(255,107,26,.40);
+          background-position:100% 100%;
+        }
+        .pro-pill-ico{ font-size:1.05rem; filter:drop-shadow(0 1px 2px rgba(0,0,0,.20)) }
+        .pro-pill-text{ display:inline-flex; align-items:center; gap:7px; line-height:1 }
+        .pro-pill-text b{ font-weight:900 }
+        .pro-pill-cta{
+          font-weight:700; font-size:.78rem;
+          background:rgba(255,255,255,.22);
+          padding:3px 9px; border-radius:99px;
+          letter-spacing:.01em;
+        }
+        @keyframes proPillBob{
+          0%, 100%{ transform:translateY(0) }
+          50%{ transform:translateY(-2px) }
+        }
+        @media (max-width:560px){
+          .pro-entry-pill{ padding:8px 13px 8px 10px; font-size:.78rem }
+          .pro-pill-cta{ font-size:.7rem; padding:2px 7px }
+          .pro-pill-ico{ font-size:.95rem }
+        }
+      </style>
       <style>
         /* Mega visible Pucho Bhai pill — louder, simpler, no abs-positioning */
         .pucho-bhai-mega-pill{
