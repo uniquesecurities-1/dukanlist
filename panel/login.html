@@ -847,22 +847,40 @@ async function handleLogin(){
     return;
   }
 
-  // Auto-claim: link any pending business by mobile.
-  // Try localStorage first (same-browser registration). If empty, fall back to
-  // user_metadata.mobile (set during signUp) — works on any device.
-  let pendingMobile = localStorage.getItem('shop_pending_mobile');
-  if (!pendingMobile && data && data.user && data.user.user_metadata){
-    pendingMobile = data.user.user_metadata.mobile || null;
-  }
+  // SECURITY FIX (2026-05-28 part 2): Auto-claim was running on EVERY login,
+  // silently re-claiming any orphan business_owners row whose owner_phone matched
+  // user_metadata.mobile. This recreated the cross-shop leak after admin cleanup.
+  //
+  // NEW RULES:
+  //   1. ONLY auto-claim if user has ZERO existing business links (fresh post-signup).
+  //   2. ONLY use localStorage.shop_pending_mobile (set explicitly during this
+  //      browser's registration flow). NEVER fall back to user_metadata.mobile
+  //      â that's persistent on the auth user and re-fires on every login.
+  //   3. If localStorage has the pending mobile but user already has a link,
+  //      just clear the localStorage flag without claiming anything.
+  const pendingMobile = localStorage.getItem('shop_pending_mobile');
   if (pendingMobile){
+    let alreadyLinked = false;
     try {
-      await c.rpc('claim_business_by_phone', { p_mobile: pendingMobile });
-    } catch(claimErr){
-      console.warn('Claim by phone failed (non-fatal — may already be linked):', claimErr);
+      const chk = await c.rpc('get_my_business_safe');
+      if (!chk.error && chk.data && chk.data.length > 0) alreadyLinked = true;
+    } catch(_){ /* if RPC unavailable, err on the safe side â DON'T claim */
+      alreadyLinked = true;
+    }
+    if (!alreadyLinked){
+      try {
+        await c.rpc('claim_business_by_phone', { p_mobile: pendingMobile });
+      } catch(claimErr){
+        console.warn('Auto-claim refused (likely ambiguous mobile â manual claim needed):', claimErr);
+      }
     }
     localStorage.removeItem('shop_pending_mobile');
     localStorage.removeItem('shop_signup_error');
   }
+  // NOTE: We intentionally do NOT auto-claim using user_metadata.mobile anymore.
+  // If a user lands here without an existing link AND without the localStorage
+  // flag (e.g. logging in from a new device), they will see the "Link my shop"
+  // button on dashboard.html which shows the shop name BEFORE claiming.
 
   const next = new URLSearchParams(location.search).get('next') || '/panel/dashboard.html';
   location.href = next;
