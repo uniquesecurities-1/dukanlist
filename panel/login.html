@@ -847,6 +847,28 @@ async function handleLogin(){
     return;
   }
 
+  // SECURITY: Defense-in-depth email verification check.
+  // Supabase Auth should already block unverified logins when "Confirm email"
+  // is enabled in the project's Auth settings. But if a misconfiguration ever
+  // disables that setting, this client-side check is the second line of defense.
+  // We explicitly force sign-out and show a clear message before any further code runs.
+  const u = data && data.user;
+  if (u && !u.email_confirmed_at && !u.confirmed_at){
+    try { await c.auth.signOut(); } catch(_){}
+    btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
+    err.innerHTML = '';
+    err.textContent = '📧 Pehle apna email verify karein. Inbox / Spam folder check karein — noreply@dukanlist.com se confirmation email aayi hai.';
+    err.style.display = 'flex';
+    const box = document.createElement('div');
+    box.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px dashed #FCA5A5;width:100%';
+    box.innerHTML =
+      '<button type="button" id="resendBtn2" onclick="resendConfirm()" style="background:#1E3A8A;color:#fff;border:none;padding:9px 14px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">📧 Resend confirmation email</button>'
+      + '<div id="resendMsg" style="font-size:12px;color:#7C2D12;margin-top:7px;line-height:1.5"></div>'
+      + '<div style="font-size:11px;color:#9A3412;margin-top:8px;line-height:1.5"><b>Common fixes:</b><br>• Inbox + Spam/Junk dono check karein<br>• "Not Spam" mark karein agar Spam me hai<br>• Already confirmed? <a href="/panel/forgot-password.html" style="color:#1E3A8A;font-weight:700">Password reset</a> karein — wo auto-confirm karega</div>';
+    err.appendChild(box);
+    return;
+  }
+
   // SECURITY FIX (2026-05-28 part 2): Auto-claim was running on EVERY login,
   // silently re-claiming any orphan business_owners row whose owner_phone matched
   // user_metadata.mobile. This recreated the cross-shop leak after admin cleanup.
