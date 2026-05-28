@@ -1,7 +1,7 @@
 {
-  "version": "3.2",
+  "version": "3.3",
   "updated": "2026-05-28",
-  "note": "v3.2: Added 27 missing local categories (Bistar Bhandar, CCTV, RO sales, plant nursery, pet shop, driving school, music/dance class, marriage bureau, CSC Aadhaar, travel agent, astrologer, loan agent, hostel/PG, pan shop, honey/ghee organic, petrol pump, battery shop, vehicle rental, dietician, art class, scrap kabadi, old furniture, almirah maker, water tank cleaning, visa-passport)",
+  "note": "v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL.",
   "parents": [
     {
       "slug": "healthcare",
@@ -69,6 +69,12 @@
           "name": "Veterinary / Pet Doctor",
           "name_hi": "पशु चिकित्सक",
           "icon": "🐾"
+        },
+        {
+          "slug": "hearing-aid-mobility",
+          "name": "Hearing Aid / Mobility Aids",
+          "name_hi": "श्रवण यंत्र / सहायक उपकरण",
+          "icon": "🦽"
         }
       ]
     },
@@ -294,6 +300,24 @@
           "name": "Water Tank / Sump Cleaning",
           "name_hi": "पानी की टंकी सफाई",
           "icon": "🚰"
+        },
+        {
+          "slug": "aluminum-fabricator",
+          "name": "Aluminium Fabricator / Window",
+          "name_hi": "एल्युमिनियम",
+          "icon": "🪟"
+        },
+        {
+          "slug": "iron-grills",
+          "name": "Iron Grills / Steel Gate Maker",
+          "name_hi": "लोहे की ग्रिल / गेट",
+          "icon": "🚪"
+        },
+        {
+          "slug": "refrigerator-washing-repair",
+          "name": "Fridge / Washing Machine Repair",
+          "name_hi": "फ्रिज / वॉशिंग मशीन रिपेयर",
+          "icon": "🧺"
         }
       ]
     },
@@ -393,6 +417,12 @@
           "name": "Car / Bike Rental",
           "name_hi": "कार / बाइक किराये पर",
           "icon": "🚙"
+        },
+        {
+          "slug": "generator-dg-set",
+          "name": "Generator / DG Set Sales / Rental",
+          "name_hi": "जनरेटर / DG सेट",
+          "icon": "⚙️"
         }
       ]
     },
@@ -879,6 +909,60 @@
           "name": "Old / Second-Hand Furniture",
           "name_hi": "पुराना फर्नीचर",
           "icon": "🪑"
+        },
+        {
+          "slug": "music-instruments",
+          "name": "Music Instruments Shop",
+          "name_hi": "संगीत वाद्ययंत्र",
+          "icon": "🎹"
+        },
+        {
+          "slug": "sports-goods",
+          "name": "Sports Goods / Cricket Shop",
+          "name_hi": "खेल का सामान / क्रिकेट",
+          "icon": "🏏"
+        },
+        {
+          "slug": "mewa-dryfruits",
+          "name": "Dry Fruits / Mewa Shop",
+          "name_hi": "मेवा / सूखे मेवे",
+          "icon": "🥜"
+        },
+        {
+          "slug": "namkeen-snacks",
+          "name": "Namkeen / Bhujia / Snacks",
+          "name_hi": "नमकीन / भुजिया",
+          "icon": "🍿"
+        },
+        {
+          "slug": "sofa-set",
+          "name": "Sofa Set / Furniture Showroom",
+          "name_hi": "सोफा सेट / फर्नीचर",
+          "icon": "🛋️"
+        },
+        {
+          "slug": "glass-mirror",
+          "name": "Glass / Mirror Shop",
+          "name_hi": "शीशा / आइना",
+          "icon": "🪞"
+        },
+        {
+          "slug": "sofa-furniture",
+          "name": "Office Furniture",
+          "name_hi": "ऑफिस फर्नीचर",
+          "icon": "🗄️"
+        },
+        {
+          "slug": "mithai-wholesale",
+          "name": "Mithai Wholesale / Halwai Supplier",
+          "name_hi": "मिठाई होलसेल",
+          "icon": "🧁"
+        },
+        {
+          "slug": "gift-bouquet",
+          "name": "Gift Shop / Flower Bouquet",
+          "name_hi": "गिफ्ट / फूल बुके",
+          "icon": "🎁"
         }
       ]
     },
@@ -1256,6 +1340,12 @@
           "name": "Visa / Passport / Immigration",
           "name_hi": "वीजा / पासपोर्ट",
           "icon": "🛂"
+        },
+        {
+          "slug": "drone-prewedding-photo",
+          "name": "Drone / Pre-Wedding Photography",
+          "name_hi": "ड्रोन / प्री-वेडिंग",
+          "icon": "🚁"
         }
       ]
     },
