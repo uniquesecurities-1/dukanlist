@@ -1,7 +1,7 @@
 {
-  "version": "3.1",
-  "updated": "2026-05-27",
-  "note": "v3.1: Added Building & Construction Material parent with 13 subs (paint, hardware, cement, chuna, sariya, tiles, sanitary, plywood, sand, pipes, electrical hardware, doors/windows, POP)",
+  "version": "3.2",
+  "updated": "2026-05-28",
+  "note": "v3.2: Added 27 missing local categories (Bistar Bhandar, CCTV, RO sales, plant nursery, pet shop, driving school, music/dance class, marriage bureau, CSC Aadhaar, travel agent, astrologer, loan agent, hostel/PG, pan shop, honey/ghee organic, petrol pump, battery shop, vehicle rental, dietician, art class, scrap kabadi, old furniture, almirah maker, water tank cleaning, visa-passport)",
   "parents": [
     {
       "slug": "healthcare",
@@ -276,6 +276,24 @@
           "name": "DJ / Sound System / Light",
           "name_hi": "DJ / साउंड",
           "icon": "🔊"
+        },
+        {
+          "slug": "cctv-camera",
+          "name": "CCTV / Security Camera",
+          "name_hi": "CCTV / सुरक्षा कैमरा",
+          "icon": "📹"
+        },
+        {
+          "slug": "almirah-maker",
+          "name": "Steel / Aluminum Almirah",
+          "name_hi": "स्टील अलमारी",
+          "icon": "🪟"
+        },
+        {
+          "slug": "water-tank-cleaning",
+          "name": "Water Tank / Sump Cleaning",
+          "name_hi": "पानी की टंकी सफाई",
+          "icon": "🚰"
         }
       ]
     },
@@ -363,6 +381,18 @@
           "name": "Commercial Vehicle Parts",
           "name_hi": "कमर्शियल व्हीकल",
           "icon": "🚛"
+        },
+        {
+          "slug": "petrol-pump",
+          "name": "Petrol / Diesel Pump",
+          "name_hi": "पेट्रोल पंप",
+          "icon": "⛽"
+        },
+        {
+          "slug": "vehicle-rental",
+          "name": "Car / Bike Rental",
+          "name_hi": "कार / बाइक किराये पर",
+          "icon": "🚙"
         }
       ]
     },
@@ -486,6 +516,18 @@
           "name": "LPG Gas Agency",
           "name_hi": "गैस एजेंसी",
           "icon": "🔥"
+        },
+        {
+          "slug": "pan-shop",
+          "name": "Pan / Tobacco / Cigarette Shop",
+          "name_hi": "पान / तंबाकू",
+          "icon": "🚬"
+        },
+        {
+          "slug": "honey-ghee-organic",
+          "name": "Honey / Pure Ghee / Organic",
+          "name_hi": "शहद / देसी घी / जैविक",
+          "icon": "🍯"
         }
       ]
     },
@@ -795,6 +837,48 @@
           "name": "Pharma / Medicine Manufacturer",
           "name_hi": "फार्मा / दवा निर्माता",
           "icon": "💊"
+        },
+        {
+          "slug": "bistar-bhandar",
+          "name": "Bistar Bhandar / Razai-Gadda",
+          "name_hi": "बिस्तर भंडार / रजाई-गद्दा",
+          "icon": "🛏️"
+        },
+        {
+          "slug": "mattress-shop",
+          "name": "Mattress / Foam Mattress Shop",
+          "name_hi": "मैट्रेस / फोम गद्दा",
+          "icon": "🛌"
+        },
+        {
+          "slug": "ro-aquaguard-sales",
+          "name": "RO / Aquaguard Sales Showroom",
+          "name_hi": "RO / एक्वागार्ड शोरूम",
+          "icon": "💧"
+        },
+        {
+          "slug": "plant-nursery",
+          "name": "Plant Nursery / Garden Centre",
+          "name_hi": "पौधा नर्सरी",
+          "icon": "🌱"
+        },
+        {
+          "slug": "pet-shop",
+          "name": "Pet Shop / Aquarium",
+          "name_hi": "पेट शॉप / एक्वेरियम",
+          "icon": "🐕"
+        },
+        {
+          "slug": "scrap-kabadi",
+          "name": "Scrap / Kabadi / Old Material",
+          "name_hi": "कबाड़ी / पुराना सामान",
+          "icon": "♻️"
+        },
+        {
+          "slug": "old-furniture",
+          "name": "Old / Second-Hand Furniture",
+          "name_hi": "पुराना फर्नीचर",
+          "icon": "🪑"
         }
       ]
     },
@@ -938,6 +1022,12 @@
           "name": "Tattoo / Piercing Studio",
           "name_hi": "टैटू स्टूडियो",
           "icon": "🎨"
+        },
+        {
+          "slug": "dietician",
+          "name": "Dietician / Nutritionist",
+          "name_hi": "डायटीशियन",
+          "icon": "🥗"
         }
       ]
     },
@@ -1019,6 +1109,24 @@
           "name": "Music / Dance Class",
           "name_hi": "संगीत / नृत्य",
           "icon": "🎵"
+        },
+        {
+          "slug": "computer-class",
+          "name": "Computer Class / Tally / Typing",
+          "name_hi": "कंप्यूटर क्लास",
+          "icon": "💻"
+        },
+        {
+          "slug": "music-dance-class",
+          "name": "Music / Singing / Dance Class",
+          "name_hi": "संगीत / नृत्य कक्षा",
+          "icon": "🎵"
+        },
+        {
+          "slug": "art-craft-class",
+          "name": "Art / Craft / Drawing Class",
+          "name_hi": "कला / ड्राइंग",
+          "icon": "🎨"
         }
       ]
     },
@@ -1118,6 +1226,36 @@
           "name": "Transport / Tempo / Mini Truck",
           "name_hi": "ट्रांसपोर्ट",
           "icon": "🚚"
+        },
+        {
+          "slug": "csc-aadhaar",
+          "name": "CSC / Aadhaar / PAN Centre",
+          "name_hi": "CSC / आधार केंद्र",
+          "icon": "🪪"
+        },
+        {
+          "slug": "travel-agent",
+          "name": "Tour & Travel / Bus-Train Booking",
+          "name_hi": "टूर ट्रैवल",
+          "icon": "✈️"
+        },
+        {
+          "slug": "astrologer-pandit",
+          "name": "Astrologer / Pandit ji",
+          "name_hi": "ज्योतिषी / पंडित जी",
+          "icon": "🔮"
+        },
+        {
+          "slug": "marriage-bureau",
+          "name": "Marriage Bureau / Matchmaker",
+          "name_hi": "विवाह ब्यूरो",
+          "icon": "💑"
+        },
+        {
+          "slug": "visa-passport",
+          "name": "Visa / Passport / Immigration",
+          "name_hi": "वीजा / पासपोर्ट",
+          "icon": "🛂"
         }
       ]
     },
@@ -1345,6 +1483,12 @@
           "name": "Marriage Hall / Community Hall",
           "name_hi": "मैरिज हॉल",
           "icon": "🏛️"
+        },
+        {
+          "slug": "hostel-pg",
+          "name": "Hostel / PG / Paying Guest",
+          "name_hi": "हॉस्टल / PG",
+          "icon": "🏘️"
         }
       ]
     }

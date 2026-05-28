@@ -189,4 +189,21 @@ NOTIFY pgrst, 'reload schema';
 
 -- ============================================================
 -- 4. Verification
--- ==============================
+-- ============================================================
+DO $$
+DECLARE
+  v_parent INT;
+  v_subs   INT;
+BEGIN
+  SELECT COUNT(*) INTO v_parent FROM categories WHERE slug = 'construction-material';
+  SELECT COUNT(*) INTO v_subs   FROM categories WHERE slug IN (
+    'paint-shop','hardware-shop','building-material','chuna-lime',
+    'sariya-tmt','tiles-marble','sanitary-bathroom','plywood-laminate',
+    'sand-gravel','pipes-fittings','electrical-hardware','doors-windows-grills',
+    'pop-false-ceiling'
+  );
+  RAISE NOTICE '✅ Parent (construction-material): % of 1', v_parent;
+  RAISE NOTICE '✅ Sub-categories present: % of 13', v_subs;
+END $$;
+
+COMMIT;

@@ -167,4 +167,4 @@ BEGIN
   RAISE NOTICE '✓ search_businesses("medical store") returned % results', v_n;
 END $$;
 
-COM
+COMMIT;

@@ -1564,4 +1564,38 @@ function fillReferral(slug){
 }
 
 function copyReferralLink(){
-  const
+  const link = window._referralLink;
+  if (!link) return;
+  try {
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById('copyRefBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Copied!';
+      btn.style.background = '#16A34A';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#0F172A'; }, 2000);
+    });
+  } catch(_){
+    prompt('Copy this link:', link);
+  }
+}
+
+function shareReferralWhatsApp(){
+  const link = window._referralLink;
+  if (!link) return;
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const message = lang === 'hi'
+    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa-Bathinda ka apna local directory. FREE registration. Aaj hi karein: ' + link
+    : 'Namaste! List your shop on DukanList — Sirsa-Bathinda ka apna local directory. FREE registration. Register today: ' + link;
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+}
+
+(function(){
+  function init(){
+    setupReferralWidget();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
