@@ -28,7 +28,7 @@
       "destination": "/welcome-pro.html"
     },
     {
-      "source": "/card/:slug",
+      "source": "/c/:slug",
       "destination": "/card.html?slug=:slug"
     },
     {

@@ -228,7 +228,7 @@ function setTheme(t){
 
 function getCardUrl(){
   if (!BIZ || !BIZ.slug) return '';
-  var url = location.origin + '/card/' + BIZ.slug;
+  var url = location.origin + '/c/' + BIZ.slug;
   if (CURRENT_THEME && CURRENT_THEME !== pickAutoTheme(BIZ.owner_role, BIZ.cat_name)){
     url += '?theme=' + CURRENT_THEME;
   }
@@ -315,3 +315,4 @@ init();
 </script>
 </body>
 </html>
+   
