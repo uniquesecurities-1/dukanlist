@@ -228,9 +228,11 @@ function setTheme(t){
 
 function getCardUrl(){
   if (!BIZ || !BIZ.slug) return '';
-  var url = location.origin + '/c/' + BIZ.slug;
+  // Use direct /card?slug=... URL — bypasses Vercel rewrite quirks.
+  // cleanUrls makes /card.html serve at /card, so this is the canonical short form.
+  var url = location.origin + '/card?slug=' + encodeURIComponent(BIZ.slug);
   if (CURRENT_THEME && CURRENT_THEME !== pickAutoTheme(BIZ.owner_role, BIZ.cat_name)){
-    url += '?theme=' + CURRENT_THEME;
+    url += '&theme=' + CURRENT_THEME;
   }
   return url;
 }
@@ -304,15 +306,4 @@ async function init(){
 
   // Auto-pick theme
   CURRENT_THEME = pickAutoTheme(BIZ.owner_role, BIZ.cat_name);
-  document.querySelectorAll('.theme-chip').forEach(function(c){
-    c.classList.toggle('active', c.dataset.theme === CURRENT_THEME);
-  });
-
-  refreshPreview();
-}
-
-init();
-</script>
-</body>
-</html>
-   
+  document.query
