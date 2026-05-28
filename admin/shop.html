@@ -279,6 +279,13 @@ function render(){
             + field('text', 'owner_name', 'Owner Name', s.owner_name)
             + field('tel',  'whatsapp', 'WhatsApp (10 digit)', s.whatsapp)
           + '</div>'
+          + '<div class="grid-2">'
+            + field('email', 'email', 'Shop Email (public contact)', s.shop_email || s.email)
+            + '<div class="field"><label style="color:#94a3b8;font-size:12px">Login Email (read-only)</label>'
+              + '<input type="email" disabled value="' + esc(s.owner_email || '— not set —') + '" style="background:#F8FAFC;color:#64748b;cursor:not-allowed">'
+              + '<small style="display:block;margin-top:4px;color:#94a3b8;font-size:11px">To change login email, use "Change Login Email" button in Owner Account panel →</small>'
+            + '</div>'
+          + '</div>'
           + field('textarea', 'usp_text',   'USP / Tagline (English)', s.usp_text)
           + field('textarea', 'usp_hi',     'USP / Tagline (Hindi)',   s.usp_hi)
           + field('textarea', 'about_text', 'About / Description',     s.about_text)
@@ -385,7 +392,7 @@ function render(){
           + '<b style="color:' + (s.owner_email ? '#065F46' : '#DC2626') + '">' + esc(s.owner_email || '— not set —') + '</b>'
           + (s.owner_user_id ? '<button type="button" onclick="openEmailEdit()" title="Change LOGIN email — instantly auto-confirmed" style="background:#1E3A8A;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Change Login Email</button> <button type="button" onclick="unlinkOwner()" title="Unlink this auth user from the shop. Also clears owner_phone so the row cannot be auto-claimed again." style="background:#DC2626;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔗 Unlink Owner</button>' : '<span style="color:#DC2626;font-size:11px;font-weight:600">⚠ No auth account linked</span>')
           + '</span></div>'
-        + '<div class="meta-row"><span class="ml">📧 Shop Email <span style="font-weight:500;color:#94a3b8;font-size:10px">(public contact — display only)</span></span><span class="mv">' + esc(s.shop_email || s.email || '—') + '</span></div>'
+        + '<div class="meta-row"><span class="ml">📧 Shop Email <span style="font-weight:500;color:#94a3b8;font-size:10px">(public contact · edit below ↓)</span></span><span class="mv">' + esc(s.shop_email || s.email || '—') + '</span></div>'
         + ((s.owner_email && (s.shop_email || s.email) && s.owner_email !== (s.shop_email || s.email)) ? '<div class="meta-row" style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:6px 10px;margin-top:4px;border-radius:6px;font-size:11.5px;color:#7C2D12;line-height:1.4">⚠️ <b>Login email ≠ Shop email.</b> Shopkeeper uses the <b>Login Email</b> to sign in. If they think the Shop Email is correct, click <b>Change Login Email</b> above.</div>' : '')
         + metaRow('Mobile', s.mobile || '—')
         + metaRow('Auth User ID', s.owner_user_id ? (s.owner_user_id.slice(0, 8) + '…') : '—')
@@ -578,6 +585,20 @@ async function saveShop(e){
     var v = f.querySelector('[name="' + k + '"]')?.value;
     if (v !== undefined && v !== SHOP[k]) patch[k] = v;
   });
+  // Shop email (public contact) — compare against shop_email OR legacy email field
+  var emailEl = f.querySelector('[name="email"]');
+  if (emailEl){
+    var newEmail = (emailEl.value || '').trim().toLowerCase();
+    var oldEmail = (SHOP.shop_email || SHOP.email || '').toLowerCase();
+    if (newEmail !== oldEmail){
+      // Light client-side validation; server re-validates
+      if (newEmail && !/^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(newEmail)){
+        toast('Invalid email format', true);
+        return;
+      }
+      patch.email = newEmail || null;
+    }
+  }
   // Trust signals
   var yEl = f.querySelector('[name="established_year"]');
   if (yEl){
@@ -1063,38 +1084,4 @@ init();
           <label>Payment method</label>
           <select id="fmMethod">
             <option value="cash">Cash</option>
-            <option value="upi">UPI</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="cheque">Cheque</option>
-            <option value="complimentary">Complimentary (₹0)</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Notes (optional)</label>
-          <input id="fmNotes" type="text" placeholder="e.g. Diwali campaign">
-        </div>
-      </div>
-
-      <div id="fmHistory"></div>
-
-      <div class="fm-actions">
-        <button type="button" class="btn" onclick="closeFeaturedModal()">Cancel</button>
-        <button type="button" class="btn danger" id="fmRevokeBtn" onclick="revokeFeatured()" style="display:none">Revoke Now</button>
-        <button type="submit" class="btn pri" id="fmSaveBtn">★ Save & Mark Featured</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-function setDays(d, el){
-  document.getElementById('fmDays').value = d;
-  document.querySelectorAll('.dur-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-}
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+ 
