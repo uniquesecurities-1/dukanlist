@@ -96,6 +96,22 @@
 
 /* BIZCTA_MOBILE_HIDE — sticky bottom already shows WhatsApp/Call on mobile, so hide the in-card duplicate row */
 @media (max-width:560px){ .biz-meta-card > .cta-row{display:none !important} }
+
+.review--hidden{ display:none }
+.reviews-expanded .review--hidden{ display:block }
+#reviewToggleBtn:hover{ background:#FFF1E0; border-color:#FB923C; transform:translateY(-1px); box-shadow:0 4px 12px rgba(245,158,11,.18) }
+
+/* Social links row */
+.social-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line) }
+.social-row .sr-label{ width:100%; font-size:.72rem; font-weight:800; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:2px }
+.social-pill{ display:inline-flex; align-items:center; gap:7px; padding:8px 13px; border-radius:10px; background:#fff; border:1.5px solid var(--line); font-size:.82rem; font-weight:700; color:var(--ink-2); text-decoration:none; transition:.15s }
+.social-pill:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(15,23,42,.10) }
+.social-pill.fb{ border-color:#BFDBFE; color:#1E40AF; background:#EFF6FF }
+.social-pill.ig{ border-color:#FBCFE8; color:#BE185D; background:#FDF2F8 }
+.social-pill.yt{ border-color:#FECACA; color:#B91C1C; background:#FEF2F2 }
+.social-pill.tw{ border-color:#CBD5E1; color:#0F172A; background:#F8FAFC }
+.social-pill.li{ border-color:#BAE6FD; color:#0369A1; background:#F0F9FF }
+.social-pill.web{ border-color:#D9F99D; color:#3F6212; background:#F7FEE7 }
 </style>
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
@@ -1120,32 +1136,6 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         </button>
       </div>
 
-      <!-- Public Q&A card -->
-      <div class="card-pill" id="qaCard" style="margin-top:18px">
-        <h3 style="font-size:1rem">❓ <span data-i18n-en>Questions & Answers</span><span data-i18n-hi>सवाल & जवाब</span>
-          <span id="qaCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
-        </h3>
-        <div id="qaList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
-          <div id="qaEmpty" class="qa-clean-empty">
-            <div class="qce-reply">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              <span data-i18n-en="Owner usually replies within 2 hours" data-i18n-hi="मालिक आमतौर पर 2 घंटे में जवाब देते हैं">Owner replies within <b>~2 hours</b></span>
-            </div>
-            <div class="qce-label" data-i18n-en="Tap a question to ask it instantly" data-i18n-hi="कोई सवाल tap करके तुरंत पूछें">TAP TO ASK</div>
-            <div class="qce-chips">
-              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Sunday timings kya hain?">Sunday timings?</button>
-              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Home visit possible hai?">Home visit?</button>
-              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Aap konsi services dete hain detail me?">Services list?</button>
-              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Payment methods kya kya accept karte ho?">Payment options?</button>
-              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Pricing range kya hai? Approximate cost?">Pricing?</button>
-            </div>
-          </div>
-        </div>
-        <button class="btn-write-review" onclick="openQAModal()">
-          ❓ <span data-i18n-en>Ask a public question</span><span data-i18n-hi>सार्वजनिक सवाल पूछें</span>
-        </button>
-      </div>
-
       <!-- Visit Guide card (fills left column space) -->
       <div class="card-pill visit-guide-card" style="margin-top:18px">
         <h3 style="font-size:1rem">🧭 <span data-i18n-en>Before you visit / call</span><span data-i18n-hi>जाने / call करने से पहले</span></h3>
@@ -1187,6 +1177,38 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Social Media row (auto-hides if no links) -->
+      <div class="card-pill" id="socialCardWrap" style="margin-top:18px;display:none">
+        <h3 style="font-size:1rem">🌐 <span data-i18n-en>Follow this shop</span><span data-i18n-hi>दुकान को follow करें</span></h3>
+        <div id="socialRow" class="social-row" style="border-top:none;padding-top:6px;margin-top:0"></div>
+      </div>
+
+      <!-- Public Q&A card -->
+      <div class="card-pill" id="qaCard" style="margin-top:18px">
+        <h3 style="font-size:1rem">❓ <span data-i18n-en>Questions & Answers</span><span data-i18n-hi>सवाल & जवाब</span>
+          <span id="qaCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
+        </h3>
+        <div id="qaList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+          <div id="qaEmpty" class="qa-clean-empty">
+            <div class="qce-reply">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span data-i18n-en="Owner usually replies within 2 hours" data-i18n-hi="मालिक आमतौर पर 2 घंटे में जवाब देते हैं">Owner replies within <b>~2 hours</b></span>
+            </div>
+            <div class="qce-label" data-i18n-en="Tap a question to ask it instantly" data-i18n-hi="कोई सवाल tap करके तुरंत पूछें">TAP TO ASK</div>
+            <div class="qce-chips">
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Sunday timings kya hain?">Sunday timings?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Home visit possible hai?">Home visit?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Aap konsi services dete hain detail me?">Services list?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Payment methods kya kya accept karte ho?">Payment options?</button>
+              <button type="button" class="qce-chip" onclick="prefillQA(this.dataset.q)" data-q="Pricing range kya hai? Approximate cost?">Pricing?</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-write-review" onclick="openQAModal()">
+          ❓ <span data-i18n-en>Ask a public question</span><span data-i18n-hi>सार्वजनिक सवाल पूछें</span>
+        </button>
       </div>
     </div>
 
@@ -1507,6 +1529,7 @@ async function loadBusiness(){
       hours_json, usp_text, usp_hi, about_text, photos, video_url,
       services_json, faqs_json, status,
       established_year, payment_methods, special_features,
+      facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url,
       verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
       rating_avg, rating_count, view_count,
       category_id, sub_category_id,
@@ -1531,6 +1554,7 @@ async function loadBusiness(){
   if (!data.categories) data.categories = { slug:'', name:'', icon:'🏪' };
 
   BIZ = data;
+  try { renderSocialRow(); } catch(_){}
   render();
 
   // Log view (fire and forget)
@@ -2364,16 +2388,19 @@ async function loadReviews(bizId){
     .eq('business_id', bizId)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
-    .limit(10);
+    .limit(50);
   if (!data || !data.length) return;
-  document.getElementById('reviewCount').textContent = `(${data.length})`;
-  document.getElementById('reviewsList').innerHTML = data.map(r => {
+  const TOTAL_REVIEWS = data.length;
+  const REVIEW_VISIBLE = 4;
+  document.getElementById('reviewCount').textContent = `(${TOTAL_REVIEWS})`;
+  const reviewHtml = data.map((r, idx) => {
+    const _hide = idx >= REVIEW_VISIBLE ? ' review--hidden' : '';
     const stars = '⭐'.repeat(r.rating) + '<span style="opacity:.25">' + '⭐'.repeat(5 - r.rating) + '</span>';
     const date = new Date(r.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
     const name = (r.customer_name || 'Anonymous').trim();
     const initial = name.charAt(0).toUpperCase() || '?';
     const replyDate = r.owner_reply_at ? new Date(r.owner_reply_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '';
-    return `<div class="review" data-rid="${r.id}">
+    return `<div class="review${_hide}" data-rid="${r.id}">
       <div class="r-head">
         <div class="r-avatar">${initial}</div>
         <div style="flex:1;min-width:0">
@@ -2404,6 +2431,32 @@ async function loadReviews(bizId){
       </div>
     </div>`;
   }).join('');
+  const listEl = document.getElementById('reviewsList');
+  listEl.innerHTML = reviewHtml;
+  // Remove any old toggle button (e.g. on re-render after writing a review)
+  const oldToggle = document.getElementById('reviewToggleWrap');
+  if (oldToggle) oldToggle.remove();
+  if (TOTAL_REVIEWS > REVIEW_VISIBLE){
+    const btnWrap = document.createElement('div');
+    btnWrap.id = 'reviewToggleWrap';
+    btnWrap.style.cssText = 'text-align:center;margin-top:14px';
+    btnWrap.innerHTML = '<button id="reviewToggleBtn" type="button" onclick="toggleAllReviews()" '
+      + 'style="background:#FFF8F0;border:1.5px solid #FED7AA;color:#92400E;padding:10px 22px;'
+      + 'border-radius:10px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit;'
+      + 'transition:.15s;box-shadow:0 2px 6px rgba(245,158,11,.10)">'
+      + 'Show all ' + TOTAL_REVIEWS + ' reviews  ↓</button>';
+    listEl.parentNode.insertBefore(btnWrap, listEl.nextSibling);
+  }
+}
+
+function toggleAllReviews(){
+  const list = document.getElementById('reviewsList');
+  const btn = document.getElementById('reviewToggleBtn');
+  if (!list || !btn) return;
+  const expanded = list.classList.toggle('reviews-expanded');
+  btn.innerHTML = expanded
+    ? ('Show less  ↑')
+    : ('Show all ' + list.querySelectorAll('.review').length + ' reviews  ↓');
 }
 
 function openReplyEditor(reviewId, currentText){
@@ -3182,6 +3235,29 @@ function copyShopUrl(){
 })();
 </script>
 <script id="biz-premium-helpers">
+
+/* Social links row — runs after BIZ is loaded */
+function renderSocialRow(){
+  if (!BIZ) return;
+  const wrap = document.getElementById('socialCardWrap');
+  const el = document.getElementById('socialRow');
+  if (!el || !wrap) return;
+  const items = [
+    { url: BIZ.website_url,   cls: 'web', icon: '\ud83c\udf10', label: 'Website' },
+    { url: BIZ.facebook_url,  cls: 'fb',  icon: 'f',                label: 'Facebook' },
+    { url: BIZ.instagram_url, cls: 'ig',  icon: '\ud83d\udcf7', label: 'Instagram' },
+    { url: BIZ.youtube_url,   cls: 'yt',  icon: '\u25b6',          label: 'YouTube' },
+    { url: BIZ.x_twitter_url, cls: 'tw',  icon: 'X',                label: 'X' },
+    { url: BIZ.linkedin_url,  cls: 'li',  icon: 'in',               label: 'LinkedIn' }
+  ].filter(x => x.url && /^https?:\/\//i.test(x.url));
+  if (!items.length){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  el.innerHTML = items.map(l => '<a class="social-pill ' + l.cls + '" href="'
+    + escapeAttr(l.url) + '" target="_blank" rel="nofollow noopener">'
+    + '<span style="font-weight:900;min-width:14px;text-align:center">'
+    + l.icon + '</span>' + l.label + '</a>').join('');
+}
+
 function prefillQA(text){
   if (typeof openQAModal === 'function') openQAModal();
   setTimeout(function(){
@@ -3192,4 +3268,3 @@ function prefillQA(text){
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

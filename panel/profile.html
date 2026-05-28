@@ -316,6 +316,42 @@
         <span data-i18n-en>← Back</span><span data-i18n-hi>← पीछे</span>
       </a>
       <div class="spacer"></div>
+    <!-- ===== SOCIAL MEDIA & WEBSITE ===== -->
+    <div class="card">
+      <div class="card-title">
+        🌐 <span data-i18n-en>Social Media & Website</span><span data-i18n-hi>सोशल मीडिया & वेबसाइट</span>
+        <span style="font-weight:500;color:var(--muted);font-size:.78rem;margin-left:6px">(optional)</span>
+      </div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:10px;line-height:1.5">
+        <span data-i18n-en>Paste your shop's public URLs. They appear as small icons on your business page — customers can follow you.</span>
+        <span data-i18n-hi>अपनी dukan के public link paste करें। Business page पर chhoti icons दिखेंगी — customer follow कर सकते हैं।</span>
+      </div>
+      <div class="form-group">
+        <label>🌐 <span data-i18n-en>Website</span><span data-i18n-hi>वेबसाइट</span></label>
+        <input id="websiteUrl" class="input" type="url" maxlength="300" placeholder="https://yourshop.com">
+      </div>
+      <div class="form-group">
+        <label>f <span data-i18n-en>Facebook Page</span><span data-i18n-hi>Facebook page</span></label>
+        <input id="facebookUrl" class="input" type="url" maxlength="300" placeholder="https://facebook.com/yourshop">
+      </div>
+      <div class="form-group">
+        <label>📷 <span data-i18n-en>Instagram</span><span data-i18n-hi>Instagram</span></label>
+        <input id="instagramUrl" class="input" type="url" maxlength="300" placeholder="https://instagram.com/yourshop">
+      </div>
+      <div class="form-group">
+        <label>▶ <span data-i18n-en>YouTube Channel</span><span data-i18n-hi>YouTube channel</span></label>
+        <input id="youtubeUrl" class="input" type="url" maxlength="300" placeholder="https://youtube.com/@yourshop">
+      </div>
+      <div class="form-group">
+        <label>X <span data-i18n-en>X / Twitter</span><span data-i18n-hi>X / Twitter</span></label>
+        <input id="xTwitterUrl" class="input" type="url" maxlength="300" placeholder="https://x.com/yourshop">
+      </div>
+      <div class="form-group">
+        <label>in <span data-i18n-en>LinkedIn</span><span data-i18n-hi>LinkedIn</span></label>
+        <input id="linkedinUrl" class="input" type="url" maxlength="300" placeholder="https://linkedin.com/company/yourshop">
+      </div>
+    </div>
+
       <button class="btn btn-pri" onclick="saveProfile()" id="saveBtn">
         <span data-i18n-en>💾 Save Changes</span><span data-i18n-hi>💾 सेव करें</span>
       </button>
@@ -449,6 +485,13 @@ async function loadProfile(){
 
 function populateFields(){
   document.getElementById('bizName').value = MY_BIZ.name || '';
+    var setSoc = function(id, val){ var el = document.getElementById(id); if (el) el.value = val || ''; };
+    setSoc('websiteUrl',   MY_BIZ.website_url);
+    setSoc('facebookUrl',  MY_BIZ.facebook_url);
+    setSoc('instagramUrl', MY_BIZ.instagram_url);
+    setSoc('youtubeUrl',   MY_BIZ.youtube_url);
+    setSoc('xTwitterUrl',  MY_BIZ.x_twitter_url);
+    setSoc('linkedinUrl',  MY_BIZ.linkedin_url);
   document.getElementById('bizNameHi').value = MY_BIZ.name_hi || '';
   // Trust signals
   document.getElementById('establishedYear').value = MY_BIZ.established_year || '';
@@ -779,6 +822,21 @@ async function saveProfile(){
     btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
     errEl.textContent = 'Save failed: ' + updErr.message; errEl.style.display = 'flex'; return;
   }
+
+  // Save social links via dedicated RPC
+  try {
+    const socLinks = {
+      website_url:   (document.getElementById('websiteUrl')   || {}).value || '',
+      facebook_url:  (document.getElementById('facebookUrl')  || {}).value || '',
+      instagram_url: (document.getElementById('instagramUrl') || {}).value || '',
+      youtube_url:   (document.getElementById('youtubeUrl')   || {}).value || '',
+      x_twitter_url: (document.getElementById('xTwitterUrl')  || {}).value || '',
+      linkedin_url:  (document.getElementById('linkedinUrl')  || {}).value || ''
+    };
+    const sr = await c.rpc('update_my_social_links', { p_links: socLinks });
+    if (sr.error) console.warn('Social links save warning:', sr.error.message);
+    else Object.assign(MY_BIZ, socLinks);
+  } catch(socErr){ console.warn('Social links save skipped:', socErr); }
 
   // Sync categories — delete existing junction entries, re-insert
   const { error: delErr } = await c.from('business_categories').delete().eq('business_id', MY_BIZ.id);
