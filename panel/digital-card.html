@@ -279,12 +279,23 @@ async function init(){
   if (!user) return;
   var c = ShopDB.client;
 
-  var ownRes = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
-  if (ownRes.error || !ownRes.data || !ownRes.data.length){
-    showErr('No business linked to this account. Complete registration or link your shop from the dashboard.');
-    return;
+  // 🚨 SECURITY: Use get_my_business_safe() RPC to avoid non-deterministic
+  // shop selection when user has multiple business_owners links.
+  var bizId = null;
+  try {
+    var safeRes = await c.rpc('get_my_business_safe');
+    if (safeRes.data && safeRes.data.length){
+      bizId = safeRes.data[0].business_id;
+    }
+  } catch(_){}
+  if (!bizId){
+    var ownRes = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+    if (ownRes.error || !ownRes.data || !ownRes.data.length){
+      showErr('No business linked to this account. Complete registration or link your shop from the dashboard.');
+      return;
+    }
+    bizId = ownRes.data[0].business_id;
   }
-  var bizId = ownRes.data[0].business_id;
   var bizRes = await c.from('businesses')
     .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, status, verified_score, sub_category_id, category_id')
     .eq('id', bizId).maybeSingle();

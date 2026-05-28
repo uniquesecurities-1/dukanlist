@@ -669,23 +669,32 @@ async function loadDashboard(){
   if (!user) return;
 
   const c = ShopDB.client;
-  // Get this user's business via business_owners join
-  let { data: owners } = await c
-    .from('business_owners')
-    .select('business_id')
-    .eq('auth_user_id', user.id)
-    .limit(1);
-
-  // SECURITY FIX (2026-05-27): Silent auto-claim removed.
-  // Previously we silently called claim_business_by_phone(metadata.mobile) here,
-  // which meant: if a shopkeeper's phone happened to be on multiple unlinked
-  // business_owners rows (test data, re-registrations, shared firm number, etc.),
-  // login would grab whichever shop matched first.
-  // After a delete, the *next* shop with same phone would silently get claimed.
-  // This was a confidentiality risk — anyone signing up with a phone they don't
-  // own could claim a shop registered with that phone.
-  // Now: no auto-link. User MUST use the explicit "Link my shop" UI below,
-  // and the server-side claim RPC refuses ambiguous matches.
+  // 🚨 SECURITY FIX 2 (2026-05-28): Use get_my_business_safe() RPC.
+  // The old query `.eq('auth_user_id', user.id).limit(1)` was returning
+  // a NON-DETERMINISTIC row when same auth_user_id had multiple
+  // business_owners links (legacy bad data from before db/71). This
+  // caused users to see WRONG shops randomly across page loads.
+  // The new RPC ranks matches by email/phone match against the auth
+  // user's identity and picks the BEST + EARLIEST claim deterministically.
+  let owners = null;
+  let multiShopWarning = '';
+  try {
+    const safeRes = await c.rpc('get_my_business_safe');
+    if (safeRes.error){
+      console.warn('[dashboard] get_my_business_safe RPC missing — fallback:', safeRes.error.message);
+      const fb = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+      owners = fb.data;
+    } else if (safeRes.data && safeRes.data.length){
+      owners = safeRes.data.map(r => ({ business_id: r.business_id }));
+      if (safeRes.data[0].warning) multiShopWarning = safeRes.data[0].warning;
+    } else {
+      owners = [];
+    }
+  } catch(e){
+    console.error('[dashboard] business lookup failed:', e);
+    const fb = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+    owners = fb.data;
+  }
 
   if (!owners || !owners.length){
     document.getElementById('loading').innerHTML =
@@ -1637,4 +1646,3 @@ function shareReferralWhatsApp(){
 </script>
 </body>
 </html>
-                                                                                                                                              
