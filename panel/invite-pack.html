@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invite Pack — DukanList</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  body{ background:#FFFBF5 }
+
+  .page{ max-width:900px; margin:0 auto; padding:22px 16px 60px }
+
+  .intro{
+    background:linear-gradient(135deg, #1E3A8A 0%, #3730A3 100%);
+    color:#FFFBEB; border-radius:14px; padding:24px 22px; margin-bottom:18px
+  }
+  .intro h1{
+    font-family:'Manrope',sans-serif; font-size:1.4rem; font-weight:900;
+    margin:0 0 6px; letter-spacing:-.02em
+  }
+  .intro p{ color:rgba(255,251,235,.85); margin:0; font-size:.92rem; line-height:1.55 }
+
+  .picker-row{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;
+    background:#fff; padding:14px 16px; border-radius:12px; border:1px solid #E2E8F0
+  }
+  .pick-chip{
+    background:#F8FAFC; color:#475569; border:1.5px solid #E2E8F0;
+    padding:9px 14px; border-radius:99px; font-family:'Manrope',sans-serif;
+    font-weight:700; font-size:.84rem; cursor:pointer; transition:.15s
+  }
+  .pick-chip:hover{ background:#FFF7ED; border-color:#FDBA74; color:#9A3412 }
+  .pick-chip.active{ background:#FF6B1A; border-color:#FF6B1A; color:#fff }
+
+  .tpl-card{
+    background:#fff; border-radius:14px; padding:20px 22px; margin-bottom:14px;
+    border:1.5px solid #E2E8F0; box-shadow:0 3px 12px rgba(15,23,42,.04);
+    transition:.15s
+  }
+  .tpl-card:hover{ border-color:#FDBA74; box-shadow:0 6px 18px rgba(255,107,26,.10) }
+  .tpl-card .tc-head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin-bottom:10px; flex-wrap:wrap
+  }
+  .tpl-card .tc-title{
+    font-family:'Manrope',sans-serif; font-size:1rem; font-weight:800;
+    color:#0F172A; letter-spacing:-.01em
+  }
+  .tpl-card .tc-tone{
+    font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:99px;
+    background:#EFF6FF; color:#1E3A8A; letter-spacing:.06em; text-transform:uppercase
+  }
+  .tpl-card .tc-tone.warm{ background:#FEF3C7; color:#92400E }
+  .tpl-card .tc-tone.formal{ background:#F0F9FF; color:#075985 }
+  .tpl-card .tc-tone.personal{ background:#FDF2F8; color:#9D174D }
+  .tpl-card .tc-msg{
+    background:#F8FAFC; border-left:3px solid #FF6B1A; padding:14px 16px;
+    border-radius:0 10px 10px 0; color:#0F172A; font-size:.92rem; line-height:1.7;
+    white-space:pre-wrap; font-family:'Manrope',sans-serif; font-weight:500
+  }
+  .tpl-card .tc-actions{
+    display:flex; gap:8px; margin-top:12px; flex-wrap:wrap
+  }
+  .tc-actions button, .tc-actions a{
+    background:#FF6B1A; color:#fff; border:none; padding:9px 16px;
+    border-radius:9px; font-family:'Manrope',sans-serif; font-weight:700;
+    font-size:.84rem; cursor:pointer; text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:.15s
+  }
+  .tc-actions button:hover, .tc-actions a:hover{ background:#EA580C; transform:translateY(-1px) }
+  .tc-actions .btn-sec{ background:#fff; color:#1E3A8A; border:1.5px solid #BFDBFE }
+  .tc-actions .btn-sec:hover{ background:#EFF6FF; color:#1E40AF }
+  .tc-actions .btn-wa{ background:#25D366 }
+  .tc-actions .btn-wa:hover{ background:#1FB855 }
+
+  .empty-state{ text-align:center; padding:40px 20px; color:#94A3B8 }
+  .empty-state .es-ico{ font-size:2.4rem; margin-bottom:8px }
+
+  .footer-note{
+    background:#FEF3C7; border-left:4px solid #F59E0B; border-radius:8px;
+    padding:14px 16px; margin-top:24px; font-size:.84rem; line-height:1.55;
+    color:#78350F
+  }
+  .footer-note b{ color:#92400E }
+
+  .lang-toggle button{
+    background:#fff; border:1px solid #E2E8F0; padding:5px 12px; border-radius:6px;
+    font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; font-size:.74rem;
+    color:#475569
+  }
+  .lang-toggle button.active{ background:#FF6B1A; color:#fff; border-color:#FF6B1A }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/panel/dashboard.html" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <a href="/panel/dashboard.html">Dashboard</a>
+      <a href="/panel/profile.html">Profile</a>
+      <a href="#" onclick="ShopDB.signOut()" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="intro">
+    <h1>📤 Invite Pack — Personalised Outreach</h1>
+    <p>Pick a profession. Get a ready-made, respectful WhatsApp invite written in <i>their</i> language. Copy → send → watch them join. <b>No begging. No generic spam.</b> Pure dignity, profession-by-profession.</p>
+  </div>
+
+  <div class="picker-row">
+    <button class="pick-chip active" data-cat="doctor">🩺 Doctor</button>
+    <button class="pick-chip" data-cat="ca">🧮 CA / Tax</button>
+    <button class="pick-chip" data-cat="lawyer">⚖️ Advocate</button>
+    <button class="pick-chip" data-cat="principal">🎓 Principal / School</button>
+    <button class="pick-chip" data-cat="ngo">🤝 NGO / Trustee</button>
+    <button class="pick-chip" data-cat="factory">🏭 Factory / MD</button>
+    <button class="pick-chip" data-cat="bank">🏦 Bank Manager</button>
+    <button class="pick-chip" data-cat="broker">📊 Broker / Agent</button>
+    <button class="pick-chip" data-cat="coach">🥋 Coach / Trainer</button>
+    <button class="pick-chip" data-cat="pandit">🛕 Pandit ji / Acharya</button>
+    <button class="pick-chip" data-cat="shop">🏪 Shopkeeper (classic)</button>
+    <button class="pick-chip" data-cat="universal">🌐 Universal / Default</button>
+  </div>
+
+  <div id="tplList"></div>
+
+  <div class="footer-note">
+    💡 <b>Pro Tip:</b> Pehle warm rapport build karo. Pucho "Aap kaise hain?", phir paste karo. Cold copy-paste from kisi bhi number — auto-reject. <b>Aap apne sambandh ki ijjat hain.</b><br>
+    📌 Templates auto-personalise hote hain agar aap apne shop ki info diye hain (signed-in shopkeepers ke liye). Otherwise generic version copy hota hai.
+  </div>
+</div>
+
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+// =====================================================
+// Templates — by category, with English + Hindi variants
+// Tone tags: warm (community), formal (respectful), personal (rapport)
+// {SHOP}, {OWNER}, {URL}, {ROLE} placeholders auto-replaced
+// =====================================================
+const TEMPLATES = {
+  doctor: [
+    { tone:'formal', title:'Formal Respectful',
+      msg:`Namaste Dr. Saheb,\n\nMy name is {OWNER}{ROLE_SUFFIX} from {SHOP}. I'd like to invite you to be listed on DukanList — Sirsa-Bathinda ka apna local directory.\n\nYour profile would appear as "Dr. [Your Name] — Doctor", with clinic hours, specialty, OPD timings, and direct call/WhatsApp. Patients in our area can find you in one tap.\n\nIt's completely FREE. No commission. No paid ranking. Admin verified. Forever.\n\nIf interested, register in 5 minutes here:\n👉 https://dukanlist.com/register.html\n\nThank you for your time, Doctor Saheb. — {OWNER}` },
+    { tone:'warm', title:'Warm Community Tone',
+      msg:`Doctor saheb, namaste 🙏\n\nMera naam {OWNER} hai, {SHOP} se. Aapke clinic ki dignified online पहचान honi chahiye — humare apne Sirsa-Bathinda local directory mein.\n\nDukanList par aap "Dr. — Doctor" ke roop mein listed honge (dukan ki tarah nahi). Patients direct call / WhatsApp kar sakenge, clinic ka address Google Maps par milega — sab कुछ FREE।\n\nKoi catch nahi: na fee, na commission, na paid rank. Founders local Mandi Dabwali के हैं (हम खुद).\n\n👉 https://dukanlist.com/register.html\n\nAapki praktish aur बढ़े! 🙏` }
+  ],
+  ca: [
+    { tone:'formal', title:'Formal Professional',
+      msg:`Dear CA {OWNER_LAST_NAME},\n\nI'm writing on behalf of DukanList — Sirsa-Bathinda's local professional directory. We'd like to invite your firm to be listed.\n\nYour profile would show as "CA [Name] — Chartered Accountant", with service areas (GST, ITR, audit, advisory), office hours, and direct contact. Local clients find local CAs — no need to lose business to bigger cities.\n\nForever FREE. Admin verified. No commission on referrals.\n\n👉 https://dukanlist.com/register.html\n\nRegards,\n{OWNER} — {SHOP}` },
+    { tone:'warm', title:'Warm Peer Tone',
+      msg:`Hello CA Saheb 🙏\n\n{OWNER} from {SHOP} here. CA practice local mein build karne ke लिए — DukanList ek dignified platform है.\n\n"CA [Naam] — Chartered Accountant" ke roop mein dikhega. GST clients, ITR season ke clients — sab Sirsa-Bathinda मे hi मिलें. Bahar jaane ki ज़रूरत nahi.\n\nForever FREE, no commission. Founders local hain.\n\n👉 https://dukanlist.com/register.html` }
+  ],
+  lawyer: [
+    { tone:'formal', title:'Formal Respectful',
+      msg:`Respected Adv. {OWNER_LAST_NAME},\n\nGreetings. DukanList — a local professional directory for Sirsa-Bathinda — would be honoured to feature your practice.\n\nYour listing would show as "Adv. [Your Name] — Advocate", with practice areas (civil, criminal, family, property), court/bar affiliation, chamber hours, and direct contact. Forever FREE. Admin verified.\n\n👉 https://dukanlist.com/register.html\n\nWith respect,\n{OWNER} — {SHOP}` },
+    { tone:'personal', title:'Personal Rapport',
+      msg:`Adv. saheb, pranam 🙏\n\nMain {OWNER} from {SHOP}. Aapki practice ko local clients तक pohnchaane ke liye ek FREE platform suggest kar raha hoon — DukanList.\n\n"Adv. [Naam] — Advocate" listed होगा. Practice areas, chamber, contact — सब. Koi fee, koi commission nahi.\n\nSamay मिले to dekh lijiega: https://dukanlist.com/register.html\n\n🙏` }
+  ],
+  principal: [
+    { tone:'formal', title:'Formal',
+      msg:`Respected Principal Sir/Madam,\n\nGreetings from DukanList — Sirsa-Bathinda ka local establishment directory. We're inviting schools, colleges and educational institutions to be listed — with the dignity of a recognised institution, not a "shop".\n\nYour listing: "[Principal Name] — Principal", with school hours, classes offered, admission period, contact. Parents discover trusted local schools directly.\n\nForever FREE.\n👉 https://dukanlist.com/register.html\n\nRegards, {OWNER} — {SHOP}` },
+    { tone:'warm', title:'Warm Community',
+      msg:`Pranam Principal saheb 🙏\n\n{OWNER} from {SHOP}. Aapke school ko local parents तक पहुँचाने ke liye ek FREE community platform hai — DukanList.\n\n"[Aapka Naam] — Principal" ke roop mein listed होगा. Admission timing, classes, school timings — sab. Bachhon ke parents एक tap par mil sakenge.\n\nDukan ki तरह nahi — school ki ijjat ke saath. Forever FREE.\n\n👉 https://dukanlist.com/register.html\n\nSamay मिले to dekh lijiega.` }
+  ],
+  ngo: [
+    { tone:'warm', title:'Warm Mission Tone',
+      msg:`Respected {OWNER_LAST_NAME} ji,\n\nNamaste 🙏 Main {OWNER} from {SHOP}. Aapke NGO/Trust ki seva ko local supporters तक पहुँचाने ke liye ek FREE platform suggest kar raha hoon — DukanList.\n\nListing dikhегी "[Naam] — President / Trustee / Acharya" ke roop mein. Donation timing, programs, community contact — sab visible. Local donors aapki seva tak directly pohnchenge.\n\nKoi fee, koi commission nahi — bilkul FREE.\n\n👉 https://dukanlist.com/register.html\n\nApki seva sthayi rahe! 🙏` }
+  ],
+  factory: [
+    { tone:'formal', title:'Formal B2B',
+      msg:`Respected Sir/Madam,\n\n{OWNER}{ROLE_SUFFIX} from {SHOP} writing.\n\nDukanList — Sirsa-Bathinda's industrial + commercial directory — invites manufacturers to be listed. Your profile: "[Your Name] — MD / Founder / Director", with product range, plant capacity, B2B contact, certifications.\n\nLocal buyers, vendors, logistics partners — they discover your unit directly. Forever FREE. No commission.\n\n👉 https://dukanlist.com/register.html\n\nRegards.` },
+    { tone:'warm', title:'Personal Industry Peer',
+      msg:`Namaste sir 🙏\n\n{OWNER} from {SHOP}. Apne plant ki online पहचान simple aur dignified रखने ke liye — DukanList par list karwa लें.\n\n"[Naam] — MD" / "[Naam] — Founder" ke roop mein listed honge. Local buyers, transporters, employees — sabko एक jaga mil जायेंगे. Forever FREE.\n\n👉 https://dukanlist.com/register.html` }
+  ],
+  bank: [
+    { tone:'formal', title:'Formal Branch Outreach',
+      msg:`Respected {OWNER_LAST_NAME} ji (Branch Manager),\n\nNamaste. {OWNER} from {SHOP} writing.\n\nDukanList — a local directory for Sirsa-Bathinda — would be glad to list your branch. Profile shows as "[Manager Name] — Branch Manager", with branch timings, services (savings, loans, lockers, FD), and contact.\n\nLocal customers find branch services in one tap. Forever FREE.\n\n👉 https://dukanlist.com/register.html\n\nRegards.` }
+  ],
+  broker: [
+    { tone:'warm', title:'Peer Investment Pro',
+      msg:`Namaste 🙏\n\n{OWNER}{ROLE_SUFFIX} from {SHOP}. Local investors aapke services तक पहुँचने ke liye ek FREE platform suggest kar raha hoon — DukanList.\n\n"[Naam] — Authorised Person / Sub-Broker / MFD" ke roop mein listed honge. Office timings, services (Mutual Fund, Stock, Insurance, FD), direct contact — sab. Verified, no spam.\n\nForever FREE. Founders mutual fund + broking industry के हैं.\n\n👉 https://dukanlist.com/register.html` }
+  ],
+  coach: [
+    { tone:'warm', title:'Warm Trainer',
+      msg:`Namaste Coach saheb 🙏\n\n{OWNER} from {SHOP}. Aapke gym / yoga centre / sports academy / music class को local students तक पहुँचाने ke liye ek FREE listing platform suggest kar raha hoon.\n\n"[Naam] — Coach / Trainer" ke roop mein listed honge. Class timings, batch info, fees, location, photos — sab visible. Forever FREE.\n\n👉 https://dukanlist.com/register.html\n\nApki energy bani rahe! 💪` }
+  ],
+  pandit: [
+    { tone:'warm', title:'Warm Spiritual',
+      msg:`🙏 Acharya ji, sasneh pranam 🙏\n\nMain {OWNER} from {SHOP}. Aapke jyotish / pandit seva ko local devotees तक पहुँचाने ke liye ek FREE dignified platform hai — DukanList.\n\n"Pt. [Naam] — Pandit ji / Acharya" ke roop mein listed honge. Puja services, vastu, kundli, muhurat, contact — sab respectfully. Forever FREE. Founders sanskari local family से हैं.\n\n👉 https://dukanlist.com/register.html\n\n🙏` }
+  ],
+  shop: [
+    { tone:'warm', title:'Classic Shop Outreach',
+      msg:`Namaste bhai sahib 🙏\n\nMain {OWNER}{ROLE_SUFFIX} from {SHOP}. Aapki dukan online aaye, customer aapko एक tap par milein — uske liye ek FREE platform hai DukanList.\n\nForever FREE, no commission, no paid rank. WhatsApp + Call direct customers se. Photos, hours, address — सब. Local Sirsa-Bathinda ka apna directory.\n\n👉 https://dukanlist.com/register.html\n\nDukan ki barkat bani rahe! 🙏` }
+  ],
+  universal: [
+    { tone:'warm', title:'Universal Friendly',
+      msg:`Namaste 🙏\n\nMain {OWNER} from {SHOP}. DukanList — Sirsa-Bathinda ka FREE local directory. Doctors, advocates, CAs, principals, dukan owners, NGOs — sabke लिए, with full dignity.\n\nApki profile dikhегी "[Aapka Naam] — [Aapki Role]" ke roop mein. Forever FREE. Verified.\n\n👉 https://dukanlist.com/register.html\n\nLocal Mandi Dabwali ke founders हैं. Aap भी जुड़ें.` },
+    { tone:'formal', title:'Universal Formal',
+      msg:`Respected {OWNER_LAST_NAME} ji,\n\nWe are reaching out from DukanList — a local establishment directory for Sirsa, Bathinda, and Mandi Dabwali. We'd be honoured to feature your establishment with the role and identity you deserve.\n\nForever FREE. Admin verified. No commission.\n\n👉 https://dukanlist.com/register.html\n\nRegards,\n{OWNER} — {SHOP}` }
+  ]
+};
+
+let MY_INFO = { owner: '', shop: 'DukanList', role: '', url: 'https://dukanlist.com', last: '' };
+
+async function loadMyInfo(){
+  try {
+    const u = await ShopDB.client.auth.getUser();
+    if (!u.data || !u.data.user) return;
+    const { data: own } = await ShopDB.client.from('business_owners')
+      .select('business_id').eq('auth_user_id', u.data.user.id).limit(1);
+    if (!own || !own.length) return;
+    const { data: biz } = await ShopDB.client.from('businesses')
+      .select('name, slug, owner_name, owner_role').eq('id', own[0].business_id).maybeSingle();
+    if (!biz) return;
+    MY_INFO.shop = biz.name || 'DukanList';
+    MY_INFO.owner = biz.owner_name || 'I';
+    MY_INFO.role = biz.owner_role || '';
+    MY_INFO.url = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug || '');
+    // Extract last name
+    const parts = (biz.owner_name || '').trim().split(/\s+/);
+    MY_INFO.last = parts.length > 1 ? parts[parts.length - 1] : (biz.owner_name || '');
+  } catch(_){}
+}
+
+function personalise(msg){
+  const roleSuffix = MY_INFO.role ? ` (${MY_INFO.role})` : '';
+  return msg
+    .replace(/\{SHOP\}/g, MY_INFO.shop)
+    .replace(/\{OWNER\}/g, MY_INFO.owner || 'I')
+    .replace(/\{OWNER_LAST_NAME\}/g, MY_INFO.last || MY_INFO.owner || '')
+    .replace(/\{ROLE\}/g, MY_INFO.role || '')
+    .replace(/\{ROLE_SUFFIX\}/g, roleSuffix)
+    .replace(/\{URL\}/g, MY_INFO.url);
+}
+
+function render(cat){
+  const list = TEMPLATES[cat] || [];
+  const wrap = document.getElementById('tplList');
+  if (!list.length){
+    wrap.innerHTML = '<div class="empty-state"><div class="es-ico">📭</div>No templates for this category yet.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map((t, i) => {
+    const msg = personalise(t.msg);
+    const wa = 'https://wa.me/?text=' + encodeURIComponent(msg);
+    return `
+      <div class="tpl-card">
+        <div class="tc-head">
+          <div class="tc-title">${escapeHtml(t.title)}</div>
+          <span class="tc-tone ${t.tone}">${t.tone.toUpperCase()}</span>
+        </div>
+        <div class="tc-msg" id="msg_${cat}_${i}">${escapeHtml(msg)}</div>
+        <div class="tc-actions">
+          <button onclick="copyMsg('msg_${cat}_${i}', this)">📋 Copy</button>
+          <a class="btn-wa" href="${wa}" target="_blank" rel="noopener">💬 Open in WhatsApp</a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function copyMsg(id, btn){
+  const el = document.getElementById(id);
+  if (!el) return;
+  try {
+    await navigator.clipboard.writeText(el.textContent);
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    btn.style.background = '#16A34A';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+  } catch(e){
+    alert('Could not copy. Long-press the message and copy manually.');
+  }
+}
+
+// Wire chips
+document.querySelectorAll('.pick-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.pick-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    render(chip.dataset.cat);
+  });
+});
+
+(async function init(){
+  await loadMyInfo();
+  render('doctor');
+})();
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>
