@@ -22,13 +22,13 @@
 
 <!-- Google Search Console verification -->
 <meta name="google-site-verification" content="XTQXqHhamGML1UVBlDglwaeKIkNkR5biCKwe5EvQdm0">
-<meta name="description" content="Discover every local shop, doctor, financial advisor, mechanic, mutual fund distributor, insurance agent, manufacturer and agri business in your city — 195+ categories across 12 segments. Free for shopkeepers. Verified for customers. From Mandi Dabwali.">
+<meta name="description" content="Discover every local shop, doctor, financial advisor, mechanic, mutual fund distributor, insurance agent, manufacturer and agri business in your city — 195+ categories across 12 segments. Free for owners. Verified for customers. From Mandi Dabwali.">
 <meta name="keywords" content="local business directory India, mutual fund distributor Mandi Dabwali, stock broker, insurance advisor, doctor, mechanic, financial services, Haryana businesses, dukan registration, Bharat directory">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DukanList">
 <meta property="og:title" content="DukanList — Every Shop, Doctor, School &amp; Bank in your city">
-<meta property="og:description" content="FREE local directory for Sirsa · Bathinda · Mandi Dabwali. 200+ categories. Pucho Bhai community Q&amp;A. WhatsApp + Call ready. Zero cost for shopkeepers.">
+<meta property="og:description" content="FREE local directory for Sirsa · Bathinda · Mandi Dabwali. 200+ categories. Pucho Bhai community Q&amp;A. WhatsApp + Call ready. Zero cost for owners.">
 <meta property="og:url" content="https://dukanlist.com">
 <meta property="og:image" content="https://dukanlist.com/assets/og-default.png">
 <meta property="og:image:width" content="1200">
@@ -71,7 +71,7 @@
   "name": "DukanList",
   "alternateName": "Dukan List",
   "url": "https://dukanlist.com",
-  "description": "Bharat's local business directory — 195+ categories, verified shopkeepers, free registration. Sirsa-Bathinda ka apna live directory.",
+  "description": "Bharat's local business directory — 195+ categories, verified owners, free registration. Sirsa-Bathinda ka apna live directory.",
   "potentialAction": {
     "@type": "SearchAction",
     "target": "https://dukanlist.com/search.html?q={search_term_string}",
@@ -535,7 +535,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 
   /* Mobile nav: keep only Logo + Lang toggle + Register CTA — others moved to bottom nav */
   .nav-links{ gap:4px; flex-wrap:nowrap }
-  .nav-links a:not(.nav-cta){ display:none !important }  /* hide Categories, Search, Shopkeeper Login */
+  .nav-links a:not(.nav-cta){ display:none !important }  /* hide Categories, Search, Owner / Manager Login */
   .nav-links .lang-toggle{ display:inline-flex !important }
   .nav-cta{ padding:7px 13px !important; font-size:.78rem !important; white-space:nowrap }
   .topbar{ padding:9px 14px !important }
@@ -594,7 +594,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
     { name_en:'Happy New Year!',         name_hi:'नया साल मुबारक!',     month:12, day:31, span:1, theme:'newyear', emoji:'🎆', msg_en:'New Year — start fresh with local shops you can trust', msg_hi:'नया साल — भरोसेमंद local shops से नई शुरुआत' },
     { name_en:'Happy New Year!',         name_hi:'नया साल मुबारक!',     month:1,  day:1,  span:3, theme:'newyear', emoji:'🎆', msg_en:'New Year — start fresh with local shops you can trust', msg_hi:'नया साल — भरोसेमंद local shops से नई शुरुआत' },
     { name_en:'Lohri Greetings',         name_hi:'लोहड़ी की शुभकामनाएं', month:1,  day:13, span:1, theme:'lohri',   emoji:'🔥', msg_en:'Lohri — celebrate with local Punjabi sweets & gajak shops', msg_hi:'लोहड़ी — local मिठाई और गजक shops से आनंद उठाएं' },
-    { name_en:'Happy Republic Day',      name_hi:'गणतंत्र दिवस मुबारक', month:1,  day:26, span:1, theme:'india',   emoji:'🇮🇳', msg_en:'Republic Day — supporting Bharat\'s local shopkeepers',  msg_hi:'गणतंत्र दिवस — भारत के local दुकानदारों का साथ' },
+    { name_en:'Happy Republic Day',      name_hi:'गणतंत्र दिवस मुबारक', month:1,  day:26, span:1, theme:'india',   emoji:'🇮🇳', msg_en:'Republic Day — supporting Bharat\'s local owners',  msg_hi:'गणतंत्र दिवस — भारत के local मालिकों का साथ' },
     { name_en:'Happy Holi',              name_hi:'होली मुबारक',         month:3,  day:5,  span:2, theme:'holi',    emoji:'🎨', msg_en:'Holi — colors, sweets, and good vibes at local shops',     msg_hi:'होली — रंग, मिठाई और local खुशियाँ' },
     { name_en:'Baisakhi Greetings',      name_hi:'बैसाखी की शुभकामनाएं',month:4,  day:13, span:2, theme:'lohri',   emoji:'🌾', msg_en:'Baisakhi — harvest season, support local farmers & agri shops', msg_hi:'बैसाखी — फसल का मौसम, local farmers की सहायता' },
     { name_en:'Happy Independence Day',  name_hi:'स्वतंत्रता दिवस मुबारक',month:8,day:15, span:1, theme:'india',   emoji:'🇮🇳', msg_en:'Vande Mataram — celebrating with Bharat\'s local businesses', msg_hi:'वंदे मातरम् — local business के साथ जश्न' },
@@ -663,7 +663,7 @@ function dismissFestBanner(){
         <span data-i18n-hi>खोज</span>
       </a>
       <a href="/panel/login.html">
-        <span data-i18n-en>Shopkeeper Login</span>
+        <span data-i18n-en>Owner / Manager Login</span>
         <span data-i18n-hi>दुकानदार लॉगिन</span>
       </a>
       <a href="/register.html" class="nav-cta">
@@ -934,8 +934,8 @@ function dismissFestBanner(){
       <span data-i18n-hi>आज क्या ढूंढना है?</span>
     </h2>
     <p>
-      <span data-i18n-en>Pick a segment to browse verified shopkeepers in your city.</span>
-      <span data-i18n-hi>अपने शहर के वेरिफाइड दुकानदारों के लिए वर्ग चुनें।</span>
+      <span data-i18n-en>Pick a segment to browse verified owners in your city.</span>
+      <span data-i18n-hi>अपने शहर के वेरिफाइड मालिकों के लिए वर्ग चुनें।</span>
     </p>
   </div>
   <div class="cats-wrap">
@@ -953,7 +953,7 @@ function dismissFestBanner(){
 <section id="featured" style="background:linear-gradient(180deg,#FAFAFA 0%,#FFFFFF 100%)">
   <div class="section-head reveal">
     <span class="eyebrow">
-      <span data-i18n-en>✨ Featured Shopkeepers</span>
+      <span data-i18n-en>✨ Featured Listings</span>
       <span data-i18n-hi>✨ चुने हुए दुकानदार</span>
     </span>
     <h2>
@@ -1004,7 +1004,7 @@ function dismissFestBanner(){
     </h2>
     <p>
       <span data-i18n-en>We're shipping new features every week to help local shops grow. Here's what just dropped.</span>
-      <span data-i18n-hi>हर हफ़्ते नए फ़ीचर्स — स्थानीय दुकानदारों के लिए।</span>
+      <span data-i18n-hi>हर हफ़्ते नए फ़ीचर्स — स्थानीय मालिकों के लिए।</span>
     </p>
   </div>
   <div class="cats-wrap">
@@ -1055,7 +1055,7 @@ function dismissFestBanner(){
       <div class="wn-card" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#A7F3D0,#10B981)">❓</div><span class="wn-badge new">NEW</span></div>
         <h3><span data-i18n-en>Public Q&amp;A on Shop Pages</span><span data-i18n-hi>दुकान पेज पर सवाल-जवाब</span></h3>
-        <p><span data-i18n-en>Customers ask, shopkeepers answer — all visible publicly. Builds trust, helps SEO.</span><span data-i18n-hi>ग्राहक सवाल पूछें, दुकानदार जवाब दें — सबको दिखेगा। भरोसा बढ़ेगा।</span></p>
+        <p><span data-i18n-en>Customers ask, owners answer — all visible publicly. Builds trust, helps SEO.</span><span data-i18n-hi>ग्राहक सवाल पूछें, मालिक जवाब दें — सबको दिखेगा। भरोसा बढ़ेगा।</span></p>
       </div>
 
       <div class="wn-card" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1072,7 +1072,7 @@ function dismissFestBanner(){
 
       <div class="wn-card" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#BAE6FD,#0EA5E9)">🏆</div><span class="wn-badge new">NEW</span></div>
-        <h3><span data-i18n-en>Shopkeeper Ranking Battle</span><span data-i18n-hi>दुकानदार रैंकिंग</span></h3>
+        <h3><span data-i18n-en>Owner Ranking Battle</span><span data-i18n-hi>मालिक रैंकिंग</span></h3>
         <p><span data-i18n-en>See your live rank vs other shops in your category &amp; city. Earn medals, climb leaderboards.</span><span data-i18n-hi>अपनी category में रैंक देखें। मेडल जीतें, leaderboard पर चढ़ें।</span></p>
       </div>
 
@@ -1085,7 +1085,7 @@ function dismissFestBanner(){
       <div class="wn-card" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#FDE68A,#F59E0B)">🎁</div><span class="wn-badge new">NEW</span></div>
         <h3><span data-i18n-en>Refer 5 = 6 Months FREE</span><span data-i18n-hi>5 Refer = 6 महीने FREE</span></h3>
-        <p><span data-i18n-en>Refer 5 shopkeepers — both of you get 6-month Featured listing FREE. Win-win growth.</span><span data-i18n-hi>5 दुकानदार रेफर करें — दोनों को 6 महीने Featured FREE।</span></p>
+        <p><span data-i18n-en>Refer 5 owners — both of you get 6-month Featured listing FREE. Win-win growth.</span><span data-i18n-hi>5 दुकानदार रेफर करें — दोनों को 6 महीने Featured FREE।</span></p>
       </div>
 
     </div>
@@ -1263,7 +1263,7 @@ function dismissFestBanner(){
       <span data-i18n-hi>कैसे काम करता है</span>
     </h2>
     <p>
-      <span data-i18n-en>5 minutes to register for shopkeepers. 1-click discovery for customers.</span>
+      <span data-i18n-en>5 minutes to register for owners. 1-click discovery for customers.</span>
       <span data-i18n-hi>दुकानदार के लिए 5 मिनट का रजिस्ट्रेशन। ग्राहक के लिए 1-क्लिक खोज।</span>
     </p>
   </div>
@@ -1297,7 +1297,7 @@ function dismissFestBanner(){
         <span data-i18n-hi>🔍 ग्राहक खोजते हैं</span>
       </h3>
       <p>
-        <span data-i18n-en>Choose category + city — verified shopkeepers appear with all info on one screen.</span>
+        <span data-i18n-en>Choose category + city — verified owners appear with all info on one screen.</span>
         <span data-i18n-hi>श्रेणी + शहर चुनो — वेरिफाइड दुकानदार सब जानकारी के साथ एक स्क्रीन पर।</span>
       </p>
     </div>
@@ -1319,7 +1319,7 @@ function dismissFestBanner(){
 <section class="cta-strip">
   <div class="reveal">
     <h2>
-      <span data-i18n-en>Are you a <span class="grad">shopkeeper?</span></span>
+      <span data-i18n-en>Are you a <span class="grad">business owner / professional?</span></span>
       <span data-i18n-hi>क्या आप <span class="grad">दुकानदार हैं?</span></span>
     </h2>
     <p>
@@ -1338,8 +1338,8 @@ function dismissFestBanner(){
   <div class="ftop">
     <h4>🇮🇳 Made for Bharat. Started in Mandi Dabwali.</h4>
     <p>
-      <span data-i18n-en class="block">"Every Shop, One Identity" — Pan-India local business directory.<br>From small towns to metros — digital identity for every shopkeeper.</span>
-      <span data-i18n-hi class="block">"हर दुकान, एक पहचान" — पूरे भारत की लोकल बिज़नेस डायरेक्टरी।<br>छोटे शहरों से मेट्रो तक — हर दुकानदार की डिजिटल पहचान।</span>
+      <span data-i18n-en class="block">"Every Shop, One Identity" — Pan-India local business directory.<br>From small towns to metros — digital identity for every owner & professional.</span>
+      <span data-i18n-hi class="block">"हर दुकान, एक पहचान" — पूरे भारत की लोकल बिज़नेस डायरेक्टरी।<br>छोटे शहरों से मेट्रो तक — हर मालिक की डिजिटल पहचान।</span>
     </p>
     <div class="links">
       <a href="/about.html"><span data-i18n-en>About</span><span data-i18n-hi>हमारे बारे में</span></a>

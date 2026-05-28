@@ -957,8 +957,8 @@
     </div>
   </div>
   <div class="pulse-foot">
-    <span data-i18n-en>Aap join karne wale 1000+ shopkeepers me se hain.</span>
-    <span data-i18n-hi>Aap join karne wale 1000+ shopkeepers me se hain.</span>
+    <span data-i18n-en>Aap join karne wale 1000+ owners me se hain.</span>
+    <span data-i18n-hi>Aap join karne wale 1000+ owners me se hain.</span>
     <br><b style="color:#FFB200">★ Aapka swagat hai!</b>
   </div>
 </aside>
@@ -1809,7 +1809,7 @@ window.addEventListener('DOMContentLoaded', () => {
     { icon: '✓',  en: 'Shop got <b>Verified Bronze</b> badge', hi: 'Shop ko <b>Verified Bronze</b> badge mila' },
     { icon: '🎉', en: '<b>Featured listing</b> activated for a {cat}', hi: '<b>Featured listing</b> activate hui ek {cat} ne' },
     { icon: '👀', en: '<b>50+ views</b> today on a {cat} in {city}', hi: '<b>50+ views</b> aaj ek {cat} ko {city} me' },
-    { icon: '📸', en: 'Owner added <b>5 new photos</b> of their shop', hi: 'Owner ne <b>5 nai photos</b> add kiya' },
+    { icon: '📸', en: 'Owner added <b>5 new photos</b> of their listing', hi: 'Owner ne <b>5 nai photos</b> add kiya' },
     { icon: '⚡', en: 'Lead notification delivered in <b>under 3 seconds</b>', hi: 'Lead notification <b>3 second me</b> pohunchi' },
     { icon: '🌟', en: 'Shop reached <b>Silver verified</b> tier', hi: 'Shop <b>Silver verified</b> tier par pohunchi' }
   ];
@@ -2036,7 +2036,7 @@ function escapeHTML(s){
       setTimeout(() => {
         const banner = document.createElement('div');
         banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#FFF7ED;border:2px solid #FB923C;color:#9A3412;padding:10px 18px;border-radius:99px;font-size:.88rem;font-weight:700;box-shadow:0 6px 20px rgba(251,146,60,0.3);z-index:100;animation:slideDownRef 0.5s ease-out';
-        banner.innerHTML = '🎁 Referred by a DukanList shopkeeper &mdash; welcome!';
+        banner.innerHTML = '🎁 Referred by a DukanList member &mdash; welcome!';
         document.body.appendChild(banner);
         const style = document.createElement('style');
         style.textContent = '@keyframes slideDownRef { from { opacity:0; transform: translateX(-50%) translateY(-20px) } to { opacity:1; transform: translateX(-50%) translateY(0) } }';

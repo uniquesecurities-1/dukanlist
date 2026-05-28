@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <style>body,.biz-title,h1,h2,h3,.biz-cat-pill{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-/* ===== Shop Highlights card (left column space filler) ===== */
+/* ===== Profile Highlights card (left column space filler) ===== */
 .shop-highlights{ margin-top:14px; background:#fff; border:1px solid rgba(15,23,42,.06); border-left:3px solid var(--saffron); border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(15,23,42,.04) }
 .shop-highlights .sh-title{ font-family:'Manrope',sans-serif; font-size:1rem; font-weight:800; color:var(--ink); letter-spacing:-.01em; margin-bottom:12px; display:flex; align-items:center; gap:6px }
 .shop-highlights .sh-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px }
@@ -718,7 +718,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
      same info is conveyed by the Admin Verified pill + verif-row badges */
   .shop-trust-card{ display:none !important }
 
-  /* Compact Shop Highlights on mobile (don't hide — keep but smaller) */
+  /* Compact Profile Highlights on mobile (don't hide — keep but smaller) */
   .shop-highlights{ padding:12px 14px !important; margin-top:10px !important }
   .shop-highlights .sh-title{ font-size:.92rem !important; margin-bottom:8px !important }
   .shop-highlights .sh-row-label{ font-size:.72rem !important }
@@ -931,7 +931,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   color:#0F172A;
 }
 
-/* ====== Color-coded Shop Highlights tiles (kept from previous) ====== */
+/* ====== Color-coded Profile Highlights tiles (kept from previous) ====== */
 .sh-tile{
   position:relative;
   border-radius:11px !important;
@@ -1013,9 +1013,9 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <div class="gallery">
           <div class="main" id="galleryMain"></div>
           <div class="thumbs" id="galleryThumbs"></div>
-          <!-- Shop Highlights — fills the empty space below gallery on desktop -->
+          <!-- Profile Highlights — fills the empty space below gallery on desktop -->
           <div class="shop-highlights" id="shopHighlights" style="display:none">
-            <div class="sh-title">✨ <span data-i18n-en>Shop Highlights</span><span data-i18n-hi>दुकान की खासियत</span></div>
+            <div class="sh-title">✨ <span data-i18n-en>Profile Highlights</span><span data-i18n-hi>लिस्टिंग की खासियत</span></div>
             <div class="sh-grid" id="shHighlightsGrid"></div>
             <div class="sh-row" id="shPaymentRow" style="display:none">
               <div class="sh-row-label" data-i18n-en="Payment accepted">Payment accepted</div>
@@ -1040,7 +1040,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             <ul class="stc-list">
               <li><span class="stc-ico">✓</span><span><b data-i18n-en>Admin verified</b><b data-i18n-hi>एडमिन वेरिफाइड</b><br><span class="stc-sub" data-i18n-en>Personally checked by DukanList team</span><span class="stc-sub" data-i18n-hi>DukanList टीम द्वारा जांचा गया</span></span></li>
               <li><span class="stc-ico">✓</span><span><b data-i18n-en>100% FREE listing</b><b data-i18n-hi>100% मुफ्त लिस्टिंग</b><br><span class="stc-sub" data-i18n-en>No paid rankings, no commission</span><span class="stc-sub" data-i18n-hi>कोई paid ranking नहीं, कोई commission नहीं</span></span></li>
-              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Owner-managed profile</b><b data-i18n-hi>मालिक द्वारा संचालित</b><br><span class="stc-sub" data-i18n-en>Real shopkeeper, real updates</span><span class="stc-sub" data-i18n-hi>असली दुकानदार, असली अपडेट</span></span></li>
+              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Owner-managed profile</b><b data-i18n-hi>मालिक द्वारा संचालित</b><br><span class="stc-sub" data-i18n-en>Real owner, real updates</span><span class="stc-sub" data-i18n-hi>असली मालिक, असली अपडेट</span></span></li>
               <li><span class="stc-ico">✓</span><span><b data-i18n-en>Sirsa–Bathinda local</b><b data-i18n-hi>स्थानीय Sirsa–Bathinda</b><br><span class="stc-sub" data-i18n-en>Built for our 2 districts only — no national spam</span><span class="stc-sub" data-i18n-hi>केवल 2 जिलों के लिए — कोई national spam नहीं</span></span></li>
             </ul>
             <div class="stc-foot">
@@ -1117,7 +1117,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <div id="mmtRatingDims" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;min-width:280px"></div>
       </div>
       <div>
-        <div style="font-size:.78rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">Shop Highlights</div>
+        <div style="font-size:.78rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">Profile Highlights</div>
         <div id="mmtHighlights" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       </div>
     </div>
@@ -1162,7 +1162,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             <div class="vg-text">
               <div class="vg-t-main" data-i18n-en>WhatsApp is fastest</div>
               <div class="vg-t-main" data-i18n-hi>WhatsApp सबसे तेज़</div>
-              <div class="vg-t-sub" data-i18n-en>Most shopkeepers reply within 30 minutes</div>
+              <div class="vg-t-sub" data-i18n-en>Most owners reply within 30 minutes</div>
               <div class="vg-t-sub" data-i18n-hi>ज़्यादातर दुकानदार 30 minutes में जवाब देते हैं</div>
             </div>
           </div>
@@ -1180,7 +1180,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             <div class="vg-text">
               <div class="vg-t-main" data-i18n-en>Mention DukanList</div>
               <div class="vg-t-main" data-i18n-hi>DukanList का नाम लें</div>
-              <div class="vg-t-sub" data-i18n-en>Shopkeeper will know you found them here — better service</div>
+              <div class="vg-t-sub" data-i18n-en>Owner will know you found them here — better service</div>
               <div class="vg-t-sub" data-i18n-hi>दुकानदार समझेगा कि आप यहाँ से आए हैं — बेहतर service</div>
             </div>
           </div>
@@ -1275,7 +1275,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="rc-ico">📣</div>
           <div class="rc-ttl"><span data-i18n-en>Share this shop</span><span data-i18n-hi>दुकान share करें</span></div>
         </div>
-        <div class="rc-sub"><span data-i18n-en>Help a local shopkeeper get more customers</span><span data-i18n-hi>स्थानीय दुकानदार को नए ग्राहक दिलाएं</span></div>
+        <div class="rc-sub"><span data-i18n-en>Help a local owner get more customers</span><span data-i18n-hi>स्थानीय मालिक को नए ग्राहक दिलाएं</span></div>
         <div class="rc-actions">
           <a id="rcShareWa" target="_blank" rel="noopener" class="rc-btn rc-btn-wa">💬 WhatsApp</a>
           <button onclick="copyShopUrl()" class="rc-btn rc-btn-copy">🔗 <span data-i18n-en>Copy link</span><span data-i18n-hi>लिंक copy</span></button>
@@ -1319,7 +1319,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <section id="similarShopsSection" style="display:none;max-width:1140px;margin:32px auto;padding:0 18px">
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
     <h2 style="font-size:1.25rem;font-weight:800;color:#0F172A;letter-spacing:-.015em">
-      <span data-i18n-en>Similar shops nearby</span><span data-i18n-hi>आस-पास की समान दुकानें</span>
+      <span data-i18n-en>Similar businesses nearby</span><span data-i18n-hi>आस-पास की समान लिस्टिंग</span>
     </h2>
     <a href="#" id="similarViewAll" style="color:#FF6B1A;font-weight:700;font-size:.88rem;text-decoration:none">
       <span data-i18n-en>View all →</span><span data-i18n-hi>सभी देखें →</span>
@@ -1951,7 +1951,7 @@ function render(){
     }
   } catch(_){}
 
-  // Shop Highlights — fills empty left-column space, builds trust
+  // Profile Highlights — fills empty left-column space, builds trust
   try { renderShopHighlights(b); } catch(e){ console.warn('highlights render failed', e); }
   try { loadShopQA(b.id); } catch(e){ console.warn('Q&A load failed', e); }
 
@@ -2885,7 +2885,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
-// =============== Shop Highlights renderer ===============
+// =============== Profile Highlights renderer ===============
 function renderShopHighlights(b){
   const host = document.getElementById('shopHighlights');
   const grid = document.getElementById('shHighlightsGrid');
