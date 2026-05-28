@@ -273,8 +273,6 @@
       <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
       <a href="/panel/profile.html"><span data-i18n-en>Edit Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
       <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
-      <a href="/panel/trust-certificate.html"><span data-i18n-en>🏆 Certificate</span><span data-i18n-hi>🏆 प्रमाणपत्र</span></a>
-      <a id="navInvitePack" href="/panel/invite-pack.html" style="display:none"><span data-i18n-en>📤 Invite Pack</span><span data-i18n-hi>📤 निमंत्रण</span></a>
       <a href="/panel/reviews.html"><span data-i18n-en>⭐ Reviews</span><span data-i18n-hi>⭐ रिव्यू</span></a>
       <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
       <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
@@ -761,10 +759,6 @@ async function loadDashboard(){
 
   MY_BUSINESS = biz;
   window.MY_BUSINESS = biz;
-  // Reveal "Invite Pack" nav link only for professional roles/categories
-  // (doctors, CAs, advocates, principals, NGO/trustees, MDs, brokers, etc.).
-  // Regular shopkeepers (Proprietor/Owner/Manager) won't see it.
-  try { maybeShowInvitePackNav(biz); } catch(_){}
   // First-login: apply pending_owner_role from registration
   try {
     const pendingRole = localStorage.getItem('pending_owner_role');
@@ -808,43 +802,6 @@ async function loadDashboard(){
       });
     }
   } catch(ogErr){ console.warn('[og-card] auto-hook error:', ogErr); }
-}
-
-// =====================================================
-// Invite Pack visibility gate
-// Show only for "pro" roles + pro-leaning categories.
-// Regular shop owners (Proprietor/Owner/Manager etc.) don't see it.
-// =====================================================
-function maybeShowInvitePackNav(biz){
-  if (!biz) return;
-  const PRO_ROLES = [
-    'doctor', 'chartered accountant', 'advocate', 'principal',
-    'architect / engineer', 'coach / trainer', 'pandit ji / acharya',
-    'branch manager', 'authorised person', 'president / secretary',
-    'founder', 'director', 'managing director (md)',
-    'ceo / chief executive', 'consultant'
-  ];
-  const PRO_KEYWORDS = [
-    'doctor', 'hospital', 'clinic', 'physician', 'surgeon', 'dentist',
-    'chartered accountant', ' ca ', 'tax consultant',
-    'advocate', 'lawyer', 'legal',
-    'school', 'college', 'principal', 'academy', 'institute',
-    'bank', 'mutual fund', 'broker', 'sub-broker', 'mfd',
-    'authorised person', 'insurance', 'financial advisor',
-    'ngo', 'trust', 'trustee', 'temple', 'pandit', 'acharya', 'religious',
-    'coach', 'trainer', 'gym', 'yoga',
-    'architect', 'engineer', 'manufacturer', 'factory'
-  ];
-  const role    = (biz.owner_role || '').toString().toLowerCase();
-  const catName = (biz.categories && biz.categories.name || '').toString().toLowerCase();
-  const bizName = (biz.name || '').toString().toLowerCase();
-  const isPro =
-    PRO_ROLES.indexOf(role) !== -1 ||
-    PRO_KEYWORDS.some(function(k){ return role.indexOf(k) !== -1 || catName.indexOf(k) !== -1 || bizName.indexOf(k) !== -1; });
-  if (isPro){
-    const el = document.getElementById('navInvitePack');
-    if (el) el.style.display = '';
-  }
 }
 
 async function loadCategoryBadges(bizId){
@@ -1626,4 +1583,57 @@ async function setupReferralWidget(){
       if (!b || !b.slug) throw new Error('No slug');
       fillReferral(b.slug);
     } catch(fbErr){
-      const box = document.getElementById('ref
+      const box = document.getElementById('referralLinkBox');
+      if (box) box.innerHTML = '<span style="color:#9A3412">Shop not loaded. <a href="javascript:location.reload()" style="color:#1E3A8A;text-decoration:underline">Refresh page</a></span>';
+      console.warn('Referral fallback:', fbErr && fbErr.message || fbErr);
+    }
+  } catch(e){ console.warn('Referral setup:', e); }
+}
+
+function fillReferral(slug){
+  const refLink = window.location.origin + '/register.html?ref=' + encodeURIComponent(slug);
+  const box = document.getElementById('referralLinkBox');
+  if (box) box.textContent = refLink;
+  window._referralLink = refLink;
+  const clicks = parseInt(localStorage.getItem('dl_ref_clicks_' + slug) || '0', 10);
+  const ctr = document.getElementById('refCounter');
+  if (ctr) ctr.textContent = clicks;
+}
+
+function copyReferralLink(){
+  const link = window._referralLink;
+  if (!link) return;
+  try {
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById('copyRefBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Copied!';
+      btn.style.background = '#16A34A';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#0F172A'; }, 2000);
+    });
+  } catch(_){
+    prompt('Copy this link:', link);
+  }
+}
+
+function shareReferralWhatsApp(){
+  const link = window._referralLink;
+  if (!link) return;
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const message = lang === 'hi'
+    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa-Bathinda ka apna local directory. FREE registration. Aaj hi karein: ' + link
+    : 'Namaste! List your shop on DukanList — Sirsa-Bathinda ka apna local directory. FREE registration. Register today: ' + link;
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+}
+
+(function(){
+  function init(){
+    setupReferralWidget();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                        
