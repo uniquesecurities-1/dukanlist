@@ -668,6 +668,40 @@ async function loadDashboard(){
   const user = await ShopDB.requireAuth();
   if (!user) return;
 
+  // 📧 Email verification gate banner — for users with pre-existing sessions
+  // who haven't verified their email yet. New logins are blocked at login.html,
+  // but a session created before the verification fix could still reach here.
+  if (user && !user.email_confirmed_at && !user.confirmed_at){
+    const host = document.getElementById('loading');
+    if (host){
+      host.innerHTML =
+        '<div style="max-width:520px;margin:30px auto;background:#FEF2F2;border:1px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:14px;padding:22px 22px 18px;text-align:center">'
+        + '<div style="font-size:2.4rem;margin-bottom:6px">📧</div>'
+        + '<div style="font-size:1.15rem;font-weight:800;color:#7F1D1D;margin-bottom:6px">Email verify pending</div>'
+        + '<div style="color:#7C2D12;font-size:.95rem;line-height:1.55;margin-bottom:14px">Aapki listing tab tak admin ke paas approval ke liye nahi jaayegi jab tak aap apna email verify nahi karenge. <br><b>Inbox + Spam folder</b> me <b>noreply@dukanlist.com</b> se aayi confirmation email check karein.</div>'
+        + '<button id="resendVerifyBtn" style="background:#1E3A8A;color:#fff;border:0;padding:11px 22px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">📧 Resend verification email</button>'
+        + '<div id="resendVerifyMsg" style="font-size:12px;color:#7C2D12;margin-top:10px;min-height:18px"></div>'
+        + '<div style="font-size:12px;color:#9A3412;margin-top:10px;line-height:1.55">Already verified? <a href="/panel/login.html" style="color:#1E3A8A;font-weight:700">Logout</a> aur dobara login karein — sab thik ho jaayega.</div>'
+        + '</div>';
+      const btn = document.getElementById('resendVerifyBtn');
+      const msg = document.getElementById('resendVerifyMsg');
+      if (btn) btn.addEventListener('click', async () => {
+        btn.disabled = true; btn.textContent = '⏳ Sending...';
+        try {
+          const c2 = ShopDB.client;
+          const { error } = await c2.auth.resend({ type: 'signup', email: user.email });
+          if (error) throw error;
+          msg.innerHTML = '✓ Verification email re-sent to <b>' + (user.email || '') + '</b>. Inbox + Spam check karein (1-2 min lag sakte hain).';
+          btn.textContent = '✓ Sent';
+        } catch(e){
+          msg.textContent = '⚠ Could not send: ' + (e.message || 'Try again in a minute.');
+          btn.disabled = false; btn.textContent = '📧 Resend verification email';
+        }
+      });
+    }
+    return;
+  }
+
   const c = ShopDB.client;
   // 🚨 SECURITY FIX 2 (2026-05-28): Use get_my_business_safe() RPC.
   // The old query `.eq('auth_user_id', user.id).limit(1)` was returning

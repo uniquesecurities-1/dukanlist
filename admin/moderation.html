@@ -388,11 +388,32 @@ async function loadPending(){
     return;
   }
   document.getElementById('cnt-pending').textContent = data.length;
-  if (!data.length){
-    document.getElementById('list-pending').innerHTML = emptyState('🎉', 'All clear!', 'No pending businesses. Nice work.');
-    return;
+
+  // Email-gate info: show how many NEW registrations are still awaiting email verify
+  // (admin can't action these, they appear here only when owner clicks the verify link)
+  try {
+    const waitRes = await C.rpc('admin_pending_awaiting_email_count');
+    const waiting = (waitRes && !waitRes.error && typeof waitRes.data === 'number') ? waitRes.data : 0;
+    const hostEl = document.getElementById('list-pending');
+    let banner = '';
+    if (waiting > 0){
+      banner = '<div style="background:#FEF3C7;border:1px solid #FCD34D;border-left:4px solid #F59E0B;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#78350F;display:flex;align-items:center;gap:10px;">'
+        + '<span style="font-size:18px">📧</span>'
+        + '<div><b>' + waiting + '</b> new registration' + (waiting === 1 ? '' : 's') + ' awaiting email verification. They will appear here automatically once the owner clicks the verification link in their email.</div>'
+        + '</div>';
+    }
+    if (!data.length){
+      hostEl.innerHTML = banner + emptyState('🎉', 'All clear!', 'No pending businesses. Nice work.');
+      return;
+    }
+    hostEl.innerHTML = banner + data.map(b => bizCard(b, 'pending')).join('');
+  } catch(e){
+    if (!data.length){
+      document.getElementById('list-pending').innerHTML = emptyState('🎉', 'All clear!', 'No pending businesses. Nice work.');
+      return;
+    }
+    document.getElementById('list-pending').innerHTML = data.map(b => bizCard(b, 'pending')).join('');
   }
-  document.getElementById('list-pending').innerHTML = data.map(b => bizCard(b, 'pending')).join('');
 }
 
 // ===== PENDING RE-REVIEW (post-approval edits) =====
