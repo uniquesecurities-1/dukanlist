@@ -106,8 +106,35 @@
         <input id="bizNameHi" class="input" type="text" maxlength="80">
       </div>
       <div class="form-group">
-        <label><span data-i18n-en>Owner Name</span><span data-i18n-hi>मालिक का नाम</span><span class="req">*</span></label>
+        <label><span data-i18n-en>Owner / Person Name</span><span data-i18n-hi>व्यक्ति का नाम</span><span class="req">*</span></label>
         <input id="ownerName" class="input" type="text" maxlength="60">
+      </div>
+      <div class="form-group">
+        <label><span data-i18n-en>Your Role / Designation</span><span data-i18n-hi>आपकी भूमिका</span></label>
+        <select id="ownerRole" class="input">
+          <option value="">— Select role (optional but recommended) —</option>
+          <option value="Proprietor / Owner">Proprietor / Owner · प्रोप्राइटर / मालिक</option>
+          <option value="Partner">Partner · साझेदार</option>
+          <option value="Founder">Founder · संस्थापक</option>
+          <option value="Director">Director · निदेशक</option>
+          <option value="Managing Director (MD)">Managing Director · प्रबंध निदेशक</option>
+          <option value="CEO / Chief Executive">CEO / Chief Executive · मुख्य कार्यकारी</option>
+          <option value="Branch Manager">Branch Manager · ब्रांच मैनेजर</option>
+          <option value="Manager">Manager · प्रबंधक</option>
+          <option value="Doctor">Doctor · डॉक्टर (shows as Dr.)</option>
+          <option value="Principal">Principal · प्राचार्य</option>
+          <option value="Head / In-Charge">Head / In-Charge · प्रमुख / प्रभारी</option>
+          <option value="Architect / Engineer">Architect / Engineer · आर्किटेक्ट / इंजीनियर</option>
+          <option value="Chartered Accountant">Chartered Accountant · CA (shows as CA)</option>
+          <option value="Advocate">Advocate · अधिवक्ता / वकील (shows as Adv.)</option>
+          <option value="Consultant">Consultant · सलाहकार</option>
+          <option value="Coach / Trainer">Coach / Trainer · प्रशिक्षक</option>
+          <option value="Pandit ji / Acharya">Pandit ji / Acharya · पंडित जी / आचार्य</option>
+          <option value="President / Secretary">President / Secretary · अध्यक्ष / सचिव</option>
+          <option value="Authorised Person">Authorised Person · प्राधिकृत व्यक्ति</option>
+          <option value="Other">Other · अन्य (write custom below)</option>
+        </select>
+        <input id="ownerRoleCustom" class="input" type="text" maxlength="60" placeholder="Custom role (e.g. Branch Head, Principal Architect)" style="margin-top:6px;display:none">
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -499,6 +526,18 @@ function populateFields(){
   document.querySelectorAll('input[data-payment]').forEach(cb => { cb.checked = pmSet.has(cb.value); });
   document.getElementById('specialFeatures').value = Array.isArray(MY_BIZ.special_features) ? MY_BIZ.special_features.join(', ') : '';
   document.getElementById('ownerName').value = MY_BIZ.owner_name || '';
+    // Owner role — match against curated list, else 'Other'
+    (function(){
+      var sel = document.getElementById('ownerRole');
+      var cust = document.getElementById('ownerRoleCustom');
+      if (!sel || !cust) return;
+      sel.onchange = function(){ cust.style.display = sel.value === 'Other' ? '' : 'none'; };
+      var role = MY_BIZ.owner_role || '';
+      if (!role){ return; }
+      var matched = false;
+      for (var i=0; i<sel.options.length; i++){ if (sel.options[i].value === role){ sel.value = role; matched = true; break; } }
+      if (!matched){ sel.value = 'Other'; cust.style.display = ''; cust.value = role; }
+    })();
   document.getElementById('whatsapp').value = MY_BIZ.whatsapp || '';
   document.getElementById('email').value = MY_BIZ.email || '';
   document.getElementById('usp').value = MY_BIZ.usp_text || '';
@@ -837,6 +876,17 @@ async function saveProfile(){
     if (sr.error) console.warn('Social links save warning:', sr.error.message);
     else Object.assign(MY_BIZ, socLinks);
   } catch(socErr){ console.warn('Social links save skipped:', socErr); }
+
+  // Save owner role (free + dignity)
+  try {
+    var roleSel = document.getElementById('ownerRole');
+    var roleCust = document.getElementById('ownerRoleCustom');
+    var roleVal = roleSel ? roleSel.value : '';
+    if (roleVal === 'Other' && roleCust) roleVal = (roleCust.value || '').trim();
+    const rr = await c.rpc('update_my_role', { p_role: roleVal });
+    if (rr.error) console.warn('Role save warning:', rr.error.message);
+    else MY_BIZ.owner_role = roleVal || null;
+  } catch(roleErr){ console.warn('Role save skipped:', roleErr); }
 
   // Sync categories — delete existing junction entries, re-insert
   const { error: delErr } = await c.from('business_categories').delete().eq('business_id', MY_BIZ.id);

@@ -758,7 +758,17 @@ async function loadDashboard(){
   }
 
   MY_BUSINESS = biz;
-  window.MY_BUSINESS = biz;  // expose for cross-script widgets
+  window.MY_BUSINESS = biz;
+  // First-login: apply pending_owner_role from registration
+  try {
+    const pendingRole = localStorage.getItem('pending_owner_role');
+    if (pendingRole && !biz.owner_role){
+      c.rpc('update_my_role', { p_role: pendingRole }).then(r => {
+        if (!r.error){ biz.owner_role = pendingRole; localStorage.removeItem('pending_owner_role'); }
+      }).catch(()=>{});
+    }
+  } catch(_){}
+  // expose for cross-script widgets
   renderDashboard(biz);
   // Power widgets (panel sidebar)
   try { renderProfileCompleteness(biz); } catch(e){ console.warn('PC widget:', e); }

@@ -112,6 +112,13 @@
 .social-pill.tw{ border-color:#CBD5E1; color:#0F172A; background:#F8FAFC }
 .social-pill.li{ border-color:#BAE6FD; color:#0369A1; background:#F0F9FF }
 .social-pill.web{ border-color:#D9F99D; color:#3F6212; background:#F7FEE7 }
+
+/* Owner / dealing-person badge — under shop name */
+.owner-credit{ display:flex; align-items:center; gap:10px; margin:6px 0 10px; padding:9px 12px; background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%); border:1px solid #FDE68A; border-radius:10px; font-family:'Manrope',sans-serif }
+.owner-credit .oc-avatar{ width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff; display:grid; place-items:center; font-weight:900; font-size:14px; flex-shrink:0 }
+.owner-credit .oc-info{ min-width:0; flex:1 }
+.owner-credit .oc-name{ font-size:.95rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.2 }
+.owner-credit .oc-role{ font-size:.75rem; font-weight:700; color:#92400E; line-height:1.3; margin-top:1px }
 </style>
 <link rel="stylesheet" href="/assets/css/main.css">
 <style>
@@ -1047,6 +1054,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <span class="biz-cat-pill" id="bizCatPill"></span>
           <div class="cat-badges" id="catBadges"></div>
           <h1 class="biz-title" id="bizName"></h1>
+          <div class="owner-credit" id="ownerCredit" style="display:none"></div>
           <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
           <div class="biz-rating-row">
             <div class="biz-rating" id="bizRating"></div>
@@ -1523,7 +1531,7 @@ async function loadBusiness(){
   const { data, error } = await c
     .from('businesses')
     .select(`
-      id, slug, name, name_hi, owner_name,
+      id, slug, name, name_hi, owner_name, owner_role,
       mobile, whatsapp, email,
       address_line1, address_line2, pincode, lat, lng,
       hours_json, usp_text, usp_hi, about_text, photos, video_url,
@@ -1554,6 +1562,7 @@ async function loadBusiness(){
   if (!data.categories) data.categories = { slug:'', name:'', icon:'🏪' };
 
   BIZ = data;
+  try { renderOwnerCredit(); } catch(_){}
   try { renderSocialRow(); } catch(_){}
   render();
 
@@ -3235,6 +3244,43 @@ function copyShopUrl(){
 })();
 </script>
 <script id="biz-premium-helpers">
+
+
+/* Owner-with-role credit — appears below shop name with dignity */
+function renderOwnerCredit(){
+  if (!BIZ) return;
+  const el = document.getElementById('ownerCredit');
+  if (!el) return;
+  const name = (BIZ.owner_name || '').trim();
+  const role = (BIZ.owner_role || '').trim();
+  if (!name && !role){ el.style.display = 'none'; return; }
+
+  // Smart prefix: Doctor → "Dr.", CA → "CA", Advocate → "Adv.", Pandit ji → "Pt."
+  let displayName = name;
+  let prefix = '';
+  const roleLower = role.toLowerCase();
+  if (roleLower.includes('doctor'))               prefix = 'Dr.';
+  else if (roleLower.includes('chartered accountant') || roleLower === 'ca') prefix = 'CA';
+  else if (roleLower.includes('advocate'))        prefix = 'Adv.';
+  else if (roleLower.includes('pandit') || roleLower.includes('acharya')) prefix = 'Pt.';
+  else if (roleLower.includes('architect'))       prefix = 'Ar.';
+  else if (roleLower.includes('engineer'))        prefix = 'Er.';
+  if (prefix && name && !name.match(/^(dr|ca|adv|pt|ar|er)\.?\s/i)){
+    displayName = prefix + ' ' + name;
+  }
+
+  const initial = (displayName.charAt(0) || '?').toUpperCase();
+  const safeName = escapeHTML(displayName || 'Listed by');
+  const safeRole = role ? escapeHTML(role) : '';
+
+  el.innerHTML =
+    '<div class="oc-avatar">' + initial + '</div>'
+    + '<div class="oc-info">'
+    + (safeName ? '<div class="oc-name">' + safeName + '</div>' : '')
+    + (safeRole ? '<div class="oc-role">' + safeRole + '</div>' : '<div class="oc-role" data-i18n-en="Listed & managed by owner" data-i18n-hi="मालिक द्वारा सूचीबद्ध">Listed &amp; managed by owner</div>')
+    + '</div>';
+  el.style.display = '';
+}
 
 /* Social links row — runs after BIZ is loaded */
 function renderSocialRow(){

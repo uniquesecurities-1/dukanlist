@@ -628,8 +628,39 @@
       <input id="bizNameHi" class="input" type="text" placeholder="शर्मा बढ़ई वर्क्स" maxlength="80">
     </div>
     <div class="form-group">
-      <label><span data-i18n-en>Owner Name</span><span data-i18n-hi>मालिक का नाम</span><span class="req">*</span></label>
+      <label><span data-i18n-en>Your Name (Owner / Manager / Doctor etc.)</span><span data-i18n-hi>आपका नाम (मालिक / प्रबंधक / डॉक्टर आदि)</span><span class="req">*</span></label>
       <input id="ownerName" class="input" type="text" placeholder="Rajesh Kumar Sharma" maxlength="60">
+    </div>
+    <div class="form-group">
+      <label><span data-i18n-en>Your Role / Designation</span><span data-i18n-hi>आपकी भूमिका / पदनाम</span></label>
+      <select id="ownerRole" class="input">
+        <option value="">— Select role (recommended) —</option>
+        <option value="Proprietor / Owner">Proprietor / Owner</option>
+        <option value="Partner">Partner</option>
+        <option value="Founder">Founder</option>
+        <option value="Director">Director</option>
+        <option value="Managing Director (MD)">Managing Director (MD)</option>
+        <option value="CEO / Chief Executive">CEO / Chief Executive</option>
+        <option value="Branch Manager">Branch Manager</option>
+        <option value="Manager">Manager</option>
+        <option value="Doctor">Doctor (shows as Dr.)</option>
+        <option value="Principal">Principal</option>
+        <option value="Head / In-Charge">Head / In-Charge</option>
+        <option value="Architect / Engineer">Architect / Engineer</option>
+        <option value="Chartered Accountant">Chartered Accountant (CA)</option>
+        <option value="Advocate">Advocate (Adv.)</option>
+        <option value="Consultant">Consultant</option>
+        <option value="Coach / Trainer">Coach / Trainer</option>
+        <option value="Pandit ji / Acharya">Pandit ji / Acharya</option>
+        <option value="President / Secretary">President / Secretary</option>
+        <option value="Authorised Person">Authorised Person</option>
+        <option value="Other">Other (custom)</option>
+      </select>
+      <input id="ownerRoleCustom" class="input" type="text" maxlength="60" placeholder="Custom role (e.g. Branch Head)" style="margin-top:6px;display:none">
+      <div style="font-size:.74rem;color:var(--muted);margin-top:6px;font-style:italic">
+        <span data-i18n-en>This will be shown on your profile (e.g. "Dr. Ravi Sharma — Doctor"). Helps visitors trust who they're reaching.</span>
+        <span data-i18n-hi>आपकी profile पर dikhega (जैसे "Dr. रवि शर्मा — Doctor"). Visitor को आप पर भरोसा होगा।</span>
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -1323,6 +1354,16 @@ function handleStep2(){
 
   const name  = document.getElementById('bizName').value.trim();
   const owner = document.getElementById('ownerName').value.trim();
+  // Owner role (optional)
+  var roleSelEl = document.getElementById('ownerRole');
+  var roleCustEl = document.getElementById('ownerRoleCustom');
+  if (roleSelEl && roleCustEl && !roleSelEl._wired){
+    roleSelEl.onchange = function(){ roleCustEl.style.display = roleSelEl.value === 'Other' ? '' : 'none'; };
+    roleSelEl._wired = true;
+  }
+  var ownerRole = roleSelEl ? roleSelEl.value : '';
+  if (ownerRole === 'Other' && roleCustEl) ownerRole = (roleCustEl.value || '').trim();
+  STATE.data.ownerRole = ownerRole;
   if (name.length < 3)  return showErr(errEl, 'Shop name must be at least 3 characters');
   if (owner.length < 3) return showErr(errEl, 'Owner name required');
 
@@ -1331,6 +1372,7 @@ function handleStep2(){
   STATE.data.name      = name;
   STATE.data.nameHi    = document.getElementById('bizNameHi').value.trim();
   STATE.data.ownerName = owner;
+  try { if (ownerRole) localStorage.setItem('pending_owner_role', ownerRole); } catch(_){}
   STATE.data.whatsapp  = document.getElementById('whatsapp').value.trim() || STATE.phone;
   STATE.data.email     = document.getElementById('email').value.trim();
   goToStep(3);
