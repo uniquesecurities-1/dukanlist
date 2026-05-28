@@ -311,6 +311,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script>
+// JS-LOADED CANARY — if this never runs the cName div will keep showing
+// the static "Loading…" and the user will know the script tag itself failed.
+console.info('[cert] page script started at', new Date().toISOString());
+try {
+  const _canary = document.getElementById('cName');
+  if (_canary) _canary.textContent = 'Loading… (JS running)';
+} catch(_){}
+
 function setLang(lang){
   if (lang !== 'en' && lang !== 'hi') lang = 'en';
   document.documentElement.setAttribute('data-lang', lang);
@@ -319,38 +327,56 @@ function setLang(lang){
 }
 try { setLang(localStorage.getItem('shop_lang') || 'en'); } catch(_){}
 
+// Visible step indicator — shown directly on certificate so user sees
+// where it stalls without opening console. Critical for debugging in the wild.
+function setStep(label){
+  console.info('[cert-step]', label);
+  const n = document.getElementById('cName');
+  if (n) n.textContent = label;
+}
+
 async function loadCert(){
+  setStep('Initialising…');
   try {
     return await _loadCertInner();
   } catch(e){
-    console.error('[trust-certificate] fatal:', e);
+    console.error('[trust-certificate] FATAL:', e);
+    setStep('⚠ Error: ' + (e && e.message ? e.message : 'see console'));
     showErr('Could not load your certificate: ' + (e && e.message ? e.message : 'Unknown error') + '. Please refresh.');
   }
 }
 
 async function _loadCertInner(){
-  const user = await ShopDB.requireAuth();
-  if (!user) return;
+  setStep('[1/5] Checking login…');
 
+  if (typeof ShopDB === 'undefined' || !ShopDB){
+    setStep('⚠ ShopDB module not loaded — please reload (Ctrl+Shift+R)');
+    return;
+  }
+
+  const user = await ShopDB.requireAuth();
+  if (!user){ setStep('Redirecting to login…'); return; }
+
+  setStep('[2/5] Looking up your business…');
   const c = ShopDB.client;
 
-  // Find linked business
   const { data: owners, error: ownErr } = await c.from('business_owners')
     .select('business_id').eq('auth_user_id', user.id).limit(1);
   if (ownErr){
     console.error('[trust-certificate] business_owners query failed:', ownErr);
+    setStep('⚠ Step 2 failed: ' + ownErr.message);
     showErr('Could not look up your business: ' + ownErr.message);
     return;
   }
   if (!owners || !owners.length){
-    showErr('No business linked to this account. Please complete registration first.');
+    setStep('⚠ No business linked');
+    showErr('No business linked to this account. Please complete registration first, or use "Link my shop" on the dashboard.');
     return;
   }
 
+  setStep('[3/5] Loading listing details…');
   const bizId = owners[0].business_id;
   let biz = null, error = null;
-  // Try full select with rating columns; if that fails (e.g. column not yet
-  // synced on the deployed schema cache), fall back to minimal select.
   try {
     const res = await c.from('businesses')
       .select('id, slug, name, owner_name, owner_role, status, created_at, rating_avg, rating_count, sub_category_id, category_id, geo_cities(name)')
@@ -361,6 +387,7 @@ async function _loadCertInner(){
   }
   if (error || !biz){
     console.warn('[trust-certificate] full select failed, falling back:', error);
+    setStep('[3/5] Retrying with fallback query…');
     const res2 = await c.from('businesses')
       .select('id, slug, name, owner_name, owner_role, status, created_at, sub_category_id, category_id, geo_cities(name)')
       .eq('id', bizId).maybeSingle();
@@ -369,40 +396,22 @@ async function _loadCertInner(){
 
   if (error || !biz){
     console.error('[trust-certificate] businesses query failed:', error);
+    setStep('⚠ Step 3 failed: ' + (error && error.message ? error.message : 'no data'));
     showErr('Could not load your listing: ' + (error && error.message ? error.message : 'no data') + '. Please try again.');
     return;
   }
 
+  setStep('[4/5] Checking status…');
   if (biz.status !== 'active'){
-    showErr('Your listing is not yet active. Certificate is available once admin verification is complete.');
+    setStep('⏳ Listing not yet ACTIVE — status: ' + biz.status);
+    showErr('Your listing is currently in "' + biz.status + '" status. Certificate is available once admin verification is complete and listing is ACTIVE. Please wait, or contact admin if pending too long.');
     return;
   }
+
+  setStep('[5/5] Rendering…');
 
   // Smart name prefix
   let displayName = biz.owner_name || '—';
   const role = (biz.owner_role || '').toLowerCase();
   if (role.includes('doctor'))               displayName = 'Dr. ' + displayName;
-  else if (role.includes('chartered accountant') || role === 'ca') displayName = 'CA ' + displayName;
-  else if (role.includes('advocate'))        displayName = 'Adv. ' + displayName;
-  else if (role.includes('pandit') || role.includes('acharya')) displayName = 'Pt. ' + displayName;
-  else if (role.includes('architect'))       displayName = 'Ar. ' + displayName;
-  else if (role.includes('engineer') && !role.includes('architect')) displayName = 'Er. ' + displayName;
-
-  document.getElementById('cName').textContent = displayName;
-  document.getElementById('cRole').textContent = (biz.owner_role || '').toString();
-
-  // Category lookup
-  const primaryCatId = biz.sub_category_id || biz.category_id;
-  if (primaryCatId){
-    const { data: cat } = await c.from('categories').select('name, icon').eq('id', primaryCatId).maybeSingle();
-    if (cat){
-      document.getElementById('cCat').textContent = (cat.icon || '') + ' ' + biz.name;
-      const subText = cat.name + (biz.geo_cities && biz.geo_cities.name ? ' · ' + biz.geo_cities.name : '');
-      document.getElementById('cCity').textContent = subText;
-    } else {
-      document.getElementById('cCat').textContent = biz.name;
-      if (biz.geo_cities && biz.geo_cities.name) document.getElementById('cCity').textContent = biz.geo_cities.name;
-    }
-  } else {
-    document.getElementById('cCat').textContent = biz.name;
-    if (biz.geo_cities && biz.geo_cities.name) documen
+  els
