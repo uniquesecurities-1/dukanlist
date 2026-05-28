@@ -1585,8 +1585,19 @@ async function setupReferralWidget(){
       const sess = await c.auth.getUser();
       const uid = sess && sess.data && sess.data.user && sess.data.user.id;
       if (!uid) throw new Error('Not logged in');
-      const { data: own } = await c.from('business_owners')
-        .select('business_id').eq('auth_user_id', uid).limit(1).maybeSingle();
+      // SECURITY: use safe RPC to avoid non-deterministic .limit(1) cross-user leak
+      let own = null;
+      try {
+        const safeRes = await c.rpc('get_my_business_safe');
+        if (!safeRes.error && safeRes.data && safeRes.data.length){
+          own = { business_id: safeRes.data[0].business_id };
+        }
+      } catch(_){ /* fallback below */ }
+      if (!own){
+        const fb = await c.from('business_owners')
+          .select('business_id').eq('auth_user_id', uid).limit(1).maybeSingle();
+        own = fb.data;
+      }
       if (!own || !own.business_id) throw new Error('No shop linked');
       const { data: b } = await c.from('businesses')
         .select('slug').eq('id', own.business_id).maybeSingle();
