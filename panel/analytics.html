@@ -335,8 +335,19 @@ async function loadAnalytics(days){
 
   // Lazy-load business id once
   if (!MY_BIZ_ID){
-    const { data: owners } = await c.from('business_owners')
-      .select('business_id').eq('auth_user_id', user.id).limit(1);
+    // SECURITY: use safe RPC to avoid non-deterministic .limit(1) cross-user leak
+    let owners = null;
+    try {
+      const safeRes = await c.rpc('get_my_business_safe');
+      if (!safeRes.error && safeRes.data && safeRes.data.length){
+        owners = safeRes.data.map(r => ({ business_id: r.business_id }));
+      }
+    } catch(e){ /* fallback */ }
+    if (!owners){
+      const fb = await c.from('business_owners')
+        .select('business_id').eq('auth_user_id', user.id).limit(1);
+      owners = fb.data;
+    }
     if (!owners || !owners.length){
       showError('No business found for this account. <a href="/register.html">Register your shop →</a>');
       return;
