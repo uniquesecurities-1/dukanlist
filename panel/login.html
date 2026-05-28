@@ -904,10 +904,58 @@ async function handleLogin(){
     localStorage.removeItem('shop_pending_mobile');
     localStorage.removeItem('shop_signup_error');
   }
-  // NOTE: We intentionally do NOT auto-claim using user_metadata.mobile anymore.
-  // If a user lands here without an existing link AND without the localStorage
-  // flag (e.g. logging in from a new device), they will see the "Link my shop"
-  // button on dashboard.html which shows the shop name BEFORE claiming.
+
+  // 🚨 STRICT ADMIN GATE (2026-05-28 part 3):
+  // Until admin approves the business (status='active'), block login entirely.
+  // User-side panel + features are unlocked ONLY after admin approval.
+  let bizStatus = null;
+  let bizName = null;
+  try {
+    const safeRes = await c.rpc('get_my_business_safe');
+    if (!safeRes.error && safeRes.data && safeRes.data.length){
+      const bizId = safeRes.data[0].business_id;
+      const { data: biz } = await c.from('businesses').select('status, name').eq('id', bizId).maybeSingle();
+      if (biz){ bizStatus = biz.status; bizName = biz.name; }
+    }
+  } catch(_){ /* if RPC errors, fall through to dashboard which has its own checks */ }
+
+  // No business linked yet — allow login (dashboard will show 'Link your shop' UI)
+  if (bizStatus && bizStatus !== 'active' && bizStatus !== 'pending_review'){
+    try { await c.auth.signOut(); } catch(_){}
+    btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
+    err.innerHTML = '';
+
+    let icon = '⏳', title = '', body = '', tone = '#FEF3C7', border = '#F59E0B', text = '#78350F';
+    if (bizStatus === 'pending'){
+      icon = '⏳';
+      title = 'Aapki listing admin approval ke liye pending hai';
+      body = 'Jab tak admin "' + (bizName || 'aapki listing') + '" ko approve nahi karta, login allowed nahi hai. <br>' +
+             'Hum personally har listing verify karte hain — usually 24 ghante me approve ho jaata hai. <br><br>' +
+             '📞 Tezi se approval ke liye WhatsApp karein: <a href="https://wa.me/919541223377?text=' + encodeURIComponent('Hi, meri listing "' + (bizName || '') + '" admin approval ke liye pending hai. Kindly verify karein.') + '" target="_blank" style="color:#1E3A8A;font-weight:700;text-decoration:underline">+91 95412 23377</a>';
+    } else if (bizStatus === 'disabled'){
+      tone = '#FEE2E2'; border = '#DC2626'; text = '#7F1D1D'; icon = '⛔';
+      title = 'Aapki listing temporarily disabled hai';
+      body = 'Admin ne aapki listing "' + (bizName || '') + '" disable kar di hai. <br>' +
+             '📞 Reactivate karwane ke liye contact karein: <a href="https://wa.me/919541223377" target="_blank" style="color:#1E3A8A;font-weight:700">+91 95412 23377</a>';
+    } else if (bizStatus === 'banned'){
+      tone = '#FEE2E2'; border = '#7F1D1D'; text = '#450A0A'; icon = '🚫';
+      title = 'Listing rejected';
+      body = 'Aapki listing approve nahi ki gayi. Reason ke liye contact karein: <a href="https://wa.me/919541223377" target="_blank" style="color:#1E3A8A;font-weight:700">+91 95412 23377</a>';
+    } else {
+      icon = '⏳';
+      title = 'Listing review me hai';
+      body = 'Status: ' + bizStatus + '. Admin review ke baad notify karenge.';
+    }
+
+    err.innerHTML =
+      '<div style="background:' + tone + ';border:1.5px solid ' + border + ';border-left:4px solid ' + border + ';border-radius:12px;padding:16px 18px;color:' + text + ';text-align:left">' +
+      '<div style="font-size:1.55rem;margin-bottom:8px">' + icon + '</div>' +
+      '<div style="font-weight:800;font-size:1.05rem;margin-bottom:8px;color:#0F172A">' + title + '</div>' +
+      '<div style="font-size:.92rem;line-height:1.6">' + body + '</div>' +
+      '</div>';
+    err.style.display = 'block';
+    return;
+  }
 
   const next = new URLSearchParams(location.search).get('next') || '/panel/dashboard.html';
   location.href = next;

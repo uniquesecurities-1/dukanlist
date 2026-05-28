@@ -789,6 +789,40 @@ async function loadDashboard(){
     return;
   }
 
+  // 🚨 STRICT ADMIN GATE: block dashboard if business is not yet approved.
+  // Login.html already blocks this path, but a pre-existing session could still reach here.
+  if (biz.status !== 'active' && biz.status !== 'pending_review'){
+    let icon = '⏳', title = '', body = '', tone = '#FEF3C7', border = '#F59E0B';
+    if (biz.status === 'pending'){
+      title = 'Listing admin approval ke liye pending hai';
+      body = 'Aapki listing "<b>' + (biz.name || '') + '</b>" abhi review me hai. Admin approve karte hi sab features unlock ho jaayenge.<br><br>' +
+             '<b>Yahan tak hum verify karte hain:</b><br>' +
+             '• Genuine local business hai ya nahi<br>• Address + contact sahi hai ya nahi<br>• Category sahi assign ki hai ya nahi<br><br>' +
+             'Usually 24 ghante me approve ho jaata hai. Tezi ke liye:<br>' +
+             '<a href="https://wa.me/919541223377?text=' + encodeURIComponent('Hi, meri listing "' + (biz.name || '') + '" admin approval ke liye pending hai. Kindly verify karein.') + '" target="_blank" style="display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none">📱 WhatsApp +91 95412 23377</a>';
+    } else if (biz.status === 'disabled'){
+      tone = '#FEE2E2'; border = '#DC2626'; icon = '⛔';
+      title = 'Listing temporarily disabled hai';
+      body = 'Admin ne "<b>' + (biz.name || '') + '</b>" temporarily disable ki hai. Reactivate karwane ke liye contact karein.';
+    } else if (biz.status === 'banned'){
+      tone = '#FEE2E2'; border = '#7F1D1D'; icon = '🚫';
+      title = 'Listing rejected';
+      body = 'Aapki listing approve nahi ki gayi. Reason aur next steps ke liye contact karein.';
+    } else {
+      title = 'Listing review me hai';
+      body = 'Status: ' + biz.status + '. Admin review ke baad notify karenge.';
+    }
+
+    document.getElementById('loading').innerHTML =
+      '<div style="max-width:560px;margin:30px auto;padding:0 16px"><div style="background:' + tone + ';border:1.5px solid ' + border + ';border-left:5px solid ' + border + ';border-radius:14px;padding:24px 22px;text-align:center;line-height:1.6">' +
+      '<div style="font-size:3rem;margin-bottom:8px">' + icon + '</div>' +
+      '<div style="font-size:1.25rem;font-weight:900;color:#0F172A;margin-bottom:10px">' + title + '</div>' +
+      '<div style="font-size:.95rem;color:#475569;text-align:left">' + body + '</div>' +
+      '<div style="margin-top:18px;padding-top:14px;border-top:1px dashed ' + border + '"><button onclick="ShopDB.signOut()" style="background:#0F172A;color:#fff;border:0;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit">Logout</button></div>' +
+      '</div></div>';
+    return;
+  }
+
   // Fetch primary category separately (avoids dual-FK ambiguity)
   const primaryCatId = biz.sub_category_id || biz.category_id;
   if (primaryCatId){
