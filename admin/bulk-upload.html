@@ -149,6 +149,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/admin-common.js"></script>
+<script>AdminCommon.requireAdmin();</script>
 <script>
 async function logout(e){ if(e) e.preventDefault(); if (window.ShopDB && ShopDB.signOut) await ShopDB.signOut(); else location.href='/admin/login.html'; }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }

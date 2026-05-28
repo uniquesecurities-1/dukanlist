@@ -153,6 +153,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/admin-common.js"></script>
 <script>
 function logout(){ if (window.ShopDB && ShopDB.signOut) ShopDB.signOut(); else location.href = '/admin/login.html'; }
 
@@ -296,9 +297,10 @@ function render(){
           + field('text', 'pincode', 'Pincode', s.pincode)
           + '<hr style="border:0;border-top:1px dashed #e2e8f0;margin:16px 0">'
           + '<div style="font-size:13px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">✨ Shop Trust Signals</div>'
+          + '<div style="background:#F0F9FF;border-left:3px solid #0EA5E9;padding:9px 12px;border-radius:6px;font-size:12px;color:#075985;line-height:1.5;margin-bottom:12px">ℹ️ These three fields power the Shop Highlights card on the public listing page. Filling them increases the verified_score and gives the listing a "Trust badge" boost in search.</div>'
           + '<div class="grid-2">'
-            + field('number', 'established_year', 'Established Year', s.established_year)
-            + '<div class="field"><label>Payment Methods</label>'
+            + field('number', 'established_year', 'Established Year (e.g. 2009 — appears as "Open since 2009 — 17 years on DukanList")', s.established_year)
+            + '<div class="field"><label title="Tick what the shop accepts. These show up as small chips on the public listing — UPI is biggest trust signal for digital-savvy buyers.">Payment Methods <span style="color:#94a3b8;font-weight:500;font-size:11px">(ticked methods show as chips on listing)</span></label>'
               + '<div id="adminPaymentBox" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">'
                 + ['cash','upi','cards','credit','cheque','online'].map(function(k){
                     var checked = Array.isArray(s.payment_methods) && s.payment_methods.indexOf(k) !== -1 ? 'checked' : '';
@@ -308,7 +310,7 @@ function render(){
               + '</div>'
             + '</div>'
           + '</div>'
-          + '<div class="field"><label>Special Features (comma-separated, max 6)</label>'
+          + '<div class="field"><label title="Each comma-separated phrase becomes a green tick on the public listing — concrete, scannable, builds trust at a glance.">Special Features <span style="color:#94a3b8;font-weight:500;font-size:11px">(max 6, comma-separated — shown as ✓ chips on listing)</span></label>'
             + '<input type="text" name="special_features_raw" id="adminFeaturesRaw" value="'
             + esc(Array.isArray(s.special_features) ? s.special_features.join(', ') : '')
             + '" placeholder="Free home delivery, Bulk discount, EMI available">'
@@ -568,8 +570,30 @@ async function doStatus(newStatus){
 }
 
 async function doDelete(){
-  var typed = prompt('Type DELETE to permanently remove this shop:');
-  if (typed !== 'DELETE') return;
+  // Use AdminCommon's strong confirm modal with required-text + reason audit
+  if (!window.AdminCommon || !AdminCommon.dangerConfirm){
+    // Fallback to old prompt if helper isn't loaded
+    var typed = prompt('Type DELETE to permanently remove this shop:');
+    if (typed !== 'DELETE') return;
+  } else {
+    var shopName = (SHOP && SHOP.name) ? SHOP.name : 'this shop';
+    var res = await AdminCommon.dangerConfirm({
+      title: 'Permanently delete "' + shopName + '"?',
+      body: '⚠️ <b>This action cannot be undone.</b><br><br>This will delete the business listing, all its reviews, leads, photos, deals, and audit history. The owner account stays but won\'t be linked to any shop.<br><br>Please provide a reason below (logged for audit trail).',
+      requiredText: 'DELETE ' + (shopName.split(/\s+/)[0] || 'SHOP').toUpperCase(),
+      reasonRequired: true,
+      confirmLabel: '🗑 Permanently Delete'
+    });
+    if (!res || !res.confirmed) return;
+    var reason = res.reason || '';
+    // Log delete reason in admin_notes BEFORE delete (so it survives in audit log)
+    try {
+      await ShopDB.client.rpc('admin_update_shop', {
+        p_business_id: BIZ_ID,
+        p_patch: { admin_notes: (SHOP.admin_notes || '') + '\n[DELETE-REASON ' + new Date().toISOString() + '] ' + reason }
+      });
+    } catch(_){}
+  }
   var c = ShopDB.client;
   var r = await c.rpc('admin_delete_business', { p_business_id: BIZ_ID });
   if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
@@ -1025,63 +1049,4 @@ async function unlinkOwner(){
   var msg = 'Unlink owner from "' + SHOP.name + '"?\n\n'
           + 'Login email:   ' + (SHOP.owner_email || '(none)') + '\n'
           + 'Owner mobile:  ' + (SHOP.mobile || '(none)') + '\n\n'
-          + 'This will:\n'
-          + '  1. Remove the auth user → shop link\n'
-          + '  2. Clear owner_phone so the row CANNOT be silently re-claimed\n\n'
-          + 'Use this when the wrong account is linked, or to fix the '
-          + '"same email → wrong shop after delete" bug.\n\nProceed?';
-  if (!confirm(msg)) return;
-
-  try {
-    var r = await ShopDB.client.rpc('admin_unlink_owner', {
-      p_business_id: BIZ_ID,
-      p_clear_phone: true
-    });
-    if (r.error) throw r.error;
-    toast('✓ Owner unlinked. Affected rows: ' + (r.data && r.data.rows_affected || 0));
-    SHOP.owner_user_id = null;
-    SHOP.owner_email = null;
-    render();
-  } catch(e){
-    alert('Unlink failed: ' + (e.message || e) + '\n\nIf this RPC is missing, run db/71-safer-claim-by-phone.sql in Supabase.');
-  }
-}
-
-init();
-</script>
-
-<!-- Featured Listing Modal -->
-<div class="modal-bg" id="featuredModal" onclick="if(event.target===this)closeFeaturedModal()">
-  <div class="modal-box">
-    <h3>★ Featured Listing</h3>
-    <div class="sub">Mark this shop as featured to boost its visibility across browse, search, and homepage.</div>
-    <div id="fmCurrent"></div>
-
-    <form onsubmit="submitFeatured(event)">
-      <div class="field">
-        <label>Duration — quick pick</label>
-        <div class="duration-grid">
-          <div class="dur-chip" onclick="setDays(7,this)">7 days</div>
-          <div class="dur-chip active" onclick="setDays(30,this)">30 days</div>
-          <div class="dur-chip" onclick="setDays(90,this)">90 days</div>
-          <div class="dur-chip" onclick="setDays(180,this)">180 days</div>
-        </div>
-      </div>
-
-      <div class="fm-row">
-        <div class="field">
-          <label>Days *</label>
-          <input id="fmDays" type="number" min="1" max="730" value="30" required>
-        </div>
-        <div class="field">
-          <label>Amount (₹) *</label>
-          <input id="fmAmount" type="number" min="0" step="0.01" placeholder="e.g. 999" required>
-        </div>
-      </div>
-
-      <div class="fm-row">
-        <div class="field">
-          <label>Payment method</label>
-          <select id="fmMethod">
-            <option value="cash">Cash</option>
- 
+        

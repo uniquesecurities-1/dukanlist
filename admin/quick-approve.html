@@ -238,7 +238,21 @@ async function quickApprove(id, name){
 }
 
 async function quickReject(id, name){
-  if (!confirm('Ban "' + name + '"?\n(Soft delete — reversible)')) return;
+  // Capture rejection reason (MUST provide one) for audit trail
+  const reason = prompt('Reason for banning "' + name + '"?\n(min 5 chars — logged for audit)');
+  if (reason === null) return; // cancelled
+  if (!reason || reason.trim().length < 5){
+    toast('Reason is required (min 5 chars)', 'error');
+    return;
+  }
+  if (!confirm('Confirm BAN "' + name + '"?\n\nReason: ' + reason.trim() + '\n\n(Soft delete — reversible from shop detail page)')) return;
+  // Try to log reason in admin_notes via admin_update_shop (best-effort)
+  try {
+    await C.rpc('admin_update_shop', {
+      p_business_id: id,
+      p_patch: { admin_notes: '[BAN-REASON ' + new Date().toISOString() + '] ' + reason.trim() }
+    });
+  } catch(_){}
   const { error } = await C.from('businesses').update({ status: 'banned' }).eq('id', id);
   if (error){ toast('Ban failed: ' + error.message, 'error'); return; }
   toast('✕ ' + name + ' banned', 'success');
@@ -258,26 +272,4 @@ async function quickDelete(id, name){
 }
 
 function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function escapeJs(s){
-  return String(s||'').replace(/['"\\]/g, '\\$&');
-}
-function toast(msg, kind){
-  const t = document.getElementById('toast');
-  t.className = 'toast show ' + (kind || 'success');
-  t.textContent = msg;
-  setTimeout(() => t.classList.remove('show'), 3500);
-}
-async function logout(){
-  await C.auth.signOut();
-  window.location.href = '/admin/login';
-}
-
-init().catch(e => {
-  document.getElementById('diagPanel').innerHTML = '<b style="color:#DC2626">init crashed:</b> ' + e.message;
-});
-</script>
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':
