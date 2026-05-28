@@ -124,12 +124,32 @@
     margin-top:auto; padding-top:40px;
     display:grid; grid-template-columns:1fr auto 1fr; align-items:end; gap:30px
   }
-  .c-sig-block{ text-align:center }
-  .c-sig-line{
-    border-top:2px solid #94A3B8; padding-top:6px;
-    font-size:.78rem; color:#475569; font-weight:700; letter-spacing:.06em; text-transform:uppercase
+
+  /* Live rating block (replaces founder signature) */
+  .c-rating-block{
+    text-align:center;
+    background:linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%);
+    border:1.5px solid #F59E0B;
+    border-radius:12px; padding:14px 12px;
+    box-shadow:0 2px 8px rgba(245,158,11,.18)
   }
-  .c-sig-name{ font-size:.92rem; color:#1E3A8A; font-weight:800; margin-bottom:2px; font-family:'Cinzel',serif; letter-spacing:.04em }
+  .c-stars{
+    font-size:1.4rem; letter-spacing:.08em; color:#F59E0B;
+    line-height:1; margin-bottom:6px; font-weight:900
+  }
+  .c-stars .empty{ color:#E5E7EB }
+  .c-rating-num{
+    font-family:'Cinzel','Plus Jakarta Sans',serif;
+    font-size:1.3rem; font-weight:800; color:#92400E; line-height:1
+  }
+  .c-rating-count{
+    font-size:.74rem; color:#78350F; font-weight:700;
+    margin-top:4px; letter-spacing:.02em
+  }
+  .c-rating-lbl{
+    font-size:.62rem; color:#92400E; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; margin-top:6px
+  }
   .c-seal{
     width:120px; height:120px; border:3px solid #F59E0B; border-radius:50%;
     display:grid; place-items:center; text-align:center; font-size:.66rem;
@@ -245,11 +265,19 @@
         <span data-i18n-hi>को DukanList टीम द्वारा <b>personally verified</b> किया गया है और इसे हमारी community directory में एक <b>trusted local प्रतिष्ठान</b> के रूप में मान्यता दी गई है। यह प्रमाणपत्र admin-verified, owner-managed उपस्थिति का प्रमाण है — गरिमा पर आधारित निर्देशिका।</span>
       </div>
 
-      <!-- Footer with sig + seal + qr -->
+      <!-- Footer with live rating + seal + qr -->
       <div class="c-foot">
-        <div class="c-sig-block">
-          <div class="c-sig-name">Deepak &amp; Navneet Singla</div>
-          <div class="c-sig-line"><span data-i18n-en>Founders, DukanList</span><span data-i18n-hi>संस्थापक, DukanList</span></div>
+        <div class="c-rating-block">
+          <div class="c-stars" id="cStars">★★★★★</div>
+          <div class="c-rating-num" id="cRatingNum">—</div>
+          <div class="c-rating-count" id="cRatingCount">
+            <span data-i18n-en>Awaiting first review</span>
+            <span data-i18n-hi>पहली समीक्षा का इंतज़ार</span>
+          </div>
+          <div class="c-rating-lbl">
+            <span data-i18n-en>Rated by Real Customers</span>
+            <span data-i18n-hi>असली ग्राहकों की रेटिंग</span>
+          </div>
         </div>
         <div class="c-seal">
           DUKANLIST<br>·VERIFIED·<br><span style="font-size:1.6rem">★</span><br>SINCE<br><span id="cYear">2026</span>
@@ -263,8 +291,8 @@
 
       <!-- Bottom strip -->
       <div class="c-strip">
-        <span data-i18n-en>Certificate ID: <b id="cId">—</b> · Issued <b id="cDate">—</b> · Valid as long as the listing is active</span>
-        <span data-i18n-hi>Certificate ID: <b id="cId2">—</b> · जारी: <b id="cDate2">—</b></span>
+        <span data-i18n-en><b>Issued by the DukanList Verification Team</b> · Certificate ID: <b id="cId">—</b> · Issued <b id="cDate">—</b> · Valid as long as the listing is active</span>
+        <span data-i18n-hi><b>DukanList Verification Team द्वारा जारी</b> · Certificate ID: <b id="cId2">—</b> · जारी: <b id="cDate2">—</b></span>
       </div>
       <div class="c-verify">
         <span data-i18n-en>Verify online at</span>
@@ -307,7 +335,7 @@ async function loadCert(){
 
   const bizId = owners[0].business_id;
   const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, status, created_at, verified_score, sub_category_id, category_id, geo_cities(name)')
+    .select('id, slug, name, owner_name, owner_role, status, created_at, verified_score, rating_avg, rating_count, sub_category_id, category_id, geo_cities(name)')
     .eq('id', bizId).maybeSingle();
 
   if (error || !biz){
@@ -361,48 +389,13 @@ async function loadCert(){
   document.getElementById('cDate').textContent = dateStr;
   document.getElementById('cDate2').textContent = dateStr;
 
-  // QR Code via public free service (api.qrserver.com) — points to listing URL
-  const profileUrl = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug || '');
-  document.getElementById('cQr').src =
-    'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' +
-    encodeURIComponent(profileUrl) + '&margin=4&qzone=2&format=svg';
-  document.getElementById('cUrl').textContent = profileUrl.replace(/^https:\/\//,'');
-
-  // Stash for share function
-  window._certData = { name: biz.name, url: profileUrl };
-}
-
-function showErr(msg){
-  const box = document.getElementById('errBox');
-  if (!box) return;
-  box.textContent = msg;
-  box.style.display = '';
-}
-
-function downloadAsPdf(){
-  // Browsers will use Print-to-PDF — same dialog, just user picks "Save as PDF"
-  alert('Print dialog will open. Choose "Save as PDF" as the destination, then save. Use A4 portrait.');
-  window.print();
-}
-
-async function shareCert(e){
-  e.preventDefault();
-  const d = window._certData;
-  if (!d){ return; }
-  const text = 'I am proudly listed on DukanList — Sirsa-Bathinda ka local directory. View my listing: ' + d.url;
-  if (navigator.share){
-    try { await navigator.share({ title: d.name, text: text, url: d.url }); return; } catch(_){}
-  }
-  try {
-    await navigator.clipboard.writeText(text);
-    e.target.textContent = '✓ Copied!';
-    setTimeout(() => { e.target.innerHTML = '📤 Share'; }, 2000);
-  } catch(_){ alert(text); }
-}
-
-loadCert();
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+  // ===== LIVE RATING (replaces founder signature) =====
+  const ratingAvg = parseFloat(biz.rating_avg || 0);
+  const ratingCnt = parseInt(biz.rating_count || 0, 10);
+  const starsEl   = document.getElementById('cStars');
+  const numEl     = document.getElementById('cRatingNum');
+  const countEl   = document.getElementById('cRatingCount');
+  if (ratingCnt > 0 && ratingAvg > 0){
+    const filled = Math.round(ratingAvg);
+    const empty  = 5 - filled;
+    starsEl.innerHTML = '★'.repeat(filled) + '<span class="empty
