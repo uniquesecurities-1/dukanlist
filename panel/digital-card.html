@@ -306,4 +306,14 @@ async function init(){
 
   // Auto-pick theme
   CURRENT_THEME = pickAutoTheme(BIZ.owner_role, BIZ.cat_name);
-  document.query
+  document.querySelectorAll('.theme-chip').forEach(function(c){
+    c.classList.toggle('active', c.dataset.theme === CURRENT_THEME);
+  });
+
+  refreshPreview();
+}
+
+init();
+</script>
+</body>
+</html>
