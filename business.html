@@ -1743,7 +1743,7 @@ function render(){
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
 
   // Meta tags
-  document.title = `${b.name} — ${b.categories?.name || 'Local Shop'} in ${b.geo_cities?.name || ''} | dukanlist.com`;
+  document.title = `${b.name} — ${b.categories?.name || 'Local Business'} in ${b.geo_cities?.name || ''} | dukanlist.com`;
   const _desc = (b.usp_text || `${b.name} — ${b.categories?.name || ''} in ${b.geo_cities?.name || ''}`).slice(0,180);
   const _title = `${b.name}${b.geo_cities?.name ? ' — ' + b.geo_cities.name : ''} · DukanList`;
   const _img   = (Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string')
@@ -1889,7 +1889,7 @@ function render(){
 
   // CTAs
   const wa = (b.whatsapp || b.mobile).replace(/[^\d]/g,'');
-  const waMsg = encodeURIComponent(`Hi ${b.owner_name || ''}, I found your shop on dukanlist.com — interested in your services.`);
+  const waMsg = encodeURIComponent(`Hi ${b.owner_name || ''}, I found your listing on dukanlist.com — interested in your services.`);
   document.getElementById('ctaWa').href = `https://wa.me/${wa}?text=${waMsg}`;
   document.getElementById('ctaWa').addEventListener('click', () => logLead('whatsapp'));
 

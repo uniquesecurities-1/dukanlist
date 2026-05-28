@@ -271,7 +271,7 @@ function renderList(){
       <div class="nm">${escapeHtml(b.name)}</div>
       <span class="city">${escapeHtml(b.city_name)} · ${escapeHtml(b.pincode || '—')}</span>
       <span class="id">${escapeHtml(b.id.slice(0, 8))}…</span>
-      <a href="/business/${escapeAttr(b.slug)}" target="_blank" style="font-size:12px;color:#1E3A8A;text-decoration:none">↗</a>
+      <a href="/business.html?slug=${escapeAttr(b.slug)}" target="_blank" style="font-size:12px;color:#1E3A8A;text-decoration:none">↗</a>
     </div>
   `).join('');
 }

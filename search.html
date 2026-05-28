@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#FF6B1A">
-<title>Search Shops — dukanlist.com</title>
+<title>Search Listings — dukanlist.com</title>
 <meta name="description" content="Find local listings, services, doctors, carpenters, mechanics near you.">
 <link rel="canonical" href="https://dukanlist.com/search.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dukanlist.com/search.html">
-<meta property="og:title" content="Search Shops — dukanlist.com">
+<meta property="og:title" content="Search Listings — dukanlist.com">
 <meta property="og:description" content="Search verified local businesses, services and professionals near you. Free for customers, free for shopkeepers.">
 <meta property="og:image" content="https://dukanlist.com/assets/icons/icon-512.png">
 <meta name="twitter:card" content="summary">
@@ -253,7 +253,7 @@
 </head>
 <body class="search-page-desktop">
 <div class="sticky-search" id="stickySearch" aria-hidden="true">
-  <input type="text" id="stickySearchInput" placeholder="Search shops, services, doctors…" aria-label="Search">
+  <input type="text" id="stickySearchInput" placeholder="Search businesses, services, doctors…" aria-label="Search">
   <button class="ss-btn" onclick="stickySearchSubmit()">Search</button>
 </div>
 
@@ -808,7 +808,7 @@ function _renderResultsInner(){
   // Apply sort (relevance keeps server order)
   rows = applySort(rows);
 
-  countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>shop${rows.length===1?'':'s'} found</span><span data-i18n-hi>दुकान मिली</span>`;
+  countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>shop${rows.length===1?'':'s'} found</span><span data-i18n-hi>लिस्टिंग मिली</span>`;
   if (OPEN_NOW && filteredOutByOpen > 0){
     hint.textContent = '(' + filteredOutByOpen + ' hidden — closed)';
   } else {

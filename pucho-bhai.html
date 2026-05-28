@@ -661,11 +661,11 @@ html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif
           </div>
           <div style="display:flex;gap:9px;margin-bottom:10px;align-items:flex-start">
             <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#EDE9FE;color:#6D28D9;font-weight:800;font-size:.72rem;display:grid;place-items:center">3</span>
-            <span><span data-i18n-en>Find best shops &amp; services in your area.</span><span data-i18n-hi style="display:none">अपने इलाके की बेहतरीन दुकानें खोजें।</span></span>
+            <span><span data-i18n-en>Find best shops &amp; services in your area.</span><span data-i18n-hi style="display:none">अपने इलाके की बेहतरीन लिस्टिंग खोजें।</span></span>
           </div>
           <div style="display:flex;gap:9px;align-items:flex-start">
             <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#EDE9FE;color:#6D28D9;font-weight:800;font-size:.72rem;display:grid;place-items:center">4</span>
-            <span><span data-i18n-en>Shopkeepers reply &amp; can quote their shop.</span><span data-i18n-hi style="display:none">दुकानदार जवाब देकर अपनी दुकान बता सकते हैं।</span></span>
+            <span><span data-i18n-en>Shopkeepers reply &amp; can quote their shop.</span><span data-i18n-hi style="display:none">मालिक जवाब देकर अपनी दुकान बता सकते हैं।</span></span>
           </div>
         </div>
       </div>
@@ -1342,6 +1342,69 @@ async function submitAsk(){
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<span data-i18n-en>Post Question</span><span data-i18n-hi style="display:none">सवाल भेजें</span>';
+  }
+}
+
+// ====== submitReply — post reply to community question ======
+async function submitReply(){
+  const btn = document.getElementById('rSubmit');
+  const err = document.getElementById('rErr');
+  const ok  = document.getElementById('rOk');
+  if (err) err.style.display='none';
+  if (ok)  ok.style.display='none';
+
+  try {
+    if (!ACTIVE_QUESTION_ID){ throw new Error('No question selected'); }
+    const text  = (document.getElementById('rText') || {}).value || '';
+    const name  = ((document.getElementById('rName') || {}).value || '').trim();
+    const phone = ((document.getElementById('rPhone') || {}).value || '').trim();
+    const bizId = ((document.getElementById('rBiz') || {}).value || '').trim() || null;
+
+    if (text.trim().length < 4){
+      if (err){ err.textContent = 'Reply must be at least 4 characters'; err.style.display='block'; }
+      return;
+    }
+    if (phone.replace(/[^0-9]/g,'').length < 10){
+      if (err){ err.textContent = 'Valid 10-digit mobile required'; err.style.display='block'; }
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Posting…';
+
+    const { data, error } = await SB.rpc('post_community_reply', {
+      p_question_id   : ACTIVE_QUESTION_ID,
+      p_reply_text    : text.trim(),
+      p_replier_name  : name || null,
+      p_replier_phone : phone,
+      p_business_id   : bizId
+    });
+    if (error) throw error;
+
+    if (ok){
+      ok.textContent = '✓ Reply posted! Thank you for helping.';
+      ok.style.display='block';
+    }
+    try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
+    document.getElementById('rText').value=''; 
+    const rLen = document.getElementById('rLen'); if (rLen) rLen.textContent='0';
+    clearBizPick();
+
+    // Refresh detail view to show new reply
+    setTimeout(()=>{
+      closeReply();
+      try { openDetail(ACTIVE_QUESTION_ID); } catch(_){}
+      try { loadLeaderboard(); } catch(_){}
+    }, 1100);
+  } catch(e){
+    console.error('[submitReply] failure:', e);
+    if (err){
+      err.textContent = (e && e.message ? e.message : 'Could not post — please try again.').replace(/^.*?:\s*/,'');
+      err.style.display='block';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Post Reply</span><span data-i18n-hi>जवाब भेजें</span>';
   }
 }
 

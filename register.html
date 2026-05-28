@@ -687,8 +687,8 @@
   <!-- ================================ STEP 3: ADDRESS ================================ -->
   <div class="card" id="step3" style="margin-top:18px;display:none">
     <div class="card-title">
-      <span data-i18n-en>📍 Shop Address</span>
-      <span data-i18n-hi>📍 दुकान का पता</span>
+      <span data-i18n-en>📍 Address</span>
+      <span data-i18n-hi>📍 व्यवसाय का पता</span>
     </div>
     <div class="card-sub">
       <span data-i18n-en>Pincode must match the city — we verify automatically.</span>
@@ -957,8 +957,8 @@
     </div>
   </div>
   <div class="pulse-foot">
-    <span data-i18n-en>Aap join karne wale 1000+ owners me se hain.</span>
-    <span data-i18n-hi>Aap join karne wale 1000+ owners me se hain.</span>
+    <span data-i18n-en>You're joining a growing community of <b id="regLiveCount">local owners</b>.</span>
+    <span data-i18n-hi>आप <b id="regLiveCountHi">स्थानीय मालिकों</b> के बढ़ते हुए समुदाय में शामिल हो रहे हैं।</span>
     <br><b style="color:#FFB200">★ Aapka swagat hai!</b>
   </div>
 </aside>
@@ -1009,8 +1009,8 @@ const STATE = {
   data: {}
 };
 
-const STEP_NAMES_EN = ['', 'Mobile Verification', 'Business Details', 'Shop Address', 'About Your Shop'];
-const STEP_NAMES_HI = ['', 'मोबाइल वेरिफिकेशन', 'दुकान की जानकारी', 'दुकान का पता', 'दुकान के बारे में'];
+const STEP_NAMES_EN = ['', 'Mobile Verification', 'Business Details', 'Address', 'About Your Business'];
+const STEP_NAMES_HI = ['', 'मोबाइल वेरिफिकेशन', 'दुकान की जानकारी', 'व्यवसाय का पता', 'दुकान के बारे में'];
 
 function goToStep(n){
   STATE.step = n;
