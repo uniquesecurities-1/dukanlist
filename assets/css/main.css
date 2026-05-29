@@ -857,8 +857,11 @@ h3{ letter-spacing:-.012em }
   .brand{ font-size:1rem; gap:8px }
   .brand .logo{ width:32px; height:32px; font-size:1rem }
   .brand em{ font-size:.78rem }
-  .nav-links{ gap:4px !important; flex-wrap:nowrap !important }
-  .nav-links a:not(.nav-cta){ display:none !important }
+  /* Compact gap when collapsed in topbar (not in drawer) */
+  .nav-links:not(.open){ gap:4px !important; flex-wrap:nowrap !important }
+  /* 🚨 BUGFIX (2026-05-28): only hide nav links when drawer is CLOSED.
+     When .open (hamburger drawer expanded), all panel links must be visible. */
+  .nav-links:not(.open) a:not(.nav-cta){ display:none !important }
   .nav-links .lang-toggle{ display:inline-flex !important; margin-right:0 }
   .nav-cta{ padding:7px 13px !important; font-size:.78rem !important; white-space:nowrap }
 }
