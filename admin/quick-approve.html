@@ -272,4 +272,26 @@ async function quickDelete(id, name){
 }
 
 function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, c => ({'&':
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeJs(s){
+  return String(s||'').replace(/['"\\]/g, '\\$&');
+}
+function toast(msg, kind){
+  const t = document.getElementById('toast');
+  t.className = 'toast show ' + (kind || 'success');
+  t.textContent = msg;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+async function logout(){
+  await C.auth.signOut();
+  window.location.href = '/admin/login';
+}
+
+init().catch(e => {
+  document.getElementById('diagPanel').innerHTML = '<b style="color:#DC2626">init crashed:</b> ' + e.message;
+});
+</script>
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0F172A">
 <title>Manage Deals & Offers — DukanList</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>">
-<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260528">
 <style>
   .page-deals{ max-width:980px; margin:24px auto; padding:0 16px }
   .deals-head{ display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px }
@@ -74,10 +74,17 @@
   <div class="topbar-inner">
     <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
     <nav class="nav-links">
-      <a href="/panel/dashboard">Dashboard</a>
-      <a href="/panel/deals.html" style="color:var(--saffron-light);font-weight:700">🎁 Deals</a>
-      <a href="/panel/profile">Profile</a>
-      <a href="/" onclick="logout(event)">Logout</a>
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
+      <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
+      <a href="/panel/digital-card.html"><span data-i18n-en>📇 Digital Card</span><span data-i18n-hi>📇 डिजिटल कार्ड</span></a>
+      <a href="/panel/reviews.html"><span data-i18n-en>⭐ Reviews</span><span data-i18n-hi>⭐ रिव्यू</span></a>
+      <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
     </nav>
   </div>
 </header>
