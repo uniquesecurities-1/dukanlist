@@ -397,12 +397,14 @@ async function loadPending(){
     const hostEl = document.getElementById('list-pending');
     let banner = '';
     if (waiting > 0){
-      banner = '<div style="background:#FEF3C7;border:1px solid #FCD34D;border-left:4px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#78350F;">'
+      banner = '<div id="emailWaitBanner" style="background:#FEF3C7;border:1px solid #FCD34D;border-left:4px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#78350F;">'
         + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
         + '<span style="font-size:18px">📧</span>'
-        + '<div><b>' + waiting + '</b> new registration' + (waiting === 1 ? '' : 's') + ' awaiting email verification. They will appear here automatically once the owner clicks the verification link.</div>'
+        + '<div style="flex:1"><b>' + waiting + '</b> new registration' + (waiting === 1 ? '' : 's') + ' awaiting email verification. Email verify hote hi yahan dikhne lagengi.</div>'
+        + '<button onclick="toggleEmailWaitList()" id="emailWaitToggleBtn" style="background:#F59E0B;color:#fff;border:0;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">👁 Show list</button>'
         + '</div>'
-        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px;border-top:1px dashed #FCD34D">'
+        + '<div id="emailWaitList" style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #FCD34D"></div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px;margin-top:8px;border-top:1px dashed #FCD34D">'
         + '<span style="font-size:12px;color:#78350F">Email completely failing for someone? Manual override:</span>'
         + '<button onclick="adminForceVerifyEmail()" style="background:#1E3A8A;color:#fff;border:0;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔓 Force-verify by email</button>'
         + '</div>'
@@ -419,6 +421,112 @@ async function loadPending(){
       return;
     }
     document.getElementById('list-pending').innerHTML = data.map(b => bizCard(b, 'pending')).join('');
+  }
+}
+
+// ===== EMAIL-WAIT LIST (expandable in pending tab) =====
+let _emailWaitLoaded = false;
+
+async function toggleEmailWaitList(){
+  const box = document.getElementById('emailWaitList');
+  const btn = document.getElementById('emailWaitToggleBtn');
+  if (!box || !btn) return;
+
+  if (box.style.display === 'none'){
+    box.style.display = 'block';
+    btn.textContent = '🔼 Hide list';
+    if (!_emailWaitLoaded){
+      box.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E">⏳ Loading…</div>';
+      try {
+        const r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+        if (r.error) throw r.error;
+        const rows = r.data || [];
+        if (!rows.length){
+          box.innerHTML = '<div style="padding:10px;color:#78350F;text-align:center">No pending-email registrations to show.</div>';
+        } else {
+          box.innerHTML = rows.map(renderEmailWaitRow).join('');
+        }
+        _emailWaitLoaded = true;
+      } catch(e){
+        box.innerHTML = '<div style="padding:10px;color:#991B1B;background:#FEE2E2;border-radius:6px">Failed to load list: ' + escapeHtml(e.message || 'Unknown') + '<br><small>Make sure db/82-pending-email-verify-list.sql is deployed.</small></div>';
+      }
+    }
+  } else {
+    box.style.display = 'none';
+    btn.textContent = '👁 Show list';
+  }
+}
+
+function renderEmailWaitRow(b){
+  const name = escapeHtml(b.business_name || 'Unknown shop');
+  const owner = escapeHtml(b.owner_name || '');
+  const city = escapeHtml(b.city_name || '');
+  const cat = escapeHtml(b.primary_cat || '');
+  const mobile = (b.mobile || '').replace(/\D/g, '').slice(-10);
+  const wa = (b.whatsapp || '').replace(/\D/g, '').slice(-10) || mobile;
+  const bizEmail = escapeHtml(b.business_email || '');
+  const loginEmail = escapeHtml(b.login_email || '');
+  const days = b.days_since_signup || 0;
+  const ageBadge = days === 0 ? 'today'
+                  : days === 1 ? '1 day ago'
+                  : days < 7   ? days + ' days ago'
+                  : days < 30  ? Math.floor(days/7) + ' weeks ago'
+                  :              Math.floor(days/30) + ' months ago';
+
+  const waMsg = encodeURIComponent(
+    'Hello' + (owner ? ' ' + b.owner_name : '') + ', DukanList se Deepak Singla bol raha hoon.\n\n' +
+    'Aapne "' + (b.business_name || '') + '" register kiya ' + ageBadge + ', lekin abhi tak email verify nahi ki hai. ' +
+    'Verification email check karein:\n' +
+    '• Login email: ' + (b.login_email || '') + '\n' +
+    '• Inbox + Spam folder dono dekhein\n' +
+    '• Sender: noreply@dukanlist.com\n\n' +
+    'Email nahi mili? Yahan se resend karein: https://dukanlist.com/panel/resend-verification.html?email=' + encodeURIComponent(b.login_email || '') + '\n\n' +
+    'Email verify hote hi mai aapki listing approve kar dunga. Dhanyawaad.'
+  );
+  const waUrl = wa ? ('https://wa.me/91' + wa + '?text=' + waMsg) : '';
+
+  const ageColor = days >= 7 ? '#991B1B' : days >= 3 ? '#92400E' : '#65A30D';
+
+  return '<div style="background:#FFFDF7;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">'
+    + '<div style="flex:1;min-width:220px">'
+    +   '<div style="font-weight:800;color:#0F172A;font-size:14px">' + name + (cat ? ' <span style="color:#94a3b8;font-weight:500;font-size:11px">· ' + cat + '</span>' : '') + '</div>'
+    +   '<div style="color:#64748B;font-size:12px;margin-top:2px">'
+    +     (owner ? '👤 ' + owner + ' · ' : '')
+    +     (city ? '📍 ' + city : '')
+    +   '</div>'
+    +   '<div style="color:#0F172A;font-size:12px;margin-top:4px;line-height:1.5">'
+    +     (mobile ? '📞 +91 ' + mobile + ' · ' : '')
+    +     (loginEmail ? '📧 ' + loginEmail : '')
+    +   '</div>'
+    +   (bizEmail && bizEmail.toLowerCase() !== loginEmail.toLowerCase() ? '<div style="color:#92400E;font-size:11px;margin-top:2px">⚠ Business email different: ' + bizEmail + '</div>' : '')
+    +   '<div style="color:' + ageColor + ';font-size:11px;font-weight:700;margin-top:4px">⏳ Registered ' + ageBadge + '</div>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:170px">'
+    +   (waUrl ? '<a href="' + waUrl + '" target="_blank" style="background:#25D366;color:#fff;text-align:center;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;display:block">📱 WhatsApp Reminder</a>' : '<span style="color:#9CA3AF;font-size:11px;text-align:center;padding:4px">no WhatsApp #</span>')
+    +   '<button onclick="adminForceVerifyEmailFor(\'' + (loginEmail || '').replace(/\'/g, "\\\'") + '\')" style="background:#1E3A8A;color:#fff;border:0;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔓 Force-verify</button>'
+    + '</div>'
+    + '</div>';
+}
+
+async function adminForceVerifyEmailFor(email){
+  if (!email) { alert('No email'); return; }
+  if (!confirm('Force-verify "' + email + '"?\n\nYe action bypass karega email confirmation. Sirf un cases me use karein jab user ke paas verification email kaafi try ke baad bhi na pahunche.')) return;
+  try {
+    const sess = await C.auth.getSession();
+    const jwt = sess?.data?.session?.access_token;
+    if (!jwt){ alert('⚠ Session expired'); return; }
+    const res = await fetch('/api/admin-force-verify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    const j = await res.json();
+    if (!res.ok){ alert('❌ Failed: ' + (j.error || ('HTTP ' + res.status))); return; }
+    alert(j.already_verified ? 'ℹ Already verified.' : '✓ Email verified manually. Business ab pending queue me appear hogi.');
+    _emailWaitLoaded = false;
+    await loadPending();
+  } catch(e){
+    alert('❌ ' + (e.message || e));
   }
 }
 
