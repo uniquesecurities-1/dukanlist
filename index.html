@@ -28,14 +28,14 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DukanList">
 <meta property="og:title" content="DukanList — Every Local Name in your city · Shop, Doctor, School, NGO & more">
-<meta property="og:description" content="FREE local directory for Sirsa · Bathinda · Mandi Dabwali. 200+ categories. Pucho Bhai community Q&amp;A. WhatsApp + Call ready. Zero cost for owners.">
+<meta property="og:description" content="FREE local directory for Sirsa · Bathinda · Mansa · Muktsar · Mandi Dabwali. 200+ categories. Pucho Bhai community Q&amp;A. WhatsApp + Call ready. Zero cost for owners.">
 <meta property="og:url" content="https://dukanlist.com">
 <meta property="og:image" content="https://dukanlist.com/assets/og-default.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="DukanList — Every Local Name in your city · Shop, Doctor, School, NGO & more">
-<meta name="twitter:description" content="FREE local directory · Sirsa · Bathinda · Mandi Dabwali · 200+ categories · Pucho Bhai community Q&amp;A">
+<meta name="twitter:description" content="FREE local directory · Sirsa · Bathinda · Mansa · Muktsar · Mandi Dabwali · 200+ categories · Pucho Bhai community Q&amp;A">
 <meta name="twitter:image" content="https://dukanlist.com/assets/og-default.png">
 <link rel="canonical" href="https://dukanlist.com/">
 
@@ -71,7 +71,7 @@
   "name": "DukanList",
   "alternateName": "Dukan List",
   "url": "https://dukanlist.com",
-  "description": "Bharat's local business directory — 195+ categories, verified owners, free registration. Sirsa-Bathinda ka apna live directory.",
+  "description": "Bharat's local business directory — 195+ categories, verified owners, free registration. Sirsa · Bathinda · Mansa · Muktsar ka apna live directory.",
   "potentialAction": {
     "@type": "SearchAction",
     "target": "https://dukanlist.com/search.html?q={search_term_string}",
@@ -600,7 +600,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
     { name_en:'Happy Independence Day',  name_hi:'स्वतंत्रता दिवस मुबारक',month:8,day:15, span:1, theme:'india',   emoji:'🇮🇳', msg_en:'Vande Mataram — celebrating with Bharat\'s local businesses', msg_hi:'वंदे मातरम् — local business के साथ जश्न' },
     { name_en:'Happy Diwali',            name_hi:'दिवाली मुबारक',       month:11, day:8,  span:4, theme:'diwali',  emoji:'🪔', msg_en:'Diwali — light up your home with gifts from local shops',  msg_hi:'दिवाली — local shops से दीये जलाएं' },
     { name_en:'Gurpurab Greetings',      name_hi:'गुरपुरब की शुभकामनाएं',month:11, day:24, span:1, theme:'sikh',   emoji:'🪯', msg_en:'Gurpurab — Vaheguru ji ki Fateh',                          msg_hi:'गुरपुरब — वाहेगुरु जी की फतेह' },
-    { name_en:'Merry Christmas',         name_hi:'क्रिसमस मुबारक',      month:12, day:25, span:2, theme:'xmas',    emoji:'🎄', msg_en:'Christmas — find gifts at local Sirsa-Bathinda shops',    msg_hi:'क्रिसमस — local Sirsa-Bathinda shops से तोहफे लें' }
+    { name_en:'Merry Christmas',         name_hi:'क्रिसमस मुबारक',      month:12, day:25, span:2, theme:'xmas',    emoji:'🎄', msg_en:'Christmas — find gifts at local local shops',    msg_hi:'क्रिसमस — local local shops से तोहफे लें' }
   ];
   const THEMES = {
     newyear:'linear-gradient(135deg,#0F172A 0%,#7C3AED 50%,#F59E0B 100%)',
@@ -683,7 +683,7 @@ function dismissFestBanner(){
       <span data-i18n-hi>🇮🇳 भारत की लोकल डायरेक्टरी · मंडी डबवाली से</span>
     </span>
     <h1 class="hero-tag">
-      <span data-i18n-en>Find anything local in <span class="grad">Sirsa-Bathinda</span></span>
+      <span data-i18n-en>Find anything local in <span class="grad">Sirsa · Bathinda · Mansa · Muktsar</span></span>
       <span data-i18n-hi>सिरसा-बठिंडा में <span class="grad">कुछ भी local</span> खोजें</span>
     </h1>
     <p class="hero-sub">
@@ -1792,7 +1792,7 @@ if (window.DukanPTR){
       <button onclick="pickLocality('rori','Rori')" class="loc-btn">🏪 Rori</button>
       <button onclick="pickLocality('kalanwali','Kalanwali')" class="loc-btn">🏪 Kalanwali</button>
     </div>
-    <button onclick="pickLocality('all','All of Sirsa-Bathinda')" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3)">
+    <button onclick="pickLocality('all','All 4 districts (Sirsa, Bathinda, Mansa, Muktsar)')" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3)">
       🌐 <span data-i18n-en>Show me ALL listings</span><span data-i18n-hi>सभी लिस्टिंग दिखाओ</span>
     </button>
   </div>
@@ -1816,7 +1816,7 @@ if (window.DukanPTR){
     // Optional: redirect to search filtered by locality (for non-"all")
     if (slug !== 'all'){
       // Soft refresh — let homepage re-personalise (future enhancement)
-      // For now we just store it; site already shows Sirsa-Bathinda only.
+      // For now we just store it; site already shows Sirsa · Bathinda · Mansa · Muktsar only.
     }
   };
   // Show on first visit only
@@ -2116,7 +2116,7 @@ if (window.DukanPTR){
     if (events.length === 0){
       // Static fallback (so ticker is never empty)
       events.push(
-        { en: '🏪 Sirsa–Bathinda ka apna local directory — join FREE', hi: '🏪 Sirsa–Bathinda का local directory — FREE जुड़ें' },
+        { en: '🏪 Sirsa · Bathinda · Mansa · Muktsar ka apna local directory — join FREE', hi: '🏪 Sirsa · Bathinda · Mansa · Muktsar का local directory — FREE जुड़ें' },
         { en: '💬 Customers daily WhatsApp local shops directly', hi: '💬 Customers रोज़ local shops से WhatsApp पर बात करते हैं' }
       );
     }

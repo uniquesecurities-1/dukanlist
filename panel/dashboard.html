@@ -7,7 +7,7 @@
 <title>My Listing Dashboard — dukanlist.com</title>
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css?v=20260528">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260531">
 <style>
 .dash-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:18px 0 24px }
 .kpi{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px }
@@ -41,8 +41,8 @@
       <span data-i18n-hi>DukanList me swagat hai!</span>
     </h2>
     <p style="text-align:center;color:#64748B;margin-bottom:22px;font-size:.95rem">
-      <span data-i18n-en>Aapki shop ab Sirsa-Bathinda ke saare customers tak pohunch sakti hai. Quick tour:</span>
-      <span data-i18n-hi>Aapki shop ab Sirsa-Bathinda ke saare customers tak pohunch sakti hai. Quick tour:</span>
+      <span data-i18n-en>Aapki shop ab Sirsa · Bathinda · Mansa · Muktsar ke saare customers tak pohunch sakti hai. Quick tour:</span>
+      <span data-i18n-hi>Aapki shop ab Sirsa · Bathinda · Mansa · Muktsar ke saare customers tak pohunch sakti hai. Quick tour:</span>
     </p>
     <div style="display:grid;gap:12px;margin-bottom:24px">
       <div style="display:flex;gap:12px;align-items:flex-start;background:#FFF7ED;padding:12px 14px;border-radius:12px;border:1px solid #FED7AA">
@@ -559,8 +559,8 @@
         <span class="mini-pulse-title">Platform Pulse</span>
       </div>
       <div style="font-size:.78rem;color:#9DB1D4">
-        <span data-i18n-en>Sirsa-Bathinda Live</span>
-        <span data-i18n-hi>Sirsa-Bathinda Live</span>
+        <span data-i18n-en>Sirsa · Bathinda · Mansa · Muktsar Live</span>
+        <span data-i18n-hi>Sirsa · Bathinda · Mansa · Muktsar Live</span>
       </div>
       <div class="mini-pulse-stats">
         <div class="mini-pulse-stat">
@@ -1710,8 +1710,8 @@ function shareReferralWhatsApp(){
   if (!link) return;
   const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
   const message = lang === 'hi'
-    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa-Bathinda ka apna local directory. FREE registration. Aaj hi karein: ' + link
-    : 'Namaste! List your shop on DukanList — Sirsa-Bathinda ka apna local directory. FREE registration. Register today: ' + link;
+    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Aaj hi karein: ' + link
+    : 'Namaste! List your shop on DukanList — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Register today: ' + link;
   window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
 }
 

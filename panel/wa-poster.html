@@ -298,7 +298,7 @@ async function render(){
   ctx.fillText('📍 DukanList', 60, 80);
   ctx.font = '600 18px Plus Jakarta Sans, sans-serif';
   ctx.fillStyle = theme.text === '#fff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
-  ctx.fillText('Sirsa–Bathinda local directory', 60, 110);
+  ctx.fillText('Sirsa · Bathinda · Mansa · Muktsar local directory', 60, 110);
   if (STATE.toggles.verified && Number(BIZ.verified_score) >= 1){
     const tier = Number(BIZ.verified_score) >= 5 ? 'GOLD' : (Number(BIZ.verified_score) >= 3 ? 'SILVER' : 'BRONZE');
     const tierColor = tier === 'GOLD' ? '#FBBF24' : (tier === 'SILVER' ? '#94A3B8' : '#A16207');

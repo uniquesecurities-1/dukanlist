@@ -16,7 +16,7 @@
 
   var SHARE_DATA = {
     title: 'DukanList — Every Shop, One App',
-    text:  'Find any local shop in Sirsa-Bathinda on DukanList. Verified shopkeepers, free for customers.',
+    text:  'Find any local shop in Sirsa · Bathinda · Mansa · Muktsar on DukanList. Verified shopkeepers, free for customers.',
     url:   'https://dukanlist.com/'
   };
 
