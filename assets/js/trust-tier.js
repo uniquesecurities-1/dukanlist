@@ -43,7 +43,10 @@
     var age  = yr > 0 ? Math.max(0, nowYr - yr) : 0;
 
     var T = THRESHOLDS;
-    var isBronze = vs >= T.bronze.verified_score;
+    // db/84 - strict Bronze gate: admin must have physically visited.
+    // verified_score alone is no longer enough (it auto-bumped from mobile/photo flags).
+    // Only verified_visit === TRUE earns the visible badge across the public site.
+    var isBronze = shop.verified_visit === true;
     var isSilver = isBronze
                 && ravg >= T.silver.rating_avg
                 && rcnt >= T.silver.rating_count
@@ -83,7 +86,8 @@
     var nextTier = null;
     var missing = [];
     if (!isBronze){
-      if (vs < T.bronze.verified_score) missing.push('Get admin verification (request callback)');
+      // db/84 - only an admin physical visit unlocks Bronze
+      missing.push('Request a verification visit from the DukanList admin team');
       nextTier = { tier:'bronze', missing: missing };
     } else if (!isSilver){
       if (ravg < T.silver.rating_avg) missing.push('Improve average rating to ' + T.silver.rating_avg + ' (current ' + ravg.toFixed(1) + ')');

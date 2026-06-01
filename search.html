@@ -751,7 +751,9 @@ function _renderResultsInner(){
     });
   }
   if (VERIFIED_FILTER){
-    rows = rows.filter(b => Number(b.verified_score) >= 3);
+    // db/84 - strict verification: admin physically visited & confirmed.
+    // verified_visit === TRUE is the only signal that earns the blue tick.
+    rows = rows.filter(b => b.verified_visit === true);
   }
   if (DEALS_FILTER && BIZ_WITH_DEALS.size){
     rows = rows.filter(b => BIZ_WITH_DEALS.has(b.id));
@@ -823,7 +825,7 @@ function renderCard(b){
   const photoHTML = photo
     ? `<img src="${photo}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
     : `<div class="ph-fb">${b.category_icon || '🏪'}</div>`;
-  const verified = (typeof DukanTier !== 'undefined') ? DukanTier.badge(b) : (b.verified_score >= 3 ? '<span class="verify">✓ Verified</span>' : '');
+  const verified = (typeof DukanTier !== 'undefined') ? DukanTier.badge(b) : (b.verified_visit === true ? '<span class="verify">✓ Verified</span>' : '');
   const featuredRibbon = b.is_featured ? '<span class="featured-ribbon">★ FEATURED</span>' : '';
   // Open-Now badge (only when hours_json is present and parseable)
   let openBadge = '';
