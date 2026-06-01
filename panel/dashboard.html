@@ -320,6 +320,9 @@
       </div>
     </div>
 
+    <!-- Verification CTA card (decoupled from approval - rendered by renderVerificationCta) -->
+    <div id="verificationCta" style="margin-top:18px"></div>
+
     <!-- KPI -->
     <div class="dash-grid">
       <div class="kpi">
@@ -923,6 +926,9 @@ async function loadDashboard(){
   // Load multi-cat badges
   loadCategoryBadges(biz.id);
 
+  // ===== Verification CTA (only show if approved + not yet verified) =====
+  try { renderVerificationCta(biz, c); } catch(e){ console.warn('Verification CTA:', e); }
+
   // ===== OG SHARE CARD auto-generation (DISABLED 2026-06-01) =====
   // Disabled on dashboard load to keep console clean. The auto-hook was
   // calling Supabase Storage upload + RPC on every dashboard load, which
@@ -957,6 +963,86 @@ async function loadCategoryBadges(bizId){
 
 function escapeHTML(s){
   return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+// ============================================================
+// renderVerificationCta(biz, c)
+// Decoupling approval from verification - db/84
+// States:
+//   1. verified_visit === true                 -> success card
+//   2. verification_requested_at within 7 days -> pending card
+//   3. status === 'active' + not verified      -> CTA card
+//   4. status !== 'active'                     -> hidden
+// ============================================================
+function renderVerificationCta(biz, c){
+  const host = document.getElementById('verificationCta');
+  if (!host) return;
+  if (!biz || biz.status !== 'active'){ host.innerHTML = ''; return; }
+
+  // STATE 1 - already verified
+  if (biz.verified_visit === true){
+    host.innerHTML = '<div style="background:linear-gradient(135deg,#ECFDF5 0%,#D1FAE5 100%);border:1.5px solid #10B981;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px">'
+      + '<div style="width:44px;height:44px;border-radius:50%;background:#10B981;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0">✓</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-weight:800;color:#065F46;font-size:.98rem;margin-bottom:2px">Verified Shop — Blue Tick Earned</div>'
+      + '<div style="color:#047857;font-size:.83rem;line-height:1.45">DukanList admin team has physically visited &amp; confirmed this business. Aapki listing par blue badge live hai.</div>'
+      + '</div></div>';
+    return;
+  }
+
+  // STATE 2 - recent request pending
+  const reqAt = biz.verification_requested_at ? new Date(biz.verification_requested_at) : null;
+  const sevenDaysAgo = new Date(Date.now() - 7*24*60*60*1000);
+  if (reqAt && reqAt > sevenDaysAgo){
+    const days = Math.max(0, Math.floor((Date.now() - reqAt.getTime())/(24*60*60*1000)));
+    const dayLabel = days === 0 ? 'today' : (days === 1 ? '1 day ago' : days + ' days ago');
+    host.innerHTML = '<div style="background:#FFFBEB;border:1.5px solid #F59E0B;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px">'
+      + '<div style="width:44px;height:44px;border-radius:50%;background:#F59E0B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⏳</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-weight:800;color:#92400E;font-size:.98rem;margin-bottom:2px">Verification Request Received</div>'
+      + '<div style="color:#78350F;font-size:.83rem;line-height:1.45">Requested ' + dayLabel + '. DukanList admin team will contact you within 3-7 business days for a physical visit. Make sure your shop is reachable on the mobile number you provided.</div>'
+      + '</div></div>';
+    return;
+  }
+
+  // STATE 3 - eligible, not yet requested
+  host.innerHTML = '<div style="background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border:1.5px solid #3B82F6;border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
+    + '<div style="width:52px;height:52px;border-radius:50%;background:#3B82F6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">✓</div>'
+    + '<div style="flex:1;min-width:200px">'
+    + '<div style="font-weight:800;color:#1E3A8A;font-size:1rem;margin-bottom:3px">Get the Blue Verified Badge</div>'
+    + '<div style="color:#1E40AF;font-size:.83rem;line-height:1.45">DukanList team aapke shop par physical visit karke verification kar sakti hai. Verified shops ko search me higher rank, customer trust aur leads jyada milte hai. <b>Bilkul Free.</b></div>'
+    + '</div>'
+    + '<button id="btnRequestVerify" style="background:#1D4ED8;color:#fff;border:none;padding:11px 22px;border-radius:99px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(29,78,216,.25);flex-shrink:0">Request Verification Visit</button>'
+    + '</div>';
+
+  const btn = document.getElementById('btnRequestVerify');
+  if (btn){
+    btn.addEventListener('click', async function(){
+      btn.disabled = true;
+      btn.textContent = 'Sending request...';
+      try{
+        const { data, error } = await c.rpc('shopkeeper_request_verification');
+        if (error){
+          alert('Error: ' + (error.message || 'Could not submit request. Please try again.'));
+          btn.disabled = false; btn.textContent = 'Request Verification Visit'; return;
+        }
+        if (data && data.success === false){
+          alert(data.message || 'Could not submit request.');
+          btn.disabled = false; btn.textContent = 'Request Verification Visit'; return;
+        }
+        biz.verification_requested_at = new Date().toISOString();
+        renderVerificationCta(biz, c);
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#065F46;color:#fff;padding:12px 22px;border-radius:99px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:.9rem';
+        toast.textContent = '✓ Verification request sent. Admin team will contact you soon.';
+        document.body.appendChild(toast);
+        setTimeout(function(){ toast.remove(); }, 4000);
+      }catch(e){
+        alert('Network error. Please check your connection and try again.');
+        btn.disabled = false; btn.textContent = 'Request Verification Visit';
+      }
+    });
+  }
 }
 
 function renderDashboard(b){
