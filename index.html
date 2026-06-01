@@ -1838,7 +1838,7 @@ if (window.DukanPTR){
       if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
       const c = ShopDB.client;
       const { data, error } = await c.from('businesses')
-        .select('id,slug,name,owner_name,photos,verified_score,rating_avg,rating_count,photos_count,geo_cities(name)')
+        .select('id,slug,name,owner_name,photos,verified_score,rating_avg,rating_count,geo_cities(name)')
         .eq('status', 'active')
         .order('rating_count', { ascending: false })
         .order('rating_avg', { ascending: false })
@@ -1849,7 +1849,7 @@ if (window.DukanPTR){
       const scored = data.map(b => ({
         ...b,
         _score: ((Number(b.rating_count) || 0) * (Number(b.rating_avg) || 0)) +
-                ((Number(b.photos_count) || 0) * 1.5) +
+                ((Array.isArray(b.photos) ? b.photos.length : 0) * 1.5) +
                 ((Number(b.verified_score) || 0) * 8)
       })).filter(b => b._score >= 3).sort((a, b) => b._score - a._score).slice(0, 10);
       if (scored.length < 3) return;
