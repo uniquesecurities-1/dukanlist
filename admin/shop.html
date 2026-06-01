@@ -1209,14 +1209,25 @@ async function adminCreateOwnerAccount(bizId){
 // ====== Credentials modal — shows email + password with WhatsApp share button ======
 // Stays open until admin explicitly closes. Big WhatsApp button auto-prefills
 // owner mobile + message. Solves: 'admin bhul gaya note karne ka' problem.
+//
+// IMPORTANT: Copy buttons + close button use addEventListener (not inline onclick)
+// because inline onclick="...JSON.stringify(value)..." breaks HTML parsing —
+// double quotes inside the value terminate the attribute early.
 function showCredentialsModal(opts){
   opts = opts || {};
-  var email = opts.email || '';
-  var password = opts.password || '';
+  var email = String(opts.email || '');
+  var password = String(opts.password || '');
   var mobile = String(opts.mobile || '').replace(/\D/g, '').slice(-10);
-  var shopName = opts.shopName || '';
-  var title = opts.title || 'Account credentials';
-  var subtitle = opts.subtitle || 'Share these with the owner via WhatsApp or phone. They should change the password after first login.';
+  var shopName = String(opts.shopName || '');
+  var title = String(opts.title || 'Account credentials');
+  var subtitle = String(opts.subtitle || 'Share these with the owner via WhatsApp or phone. They should change the password after first login.');
+  var onClose = opts.onClose || function(){};
+
+  function esc(v){
+    return String(v||'').replace(/[&<>"']/g, function(c){
+      return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c];
+    });
+  }
 
   // Pre-filled WhatsApp message
   var waMsg = (
@@ -1224,22 +1235,26 @@ function showCredentialsModal(opts){
     + 'Aapka login account ' + (shopName ? '"' + shopName + '" ke liye ' : '') + 'taiyaar ho gaya hai.\n\n'
     + 'Login URL: https://dukanlist.com/panel/login.html\n'
     + 'Email: ' + email + '\n'
-    + 'Password: ' + password + '\n\n'
+    + (password ? 'Password: ' + password + '\n\n' : '\n')
     + 'Pehli baar login karne ke baad password change kar lena please (Settings > Reset Password).\n\n'
     + 'Koi help chahiye to is number par WhatsApp kar dena. — Team DukanList'
   );
   var waUrl = mobile ? ('https://wa.me/91' + mobile + '?text=' + encodeURIComponent(waMsg)) : '';
-  var smsUrl = mobile ? ('sms:+91' + mobile + '?body=' + encodeURIComponent(waMsg)) : '';
 
-  function esc(v){ return String(v||'').replace(/[&<>"\\']/g, function(c){ return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]; }); }
-
-  // Build modal
+  // Remove any pre-existing modal
   var existing = document.getElementById('credentialsModal');
   if (existing) existing.remove();
 
   var overlay = document.createElement('div');
   overlay.id = 'credentialsModal';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;font-family:inherit';
+
+  // Build inner HTML — values escaped, NO inline onclick handlers
+  var hasPwd = !!password;
+  var hasMobile = !!mobile && !!password; // only show WA button if both exist
+  var noMobileWarn = !mobile && hasPwd
+    ? '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:10px;border-radius:6px;font-size:12px;color:#78350F;margin-bottom:8px">⚠ No mobile number set for this shop. Copy credentials above and share manually.</div>'
+    : '';
 
   overlay.innerHTML =
       '<div style="background:#fff;border-radius:16px;padding:24px;max-width:520px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.4);max-height:92vh;overflow-y:auto">'
@@ -1255,40 +1270,73 @@ function showCredentialsModal(opts){
     +         '<div style="font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Email</div>'
     +         '<div style="font-size:14px;color:#0F172A;font-weight:700">' + esc(email) + '</div>'
     +       '</div>'
-    +       '<button type="button" onclick="(async()=>{try{await navigator.clipboard.writeText(' + JSON.stringify(email) + ');this.textContent=\'✓\';setTimeout(()=>this.textContent=\'⧉\',1500)}catch(_){}})()" style="background:#1D4ED8;color:#fff;border:none;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0" title="Copy email">⧉</button>'
+    +       '<button type="button" data-copy="email" style="background:#1D4ED8;color:#fff;border:none;width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;font-family:inherit" title="Copy email">⧉</button>'
     +     '</div>'
     +     '<div style="border-top:1px dashed #CBD5E1;padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px">'
     +       '<div style="flex:1;min-width:0">'
     +         '<div style="font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Password</div>'
-    +         '<div style="font-size:18px;color:#0F172A;font-weight:800;letter-spacing:.05em">' + esc(password || '(unchanged — owner uses existing password)') + '</div>'
+    +         '<div style="font-size:18px;color:#0F172A;font-weight:800;letter-spacing:.05em">' + (hasPwd ? esc(password) : '<span style="font-weight:500;color:#64748b;font-style:italic">(unchanged — owner uses existing password)</span>') + '</div>'
     +       '</div>'
-    +       (password ? '<button type="button" onclick="(async()=>{try{await navigator.clipboard.writeText(' + JSON.stringify(password) + ');this.textContent=\'✓\';setTimeout(()=>this.textContent=\'⧉\',1500)}catch(_){}})()" style="background:#1D4ED8;color:#fff;border:none;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0" title="Copy password">⧉</button>' : '')
+    +       (hasPwd ? '<button type="button" data-copy="password" style="background:#1D4ED8;color:#fff;border:none;width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;font-family:inherit" title="Copy password">⧉</button>' : '')
     +     '</div>'
     +   '</div>'
 
-    +   (mobile && password ?
-      (   '<a href="' + waUrl + '" target="_blank" rel="noopener" '
-        +   'style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;padding:14px;border-radius:10px;font-weight:800;font-size:15px;margin-bottom:8px;box-shadow:0 4px 12px rgba(37,211,102,.35);transition:.15s" '
-        +   'onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">'
-        +   '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.6 6.32A7.8 7.8 0 0 0 12 4a7.85 7.85 0 0 0-6.66 11.94L4 20l4.18-1.32A7.86 7.86 0 0 0 19.85 12 7.8 7.8 0 0 0 17.6 6.32zm-5.55 12.06a6.5 6.5 0 0 1-3.32-.91l-.24-.14-2.47.78.78-2.4-.16-.25a6.55 6.55 0 1 1 12.13-3.5 6.56 6.56 0 0 1-6.72 6.42z"/><path d="M15.62 13.5c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.5.65-.62.78-.11.13-.23.15-.43.05-.2-.1-.83-.3-1.59-.98-.59-.52-.98-1.17-1.1-1.37-.11-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.07-.13.03-.25-.02-.35-.05-.1-.45-1.08-.61-1.48-.16-.39-.33-.34-.45-.34l-.39-.01c-.13 0-.34.05-.52.25-.18.2-.69.67-.69 1.64s.7 1.91.8 2.04c.1.13 1.4 2.14 3.4 3 .47.2.85.32 1.14.41.48.15.92.13 1.26.08.39-.06 1.18-.48 1.35-.95.17-.47.17-.87.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>'
-        +   'Send via WhatsApp to ' + mobile
-        + '</a>'
-      ) : (
-        password ? '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:10px;border-radius:6px;font-size:12px;color:#78350F;margin-bottom:8px">⚠ No mobile number set for this shop. Copy credentials above and share manually.</div>' : ''
-      )
-    )
+    +   (hasMobile
+        ? '<a href="' + esc(waUrl) + '" target="_blank" rel="noopener" '
+          + 'style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;padding:14px;border-radius:10px;font-weight:800;font-size:15px;margin-bottom:8px;box-shadow:0 4px 12px rgba(37,211,102,.35)">'
+          + '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.6 6.32A7.8 7.8 0 0 0 12 4a7.85 7.85 0 0 0-6.66 11.94L4 20l4.18-1.32A7.86 7.86 0 0 0 19.85 12 7.8 7.8 0 0 0 17.6 6.32zm-5.55 12.06a6.5 6.5 0 0 1-3.32-.91l-.24-.14-2.47.78.78-2.4-.16-.25a6.55 6.55 0 1 1 12.13-3.5 6.56 6.56 0 0 1-6.72 6.42z"/><path d="M15.62 13.5c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.5.65-.62.78-.11.13-.23.15-.43.05-.2-.1-.83-.3-1.59-.98-.59-.52-.98-1.17-1.1-1.37-.11-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.07-.13.03-.25-.02-.35-.05-.1-.45-1.08-.61-1.48-.16-.39-.33-.34-.45-.34l-.39-.01c-.13 0-.34.05-.52.25-.18.2-.69.67-.69 1.64s.7 1.91.8 2.04c.1.13 1.4 2.14 3.4 3 .47.2.85.32 1.14.41.48.15.92.13 1.26.08.39-.06 1.18-.48 1.35-.95.17-.47.17-.87.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>'
+          + 'Send via WhatsApp to ' + esc(mobile)
+          + '</a>'
+        : noMobileWarn)
 
-    +   '<button type="button" onclick="document.getElementById(\'credentialsModal\').remove();window._credentialsModalOnClose && window._credentialsModalOnClose()" style="width:100%;background:#475569;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+    +   '<button type="button" data-modal-close="1" style="width:100%;background:#475569;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
 
     +   '<div style="font-size:10.5px;color:#94a3b8;margin-top:10px;text-align:center;line-height:1.45">'
     +     'Password is shown only here — it is NOT logged. If you close without saving, you can use Reset Password again to generate a new one.'
     +   '</div>'
     + '</div>';
 
-  // Stash onClose so the inline button can call it after DOM removal
-  window._credentialsModalOnClose = opts.onClose || function(){};
-
   document.body.appendChild(overlay);
+
+  // Wire up event handlers AFTER mount — avoids inline-onclick quote-escaping hell
+  function copyTo(btn, value){
+    var orig = btn.textContent;
+    function flash(ok){
+      btn.textContent = ok ? '✓' : '✗';
+      btn.style.background = ok ? '#10B981' : '#DC2626';
+      setTimeout(function(){
+        btn.textContent = orig;
+        btn.style.background = '#1D4ED8';
+      }, 1400);
+    }
+    try {
+      navigator.clipboard.writeText(value).then(function(){ flash(true); }, function(){ flash(false); });
+    } catch(_){
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = value; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        flash(true);
+      } catch(__){ flash(false); }
+    }
+  }
+
+  overlay.querySelectorAll('button[data-copy]').forEach(function(btn){
+    var which = btn.getAttribute('data-copy');
+    btn.addEventListener('click', function(){
+      copyTo(btn, which === 'password' ? password : email);
+    });
+  });
+
+  var closeBtn = overlay.querySelector('button[data-modal-close]');
+  if (closeBtn){
+    closeBtn.addEventListener('click', function(){
+      overlay.remove();
+      try { onClose(); } catch(_){}
+    });
+  }
 }
 
 // ====== Force Verify Email (admin override) ======
