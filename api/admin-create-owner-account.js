@@ -101,6 +101,10 @@ module.exports = async (req, res) => {
   const businessId = (body.business_id || '').trim();
   const overrideEmail = (body.email || '').trim().toLowerCase();
   const overridePassword = String(body.password || '').trim();
+  // If set, skip auth user creation and link the existing user instead.
+  // Used when caller already saw a 409 "email already exists" and wants to
+  // re-link the orphaned auth user back to this business.
+  const linkExistingUserId = (body.link_existing_user_id || '').trim();
 
   if (!businessId || !/^[0-9a-f-]{36}$/i.test(businessId)) {
     res.status(400).json({ error: 'Provide a valid business_id in body' });
@@ -159,57 +163,78 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ===== 5. Check email is not already in auth =====
-  const lookup = await sbFetch(
-    '/auth/v1/admin/users?filter=' + encodeURIComponent('email.eq.' + targetEmail),
-    { method: 'GET' }
-  );
-  let existingUser = null;
-  if (lookup.ok && lookup.body && Array.isArray(lookup.body.users)) {
-    existingUser = lookup.body.users.find(u => (u.email || '').toLowerCase() === targetEmail);
-  }
-  if (!existingUser) {
-    // Fallback list scan
-    const listRes = await sbFetch('/auth/v1/admin/users?per_page=200', { method: 'GET' });
-    if (listRes.ok && listRes.body && Array.isArray(listRes.body.users)) {
-      existingUser = listRes.body.users.find(u => (u.email || '').toLowerCase() === targetEmail);
-    }
-  }
-  if (existingUser) {
-    res.status(409).json({
-      error: 'An account with this email already exists in the auth system.',
-      existing_user_id: existingUser.id,
-      hint: 'Either link this user to the business via business_owners directly, or use a different email.'
-    });
-    return;
-  }
+  // ===== 5. Decide path: link existing user OR create new =====
+  let newUserId = null;        // populated either by creation or by lookup
+  let usedExistingUser = false;
+  let createdPassword = null;  // populated only if we actually created the user
 
-  // ===== 6. Create auth user — email pre-confirmed =====
-  const createRes = await sbFetch('/auth/v1/admin/users', {
-    method: 'POST',
-    body: JSON.stringify({
-      email: targetEmail,
-      password: password,
-      email_confirm: true,                // admin bypass — no verification needed
-      user_metadata: {
-        mobile: biz.mobile || null,        // so existing auto-claim by mobile keeps working
-        created_by_admin: adminEmail,
-        created_for_business_id: businessId,
-        created_for_business_name: biz.name || null
+  if (linkExistingUserId) {
+    // Caller explicitly chose to link an existing auth user (after seeing
+    // a previous 409 response). Verify the user exists.
+    const verify = await sbFetch(
+      '/auth/v1/admin/users/' + encodeURIComponent(linkExistingUserId),
+      { method: 'GET' }
+    );
+    if (!verify.ok || !verify.body || !verify.body.id) {
+      res.status(404).json({ error: 'Existing user id not found in auth system' });
+      return;
+    }
+    newUserId = verify.body.id;
+    usedExistingUser = true;
+  } else {
+    // Normal path - check email is not already in auth
+    const lookup = await sbFetch(
+      '/auth/v1/admin/users?filter=' + encodeURIComponent('email.eq.' + targetEmail),
+      { method: 'GET' }
+    );
+    let existingUser = null;
+    if (lookup.ok && lookup.body && Array.isArray(lookup.body.users)) {
+      existingUser = lookup.body.users.find(function(u){ return (u.email || '').toLowerCase() === targetEmail; });
+    }
+    if (!existingUser) {
+      const listRes = await sbFetch('/auth/v1/admin/users?per_page=200', { method: 'GET' });
+      if (listRes.ok && listRes.body && Array.isArray(listRes.body.users)) {
+        existingUser = listRes.body.users.find(function(u){ return (u.email || '').toLowerCase() === targetEmail; });
       }
-    })
-  });
-  if (!createRes.ok) {
-    res.status(createRes.status || 500).json({
-      error: 'Failed to create auth user',
-      detail: createRes.body
+    }
+    if (existingUser) {
+      res.status(409).json({
+        error: 'An account with this email already exists in the auth system.',
+        existing_user_id: existingUser.id,
+        existing_email: existingUser.email,
+        hint: 'You can link this existing user to the business. Retry with body { link_existing_user_id: "' + existingUser.id + '" } - or use a different email.'
+      });
+      return;
+    }
+
+    // ===== 6. Create auth user - email pre-confirmed =====
+    const createRes = await sbFetch('/auth/v1/admin/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: targetEmail,
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          mobile: biz.mobile || null,
+          created_by_admin: adminEmail,
+          created_for_business_id: businessId,
+          created_for_business_name: biz.name || null
+        }
+      })
     });
-    return;
-  }
-  const newUserId = (createRes.body && (createRes.body.id || (createRes.body.user && createRes.body.user.id))) || null;
-  if (!newUserId) {
-    res.status(500).json({ error: 'Auth user created but no id returned', detail: createRes.body });
-    return;
+    if (!createRes.ok) {
+      res.status(createRes.status || 500).json({
+        error: 'Failed to create auth user',
+        detail: createRes.body
+      });
+      return;
+    }
+    newUserId = (createRes.body && (createRes.body.id || (createRes.body.user && createRes.body.user.id))) || null;
+    if (!newUserId) {
+      res.status(500).json({ error: 'Auth user created but no id returned', detail: createRes.body });
+      return;
+    }
+    createdPassword = password;
   }
 
   // ===== 7. Link to business_owners =====
@@ -237,43 +262,56 @@ module.exports = async (req, res) => {
     });
   }
   if (!linkOp.ok) {
-    // Roll back the auth user so we don't leave orphans
-    await sbFetch('/auth/v1/admin/users/' + newUserId, { method: 'DELETE' });
+    // Roll back the auth user ONLY if we created it (don't delete existing user!)
+    if (!usedExistingUser) {
+      await sbFetch('/auth/v1/admin/users/' + newUserId, { method: 'DELETE' });
+    }
     res.status(linkOp.status || 500).json({
-      error: 'Failed to link auth user to business (auth user rolled back)',
+      error: 'Failed to link auth user to business' + (usedExistingUser ? '' : ' (auth user rolled back)'),
       detail: linkOp.body,
-      orphan_path: orphanRowExists
+      orphan_path: orphanRowExists,
+      used_existing_user: usedExistingUser
     });
     return;
   }
 
-  // ===== 8. Audit log (never logs the password value) =====
+  // Audit log (different label depending on path)
   try {
     await sbFetch('/rest/v1/rpc/log_admin_action', {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + jwt, apikey: SERVICE_KEY },
       body: JSON.stringify({
-        p_action: 'create_owner_account',
+        p_action: usedExistingUser ? 'relink_existing_user' : 'create_owner_account',
         p_target_type: 'business',
         p_target_id: businessId,
         p_target_label: biz.name || targetEmail,
         p_details: {
-          new_user_id: newUserId,
+          user_id: newUserId,
           email: targetEmail,
-          mobile: biz.mobile,
-          created_by_admin_email: adminEmail
-          // NEVER log password value
+          orphan_row_existed: orphanRowExists,
+          used_existing_user: usedExistingUser
         }
       })
     });
   } catch(_){ /* non-fatal */ }
 
-  res.status(200).json({
-    ok: true,
-    user_id: newUserId,
-    email: targetEmail,
-    password: password,
-    business_id: businessId,
-    message: 'Login account created. Share the email + password with the owner via WhatsApp. Advise them to change the password after first login from their panel.'
-  });
+  if (usedExistingUser) {
+    res.status(200).json({
+      ok: true,
+      user_id: newUserId,
+      email: targetEmail,
+      business_id: businessId,
+      relinked_existing: true,
+      message: 'Existing auth user re-linked to this business. The owner can login with their original password. If they forgot it, use the Reset Password feature on this shop.'
+    });
+  } else {
+    res.status(200).json({
+      ok: true,
+      user_id: newUserId,
+      email: targetEmail,
+      password: createdPassword,
+      business_id: businessId,
+      message: 'Login account created. Share the email + password with the owner via WhatsApp. Advise them to change the password after first login from their panel.'
+    });
+  }
 };
