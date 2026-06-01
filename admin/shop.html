@@ -400,6 +400,23 @@ function render(){
         + metaRow('Auth User ID', s.owner_user_id ? (s.owner_user_id.slice(0, 8) + '…') : '—')
       + '</div>'
 
+      + (s.owner_email ? (
+        '<div class="card" style="margin-top:14px;border:2px solid #FECACA;background:linear-gradient(180deg,#FFF7F7 0%,#FFF 100%)">'
+        + '<h2 style="color:#7F1D1D">🔧 Owner Account Diagnostics</h2>'
+        + '<div style="font-size:11.5px;color:#64748b;margin-bottom:10px;line-height:1.45">Use these to help shopkeepers who are stuck. Every action is logged.</div>'
+        + '<button type="button" onclick="adminForceVerifyEmail(\'' + s.owner_email.replace(/[\'"\\\\]/g, "") + '\')" '
+          + 'style="display:block;width:100%;background:#1D4ED8;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:8px">'
+          + '📧 Force Verify Email</button>'
+        + '<button type="button" onclick="adminResetPassword(\'' + s.owner_email.replace(/[\'"\\\\]/g, "") + '\')" '
+          + 'style="display:block;width:100%;background:#B45309;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:8px">'
+          + '🔑 Reset Password (Set Temporary)</button>'
+        + '<button type="button" onclick="adminImpersonate(\'' + s.owner_email.replace(/[\'"\\\\]/g, "") + '\')" '
+          + 'style="display:block;width:100%;background:#7C3AED;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit">'
+          + '🎭 Login as Owner (Impersonate)</button>'
+        + '<div style="font-size:10.5px;color:#94a3b8;margin-top:8px;line-height:1.4">Open impersonation link in <b>incognito/private window</b> so admin session is not lost.</div>'
+        + '</div>'
+      ) : '')
+
       + '<div class="card" style="margin-top:14px">'
         + '<h2>📊 Engagement</h2>'
         + '<div class="stat-grid">'
@@ -1038,6 +1055,102 @@ async function openEmailEdit(){
   } catch(e){
     alert('Network error: ' + (e.message || e));
   }
+}
+
+// ====== Force Verify Email (admin override) ======
+async function adminForceVerifyEmail(email){
+  if (!email) return;
+  if (!confirm('Mark email "' + email + '" as VERIFIED?\n\nUse this only when the user did not receive the verification mail.\n\nThis is logged in the admin audit trail.')) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    toast('⏳ Verifying email...');
+    var r = await fetch('/api/admin-force-verify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await r.json();
+    if (!r.ok){ alert('Verify failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    toast(data.already_verified ? '✓ Already verified' : '✓ Email marked verified');
+  } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// ====== Reset Password (admin sets temp password) ======
+async function adminResetPassword(email){
+  if (!email) return;
+  var suggested = 'Dukan@' + (1000 + Math.floor(Math.random() * 9000));
+  var newPwd = prompt(
+    'Set TEMPORARY password for ' + email + '\n\n' +
+    'Use a password the user can remember briefly. They must change it after login.\n\n' +
+    'Minimum 8 chars. Suggestion (you can edit):',
+    suggested
+  );
+  if (newPwd === null) return;
+  newPwd = String(newPwd).trim();
+  if (newPwd.length < 8){ alert('Password must be at least 8 characters.'); return; }
+  if (!confirm('Set password for ' + email + ' to:\n\n' + newPwd + '\n\nShare this with the user via WhatsApp/phone. They will need to change it after login.\n\nProceed?')) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    toast('⏳ Resetting password...');
+    var r = await fetch('/api/admin-reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email, new_password: newPwd })
+    });
+    var data = await r.json();
+    if (!r.ok){ alert('Reset failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    prompt(
+      '✓ Password reset successfully!\n\n' +
+      'Send this to ' + email + ' via WhatsApp or phone.\n' +
+      'Tell them to change it from panel after login.\n\n' +
+      'TEMP PASSWORD (copy this now — won\'t be shown again):',
+      newPwd
+    );
+    toast('✓ Password reset');
+  } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// ====== Impersonate Login (open as the user) ======
+async function adminImpersonate(email){
+  if (!email) return;
+  var msg = '🎭 LOGIN AS ' + email + '\n\n' +
+    'You will be signed in as this user in a NEW INCOGNITO/PRIVATE window.\n' +
+    'Use a private window so your admin session is preserved here.\n\n' +
+    'WHAT TO DO:\n' +
+    '  1. Click OK below\n' +
+    '  2. A link will be shown — copy it\n' +
+    '  3. Open INCOGNITO window (Ctrl+Shift+N) and paste\n' +
+    '  4. You will land on the shopkeeper dashboard with a red banner on top\n\n' +
+    'Every action you take is logged. Proceed?';
+  if (!confirm(msg)) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    toast('⏳ Generating impersonation link...');
+    var r = await fetch('/api/admin-impersonate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await r.json();
+    if (!r.ok){ alert('Impersonation failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    var link = data.url;
+    var copied = false;
+    try { await navigator.clipboard.writeText(link); copied = true; } catch(_){}
+    prompt(
+      '✓ IMPERSONATION LINK READY' + (copied ? ' (copied to clipboard)' : '') + '\n\n' +
+      'Paste in an INCOGNITO window — link expires in 60 min.\n\n' +
+      'Target: ' + email + '\n\n' +
+      'LINK:',
+      link
+    );
+    toast('🎭 Link ready');
+  } catch(e){ alert('Network error: ' + (e.message || e)); }
 }
 
 // ====== Unlink Owner (security fix — break auto-claim chain) ======
