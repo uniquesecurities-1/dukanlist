@@ -1229,15 +1229,16 @@ function showCredentialsModal(opts){
     });
   }
 
-  // Pre-filled WhatsApp message
+  // Pre-filled WhatsApp / SMS / clipboard message - professional English.
   var waMsg = (
-    'Namaste! DukanList admin team se baat hai.\n\n'
-    + 'Aapka login account ' + (shopName ? '"' + shopName + '" ke liye ' : '') + 'taiyaar ho gaya hai.\n\n'
+    'Hello!\n\n'
+    + 'This is the DukanList admin team. Your login account' + (shopName ? ' for "' + shopName + '"' : '') + ' is now ready.\n\n'
     + 'Login URL: https://dukanlist.com/panel/login.html\n'
     + 'Email: ' + email + '\n'
     + (password ? 'Password: ' + password + '\n\n' : '\n')
-    + 'Pehli baar login karne ke baad password change kar lena please (Settings > Reset Password).\n\n'
-    + 'Koi help chahiye to is number par WhatsApp kar dena. — Team DukanList'
+    + 'Please change your password after your first login (Settings > Reset Password).\n\n'
+    + 'For any help, please message us on this number.\n\n'
+    + '- Team DukanList'
   );
   var waUrl = mobile ? ('https://wa.me/91' + mobile + '?text=' + encodeURIComponent(waMsg)) : '';
 
@@ -1289,6 +1290,9 @@ function showCredentialsModal(opts){
           + '</a>'
         : noMobileWarn)
 
+    +   '<button type="button" data-copy="fullmsg" style="width:100%;background:#1E3A8A;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">'
+    +     '<span style="font-size:16px">⎘</span> Copy full message (paste anywhere)'
+    +   '</button>'
     +   '<button type="button" data-modal-close="1" style="width:100%;background:#475569;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
 
     +   '<div style="font-size:10.5px;color:#94a3b8;margin-top:10px;text-align:center;line-height:1.45">'
@@ -1326,7 +1330,11 @@ function showCredentialsModal(opts){
   overlay.querySelectorAll('button[data-copy]').forEach(function(btn){
     var which = btn.getAttribute('data-copy');
     btn.addEventListener('click', function(){
-      copyTo(btn, which === 'password' ? password : email);
+      var val;
+      if (which === 'password')      val = password;
+      else if (which === 'fullmsg')  val = waMsg;
+      else                           val = email;
+      copyTo(btn, val);
     });
   });
 
