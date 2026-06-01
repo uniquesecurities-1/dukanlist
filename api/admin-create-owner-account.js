@@ -118,16 +118,26 @@ module.exports = async (req, res) => {
   }
   const biz = bizRes.body[0];
 
-  // Refuse if owner already linked
+  // Check business_owners state. Three possibilities:
+  //   A) No row at all                -> INSERT later
+  //   B) Row with auth_user_id=NULL   -> orphan (from past admin_unlink_owner)
+  //                                      UPDATE the orphan row later
+  //   C) Row with auth_user_id set    -> active link, refuse
   const linkRes = await sbFetch(
-    '/rest/v1/business_owners?select=auth_user_id&business_id=eq.' + encodeURIComponent(businessId) + '&limit=1',
+    '/rest/v1/business_owners?select=auth_user_id,role&business_id=eq.' + encodeURIComponent(businessId),
     { method: 'GET' }
   );
+  let orphanRowExists = false;
   if (linkRes.ok && Array.isArray(linkRes.body) && linkRes.body.length > 0) {
-    res.status(409).json({
-      error: 'This business already has an owner account linked. Use Reset Password or Impersonate instead.'
-    });
-    return;
+    const activeLink = linkRes.body.find(function(r){ return r.auth_user_id != null; });
+    if (activeLink) {
+      res.status(409).json({
+        error: 'This business already has an owner account linked. Use Reset Password or Impersonate instead.'
+      });
+      return;
+    }
+    // Has rows but all auth_user_id are NULL -> orphan(s) from past unlink
+    orphanRowExists = true;
   }
 
   // ===== 4. Decide email + password =====
@@ -203,21 +213,36 @@ module.exports = async (req, res) => {
   }
 
   // ===== 7. Link to business_owners =====
-  const linkInsert = await sbFetch('/rest/v1/business_owners', {
-    method: 'POST',
-    headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({
-      business_id:  businessId,
-      auth_user_id: newUserId,
-      role:         'owner'
-    })
-  });
-  if (!linkInsert.ok) {
+  // If an orphan row (auth_user_id=NULL) exists from a past admin_unlink_owner,
+  // UPDATE it instead of INSERT. Otherwise INSERT a new row.
+  let linkOp;
+  if (orphanRowExists) {
+    linkOp = await sbFetch(
+      '/rest/v1/business_owners?business_id=eq.' + encodeURIComponent(businessId) + '&auth_user_id=is.null',
+      {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ auth_user_id: newUserId, role: 'owner' })
+      }
+    );
+  } else {
+    linkOp = await sbFetch('/rest/v1/business_owners', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        business_id:  businessId,
+        auth_user_id: newUserId,
+        role:         'owner'
+      })
+    });
+  }
+  if (!linkOp.ok) {
     // Roll back the auth user so we don't leave orphans
     await sbFetch('/auth/v1/admin/users/' + newUserId, { method: 'DELETE' });
-    res.status(linkInsert.status || 500).json({
+    res.status(linkOp.status || 500).json({
       error: 'Failed to link auth user to business (auth user rolled back)',
-      detail: linkInsert.body
+      detail: linkOp.body,
+      orphan_path: orphanRowExists
     });
     return;
   }

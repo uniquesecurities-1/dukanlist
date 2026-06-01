@@ -100,7 +100,10 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/admin-common.js"></script>
 <script>
-const C = window.C || (window.AdminDB && AdminDB.client) || null;
+// Use ShopDB.client (the actual export from supabase-init.js).
+// Old code referenced window.C / AdminDB which never existed - caused
+// "Supabase client missing" error. We accept any of the 3 forms now.
+const C = (window.ShopDB && ShopDB.client) || window.C || (window.AdminDB && AdminDB.client) || null;
 
 function showToast(msg, kind){
   const t = document.getElementById('toast');
