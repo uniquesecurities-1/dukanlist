@@ -1591,7 +1591,7 @@ function renderProfileCompleteness(b){
     { key:'address',       label_en:'Address + Pincode', label_hi:'पता + पिनकोड',    pts:8,  ok: !!(b.address_line1 && b.pincode) },
     { key:'usp_text',      label_en:'USP / Tagline',     label_hi:'USP / टैगलाइन',   pts:10, ok: !!(b.usp_text && b.usp_text.trim().length > 10) },
     { key:'about_text',    label_en:'About Us story',    label_hi:'हमारे बारे में',   pts:10, ok: !!(b.about_text && b.about_text.trim().length > 50) },
-    { key:'photos',        label_en:'3+ photos',    label_hi:'3+ फोटो',          pts:12, ok: (Number(b.photos_count) || 0) >= 3 },
+    { key:'photos',        label_en:'3+ photos',    label_hi:'3+ फोटो',          pts:12, ok: (Array.isArray(b.photos) ? b.photos.length : 0) >= 3 },
     { key:'hours_json',    label_en:'Open hours',        label_hi:'खुलने का समय',    pts:6,  ok: !!(b.hours_json && Object.keys(b.hours_json || {}).length > 0) },
     { key:'payment',       label_en:'Payment methods',   label_hi:'पेमेंट तरीके',     pts:6,  ok: Array.isArray(b.payment_methods) && b.payment_methods.length > 0 },
     { key:'features',      label_en:'Special features',  label_hi:'खासियत',          pts:5,  ok: Array.isArray(b.special_features) && b.special_features.length > 0 },
@@ -1636,7 +1636,7 @@ async function loadRankingBattle(b){
 
   try {
     const { data: peers, error } = await c.from('businesses')
-      .select('id, name, slug, verified_score, rating_count, rating_avg, photos_count')
+      .select('id, name, slug, verified_score, rating_count, rating_avg, photos')
       .eq('city_id', cityId)
       .eq('status', 'active')
       .or(`sub_category_id.eq.${catId},category_id.eq.${catId}`)
@@ -1654,12 +1654,12 @@ async function loadRankingBattle(b){
       return;
     }
 
-    // Score formula: (rating_count * rating_avg) + (verified_score * 10) + (photos_count * 2)
+    // Score formula: (rating_count * rating_avg) + (verified_score * 10) + (photos.length * 2)
     const scored = peers.map(p => ({
       ...p,
       _score: (Number(p.rating_count) || 0) * (Number(p.rating_avg) || 0) +
               (Number(p.verified_score) || 0) * 10 +
-              (Number(p.photos_count) || 0) * 2
+              ((Array.isArray(p.photos) ? p.photos.length : 0)) * 2
     }));
     scored.sort((a, x) => x._score - a._score);
 
