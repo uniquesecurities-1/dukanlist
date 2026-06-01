@@ -1051,16 +1051,22 @@ function renderOwnerDiagnostics(s){
 
   // CASE A: no auth account linked yet
   if (!hasAuth){
+    var hasShopEmail = !!(s.shop_email || s.email);
+    var createBtn = hasShopEmail
+      ? '<button type="button" onclick="adminCreateOwnerAccount(\'' + s.id + '\')" '
+        + 'style="display:block;width:100%;background:#059669;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;margin-top:10px">'
+        + '🆕 Create Login Account for Owner</button>'
+      : '<div style="font-size:11px;color:#94a3b8;margin-top:10px;font-style:italic">Add a Shop Email (in Edit Shop Details below) to enable account creation.</div>';
     return '<div class="card" style="margin-top:14px;border:2px dashed #CBD5E1;background:#F8FAFC">'
       + '<h2 style="color:#475569">' + '🔧' + ' Owner Account Diagnostics</h2>'
       + '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:10px 12px;border-radius:6px;font-size:12px;color:#78350F;line-height:1.5">'
       + '<b>' + '⚠' + ' No login account exists for this shop.</b><br>'
       + 'Shopkeeper has not registered yet, or admin manually created the listing. '
-      + 'Account-level actions (verify email / reset password / impersonate) are not available '
-      + 'until an auth user is linked.'
+      + 'You can either (a) create an account on their behalf now, or (b) ask them to self-register.'
       + '</div>'
+      + createBtn
       + '<div style="font-size:11px;color:#64748b;margin-top:10px;line-height:1.45">'
-      + '<b>What you can do:</b> Ask the owner to register at /register.html using mobile '
+      + '<b>Or self-register:</b> Ask owner to register at /register.html using mobile '
       + '<b>' + esc(s.mobile || '—') + '</b>. Their account will auto-claim this listing.'
       + '</div>'
       + '</div>';
@@ -1096,6 +1102,70 @@ function renderOwnerDiagnostics(s){
     + '</div>';
 
   return html;
+}
+
+// ====== Create Login Account for owner (no auth yet) ======
+async function adminCreateOwnerAccount(bizId){
+  if (!bizId) return;
+  var shopEmail = SHOP.shop_email || SHOP.email || '';
+  if (!shopEmail){
+    alert('No shop email found. Add it in Edit Shop Details first.');
+    return;
+  }
+  var useEmail = prompt(
+    'Create login account for ' + SHOP.name + '\n\n' +
+    'This will create an auth user, mark email VERIFIED, and link to this shop.\n\n' +
+    'Login email (default = Shop Email; you can edit):',
+    shopEmail
+  );
+  if (useEmail === null) return;
+  useEmail = String(useEmail).trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(useEmail)){
+    alert('Invalid email format'); return;
+  }
+  var suggested = 'Dukan@' + (1000 + Math.floor(Math.random() * 9000));
+  var usePwd = prompt(
+    'Temporary password for ' + useEmail + '\n\n' +
+    'Owner will change this after first login. Min 8 chars.\n\n' +
+    'Suggestion (you can edit):',
+    suggested
+  );
+  if (usePwd === null) return;
+  usePwd = String(usePwd).trim();
+  if (usePwd.length < 8){ alert('Password too short (min 8 chars)'); return; }
+  if (!confirm('Create account?\n\nEmail:    ' + useEmail + '\nPassword: ' + usePwd + '\nLink to:  ' + SHOP.name + '\n\nShare these credentials with the owner after creation. Proceed?')) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt){ alert('Login expired. Refresh and try again.'); return; }
+    toast('⏳ Creating account...');
+    var r = await fetch('/api/admin-create-owner-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ business_id: bizId, email: useEmail, password: usePwd })
+    });
+    var data = await r.json();
+    if (!r.ok){
+      var msg = data.error || ('HTTP ' + r.status);
+      if (data.hint) msg += '\n\n' + data.hint;
+      if (data.existing_user_id) msg += '\n\nExisting user id: ' + data.existing_user_id;
+      alert('Create account failed:\n\n' + msg);
+      return;
+    }
+    prompt(
+      '✓ ACCOUNT CREATED\n\n' +
+      'Share these with the owner via WhatsApp/phone.\n' +
+      'Tell them to change password after first login from their panel.\n\n' +
+      'EMAIL:    ' + data.email + '\n' +
+      'PASSWORD: ' + data.password + '\n\n' +
+      '(Copy this entire window now — won\'t be shown again):',
+      'Email: ' + data.email + ' | Password: ' + data.password
+    );
+    toast('✓ Account created');
+    setTimeout(function(){ location.reload(); }, 800);
+  } catch(e){
+    alert('Network error: ' + (e.message || e));
+  }
 }
 
 // ====== Force Verify Email (admin override) ======
