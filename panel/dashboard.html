@@ -923,31 +923,16 @@ async function loadDashboard(){
   // Load multi-cat badges
   loadCategoryBadges(biz.id);
 
-  // ===== AUTO-GENERATE OG SHARE CARD on first load if missing =====
-  // For shops registered before this feature, or for newly-registered shops
-  // that just confirmed email and arrived here. Fire-and-forget.
-  try {
-    if (window.OGCard && biz.id && !biz.og_image_url){
-      console.info('[og-card] og_image_url missing — auto-generating');
-      OGCard.refresh(c, {
-        id:            biz.id,
-        name:          biz.name,
-        owner_name:    biz.owner_name,
-        mobile:        biz.mobile,
-        city_name:     (biz.geo_cities && biz.geo_cities.name) || '',
-        rating_avg:    biz.rating_avg,
-        rating_count:  biz.rating_count,
-        category_icon: biz.categories && biz.categories.icon,
-        category_name: biz.categories && biz.categories.name,
-        usp_text:      biz.usp_text
-      }).then(function(r){
-        console.info('[og-card] auto-generated:', r && r.publicUrl);
-        biz.og_image_url = r && r.publicUrl;
-      }).catch(function(e){
-        console.warn('[og-card] auto-generate failed (non-fatal):', e && e.message);
-      });
-    }
-  } catch(ogErr){ console.warn('[og-card] auto-hook error:', ogErr); }
+  // ===== OG SHARE CARD auto-generation (DISABLED 2026-06-01) =====
+  // Disabled on dashboard load to keep console clean. The auto-hook was
+  // calling Supabase Storage upload + RPC on every dashboard load, which
+  // logged 400 errors when the business-og bucket RLS policies were not
+  // fully synced. OG cards still get generated when the owner saves their
+  // profile (panel/profile.html). api/share.js falls back to first photo
+  // or default image if og_image_url is missing — no UX impact.
+  //
+  // To re-enable: verify db/73-og-share-card-storage.sql is fully deployed
+  // in Supabase (column + bucket + 4 RLS policies + 2 RPCs) and uncomment.
 }
 
 async function loadCategoryBadges(bizId){
