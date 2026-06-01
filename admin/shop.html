@@ -1145,6 +1145,46 @@ async function adminCreateOwnerAccount(bizId){
       body: JSON.stringify({ business_id: bizId, email: useEmail, password: usePwd })
     });
     var data = await r.json();
+
+    // Special case: 409 with existing_user_id - offer to RELINK
+    if (r.status === 409 && data.existing_user_id){
+      var relinkMsg = 'An auth account already exists for ' + useEmail + '\n\n'
+        + 'User ID: ' + data.existing_user_id + '\n\n'
+        + 'Most likely this owner registered before, then admin clicked Unlink Owner.\n'
+        + 'The auth account was kept but the link to this shop was broken.\n\n'
+        + 'OPTIONS:\n'
+        + '  OK     - Re-link this existing user to ' + SHOP.name + '\n'
+        + '           (owner keeps their ORIGINAL password; use Reset Password if forgotten)\n\n'
+        + '  Cancel - Do nothing. You can try a different email manually.\n\n'
+        + 'Re-link the existing account?';
+      if (!confirm(relinkMsg)) return;
+
+      toast('⏳ Re-linking existing account...');
+      var r2 = await fetch('/api/admin-create-owner-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+        body: JSON.stringify({
+          business_id: bizId,
+          link_existing_user_id: data.existing_user_id
+        })
+      });
+      var data2 = await r2.json();
+      if (!r2.ok){
+        alert('Re-link failed:\n\n' + (data2.error || ('HTTP ' + r2.status)));
+        return;
+      }
+      alert(
+        '✓ EXISTING ACCOUNT RE-LINKED\n\n' +
+        'Email: ' + data2.email + '\n' +
+        'User ID: ' + data2.user_id + '\n\n' +
+        'The owner can login with their ORIGINAL password.\n' +
+        'If they forgot it, click "Reset Password" on this shop next.'
+      );
+      toast('✓ Account re-linked');
+      setTimeout(function(){ location.reload(); }, 800);
+      return;
+    }
+
     if (!r.ok){
       var msg = data.error || ('HTTP ' + r.status);
       if (data.hint) msg += '\n\n' + data.hint;
