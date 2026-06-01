@@ -822,9 +822,7 @@ async function loadDashboard(){
         }
 
         const shopName = matches[0].name || 'this shop';
-        if (!confirm('Link this account to "' + shopName + '"?
-
-Ye aapka shop dashboard ban jaayega. SIRF tab confirm karein agar ye AAPKI shop hai.')){
+        if (!confirm('Link this account to "' + shopName + '"?\n\nYe aapka shop dashboard ban jaayega. SIRF tab confirm karein agar ye AAPKI shop hai.')){
           btn.disabled = false; btn.textContent = '🔗 Link my shop';
           return;
         }
