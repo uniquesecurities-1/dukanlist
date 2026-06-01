@@ -360,7 +360,24 @@ async function handleFiles(files){
     updateQueueItem(item, { pct: 75 });
     const { error: upErr } = await c.storage.from('shop-photos').upload(key, f, { contentType: f.type, upsert: false });
     if (upErr){
-      updateQueueItem(item, { ico: '❌', status: 'Upload fail: ' + upErr.message + '. Internet check karein ya retry karein.', err: true });
+      // Translate misleading Supabase errors to actionable user messages.
+      // Most common error: 'database schema is invalid or incompatible' -
+      // this is actually a storage-RLS denial (not a schema problem).
+      var raw = String(upErr.message || '');
+      var friendly;
+      if (/schema is invalid|incompatible/i.test(raw)) {
+        friendly = 'Upload permission issue. Aapke account aur shop ka link sahi hai? '
+                 + 'Logout-login karke retry karein. Agar fir bhi error aaye to WhatsApp pe screenshot bhejein.';
+      } else if (/not authorized|unauthorized|JWT|expired/i.test(raw)) {
+        friendly = 'Session expire ho gaya. Page refresh karein aur dobara login karein.';
+      } else if (/network|fetch|failed to fetch|timeout/i.test(raw)) {
+        friendly = 'Internet weak hai. WiFi ya 4G check karke retry karein.';
+      } else if (/too large|size|payload/i.test(raw)) {
+        friendly = 'Photo bahut bada hai. Phone gallery se compress karke retry karein.';
+      } else {
+        friendly = 'Upload fail: ' + raw + '. Retry karein.';
+      }
+      updateQueueItem(item, { ico: '❌', status: friendly, err: true });
       failed++; continue;
     }
     const { data: pub } = c.storage.from('shop-photos').getPublicUrl(key);
