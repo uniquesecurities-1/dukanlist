@@ -617,15 +617,19 @@
 
     <div class="form-group">
       <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span><span class="req">*</span></label>
-      <input id="bizName" class="input" type="text" placeholder="e.g. Sharma Carpentry Works" maxlength="80">
+      <input id="bizName" class="input" type="text" placeholder="e.g. Sharma Carpentry Works" maxlength="80" oninput="scheduleHindiAutoFill()">
       <div class="help">
-        <span data-i18n-en>Display name customers will see.</span>
-        <span data-i18n-hi>यही नाम ग्राहक देखेंगे।</span>
+        <span data-i18n-en>Display name customers will see. Hindi version below will fill automatically.</span>
+        <span data-i18n-hi>यही नाम ग्राहक देखेंगे। नीचे हिंदी अपने आप भर जाएगा।</span>
       </div>
     </div>
     <div class="form-group">
-      <label><span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>दुकान का नाम (हिंदी)</span><span class="opt">(optional)</span></label>
-      <input id="bizNameHi" class="input" type="text" placeholder="शर्मा बढ़ई वर्क्स" maxlength="80">
+      <label>
+        <span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>दुकान का नाम (हिंदी)</span>
+        <span class="opt">(auto-filled — edit if wrong)</span>
+        <span id="hindiAutoStatus" style="font-size:11px;color:#0EA5E9;font-weight:600;margin-left:6px"></span>
+      </label>
+      <input id="bizNameHi" class="input" type="text" placeholder="शर्मा बढ़ई वर्क्स" maxlength="80" oninput="onHindiManualEdit()">
     </div>
     <div class="form-group">
       <label><span data-i18n-en>Your Name (Owner / Manager / Doctor etc.)</span><span data-i18n-hi>आपका नाम (मालिक / प्रबंधक / डॉक्टर आदि)</span><span class="req">*</span></label>
@@ -2026,6 +2030,92 @@ function pickCatFromModal(id){
 // Helper used in modal templates
 function escapeHTML(s){
   return String(s == null ? '' : s).replace(/[&<>"\']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
+}
+
+// ============================================================
+// Hindi auto-fill for shop name using Google Input Tools API
+// ------------------------------------------------------------
+// Free public endpoint (used by Google's own services) that returns
+// the most likely Devanagari transliteration of a Roman-script word.
+// We debounce 600ms after the user stops typing, and skip if the
+// shopkeeper has manually edited the Hindi field.
+// ============================================================
+let _hindiAutoTimer = null;
+let _hindiManuallyEdited = false;
+let _lastTransliteratedSource = '';
+
+function onHindiManualEdit(){
+  // If user types into the Hindi box themselves, stop auto-overwriting it
+  const en = (document.getElementById('bizName') || {}).value || '';
+  const hi = (document.getElementById('bizNameHi') || {}).value || '';
+  // Only flag as manual if the value diverged from the last auto-fill
+  if (hi && hi !== _lastTransliteratedSource) {
+    _hindiManuallyEdited = true;
+    const s = document.getElementById('hindiAutoStatus');
+    if (s) s.textContent = '';
+  }
+}
+
+function scheduleHindiAutoFill(){
+  if (_hindiAutoTimer) clearTimeout(_hindiAutoTimer);
+  const status = document.getElementById('hindiAutoStatus');
+  if (_hindiManuallyEdited) return; // respect manual edit
+  if (status) status.textContent = '✏️ Typing…';
+  _hindiAutoTimer = setTimeout(runHindiAutoFill, 600);
+}
+
+async function runHindiAutoFill(){
+  const enEl = document.getElementById('bizName');
+  const hiEl = document.getElementById('bizNameHi');
+  const status = document.getElementById('hindiAutoStatus');
+  if (!enEl || !hiEl) return;
+
+  const en = (enEl.value || '').trim();
+  if (!en || en.length < 2) {
+    hiEl.value = '';
+    _lastTransliteratedSource = '';
+    if (status) status.textContent = '';
+    return;
+  }
+  if (_hindiManuallyEdited) return;
+
+  if (status) status.textContent = '⏳ Converting to Hindi…';
+
+  try {
+    // Split on whitespace and transliterate each token, then join.
+    // Numbers and punctuation are passed through unchanged.
+    const tokens = en.split(/\s+/);
+    const out = await Promise.all(tokens.map(async (tok) => {
+      // Strip non-letter prefixes/suffixes so they don't break the lookup
+      const m = tok.match(/^([^A-Za-z]*)([A-Za-z]+)([^A-Za-z]*)$/);
+      if (!m) return tok; // no letters — pass through (numbers, &, etc.)
+      const [, pre, word, post] = m;
+      try {
+        const url = 'https://www.google.com/inputtools/request'
+          + '?text=' + encodeURIComponent(word.toLowerCase())
+          + '&ime=transliteration_en_hi'
+          + '&num=1';
+        const r = await fetch(url);
+        const j = await r.json();
+        // Shape: ["SUCCESS",[["en_word",["हिंदी1","हिंदी2"],[],{...}]]]
+        if (Array.isArray(j) && j[0] === 'SUCCESS') {
+          const arr = j[1] && j[1][0] && j[1][0][1];
+          if (arr && arr.length) return pre + arr[0] + post;
+        }
+        return tok;
+      } catch (_) {
+        return tok;
+      }
+    }));
+    const hindiResult = out.join(' ');
+    if (!_hindiManuallyEdited) {
+      hiEl.value = hindiResult;
+      _lastTransliteratedSource = hindiResult;
+    }
+    if (status) status.textContent = '✓ Auto-filled (edit if wrong)';
+  } catch (e) {
+    if (status) status.textContent = '⚠️ Auto-fill failed — please type Hindi name manually';
+  }
 }
 </script>
 <script>

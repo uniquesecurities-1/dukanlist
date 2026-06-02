@@ -1037,15 +1037,22 @@ async function openEmailEdit(){
     }
     // Email change is staged: confirmation link sent to new address.
     // Old email continues to work for login until the new one is confirmed.
+    // The displayed shop email and business email both cascade immediately.
     alert(
       'Email change initiated for ' + newEmail + '.\n\n' +
       'A confirmation link has been sent to that address. ' +
-      'The shopkeeper must click that link to activate the new email.\n\n' +
+      'The shopkeeper must click that link to activate the new login email.\n\n' +
       'Until they confirm, login still works with the OLD email.\n\n' +
+      'Shop email displayed on the public page has been updated immediately.\n\n' +
       'If the email does not arrive, use the "Force Verify Email" button below to override.'
     );
-    SHOP.owner_email_pending = newEmail;
-    render();
+    // Reload the entire shop view so all email fields reflect the new value
+    // (owner_email, shop_email and any other cached copies).
+    try {
+      var fresh = await ShopDB.client.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+      if (fresh && fresh.data) { SHOP = fresh.data; render(); }
+      else render();
+    } catch(_) { render(); }
   } catch(e){
     alert('Network error: ' + (e.message || e));
   }

@@ -154,6 +154,25 @@ export default async function handler(req, res) {
     });
   }
 
+  // 6b. CASCADE — also update businesses.email so the public shop page
+  // and admin views reflect the new email everywhere. We update this
+  // even though the auth email change is staged (pending verification),
+  // because the businesses.email column is just the displayed contact
+  // email — keeping it in sync prevents confusion in admin diagnostics.
+  try {
+    await sb(
+      `/rest/v1/businesses?id=eq.${encodeURIComponent(business_id)}`,
+      {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ email: cleanEmail, updated_at: new Date().toISOString() })
+      }
+    );
+  } catch (cascadeErr) {
+    // Cascade is best-effort — auth update already succeeded above.
+    console.warn('businesses.email cascade failed:', cascadeErr);
+  }
+
   // 7. Log to admin_audit_log (best-effort)
   try {
     await sb('/rest/v1/rpc/admin_log_action', {

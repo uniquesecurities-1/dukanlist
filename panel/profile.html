@@ -104,12 +104,18 @@
         🏪 <span data-i18n-en>Business Details</span><span data-i18n-hi>दुकान की जानकारी</span>
       </div>
       <div class="form-group">
-        <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span><span class="req">*</span></label>
-        <input id="bizName" class="input" type="text" maxlength="80">
+        <label>
+          <span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span>
+          <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em">🔒 LOCKED</span>
+        </label>
+        <input id="bizName" class="input" type="text" maxlength="80" readonly style="background:#F8FAFC;color:#475569;cursor:not-allowed">
+        <div style="font-size:.74rem;color:#64748B;margin-top:4px">
+          To change the shop name, please contact admin on WhatsApp.
+        </div>
       </div>
       <div class="form-group">
         <label><span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>दुकान का नाम (हिंदी)</span></label>
-        <input id="bizNameHi" class="input" type="text" maxlength="80">
+        <input id="bizNameHi" class="input" type="text" maxlength="80" placeholder="Will auto-fill from English — edit if conversion looks wrong">
       </div>
       <div class="form-group">
         <label><span data-i18n-en>Owner / Person Name</span><span data-i18n-hi>व्यक्ति का नाम</span><span class="req">*</span></label>
@@ -148,8 +154,14 @@
           <input id="whatsapp" class="input keep-en" type="tel" maxlength="13" placeholder="91XXXXXXXXXX">
         </div>
         <div class="form-group">
-          <label><span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span></label>
-          <input id="email" class="input keep-en" type="email" placeholder="shop@example.com">
+          <label>
+            <span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span>
+            <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em">🔒 LOCKED</span>
+          </label>
+          <input id="email" class="input keep-en" type="email" placeholder="shop@example.com" readonly style="background:#F8FAFC;color:#475569;cursor:not-allowed">
+          <div style="font-size:.74rem;color:#64748B;margin-top:4px">
+            Login email. To change, please contact admin on WhatsApp.
+          </div>
         </div>
       </div>
     </div>
@@ -832,10 +844,11 @@ async function saveProfile(){
   const okEl = document.getElementById('saveOk');
   errEl.style.display = okEl.style.display = 'none';
 
-  const name = document.getElementById('bizName').value.trim();
+  // Shop name and email are LOCKED for owner edits — only admin can change.
+  // Read them from DB state (not the readonly fields) so the payload below
+  // never carries an owner-side change to these protected fields.
   const owner = document.getElementById('ownerName').value.trim();
-  if (name.length < 3){ errEl.textContent='Shop name min 3 chars'; errEl.style.display='flex'; return; }
-  if (owner.length < 3){ errEl.textContent='Owner name min 3 chars'; errEl.style.display='flex'; return; }
+  if (owner.length < 3){ errEl.textContent='Owner / person name must be at least 3 characters'; errEl.style.display='flex'; return; }
   if (!MY_CATS.length){ errEl.textContent='Select at least 1 category'; errEl.style.display='flex'; return; }
   if (!MY_CATS.some(c => c.is_primary)){ errEl.textContent='Mark one category as primary (⭐)'; errEl.style.display='flex'; return; }
 
@@ -855,12 +868,13 @@ async function saveProfile(){
   const specialFeatures = document.getElementById('specialFeatures').value
     .split(',').map(s => s.trim()).filter(s => s.length > 0 && s.length < 60).slice(0, 6);
 
+  // Shop name + email are deliberately NOT in this payload — they are
+  // identity fields that only admin can change. The backend RPC also
+  // rejects these fields when sent by a non-admin owner.
   const payload = {
-    name: name,
     name_hi: document.getElementById('bizNameHi').value.trim() || null,
     owner_name: owner,
     whatsapp: document.getElementById('whatsapp').value.trim() || null,
-    email: document.getElementById('email').value.trim() || null,
     usp_text: document.getElementById('usp').value.trim() || null,
     usp_hi: document.getElementById('uspHi').value.trim() || null,
     about_text: document.getElementById('aboutText').value.trim() || null,
