@@ -150,8 +150,14 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label><span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span></label>
-          <input id="whatsapp" class="input keep-en" type="tel" maxlength="13" placeholder="91XXXXXXXXXX">
+          <label>
+            <span data-i18n-en>WhatsApp / Mobile</span><span data-i18n-hi>WhatsApp / मोबाइल</span>
+            <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em">🔒 LOCKED</span>
+          </label>
+          <input id="whatsapp" class="input keep-en" type="tel" maxlength="13" placeholder="91XXXXXXXXXX" readonly style="background:#F8FAFC;color:#475569;cursor:not-allowed">
+          <div style="font-size:.74rem;color:#64748B;margin-top:4px">
+            Contact number. To change, please contact admin on WhatsApp.
+          </div>
         </div>
         <div class="form-group">
           <label>
@@ -868,13 +874,13 @@ async function saveProfile(){
   const specialFeatures = document.getElementById('specialFeatures').value
     .split(',').map(s => s.trim()).filter(s => s.length > 0 && s.length < 60).slice(0, 6);
 
-  // Shop name + email are deliberately NOT in this payload — they are
-  // identity fields that only admin can change. The backend RPC also
-  // rejects these fields when sent by a non-admin owner.
+  // Shop name, email, mobile (whatsapp) and address are deliberately NOT
+  // in this payload — they are identity fields that only admin can
+  // change. The backend RPC also rejects these fields when sent by a
+  // non-admin owner.
   const payload = {
     name_hi: document.getElementById('bizNameHi').value.trim() || null,
     owner_name: owner,
-    whatsapp: document.getElementById('whatsapp').value.trim() || null,
     usp_text: document.getElementById('usp').value.trim() || null,
     usp_hi: document.getElementById('uspHi').value.trim() || null,
     about_text: document.getElementById('aboutText').value.trim() || null,

@@ -25,14 +25,14 @@
 --        but always with status='active' and pending_fields=[].
 --
 --   2. Editable by owner (all instant):
---        owner_name, whatsapp, usp_text, usp_hi, about_text,
+--        owner_name, name_hi, usp_text, usp_hi, about_text,
 --        hours_json, services_json, faqs_json,
 --        established_year, payment_methods, special_features
 --
 --   3. Locked from owner (admin only via direct DB or admin tools):
---        name, name_hi, address_line1, address_line2, pincode,
+--        name, address_line1, address_line2, pincode,
 --        city_id, locality_id, state_id, district_id,
---        email, mobile
+--        email, mobile, whatsapp
 --
 -- ZERO SCHEMA CHANGE. Pure RPC swap. Safe to re-run.
 -- =====================================================
@@ -117,18 +117,9 @@ BEGIN
     v_fields_updated := v_fields_updated || 'faqs_json';
   END IF;
 
-  IF p_patch ? 'whatsapp' THEN
-    v_new_val := NULLIF(trim(p_patch->>'whatsapp'), '');
-    v_old_val := v_old.whatsapp;
-    IF COALESCE(v_new_val,'') IS DISTINCT FROM COALESCE(v_old_val,'') THEN
-      UPDATE businesses SET whatsapp = v_new_val WHERE id = v_business_id;
-      BEGIN
-        INSERT INTO business_edits(business_id, field_name, old_value, new_value, edited_by, edited_role)
-          VALUES (v_business_id, 'whatsapp', v_old_val, v_new_val, v_user_id, 'owner');
-      EXCEPTION WHEN OTHERS THEN NULL; END;
-      v_fields_updated := v_fields_updated || 'whatsapp';
-    END IF;
-  END IF;
+  -- whatsapp is now treated as an identity field — locked from owner
+  -- patches. Only admins (handled in the locked-fields block below)
+  -- can change it via this RPC.
 
   IF p_patch ? 'owner_name' THEN
     v_new_val := NULLIF(trim(p_patch->>'owner_name'), '');
@@ -214,6 +205,11 @@ BEGIN
       v_new_val := NULLIF(trim(p_patch->>'mobile'), '');
       UPDATE businesses SET mobile = v_new_val WHERE id = v_business_id;
       v_fields_updated := v_fields_updated || 'mobile';
+    END IF;
+    IF p_patch ? 'whatsapp' THEN
+      v_new_val := NULLIF(trim(p_patch->>'whatsapp'), '');
+      UPDATE businesses SET whatsapp = v_new_val WHERE id = v_business_id;
+      v_fields_updated := v_fields_updated || 'whatsapp';
     END IF;
     IF p_patch ? 'address_line1' THEN
       v_new_val := NULLIF(trim(p_patch->>'address_line1'), '');
