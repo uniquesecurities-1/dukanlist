@@ -720,10 +720,14 @@
         <label><span data-i18n-en>City</span><span data-i18n-hi>शहर</span><span class="req">*</span></label>
         <select id="cityId" class="select" onchange="onCityChange()"></select>
       </div>
-      <div class="form-group">
-        <label><span data-i18n-en>Locality</span><span data-i18n-hi>मोहल्ला</span><span class="opt">(optional)</span></label>
-        <select id="localityId" class="select"></select>
-      </div>
+      <!-- Locality dropdown removed (2026-06-02) — confusing for shopkeepers
+           who add area/mohalla details in Address Line 1 anyway. The
+           hidden select below stays so existing JS that references it
+           does not break, but it is invisible and never submitted as a
+           value (always defaults to NULL via the parseInt fallback). -->
+      <select id="localityId" class="select" style="display:none" aria-hidden="true">
+        <option value="">— optional —</option>
+      </select>
     </div>
     <div class="form-group">
       <label><span data-i18n-en>Pincode</span><span data-i18n-hi>पिनकोड</span><span class="req">*</span></label>
@@ -2091,16 +2095,31 @@ async function runHindiAutoFill(){
       if (!m) return tok; // no letters — pass through (numbers, &, etc.)
       const [, pre, word, post] = m;
       try {
-        const url = 'https://www.google.com/inputtools/request'
+        // FIX (2026-06-02): the public Google Input Tools endpoint expects
+        // `itc=hi-t-i0-und` (not `ime=transliteration_en_hi`) and lives at
+        // inputtools.google.com (not www.google.com). The older URL still
+        // resolved but returned English fallback for some inputs.
+        const url = 'https://inputtools.google.com/request'
           + '?text=' + encodeURIComponent(word.toLowerCase())
-          + '&ime=transliteration_en_hi'
-          + '&num=1';
+          + '&itc=hi-t-i0-und'
+          + '&num=5'
+          + '&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage';
         const r = await fetch(url);
+        if (!r.ok) return tok;
         const j = await r.json();
         // Shape: ["SUCCESS",[["en_word",["हिंदी1","हिंदी2"],[],{...}]]]
         if (Array.isArray(j) && j[0] === 'SUCCESS') {
           const arr = j[1] && j[1][0] && j[1][0][1];
-          if (arr && arr.length) return pre + arr[0] + post;
+          // Pick the first suggestion that is actually Devanagari script
+          // (sometimes the API returns the English word as fallback)
+          if (arr && arr.length) {
+            for (let i = 0; i < arr.length; i++) {
+              const candidate = arr[i];
+              if (candidate && /[ऀ-ॿ]/.test(candidate)) {
+                return pre + candidate + post;
+              }
+            }
+          }
         }
         return tok;
       } catch (_) {
