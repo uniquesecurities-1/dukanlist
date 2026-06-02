@@ -169,11 +169,11 @@
     <div class="search-results" id="gSearchResults" style="display:none"></div>
   </div>
 
-  <!-- ===== Today's Tasks digest ===== -->
+  <!-- ===== Today's Focus — single-glance summary of what needs admin attention ===== -->
   <div class="section">
-    <h2 class="section-title">🎯 Today's Tasks <span class="section-sub" id="totalActionable">(loading…)</span></h2>
+    <h2 class="section-title">🎯 Today's Focus <span class="section-sub" id="totalActionable">(loading…)</span></h2>
     <div class="task-grid" id="taskGrid">
-      <div class="loader">Loading task digest…</div>
+      <div class="loader">Loading focus digest…</div>
     </div>
   </div>
 
@@ -447,13 +447,31 @@ async function loadDigest(){
   const total = t.total_actionable || 0;
   document.getElementById('totalActionable').textContent = total === 0 ? '🎉 All caught up!' : '(' + total + ' items need your attention)';
 
+  // Tier 1: URGENT (red border, top priority) — needs action TODAY
+  // Tier 2: ATTENTION (yellow) — important but not blocking
+  // Tier 3: CALM (grey) — informational, all caught up
   const cards = [
-    { icon:'⏳', num:t.pending,           label:'Pending Approvals',    cls:t.pending           > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=pending' },
-    { icon:'🔄', num:t.pending_edits,     label:'Pending Edits',         cls:t.pending_edits     > 0 ? 'warn'   : 'calm', href:'/admin/moderation.html?tab=edits' },
-    { icon:'🚩', num:t.flagged,           label:'Flagged Shops',         cls:t.flagged           > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=flagged' },
-    { icon:'📋', num:t.flags_open,        label:'Open Flag Reports',     cls:t.flags_open        > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=flags' },
-    { icon:'⭐', num:t.featured_expiring, label:'Featured Expiring (7d)', cls:t.featured_expiring > 0 ? 'warn' : 'calm', href:'/admin/featured.html' },
-    { icon:'⚠️', num:t.reports_open,      label:'Open Reports',          cls:t.reports_open      > 0 ? 'urgent' : 'calm', href:'/admin/moderation.html?tab=flags' }
+    // Urgent
+    { icon:'⏳', num:t.pending,                 label:'Pending Approvals',       href:'/admin/moderation.html?tab=pending',
+      cls: (t.pending > 0)                 ? 'urgent' : 'calm' },
+    { icon:'🚩', num:t.flagged,                 label:'Flagged Shops',           href:'/admin/moderation.html?tab=flagged',
+      cls: (t.flagged > 0)                 ? 'urgent' : 'calm' },
+    { icon:'📋', num:t.flags_open,              label:'Open Flag Reports',       href:'/admin/moderation.html?tab=flags',
+      cls: (t.flags_open > 0)              ? 'urgent' : 'calm' },
+    { icon:'⚠️', num:t.reports_open,            label:'User-Submitted Reports',   href:'/admin/moderation.html?tab=flags',
+      cls: (t.reports_open > 0)            ? 'urgent' : 'calm' },
+    // Attention
+    { icon:'🔄', num:t.pending_edits,           label:'Pending Owner Edits',     href:'/admin/moderation.html?tab=edits',
+      cls: (t.pending_edits > 0)           ? 'warn'   : 'calm' },
+    { icon:'🔵', num:t.verification_requested,  label:'Verification Requests',   href:'/admin/verification.html',
+      cls: (t.verification_requested > 0)  ? 'warn'   : 'calm' },
+    { icon:'📧', num:t.email_unverified,        label:'Unverified Signups (7d)', href:'/admin/verification.html',
+      cls: (t.email_unverified > 0)        ? 'warn'   : 'calm' },
+    { icon:'💬', num:(t.pucho_flagged || 0) + (t.pucho_replies_flagged || 0),
+                                                label:'Flagged Q&A (Pucho Bhai)', href:'/admin/pucho-moderation.html',
+      cls: ((t.pucho_flagged + t.pucho_replies_flagged) > 0) ? 'warn' : 'calm' },
+    { icon:'⭐', num:t.featured_expiring,       label:'Featured Expiring (7d)',  href:'/admin/featured.html',
+      cls: (t.featured_expiring > 0)       ? 'warn'   : 'calm' }
   ];
   document.getElementById('taskGrid').innerHTML = cards.map(c => `
     <a class="task-card ${c.cls}" href="${c.href}">
