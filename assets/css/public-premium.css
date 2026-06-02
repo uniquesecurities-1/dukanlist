@@ -142,13 +142,19 @@ button.secondary:hover{
               inset 0 0 0 1px rgba(255,255,255,.18) !important;
 }
 
-/* ===== Headings — tighter letter-spacing for premium feel ===== */
+/* ===== Headings — tighter letter-spacing for premium feel =====
+   NOTE: NO color override here — pages have their own headings on
+   varying backgrounds (light AND dark sections like .cta-strip).
+   Forcing dark navy via !important made white-on-dark headings
+   invisible. Only letter-spacing is safe to apply universally.
+*/
 h1, h2, h3,
 .page-title, .section-title, .hero-title{
   letter-spacing: -.022em !important;
-  color: var(--pp-ink-strong) !important;
 }
 h1, .hero-title{ letter-spacing: -.028em !important; }
+/* Explicit dark colour only for class-scoped page titles where it's safe */
+.page-title, .section-title{ color: var(--pp-ink-strong) !important; }
 
 /* ===== Stars and rating — crisper amber ===== */
 .stars, .rating-stars{
@@ -273,19 +279,4 @@ input[type="text"].search-input:focus{
   .card, .shop-card, .biz-card{
     border-radius: 12px !important;
   }
-  .btn-primary, button.primary, .cta-primary{
-    box-shadow: 0 4px 12px rgba(255,107,26,.20) !important;
-  }
-}
-
-/* ===== Accessibility — better focus rings ===== */
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible{
-  outline: 3px solid rgba(255,107,26,.40) !important;
-  outline-offset: 2px !important;
-}
-
-/* ====================
+  .btn-primary, but
