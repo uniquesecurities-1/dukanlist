@@ -57,6 +57,9 @@
   .toast.show{opacity:1}
   .toast.err{background:#DC2626}
 </style>
+
+<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css">
 </head>
 <body>
 <!-- Impersonation banner -->
@@ -255,5 +258,8 @@ function failure(msg){
 
 load();
 </script>
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
 </body>
 </html>

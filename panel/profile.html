@@ -55,6 +55,9 @@
 .pm-chip:has(input:checked){background:#ECFDF5;border-color:var(--emerald-light);color:#065F46}
 .pm-chip input{accent-color:var(--emerald-light);cursor:pointer;margin:0}
 </style>
+
+<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css">
 </head>
 <body>
 <!-- Impersonation banner -->
@@ -1111,5 +1114,8 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
 </body>
 </html>

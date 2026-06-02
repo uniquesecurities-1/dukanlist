@@ -48,6 +48,9 @@
   body.has-sticky-cta{ padding-bottom:0 }
 }
 </style>
+
+<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css">
 </head>
 <body>
 <!-- Impersonation banner -->
@@ -375,6 +378,9 @@ function buildPosterHtml(shopName, usp, url){
   </div>
   <div class="foot">Powered by DukanList · dukanlist.com</div>
 </div>
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
 </body></html>`;
 }
 

@@ -29,6 +29,9 @@
 .qa .name{ font-weight:800; font-size:.92rem; color:var(--ink) }
 .qa .desc{ font-size:.75rem; color:var(--muted); margin-top:1px }
 </style>
+
+<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css">
 </head>
 <body>
 <!-- Impersonation banner -->
@@ -2004,5 +2007,8 @@ function shareReferralWhatsApp(){
   else init();
 })();
 </script>
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
 </body>
 </html>
