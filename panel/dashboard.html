@@ -500,22 +500,11 @@
       </a>
     </div>
 
-    <div class="side-widget" id="profCompleteWidget" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#3B82F6;display:none">
-      <div class="side-widget-title" style="color:#1E40AF">📋 <span data-i18n-en>Profile Strength</span><span data-i18n-hi>प्रोफ़ाइल मज़बूती</span></div>
-      <div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
-          <span style="font-size:.78rem;color:#475569;font-weight:600"><span data-i18n-en>Completeness</span><span data-i18n-hi>पूर्णता</span></span>
-          <span id="pcScoreText" style="font-size:1.4rem;font-weight:900;color:#1E40AF;line-height:1">0%</span>
-        </div>
-        <div style="height:8px;background:#E2E8F0;border-radius:99px;overflow:hidden">
-          <div id="pcBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3B82F6,#1E40AF);border-radius:99px;transition:width .5s"></div>
-        </div>
-      </div>
-      <div id="pcChecklist" style="font-size:.78rem;color:#1E3A8A;line-height:1.65"></div>
-      <a id="pcCTA" href="/panel/profile.html" style="display:block;margin-top:10px;padding:8px;background:#1E40AF;color:#fff;border-radius:8px;text-align:center;font-weight:700;text-decoration:none;font-size:.82rem">
-        <span data-i18n-en>Complete Profile →</span><span data-i18n-hi>प्रोफ़ाइल पूरा करें →</span>
-      </a>
-    </div>
+    <!-- Sidebar Profile Completeness widget removed (2026-06-02).
+         Replaced by the prominent main-area widget at top of dashboard
+         (#completenessWidget) which is bigger, gamified, and more
+         actionable. Single source of truth = renderProfileCompleteness(). -->
+
 
     <!-- Ranking Battle widget -->
     <div class="side-widget" id="rankWidget" style="background:linear-gradient(135deg,#FAF5FF,#E9D5FF);border-color:#9333EA;display:none">
@@ -1653,47 +1642,126 @@ function renderDashActivity(){
 
 <script>
 // ============= Profile Completeness Wizard =============
+// =====================================================
+// Profile Completeness Meter — prominent top-of-dashboard card
+// -----------------------------------------------------
+// Scores ONLY fields the shopkeeper actually controls from the panel.
+// Identity fields (name, mobile, email, whatsapp, address) are locked
+// at registration and NOT scored — every shop would get those points
+// for free, which dilutes the meter's motivational value.
+//
+// Tiers: 0–39 Beginner, 40–59 Basic, 60–79 Good, 80–94 Excellent,
+//        95–100 Platinum (gold border + trophy).
+// =====================================================
 function renderProfileCompleteness(b){
   if (!b) return;
+  const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+
   const checks = [
-    { key:'name',          label_en:'Shop name',         label_hi:'दुकान का नाम',    pts:8,  ok: !!(b.name && b.name.trim()) },
-    { key:'owner_name',    label_en:'Owner name',        label_hi:'मालिक का नाम',    pts:6,  ok: !!(b.owner_name && b.owner_name.trim()) },
-    { key:'mobile',        label_en:'Mobile number',     label_hi:'मोबाइल नंबर',     pts:6,  ok: !!(b.mobile && b.mobile.length >= 10) },
-    { key:'whatsapp',      label_en:'WhatsApp number',   label_hi:'WhatsApp नंबर',   pts:6,  ok: !!(b.whatsapp) },
-    { key:'email',         label_en:'Email',             label_hi:'ईमेल',           pts:4,  ok: !!(b.email) },
-    { key:'address',       label_en:'Address + Pincode', label_hi:'पता + पिनकोड',    pts:8,  ok: !!(b.address_line1 && b.pincode) },
-    { key:'usp_text',      label_en:'USP / Tagline',     label_hi:'USP / टैगलाइन',   pts:10, ok: !!(b.usp_text && b.usp_text.trim().length > 10) },
-    { key:'about_text',    label_en:'About Us story',    label_hi:'हमारे बारे में',   pts:10, ok: !!(b.about_text && b.about_text.trim().length > 50) },
-    { key:'photos',        label_en:'3+ photos',    label_hi:'3+ फोटो',          pts:12, ok: (Array.isArray(b.photos) ? b.photos.length : 0) >= 3 },
-    { key:'hours_json',    label_en:'Open hours',        label_hi:'खुलने का समय',    pts:6,  ok: !!(b.hours_json && Object.keys(b.hours_json || {}).length > 0) },
-    { key:'payment',       label_en:'Payment methods',   label_hi:'पेमेंट तरीके',     pts:6,  ok: Array.isArray(b.payment_methods) && b.payment_methods.length > 0 },
-    { key:'features',      label_en:'Special features',  label_hi:'खासियत',          pts:5,  ok: Array.isArray(b.special_features) && b.special_features.length > 0 },
-    { key:'estd_year',     label_en:'Established year',  label_hi:'स्थापना वर्ष',     pts:5,  ok: !!(b.established_year && b.established_year > 1900) },
-    { key:'faqs',          label_en:'FAQs (3+)',         label_hi:'FAQs (3+)',        pts:8,  ok: Array.isArray(b.faqs_json) && b.faqs_json.length >= 3 }
+    { en:'Upload 3+ shop photos',    hi:'3+ फोटो अपलोड करें',     pts:20, href:'/panel/photos.html#upload',
+      ok: (Array.isArray(b.photos) ? b.photos.length : 0) >= 3,
+      partial: (Array.isArray(b.photos) ? b.photos.length : 0) >= 1 ? 10 : 0 },
+    { en:'Write your USP / tagline (English)', hi:'USP / टैगलाइन (English)', pts:12, href:'/panel/profile.html#usp',
+      ok: !!(b.usp_text && b.usp_text.trim().length > 10) },
+    { en:'Write your USP in Hindi',  hi:'USP हिंदी में',           pts:6,  href:'/panel/profile.html#usp',
+      ok: !!(b.usp_hi && b.usp_hi.trim().length > 5) },
+    { en:'Add About Us (50+ chars)', hi:'हमारे बारे में (50+ अक्षर)', pts:12, href:'/panel/profile.html#about',
+      ok: !!(b.about_text && b.about_text.trim().length > 50) },
+    { en:'Set business hours',       hi:'खुलने का समय सेट करें',    pts:8,  href:'/panel/profile.html#hours',
+      ok: !!(b.hours_json && Object.keys(b.hours_json || {}).length > 0) },
+    { en:'Select payment methods',   hi:'पेमेंट तरीके चुनें',         pts:7,  href:'/panel/profile.html#trust',
+      ok: Array.isArray(b.payment_methods) && b.payment_methods.length > 0 },
+    { en:'Add special features',     hi:'खासियत जोड़ें',             pts:6,  href:'/panel/profile.html#trust',
+      ok: Array.isArray(b.special_features) && b.special_features.length > 0 },
+    { en:'Add established year',     hi:'स्थापना वर्ष जोड़ें',        pts:5,  href:'/panel/profile.html#trust',
+      ok: !!(b.established_year && b.established_year > 1900) },
+    { en:'Add 3+ FAQs',              hi:'3+ FAQs जोड़ें',          pts:10, href:'/panel/profile.html#faqs',
+      ok: Array.isArray(b.faqs_json) && b.faqs_json.length >= 3 },
+    { en:'Set your role / designation', hi:'अपनी भूमिका सेट करें', pts:5,  href:'/panel/profile.html#owner',
+      ok: !!(b.owner_role && b.owner_role.trim()) },
+    { en:'Add 1 social media link',  hi:'सोशल मीडिया लिंक जोड़ें',  pts:5,  href:'/panel/profile.html#social',
+      ok: !!(b.facebook_url || b.instagram_url || b.youtube_url || b.x_twitter_url || b.linkedin_url || b.website_url) },
+    { en:'Add services with prices', hi:'सेवाएँ + दाम जोड़ें',       pts:4,  href:'/panel/services.html',
+      ok: Array.isArray(b.services_json) ? b.services_json.length > 0 : (b.services_json && Object.keys(b.services_json).length > 0) }
   ];
+
+  // Compute totals
   const totalPts = checks.reduce((s, c) => s + c.pts, 0);
-  const earned   = checks.filter(c => c.ok).reduce((s, c) => s + c.pts, 0);
-  const score    = Math.round((earned / totalPts) * 100);
+  const earned = checks.reduce((s, c) => s + (c.ok ? c.pts : (c.partial || 0)), 0);
+  const score = Math.round((earned / totalPts) * 100);
 
-  document.getElementById('profCompleteWidget').style.display = '';
-  const txt = document.getElementById('pcScoreText');
-  const bar = document.getElementById('pcBar');
-  txt.textContent = score + '%';
-  bar.style.width = score + '%';
-  if (score >= 90)      txt.style.color = '#16A34A';
-  else if (score >= 60) txt.style.color = '#1E40AF';
-  else                  txt.style.color = '#D97706';
+  // Tier
+  let tier;
+  if      (score >= 95) tier = { name:(lang==='hi'?'Platinum 🏆':'Platinum 🏆'), bg:'linear-gradient(135deg,#FBBF24,#D97706)', txt:'#78350F', accent:'#D97706', tag:(lang==='hi'?'सर्वोच्च प्रोफ़ाइल — top रैंकिंग':'Top-tier profile — best ranking') };
+  else if (score >= 80) tier = { name:(lang==='hi'?'Excellent ✨':'Excellent ✨'), bg:'linear-gradient(135deg,#D1FAE5,#A7F3D0)', txt:'#065F46', accent:'#10B981', tag:(lang==='hi'?'ग्राहक-रेडी, बढ़िया!':'Customer-ready, great!') };
+  else if (score >= 60) tier = { name:(lang==='hi'?'Good 👍':'Good 👍'),       bg:'linear-gradient(135deg,#DBEAFE,#BFDBFE)', txt:'#1E40AF', accent:'#3B82F6', tag:(lang==='hi'?'और भी details जोड़ें':'Add more details to stand out') };
+  else if (score >= 40) tier = { name:(lang==='hi'?'Basic 📝':'Basic 📝'),     bg:'linear-gradient(135deg,#FEF3C7,#FDE68A)', txt:'#92400E', accent:'#F59E0B', tag:(lang==='hi'?'काम चल रहा है — और जोड़ें':'Profile needs more work') };
+  else                  tier = { name:(lang==='hi'?'Incomplete ⚠️':'Incomplete ⚠️'), bg:'linear-gradient(135deg,#FEE2E2,#FECACA)', txt:'#991B1B', accent:'#EF4444', tag:(lang==='hi'?'ग्राहक आपकी listing skip कर सकते हैं':'Customers may skip your listing') };
 
-  // Show missing items only (top 4 by pts)
-  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-  const missing = checks.filter(c => !c.ok).sort((a, b) => b.pts - a.pts).slice(0, 4);
-  if (missing.length === 0){
-    document.getElementById('pcChecklist').innerHTML = '<div style="color:#16A34A;font-weight:700;text-align:center;padding:6px">🎉 ' + (lang === 'hi' ? 'सब कुछ पूरा! बहुत बढ़िया!' : 'All done! Excellent!') + '</div>';
-    document.getElementById('pcCTA').style.display = 'none';
-  } else {
-    document.getElementById('pcChecklist').innerHTML = '<div style="font-weight:700;margin-bottom:6px;font-size:.78rem">' + (lang === 'hi' ? 'अधूरा:' : 'Missing:') + '</div>' +
-      missing.map(c => '<div style="display:flex;justify-content:space-between;padding:3px 0">○ <span style="flex:1;margin-left:6px">' + (lang === 'hi' ? c.label_hi : c.label_en) + '</span> <span style="opacity:.6;font-size:.7rem">+' + c.pts + '%</span></div>').join('');
-  }
+  const missing = checks.filter(c => !c.ok).sort((a, b) => b.pts - a.pts);
+
+  const container = document.getElementById('completenessWidget');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div style="background:${tier.bg};border-radius:16px;padding:18px 20px;box-shadow:0 4px 18px rgba(0,0,0,.06);margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:.7rem;font-weight:800;color:${tier.txt};letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:4px">
+            ${lang==='hi' ? 'प्रोफ़ाइल पूर्णता' : 'Profile Completeness'}
+          </div>
+          <div style="font-size:1.6rem;font-weight:900;color:${tier.txt};line-height:1.1;letter-spacing:-.01em">
+            ${tier.name}
+          </div>
+          <div style="font-size:.85rem;color:${tier.txt};opacity:.85;font-weight:600;margin-top:4px">
+            ${tier.tag}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:3rem;font-weight:900;color:${tier.txt};line-height:1;letter-spacing:-.02em">${score}<span style="font-size:1.4rem">%</span></div>
+          <div style="font-size:.72rem;color:${tier.txt};opacity:.7;font-weight:700;margin-top:2px">${earned} / ${totalPts} pts</div>
+        </div>
+      </div>
+      <div style="height:10px;background:rgba(255,255,255,.55);border-radius:99px;overflow:hidden;margin:14px 0 4px">
+        <div style="height:100%;width:${score}%;background:${tier.accent};border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px ${tier.accent}aa"></div>
+      </div>
+    </div>
+
+    ${missing.length === 0 ? `
+      <div style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1.5px solid #6EE7B7;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:1.8rem">🎉</div>
+        <div>
+          <div style="font-weight:800;color:#065F46;font-size:1rem">${lang==='hi' ? 'सब कुछ पूरा! बहुत बढ़िया!' : 'All done — perfect profile!'}</div>
+          <div style="font-size:.82rem;color:#047857;margin-top:2px;font-weight:600">${lang==='hi' ? 'आपकी listing top रैंक पर है।' : 'Your listing now has the top-tier badge.'}</div>
+        </div>
+      </div>
+    ` : `
+      <div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+        <div style="font-size:.78rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">
+          ${lang==='hi' ? '🚀 स्कोर बढ़ाने के लिए ये जोड़ें' : '🚀 Add these to boost your score'}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${missing.slice(0, 5).map(c => `
+            <a href="${c.href}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 13px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;text-decoration:none;color:#0F172A;font-size:.9rem;font-weight:600;transition:all .15s">
+              <span style="display:flex;align-items:center;gap:8px">
+                <span style="color:#94a3b8">○</span>
+                <span>${lang==='hi' ? c.hi : c.en}</span>
+              </span>
+              <span style="display:flex;align-items:center;gap:8px">
+                <span style="background:${tier.accent};color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:99px">+${c.pts}%</span>
+                <span style="color:${tier.accent};font-weight:900">→</span>
+              </span>
+            </a>
+          `).join('')}
+          ${missing.length > 5 ? `
+            <div style="text-align:center;font-size:.78rem;color:#94a3b8;font-weight:600;margin-top:4px">
+              +${missing.length - 5} ${lang==='hi' ? 'और भी' : 'more items'}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `}
+  `;
 }
 
 // ============= Ranking Battle Widget =============
