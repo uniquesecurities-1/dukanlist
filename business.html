@@ -604,11 +604,45 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 /* Mini trust strip on detail page */
 .detail-trust-strip{ display:flex; flex-wrap:wrap; gap:6px; padding:8px 0 16px; align-items:center }
-.dt-pill{ display:inline-flex; align-items:center; gap:5px; padding:5px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:99px; font-size:.74rem; font-weight:700; color:#475569; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+.dt-pill{ display:inline-flex; align-items:center; gap:5px; padding:5px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:99px; font-size:.74rem; font-weight:700; color:#475569; box-shadow:0 1px 3px rgba(15,23,42,.04); text-decoration:none }
 .dt-pill.verified{ background:#ECFDF5; border-color:#6EE7B7; color:#065F46 }
 .dt-pill.featured{ background:#FFFBEB; border-color:#FCD34D; color:#92400E }
 .dt-pill.fast{ background:#EFF6FF; border-color:#93C5FD; color:#1E40AF }
+.dt-pill.rating-clickable{ background:#FFFBEB; border-color:#FCD34D; color:#92400E; cursor:pointer; transition:.15s ease }
+.dt-pill.rating-clickable:hover{ background:#FEF3C7; transform:translateY(-1px); box-shadow:0 4px 12px rgba(245,158,11,.18) }
 .dt-pill .dt-ico{ font-size:.85rem }
+
+/* === Mobile business hero polish — shop name prominent + compact strip === */
+.biz-hero-top-bar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:18px }
+.biz-hero-top-bar .biz-back{ margin-bottom:0 !important; flex-shrink:0 }
+.biz-hero-top-bar .detail-trust-strip{ padding:0; flex:1; margin:0; gap:6px }
+.biz-hero-name-mobile{
+  display:none;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.45rem; font-weight: 800;
+  letter-spacing: -.022em; line-height: 1.18;
+  color: var(--ink, #0B1220);
+  margin: 4px 0 14px;
+}
+@media (max-width: 760px){
+  .biz-hero-name-mobile{ display: block }
+  /* Hide the inside-meta-card H1 on mobile to avoid duplication */
+  .biz-meta-card .biz-title{ display: none !important }
+  /* Tighten the hero top bar */
+  .biz-hero-top-bar{ margin-bottom: 12px; gap: 8px }
+  .biz-hero-top-bar .biz-back{
+    padding: 5px 12px; font-size: .8rem;
+  }
+  .biz-hero-top-bar .detail-trust-strip{ padding: 0; flex: 1 1 auto }
+  .biz-hero-top-bar .dt-pill{
+    padding: 4px 10px; font-size: .72rem;
+  }
+  .biz-hero{ padding-top: 18px !important; padding-bottom: 20px !important }
+}
+@media (max-width: 400px){
+  .biz-hero-name-mobile{ font-size: 1.3rem }
+  .biz-hero-top-bar .dt-pill{ font-size: .68rem; padding: 3px 9px }
+}
 
 .admin-verified-badge{
   display:flex; align-items:center; gap:10px;
@@ -1010,8 +1044,12 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <!-- HERO -->
   <section class="biz-hero">
     <div class="biz-hero-wrap">
-      <a href="javascript:history.back()" class="biz-back">← <span data-i18n-en>Back</span><span data-i18n-hi>वापस</span></a>
-      <div class="detail-trust-strip" id="detailTrustStrip"></div>
+      <div class="biz-hero-top-bar">
+        <a href="javascript:history.back()" class="biz-back">← <span data-i18n-en>Back</span><span data-i18n-hi>वापस</span></a>
+        <div class="detail-trust-strip" id="detailTrustStrip"></div>
+      </div>
+      <!-- Mobile-only prominent shop name (desktop keeps H1 inside meta-card) -->
+      <h1 class="biz-hero-name-mobile" id="bizNameMobile"></h1>
       <div class="biz-top">
         <div class="gallery">
           <div class="main" id="galleryMain"></div>
@@ -1131,7 +1169,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
     <div>
       <!-- Reviews -->
-      <div class="card-pill">
+      <div class="card-pill" id="reviewsAnchor">
         <h3>⭐ <span data-i18n-en>Customer Reviews</span><span data-i18n-hi>ग्राहक रिव्यू</span>
           <span id="reviewCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
         </h3>
@@ -1795,6 +1833,9 @@ function render(){
   // Header
   document.getElementById('bizCatPill').innerHTML = `${b.categories?.icon || ''} ${escapeHTML(b.categories?.name || '')}`;
   document.getElementById('bizName').textContent = b.name;
+  // Mobile-only hero title (visible only on small screens via CSS)
+  const _bnMobile = document.getElementById('bizNameMobile');
+  if (_bnMobile) _bnMobile.textContent = b.name;
   if (b.name_hi){
     document.getElementById('bizNameHi').textContent = b.name_hi;
     document.getElementById('bizNameHi').style.display = '';
@@ -2507,14 +2548,20 @@ async function renderDetailTrustStrip(b){
     if (yrs >= 1) pills.push({ ico: '\u{1F3DB}', text: yrs + (yrs === 1 ? ' year' : ' years') + ' established', cls: '' });
   }
   if (Number(b.rating_avg) >= 4 && Number(b.rating_count) >= 5){
-    pills.push({ ico: '⭐', text: Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ' reviews)', cls: '' });
+    pills.push({ ico: '⭐', text: Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ' reviews)', cls: 'rating-clickable', href: '#reviewsAnchor' });
   }
   // Quick-replies signal — if owner has any review reply
   if (b.has_owner_replies) pills.push({ ico: '\u{1F4AC}', text: 'Replies fast', cls: 'fast' });
 
   if (!pills.length){ host.style.display = 'none'; return; }
   host.style.display = 'flex';
-  host.innerHTML = pills.map(p => '<span class="dt-pill ' + (p.cls || '') + '"><span class="dt-ico">' + p.ico + '</span>' + escapeHTML(p.text) + '</span>').join('');
+  host.innerHTML = pills.map(p => {
+    const inner = '<span class="dt-ico">' + p.ico + '</span>' + escapeHTML(p.text);
+    if (p.href){
+      return '<a href="' + p.href + '" class="dt-pill ' + (p.cls || '') + '" onclick="event.preventDefault();var t=document.getElementById(\'reviewsAnchor\');if(t){t.scrollIntoView({behavior:\'smooth\',block:\'start\'});}">' + inner + '</a>';
+    }
+    return '<span class="dt-pill ' + (p.cls || '') + '">' + inner + '</span>';
+  }).join('');
 }
 
 async function logLead(action){
@@ -3266,54 +3313,4 @@ function renderOwnerCredit(){
   else if (roleLower.includes('chartered accountant') || roleLower === 'ca') prefix = 'CA';
   else if (roleLower.includes('advocate'))        prefix = 'Adv.';
   else if (roleLower.includes('pandit') || roleLower.includes('acharya')) prefix = 'Pt.';
-  else if (roleLower.includes('architect'))       prefix = 'Ar.';
-  else if (roleLower.includes('engineer'))        prefix = 'Er.';
-  if (prefix && name && !name.match(/^(dr|ca|adv|pt|ar|er)\.?\s/i)){
-    displayName = prefix + ' ' + name;
-  }
-
-  const initial = (displayName.charAt(0) || '?').toUpperCase();
-  const safeName = escapeHTML(displayName || 'Listed by');
-  const safeRole = role ? escapeHTML(role) : '';
-
-  el.innerHTML =
-    '<div class="oc-avatar">' + initial + '</div>'
-    + '<div class="oc-info">'
-    + (safeName ? '<div class="oc-name">' + safeName + '</div>' : '')
-    + (safeRole ? '<div class="oc-role">' + safeRole + '</div>' : '<div class="oc-role" data-i18n-en="Listed & managed by owner" data-i18n-hi="मालिक द्वारा सूचीबद्ध">Listed &amp; managed by owner</div>')
-    + '</div>';
-  el.style.display = '';
-}
-
-/* Social links row — runs after BIZ is loaded */
-function renderSocialRow(){
-  if (!BIZ) return;
-  const wrap = document.getElementById('socialCardWrap');
-  const el = document.getElementById('socialRow');
-  if (!el || !wrap) return;
-  const items = [
-    { url: BIZ.website_url,   cls: 'web', icon: '\ud83c\udf10', label: 'Website' },
-    { url: BIZ.facebook_url,  cls: 'fb',  icon: 'f',                label: 'Facebook' },
-    { url: BIZ.instagram_url, cls: 'ig',  icon: '\ud83d\udcf7', label: 'Instagram' },
-    { url: BIZ.youtube_url,   cls: 'yt',  icon: '\u25b6',          label: 'YouTube' },
-    { url: BIZ.x_twitter_url, cls: 'tw',  icon: 'X',                label: 'X' },
-    { url: BIZ.linkedin_url,  cls: 'li',  icon: 'in',               label: 'LinkedIn' }
-  ].filter(x => x.url && /^https?:\/\//i.test(x.url));
-  if (!items.length){ wrap.style.display = 'none'; return; }
-  wrap.style.display = '';
-  el.innerHTML = items.map(l => '<a class="social-pill ' + l.cls + '" href="'
-    + escapeAttr(l.url) + '" target="_blank" rel="nofollow noopener">'
-    + '<span style="font-weight:900;min-width:14px;text-align:center">'
-    + l.icon + '</span>' + l.label + '</a>').join('');
-}
-
-function prefillQA(text){
-  if (typeof openQAModal === 'function') openQAModal();
-  setTimeout(function(){
-    var t = document.getElementById('qaQuestionText');
-    if (t){ t.value = text; t.focus(); try{ t.setSelectionRange(t.value.length, t.value.length) }catch(_){} }
-  }, 150);
-}
-</script>
-</body>
-</html>
+  else if (roleLower.includes('architect'))       prefix =
