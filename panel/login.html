@@ -955,35 +955,61 @@ async function handleLogin(){
     btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
     err.innerHTML = '';
 
-    let icon = '⏳', title = '', body = '', tone = '#FEF3C7', border = '#F59E0B', text = '#78350F';
+    // Card style tokens — info (yellow) for pending, danger (red) for blocked
+    var iconBg = 'linear-gradient(135deg,#FEF3C7,#FDE68A)';
+    var iconColor = '#92400E';
+    var accent = '#F59E0B';
+    var titleText = '#78350F';
+    var bodyText = '#78350F';
+    var icon = '⏳', title = '', body = '', subtitle = '';
+    var waMsg = 'Hello, my listing "' + (bizName || '') + '" is pending admin approval. Could you please review it?';
+    var waUrl = 'https://wa.me/919541223377?text=' + encodeURIComponent(waMsg);
+
     if (bizStatus === 'pending'){
       icon = '⏳';
-      title = 'Aapki listing admin approval ke liye pending hai';
-      body = 'Jab tak admin "' + (bizName || 'aapki listing') + '" ko approve nahi karta, login allowed nahi hai. <br>' +
-             'Hum personally har listing verify karte hain — usually 24 ghante me approve ho jaata hai. <br><br>' +
-             '📞 Tezi se approval ke liye WhatsApp karein: <a href="https://wa.me/919541223377?text=' + encodeURIComponent('Hi, meri listing "' + (bizName || '') + '" admin approval ke liye pending hai. Kindly verify karein.') + '" target="_blank" style="color:#1E3A8A;font-weight:700;text-decoration:underline">+91 95412 23377</a>';
+      title = 'Your listing is awaiting admin approval';
+      subtitle = '"' + (bizName || 'Your listing') + '"';
+      body = 'We personally verify every listing — most are approved within 24 hours. Login will be enabled once your listing is approved.';
     } else if (bizStatus === 'disabled'){
-      tone = '#FEE2E2'; border = '#DC2626'; text = '#7F1D1D'; icon = '⛔';
-      title = 'Aapki listing temporarily disabled hai';
-      body = 'Admin ne aapki listing "' + (bizName || '') + '" disable kar di hai. <br>' +
-             '📞 Reactivate karwane ke liye contact karein: <a href="https://wa.me/919541223377" target="_blank" style="color:#1E3A8A;font-weight:700">+91 95412 23377</a>';
+      iconBg = 'linear-gradient(135deg,#FEE2E2,#FECACA)';
+      iconColor = '#991B1B'; accent = '#DC2626'; titleText = '#7F1D1D'; bodyText = '#7F1D1D';
+      icon = '⛔';
+      title = 'Your listing is temporarily disabled';
+      subtitle = '"' + (bizName || '') + '"';
+      body = 'Admin has temporarily disabled your listing. Please contact us to reactivate.';
     } else if (bizStatus === 'banned'){
-      tone = '#FEE2E2'; border = '#7F1D1D'; text = '#450A0A'; icon = '🚫';
-      title = 'Listing rejected';
-      body = 'Aapki listing approve nahi ki gayi. Reason ke liye contact karein: <a href="https://wa.me/919541223377" target="_blank" style="color:#1E3A8A;font-weight:700">+91 95412 23377</a>';
+      iconBg = 'linear-gradient(135deg,#FEE2E2,#FECACA)';
+      iconColor = '#7F1D1D'; accent = '#7F1D1D'; titleText = '#450A0A'; bodyText = '#7F1D1D';
+      icon = '🚫';
+      title = 'Listing was not approved';
+      subtitle = '"' + (bizName || '') + '"';
+      body = 'Your listing was rejected during review. Please contact us to understand the reason.';
     } else {
       icon = '⏳';
-      title = 'Listing review me hai';
-      body = 'Status: ' + bizStatus + '. Admin review ke baad notify karenge.';
+      title = 'Your listing is under review';
+      subtitle = 'Status: ' + bizStatus;
+      body = 'We will notify you once admin completes the review.';
     }
 
-    err.innerHTML =
-      '<div style="background:' + tone + ';border:1.5px solid ' + border + ';border-left:4px solid ' + border + ';border-radius:12px;padding:16px 18px;color:' + text + ';text-align:left">' +
-      '<div style="font-size:1.55rem;margin-bottom:8px">' + icon + '</div>' +
-      '<div style="font-weight:800;font-size:1.05rem;margin-bottom:8px;color:#0F172A">' + title + '</div>' +
-      '<div style="font-size:.92rem;line-height:1.6">' + body + '</div>' +
-      '</div>';
+    // Clean professional card replacing the loud error alert
+    err.className = '';
     err.style.display = 'block';
+    err.innerHTML =
+        '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:22px 22px 18px;box-shadow:0 4px 18px rgba(15,23,42,0.06);font-family:Manrope,Inter,-apple-system,sans-serif;text-align:left">'
+      +   '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">'
+      +     '<div style="width:46px;height:46px;border-radius:12px;background:' + iconBg + ';display:grid;place-items:center;font-size:1.4rem;flex-shrink:0;color:' + iconColor + '">' + icon + '</div>'
+      +     '<div style="flex:1;min-width:0">'
+      +       '<div style="font-size:1.02rem;font-weight:800;color:#0F172A;line-height:1.25">' + title + '</div>'
+      +       (subtitle ? '<div style="font-size:.82rem;color:#475569;margin-top:3px;font-weight:600">' + subtitle + '</div>' : '')
+      +     '</div>'
+      +   '</div>'
+      +   '<div style="font-size:.88rem;color:#334155;line-height:1.6;margin-bottom:14px">' + body + '</div>'
+      +   '<a href="' + waUrl + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;padding:11px 14px;border-radius:10px;text-decoration:none;font-weight:800;font-size:.92rem;box-shadow:0 2px 8px rgba(37,211,102,0.25)">'
+      +     '<span style="font-size:1.1rem">💬</span>'
+      +     '<span>Speed up approval — WhatsApp us</span>'
+      +   '</a>'
+      +   '<div style="text-align:center;margin-top:10px;font-size:.78rem;color:#64748B">Reply time: usually under 5 minutes</div>'
+      + '</div>';
     return;
   }
 

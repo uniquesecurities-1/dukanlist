@@ -770,22 +770,29 @@ async function loadDashboard(){
     }
 
     document.getElementById('loading').innerHTML =
-      '<div style="max-width:560px;margin:24px auto;padding:0 16px">'
-      + '<div style="background:linear-gradient(160deg,#FFFBEB 0%,#FEF3C7 100%);border:1px solid #FCD34D;border-left:5px solid #F59E0B;border-radius:18px;padding:24px 22px;box-shadow:0 8px 24px rgba(245,158,11,0.12);margin-bottom:14px">'
-      +   '<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">'
-      +     '<div style="width:48px;height:48px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:1.6rem;flex-shrink:0;box-shadow:0 4px 12px rgba(245,158,11,0.2)">&#128279;</div>'
-      +     '<div>'
-      +       '<div style="font-family:Manrope,sans-serif;font-size:1.2rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:4px">Shop link karne ki zaroorat hai</div>'
-      +       '<div style="font-size:.85rem;color:#92400E;font-weight:600">Aapka email verify ho gaya, lekin business abhi link nahi hua hai.</div>'
+      '<div style="max-width:560px;margin:24px auto;padding:0 16px;font-family:Manrope,Inter,-apple-system,sans-serif">'
+      // -------- Header card (info, not warning) --------
+      + '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:18px;padding:24px 24px 22px;box-shadow:0 6px 22px rgba(15,23,42,0.06);margin-bottom:16px">'
+      +   '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">'
+      +     '<div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#DBEAFE,#BFDBFE);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0">&#128279;</div>'
+      +     '<div style="flex:1;min-width:0">'
+      +       '<div style="font-size:1.2rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:4px">Link your shop to this account</div>'
+      +       '<div style="font-size:.88rem;color:#475569;line-height:1.5">Your email is verified. Now connect your existing shop listing or register a new one.</div>'
       +     '</div>'
       +   '</div>'
-      +   '<div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:.86rem;color:#475569;line-height:1.6">'
-      +     'Login email: <b style="color:#0F172A">' + escapeHtmlSafe(userEmail) + '</b><br>'
-      +     '<span style="color:#64748B;font-size:.78rem">Apni registered mobile number niche enter karein (10 digit, bina +91)</span>'
+      +   '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:11px 14px;font-size:.84rem;color:#334155;line-height:1.5">'
+      +     '<span style="color:#64748B;font-weight:600">Signed in as</span> <b style="color:#0F172A;word-break:break-all">' + escapeHtmlSafe(userEmail) + '</b>'
       +   '</div>'
       + '</div>'
-      + '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:18px 18px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,23,42,0.04)">'
-      +   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:#FF6B1A;color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.78rem">1</span><b style="font-size:.95rem;color:#0F172A">Apni registered mobile se link karein</b></div>'
+      // -------- Option 1: Link by mobile --------
+      + '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:18px 20px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,23,42,0.04)">'
+      +   '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+      +     '<span style="background:#FF6B1A;color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.82rem">1</span>'
+      +     '<div style="flex:1">'
+      +       '<div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">Link an existing shop</div>'
+      +       '<div style="font-size:.78rem;color:#64748B;margin-top:2px">Enter the 10-digit mobile number used at registration</div>'
+      +     '</div>'
+      +   '</div>'
       +   '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
       +     '<input id="linkMobile" type="tel" inputmode="numeric" maxlength="10" value="' + escapeHtmlSafe(metaMobile) + '" placeholder="10-digit mobile" style="flex:1;min-width:160px;padding:12px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:15px;font-family:inherit;font-weight:600;letter-spacing:.05em">'
       +     '<button onclick="tryLinkByMobile()" id="linkBtn" style="background:linear-gradient(135deg,#FF6B1A,#F97316);color:#fff;border:0;padding:12px 22px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,26,0.3);font-family:inherit;white-space:nowrap">&#128279; Link my shop</button>'
@@ -793,15 +800,27 @@ async function loadDashboard(){
       +   '<div id="linkErr" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#FEE2E2;color:#991B1B;font-size:.85rem;line-height:1.5;border:1px solid #FCA5A5"></div>'
       +   '<div id="linkOk" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#D1FAE5;color:#065F46;font-size:.85rem;line-height:1.5;border:1px solid #6EE7B7"></div>'
       + '</div>'
-      + '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 18px;margin-bottom:12px">'
-      +   '<div style="display:flex;align-items:center;gap:10px"><span style="background:#1E3A8A;color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.78rem">2</span><div style="flex:1"><b style="color:#0F172A">Naye business ke liye register karein</b><div style="font-size:.78rem;color:#64748B;margin-top:2px">Agar pehle register nahi kiya tha</div></div><a href="/register.html" style="background:#1E3A8A;color:#fff;padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;white-space:nowrap">Register &rarr;</a></div>'
+      // -------- Option 2: Register new shop --------
+      + '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 20px;margin-bottom:12px">'
+      +   '<div style="display:flex;align-items:center;gap:10px">'
+      +     '<span style="background:#1E3A8A;color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.82rem">2</span>'
+      +     '<div style="flex:1">'
+      +       '<div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">Register a new shop</div>'
+      +       '<div style="font-size:.78rem;color:#64748B;margin-top:2px">If you have not registered yet</div>'
+      +     '</div>'
+      +     '<a href="/register.html" style="background:#1E3A8A;color:#fff;padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;white-space:nowrap">Register &rarr;</a>'
+      +   '</div>'
       + '</div>'
+      // -------- WhatsApp help --------
       + '<div style="background:linear-gradient(135deg,#25D366,#128C7E);border-radius:14px;padding:14px 18px;color:#fff;display:flex;align-items:center;gap:12px">'
       +   '<span style="font-size:1.6rem">&#128172;</span>'
-      +   '<div style="flex:1"><b style="font-size:.95rem">Madad chahiye? Hum personally help karenge</b><div style="font-size:.78rem;opacity:.9;margin-top:2px">WhatsApp pe 5 minute me jawab</div></div>'
+      +   '<div style="flex:1">'
+      +     '<b style="font-size:.95rem">Need help? We respond personally</b>'
+      +     '<div style="font-size:.78rem;opacity:.9;margin-top:2px">Average reply on WhatsApp: 5 minutes</div>'
+      +   '</div>'
       +   '<a href="' + waUrl + '" target="_blank" style="background:#fff;color:#128C7E;padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:800;font-size:.84rem;white-space:nowrap">WhatsApp us</a>'
       + '</div>'
-      + '<div style="text-align:center;margin-top:16px"><a href="#" onclick="ShopDB.signOut();return false;" style="font-size:.84rem;color:#64748B;text-decoration:none">Logout & login with different email &rarr;</a></div>'
+      + '<div style="text-align:center;margin-top:16px"><a href="#" onclick="ShopDB.signOut();return false;" style="font-size:.84rem;color:#64748B;text-decoration:none">Logout and sign in with a different email &rarr;</a></div>'
       + '</div>';
 
     window.tryLinkByMobile = async function(){
@@ -814,7 +833,7 @@ async function loadDashboard(){
 
       const m = (el.value || '').replace(/\D/g,'').slice(-10);
       if (m.length !== 10){
-        er.innerHTML = '<b>&#9888; Invalid mobile</b><br>Sahi 10-digit Indian mobile number daalein (bina +91 ke).';
+        er.innerHTML = '<b>&#9888; Invalid mobile</b><br>Please enter a valid 10-digit Indian mobile number (without +91).';
         er.style.display = 'block'; return;
       }
 
@@ -827,12 +846,12 @@ async function loadDashboard(){
 
         if (matches.length === 0){
           er.innerHTML =
-            '<b>&#10060; Is mobile par koi shop nahi mili</b><br>' +
+            '<b>&#10060; No shop found for this mobile</b><br>' +
             'Possible reasons:<br>' +
-            '&bull; Aap pehle hi link ho chuke ho (logout-login try karo)<br>' +
-            '&bull; Mobile alag format me hai registration time pe<br>' +
-            '&bull; Shop registered hi nahi hai abhi<br>' +
-            '<br><b>Help:</b> <a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp us with your email + mobile</a> &mdash; hum manually link kar denge';
+            '&bull; You may already be linked (try logging out and back in)<br>' +
+            '&bull; Mobile may be in a different format from the one used at registration<br>' +
+            '&bull; The shop has not been registered yet<br>' +
+            '<br><b>Need help?</b> <a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp us with your email and mobile</a> &mdash; we will link it manually.';
           er.style.display = 'block';
           btn.disabled = false; btn.textContent = '🔗 Link my shop';
           return;
@@ -840,17 +859,17 @@ async function loadDashboard(){
 
         if (matches.length > 1){
           er.innerHTML =
-            '<b>&#9888; Multiple shops on this mobile</b><br>' +
-            'Safety ke liye admin manually link karega. Shops found:<br>' +
+            '<b>&#9888; Multiple shops found on this mobile</b><br>' +
+            'For safety, admin will link the correct one manually. Shops found:<br>' +
             '<small>' + matches.map(x => '&bull; ' + x.name).join('<br>') + '</small><br><br>' +
-            '<a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp admin to specify your shop</a>';
+            '<a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp admin to confirm your shop</a>';
           er.style.display = 'block';
           btn.disabled = false; btn.textContent = '🔗 Link my shop';
           return;
         }
 
         const shopName = matches[0].name || 'this shop';
-        if (!confirm('Link this account to "' + shopName + '"?\n\nYe aapka shop dashboard ban jaayega. SIRF tab confirm karein agar ye AAPKI shop hai.')){
+        if (!confirm('Link this account to "' + shopName + '"?\n\nThis will become your shop dashboard. Confirm ONLY if this is YOUR shop.')){
           btn.disabled = false; btn.textContent = '🔗 Link my shop';
           return;
         }
