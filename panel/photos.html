@@ -355,41 +355,76 @@ async function handleFiles(files){
       failed++; continue;
     }
 
-    const ext = (f.type === 'image/jpeg') ? 'jpg' : f.name.split('.').pop().toLowerCase();
-    const key = MY_BIZ.id + '/' + Date.now() + '-' + uploaded + '.' + ext;
-    updateQueueItem(item, { pct: 75 });
-    const { error: upErr } = await c.storage.from('shop-photos').upload(key, f, { contentType: f.type, upsert: false });
-    if (upErr){
-      // Translate misleading Supabase errors to actionable user messages.
-      // Most common error: 'database schema is invalid or incompatible' -
-      // this is actually a storage-RLS denial (not a schema problem).
-      var raw = String(upErr.message || '');
-      var friendly;
-      if (/schema is invalid|incompatible/i.test(raw)) {
-        friendly = 'Upload permission issue. Aapke account aur shop ka link sahi hai? '
-                 + 'Logout-login karke retry karein. Agar fir bhi error aaye to WhatsApp pe screenshot bhejein.';
-      } else if (/not authorized|unauthorized|JWT|expired/i.test(raw)) {
-        friendly = 'Session expire ho gaya. Page refresh karein aur dobara login karein.';
-      } else if (/network|fetch|failed to fetch|timeout/i.test(raw)) {
-        friendly = 'Internet weak hai. WiFi ya 4G check karke retry karein.';
-      } else if (/too large|size|payload/i.test(raw)) {
-        friendly = 'Photo bahut bada hai. Phone gallery se compress karke retry karein.';
+    updateQueueItem(item, { pct: 65, status: 'Uploading (' + fmtSize(f.size) + ')...' });
+
+    // =====================================================
+    // Master Fix: use server-side upload endpoint
+    // - Bypasses storage RLS (no more "permission issue" errors)
+    // - Self-heals missing business_owners link on the fly
+    // - Validates session + business status server-side
+    // =====================================================
+    let uploadResp = null;
+    let uploadErr  = null;
+    try {
+      // Get current session token
+      const sess = await c.auth.getSession();
+      const token = sess && sess.data && sess.data.session && sess.data.session.access_token;
+      if (!token){
+        uploadErr = { message: 'Session not active. Please logout and login again.' };
       } else {
-        friendly = 'Upload fail: ' + raw + '. Retry karein.';
+        // Read file as base64 data URL
+        const dataUrl = await new Promise(function(resolve, reject){
+          const r = new FileReader();
+          r.onload  = function(){ resolve(r.result); };
+          r.onerror = function(){ reject(new Error('Could not read file')); };
+          r.readAsDataURL(f);
+        });
+
+        const apiRes = await fetch('/api/upload-shop-photo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ file: dataUrl, filename: f.name })
+        });
+        const apiJson = await apiRes.json().catch(function(){ return {}; });
+        if (!apiRes.ok || !apiJson.ok){
+          uploadErr = { message: apiJson.message || apiJson.error || ('HTTP ' + apiRes.status) };
+        } else {
+          uploadResp = apiJson;
+        }
+      }
+    } catch (e) {
+      uploadErr = { message: (e && e.message) || 'Network error' };
+    }
+
+    if (uploadErr){
+      var raw = String(uploadErr.message || '');
+      var friendly;
+      if (/no_shop_linked|not linked to any shop|contact admin to link/i.test(raw)) {
+        friendly = 'Your account is not yet linked to a shop. Please WhatsApp us a screenshot — we will link it instantly.';
+      } else if (/verify your email|email_confirmed|email not verified/i.test(raw)) {
+        friendly = 'Your email is not yet verified. Please check your inbox/spam and click the verification link.';
+      } else if (/disabled/i.test(raw)) {
+        friendly = 'Your business has been disabled. Please contact admin.';
+      } else if (/session|jwt|expired|unauthorized|invalid session/i.test(raw)) {
+        friendly = 'Your session has expired. Please logout and login again, then retry.';
+      } else if (/network|fetch|failed to fetch|timeout/i.test(raw)) {
+        friendly = 'Internet connection is weak. Check WiFi/4G and retry.';
+      } else if (/too large|size|payload/i.test(raw)) {
+        friendly = 'Photo is too large. Please compress in phone gallery and retry.';
+      } else if (/unsupported|file type|format/i.test(raw)) {
+        friendly = 'Only JPG, PNG, WebP photos are supported.';
+      } else {
+        friendly = 'Upload failed: ' + raw + '. Please retry. If issue persists, WhatsApp us a screenshot.';
       }
       updateQueueItem(item, { ico: '❌', status: friendly, err: true });
       failed++; continue;
     }
-    const { data: pub } = c.storage.from('shop-photos').getPublicUrl(key);
-    const url = pub.publicUrl;
-    updateQueueItem(item, { pct: 90 });
-    const newPhotos = [...(MY_BIZ.photos || []), url];
-    const { error: updErr } = await c.from('businesses').update({ photos: newPhotos }).eq('id', MY_BIZ.id);
-    if (updErr){
-      updateQueueItem(item, { ico: '❌', status: 'Save fail: ' + updErr.message, err: true });
-      failed++; continue;
-    }
-    MY_BIZ.photos = newPhotos;
+
+    // Success — refresh local state
+    MY_BIZ.photos = [...(MY_BIZ.photos || []), uploadResp.url];
     uploaded++;
     updateQueueItem(item, { ico: '✅', status: 'Uploaded successfully — ' + fmtSize(f.size), ok: true, pct: 100 });
   }
