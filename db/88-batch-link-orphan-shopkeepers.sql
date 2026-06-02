@@ -1,61 +1,45 @@
 -- =====================================================
--- db/88-batch-link-orphan-shopkeepers.sql
+-- db/88-batch-link-orphan-shopkeepers.sql  (v2 - FK-safe)
 -- =====================================================
--- CRITICAL USER ISSUE (2026-06-02):
---   Diagnostic showed 10 out of 13 recent shopkeeper signups have NO
---   business_owners link. They registered but their account never got
---   wired to their business.
+-- v1 failed on: foreign key constraint business_owners_business_id_fkey
+-- when a user metadata.business_id pointed to a DELETED business.
 --
--- ROOT CAUSE:
---   register.html line 1657 only runs claim_business_by_phone() if
---   signUpRes.data.session exists. With email confirmation ON in
---   Supabase, signUp returns NO session — user must verify email first
---   AND THEN log in for the claim to happen.
---
---   Many users register, then either:
---     * Never verify email (account stays orphaned forever)
---     * Verify email but never come back to log in
---     * Verify + login but their user_metadata.mobile doesn't exactly
---       match businesses.mobile (formatting / +91 prefix mismatch)
---
--- THIS PATCH (idempotent, safe):
---   1. Finds all auth.users who have:
---        * No business_owners link yet
---        * user_metadata.business_id pointing to a real business
---          (register.html stores it at signup time)
---   2. INSERTs or UPDATEs the business_owners row to link them.
---   3. Logs how many were fixed.
---
--- SAFE TO RE-RUN — uses ON CONFLICT to upsert and only operates on
--- users where the link is genuinely missing.
+-- This v2 filters orphans to only those whose business still exists.
+-- Also wraps the UUID cast in a safe regex check so weird metadata
+-- values (non-UUID strings) don\'t crash the query.
 -- =====================================================
 
 BEGIN;
 
--- ============================================================
--- 1. Batch link orphan users using user_metadata.business_id
--- ============================================================
+-- Help PG: cast metadata field through a safe filter
 WITH orphans AS (
   SELECT
-    u.id                                                    AS auth_user_id,
-    u.email                                                 AS user_email,
-    (u.raw_user_meta_data->>'business_id')::UUID            AS biz_id,
-    u.raw_user_meta_data->>'mobile'                         AS user_mobile
+    u.id                                                        AS auth_user_id,
+    u.email                                                     AS user_email,
+    (u.raw_user_meta_data->>\'business_id\')::UUID            AS biz_id,
+    u.raw_user_meta_data->>\'mobile\'                         AS user_mobile
   FROM auth.users u
-  WHERE u.raw_user_meta_data->>'business_id' IS NOT NULL
-    -- Only candidates with no active link yet
+  WHERE u.raw_user_meta_data->>\'business_id\' IS NOT NULL
+    -- only valid UUID format
+    AND u.raw_user_meta_data->>\'business_id\' ~* \'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$\'
+    -- business must still exist (no FK violation)
+    AND EXISTS (
+      SELECT 1 FROM businesses b
+      WHERE b.id = (u.raw_user_meta_data->>\'business_id\')::UUID
+    )
+    -- user not already linked to any business
     AND NOT EXISTS (
       SELECT 1 FROM business_owners bo
       WHERE bo.auth_user_id = u.id
     )
-    -- And not an admin
+    -- and not an admin
     AND NOT EXISTS (
       SELECT 1 FROM admin_users a
       WHERE a.auth_user_id = u.id
     )
 ),
 linked AS (
-  -- Try UPDATE first — orphan row exists from register_business_public
+  -- Try UPDATE first - orphan row exists from register_business_public
   UPDATE business_owners bo
   SET auth_user_id = o.auth_user_id
   FROM orphans o
@@ -70,7 +54,7 @@ inserted AS (
     o.biz_id,
     o.auth_user_id,
     o.user_mobile,
-    'owner'
+    \'owner\'
   FROM orphans o
   WHERE NOT EXISTS (
     SELECT 1 FROM business_owners bo2
@@ -88,22 +72,32 @@ SELECT
 COMMIT;
 
 
--- ============================================================
--- 2. VERIFICATION — show before/after counts
--- ============================================================
 DO $$
 DECLARE
   v_total_users     INT;
   v_linked_users    INT;
   v_orphans         INT;
+  v_deleted_biz     INT;
 BEGIN
   SELECT COUNT(*) INTO v_total_users FROM auth.users;
   SELECT COUNT(DISTINCT auth_user_id) INTO v_linked_users
     FROM business_owners WHERE auth_user_id IS NOT NULL;
+
+  -- Users with metadata.business_id but business deleted (cannot link)
+  SELECT COUNT(*) INTO v_deleted_biz
+    FROM auth.users u
+    WHERE u.raw_user_meta_data->>\'business_id\' IS NOT NULL
+      AND u.raw_user_meta_data->>\'business_id\' ~* \'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$\'
+      AND NOT EXISTS (
+        SELECT 1 FROM businesses b
+        WHERE b.id = (u.raw_user_meta_data->>\'business_id\')::UUID
+      )
+      AND NOT EXISTS (SELECT 1 FROM admin_users a WHERE a.auth_user_id = u.id);
+
+  -- Users with no business_id metadata and no link
   SELECT COUNT(*) INTO v_orphans
     FROM auth.users u
-    WHERE u.raw_user_meta_data->>'business_id' IS NOT NULL
-      AND NOT EXISTS (
+    WHERE NOT EXISTS (
         SELECT 1 FROM business_owners bo
         WHERE bo.auth_user_id = u.id
       )
@@ -112,45 +106,48 @@ BEGIN
         WHERE a.auth_user_id = u.id
       );
 
-  RAISE NOTICE '====================================================';
-  RAISE NOTICE 'BATCH LINK RESULT';
-  RAISE NOTICE '====================================================';
-  RAISE NOTICE 'Total auth.users:                          %', v_total_users;
-  RAISE NOTICE 'Users now linked to >=1 business:          %', v_linked_users;
-  RAISE NOTICE 'Remaining orphan users (could not link):   %', v_orphans;
-  RAISE NOTICE '';
-  IF v_orphans = 0 THEN
-    RAISE NOTICE '✅ All orphan users with valid user_metadata.business_id';
-    RAISE NOTICE '   are now linked. Photo upload should work for them.';
-  ELSE
-    RAISE NOTICE '⚠ % users still unlinked — their user_metadata.business_id', v_orphans;
-    RAISE NOTICE '   may be missing or point to a deleted business.';
-    RAISE NOTICE '   These need manual admin link via admin/shop.html.';
+  RAISE NOTICE \'====================================================\';
+  RAISE NOTICE \'BATCH LINK RESULT (v2)\';
+  RAISE NOTICE \'====================================================\';
+  RAISE NOTICE \'Total auth.users:                          %\', v_total_users;
+  RAISE NOTICE \'Users now linked to >=1 business:          %\', v_linked_users;
+  RAISE NOTICE \'Total unlinked users remaining:            %\', v_orphans;
+  RAISE NOTICE \'  ... of which point to DELETED business:  %\', v_deleted_biz;
+  RAISE NOTICE \'  ... rest have no metadata.business_id    %\', v_orphans - v_deleted_biz;
+  RAISE NOTICE \'\';
+  IF v_deleted_biz > 0 THEN
+    RAISE NOTICE \'⚠ % users have orphan auth accounts because their\', v_deleted_biz;
+    RAISE NOTICE \'  business was deleted. These should be either:\';
+    RAISE NOTICE \'    a) Deleted via admin/test-cleanup.html, OR\';
+    RAISE NOTICE \'    b) Re-registered (admin Create Login Account on a real shop)\';
   END IF;
-  RAISE NOTICE '====================================================';
+  IF v_orphans = 0 THEN
+    RAISE NOTICE \'✅ ALL USERS LINKED OR HANDLED. Photo upload ready.\';
+  END IF;
+  RAISE NOTICE \'====================================================\';
 END $$;
 
 
--- ============================================================
--- 3. SHOW REMAINING ORPHANS — admin can manually link these
--- ============================================================
+-- Final list of remaining orphans with diagnosis
 SELECT
   u.email,
-  u.created_at::DATE                                       AS registered_on,
-  u.email_confirmed_at IS NOT NULL                          AS email_verified,
-  u.raw_user_meta_data->>'business_id'                      AS metadata_biz_id,
-  u.raw_user_meta_data->>'mobile'                           AS metadata_mobile,
+  u.created_at::DATE                                          AS registered_on,
+  u.email_confirmed_at IS NOT NULL                            AS email_verified,
+  u.raw_user_meta_data->>\'business_id\'                     AS metadata_biz_id,
+  u.raw_user_meta_data->>\'mobile\'                          AS metadata_mobile,
   CASE
-    WHEN u.raw_user_meta_data->>'business_id' IS NULL
-      THEN '⚠ No business_id in metadata — was a manual or old signup'
+    WHEN u.raw_user_meta_data->>\'business_id\' IS NULL
+      THEN \'⚠ No business_id in metadata - old or manual signup\'
+    WHEN u.raw_user_meta_data->>\'business_id\' !~* \'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$\'
+      THEN \'⚠ metadata business_id is not a valid UUID\'
     WHEN NOT EXISTS (
       SELECT 1 FROM businesses b
-      WHERE b.id = (u.raw_user_meta_data->>'business_id')::UUID
+      WHERE b.id = (u.raw_user_meta_data->>\'business_id\')::UUID
     )
-      THEN '⚠ business_id points to deleted business — admin Create Login'
+      THEN \'⚠ business_id points to DELETED business - delete user or use admin Create Login on real shop\'
     ELSE
-      '✅ Linkable but missed — re-run this file or manual link'
-  END                                                       AS why_orphan
+      \'✅ Linkable but missed - re-run this file\'
+  END                                                          AS why_orphan
 FROM auth.users u
 WHERE NOT EXISTS (
         SELECT 1 FROM business_owners bo
