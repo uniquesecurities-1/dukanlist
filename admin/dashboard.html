@@ -124,6 +124,305 @@
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>body,h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important}</style>
+
+<!-- ===================================================================
+     Premium "banking-class" visual polish (added 2026-06-02).
+     PURE CSS layer — overrides the styles above without touching any
+     class names, IDs, or JS hooks. Safe to remove if you ever want the
+     plain look back.
+     Inspired by HDFC/ICICI internal dashboards and Stripe admin.
+=================================================================== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-base:        #F4F6FB;
+    --bg-soft:        #EEF1F7;
+    --ink-strong:     #0B1220;
+    --ink-soft:       #475569;
+    --ink-mute:       #94A3B8;
+    --line:           #E4E8F0;
+    --accent:         #0B3A8C;       /* deep banking navy */
+    --accent-soft:    #1E40AF;
+    --gold:           #B07A2A;
+    --gold-soft:      #F5EBD5;
+    --emerald:        #047857;
+    --amber:          #C2410C;
+    --danger:         #B91C1C;
+    --shadow-sm:      0 1px 2px rgba(11,18,32,.04), 0 1px 1px rgba(11,18,32,.02);
+    --shadow-md:      0 4px 12px rgba(11,18,32,.06), 0 2px 4px rgba(11,18,32,.04);
+    --shadow-lg:      0 14px 36px rgba(11,18,32,.10), 0 4px 10px rgba(11,18,32,.04);
+  }
+
+  /* Page background — subtle diagonal wash */
+  body{
+    background: linear-gradient(180deg, #F8FAFD 0%, var(--bg-base) 280px, var(--bg-base) 100%) !important;
+    color: var(--ink-strong) !important;
+  }
+
+  /* Tabular figures everywhere — premium financial feel */
+  body{ font-feature-settings: "tnum" 1, "kern" 1, "ss01" 1; }
+
+  /* ===== Topbar — deeper navy, refined accent line ===== */
+  .topbar{
+    background: linear-gradient(180deg, #0A1226 0%, #0B1530 100%) !important;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    box-shadow: 0 1px 0 rgba(11,18,32,.06), 0 6px 18px -8px rgba(11,18,32,.18);
+    padding: 14px 24px !important;
+  }
+  .brand{ letter-spacing: -.01em; }
+  .brand em{ color: #93C5FD !important; }
+  /* ADMIN badge → gold (premium signal) */
+  .badge{
+    background: linear-gradient(135deg, #C2A05A, #8C6A1F) !important;
+    color: #FFF8E6 !important;
+    font-weight: 800 !important;
+    letter-spacing: .12em !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+  }
+  .nav a{
+    color: #C5CDDA !important;
+    font-size: 13px !important;
+    padding: 7px 11px !important;
+    border-radius: 7px !important;
+    transition: all .15s ease !important;
+  }
+  .nav a:hover{ background: rgba(255,255,255,.06) !important; color: #fff !important; }
+  .nav a.active{
+    background: rgba(99,140,255,.16) !important;
+    color: #DBEAFE !important;
+    box-shadow: inset 0 0 0 1px rgba(147,197,253,.22);
+  }
+  .logout{ color: #94A3B8 !important; font-size: 11.5px !important; }
+
+  /* ===== Main + Page header ===== */
+  .main{ max-width: 1240px !important; padding: 0 24px !important; margin-top: 28px !important; }
+  .page-title{
+    font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif !important;
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    letter-spacing: -.025em !important;
+    color: var(--ink-strong) !important;
+    margin-bottom: 2px !important;
+  }
+  .page-sub{
+    font-size: 13px !important;
+    color: var(--ink-mute) !important;
+    letter-spacing: .01em;
+    margin-bottom: 22px !important;
+  }
+  .page-sub::before{
+    content:''; display:inline-block; width:6px; height:6px; border-radius:50%;
+    background:#10B981; margin-right:8px; vertical-align: middle;
+    box-shadow: 0 0 0 3px rgba(16,185,129,.18);
+  }
+
+  /* Scope banner — cream gold */
+  #scopeBanner{
+    background: linear-gradient(135deg, #FBF5E2 0%, #F5EBD5 100%) !important;
+    border: 1px solid #E6CF92 !important;
+    border-radius: 12px !important;
+    color: #5A4216 !important;
+    font-weight: 600 !important;
+    padding: 12px 18px !important;
+    font-size: 13px !important;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ===== Search box — premium elevated input ===== */
+  .search-wrap{ margin-bottom: 24px !important; }
+  .search-box{
+    background: #FFF !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
+    padding: 13px 18px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: all .2s ease !important;
+  }
+  .search-box:focus-within{
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 4px rgba(11,58,140,.10), var(--shadow-md) !important;
+  }
+  .search-box input{ font-size: 14px !important; }
+  .search-icon{ opacity: .5 !important; }
+
+  /* ===== Sections (Today's Focus / Quick Actions container) ===== */
+  .section{
+    background: #FFF !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    padding: 22px 24px !important;
+    margin-bottom: 18px !important;
+    box-shadow: var(--shadow-sm);
+  }
+  .section-title{
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: var(--ink-strong) !important;
+    letter-spacing: -.01em !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-sub{ color: var(--ink-mute) !important; font-size: 12px !important; font-weight: 500 !important; }
+
+  /* ===== Today's Focus tiles — refined banking-grade cards ===== */
+  .task-grid{ gap: 12px !important; }
+  .task-card{
+    background: #FFF !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
+    padding: 16px 18px !important;
+    transition: transform .15s ease, box-shadow .2s ease, border-color .15s ease !important;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Left accent stripe — subtle, like Bloomberg */
+  .task-card::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background: var(--line); transition: background .15s ease;
+  }
+  .task-card:hover{
+    transform: translateY(-1px) !important;
+    box-shadow: var(--shadow-md) !important;
+    border-color: #D6DCE8 !important;
+  }
+  .task-card.urgent{ background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 65%) !important; border-color: #F4C7C7 !important; }
+  .task-card.urgent::before{ background: var(--danger); }
+  .task-card.warn{   background: linear-gradient(135deg, #FFFAF0 0%, #FFFFFF 65%) !important; border-color: #ECCDA0 !important; }
+  .task-card.warn::before{ background: var(--amber); }
+  .task-card.calm{   background: linear-gradient(135deg, #F4FAF7 0%, #FFFFFF 65%) !important; border-color: #C8E6D7 !important; }
+  .task-card.calm::before{ background: var(--emerald); }
+  .tc-icon{
+    width: 34px; height: 34px;
+    background: #FFF;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    display: grid; place-items: center;
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+    box-shadow: var(--shadow-sm);
+  }
+  .tc-num{
+    font-family: "Inter", system-ui, sans-serif !important;
+    font-size: 30px !important;
+    font-weight: 800 !important;
+    letter-spacing: -.025em !important;
+    color: var(--ink-strong) !important;
+    font-variant-numeric: tabular-nums !important;
+    line-height: 1 !important;
+  }
+  .task-card.urgent .tc-num{ color: var(--danger) !important; }
+  .task-card.warn .tc-num{   color: var(--amber) !important; }
+  .tc-label{
+    font-size: 11.5px !important;
+    color: var(--ink-soft) !important;
+    font-weight: 700 !important;
+    margin-top: 6px !important;
+    letter-spacing: .01em !important;
+  }
+  .tc-cta{
+    font-size: 10.5px !important;
+    color: var(--accent) !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: .08em !important;
+    margin-top: 10px !important;
+  }
+
+  /* ===== KPI cards — refined data tile ===== */
+  .grid{ gap: 12px !important; margin-bottom: 22px !important; }
+  .kpi{
+    background: #FFF !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
+    padding: 16px 18px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: transform .15s ease, box-shadow .2s ease;
+  }
+  .kpi:hover{ transform: translateY(-1px); box-shadow: var(--shadow-md) !important; }
+  .kpi .label{
+    font-size: 10.5px !important;
+    color: var(--ink-mute) !important;
+    font-weight: 700 !important;
+    letter-spacing: .12em !important;
+    text-transform: uppercase !important;
+  }
+  .kpi .value{
+    font-family: "Inter", system-ui, sans-serif !important;
+    font-size: 30px !important;
+    font-weight: 800 !important;
+    letter-spacing: -.025em !important;
+    font-variant-numeric: tabular-nums !important;
+    margin-top: 6px !important;
+    line-height: 1 !important;
+  }
+  .kpi .value.success{ color: var(--emerald) !important; }
+  .kpi .value.warn{    color: var(--amber)   !important; }
+  .kpi .value.danger{  color: var(--danger)  !important; }
+  .kpi .delta{ font-size: 11px !important; margin-top: 4px !important; color: var(--ink-mute) !important; }
+  .kpi.pri    { border-left: 3px solid var(--accent)  !important; }
+  .kpi.success{ border-left: 3px solid var(--emerald) !important; }
+  .kpi.warn   { border-left: 3px solid var(--amber)   !important; }
+  .kpi.danger { border-left: 3px solid var(--danger)  !important; }
+
+  /* ===== Quick Action tiles ===== */
+  .quick-link{
+    background: #FFF !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    transition: all .15s ease !important;
+  }
+  .quick-link:hover{
+    border-color: var(--accent) !important;
+    background: linear-gradient(135deg, #F7F9FE 0%, #FFFFFF 60%) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .quick-link .ql-icon{ font-size: 22px !important; }
+  .quick-link .ql-title{ font-weight: 700 !important; font-size: 13.5px !important; margin-top: 6px !important; }
+  .quick-link .ql-desc{ font-size: 11.5px !important; color: var(--ink-mute) !important; line-height: 1.5; }
+
+  /* ===== Recent items (pending shops + edits) ===== */
+  .recent-item{
+    border: 1px solid var(--line) !important;
+    border-radius: 10px !important;
+    padding: 11px 12px !important;
+    transition: all .15s ease !important;
+    background: #FFF;
+  }
+  .recent-item:hover{
+    background: #F8FAFD !important;
+    border-color: #D6DCE8 !important;
+    transform: translateX(2px);
+  }
+  .ri-name{ font-size: 13px !important; color: var(--ink-strong) !important; }
+  .ri-meta{ font-size: 11px !important; color: var(--ink-mute) !important; letter-spacing: .01em; }
+  .ri-time{ font-size: 10px !important; color: var(--ink-mute) !important; font-variant-numeric: tabular-nums; }
+
+  /* ===== Sidebar widgets (if any visible) ===== */
+  .side-widget{
+    border-radius: 12px !important;
+    padding: 16px 18px !important;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line) !important;
+  }
+  .side-widget-title{ font-size: 12px !important; font-weight: 800 !important; letter-spacing: .04em; }
+
+  /* ===== Footer ===== */
+  .footer{
+    color: var(--ink-mute) !important;
+    font-size: 11px !important;
+    letter-spacing: .02em;
+    padding: 30px 0 20px !important;
+  }
+
+  /* ===== Subtle scrollbar polish ===== */
+  ::-webkit-scrollbar{ width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track{ background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb{ background: #C5CCD9; border-radius: 99px; border: 2px solid var(--bg-base); }
+  ::-webkit-scrollbar-thumb:hover{ background: #A1AAB8; }
+</style>
 </head>
 <body>
 
