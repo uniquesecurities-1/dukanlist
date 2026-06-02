@@ -35,41 +35,73 @@
 <script src="/assets/js/impersonation-banner.js"></script>
 <!-- Email verification reminder banner — shows if email not yet confirmed -->
 <script src="/assets/js/email-verify-banner.js"></script>
-<!-- Welcome Modal (first-time login only) -->
-<div id="welcomeModalDL" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;padding:32px 28px;box-shadow:0 20px 60px rgba(15,23,42,0.3);position:relative;animation:welcomeIn 0.4s ease-out">
-    <button onclick="closeWelcomeModal()" style="position:absolute;top:14px;right:14px;background:#F1F5F9;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#64748B" aria-label="Close">×</button>
-    <div style="text-align:center;font-size:3rem;margin-bottom:8px">🎉</div>
-    <h2 style="font-family:'Manrope',sans-serif;font-size:1.6rem;font-weight:900;text-align:center;margin-bottom:8px;letter-spacing:-0.02em;color:#0F172A">
-      <span data-i18n-en>Welcome to DukanList!</span>
-      <span data-i18n-hi>DukanList me swagat hai!</span>
-    </h2>
-    <p style="text-align:center;color:#64748B;margin-bottom:22px;font-size:.95rem">
-      <span data-i18n-en>Aapki shop ab Sirsa · Bathinda · Mansa · Muktsar ke saare customers tak pohunch sakti hai. Quick tour:</span>
-      <span data-i18n-hi>Aapki shop ab Sirsa · Bathinda · Mansa · Muktsar ke saare customers tak pohunch sakti hai. Quick tour:</span>
-    </p>
-    <div style="display:grid;gap:12px;margin-bottom:24px">
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#FFF7ED;padding:12px 14px;border-radius:12px;border:1px solid #FED7AA">
-        <div style="font-size:1.5rem">📸</div>
-        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Photos add karein</b><div style="font-size:.82rem;color:#64748B">5+ photos = 3x more calls. Photos tab me jayein.</div></div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#EFF6FF;padding:12px 14px;border-radius:12px;border:1px solid #93C5FD">
-        <div style="font-size:1.5rem">🎁</div>
-        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Deals banayein</b><div style="font-size:.82rem;color:#64748B">Special offers customers ko attract karte hain. Deals tab.</div></div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#F0FDF4;padding:12px 14px;border-radius:12px;border:1px solid #86EFAC">
-        <div style="font-size:1.5rem">📊</div>
-        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Analytics dekhe</b><div style="font-size:.82rem;color:#64748B">Roz check karein kitne customers aaye. Analytics tab.</div></div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;background:#FAF5FF;padding:12px 14px;border-radius:12px;border:1px solid #D8B4FE">
-        <div style="font-size:1.5rem">⭐</div>
-        <div style="flex:1"><b style="color:#0F172A;font-size:.95rem">Reviews ka reply</b><div style="font-size:.82rem;color:#64748B">Customer ko reply karein. Trust badhega. Reviews tab.</div></div>
-      </div>
+<!-- Welcome Onboarding Wizard (first-time login only) -->
+<!-- Replaced Hinglish tips modal with a clean, action-focused wizard
+     that deep-links each step to the specific page that completes it. -->
+<div id="welcomeModalDL" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.78);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:#fff;border-radius:22px;max-width:520px;width:100%;padding:34px 30px 30px;box-shadow:0 24px 64px rgba(15,23,42,0.35);position:relative;animation:welcomeIn 0.4s ease-out;font-family:'Manrope',Inter,-apple-system,sans-serif">
+    <button onclick="closeWelcomeModal()" style="position:absolute;top:16px;right:16px;background:#F1F5F9;border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;color:#64748B;line-height:1" aria-label="Close">×</button>
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-size:3.4rem;line-height:1;margin-bottom:6px">🎉</div>
+      <h2 style="font-size:1.7rem;font-weight:900;letter-spacing:-0.02em;color:#0F172A;margin-bottom:6px">
+        Welcome to DukanList!
+      </h2>
+      <p style="color:#64748B;font-size:.95rem;line-height:1.5;max-width:380px;margin:0 auto">
+        Your shop is now visible to customers across <b style="color:#0F172A">Sirsa, Bathinda, Mansa &amp; Muktsar</b>.
+      </p>
     </div>
-    <button onclick="closeWelcomeModal()" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:14px;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;font-family:'Manrope',sans-serif">
-      <span data-i18n-en>Got it — Start using! →</span>
-      <span data-i18n-hi>Theek hai — Start karein! →</span>
+
+    <!-- Sub-heading -->
+    <div style="margin:22px 0 14px;padding:11px 14px;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-radius:11px;border-left:4px solid #F59E0B">
+      <div style="font-size:.7rem;font-weight:800;color:#92400E;letter-spacing:.08em;text-transform:uppercase">Get your first lead in 3 quick steps</div>
+      <div style="font-size:.78rem;color:#78350F;margin-top:2px">Completing all three takes about 4 minutes.</div>
+    </div>
+
+    <!-- Step 1: Photos -->
+    <a href="/panel/photos.html" style="display:flex;gap:14px;align-items:center;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#F97316'" onmouseout="this.style.transform='';this.style.borderColor='#FED7AA'">
+      <div style="background:#fff;border:2px solid #F97316;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#C2410C;flex-shrink:0">1</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">📸 Add 3+ shop photos</div>
+        <div style="font-size:.8rem;color:#78350F;margin-top:3px">Shops with photos get 3× more calls. Real photos beat stock images every time.</div>
+      </div>
+      <div style="background:#F97316;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Add →</div>
+    </a>
+
+    <!-- Step 2: USP -->
+    <a href="/panel/profile.html#usp" style="display:flex;gap:14px;align-items:center;background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#2563EB'" onmouseout="this.style.transform='';this.style.borderColor='#93C5FD'">
+      <div style="background:#fff;border:2px solid #2563EB;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#1E40AF;flex-shrink:0">2</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">✨ Write a one-line USP</div>
+        <div style="font-size:.8rem;color:#1E3A8A;margin-top:3px">Tell customers why to pick you — "Free home delivery", "20+ years experience", "Lowest price guarantee".</div>
+      </div>
+      <div style="background:#2563EB;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Write →</div>
+    </a>
+
+    <!-- Step 3: Share -->
+    <a href="/panel/wa-poster.html" style="display:flex;gap:14px;align-items:center;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:18px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#15803D'" onmouseout="this.style.transform='';this.style.borderColor='#86EFAC'">
+      <div style="background:#fff;border:2px solid #15803D;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#15803D;flex-shrink:0">3</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">📱 Share with your customers</div>
+        <div style="font-size:.8rem;color:#14532D;margin-top:3px">Generate a free WhatsApp Status poster with QR code. Send it to 50 customers — leads start flowing.</div>
+      </div>
+      <div style="background:#15803D;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Create →</div>
+    </a>
+
+    <!-- Email verify reminder -->
+    <div id="welcomeEmailVerify" style="display:none;background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.82rem;color:#78350F;line-height:1.4">
+      <b>⚠️ Verify your email</b> — Look for the confirmation link in your inbox. Once verified, your listing goes live publicly.
+    </div>
+
+    <!-- Bottom action -->
+    <button onclick="closeWelcomeModal()" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:12px;font-size:.98rem;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.01em">
+      Start exploring DukanList →
     </button>
+
+    <div style="text-align:center;margin-top:12px;font-size:.74rem;color:#94a3b8">
+      You can revisit this guide anytime from <b>Dashboard</b>.
+    </div>
   </div>
 </div>
 
@@ -1416,17 +1448,36 @@ document.addEventListener('click', (e) => {
 <script src="/assets/js/trust-tier.js"></script>
 
 <script>
-// ============= Welcome Modal (first-time only) =============
+// ============= Welcome Onboarding Wizard (first-time only) =============
+// Bumped to v2 so users who saw the older Hinglish modal also see the
+// new action-focused English wizard once. After they close v2, it
+// won't appear again.
 function openWelcomeModalIfFirstTime(){
   try {
-    if (localStorage.getItem('dl_welcome_seen_v1')) return;
+    if (localStorage.getItem('dl_welcome_seen_v2')) return;
     const modal = document.getElementById('welcomeModalDL');
-    if (modal) modal.style.display = 'flex';
+    if (!modal) return;
+    modal.style.display = 'flex';
+
+    // If the user hasn't verified email yet, show the warning row inside
+    // the wizard so they know to check their inbox.
+    try {
+      var c = window.ShopDB && window.ShopDB.client;
+      if (c) {
+        c.auth.getUser().then(function(res){
+          var u = res && res.data && res.data.user;
+          if (u && !u.email_confirmed_at) {
+            var warn = document.getElementById('welcomeEmailVerify');
+            if (warn) warn.style.display = 'block';
+          }
+        }).catch(function(){});
+      }
+    } catch(_){}
   } catch(_){}
 }
 function closeWelcomeModal(){
   try {
-    localStorage.setItem('dl_welcome_seen_v1', '1');
+    localStorage.setItem('dl_welcome_seen_v2', '1');
     const modal = document.getElementById('welcomeModalDL');
     if (modal) modal.style.display = 'none';
     // Trigger confetti for first close
