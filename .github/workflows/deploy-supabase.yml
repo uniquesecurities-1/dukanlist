@@ -1,0 +1,116 @@
+name: Auto-deploy SQL to Supabase
+
+# WHAT THIS DOES:
+#   Whenever you push a commit to `main` that changes any file inside
+#   the `db/` folder, this workflow runs every changed SQL file on
+#   your Supabase production database automatically.
+#
+#   No more "paste SQL in Supabase editor" — git push and it's done.
+#
+# ONE-TIME SETUP (do these once and forget):
+#   1. Get your Supabase access token:
+#        https://supabase.com/dashboard/account/tokens
+#        -> "Generate new token", name it "GitHub Actions"
+#        -> Copy the token (starts with sbp_...)
+#
+#   2. Get your project ref (the ID in your Supabase URL):
+#        https://supabase.com/dashboard/project/<THIS_IS_YOUR_PROJECT_REF>
+#        For dukanlist it's: qazuyygrpqopwygxmvwq
+#
+#   3. Get your database password:
+#        Supabase Dashboard -> Project Settings -> Database
+#        -> Connection string -> reveal password
+#        (NOT the service role key, the actual DB password)
+#
+#   4. Add 3 secrets to GitHub:
+#        Go to https://github.com/<your-username>/dukanlist-web/settings/secrets/actions
+#        Click "New repository secret" three times:
+#          Name: SUPABASE_ACCESS_TOKEN   Value: <token from step 1>
+#          Name: SUPABASE_PROJECT_REF    Value: qazuyygrpqopwygxmvwq
+#          Name: SUPABASE_DB_PASSWORD    Value: <password from step 3>
+#
+# THAT'S IT. After this setup, every git push to main that includes a
+# new db/*.sql file will auto-apply on Supabase within 1-2 minutes.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'db/**.sql'
+
+  # also allow manual run from GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      sql_file:
+        description: "Specific SQL file to run (e.g. db/88-batch-link-orphan-shopkeepers.sql). Leave empty to run all CHANGED files."
+        required: false
+        type: string
+
+jobs:
+  apply-sql:
+    name: Apply SQL to Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Need history so we can diff against the previous commit
+          fetch-depth: 2
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Determine which SQL files to run
+        id: files
+        run: |
+          if [ -n "${{ github.event.inputs.sql_file }}" ]; then
+            echo "Manual run for: ${{ github.event.inputs.sql_file }}"
+            echo "files=${{ github.event.inputs.sql_file }}" >> $GITHUB_OUTPUT
+          else
+            # Diff against the previous commit, show only added/modified .sql files in db/
+            CHANGED=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'db/*.sql' | tr '\n' ' ')
+            echo "Changed SQL files: $CHANGED"
+            echo "files=$CHANGED" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run SQL on Supabase
+        if: steps.files.outputs.files != ''
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          PGHOST: aws-0-ap-south-1.pooler.supabase.com
+          PGPORT: 6543
+          PGUSER: postgres.${{ secrets.SUPABASE_PROJECT_REF }}
+          PGDATABASE: postgres
+        run: |
+          set -e
+          FILES="${{ steps.files.outputs.files }}"
+          if [ -z "$FILES" ]; then
+            echo "No SQL files to apply. Exiting."
+            exit 0
+          fi
+          for f in $FILES; do
+            if [ -f "$f" ]; then
+              echo ""
+              echo "================================================="
+              echo "Applying: $f"
+              echo "================================================="
+              psql -v ON_ERROR_STOP=1 -f "$f"
+              echo "OK: $f applied"
+            else
+              echo "SKIP (file not found): $f"
+            fi
+          done
+          echo ""
+          echo "================================================="
+          echo "DONE: All SQL files applied successfully"
+          echo "================================================="
+
+      - name: Show summary
+        if: always()
+        run: |
+          echo "Files processed: ${{ steps.files.outputs.files }}"
+          echo "If anything failed, click into the 'Run SQL on Supabase' step above for the error."
