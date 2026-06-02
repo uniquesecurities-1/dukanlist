@@ -81,7 +81,14 @@ jobs:
         if: steps.files.outputs.files != ''
         env:
           PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          PGHOST: aws-0-ap-south-1.pooler.supabase.com
+          # Host must be the EXACT session-pooler host shown in
+          # Supabase -> Settings -> Database -> Connection string -> Session pooler.
+          # Different projects live in different AWS regions, so this can't be
+          # hardcoded to ap-south-1. Examples of valid values:
+          #   aws-0-ap-south-1.pooler.supabase.com
+          #   aws-0-us-east-1.pooler.supabase.com
+          #   aws-0-eu-west-2.pooler.supabase.com
+          PGHOST: ${{ secrets.SUPABASE_DB_HOST }}
           PGPORT: 6543
           PGUSER: postgres.${{ secrets.SUPABASE_PROJECT_REF }}
           PGDATABASE: postgres
