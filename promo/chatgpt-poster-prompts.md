@@ -399,4 +399,141 @@ Headline can become:
 "डॉक्टर.
 प्राचार्य.
 पंडित जी.
-दुकानदा�
+दुकानदार."
+```
+in Noto Sans Devanagari weight 700, same ink-navy color.
+
+---
+
+# 8️⃣ 📱 WHATSAPP STATUS · 1080×1920 — "Three seconds. One truth."
+
+### 🎯 Campaign Concept
+WhatsApp Status gives you 3 seconds before the user swipes. This poster wastes none of them.
+
+### 🏛 Reference Aesthetics
+- **Apple iPhone launch teasers** (vertical)
+- **Nike Air Max** Story-format campaigns
+- **The New York Times Magazine** vertical covers
+
+### 📸 PROMPT
+```
+Vertical editorial campaign poster, 1080×1920 (9:16 aspect ratio).
+The composition splits cleanly into three thirds:
+
+UPPER THIRD (cinematic photograph):
+A close-up cinematic photograph of a brass nameplate being polished —
+shot from a low angle, shallow focus, with golden warm light catching
+the brass. The nameplate is intentionally out of focus enough that
+the engraved text isn't readable, but you can see it's an Indian
+name with a professional designation prefix.
+Shot on Hasselblad, 80mm, f/2.0, golden hour. The image fades to
+deep navy ink (#0F172A) at the bottom of this third.
+
+MIDDLE THIRD (deep navy ink #0F172A background, hero typography):
+In Plus Jakarta Sans weight 900, color cream (#FFFBF5),
+all-caps, perfectly centered, four lines stacked TIGHT:
+
+"YOUR
+NAME.
+YOUR
+TITLE."
+
+Below the four-line stack, one saffron word (#FF6B1A) in italic:
+"Listed."
+
+LOWER THIRD (cream background #FFFBF5, action zone):
+At the top of this third, a hairline gold divider (#D97706, 1px).
+Below, in Manrope weight 500, slate color, centered, two lines:
+"Free Forever. No Commission.
+Made by local Mandi Dabwali residents."
+
+A large generous-padding saffron CTA button:
+"BE LISTED → DUKANLIST.COM/PRO"
+(Plus Jakarta Sans 800, white text on saffron #FF6B1A, rounded 12px)
+
+Very bottom: tiny center-aligned credit line in 10pt cream slate:
+"DukanList — For Every Professional"
+
+Tone: Apple iPhone launch teaser meets Patek Philippe print ad.
+Cinematic, generous breathing room, every pixel earns its place.
+```
+
+---
+
+## 🎬 How to Iterate (Pro Tips)
+
+1. **First pass:** Generate exactly as written. Don't tweak.
+2. **If output is too busy** → Add to end of prompt:
+   > *"REDUCE all visual elements. Single hero focus only. Triple the negative space. Remove any icons or badges."*
+3. **If typography is wrong** → Add:
+   > *"Render typography in pixel-perfect English (and Devanagari where specified). NO misspellings. Use Plus Jakarta Sans family. Maintain exact line-breaks as written."*
+4. **If colors look off** → Specify:
+   > *"Color grade strictly: ink-navy #0F172A, cream #FFFBF5, saffron #FF6B1A only. No other colors. No gradients."*
+5. **If it looks "stock-photo-y"** → Add:
+   > *"Editorial brand campaign aesthetic. Reference: [Apple / Mercedes / Lufthansa] brand book pages. NOT a Justdial / Sulekha / OLX flyer."*
+
+---
+
+## 📐 Tool-Specific Routing
+
+| Tool | Best for | Setting |
+|---|---|---|
+| **DALL-E 3 (ChatGPT-4o)** | Typography-driven posters (#7, #2) | Default; ask "ultra-detailed" |
+| **Midjourney v6.1** | Photography-driven posters (#1, #3, #4, #5, #6) | `--ar 1:1 --style raw --v 6.1 --s 250` |
+| **Adobe Firefly 3** | Best for posters with rendered text | Use "Editorial" style |
+| **Ideogram 2.0** | Highest text-rendering accuracy | Use the "Realistic" model |
+| **Leonardo Phoenix** | When MJ blocks brand-ref keywords | Set "Photographic" + "Editorial" |
+
+---
+
+## 🎯 Outreach Playbook
+
+After generating posters, send via WhatsApp with **one of these** templates (NOT all together):
+
+### Template A — Direct & Respectful
+```
+Doctor saheb, namaste 🙏
+{POSTER ATTACHMENT}
+DukanList ek free platform hai. Aap chaaho to dekho:
+https://dukanlist.com/pro
+— [Your name]
+```
+
+### Template B — Peer Recommendation
+```
+{POSTER ATTACHMENT}
+Ek baat share karna chahta tha — Sirsa-Bathinda ke
+doctors, CAs, advocates ko ek dignified directory mil
+gayi. Free hai, koi commission nahi.
+
+Apne profile pe dekh lena: dukanlist.com/pro
+```
+
+### Template C — Founder Voice
+```
+{POSTER ATTACHMENT}
+Mai Deepak Singla, Mandi Dabwali se. Hamne ek platform
+banaya hai jahan har Doctor, CA, Lawyer, Principal ko
+unke title ke saath listing milti hai — dukandaar
+nahi, balki "Dr. / CA / Adv." ke saath.
+
+Forever free. dukanlist.com/pro
+```
+
+---
+
+## ⛔ The "Reject" Checklist
+
+Before sending any generated poster on WhatsApp, ask:
+- Does it look like a **stock-flyer template**? ❌ Regenerate.
+- Are there **more than 3 emojis** on it? ❌ Regenerate.
+- Is the text **more than 5 lines** total? ❌ Regenerate.
+- Does it have **clip-art icons** (stethoscope/scales/calculator illustrations)? ❌ Regenerate.
+- Does it look like it could be on the cover of **a top business magazine**? ✅ Send.
+
+---
+
+**Brief by:** DukanList Creative Direction — Internal Document
+**Last updated:** 2026-05-28
+**For:** Deepak & Navneet Singla — outreach to local Mandi Dabwali professionals
+**License:** Internal use, modify freely. Brand: dukanlist.com / DigiMutual Goals Pvt. Ltd.
