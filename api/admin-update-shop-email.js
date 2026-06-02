@@ -8,8 +8,15 @@
 //   3. Look up business → get owner_id.
 //   4. Use SUPABASE_SERVICE_ROLE_KEY to PATCH auth.users:
 //        - email = new email
-//        - email_confirm = true (skip new confirmation flow)
-//   5. Return new email.
+//        - email_confirm = false (require re-verification)
+//   5. Supabase sends a confirmation link to the NEW email automatically.
+//   6. Return new email + confirmation status.
+//
+// USER POLICY (2026-06-02):
+//   Even when admin changes a user's email, the user must verify the new
+//   address. This prevents typos / accidental wrong emails from causing
+//   silent lockouts. If verification email doesn't reach the new address,
+//   admin can use api/admin-force-verify-email as a manual override.
 //
 // USE CASE: Shopkeeper changed phone number / lost access to old email,
 // or admin needs to re-link their auth to a different verified address.
@@ -123,13 +130,19 @@ export default async function handler(req, res) {
   }
 
   // 6. Update the auth user via admin API
+  //    NOTE: email_confirm is FALSE so Supabase puts the user into the
+  //    email-change confirmation flow. The new email is staged in
+  //    auth.users.email_change, and a confirmation link is sent to the new
+  //    address. Until the user clicks that link, login still uses the old
+  //    email. If the verification email never arrives, admin can manually
+  //    confirm via api/admin-force-verify-email.
   const updateUser = await sb(
     `/auth/v1/admin/users/${biz.owner_id}`,
     {
       method: 'PUT',
       body: JSON.stringify({
         email: cleanEmail,
-        email_confirm: true   // auto-confirm — no re-verification flow
+        email_confirm: false
       })
     }
   );
@@ -159,6 +172,8 @@ export default async function handler(req, res) {
     business_id,
     owner_id: biz.owner_id,
     new_email: cleanEmail,
-    business_name: biz.name
+    business_name: biz.name,
+    verification_required: true,
+    message: 'Email change initiated. A confirmation link has been sent to the new address. The shopkeeper must click that link to activate the new email. Until then, login still works with the old email. If the email does not arrive, use the Force Verify Email tool to override.'
   });
 }

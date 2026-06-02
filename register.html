@@ -667,10 +667,8 @@
         <label><span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span><span class="opt">(if different)</span></label>
         <input id="whatsapp" class="input keep-en" type="tel" placeholder="Same as mobile" inputmode="numeric" maxlength="13">
       </div>
-      <div class="form-group">
-        <label><span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span><span class="opt">(optional)</span></label>
-        <input id="email" class="input keep-en" type="email" placeholder="shop@example.com">
-      </div>
+      <!-- Shop email field removed — email is collected only once in the
+           Login Credentials section at end of form to avoid confusion. -->
     </div>
     <div class="alert error" id="step2Err" style="display:none"></div>
     <div class="btn-row">
@@ -1377,7 +1375,7 @@ function handleStep2(){
   STATE.data.ownerName = owner;
   try { if (ownerRole) localStorage.setItem('pending_owner_role', ownerRole); } catch(_){}
   STATE.data.whatsapp  = document.getElementById('whatsapp').value.trim() || STATE.phone;
-  STATE.data.email     = document.getElementById('email').value.trim();
+  // STATE.data.email removed — login email at Step 4 is the single source of truth
   goToStep(3);
 }
 
@@ -1480,14 +1478,14 @@ function showFriendlyErr(el, err, retryFn){
   if (/network|fetch|failed to fetch|networkerror|err_internet|timeout|aborted/i.test(raw)){
     isNetwork = true;
     friendly = '⚠️ Internet connection issue. ' +
-               'Aapki net slow ya disconnect ho gayi. ' +
-               'Wi-Fi/4G check karein aur Retry dabayein.';
+               'Your network seems slow or disconnected. ' +
+               'Please check Wi-Fi or mobile data and press Retry.';
   } else if (/rate.?limit/i.test(raw)){
-    friendly = '⏱ Bahut requests bhej diye. 1 minute wait karke phir try karein.';
+    friendly = '⏱ Too many requests. Please wait 1 minute and try again.';
   } else if (/duplicate|already exists|unique/i.test(raw)){
-    friendly = 'Yeh email/mobile pehle se registered hai. Login karein ya alag use karein.';
+    friendly = 'This email or mobile is already registered. Please log in or use a different email.';
   } else if (/captcha|turnstile/i.test(raw)){
-    friendly = 'CAPTCHA verification fail huyi. Page refresh karke phir try karein.';
+    friendly = 'CAPTCHA verification failed. Please refresh the page and try again.';
   }
   el.innerHTML = '';
   el.textContent = friendly;
@@ -1505,7 +1503,7 @@ function showFriendlyErr(el, err, retryFn){
   if (isNetwork){
     const small = document.createElement('div');
     small.style.cssText = 'font-size:.74rem;color:#7C2D12;margin-top:6px;line-height:1.4;width:100%';
-    small.innerHTML = 'Tip: Wi-Fi off karke 4G se try karein, ya browser change karke (Chrome recommended) try karein.';
+    small.innerHTML = 'Tip: Try switching from Wi-Fi to mobile data, or use a different browser (Chrome recommended).';
     el.appendChild(small);
   }
   el.style.display = 'flex';
@@ -1598,7 +1596,7 @@ async function handleSubmit(){
       p_owner_name   : STATE.data.ownerName,
       p_mobile       : STATE.phone,
       p_whatsapp     : waInput,
-      p_email        : STATE.data.loginEmail || STATE.data.email || null,
+      p_email        : STATE.data.loginEmail || null,
       p_address_line1: STATE.data.addr1,
       p_address_line2: STATE.data.addr2 || null,
       p_locality_id  : STATE.data.localityId,
@@ -1865,7 +1863,7 @@ window.addEventListener('DOMContentLoaded', () => {
         <button class="cat-modal-close" onclick="closeCatPicker()" aria-label="Close">×</button>
       </div>
       <div class="cat-modal-sub">
-        <span data-i18n-en>Type karke search karein ya neeche scroll karein. 158+ categories available.</span>
+        <span data-i18n-en>Type to search or scroll to browse. 158+ categories available.</span>
         <span data-i18n-hi>टाइप करके खोजें या नीचे scroll करें। 158+ श्रेणियाँ उपलब्ध।</span>
       </div>
       <div class="cat-search-wrap">
@@ -1885,7 +1883,7 @@ window.addEventListener('DOMContentLoaded', () => {
     </div>
     <div class="cat-modal-foot">
       <span>
-        <span data-i18n-en>🤔 Apni category nahi mil rahi?</span>
+        <span data-i18n-en>🤔 Can't find your category?</span>
         <span data-i18n-hi>🤔 आपकी श्रेणी नहीं मिल रही?</span>
       </span>
       <a href="https://wa.me/919541223377?text=Hi%2C%20DukanList%20me%20meri%20category%20nahi%20mil%20rahi%3A%20" target="_blank">
@@ -1963,9 +1961,9 @@ function renderCatTiles(query){
     body.innerHTML = `
       <div class="cat-empty-state">
         <div class="cat-empty-state-ico">🤔</div>
-        <div class="cat-empty-state-text">"${query}" — Koi match nahi mila</div>
-        <div style="font-size:.82rem;color:#64748B;margin-bottom:14px">Different keyword try karein, ya WhatsApp pe humein bata dijiye.</div>
-        <a href="https://wa.me/919541223377?text=DukanList%20me%20'${encodeURIComponent(query)}'%20category%20nahi%20mil%20rahi"
+        <div class="cat-empty-state-text">"${query}" — No matches found</div>
+        <div style="font-size:.82rem;color:#64748B;margin-bottom:14px">Try a different keyword, or let us know on WhatsApp.</div>
+        <a href="https://wa.me/919541223377?text=DukanList:%20I%20cannot%20find%20the%20category%20'${encodeURIComponent(query)}'"
            target="_blank"
            style="display:inline-block;background:#25D366;color:#fff;padding:10px 18px;border-radius:99px;font-weight:700;text-decoration:none;font-size:.88rem">
           💬 Request "${escapeHTML(query)}" on WhatsApp

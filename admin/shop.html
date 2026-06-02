@@ -1035,8 +1035,16 @@ async function openEmailEdit(){
       alert('Email update failed:\n\n' + msg);
       return;
     }
-    toast('✓ Email updated to ' + newEmail);
-    SHOP.owner_email = newEmail;
+    // Email change is staged: confirmation link sent to new address.
+    // Old email continues to work for login until the new one is confirmed.
+    alert(
+      'Email change initiated for ' + newEmail + '.\n\n' +
+      'A confirmation link has been sent to that address. ' +
+      'The shopkeeper must click that link to activate the new email.\n\n' +
+      'Until they confirm, login still works with the OLD email.\n\n' +
+      'If the email does not arrive, use the "Force Verify Email" button below to override.'
+    );
+    SHOP.owner_email_pending = newEmail;
     render();
   } catch(e){
     alert('Network error: ' + (e.message || e));
