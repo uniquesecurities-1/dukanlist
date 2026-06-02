@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>WhatsApp Broadcast — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📣</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,sans-serif;
+    background:#f1f5f9;color:#0F172A;min-height:100vh;
+  }
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600;transition:all .15s}
+  .nav a:hover{background:rgba(255,255,255,0.1);color:white}
+  .nav a.active{background:#1E3A8A;color:white}
+  .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
+  .logout:hover{background:rgba(255,255,255,0.1);color:white}
+
+  .main{max-width:1100px;margin:24px auto;padding:0 20px 60px}
+  h1.page-title{font-size:24px;font-weight:800;margin-bottom:4px;letter-spacing:-.02em}
+  p.page-sub{font-size:14px;color:#64748b;margin-bottom:24px}
+
+  .step-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+  .step-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .step-num{background:#1E3A8A;color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;flex-shrink:0}
+  .step-title{font-weight:800;font-size:15px;color:#0F172A}
+  .step-help{font-size:12px;color:#64748b;margin-left:auto}
+
+  textarea, input[type="text"], select{width:100%;padding:11px 13px;border:1.5px solid #cbd5e1;border-radius:9px;font-size:14px;font-family:inherit;background:#fff;color:#0F172A;transition:.15s}
+  textarea:focus, input:focus, select:focus{outline:none;border-color:#1E3A8A;box-shadow:0 0 0 3px rgba(30,58,138,.12)}
+  textarea{resize:vertical;min-height:120px;line-height:1.5}
+
+  .template-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .tpl-chip{padding:6px 12px;background:#F1F5F9;border:1.5px solid #E2E8F0;border-radius:99px;font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:.15s}
+  .tpl-chip:hover{border-color:#1E3A8A;color:#1E3A8A;background:#fff}
+
+  .token-hint{font-size:11px;color:#64748b;margin-top:6px;line-height:1.6}
+  .token-hint code{background:#F1F5F9;padding:1px 6px;border-radius:4px;font-size:11px;color:#1E3A8A;font-weight:700}
+
+  .audience-row{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.15s}
+  .audience-row:hover{border-color:#1E3A8A;background:#fff}
+  .audience-row.sel{border-color:#1E3A8A;background:linear-gradient(135deg,#EFF6FF,#DBEAFE)}
+  .audience-row input[type="radio"]{accent-color:#1E3A8A;cursor:pointer}
+  .audience-row .a-label{flex:1;font-weight:700;font-size:14px;color:#0F172A}
+  .audience-row .a-count{background:#1E3A8A;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px}
+  .audience-row .a-count.zero{background:#94a3b8}
+  .audience-row select{max-width:200px;margin-left:auto}
+
+  .preview-banner{background:linear-gradient(135deg,#1E40AF,#1D4ED8);color:#fff;padding:14px 18px;border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .pb-text{font-weight:800;font-size:14px}
+  .pb-text small{display:block;opacity:.85;font-weight:500;font-size:12px;margin-top:2px}
+  .pb-btn{background:#fff;color:#1E40AF;border:none;padding:10px 18px;border-radius:9px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;transition:.15s}
+  .pb-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,255,255,.2)}
+  .pb-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+  .recipient-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid #E2E8F0;border-bottom:none;font-size:13px}
+  .recipient-row:first-child{border-radius:10px 10px 0 0}
+  .recipient-row:last-child{border-radius:0 0 10px 10px;border-bottom:1px solid #E2E8F0}
+  .recipient-row.sent{background:#F0FDF4}
+  .recipient-row .r-num{font-size:11px;color:#94a3b8;font-weight:700;width:30px;flex-shrink:0}
+  .recipient-row .r-name{flex:1;font-weight:700;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .recipient-row .r-meta{font-size:11px;color:#64748b}
+  .recipient-row .r-mobile{font-family:monospace;font-size:12px;color:#475569;background:#F1F5F9;padding:2px 8px;border-radius:4px;flex-shrink:0}
+  .wa-btn{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;padding:7px 14px;border-radius:8px;font-weight:800;font-size:12px;flex-shrink:0;transition:.15s}
+  .wa-btn:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(37,211,102,.3)}
+  .wa-btn.sent{background:#E2E8F0;color:#64748b;pointer-events:none}
+
+  .batch-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #E2E8F0;padding:14px 18px;margin:18px -22px -20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-radius:0 0 14px 14px}
+  .batch-bar button{background:#1E3A8A;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
+  .batch-bar button:hover{background:#1E40AF}
+  .batch-bar button.sec{background:#fff;color:#1E3A8A;border:1.5px solid #1E3A8A}
+  .batch-bar button.sec:hover{background:#EFF6FF}
+  .progress-pill{margin-left:auto;font-size:13px;font-weight:700;color:#475569}
+  .progress-pill b{color:#10B981}
+
+  .info-card{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:10px;padding:11px 14px;font-size:13px;color:#78350F;line-height:1.55;margin-bottom:14px}
+  .loader{padding:24px;text-align:center;color:#94a3b8;font-size:13px}
+  .err{background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:11px 14px;color:#991B1B;font-size:13px;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span>🛡️</span>
+    <span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav class="nav">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/verification.html">🔵 Verification</a>
+    <a href="/admin/bulk-upload">📥 Bulk Add</a>
+    <a href="/admin/announcements">📣 Announcements</a>
+    <a href="/admin/broadcast.html" class="active">💬 Broadcast</a>
+    <a href="/admin/featured.html">⭐ Featured</a>
+    <a href="/admin/pucho-moderation.html">💬 Pucho Bhai</a>
+    <span class="logout" onclick="logout()">⎋ Logout</span>
+  </nav>
+</header>
+
+<main class="main">
+  <h1 class="page-title">📣 WhatsApp Broadcast</h1>
+  <p class="page-sub">Send personalized WhatsApp messages to multiple shopkeepers at once — using free click-to-chat links (no Business API needed).</p>
+
+  <div id="errBox" class="err" style="display:none"></div>
+
+  <!-- ===== Step 1: Compose message ===== -->
+  <div class="step-card">
+    <div class="step-h">
+      <div class="step-num">1</div>
+      <div class="step-title">Compose your message</div>
+      <div class="step-help"><span id="charCount">0</span> / 500</div>
+    </div>
+    <div class="template-chips">
+      <div class="tpl-chip" data-tpl="welcome">👋 Welcome / Onboarding</div>
+      <div class="tpl-chip" data-tpl="approval">✅ Approval Notice</div>
+      <div class="tpl-chip" data-tpl="reminder">📸 Profile Reminder</div>
+      <div class="tpl-chip" data-tpl="feature">🚀 New Feature</div>
+      <div class="tpl-chip" data-tpl="festival">🎉 Festival Greeting</div>
+      <div class="tpl-chip" data-tpl="reactivate">🔔 Re-engagement</div>
+    </div>
+    <textarea id="msgText" maxlength="500" placeholder="Hello {{shop_name}}, ..."></textarea>
+    <div class="token-hint">
+      Tip: Use <code>{{shop_name}}</code>, <code>{{owner_name}}</code>, <code>{{shop_url}}</code>, <code>{{city}}</code> for personalization.
+    </div>
+  </div>
+
+  <!-- ===== Step 2: Select audience ===== -->
+  <div class="step-card">
+    <div class="step-h">
+      <div class="step-num">2</div>
+      <div class="step-title">Select audience</div>
+    </div>
+    <label class="audience-row sel" id="audAll">
+      <input type="radio" name="aud" value="all" checked>
+      <div class="a-label">All active shopkeepers</div>
+      <span class="a-count zero" id="cntAll">…</span>
+    </label>
+    <label class="audience-row" id="audPending">
+      <input type="radio" name="aud" value="pending">
+      <div class="a-label">Pending approval (need follow-up)</div>
+      <span class="a-count zero" id="cntPending">…</span>
+    </label>
+    <label class="audience-row" id="audIncomplete">
+      <input type="radio" name="aud" value="incomplete">
+      <div class="a-label">Active but no photos (needs reminder)</div>
+      <span class="a-count zero" id="cntIncomplete">…</span>
+    </label>
+    <label class="audience-row" id="audCity">
+      <input type="radio" name="aud" value="city">
+      <div class="a-label">By city</div>
+      <select id="cityFilter" onchange="updateAudience()"><option value="">— Select city —</option></select>
+      <span class="a-count zero" id="cntCity">…</span>
+    </label>
+    <label class="audience-row" id="audCategory">
+      <input type="radio" name="aud" value="category">
+      <div class="a-label">By category</div>
+      <select id="catFilter" onchange="updateAudience()"><option value="">— Select category —</option></select>
+      <span class="a-count zero" id="cntCategory">…</span>
+    </label>
+  </div>
+
+  <!-- ===== Step 3: Preview + Generate ===== -->
+  <div class="step-card">
+    <div class="step-h">
+      <div class="step-num">3</div>
+      <div class="step-title">Preview &amp; Generate</div>
+    </div>
+    <div class="preview-banner">
+      <div class="pb-text">
+        Ready to send to <span id="audCount">0</span> shopkeepers
+        <small id="audDesc">Compose a message first to enable</small>
+      </div>
+      <button class="pb-btn" id="genBtn" onclick="generateLinks()" disabled>Generate links →</button>
+    </div>
+  </div>
+
+  <!-- ===== Generated list ===== -->
+  <div class="step-card" id="resultCard" style="display:none">
+    <div class="step-h">
+      <div class="step-num" style="background:#10B981">✓</div>
+      <div class="step-title">Generated WhatsApp links</div>
+      <div class="step-help" id="genCount"></div>
+    </div>
+
+    <div class="info-card">
+      💡 Click <b>Send →</b> on each row. WhatsApp web opens with the pre-filled message — just press the Send arrow in WhatsApp.
+      Sent rows are marked locally so you don't double-send. <b>Open 5 in tabs</b> sends a batch faster.
+    </div>
+
+    <div id="recipientList"></div>
+
+    <div class="batch-bar">
+      <button onclick="openBatch(5)">Open next 5 in tabs</button>
+      <button class="sec" onclick="copyAllLinks()">Copy all links</button>
+      <button class="sec" onclick="resetSentMarks()">Reset progress</button>
+      <div class="progress-pill"><b id="sentCount">0</b> / <span id="totalCount">0</span> marked sent</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+// ====== Templates ======
+const TEMPLATES = {
+  welcome: 'Hello {{owner_name}}, welcome to DukanList! Your shop "{{shop_name}}" is now visible on our directory. View your public page here: {{shop_url}}\n\nNeed help? Reply to this message any time.',
+  approval: 'Hello {{owner_name}}, good news — your listing "{{shop_name}}" has been approved on DukanList. It is now live and customers in {{city}} can find you here: {{shop_url}}',
+  reminder: 'Hello {{owner_name}}, please add 3+ shop photos to "{{shop_name}}" — shops with photos get 3× more calls. Add them here: {{shop_url}}\n\nIt takes less than 2 minutes.',
+  feature: 'Hello {{owner_name}}, we just launched a new feature on DukanList that will help "{{shop_name}}" get more leads. Login at dukanlist.com to try it out.',
+  festival: 'Hello {{owner_name}}, wishing "{{shop_name}}" a prosperous festival season! Customers are searching more during this time — make sure your DukanList profile is complete: {{shop_url}}',
+  reactivate: 'Hello {{owner_name}}, we noticed it has been a while. "{{shop_name}}" is still listed on DukanList but new customers might miss it without recent updates. Add fresh photos here: {{shop_url}}'
+};
+
+let ROWS = [];      // all shopkeepers fetched
+let CITIES = [];
+let CATEGORIES = [];
+let CURRENT = [];   // filtered audience
+let GENERATED = []; // links generated
+
+const c = ShopDB.client;
+
+// ====== Init ======
+async function init(){
+  // 1. Auth gate
+  const ses = await c.auth.getSession();
+  if (!ses.data.session){ location.href = '/admin/login.html'; return; }
+
+  // 2. is_admin check
+  const a = await c.rpc('is_admin');
+  if (a.error || a.data !== true){
+    showErr('Admin access required. Logging out…');
+    setTimeout(()=>{ c.auth.signOut().then(()=>location.href='/admin/login.html'); }, 1500);
+    return;
+  }
+
+  // 3. Fetch shopkeepers + reference data in parallel
+  await Promise.all([
+    fetchShops(),
+    fetchCities(),
+    fetchCategories()
+  ]);
+
+  // 4. Wire up UI
+  document.querySelectorAll('input[name="aud"]').forEach(r => r.addEventListener('change', updateAudience));
+  document.getElementById('msgText').addEventListener('input', onMsgChange);
+  document.querySelectorAll('.tpl-chip').forEach(ch => ch.addEventListener('click', () => {
+    document.getElementById('msgText').value = TEMPLATES[ch.dataset.tpl] || '';
+    onMsgChange();
+  }));
+
+  updateAudience();
+}
+
+async function fetchShops(){
+  const { data, error } = await c.from('businesses')
+    .select('id, slug, name, owner_name, mobile, whatsapp, status, city_id, category_id, photos')
+    .in('status', ['active','pending'])
+    .order('name');
+  if (error){ showErr('Failed to load shops: ' + error.message); return; }
+  ROWS = data || [];
+  // counters
+  document.getElementById('cntAll').textContent = ROWS.filter(r => r.status === 'active').length;
+  document.getElementById('cntAll').classList.toggle('zero', ROWS.filter(r => r.status === 'active').length === 0);
+  document.getElementById('cntPending').textContent = ROWS.filter(r => r.status === 'pending').length;
+  document.getElementById('cntPending').classList.toggle('zero', ROWS.filter(r => r.status === 'pending').length === 0);
+  const incomplete = ROWS.filter(r => r.status === 'active' && (!Array.isArray(r.photos) || r.photos.length === 0)).length;
+  document.getElementById('cntIncomplete').textContent = incomplete;
+  document.getElementById('cntIncomplete').classList.toggle('zero', incomplete === 0);
+}
+
+async function fetchCities(){
+  const { data, error } = await c.from('geo_cities').select('id, name').order('name');
+  if (error) return;
+  CITIES = data || [];
+  const sel = document.getElementById('cityFilter');
+  CITIES.forEach(ct => {
+    const o = document.createElement('option');
+    o.value = String(ct.id); o.textContent = ct.name;
+    sel.appendChild(o);
+  });
+}
+
+async function fetchCategories(){
+  const { data, error } = await c.from('categories').select('id, name, parent_id').eq('active', true).order('name');
+  if (error) return;
+  CATEGORIES = data || [];
+  const sel = document.getElementById('catFilter');
+  CATEGORIES.forEach(ct => {
+    const o = document.createElement('option');
+    o.value = String(ct.id);
+    o.textContent = ct.parent_id ? '└ ' + ct.name : '◉ ' + ct.name;
+    sel.appendChild(o);
+  });
+}
+
+function showErr(msg){
+  const e = document.getElementById('errBox');
+  e.textContent = msg;
+  e.style.display = 'block';
+}
+
+// ====== Audience filter ======
+function updateAudience(){
+  // Update selected style
+  document.querySelectorAll('.audience-row').forEach(r => r.classList.remove('sel'));
+  const checked = document.querySelector('input[name="aud"]:checked');
+  if (checked) checked.closest('.audience-row').classList.add('sel');
+
+  const aud = checked ? checked.value : 'all';
+  let list = [];
+
+  if (aud === 'all'){
+    list = ROWS.filter(r => r.status === 'active');
+  } else if (aud === 'pending'){
+    list = ROWS.filter(r => r.status === 'pending');
+  } else if (aud === 'incomplete'){
+    list = ROWS.filter(r => r.status === 'active' && (!Array.isArray(r.photos) || r.photos.length === 0));
+  } else if (aud === 'city'){
+    const v = parseInt(document.getElementById('cityFilter').value || '0', 10);
+    list = v ? ROWS.filter(r => r.city_id === v && r.status === 'active') : [];
+  } else if (aud === 'category'){
+    const v = parseInt(document.getElementById('catFilter').value || '0', 10);
+    list = v ? ROWS.filter(r => r.category_id === v && r.status === 'active') : [];
+  }
+
+  // Filter out rows with no mobile/whatsapp
+  CURRENT = list.filter(r => r.mobile || r.whatsapp);
+
+  // Update preview banner
+  document.getElementById('audCount').textContent = CURRENT.length;
+  document.getElementById('cntCity').textContent = aud === 'city' ? CURRENT.length : '…';
+  document.getElementById('cntCategory').textContent = aud === 'category' ? CURRENT.length : '…';
+
+  // Disable gen button if message empty or audience empty
+  const msg = document.getElementById('msgText').value.trim();
+  const btn = document.getElementById('genBtn');
+  const desc = document.getElementById('audDesc');
+  if (!msg.length){
+    btn.disabled = true; desc.textContent = 'Compose a message first to enable';
+  } else if (!CURRENT.length){
+    btn.disabled = true; desc.textContent = 'No shopkeepers match this audience';
+  } else {
+    btn.disabled = false; desc.textContent = 'Message will be personalized with shop name + owner';
+  }
+}
+
+function onMsgChange(){
+  const v = document.getElementById('msgText').value;
+  document.getElementById('charCount').textContent = v.length;
+  updateAudience(); // re-evaluate button state
+}
+
+// ====== Generate links ======
+function escapeHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]); }
+
+function cleanMobile(raw){
+  let d = (raw || '').replace(/\D/g, '');
+  if (d.length === 10 && /^[6-9]/.test(d)) return '91' + d;
+  if (d.length === 11 && d.startsWith('0')) return '91' + d.slice(1);
+  if (d.length === 12 && d.startsWith('91')) return d;
+  if (d.length === 13 && d.startsWith('091')) return d.slice(1);
+  return null;
+}
+
+function personalize(template, row){
+  const cityName = (CITIES.find(c => c.id === row.city_id) || {}).name || '';
+  return template
+    .replace(/\{\{\s*shop_name\s*\}\}/g, row.name || 'your shop')
+    .replace(/\{\{\s*owner_name\s*\}\}/g, row.owner_name || 'shopkeeper')
+    .replace(/\{\{\s*shop_url\s*\}\}/g, 'https://dukanlist.com/' + (row.slug || ''))
+    .replace(/\{\{\s*city\s*\}\}/g, cityName);
+}
+
+function getSentKey(){
+  // localStorage key based on message hash so different broadcasts have separate progress
+  const msg = document.getElementById('msgText').value;
+  let h = 0; for (let i = 0; i < msg.length; i++){ h = (h * 31 + msg.charCodeAt(i)) | 0; }
+  return 'dl_bcast_sent_' + h;
+}
+
+function isSent(rowId){
+  try {
+    const s = JSON.parse(localStorage.getItem(getSentKey()) || '[]');
+    return s.indexOf(rowId) !== -1;
+  } catch(_){ return false; }
+}
+function markSent(rowId){
+  try {
+    const k = getSentKey();
+    const s = JSON.parse(localStorage.getItem(k) || '[]');
+    if (s.indexOf(rowId) === -1) s.push(rowId);
+    localStorage.setItem(k, JSON.stringify(s));
+  } catch(_){}
+}
+
+function generateLinks(){
+  const tpl = document.getElementById('msgText').value;
+  if (!tpl.trim() || !CURRENT.length) return;
+
+  GENERATED = CURRENT.map(r => {
+    const wa = cleanMobile(r.whatsapp || r.mobile);
+    if (!wa) return null;
+    const msg = personalize(tpl, r);
+    return {
+      id: r.id,
+      name: r.name,
+      owner: r.owner_name,
+      mobile: wa,
+      mobile_display: wa.replace(/^91/, '+91 '),
+      url: 'https://wa.me/' + wa + '?text=' + encodeURIComponent(msg)
+    };
+  }).filter(Boolean);
+
+  renderRecipients();
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('genCount').textContent = GENERATED.length + ' personalized links ready';
+  document.getElementById('totalCount').textContent = GENERATED.length;
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderRecipients(){
+  const wrap = document.getElementById('recipientList');
+  wrap.innerHTML = GENERATED.map((g, idx) => {
+    const sent = isSent(g.id);
+    return ''
+      + '<div class="recipient-row ' + (sent ? 'sent' : '') + '" id="row-' + g.id + '">'
+      +   '<div class="r-num">' + (idx + 1) + '</div>'
+      +   '<div style="flex:1;min-width:0">'
+      +     '<div class="r-name">' + escapeHtml(g.name) + '</div>'
+      +     '<div class="r-meta">' + escapeHtml(g.owner || 'no owner name') + '</div>'
+      +   '</div>'
+      +   '<div class="r-mobile">' + escapeHtml(g.mobile_display) + '</div>'
+      +   '<a class="wa-btn ' + (sent ? 'sent' : '') + '" href="' + g.url + '" target="_blank" rel="noopener" '
+      +     'onclick="markSentAndRefresh(\'' + g.id + '\')">'
+      +     (sent ? '✓ Sent' : '💬 Send →')
+      +   '</a>'
+      + '</div>';
+  }).join('');
+  updateProgressCount();
+}
+
+function markSentAndRefresh(rowId){
+  markSent(rowId);
+  // Update just this row visually after a tiny delay (so WhatsApp opens first)
+  setTimeout(() => {
+    const row = document.getElementById('row-' + rowId);
+    if (row) {
+      row.classList.add('sent');
+      const btn = row.querySelector('.wa-btn');
+      if (btn){ btn.classList.add('sent'); btn.textContent = '✓ Sent'; }
+    }
+    updateProgressCount();
+  }, 300);
+}
+
+function updateProgressCount(){
+  const sent = GENERATED.filter(g => isSent(g.id)).length;
+  document.getElementById('sentCount').textContent = sent;
+}
+
+function openBatch(n){
+  const next = GENERATED.filter(g => !isSent(g.id)).slice(0, n);
+  if (!next.length){ alert('All marked sent. Use "Reset progress" to start over.'); return; }
+  if (!confirm('Open ' + next.length + ' WhatsApp tabs?\n\nYour browser may block pop-ups — allow them on this page if asked.')) return;
+  next.forEach((g, i) => {
+    setTimeout(() => {
+      window.open(g.url, '_blank', 'noopener');
+      markSent(g.id);
+      const row = document.getElementById('row-' + g.id);
+      if (row){
+        row.classList.add('sent');
+        const btn = row.querySelector('.wa-btn');
+        if (btn){ btn.classList.add('sent'); btn.textContent = '✓ Sent'; }
+      }
+      updateProgressCount();
+    }, i * 350);
+  });
+}
+
+function copyAllLinks(){
+  const txt = GENERATED.map((g, i) => (i+1) + '. ' + g.name + ' — ' + g.url).join('\n');
+  navigator.clipboard.writeText(txt).then(
+    () => alert('Copied ' + GENERATED.length + ' links to clipboard.'),
+    () => alert('Could not copy — please copy manually.')
+  );
+}
+
+function resetSentMarks(){
+  if (!confirm('Reset sent progress for this message?')) return;
+  try { localStorage.removeItem(getSentKey()); } catch(_){}
+  renderRecipients();
+}
+
+async function logout(){
+  await c.auth.signOut();
+  location.href = '/admin/login.html';
+}
+
+init();
+</script>
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>
