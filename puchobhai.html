@@ -1702,14 +1702,22 @@ function setupBizSearch(){
       box.innerHTML = '<div style="padding:10px 11px;color:#6B7280;font-size:.8rem">🔍 Searching…</div>';
       box.style.display = 'block';
       try {
-        const { data, error } = await SB
+        // FIX (2026-06-02): column was wrong — businesses has no plain
+        // "verified" / "city" columns. Use verified_score (generated)
+        // for ranking, and embed geo_cities for city name display.
+        const { data: rawData, error } = await SB
           .from('businesses')
-          .select('id, name, city')
+          .select('id, name, city_id, geo_cities(name)')
           .ilike('name', '%' + q.replace(/[%_]/g,'') + '%')
           .eq('status','active')
-          .order('verified', { ascending: false })
+          .order('verified_score', { ascending: false, nullsFirst: false })
           .limit(12);
         if (error) throw error;
+        const data = (rawData || []).map(b => ({
+          id: b.id,
+          name: b.name,
+          city: b.geo_cities && b.geo_cities.name ? b.geo_cities.name : ''
+        }));
         if (!data || data.length === 0) {
           box.innerHTML = '<div style="padding:10px 11px;color:#9CA3AF;font-size:.8rem">No shop found matching "' + escapeHtml(q) + '"</div>';
           return;
