@@ -666,14 +666,16 @@
         <span data-i18n-hi>आपकी profile पर dikhega (जैसे "Dr. रवि शर्मा — Doctor"). Visitor को आप पर भरोसा होगा।</span>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label><span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span><span class="opt">(if different)</span></label>
-        <input id="whatsapp" class="input keep-en" type="tel" placeholder="Same as mobile" inputmode="numeric" maxlength="13">
-      </div>
-      <!-- Shop email field removed — email is collected only once in the
-           Login Credentials section at end of form to avoid confusion. -->
-    </div>
+    <!-- WhatsApp + Shop Email fields removed (2026-06-02).
+         Earlier these were optional fields, but they caused confusion:
+         shopkeepers would either repeat their mobile or leave them blank.
+         Backend defaults whatsapp = mobile automatically; the login email
+         in Step 4 is the single email source.
+         Keeping the hidden input below so existing JS references (
+         document.getElementById('whatsapp')) keep returning a value of ''
+         instead of throwing on null. -->
+    <input id="whatsapp" type="hidden" value="">
+
     <div class="alert error" id="step2Err" style="display:none"></div>
     <div class="btn-row">
       <button class="btn btn-sec" onclick="goToStep(1)">
