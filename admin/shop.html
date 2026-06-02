@@ -282,7 +282,15 @@ function render(){
             + field('tel',  'whatsapp', 'WhatsApp (10 digit)', s.whatsapp)
           + '</div>'
           + '<div class="grid-2">'
-            + field('email', 'email', 'Shop Email (public contact)', s.shop_email || s.email)
+            // Single source of truth: auth.users.email. The public "shop
+            // email" is just a mirror of the login email — they are kept
+            // in sync by api/admin-update-shop-email.js cascade and the
+            // one-time db/92 backfill. Editing here is disabled to
+            // prevent the two values from diverging again.
+            + '<div class="field"><label>Shop Email (public contact)</label>'
+              + '<input type="email" disabled value="' + esc(s.owner_email || s.shop_email || s.email || '— not set —') + '" style="background:#F8FAFC;color:#475569;cursor:not-allowed">'
+              + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">Mirrors the login email — change it via "Change Login Email" in Owner Account panel →</small>'
+            + '</div>'
             + '<div class="field"><label style="color:#94a3b8;font-size:12px">Login Email (read-only)</label>'
               + '<input type="email" disabled value="' + esc(s.owner_email || '— not set —') + '" style="background:#F8FAFC;color:#64748b;cursor:not-allowed">'
               + '<small style="display:block;margin-top:4px;color:#94a3b8;font-size:11px">To change login email, use "Change Login Email" button in Owner Account panel →</small>'
@@ -612,20 +620,12 @@ async function saveShop(e){
     var v = f.querySelector('[name="' + k + '"]')?.value;
     if (v !== undefined && v !== SHOP[k]) patch[k] = v;
   });
-  // Shop email (public contact) — compare against shop_email OR legacy email field
-  var emailEl = f.querySelector('[name="email"]');
-  if (emailEl){
-    var newEmail = (emailEl.value || '').trim().toLowerCase();
-    var oldEmail = (SHOP.shop_email || SHOP.email || '').toLowerCase();
-    if (newEmail !== oldEmail){
-      // Light client-side validation; server re-validates
-      if (newEmail && !/^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(newEmail)){
-        toast('Invalid email format', true);
-        return;
-      }
-      patch.email = newEmail || null;
-    }
-  }
+  // Shop email is deliberately NOT included in this patch. It is now
+  // a read-only mirror of auth.users.email. To change it, admin uses
+  // the "Change Login Email" button which cascades to businesses.email
+  // (see api/admin-update-shop-email.js). Including it here would
+  // re-introduce the historical bug of the two email columns drifting
+  // apart from each other.
   // Trust signals
   var yEl = f.querySelector('[name="established_year"]');
   if (yEl){
