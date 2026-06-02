@@ -51,7 +51,7 @@ DECLARE
   v_user_id        UUID := auth.uid();
   v_business_id    UUID;
   v_old            businesses%ROWTYPE;
-  v_fields_updated TEXT[] := '{}';
+  v_fields_updated TEXT[] := ARRAY[]::TEXT[];
   v_check          JSONB;
   v_combined_text  TEXT := '';
   v_new_val        TEXT;
@@ -102,19 +102,25 @@ BEGIN
   -- APPLY EDITS (all instant, no pending_review queue)
   -- =====================================================
 
+  -- NOTE: PostgreSQL's `||` operator is ambiguous when the right side is
+  -- an unknown-type string literal and the left side is TEXT[]. The parser
+  -- can mis-resolve it as array-concat and try to parse the literal as an
+  -- array literal — producing "malformed array literal: hours_json".
+  -- Solution (same as db/38b): always use array_append() — unambiguous.
+
   IF p_patch ? 'hours_json' THEN
     UPDATE businesses SET hours_json = p_patch->'hours_json' WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'hours_json';
+    v_fields_updated := array_append(v_fields_updated, 'hours_json');
   END IF;
 
   IF p_patch ? 'services_json' THEN
     UPDATE businesses SET services_json = p_patch->'services_json' WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'services_json';
+    v_fields_updated := array_append(v_fields_updated, 'services_json');
   END IF;
 
   IF p_patch ? 'faqs_json' THEN
     UPDATE businesses SET faqs_json = p_patch->'faqs_json' WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'faqs_json';
+    v_fields_updated := array_append(v_fields_updated, 'faqs_json');
   END IF;
 
   -- whatsapp is now treated as an identity field — locked from owner
@@ -130,33 +136,33 @@ BEGIN
         INSERT INTO business_edits(business_id, field_name, old_value, new_value, edited_by, edited_role)
           VALUES (v_business_id, 'owner_name', v_old_val, v_new_val, v_user_id, 'owner');
       EXCEPTION WHEN OTHERS THEN NULL; END;
-      v_fields_updated := v_fields_updated || 'owner_name';
+      v_fields_updated := array_append(v_fields_updated, 'owner_name');
     END IF;
   END IF;
 
   IF p_patch ? 'usp_text' THEN
     v_new_val := NULLIF(trim(p_patch->>'usp_text'), '');
     UPDATE businesses SET usp_text = v_new_val WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'usp_text';
+    v_fields_updated := array_append(v_fields_updated, 'usp_text');
   END IF;
 
   IF p_patch ? 'usp_hi' THEN
     v_new_val := NULLIF(trim(p_patch->>'usp_hi'), '');
     UPDATE businesses SET usp_hi = v_new_val WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'usp_hi';
+    v_fields_updated := array_append(v_fields_updated, 'usp_hi');
   END IF;
 
   IF p_patch ? 'about_text' THEN
     v_new_val := NULLIF(trim(p_patch->>'about_text'), '');
     UPDATE businesses SET about_text = v_new_val WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'about_text';
+    v_fields_updated := array_append(v_fields_updated, 'about_text');
   END IF;
 
   IF p_patch ? 'established_year' THEN
     BEGIN
       UPDATE businesses SET established_year = (p_patch->>'established_year')::INT
         WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'established_year';
+      v_fields_updated := array_append(v_fields_updated, 'established_year');
     EXCEPTION WHEN OTHERS THEN NULL; END;
   END IF;
 
@@ -165,7 +171,7 @@ BEGIN
       UPDATE businesses
         SET payment_methods = ARRAY(SELECT jsonb_array_elements_text(p_patch->'payment_methods'))
         WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'payment_methods';
+      v_fields_updated := array_append(v_fields_updated, 'payment_methods');
     EXCEPTION WHEN OTHERS THEN NULL; END;
   END IF;
 
@@ -174,7 +180,7 @@ BEGIN
       UPDATE businesses
         SET special_features = ARRAY(SELECT jsonb_array_elements_text(p_patch->'special_features'))
         WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'special_features';
+      v_fields_updated := array_append(v_fields_updated, 'special_features');
     EXCEPTION WHEN OTHERS THEN NULL; END;
   END IF;
 
@@ -182,7 +188,7 @@ BEGIN
   IF p_patch ? 'name_hi' THEN
     v_new_val := NULLIF(trim(p_patch->>'name_hi'), '');
     UPDATE businesses SET name_hi = v_new_val WHERE id = v_business_id;
-    v_fields_updated := v_fields_updated || 'name_hi';
+    v_fields_updated := array_append(v_fields_updated, 'name_hi');
   END IF;
 
   -- =====================================================
@@ -194,37 +200,37 @@ BEGIN
     IF p_patch ? 'name' THEN
       v_new_val := NULLIF(trim(p_patch->>'name'), '');
       UPDATE businesses SET name = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'name';
+      v_fields_updated := array_append(v_fields_updated, 'name');
     END IF;
     IF p_patch ? 'email' THEN
       v_new_val := NULLIF(trim(p_patch->>'email'), '');
       UPDATE businesses SET email = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'email';
+      v_fields_updated := array_append(v_fields_updated, 'email');
     END IF;
     IF p_patch ? 'mobile' THEN
       v_new_val := NULLIF(trim(p_patch->>'mobile'), '');
       UPDATE businesses SET mobile = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'mobile';
+      v_fields_updated := array_append(v_fields_updated, 'mobile');
     END IF;
     IF p_patch ? 'whatsapp' THEN
       v_new_val := NULLIF(trim(p_patch->>'whatsapp'), '');
       UPDATE businesses SET whatsapp = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'whatsapp';
+      v_fields_updated := array_append(v_fields_updated, 'whatsapp');
     END IF;
     IF p_patch ? 'address_line1' THEN
       v_new_val := NULLIF(trim(p_patch->>'address_line1'), '');
       UPDATE businesses SET address_line1 = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'address_line1';
+      v_fields_updated := array_append(v_fields_updated, 'address_line1');
     END IF;
     IF p_patch ? 'address_line2' THEN
       v_new_val := NULLIF(trim(p_patch->>'address_line2'), '');
       UPDATE businesses SET address_line2 = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'address_line2';
+      v_fields_updated := array_append(v_fields_updated, 'address_line2');
     END IF;
     IF p_patch ? 'pincode' THEN
       v_new_val := NULLIF(trim(p_patch->>'pincode'), '');
       UPDATE businesses SET pincode = v_new_val WHERE id = v_business_id;
-      v_fields_updated := v_fields_updated || 'pincode';
+      v_fields_updated := array_append(v_fields_updated, 'pincode');
     END IF;
   END IF;
 
