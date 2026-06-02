@@ -1059,7 +1059,7 @@ function dismissFestBanner(){
     </p>
   </div>
   <div class="cats-wrap">
-    <div class="wn-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:1180px;margin:0 auto">
+    <div class="wn-grid" id="wnGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:1180px;margin:0 auto">
 
       <a href="/browse.html?cat=construction-material" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FED7AA !important;background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(234,88,12,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#F97316,#92400E);color:#fff">🧱</div><span class="wn-badge new" style="background:linear-gradient(135deg,#F97316,#EA580C);color:#fff">FRESH</span></div>
@@ -1099,7 +1099,7 @@ function dismissFestBanner(){
 
       <div class="wn-card" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#FBBF24,#F59E0B)">🏆</div><span class="wn-badge new">NEW</span></div>
-        <h3><span data-i18n-en>Top 10 Listings</span><span data-i18n-hi>टॉप 10 लिस्टिंग</span></h3>
+        <h3><span data-i18n-en>Top 5 Listings</span><span data-i18n-hi>टॉप 5 लिस्टिंग</span></h3>
         <p><span data-i18n-en>Auto-ranked monthly by reviews + photos + verification. Gold/Silver/Bronze medals for top 3.</span><span data-i18n-hi>मासिक रैंकिंग — रिव्यू + फोटो + वेरिफिकेशन से। टॉप 3 को gold/silver/bronze।</span></p>
       </div>
 
@@ -1160,10 +1160,39 @@ function dismissFestBanner(){
         .wn-card p{ font-size:.8rem !important; line-height:1.45 !important }
         .wn-card .wn-ico{ width:34px !important; height:34px !important; font-size:16px !important }
         .wn-card .wn-badge{ font-size:10px !important; padding:2px 7px !important }
+        /* Mobile: show only first 2 cards by default — expand button reveals rest */
+        .wn-grid:not(.wn-expanded) > .wn-card:nth-child(n+3){ display:none !important }
+      }
+      /* "View all" toggle — visible only on mobile */
+      .wn-toggle{ display:none }
+      @media (max-width:560px){
+        .wn-toggle{
+          display:flex; align-items:center; justify-content:center; gap:6px;
+          width:calc(100% - 28px); margin:14px 14px 0; padding:12px 16px;
+          background:#FFFFFF; border:1.5px solid #C7D2FE; border-radius:12px;
+          color:#4338CA; font-weight:800; font-size:.92rem; cursor:pointer;
+          box-shadow:0 4px 12px rgba(67,56,202,.10);
+          transition:all .15s ease;
+        }
+        .wn-toggle:hover{ background:#EEF2FF; transform:translateY(-1px) }
+        .wn-toggle:active{ transform:translateY(0) }
+        .wn-toggle .wn-chevron{ transition:transform .2s ease }
+        .wn-grid.wn-expanded ~ .wn-toggle .wn-chevron{ transform:rotate(180deg) }
       }
     </style>
 
     </div>
+
+    <!-- Mobile-only: View All / Show Less toggle -->
+    <button type="button" class="wn-toggle" id="wnToggle" onclick="(function(b){var g=document.getElementById('wnGrid');var ex=g.classList.toggle('wn-expanded');b.querySelector('.wn-toggle-label-show').style.display=ex?'none':'inline';b.querySelector('.wn-toggle-label-hide').style.display=ex?'inline':'none';if(!ex){g.scrollIntoView({behavior:'smooth',block:'start'});}})(this)" aria-label="Toggle all features">
+      <span class="wn-toggle-label-show">
+        <span data-i18n-en>View all features</span><span data-i18n-hi>सभी फ़ीचर देखें</span>
+      </span>
+      <span class="wn-toggle-label-hide" style="display:none">
+        <span data-i18n-en>Show less</span><span data-i18n-hi>कम दिखाएँ</span>
+      </span>
+      <span class="wn-chevron" aria-hidden="true">▾</span>
+    </button>
 
     <div style="text-align:center;margin-top:24px;font-size:0.85rem;color:var(--muted)">
       <span data-i18n-en>Have an idea for the next feature?</span>
@@ -1175,10 +1204,10 @@ function dismissFestBanner(){
   </div>
 </section>
 
-<!-- ===== TOP 10 SHOPS OF THE MONTH (leaderboard) ===== -->
+<!-- ===== TOP 5 SHOPS OF THE MONTH (leaderboard) ===== -->
 <section id="top10Section" style="background:#FFFBEB;padding:50px 0;display:none">
   <div class="section-head reveal">
-    <span class="eyebrow" style="color:#92400E">🏆 <span data-i18n-en>Top 10 of the Month</span><span data-i18n-hi>महीने के टॉप 10</span></span>
+    <span class="eyebrow" style="color:#92400E">🏆 <span data-i18n-en>Top 5 of the Month</span><span data-i18n-hi>महीने के टॉप 5</span></span>
     <h2><span data-i18n-en>Most loved by customers</span><span data-i18n-hi>ग्राहकों का सबसे ज़्यादा भरोसा</span></h2>
     <p><span data-i18n-en>Ranked by reviews + photos + verification. Auto-updated weekly.</span><span data-i18n-hi>रिव्यू + फोटो + वेरिफिकेशन से रैंक। हर हफ़्ते अपडेट।</span></p>
   </div>
@@ -1854,10 +1883,10 @@ if (window.DukanPTR){
         _score: ((Number(b.rating_count) || 0) * (Number(b.rating_avg) || 0)) +
                 ((Array.isArray(b.photos) ? b.photos.length : 0) * 1.5) +
                 ((Number(b.verified_score) || 0) * 8)
-      })).filter(b => b._score >= 3).sort((a, b) => b._score - a._score).slice(0, 10);
+      })).filter(b => b._score >= 3).sort((a, b) => b._score - a._score).slice(0, 5);
       if (scored.length < 3) return;
       const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-      const medals = ['🥇','🥈','🥉','4','5','6','7','8','9','10'];
+      const medals = ['🥇','🥈','🥉','4','5'];
       const html = scored.map((b, i) => {
         const photo = (b.photos && b.photos[0]) || null;
         const cityName = (b.geo_cities && b.geo_cities.name) || '';
@@ -2111,53 +2140,4 @@ if (window.DukanPTR){
         if (!r.businesses || !r.businesses.name) return;
         events.push({
           en: '⭐ ' + r.rating + '-star review for <b>' + esc(r.businesses.name) + '</b> · ' + fmtAgo(r.created_at),
-          hi: '⭐ ' + r.rating + '-star review मिला <b>' + esc(r.businesses.name) + '</b> को · ' + fmtAgo(r.created_at)
-        });
-      });
-    } catch(_){}
-
-    if (events.length === 0){
-      // Static fallback (so ticker is never empty)
-      events.push(
-        { en: '🏪 Sirsa · Bathinda · Mansa · Muktsar ka apna local directory — join FREE', hi: '🏪 Sirsa · Bathinda · Mansa · Muktsar का local directory — FREE जुड़ें' },
-        { en: '💬 Customers daily WhatsApp local shops directly', hi: '💬 Customers रोज़ local shops से WhatsApp पर बात करते हैं' }
-      );
-    }
-
-    // Shuffle for variety
-    events.sort(() => Math.random() - 0.5);
-
-    let idx = 0;
-    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-    function show(){
-      const msg = document.getElementById('actMsg');
-      if (!msg) return;
-      msg.innerHTML = events[idx % events.length][lang] || events[idx % events.length].en;
-      idx++;
-    }
-    show();
-    ticker.style.display = '';
-    setInterval(show, 5000);
-
-    // Push body padding to avoid covering content at bottom.
-    // On mobile, mobile-nav already adds its own padding so we add only ticker height.
-    const isMobile = window.matchMedia('(max-width:700px)').matches;
-    document.body.style.paddingBottom = (isMobile ? '110px' : '52px');
-  }
-
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', () => setTimeout(loadActivity, 1800));
-  } else {
-    setTimeout(loadActivity, 1800);
-  }
-})();
-function dismissActTicker(){
-  try { localStorage.setItem('dl_act_dismissed_today', new Date().toISOString().slice(0,10)); } catch(_){}
-  const t = document.getElementById('actTicker');
-  if (t) t.style.display = 'none';
-  document.body.style.paddingBottom = '';
-}
-</script>
-
-</body>
-</html>
+        
