@@ -361,10 +361,18 @@
 
   <div class="card">
     <div class="form-group">
-      <label><span data-i18n-en>Email</span><span data-i18n-hi>ईमेल</span><span class="req">*</span></label>
+      <label>
+        <span data-i18n-en>Email or Mobile</span><span data-i18n-hi>ईमेल या मोबाइल</span><span class="req">*</span>
+      </label>
       <div class="input-icon">
         <span class="ico">✉️</span>
-        <input id="email" class="input keep-en" type="email" placeholder="you@example.com" autocomplete="email">
+        <!-- type="text" (not "email") so users can also type mobile digits.
+             Login handler auto-detects format and resolves mobile→email
+             via the lookup_login_email_by_mobile RPC. -->
+        <input id="email" class="input keep-en" type="text" placeholder="you@example.com or 9876543210" autocomplete="username" inputmode="email">
+      </div>
+      <div class="help" style="font-size:.74rem;color:#64748b;margin-top:4px">
+        Use the email or 10-digit mobile you registered with.
       </div>
     </div>
 
@@ -850,12 +858,13 @@ async function handleLogin(){
   const err = document.getElementById('loginErr');
   err.style.display = 'none';
   err.innerHTML = '';
+  err.className = 'alert error';
 
-  const email = document.getElementById('email').value.trim().toLowerCase();
+  let identifier = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
 
-  if (!email || email.indexOf('@') === -1){
-    err.textContent = 'Enter a valid email address';
+  if (!identifier){
+    err.textContent = 'Enter your email or mobile number';
     err.style.display = 'flex'; return;
   }
   if (!password){
@@ -863,9 +872,43 @@ async function handleLogin(){
     err.style.display = 'flex'; return;
   }
 
+  const c = ShopDB.client;
+
+  // ===== Detect whether the identifier is an email or a mobile =====
+  // Email path: contains '@'. Mobile path: all digits (after stripping +, spaces, dashes).
+  let email = identifier.toLowerCase();
+  const isEmailFormat = identifier.indexOf('@') !== -1;
+  const digitsOnly = identifier.replace(/\D/g, '');
+  const looksLikeMobile = !isEmailFormat && digitsOnly.length >= 10 && digitsOnly.length <= 13;
+
+  if (isEmailFormat) {
+    // Standard email login — nothing to resolve
+  } else if (looksLikeMobile) {
+    // Mobile login — resolve to email via RPC
+    btn.disabled = true; btn.innerHTML = '<span>⏳ Looking up account...</span>';
+    try {
+      const res = await c.rpc('lookup_login_email_by_mobile', { p_mobile: digitsOnly });
+      if (res.error) throw res.error;
+      const resolved = res.data;
+      if (!resolved){
+        btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
+        err.innerHTML = '<b>No account found on this mobile</b><br>' +
+          'Either the number is not registered, or it is linked to more than one shop. Please log in using your email instead.';
+        err.style.display = 'flex'; return;
+      }
+      email = String(resolved).toLowerCase();
+    } catch (e) {
+      btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
+      err.textContent = 'Could not look up that mobile. Please try again or use your email.';
+      err.style.display = 'flex'; return;
+    }
+  } else {
+    err.textContent = 'Enter a valid email or 10-digit mobile number';
+    err.style.display = 'flex'; return;
+  }
+
   btn.disabled = true; btn.innerHTML = '<span>⏳ Signing in...</span>';
 
-  const c = ShopDB.client;
   const { data, error } = await c.auth.signInWithPassword({ email, password });
 
   if (error){
