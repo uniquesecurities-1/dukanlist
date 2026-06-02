@@ -10,49 +10,74 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,sans-serif;
-    background:#f1f5f9;color:#0F172A;min-height:100vh;
-  }
+  body{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
   .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
   .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
   .nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600;transition:all .15s}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600;transition:.15s}
   .nav a:hover{background:rgba(255,255,255,0.1);color:white}
   .nav a.active{background:#1E3A8A;color:white}
   .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
   .logout:hover{background:rgba(255,255,255,0.1);color:white}
 
-  .main{max-width:1100px;margin:24px auto;padding:0 20px 60px}
+  .main{max-width:1200px;margin:24px auto;padding:0 20px 80px}
   h1.page-title{font-size:24px;font-weight:800;margin-bottom:4px;letter-spacing:-.02em}
-  p.page-sub{font-size:14px;color:#64748b;margin-bottom:24px}
+  p.page-sub{font-size:14px;color:#64748b;margin-bottom:18px}
+
+  /* Stats strip up top */
+  .stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:22px}
+  .stat-mini{background:#fff;border:1px solid #E2E8F0;border-radius:11px;padding:13px 15px;font-size:12px;color:#64748b;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .stat-mini b{display:block;font-size:22px;font-weight:800;color:#0F172A;margin-top:3px;letter-spacing:-.01em;text-transform:none}
+  .stat-mini.quota b{color:#15803D}
+  .stat-mini.quota.warn b{color:#D97706}
+  .stat-mini.quota.danger b{color:#DC2626}
 
   .step-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
-  .step-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .step-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
   .step-num{background:#1E3A8A;color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;flex-shrink:0}
   .step-title{font-weight:800;font-size:15px;color:#0F172A}
   .step-help{font-size:12px;color:#64748b;margin-left:auto}
 
-  textarea, input[type="text"], select{width:100%;padding:11px 13px;border:1.5px solid #cbd5e1;border-radius:9px;font-size:14px;font-family:inherit;background:#fff;color:#0F172A;transition:.15s}
-  textarea:focus, input:focus, select:focus{outline:none;border-color:#1E3A8A;box-shadow:0 0 0 3px rgba(30,58,138,.12)}
+  textarea,input[type=text],input[type=search],input[type=number],select{
+    width:100%;padding:11px 13px;border:1.5px solid #cbd5e1;border-radius:9px;font-size:14px;
+    font-family:inherit;background:#fff;color:#0F172A;transition:.15s
+  }
+  textarea:focus,input:focus,select:focus{outline:none;border-color:#1E3A8A;box-shadow:0 0 0 3px rgba(30,58,138,.12)}
   textarea{resize:vertical;min-height:120px;line-height:1.5}
 
-  .template-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .tpl-chip{padding:6px 12px;background:#F1F5F9;border:1.5px solid #E2E8F0;border-radius:99px;font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:.15s}
+  /* Compose layout: textarea + preview side by side on desktop */
+  .compose-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:860px){.compose-grid{grid-template-columns:1fr 320px}}
+
+  /* WhatsApp chat-bubble preview */
+  .wa-preview{background:#E5DDD5;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><text x=%2210%22 y=%2260%22 font-size=%2240%22 fill=%22%23ddd2c5%22>💬</text></svg>');border-radius:11px;padding:14px;min-height:200px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden}
+  .wa-preview::before{content:'Preview — how shopkeeper sees it';position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.04em}
+  .wa-bubble{background:#fff;border-radius:8px;padding:8px 11px;max-width:90%;align-self:flex-start;box-shadow:0 1px 1px rgba(0,0,0,.08);font-size:13px;color:#0F172A;line-height:1.4;white-space:pre-wrap;word-wrap:break-word;position:relative}
+  .wa-bubble::before{content:'';position:absolute;left:-7px;top:0;width:0;height:0;border:7px solid transparent;border-right-color:#fff;border-left:0;border-top:0}
+  .wa-time{font-size:9px;color:#94a3b8;text-align:right;margin-top:4px;font-weight:500}
+  .wa-bubble.empty{color:#94a3b8;font-style:italic}
+
+  .template-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .tpl-chip{padding:6px 11px;background:#F1F5F9;border:1.5px solid #E2E8F0;border-radius:99px;font-size:11.5px;font-weight:700;color:#475569;cursor:pointer;transition:.15s}
   .tpl-chip:hover{border-color:#1E3A8A;color:#1E3A8A;background:#fff}
+  .tpl-chip.custom{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-color:#F59E0B;color:#92400E}
+  .tpl-section-label{font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin:8px 0 6px}
 
-  .token-hint{font-size:11px;color:#64748b;margin-top:6px;line-height:1.6}
-  .token-hint code{background:#F1F5F9;padding:1px 6px;border-radius:4px;font-size:11px;color:#1E3A8A;font-weight:700}
+  .token-hint{font-size:11px;color:#64748b;margin-top:6px;line-height:1.7}
+  .token-hint code{background:#F1F5F9;padding:1px 6px;border-radius:4px;font-size:11px;color:#1E3A8A;font-weight:700;cursor:pointer;transition:.15s}
+  .token-hint code:hover{background:#1E3A8A;color:#fff}
 
-  .audience-row{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.15s}
+  .audience-row{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:.15s;font-size:13px}
   .audience-row:hover{border-color:#1E3A8A;background:#fff}
-  .audience-row.sel{border-color:#1E3A8A;background:linear-gradient(135deg,#EFF6FF,#DBEAFE)}
-  .audience-row input[type="radio"]{accent-color:#1E3A8A;cursor:pointer}
-  .audience-row .a-label{flex:1;font-weight:700;font-size:14px;color:#0F172A}
-  .audience-row .a-count{background:#1E3A8A;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px}
+  .audience-row input[type=checkbox]{accent-color:#1E3A8A;cursor:pointer;width:16px;height:16px}
+  .audience-row .a-label{flex:1;font-weight:700;color:#0F172A}
+  .audience-row .a-count{background:#1E3A8A;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;min-width:28px;text-align:center}
   .audience-row .a-count.zero{background:#94a3b8}
-  .audience-row select{max-width:200px;margin-left:auto}
+  .audience-row select,.audience-row input[type=number]{max-width:160px;margin-left:auto;padding:6px 10px;font-size:12px}
+
+  .filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:640px){.filter-grid{grid-template-columns:1fr}}
 
   .preview-banner{background:linear-gradient(135deg,#1E40AF,#1D4ED8);color:#fff;padding:14px 18px;border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
   .pb-text{font-weight:800;font-size:14px}
@@ -61,29 +86,63 @@
   .pb-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,255,255,.2)}
   .pb-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-  .recipient-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid #E2E8F0;border-bottom:none;font-size:13px}
+  /* Recipients */
+  .recipient-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .recipient-toolbar input[type=search]{max-width:240px;padding:8px 12px;font-size:13px}
+  .recipient-toolbar select{max-width:140px;padding:7px 10px;font-size:12px}
+  .selected-info{font-size:12px;font-weight:700;color:#475569;background:#F1F5F9;padding:6px 12px;border-radius:99px}
+  .selected-info b{color:#1E3A8A}
+
+  .recipient-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#fff;border:1px solid #E2E8F0;border-bottom:none;font-size:13px}
   .recipient-row:first-child{border-radius:10px 10px 0 0}
   .recipient-row:last-child{border-radius:0 0 10px 10px;border-bottom:1px solid #E2E8F0}
   .recipient-row.sent{background:#F0FDF4}
-  .recipient-row .r-num{font-size:11px;color:#94a3b8;font-weight:700;width:30px;flex-shrink:0}
-  .recipient-row .r-name{flex:1;font-weight:700;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .recipient-row .r-meta{font-size:11px;color:#64748b}
-  .recipient-row .r-mobile{font-family:monospace;font-size:12px;color:#475569;background:#F1F5F9;padding:2px 8px;border-radius:4px;flex-shrink:0}
-  .wa-btn{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;padding:7px 14px;border-radius:8px;font-weight:800;font-size:12px;flex-shrink:0;transition:.15s}
-  .wa-btn:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(37,211,102,.3)}
+  .recipient-row.unsel{opacity:.45}
+  .recipient-row input[type=checkbox]{accent-color:#1E3A8A;cursor:pointer;width:16px;height:16px;flex-shrink:0}
+  .recipient-row .r-num{font-size:11px;color:#94a3b8;font-weight:700;width:28px;text-align:center;flex-shrink:0}
+  .recipient-row .r-name{flex:1;font-weight:700;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .recipient-row .r-meta{font-size:11px;color:#64748b;margin-top:1px}
+  .recipient-row .r-mobile{font-family:monospace;font-size:11.5px;color:#475569;background:#F1F5F9;padding:2px 7px;border-radius:4px;flex-shrink:0}
+  .recipient-row .badge-mini{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:99px;letter-spacing:.04em}
+  .badge-mini.verified{background:#DCFCE7;color:#15803D}
+  .badge-mini.no-photo{background:#FEE2E2;color:#991B1B}
+  .badge-mini.featured{background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff}
+  .wa-btn{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;padding:6px 12px;border-radius:7px;font-weight:800;font-size:11.5px;flex-shrink:0;transition:.15s}
+  .wa-btn:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(37,211,102,.3)}
   .wa-btn.sent{background:#E2E8F0;color:#64748b;pointer-events:none}
+  .preview-btn{background:#fff;border:1.5px solid #cbd5e1;color:#475569;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;transition:.15s;font-family:inherit}
+  .preview-btn:hover{border-color:#1E3A8A;color:#1E3A8A}
 
-  .batch-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #E2E8F0;padding:14px 18px;margin:18px -22px -20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-radius:0 0 14px 14px}
+  .batch-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #E2E8F0;padding:14px 18px;margin:18px -22px -20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:0 0 14px 14px;box-shadow:0 -4px 14px rgba(0,0,0,.04)}
   .batch-bar button{background:#1E3A8A;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
   .batch-bar button:hover{background:#1E40AF}
   .batch-bar button.sec{background:#fff;color:#1E3A8A;border:1.5px solid #1E3A8A}
   .batch-bar button.sec:hover{background:#EFF6FF}
+  .batch-bar select{max-width:130px;padding:7px 10px;font-size:12px}
   .progress-pill{margin-left:auto;font-size:13px;font-weight:700;color:#475569}
   .progress-pill b{color:#10B981}
 
+  /* Campaign history */
+  .history-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;margin-bottom:18px}
+  .history-row{display:flex;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid #F1F5F9;font-size:13px}
+  .history-row:last-child{border-bottom:none}
+  .h-info{flex:1;min-width:0}
+  .h-msg{font-weight:600;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+  .h-meta{font-size:11px;color:#64748b;margin-top:2px}
+  .h-action{background:#F1F5F9;color:#1E3A8A;border:none;padding:5px 10px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .h-action:hover{background:#E0E7FF}
+
   .info-card{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:10px;padding:11px 14px;font-size:13px;color:#78350F;line-height:1.55;margin-bottom:14px}
+  .info-card.success{background:#F0FDF4;border-color:#86EFAC;border-left-color:#15803D;color:#166534}
+  .info-card.danger{background:#FEE2E2;border-color:#FCA5A5;border-left-color:#DC2626;color:#991B1B}
   .loader{padding:24px;text-align:center;color:#94a3b8;font-size:13px}
   .err{background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:11px 14px;color:#991B1B;font-size:13px;margin-bottom:14px}
+  .small-muted{font-size:11px;color:#94a3b8}
+
+  /* Lang toggle */
+  .lang-toggle{display:inline-flex;gap:2px;background:#F1F5F9;border-radius:99px;padding:3px}
+  .lang-toggle button{background:transparent;border:none;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}
+  .lang-toggle button.active{background:#1E3A8A;color:#fff}
 </style>
 </head>
 <body>
@@ -109,67 +168,138 @@
 
 <main class="main">
   <h1 class="page-title">📣 WhatsApp Broadcast</h1>
-  <p class="page-sub">Send personalized WhatsApp messages to multiple shopkeepers at once — using free click-to-chat links (no Business API needed).</p>
+  <p class="page-sub">Send personalized WhatsApp messages to multiple shopkeepers using free click-to-chat — with chat-bubble preview, smart filters, and daily quota safety.</p>
 
   <div id="errBox" class="err" style="display:none"></div>
 
-  <!-- ===== Step 1: Compose message ===== -->
+  <!-- ===== Stats strip ===== -->
+  <div class="stats-strip">
+    <div class="stat-mini">Total shopkeepers<b id="statTotal">…</b></div>
+    <div class="stat-mini quota" id="quotaCard">Sent today<b><span id="statSentToday">…</span> / 200 safe</b></div>
+    <div class="stat-mini">All-time sent<b id="statAllTime">…</b></div>
+    <div class="stat-mini">Campaigns saved<b id="statCampaigns">…</b></div>
+  </div>
+
+  <!-- ===== Campaign history ===== -->
+  <div class="history-card" id="historyCard" style="display:none">
+    <div class="step-h" style="margin-bottom:8px">
+      <div class="step-num" style="background:#94a3b8">⏱</div>
+      <div class="step-title">Recent campaigns</div>
+      <div class="step-help"><a href="#" onclick="clearHistory();return false" style="color:#DC2626;font-weight:700;text-decoration:none">Clear all</a></div>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ===== Step 1: Compose ===== -->
   <div class="step-card">
     <div class="step-h">
       <div class="step-num">1</div>
       <div class="step-title">Compose your message</div>
-      <div class="step-help"><span id="charCount">0</span> / 500</div>
+      <div class="lang-toggle" style="margin-left:auto">
+        <button class="active" data-lang="en" onclick="setLang('en')">English</button>
+        <button data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+      </div>
+      <div class="step-help"><span id="charCount">0</span> / 1024</div>
     </div>
-    <div class="template-chips">
-      <div class="tpl-chip" data-tpl="welcome">👋 Welcome / Onboarding</div>
-      <div class="tpl-chip" data-tpl="approval">✅ Approval Notice</div>
-      <div class="tpl-chip" data-tpl="reminder">📸 Profile Reminder</div>
-      <div class="tpl-chip" data-tpl="feature">🚀 New Feature</div>
-      <div class="tpl-chip" data-tpl="festival">🎉 Festival Greeting</div>
-      <div class="tpl-chip" data-tpl="reactivate">🔔 Re-engagement</div>
-    </div>
-    <textarea id="msgText" maxlength="500" placeholder="Hello {{shop_name}}, ..."></textarea>
-    <div class="token-hint">
-      Tip: Use <code>{{shop_name}}</code>, <code>{{owner_name}}</code>, <code>{{shop_url}}</code>, <code>{{city}}</code> for personalization.
+
+    <div class="tpl-section-label">Quick templates</div>
+    <div class="template-chips" id="templateChips"></div>
+
+    <div class="tpl-section-label" id="customLabel" style="display:none">Your saved templates</div>
+    <div class="template-chips" id="customChips"></div>
+
+    <div class="compose-grid">
+      <div>
+        <textarea id="msgText" maxlength="1024" placeholder="Hello {{owner_name}}, ..."></textarea>
+        <div class="token-hint">
+          Click to insert:
+          <code data-tok="{{shop_name}}">shop_name</code>
+          <code data-tok="{{owner_name}}">owner_name</code>
+          <code data-tok="{{shop_url}}">shop_url</code>
+          <code data-tok="{{city}}">city</code>
+          <code data-tok="{{category}}">category</code>
+          <code data-tok="{{phone}}">phone</code>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="saveCustomTemplate()" class="h-action" style="font-size:12px;padding:6px 12px">💾 Save as template</button>
+          <button onclick="document.getElementById('msgText').value='';onMsgChange()" class="h-action" style="font-size:12px;padding:6px 12px;background:#FEE2E2;color:#991B1B">🗑 Clear</button>
+        </div>
+      </div>
+
+      <!-- WhatsApp chat preview -->
+      <div class="wa-preview">
+        <div class="wa-bubble empty" id="waBubble">Type a message to preview…</div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== Step 2: Select audience ===== -->
+  <!-- ===== Step 2: Audience filters ===== -->
   <div class="step-card">
     <div class="step-h">
       <div class="step-num">2</div>
       <div class="step-title">Select audience</div>
+      <div class="step-help">Combine any filters — they all apply together (AND)</div>
     </div>
-    <label class="audience-row sel" id="audAll">
-      <input type="radio" name="aud" value="all" checked>
-      <div class="a-label">All active shopkeepers</div>
-      <span class="a-count zero" id="cntAll">…</span>
-    </label>
-    <label class="audience-row" id="audPending">
-      <input type="radio" name="aud" value="pending">
-      <div class="a-label">Pending approval (need follow-up)</div>
-      <span class="a-count zero" id="cntPending">…</span>
-    </label>
-    <label class="audience-row" id="audIncomplete">
-      <input type="radio" name="aud" value="incomplete">
-      <div class="a-label">Active but no photos (needs reminder)</div>
-      <span class="a-count zero" id="cntIncomplete">…</span>
-    </label>
-    <label class="audience-row" id="audCity">
-      <input type="radio" name="aud" value="city">
-      <div class="a-label">By city</div>
-      <select id="cityFilter" onchange="updateAudience()"><option value="">— Select city —</option></select>
-      <span class="a-count zero" id="cntCity">…</span>
-    </label>
-    <label class="audience-row" id="audCategory">
-      <input type="radio" name="aud" value="category">
-      <div class="a-label">By category</div>
-      <select id="catFilter" onchange="updateAudience()"><option value="">— Select category —</option></select>
-      <span class="a-count zero" id="cntCategory">…</span>
-    </label>
+
+    <div class="filter-grid">
+      <label class="audience-row">
+        <input type="checkbox" id="fltActive" checked onchange="updateAudience()">
+        <div class="a-label">Status: Active only</div>
+        <span class="a-count" id="cntActive">…</span>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltPending" onchange="updateAudience()">
+        <div class="a-label">Status: Pending approval</div>
+        <span class="a-count" id="cntPending">…</span>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltNoPhoto" onchange="updateAudience()">
+        <div class="a-label">Shops with no photos</div>
+        <span class="a-count" id="cntNoPhoto">…</span>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltVerified" onchange="updateAudience()">
+        <div class="a-label">Verified only (verified_score ≥ 3)</div>
+        <span class="a-count" id="cntVerified">…</span>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltFeatured" onchange="updateAudience()">
+        <div class="a-label">Featured shops only</div>
+        <span class="a-count" id="cntFeatured">…</span>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltRecent" onchange="updateAudience()">
+        <div class="a-label">Registered in last</div>
+        <select id="recentDays" onchange="updateAudience()">
+          <option value="7">7 days</option>
+          <option value="30" selected>30 days</option>
+          <option value="90">90 days</option>
+        </select>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltCity" onchange="updateAudience()">
+        <div class="a-label">City:</div>
+        <select id="cityFilter" onchange="updateAudience()"><option value="">— Any —</option></select>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltCategory" onchange="updateAudience()">
+        <div class="a-label">Category:</div>
+        <select id="catFilter" onchange="updateAudience()"><option value="">— Any —</option></select>
+      </label>
+      <label class="audience-row">
+        <input type="checkbox" id="fltExclude" checked onchange="updateAudience()">
+        <div class="a-label">Skip if messaged within</div>
+        <select id="excludeDays" onchange="updateAudience()">
+          <option value="3">3 days</option>
+          <option value="7" selected>7 days</option>
+          <option value="14">14 days</option>
+          <option value="30">30 days</option>
+        </select>
+      </label>
+    </div>
   </div>
 
-  <!-- ===== Step 3: Preview + Generate ===== -->
+  <!-- ===== Step 3: Preview & Generate ===== -->
   <div class="step-card">
     <div class="step-h">
       <div class="step-num">3</div>
@@ -188,22 +318,48 @@
   <div class="step-card" id="resultCard" style="display:none">
     <div class="step-h">
       <div class="step-num" style="background:#10B981">✓</div>
-      <div class="step-title">Generated WhatsApp links</div>
+      <div class="step-title">Recipients</div>
       <div class="step-help" id="genCount"></div>
     </div>
 
     <div class="info-card">
-      💡 Click <b>Send →</b> on each row. WhatsApp web opens with the pre-filled message — just press the Send arrow in WhatsApp.
-      Sent rows are marked locally so you don't double-send. <b>Open 5 in tabs</b> sends a batch faster.
+      💡 Click <b>Send →</b> on each row, or use <b>Open batch</b> below to launch multiple tabs at once. Send sparingly — WhatsApp may flag accounts that send 200+ messages per day.
+    </div>
+
+    <!-- Recipient toolbar -->
+    <div class="recipient-toolbar">
+      <input type="search" id="recSearch" placeholder="🔍 Search shopkeeper / mobile / city" oninput="filterRecipients()">
+      <select id="recSort" onchange="filterRecipients()">
+        <option value="name">Sort: Name</option>
+        <option value="city">Sort: City</option>
+        <option value="recent">Sort: Recently registered</option>
+        <option value="verified">Sort: Verified first</option>
+      </select>
+      <span class="selected-info"><b id="selCount">0</b> of <span id="totalRecipients">0</span> selected</span>
+      <button class="preview-btn" onclick="selectAll(true)">Select all</button>
+      <button class="preview-btn" onclick="selectAll(false)">Deselect all</button>
     </div>
 
     <div id="recipientList"></div>
 
     <div class="batch-bar">
-      <button onclick="openBatch(5)">Open next 5 in tabs</button>
-      <button class="sec" onclick="copyAllLinks()">Copy all links</button>
-      <button class="sec" onclick="resetSentMarks()">Reset progress</button>
-      <div class="progress-pill"><b id="sentCount">0</b> / <span id="totalCount">0</span> marked sent</div>
+      <button onclick="openBatch(parseInt(document.getElementById('batchSize').value,10))">Open batch →</button>
+      <select id="batchSize" title="How many to open at once">
+        <option value="3">3 at a time</option>
+        <option value="5" selected>5 at a time</option>
+        <option value="10">10 at a time</option>
+        <option value="20">20 at a time</option>
+      </select>
+      <select id="batchDelay" title="Delay between each tab">
+        <option value="350">Fast (0.35s)</option>
+        <option value="800" selected>Normal (0.8s)</option>
+        <option value="1500">Safe (1.5s)</option>
+        <option value="3000">Stealth (3s)</option>
+      </select>
+      <button class="sec" onclick="copyAllLinks()">📋 Copy links</button>
+      <button class="sec" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="sec" onclick="saveCampaign()">💾 Save campaign</button>
+      <div class="progress-pill"><b id="sentCount">0</b> / <span id="totalCount">0</span> sent</div>
     </div>
   </div>
 
@@ -212,76 +368,96 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script>
-// ====== Templates ======
+// ============================================================
+// WhatsApp Broadcast v2 — power tool
+// ============================================================
+
+// 6 templates × 2 languages
 const TEMPLATES = {
-  welcome: 'Hello {{owner_name}}, welcome to DukanList! Your shop "{{shop_name}}" is now visible on our directory. View your public page here: {{shop_url}}\n\nNeed help? Reply to this message any time.',
-  approval: 'Hello {{owner_name}}, good news — your listing "{{shop_name}}" has been approved on DukanList. It is now live and customers in {{city}} can find you here: {{shop_url}}',
-  reminder: 'Hello {{owner_name}}, please add 3+ shop photos to "{{shop_name}}" — shops with photos get 3× more calls. Add them here: {{shop_url}}\n\nIt takes less than 2 minutes.',
-  feature: 'Hello {{owner_name}}, we just launched a new feature on DukanList that will help "{{shop_name}}" get more leads. Login at dukanlist.com to try it out.',
-  festival: 'Hello {{owner_name}}, wishing "{{shop_name}}" a prosperous festival season! Customers are searching more during this time — make sure your DukanList profile is complete: {{shop_url}}',
-  reactivate: 'Hello {{owner_name}}, we noticed it has been a while. "{{shop_name}}" is still listed on DukanList but new customers might miss it without recent updates. Add fresh photos here: {{shop_url}}'
+  en: {
+    welcome:   { label:'👋 Welcome',     msg:'Hello {{owner_name}}, welcome to DukanList! Your shop "{{shop_name}}" is now visible. View your public page: {{shop_url}}\n\nNeed help? Reply to this message.' },
+    approval:  { label:'✅ Approval',     msg:'Hello {{owner_name}}, good news — your listing "{{shop_name}}" has been approved on DukanList. Customers in {{city}} can now find you: {{shop_url}}' },
+    photos:    { label:'📸 Add photos',   msg:'Hello {{owner_name}}, please add 3+ shop photos to "{{shop_name}}". Shops with photos get 3× more calls. Add here: {{shop_url}}\n\nIt takes 2 minutes.' },
+    feature:   { label:'🚀 New feature',  msg:'Hello {{owner_name}}, a new feature just launched on DukanList that will help "{{shop_name}}" get more leads. Login at dukanlist.com to try it.' },
+    festival:  { label:'🎉 Festival',     msg:'Hello {{owner_name}}, wishing "{{shop_name}}" a prosperous festival season! Customers search more during this time. Keep your DukanList profile fresh: {{shop_url}}' },
+    revisit:   { label:'🔔 Re-engage',    msg:'Hello {{owner_name}}, "{{shop_name}}" is still listed but new customers may miss it without recent updates. Add fresh photos or hours: {{shop_url}}' },
+    verified:  { label:'🔵 Get verified', msg:'Hello {{owner_name}}, complete your verification on DukanList to display the "Verified" badge on "{{shop_name}}". Verified shops rank higher and get more trust from customers. Apply: {{shop_url}}' },
+    review:    { label:'⭐ Reviews',      msg:'Hello {{owner_name}}, ask 5 happy customers to leave a 5-star review for "{{shop_name}}" on DukanList — top-rated shops dominate search. Share your link: {{shop_url}}' }
+  },
+  hi: {
+    welcome:   { label:'👋 स्वागत',       msg:'नमस्ते {{owner_name}} जी, DukanList में आपका स्वागत है! "{{shop_name}}" अब आपकी public listing है। यहाँ देखें: {{shop_url}}\n\nकोई सहायता चाहिए तो इस message का जवाब दीजिए।' },
+    approval:  { label:'✅ Approval',      msg:'नमस्ते {{owner_name}} जी, खुशखबरी — आपकी listing "{{shop_name}}" DukanList पर approve हो गई है। {{city}} के ग्राहक अब आपको यहाँ ढूंढ सकते हैं: {{shop_url}}' },
+    photos:    { label:'📸 फोटो जोड़ें',   msg:'नमस्ते {{owner_name}} जी, "{{shop_name}}" में कृपया 3+ shop photos जोड़ें। जिन दुकानों के photos होते हैं उन्हें 3× ज़्यादा calls मिलती हैं। यहाँ डालें: {{shop_url}}' },
+    feature:   { label:'🚀 नया Feature',   msg:'नमस्ते {{owner_name}} जी, DukanList पर एक नया feature आया है जो "{{shop_name}}" को और ज़्यादा leads दिलाएगा। dukanlist.com पर login करके देखें।' },
+    festival:  { label:'🎉 त्यौहार',       msg:'नमस्ते {{owner_name}} जी, "{{shop_name}}" को आने वाले त्यौहारों की हार्दिक शुभकामनाएँ! इस समय ग्राहक ज़्यादा search करते हैं — अपनी DukanList profile fresh रखें: {{shop_url}}' },
+    revisit:   { label:'🔔 Re-engage',     msg:'नमस्ते {{owner_name}} जी, "{{shop_name}}" listed तो है पर बिना updates के नए ग्राहक miss कर सकते हैं। ताज़ा photos या hours add करें: {{shop_url}}' },
+    verified:  { label:'🔵 Verified बनें', msg:'नमस्ते {{owner_name}} जी, "{{shop_name}}" पर "Verified" badge लगाने के लिए verification पूरी करें। Verified shops की रैंकिंग ऊँची होती है और ग्राहक उन पर ज़्यादा भरोसा करते हैं: {{shop_url}}' },
+    review:    { label:'⭐ Reviews',       msg:'नमस्ते {{owner_name}} जी, "{{shop_name}}" के 5 खुश ग्राहकों से 5-star review मांगिए — top-rated shops search में आगे आती हैं। यह link share कीजिए: {{shop_url}}' }
+  }
 };
 
-let ROWS = [];      // all shopkeepers fetched
+let LANG = 'en';
+let ROWS = [];
 let CITIES = [];
 let CATEGORIES = [];
-let CURRENT = [];   // filtered audience
-let GENERATED = []; // links generated
+let CURRENT = [];        // current filtered audience
+let GENERATED = [];      // all generated recipients (post-Generate click)
+let SELECTED_IDS = new Set();  // recipients admin chose to send to (manual deselect)
+let DISPLAYED = [];      // currently rendered after search/sort
 
 const c = ShopDB.client;
+const LS_HISTORY = 'dl_bcast_history_v1';
+const LS_LAST_SENT = 'dl_bcast_last_sent_v1';  // { rowId: timestamp }
+const LS_CUSTOM_TPL = 'dl_bcast_custom_tpls_v1';
+const LS_QUOTA = 'dl_bcast_quota_v1';          // {date, count}
 
-// ====== Init ======
+// ============================================================
+// Init
+// ============================================================
 async function init(){
-  // 1. Auth gate
   const ses = await c.auth.getSession();
-  if (!ses.data.session){ location.href = '/admin/login.html'; return; }
-
-  // 2. is_admin check
+  if (!ses.data.session){ location.href='/admin/login.html'; return; }
   const a = await c.rpc('is_admin');
   if (a.error || a.data !== true){
-    showErr('Admin access required. Logging out…');
+    showErr('Admin access required.');
     setTimeout(()=>{ c.auth.signOut().then(()=>location.href='/admin/login.html'); }, 1500);
     return;
   }
-
-  // 3. Fetch shopkeepers + reference data in parallel
-  await Promise.all([
-    fetchShops(),
-    fetchCities(),
-    fetchCategories()
-  ]);
-
-  // 4. Wire up UI
-  document.querySelectorAll('input[name="aud"]').forEach(r => r.addEventListener('change', updateAudience));
+  await Promise.all([fetchShops(), fetchCities(), fetchCategories()]);
+  renderTemplates();
+  renderCustomTemplates();
+  renderHistory();
+  refreshStats();
   document.getElementById('msgText').addEventListener('input', onMsgChange);
-  document.querySelectorAll('.tpl-chip').forEach(ch => ch.addEventListener('click', () => {
-    document.getElementById('msgText').value = TEMPLATES[ch.dataset.tpl] || '';
-    onMsgChange();
-  }));
-
+  document.querySelectorAll('.token-hint code').forEach(code=>{
+    code.addEventListener('click', () => insertToken(code.dataset.tok));
+  });
   updateAudience();
 }
 
 async function fetchShops(){
   const { data, error } = await c.from('businesses')
-    .select('id, slug, name, owner_name, mobile, whatsapp, status, city_id, category_id, photos')
+    .select('id, slug, name, owner_name, mobile, whatsapp, status, city_id, category_id, photos, verified_score, featured, featured_until, created_at')
     .in('status', ['active','pending'])
     .order('name');
   if (error){ showErr('Failed to load shops: ' + error.message); return; }
   ROWS = data || [];
-  // counters
-  document.getElementById('cntAll').textContent = ROWS.filter(r => r.status === 'active').length;
-  document.getElementById('cntAll').classList.toggle('zero', ROWS.filter(r => r.status === 'active').length === 0);
-  document.getElementById('cntPending').textContent = ROWS.filter(r => r.status === 'pending').length;
-  document.getElementById('cntPending').classList.toggle('zero', ROWS.filter(r => r.status === 'pending').length === 0);
-  const incomplete = ROWS.filter(r => r.status === 'active' && (!Array.isArray(r.photos) || r.photos.length === 0)).length;
-  document.getElementById('cntIncomplete').textContent = incomplete;
-  document.getElementById('cntIncomplete').classList.toggle('zero', incomplete === 0);
+  // Counts
+  const setCount = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = val;
+    el.classList.toggle('zero', val === 0);
+  };
+  setCount('cntActive',   ROWS.filter(r => r.status === 'active').length);
+  setCount('cntPending',  ROWS.filter(r => r.status === 'pending').length);
+  setCount('cntNoPhoto',  ROWS.filter(r => r.status === 'active' && (!Array.isArray(r.photos) || r.photos.length === 0)).length);
+  setCount('cntVerified', ROWS.filter(r => r.status === 'active' && (r.verified_score || 0) >= 3).length);
+  setCount('cntFeatured', ROWS.filter(r => r.status === 'active' && r.featured === true && (!r.featured_until || new Date(r.featured_until) > new Date())).length);
 }
 
 async function fetchCities(){
-  const { data, error } = await c.from('geo_cities').select('id, name').order('name');
-  if (error) return;
+  const { data } = await c.from('geo_cities').select('id, name').order('name');
   CITIES = data || [];
   const sel = document.getElementById('cityFilter');
   CITIES.forEach(ct => {
@@ -290,80 +466,194 @@ async function fetchCities(){
     sel.appendChild(o);
   });
 }
-
 async function fetchCategories(){
-  const { data, error } = await c.from('categories').select('id, name, parent_id').eq('active', true).order('name');
-  if (error) return;
+  const { data } = await c.from('categories').select('id, name, parent_id').eq('active', true).order('name');
   CATEGORIES = data || [];
   const sel = document.getElementById('catFilter');
   CATEGORIES.forEach(ct => {
     const o = document.createElement('option');
     o.value = String(ct.id);
-    o.textContent = ct.parent_id ? '└ ' + ct.name : '◉ ' + ct.name;
+    o.textContent = (ct.parent_id ? '└ ' : '◉ ') + ct.name;
     sel.appendChild(o);
   });
 }
 
 function showErr(msg){
-  const e = document.getElementById('errBox');
-  e.textContent = msg;
-  e.style.display = 'block';
+  const e = document.getElementById('errBox'); e.textContent = msg; e.style.display = 'block';
 }
 
-// ====== Audience filter ======
-function updateAudience(){
-  // Update selected style
-  document.querySelectorAll('.audience-row').forEach(r => r.classList.remove('sel'));
-  const checked = document.querySelector('input[name="aud"]:checked');
-  if (checked) checked.closest('.audience-row').classList.add('sel');
+// ============================================================
+// Templates
+// ============================================================
+function setLang(l){
+  LANG = l;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  renderTemplates();
+}
+function renderTemplates(){
+  const wrap = document.getElementById('templateChips');
+  const tpls = TEMPLATES[LANG] || TEMPLATES.en;
+  wrap.innerHTML = Object.keys(tpls).map(k =>
+    '<div class="tpl-chip" onclick="useTemplate(\''+k+'\')">' + tpls[k].label + '</div>'
+  ).join('');
+}
+function useTemplate(key){
+  const t = (TEMPLATES[LANG] || TEMPLATES.en)[key];
+  if (!t) return;
+  document.getElementById('msgText').value = t.msg;
+  onMsgChange();
+}
 
-  const aud = checked ? checked.value : 'all';
-  let list = [];
-
-  if (aud === 'all'){
-    list = ROWS.filter(r => r.status === 'active');
-  } else if (aud === 'pending'){
-    list = ROWS.filter(r => r.status === 'pending');
-  } else if (aud === 'incomplete'){
-    list = ROWS.filter(r => r.status === 'active' && (!Array.isArray(r.photos) || r.photos.length === 0));
-  } else if (aud === 'city'){
-    const v = parseInt(document.getElementById('cityFilter').value || '0', 10);
-    list = v ? ROWS.filter(r => r.city_id === v && r.status === 'active') : [];
-  } else if (aud === 'category'){
-    const v = parseInt(document.getElementById('catFilter').value || '0', 10);
-    list = v ? ROWS.filter(r => r.category_id === v && r.status === 'active') : [];
+function getCustomTemplates(){
+  try { return JSON.parse(localStorage.getItem(LS_CUSTOM_TPL) || '[]'); } catch(_){ return []; }
+}
+function renderCustomTemplates(){
+  const list = getCustomTemplates();
+  const wrap = document.getElementById('customChips');
+  const label = document.getElementById('customLabel');
+  if (!list.length){
+    wrap.innerHTML = '';
+    label.style.display = 'none';
+    return;
   }
-
-  // Filter out rows with no mobile/whatsapp
-  CURRENT = list.filter(r => r.mobile || r.whatsapp);
-
-  // Update preview banner
-  document.getElementById('audCount').textContent = CURRENT.length;
-  document.getElementById('cntCity').textContent = aud === 'city' ? CURRENT.length : '…';
-  document.getElementById('cntCategory').textContent = aud === 'category' ? CURRENT.length : '…';
-
-  // Disable gen button if message empty or audience empty
+  label.style.display = 'block';
+  wrap.innerHTML = list.map((t, i) =>
+    '<div class="tpl-chip custom" onclick="loadCustomTemplate('+i+')">'
+    + escapeHtml(t.name) + ' <span style="opacity:.5;margin-left:6px" onclick="event.stopPropagation();deleteCustomTemplate('+i+')">×</span></div>'
+  ).join('');
+}
+function saveCustomTemplate(){
   const msg = document.getElementById('msgText').value.trim();
-  const btn = document.getElementById('genBtn');
-  const desc = document.getElementById('audDesc');
-  if (!msg.length){
-    btn.disabled = true; desc.textContent = 'Compose a message first to enable';
-  } else if (!CURRENT.length){
-    btn.disabled = true; desc.textContent = 'No shopkeepers match this audience';
-  } else {
-    btn.disabled = false; desc.textContent = 'Message will be personalized with shop name + owner';
-  }
+  if (!msg){ alert('Compose a message first.'); return; }
+  const name = prompt('Name this template (e.g. "Diwali offer"):');
+  if (!name || !name.trim()) return;
+  const list = getCustomTemplates();
+  list.push({ name: name.trim().slice(0,30), msg });
+  localStorage.setItem(LS_CUSTOM_TPL, JSON.stringify(list));
+  renderCustomTemplates();
+  toast('Template saved.');
+}
+function loadCustomTemplate(i){
+  const list = getCustomTemplates();
+  if (!list[i]) return;
+  document.getElementById('msgText').value = list[i].msg;
+  onMsgChange();
+}
+function deleteCustomTemplate(i){
+  if (!confirm('Delete this template?')) return;
+  const list = getCustomTemplates();
+  list.splice(i, 1);
+  localStorage.setItem(LS_CUSTOM_TPL, JSON.stringify(list));
+  renderCustomTemplates();
+}
+
+// ============================================================
+// Message composer + preview
+// ============================================================
+function insertToken(tok){
+  const ta = document.getElementById('msgText');
+  const s = ta.selectionStart || ta.value.length;
+  const e = ta.selectionEnd || ta.value.length;
+  ta.value = ta.value.slice(0, s) + tok + ta.value.slice(e);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = s + tok.length;
+  onMsgChange();
 }
 
 function onMsgChange(){
   const v = document.getElementById('msgText').value;
   document.getElementById('charCount').textContent = v.length;
-  updateAudience(); // re-evaluate button state
+  // Update WA bubble preview using a sample shop (first active one)
+  const sample = ROWS.find(r => r.status === 'active') || { name:'Your Shop', owner_name:'Owner', slug:'your-shop', city_id:null, category_id:null, mobile:'9999999999' };
+  const bubble = document.getElementById('waBubble');
+  if (!v.trim()){
+    bubble.classList.add('empty');
+    bubble.innerHTML = 'Type a message to preview…';
+  } else {
+    bubble.classList.remove('empty');
+    const rendered = personalize(v, sample);
+    const time = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    bubble.innerHTML = escapeHtml(rendered).replace(/\n/g, '<br>')
+      + '<div class="wa-time">' + time + ' ✓✓</div>';
+  }
+  updateAudience();
 }
 
-// ====== Generate links ======
-function escapeHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]); }
+function personalize(tpl, row){
+  const cityName = (CITIES.find(c => c.id === row.city_id) || {}).name || '';
+  const catObj = CATEGORIES.find(c => c.id === row.category_id);
+  const catName = catObj ? catObj.name : '';
+  return tpl
+    .replace(/\{\{\s*shop_name\s*\}\}/g, row.name || 'your shop')
+    .replace(/\{\{\s*owner_name\s*\}\}/g, row.owner_name || 'shopkeeper')
+    .replace(/\{\{\s*shop_url\s*\}\}/g, 'https://dukanlist.com/' + (row.slug || ''))
+    .replace(/\{\{\s*city\s*\}\}/g, cityName)
+    .replace(/\{\{\s*category\s*\}\}/g, catName)
+    .replace(/\{\{\s*phone\s*\}\}/g, row.mobile || '');
+}
 
+// ============================================================
+// Audience filtering
+// ============================================================
+function getLastSentMap(){
+  try { return JSON.parse(localStorage.getItem(LS_LAST_SENT) || '{}'); } catch(_){ return {}; }
+}
+function markLastSent(rowId){
+  const m = getLastSentMap();
+  m[rowId] = Date.now();
+  localStorage.setItem(LS_LAST_SENT, JSON.stringify(m));
+}
+
+function updateAudience(){
+  const onlyActive   = document.getElementById('fltActive').checked;
+  const onlyPending  = document.getElementById('fltPending').checked;
+  const onlyNoPhoto  = document.getElementById('fltNoPhoto').checked;
+  const onlyVerified = document.getElementById('fltVerified').checked;
+  const onlyFeatured = document.getElementById('fltFeatured').checked;
+  const onlyRecent   = document.getElementById('fltRecent').checked;
+  const byCity       = document.getElementById('fltCity').checked;
+  const byCat        = document.getElementById('fltCategory').checked;
+  const excludeRecent = document.getElementById('fltExclude').checked;
+
+  const recentDays   = parseInt(document.getElementById('recentDays').value, 10) || 30;
+  const excludeDays  = parseInt(document.getElementById('excludeDays').value, 10) || 7;
+  const cityId       = parseInt(document.getElementById('cityFilter').value || '0', 10);
+  const catId        = parseInt(document.getElementById('catFilter').value || '0', 10);
+
+  const nowMs = Date.now();
+  const recentCutoff = nowMs - (recentDays * 86400000);
+  const excludeCutoff = nowMs - (excludeDays * 86400000);
+  const lastSent = getLastSentMap();
+
+  let list = ROWS.slice();
+  // Status filter: if neither Active nor Pending checked, default to Active
+  if (onlyActive && !onlyPending) list = list.filter(r => r.status === 'active');
+  else if (onlyPending && !onlyActive) list = list.filter(r => r.status === 'pending');
+  // else both or none → keep both statuses
+
+  if (onlyNoPhoto)  list = list.filter(r => !Array.isArray(r.photos) || r.photos.length === 0);
+  if (onlyVerified) list = list.filter(r => (r.verified_score || 0) >= 3);
+  if (onlyFeatured) list = list.filter(r => r.featured === true && (!r.featured_until || new Date(r.featured_until) > new Date()));
+  if (onlyRecent)   list = list.filter(r => r.created_at && new Date(r.created_at).getTime() >= recentCutoff);
+  if (byCity && cityId) list = list.filter(r => r.city_id === cityId);
+  if (byCat && catId)   list = list.filter(r => r.category_id === catId);
+  if (excludeRecent)    list = list.filter(r => !lastSent[r.id] || lastSent[r.id] < excludeCutoff);
+
+  // Must have a phone to message
+  CURRENT = list.filter(r => r.mobile || r.whatsapp);
+
+  document.getElementById('audCount').textContent = CURRENT.length;
+  const msg = document.getElementById('msgText').value.trim();
+  const btn = document.getElementById('genBtn');
+  const desc = document.getElementById('audDesc');
+  if (!msg.length){ btn.disabled = true; desc.textContent = 'Compose a message first to enable'; }
+  else if (!CURRENT.length){ btn.disabled = true; desc.textContent = 'No shopkeepers match these filters'; }
+  else { btn.disabled = false; desc.textContent = 'Message will be personalized with each shop\'s details'; }
+}
+
+// ============================================================
+// Generate links
+// ============================================================
 function cleanMobile(raw){
   let d = (raw || '').replace(/\D/g, '');
   if (d.length === 10 && /^[6-9]/.test(d)) return '91' + d;
@@ -371,37 +661,6 @@ function cleanMobile(raw){
   if (d.length === 12 && d.startsWith('91')) return d;
   if (d.length === 13 && d.startsWith('091')) return d.slice(1);
   return null;
-}
-
-function personalize(template, row){
-  const cityName = (CITIES.find(c => c.id === row.city_id) || {}).name || '';
-  return template
-    .replace(/\{\{\s*shop_name\s*\}\}/g, row.name || 'your shop')
-    .replace(/\{\{\s*owner_name\s*\}\}/g, row.owner_name || 'shopkeeper')
-    .replace(/\{\{\s*shop_url\s*\}\}/g, 'https://dukanlist.com/' + (row.slug || ''))
-    .replace(/\{\{\s*city\s*\}\}/g, cityName);
-}
-
-function getSentKey(){
-  // localStorage key based on message hash so different broadcasts have separate progress
-  const msg = document.getElementById('msgText').value;
-  let h = 0; for (let i = 0; i < msg.length; i++){ h = (h * 31 + msg.charCodeAt(i)) | 0; }
-  return 'dl_bcast_sent_' + h;
-}
-
-function isSent(rowId){
-  try {
-    const s = JSON.parse(localStorage.getItem(getSentKey()) || '[]');
-    return s.indexOf(rowId) !== -1;
-  } catch(_){ return false; }
-}
-function markSent(rowId){
-  try {
-    const k = getSentKey();
-    const s = JSON.parse(localStorage.getItem(k) || '[]');
-    if (s.indexOf(rowId) === -1) s.push(rowId);
-    localStorage.setItem(k, JSON.stringify(s));
-  } catch(_){}
 }
 
 function generateLinks(){
@@ -416,63 +675,205 @@ function generateLinks(){
       id: r.id,
       name: r.name,
       owner: r.owner_name,
+      city: (CITIES.find(c => c.id === r.city_id) || {}).name || '',
       mobile: wa,
       mobile_display: wa.replace(/^91/, '+91 '),
-      url: 'https://wa.me/' + wa + '?text=' + encodeURIComponent(msg)
+      url: 'https://wa.me/' + wa + '?text=' + encodeURIComponent(msg),
+      message: msg,
+      verified_score: r.verified_score || 0,
+      featured: r.featured === true,
+      no_photo: !Array.isArray(r.photos) || r.photos.length === 0,
+      created_at: r.created_at
     };
   }).filter(Boolean);
 
-  renderRecipients();
+  // By default all are selected for sending
+  SELECTED_IDS = new Set(GENERATED.map(g => g.id));
+
   document.getElementById('resultCard').style.display = 'block';
-  document.getElementById('genCount').textContent = GENERATED.length + ' personalized links ready';
+  document.getElementById('genCount').textContent = GENERATED.length + ' recipients';
   document.getElementById('totalCount').textContent = GENERATED.length;
-  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('totalRecipients').textContent = GENERATED.length;
+  filterRecipients();
+  document.getElementById('resultCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  refreshStats();
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
+}
+
+// ============================================================
+// Recipient list (search, sort, manual select)
+// ============================================================
+function filterRecipients(){
+  const q = (document.getElementById('recSearch').value || '').toLowerCase().trim();
+  const sort = document.getElementById('recSort').value;
+
+  let list = GENERATED.slice();
+  if (q){
+    list = list.filter(g => (g.name+' '+g.owner+' '+g.mobile+' '+g.city).toLowerCase().indexOf(q) !== -1);
+  }
+  if (sort === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
+  else if (sort === 'city') list.sort((a,b) => (a.city||'').localeCompare(b.city||''));
+  else if (sort === 'recent') list.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+  else if (sort === 'verified') list.sort((a,b) => (b.verified_score||0) - (a.verified_score||0));
+
+  DISPLAYED = list;
+  renderRecipients();
 }
 
 function renderRecipients(){
   const wrap = document.getElementById('recipientList');
-  wrap.innerHTML = GENERATED.map((g, idx) => {
-    const sent = isSent(g.id);
-    return ''
-      + '<div class="recipient-row ' + (sent ? 'sent' : '') + '" id="row-' + g.id + '">'
-      +   '<div class="r-num">' + (idx + 1) + '</div>'
-      +   '<div style="flex:1;min-width:0">'
-      +     '<div class="r-name">' + escapeHtml(g.name) + '</div>'
-      +     '<div class="r-meta">' + escapeHtml(g.owner || 'no owner name') + '</div>'
-      +   '</div>'
-      +   '<div class="r-mobile">' + escapeHtml(g.mobile_display) + '</div>'
-      +   '<a class="wa-btn ' + (sent ? 'sent' : '') + '" href="' + g.url + '" target="_blank" rel="noopener" '
-      +     'onclick="markSentAndRefresh(\'' + g.id + '\')">'
-      +     (sent ? '✓ Sent' : '💬 Send →')
-      +   '</a>'
-      + '</div>';
-  }).join('');
-  updateProgressCount();
+  if (!DISPLAYED.length){
+    wrap.innerHTML = '<div style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">No matches</div>';
+  } else {
+    wrap.innerHTML = DISPLAYED.map((g, idx) => {
+      const sent = isSent(g.id);
+      const selected = SELECTED_IDS.has(g.id);
+      let badges = '';
+      if (g.verified_score >= 3) badges += '<span class="badge-mini verified">✓ VERIFIED</span> ';
+      if (g.featured) badges += '<span class="badge-mini featured">⭐ FEATURED</span> ';
+      if (g.no_photo) badges += '<span class="badge-mini no-photo">📷 NO PHOTO</span> ';
+      return ''
+        + '<div class="recipient-row ' + (sent ? 'sent' : '') + (selected ? '' : ' unsel') + '" id="row-' + g.id + '">'
+        +   '<input type="checkbox" ' + (selected ? 'checked' : '') + ' onchange="toggleSelected(\'' + g.id + '\')" '
+        +     'title="Include this shop in the broadcast">'
+        +   '<div class="r-num">' + (idx + 1) + '</div>'
+        +   '<div style="flex:1;min-width:0">'
+        +     '<div class="r-name">' + escapeHtml(g.name) + (badges ? ' ' + badges : '') + '</div>'
+        +     '<div class="r-meta">' + escapeHtml((g.owner||'-') + ' · ' + (g.city||'-')) + '</div>'
+        +   '</div>'
+        +   '<div class="r-mobile">' + escapeHtml(g.mobile_display) + '</div>'
+        +   '<button class="preview-btn" onclick="showRowPreview(\'' + g.id + '\')" title="Preview rendered message">👁 Preview</button>'
+        +   '<a class="wa-btn ' + (sent ? 'sent' : '') + '" href="' + g.url + '" target="_blank" rel="noopener" '
+        +     'onclick="markSentAndRefresh(\'' + g.id + '\')">'
+        +     (sent ? '✓ Sent' : '💬 Send →')
+        +   '</a>'
+        + '</div>';
+    }).join('');
+  }
+  updateSelectionInfo();
 }
 
+function showRowPreview(rowId){
+  const g = GENERATED.find(g => g.id === rowId);
+  if (!g) return;
+  alert('=== Personalized message for ' + g.name + ' ===\n\n' + g.message);
+}
+
+function toggleSelected(rowId){
+  if (SELECTED_IDS.has(rowId)) SELECTED_IDS.delete(rowId);
+  else SELECTED_IDS.add(rowId);
+  // Re-render just this row
+  const row = document.getElementById('row-' + rowId);
+  if (row) row.classList.toggle('unsel', !SELECTED_IDS.has(rowId));
+  updateSelectionInfo();
+}
+
+function selectAll(on){
+  if (on) SELECTED_IDS = new Set(DISPLAYED.map(g => g.id));
+  else DISPLAYED.forEach(g => SELECTED_IDS.delete(g.id));
+  renderRecipients();
+}
+
+function updateSelectionInfo(){
+  document.getElementById('selCount').textContent = SELECTED_IDS.size;
+}
+
+// ============================================================
+// Sent tracking (per-message hash so different broadcasts have own progress)
+// ============================================================
+function getSentKey(){
+  const msg = document.getElementById('msgText').value;
+  let h = 0; for (let i = 0; i < msg.length; i++){ h = (h * 31 + msg.charCodeAt(i)) | 0; }
+  return 'dl_bcast_sent_' + h;
+}
+function isSent(rowId){
+  try { return JSON.parse(localStorage.getItem(getSentKey()) || '[]').indexOf(rowId) !== -1; } catch(_){ return false; }
+}
+function markSent(rowId){
+  try {
+    const k = getSentKey();
+    const s = JSON.parse(localStorage.getItem(k) || '[]');
+    if (s.indexOf(rowId) === -1){ s.push(rowId); localStorage.setItem(k, JSON.stringify(s)); }
+    // Also record last-sent timestamp (cross-broadcast exclusion)
+    markLastSent(rowId);
+    // Bump daily quota counter
+    bumpQuota();
+  } catch(_){}
+}
 function markSentAndRefresh(rowId){
   markSent(rowId);
-  // Update just this row visually after a tiny delay (so WhatsApp opens first)
   setTimeout(() => {
     const row = document.getElementById('row-' + rowId);
-    if (row) {
+    if (row){
       row.classList.add('sent');
       const btn = row.querySelector('.wa-btn');
       if (btn){ btn.classList.add('sent'); btn.textContent = '✓ Sent'; }
     }
     updateProgressCount();
+    refreshStats();
   }, 300);
 }
-
 function updateProgressCount(){
   const sent = GENERATED.filter(g => isSent(g.id)).length;
   document.getElementById('sentCount').textContent = sent;
 }
 
+// ============================================================
+// Daily quota (WhatsApp safe-send guardrail)
+// ============================================================
+function getQuota(){
+  try {
+    const q = JSON.parse(localStorage.getItem(LS_QUOTA) || '{}');
+    const today = new Date().toDateString();
+    if (q.date !== today) return { date: today, count: 0 };
+    return q;
+  } catch(_){ return { date: new Date().toDateString(), count: 0 }; }
+}
+function bumpQuota(){
+  const q = getQuota();
+  q.count = (q.count || 0) + 1;
+  localStorage.setItem(LS_QUOTA, JSON.stringify(q));
+}
+function refreshStats(){
+  document.getElementById('statTotal').textContent = ROWS.filter(r => r.status === 'active').length;
+  const q = getQuota();
+  const card = document.getElementById('quotaCard');
+  card.classList.remove('warn','danger');
+  if (q.count > 150) card.classList.add('warn');
+  if (q.count > 200) card.classList.add('danger');
+  document.getElementById('statSentToday').textContent = q.count;
+  // All-time = sum of every sent_X key length
+  let total = 0;
+  for (let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if (k && k.indexOf('dl_bcast_sent_') === 0){
+      try { total += (JSON.parse(localStorage.getItem(k) || '[]') || []).length; } catch(_){}
+    }
+  }
+  document.getElementById('statAllTime').textContent = total;
+  // Campaigns saved
+  try {
+    const hist = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+    document.getElementById('statCampaigns').textContent = hist.length;
+  } catch(_){ document.getElementById('statCampaigns').textContent = 0; }
+}
+
+// ============================================================
+// Batch operations
+// ============================================================
 function openBatch(n){
-  const next = GENERATED.filter(g => !isSent(g.id)).slice(0, n);
-  if (!next.length){ alert('All marked sent. Use "Reset progress" to start over.'); return; }
-  if (!confirm('Open ' + next.length + ' WhatsApp tabs?\n\nYour browser may block pop-ups — allow them on this page if asked.')) return;
+  const next = DISPLAYED.filter(g => SELECTED_IDS.has(g.id) && !isSent(g.id)).slice(0, n);
+  if (!next.length){ alert('Nothing to open. Select rows or reset progress.'); return; }
+  const delay = parseInt(document.getElementById('batchDelay').value, 10) || 800;
+  const q = getQuota();
+  if (q.count + next.length > 200){
+    if (!confirm('You will exceed 200 messages today (currently ' + q.count + '). WhatsApp may flag this as spam. Continue?')) return;
+  } else {
+    if (!confirm('Open ' + next.length + ' WhatsApp tabs (with ' + (delay/1000) + 's stagger)?\n\nAllow pop-ups if your browser blocks them.')) return;
+  }
   next.forEach((g, i) => {
     setTimeout(() => {
       window.open(g.url, '_blank', 'noopener');
@@ -484,28 +885,111 @@ function openBatch(n){
         if (btn){ btn.classList.add('sent'); btn.textContent = '✓ Sent'; }
       }
       updateProgressCount();
-    }, i * 350);
+      refreshStats();
+    }, i * delay);
   });
 }
 
 function copyAllLinks(){
-  const txt = GENERATED.map((g, i) => (i+1) + '. ' + g.name + ' — ' + g.url).join('\n');
+  const list = DISPLAYED.filter(g => SELECTED_IDS.has(g.id));
+  if (!list.length){ alert('Nothing selected.'); return; }
+  const txt = list.map((g, i) => (i+1) + '. ' + g.name + ' — ' + g.url).join('\n');
   navigator.clipboard.writeText(txt).then(
-    () => alert('Copied ' + GENERATED.length + ' links to clipboard.'),
-    () => alert('Could not copy — please copy manually.')
+    () => toast('Copied ' + list.length + ' links to clipboard.'),
+    () => alert('Could not copy.')
   );
 }
 
-function resetSentMarks(){
-  if (!confirm('Reset sent progress for this message?')) return;
-  try { localStorage.removeItem(getSentKey()); } catch(_){}
-  renderRecipients();
+function exportCSV(){
+  const list = DISPLAYED.filter(g => SELECTED_IDS.has(g.id));
+  if (!list.length){ alert('Nothing selected.'); return; }
+  const rows = [
+    ['Shop Name','Owner','City','Mobile','Verified Score','WhatsApp Link'],
+    ...list.map(g => [g.name, g.owner||'', g.city||'', g.mobile_display, g.verified_score||0, g.url])
+  ];
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dukanlist-broadcast-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('CSV downloaded.');
 }
 
-async function logout(){
-  await c.auth.signOut();
-  location.href = '/admin/login.html';
+// ============================================================
+// Campaign history
+// ============================================================
+function saveCampaign(){
+  const msg = document.getElementById('msgText').value.trim();
+  if (!msg) return alert('No message to save.');
+  const name = prompt('Campaign name (optional):', 'Campaign ' + new Date().toLocaleDateString());
+  if (name === null) return;
+  let list;
+  try { list = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]'); } catch(_){ list = []; }
+  list.unshift({
+    name: name || 'Untitled',
+    msg,
+    audience: SELECTED_IDS.size + ' recipients',
+    timestamp: Date.now()
+  });
+  // Keep only last 20
+  list = list.slice(0, 20);
+  localStorage.setItem(LS_HISTORY, JSON.stringify(list));
+  renderHistory();
+  refreshStats();
+  toast('Campaign saved to history.');
 }
+
+function renderHistory(){
+  let list;
+  try { list = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]'); } catch(_){ list = []; }
+  const card = document.getElementById('historyCard');
+  if (!list.length){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  document.getElementById('historyList').innerHTML = list.map((h, i) => ''
+    + '<div class="history-row">'
+    +   '<div class="h-info">'
+    +     '<div class="h-msg">' + escapeHtml(h.name) + ' — "' + escapeHtml(h.msg.slice(0, 80)) + '"</div>'
+    +     '<div class="h-meta">' + new Date(h.timestamp).toLocaleString() + ' · ' + escapeHtml(h.audience) + '</div>'
+    +   '</div>'
+    +   '<button class="h-action" onclick="loadHistoryItem(' + i + ')">Load</button>'
+    + '</div>'
+  ).join('');
+}
+function loadHistoryItem(i){
+  let list;
+  try { list = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]'); } catch(_){ list = []; }
+  if (!list[i]) return;
+  document.getElementById('msgText').value = list[i].msg;
+  onMsgChange();
+  document.getElementById('msgText').scrollIntoView({ behavior:'smooth' });
+  toast('Loaded campaign — review and Generate again.');
+}
+function clearHistory(){
+  if (!confirm('Clear all campaign history?')) return;
+  localStorage.removeItem(LS_HISTORY);
+  renderHistory();
+  refreshStats();
+}
+
+// ============================================================
+// Toast helper
+// ============================================================
+function toast(msg){
+  let t = document.getElementById('_t');
+  if (!t){
+    t = document.createElement('div');
+    t.id = '_t';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);font-family:inherit';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._h);
+  t._h = setTimeout(() => { t.style.display = 'none'; }, 2400);
+}
+
+async function logout(){ await c.auth.signOut(); location.href = '/admin/login.html'; }
 
 init();
 </script>
