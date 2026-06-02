@@ -220,11 +220,12 @@ input[type="text"].search-input:focus{
   -webkit-backdrop-filter: saturate(1.05) blur(6px);
 }
 
-/* ===== Footer ===== */
-footer, .site-footer{
-  border-top: 1px solid var(--pp-line) !important;
-  background: var(--pp-bg-soft) !important;
-}
+/* ===== Footer =====
+   NOTE: Removed background + border-top override. Pages like
+   index.html ship a dark <footer> with white text via main.css
+   (background:var(--ink)). A light override here made the text
+   invisible. Footers now keep their own page-defined styling.
+*/
 
 /* ===== Toast / snackbar / alerts ===== */
 .toast, .snackbar, .alert{
@@ -287,6 +288,4 @@ textarea:focus-visible{
   outline-offset: 2px !important;
 }
 
-/* ============================================================
-   END public-premium.css
-   ============================================================ */
+/* ====================

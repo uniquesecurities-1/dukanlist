@@ -1959,7 +1959,7 @@ if (window.DukanPTR){
               ${Number(b.verified_score) >= 3 ? `<span style="background:#94a3b8;color:#fff;padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:800">${Number(b.verified_score) >= 5 ? 'GOLD' : 'SILVER'} ✓</span>` : ''}
             </div>
             <a href="/${b.slug}" class="fsotw-cta">
-              ${lang === 'hi' ? 'दुकान देखें' : 'Visit Shop'} →
+              ${lang === 'hi' ? 'विवरण देखें' : 'View Listing'} →
             </a>
           </div>
         </div>
@@ -2140,4 +2140,4 @@ if (window.DukanPTR){
         if (!r.businesses || !r.businesses.name) return;
         events.push({
           en: '⭐ ' + r.rating + '-star review for <b>' + esc(r.businesses.name) + '</b> · ' + fmtAgo(r.created_at),
-        
+      
