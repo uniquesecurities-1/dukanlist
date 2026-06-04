@@ -170,6 +170,47 @@ module.exports = async (req, res) => {
     });
   }
 
+  // ===== 5.5 OPTIONAL: AI image moderation =====
+  // Only runs if both env vars are set (Cloudflare Worker deployed).
+  // See workers/image-moderation/worker.js + IMAGE-MODERATION-SETUP.md
+  // Fails OPEN: if the worker is down/slow, upload proceeds normally.
+  const MOD_URL    = process.env.IMG_MOD_WORKER_URL;
+  const MOD_SECRET = process.env.IMG_MOD_SECRET;
+  if (MOD_URL && MOD_SECRET) {
+    try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 8000); // 8s max wait
+      const modRes = await fetch(MOD_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + MOD_SECRET,
+          'Content-Type': mime
+        },
+        body: fileBuf,
+        signal: controller.signal
+      });
+      clearTimeout(t);
+      if (modRes.ok) {
+        const verdict = await modRes.json();
+        if (verdict && verdict.verdict === 'block') {
+          return res.status(400).json({
+            error: 'Image rejected by content safety check',
+            detail: 'Reasons: ' + (verdict.reasons || []).join(', '),
+            verdict
+          });
+        }
+        // 'flag' → allow but log (admin reviews via /admin/moderation)
+        if (verdict && verdict.verdict === 'flag') {
+          console.warn('[upload] image flagged:', verdict.reasons);
+        }
+      }
+      // Non-ok response from worker → fail open (allow upload)
+    } catch (e) {
+      // Worker unavailable / timed out — fail open, log to console
+      console.warn('[upload] moderation skipped:', String(e.message || e).slice(0, 200));
+    }
+  }
+
   // ===== 6. Build storage path =====
   const ext = (mime === 'image/png') ? 'png'
             : (mime === 'image/webp') ? 'webp'
@@ -196,59 +237,4 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       error: 'Storage upload failed',
       detail: errTxt,
-      status: uploadRes.status
-    });
-  }
-
-  // ===== 8. Build public URL =====
-  const publicUrl = SUPABASE_URL.replace(/\/$/, '')
-    + '/storage/v1/object/public/' + BUCKET + '/' + storagePath;
-
-  // ===== 9. Append to businesses.photos =====
-  const newPhotos = [...currentPhotos, publicUrl];
-  const updRes = await sbAdmin(
-    '/rest/v1/businesses?id=eq.' + encodeURIComponent(businessId),
-    {
-      method: 'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({ photos: newPhotos, updated_at: new Date().toISOString() })
-    }
-  );
-  if (!updRes.ok) {
-    // Try to clean up uploaded file
-    try {
-      await fetch(SUPABASE_URL + '/storage/v1/object/' + BUCKET + '/' + storagePath, {
-        method: 'DELETE',
-        headers: { apikey: SERVICE_KEY, Authorization: 'Bearer ' + SERVICE_KEY }
-      });
-    } catch(_){}
-    return res.status(500).json({ error: 'Failed to update business photos', detail: updRes.body });
-  }
-
-  // ===== 10. Best-effort activate pending business after first photo =====
-  try {
-    if (biz.status === 'pending' && currentPhotos.length === 0) {
-      await sbAdmin('/rest/v1/rpc/activate_business_after_photos', {
-        method: 'POST',
-        body: JSON.stringify({ p_business_id: businessId })
-      });
-    }
-  } catch(_){}
-
-  return res.status(200).json({
-    ok: true,
-    url: publicUrl,
-    path: storagePath,
-    business_id: businessId,
-    photos_now: newPhotos.length
-  });
-};
-
-// Allow up to 15MB JSON body (10MB raw file = ~13.3MB base64)
-module.exports.config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '15mb'
-    }
-  }
-};
+      sta

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicate Shop Detection — DukanList Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260531">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{ font-family:'Plus Jakarta Sans',-apple-system,sans-serif; background:#f4f6fb; color:#0F172A; margin:0 }
+  .topbar{ background:linear-gradient(180deg,#0A1226 0%,#0B1530 100%); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between }
+  .brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.1rem }
+  .badge{ background:linear-gradient(135deg,#C2A05A,#8C6A1F); color:#FFF8E6; font-size:.6rem; font-weight:800; letter-spacing:.12em; padding:4px 8px; border-radius:6px }
+  .nav a{ color:#C5CDDA; text-decoration:none; font-size:.85rem; margin-left:14px; padding:6px 10px; border-radius:7px }
+  .nav a.active{ background:rgba(99,140,255,.16); color:#DBEAFE }
+  .main{ max-width:1240px; margin:24px auto; padding:0 24px }
+  .page-title{ font-size:24px; font-weight:800; letter-spacing:-.025em }
+  .page-sub{ color:#94A3B8; font-size:13px; margin-bottom:20px }
+  .controls{ display:flex; gap:10px; align-items:center; margin-bottom:18px; flex-wrap:wrap; padding:14px 18px; background:#fff; border-radius:12px; border:1px solid #E6E9EE }
+  .controls label{ font-weight:700; font-size:.84rem; color:#475569 }
+  .controls select, .controls input, .controls button{ font-family:inherit; font-size:.86rem; padding:8px 12px; border-radius:8px; border:1px solid #D7DCE4; background:#fff; cursor:pointer }
+  .controls button.primary{ background:#0B3A8C; color:#fff; border-color:#0B3A8C; font-weight:700 }
+  .pair{ display:grid; grid-template-columns: 1fr auto 1fr; gap:14px; background:#fff; border:1px solid #E6E9EE; border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+  .pair-shop{ padding:14px; background:#FAFBFD; border:1px solid #EEF1F6; border-radius:10px }
+  .pair-shop h3{ font-size:1.05rem; font-weight:800; margin:0 0 4px; color:#0F1729 }
+  .pair-shop a{ color:#0B3A8C; text-decoration:none }
+  .pair-shop a:hover{ text-decoration:underline }
+  .pair-meta{ font-size:.78rem; color:#64748B; line-height:1.6; margin-top:6px }
+  .pair-meta b{ color:#0F1729 }
+  .pair-center{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; min-width:140px }
+  .conf-pill{ display:inline-block; padding:6px 14px; border-radius:99px; font-weight:800; font-size:.78rem; letter-spacing:.04em }
+  .conf-high{ background:linear-gradient(135deg,#FCA5A5,#DC2626); color:#fff }
+  .conf-med{ background:linear-gradient(135deg,#FCD34D,#D97706); color:#fff }
+  .conf-low{ background:#E2E8F0; color:#475569 }
+  .reason{ font-size:.7rem; color:#64748B; text-transform:uppercase; letter-spacing:.06em; font-weight:700 }
+  .pair-actions{ display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; justify-content:center }
+  .pair-actions button{ font-size:.74rem; padding:7px 11px; border-radius:8px; border:1px solid #D7DCE4; background:#fff; cursor:pointer; font-weight:700 }
+  .pair-actions .keep{ border-color:#86EFAC; color:#047857 }
+  .pair-actions .keep:hover{ background:#ECFDF5 }
+  .pair-actions .merge{ background:#0B3A8C; color:#fff; border-color:#0B3A8C }
+  .pair-actions .merge:hover{ filter:brightness(1.1) }
+  .empty{ text-align:center; padding:80px 20px; color:#94A3B8; background:#fff; border-radius:14px; border:1px solid #E6E9EE }
+  .empty-emoji{ font-size:56px; margin-bottom:14px }
+  .stats{ display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap }
+  .stat{ background:#fff; border:1px solid #E6E9EE; border-radius:10px; padding:12px 18px; flex:1; min-width:140px }
+  .stat-label{ font-size:11px; font-weight:700; color:#94A3B8; letter-spacing:.06em; text-transform:uppercase }
+  .stat-value{ font-size:22px; font-weight:800; color:#0F1729; margin-top:4px; font-variant-numeric:tabular-nums }
+  @media (max-width: 720px){
+    .pair{ grid-template-columns: 1fr; }
+    .pair-center{ flex-direction:row; justify-content:space-between; min-width:0; padding:8px 0; border-top:1px solid #E6E9EE; border-bottom:1px solid #E6E9EE }
+  }
+</style>
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🛡️ Dukan<em style="font-style:normal;color:#93C5FD">List</em>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav class="nav">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/duplicates.html" class="active">🔍 Duplicates</a>
+    <a href="/admin/monitoring.html">📡 Monitoring</a>
+    <a href="/admin/login.html" style="color:#94A3B8;font-size:.7rem">Logout</a>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="page-title">🔍 Duplicate Shop Detection</div>
+  <div class="page-sub">Fuzzy name + canonical mobile + locality matching · Review and resolve potential duplicates</div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Pending duplicates</div>
+      <div class="stat-value" id="statTotal">…</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">High confidence</div>
+      <div class="stat-value" id="statHigh" style="color:#B91C1C">…</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Medium / weak</div>
+      <div class="stat-value" id="statMed" style="color:#C2410C">…</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label>Min similarity:</label>
+    <select id="simSelect">
+      <option value="0.85">0.85 (very strict)</option>
+      <option value="0.70" selected>0.70 (recommended)</option>
+      <option value="0.55">0.55 (loose)</option>
+      <option value="0.40">0.40 (very loose — many false positives)</option>
+    </select>
+    <label>Show:</label>
+    <select id="limitSelect">
+      <option value="50">50</option>
+      <option value="100" selected>100</option>
+      <option value="250">250</option>
+    </select>
+    <button class="primary" onclick="loadDuplicates()">🔄 Refresh</button>
+    <span style="font-size:.78rem;color:#64748B;margin-left:auto">
+      Tip: mark pairs as "not a duplicate" to suppress future flags.
+    </span>
+  </div>
+
+  <div id="results">
+    <div class="empty"><div class="empty-emoji">⏳</div>Loading potential duplicates…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+(async function init(){
+  document.getElementById('simSelect').addEventListener('change', loadDuplicates);
+  document.getElementById('limitSelect').addEventListener('change', loadDuplicates);
+  await loadDuplicates();
+})();
+
+async function loadDuplicates(){
+  const c = window.ShopDB && window.ShopDB.client;
+  const host = document.getElementById('results');
+  if (!c || typeof c.rpc !== 'function'){
+    host.innerHTML = '<div class="empty"><div class="empty-emoji">⏳</div>Supabase client not ready</div>';
+    return;
+  }
+  host.innerHTML = '<div class="empty"><div class="empty-emoji">⏳</div>Scanning shops for duplicates…</div>';
+
+  const sim = parseFloat(document.getElementById('simSelect').value) || 0.7;
+  const lim = parseInt(document.getElementById('limitSelect').value, 10) || 100;
+  try {
+    const { data, error } = await c.rpc('admin_find_duplicate_shops', { p_min_similarity: sim, p_limit: lim });
+    if (error) throw error;
+    renderStats(data);
+    renderPairs(data.rows || []);
+  } catch (e) {
+    const msg = String(e.message || e);
+    if (/does not exist|404|PGRST202/.test(msg)){
+      host.innerHTML = '<div class="empty"><div class="empty-emoji">📋</div>'
+        + '<div style="font-weight:700;color:#0F1729;margin-bottom:6px">Setup required</div>'
+        + 'Run <code style="background:#F1F4F9;padding:2px 6px;border-radius:4px">db/99-duplicate-shop-detection.sql</code> in Supabase first.</div>';
+    } else if (/admin only/i.test(msg)){
+      host.innerHTML = '<div class="empty"><div class="empty-emoji">🔒</div>Admin access required.</div>';
+    } else {
+      host.innerHTML = '<div class="empty"><div class="empty-emoji">❌</div>Failed: ' + escapeHtml(msg) + '</div>';
+    }
+  }
+}
+
+function renderStats(data){
+  const rows = data.rows || [];
+  document.getElementById('statTotal').textContent = data.count || 0;
+  const high = rows.filter(r => r.similarity >= 0.85 || r.reason === 'mobile_match').length;
+  const med = rows.length - high;
+  document.getElementById('statHigh').textContent = high;
+  document.getElementById('statMed').textContent = med;
+}
+
+function renderPairs(pairs){
+  const host = document.getElementById('results');
+  if (!pairs.length){
+    host.innerHTML = '<div class="empty"><div class="empty-emoji">🎉</div>No potential duplicates found. Your listing database is clean.</div>';
+    return;
+  }
+  host.innerHTML = pairs.map(p => {
+    const sim = p.similarity || 0;
+    const confCls = (sim >= 0.85 || p.reason === 'mobile_match') ? 'conf-high'
+                  : (sim >= 0.6) ? 'conf-med' : 'conf-low';
+    const confLabel = (sim >= 0.85 || p.reason === 'mobile_match') ? 'HIGH'
+                    : (sim >= 0.6) ? 'MEDIUM' : 'LOW';
+    return `
+      <div class="pair" data-a="${p.id_a}" data-b="${p.id_b}">
+        ${renderShopBlock(p.shop_a)}
+        <div class="pair-center">
+          <div class="conf-pill ${confCls}">${confLabel}</div>
+          <div style="font-size:1.2rem;font-weight:800;color:#0F1729;font-variant-numeric:tabular-nums">${(sim*100).toFixed(0)}%</div>
+          <div class="reason">${escapeHtml(p.reason || '')}</div>
+          <div class="pair-actions">
+            <button class="keep" onclick="markNotDup('${p.id_a}','${p.id_b}',this)">✓ Not a dup</button>
+          </div>
+        </div>
+        ${renderShopBlock(p.shop_b)}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderShopBlock(s){
+  if (!s) return '<div class="pair-shop">—</div>';
+  const cap = (s.status || 'active').toUpperCase();
+  return `
+    <div class="pair-shop">
+      <h3><a href="/admin/shop.html?id=${s.id}" target="_blank">${escapeHtml(s.name || 'Unnamed')}</a></h3>
+      <div class="pair-meta">
+        <div>📞 <b>${escapeHtml(s.mobile || '—')}</b></div>
+        <div>📅 Created: ${s.created_at ? new Date(s.created_at).toLocaleDateString('en-IN') : '—'}</div>
+        <div>🏷️ Status: <b>${cap}</b></div>
+      </div>
+    </div>
+  `;
+}
+
+async function markNotDup(a, b, btn){
+  if (!confirm('Mark this pair as NOT duplicate? They will be hidden from future scans.')) return;
+  const c = window.ShopDB.client;
+  btn.disabled = true; btn.textContent = '⏳';
+  try {
+    const reason = prompt('Reason (optional, e.g. "Different shops with similar names"):') || null;
+    const { data, error } = await c.rpc('admin_mark_not_duplicate', { p_a: a, p_b: b, p_reason: reason });
+    if (error) throw error;
+    const row = btn.closest('.pair');
+    if (row) row.style.opacity = '.4', row.style.pointerEvents = 'none';
+  } catch (e) {
+    alert('Failed: ' + (e.message || e));
+    btn.disabled = false; btn.textContent = '✓ Not a dup';
+  }
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
