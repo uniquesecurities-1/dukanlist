@@ -1,7 +1,7 @@
 {
-  "version": "3.3",
-  "updated": "2026-05-28",
-  "note": "v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL.",
+  "version": "3.4",
+  "updated": "2026-06-04T05:09:00.214669Z",
+  "note": "v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL.",
   "parents": [
     {
       "slug": "healthcare",
@@ -1487,6 +1487,105 @@
           "name": "Fishery / Fish Farm",
           "name_hi": "मछली पालन / फिशरी",
           "icon": "🐟"
+        }
+      ]
+    },
+    {
+      "slug": "energy-solar",
+      "name": "Energy, Solar & Renewable",
+      "name_hi": "ऊर्जा, सोलर एवं नवीकरणीय",
+      "icon": "☀️",
+      "color": "#F59E0B",
+      "subs": [
+        {
+          "slug": "solar-panel-installation",
+          "name": "Solar Panel Installation",
+          "name_hi": "सोलर पैनल इंस्टॉलेशन",
+          "icon": "🔆"
+        },
+        {
+          "slug": "solar-water-heater",
+          "name": "Solar Water Heater",
+          "name_hi": "सोलर वाटर हीटर",
+          "icon": "♨️"
+        },
+        {
+          "slug": "solar-inverter-battery",
+          "name": "Solar Inverter / Battery",
+          "name_hi": "सोलर इन्वर्टर / बैटरी",
+          "icon": "🔋"
+        },
+        {
+          "slug": "rooftop-solar",
+          "name": "Rooftop Solar (Residential)",
+          "name_hi": "रूफटॉप सोलर (घरेलू)",
+          "icon": "🏠"
+        },
+        {
+          "slug": "commercial-solar-epc",
+          "name": "Commercial Solar / EPC",
+          "name_hi": "कमर्शियल सोलर / EPC",
+          "icon": "🏢"
+        },
+        {
+          "slug": "solar-pump-agri",
+          "name": "Solar Pump (Agri / KUSUM)",
+          "name_hi": "सोलर पंप (कृषि / KUSUM)",
+          "icon": "💧"
+        },
+        {
+          "slug": "solar-street-light",
+          "name": "Solar Street Light / Lamp",
+          "name_hi": "सोलर स्ट्रीट लाइट",
+          "icon": "💡"
+        },
+        {
+          "slug": "solar-amc-cleaning",
+          "name": "Solar AMC & Cleaning",
+          "name_hi": "सोलर AMC एवं सफाई",
+          "icon": "🧹"
+        },
+        {
+          "slug": "renewable-energy-consultant",
+          "name": "Renewable Energy Consultant",
+          "name_hi": "नवीकरणीय ऊर्जा सलाहकार",
+          "icon": "🌱"
+        },
+        {
+          "slug": "energy-audit",
+          "name": "Energy Audit / Saving",
+          "name_hi": "एनर्जी ऑडिट / बचत",
+          "icon": "📋"
+        },
+        {
+          "slug": "wind-energy",
+          "name": "Wind Energy Solutions",
+          "name_hi": "पवन ऊर्जा समाधान",
+          "icon": "🌬️"
+        },
+        {
+          "slug": "biogas-biomass",
+          "name": "Biogas / Biomass",
+          "name_hi": "बायोगैस / बायोमास",
+          "icon": "♻️"
+        },
+        {
+          "slug": "ev-charging-station",
+          "name": "EV Charging Station",
+          "name_hi": "EV चार्जिंग स्टेशन",
+          "icon": "🔌"
+        },
+        {
+          "slug": "ups-inverter-battery",
+          "name": "UPS / Inverter / Battery Shop",
+          "name_hi": "UPS / इन्वर्टर / बैटरी शॉप",
+          "icon": "🔋"
+        },
+        {
+          "slug": "solar-subsidy-mnre",
+          "name": "Solar Subsidy / MNRE Consultant",
+          "name_hi": "सोलर सब्सिडी / MNRE सलाहकार",
+          "icon": "📜"
         }
       ]
     },

@@ -279,4 +279,21 @@ input[type="text"].search-input:focus{
   .card, .shop-card, .biz-card{
     border-radius: 12px !important;
   }
-  .btn-primary, but
+  .btn-primary, button.primary, .cta-primary{
+    box-shadow: 0 4px 12px rgba(255,107,26,.20) !important;
+  }
+}
+
+/* ===== Accessibility — better focus rings ===== */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline: 3px solid rgba(255,107,26,.40) !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================================
+   END public-premium.css
+   ============================================================ */
