@@ -2257,7 +2257,7 @@ function renderMmtStatStrip(b){
     document.getElementById('mmtRatingNum').textContent = r.toFixed(1);
     document.getElementById('mmtRatingTier').textContent = tier;
     document.getElementById('mmtRatingTier').style.color = tierColor;
-    document.getElementById('mmtRatingMeta').textContent = totalRatings + ' ratings · ' + (b.reviews_count || totalRatings) + ' reviews';
+    document.getElementById('mmtRatingMeta').textContent = (function(n){return n+' rating'+(n===1?'':'s')+' · '+(b.reviews_count||n)+' review'+((b.reviews_count||n)===1?'':'s');})(totalRatings);
     // 4 rating dimensions — we don't have these in DB yet, derive synthetic from overall (until proper schema)
     const dims = [
       ['Service',   Math.min(5, r + 0.1).toFixed(1)],
@@ -2501,7 +2501,7 @@ async function loadReviews(bizId){
       + 'style="background:#FFF8F0;border:1.5px solid #FED7AA;color:#92400E;padding:10px 22px;'
       + 'border-radius:10px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit;'
       + 'transition:.15s;box-shadow:0 2px 6px rgba(245,158,11,.10)">'
-      + 'Show all ' + TOTAL_REVIEWS + ' reviews  ↓</button>';
+      + 'Show all ' + TOTAL_REVIEWS + ' review' + (TOTAL_REVIEWS===1?'':'s') + '  ↓</button>';
     listEl.parentNode.insertBefore(btnWrap, listEl.nextSibling);
   }
 }
@@ -2513,7 +2513,7 @@ function toggleAllReviews(){
   const expanded = list.classList.toggle('reviews-expanded');
   btn.innerHTML = expanded
     ? ('Show less  ↑')
-    : ('Show all ' + list.querySelectorAll('.review').length + ' reviews  ↓');
+    : (function(n){return 'Show all '+n+' review'+(n===1?'':'s')+'  ↓'})(list.querySelectorAll('.review').length);
 }
 
 function openReplyEditor(reviewId, currentText){
@@ -2552,7 +2552,7 @@ async function renderDetailTrustStrip(b){
     if (yrs >= 1) pills.push({ ico: '\u{1F3DB}', text: yrs + (yrs === 1 ? ' year' : ' years') + ' established', cls: '' });
   }
   if (Number(b.rating_avg) >= 4 && Number(b.rating_count) >= 5){
-    pills.push({ ico: '⭐', text: Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ' reviews)', cls: 'rating-clickable', href: '#reviewsAnchor' });
+    pills.push({ ico: '⭐', text: Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ' review' + (Number(b.rating_count)===1?'':'s') + ')', cls: 'rating-clickable', href: '#reviewsAnchor' });
   }
   // Quick-replies signal — if owner has any review reply
   if (b.has_owner_replies) pills.push({ ico: '\u{1F4AC}', text: 'Replies fast', cls: 'fast' });
@@ -2670,13 +2670,32 @@ async function rpSha256(str){
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Inline-error helper for the review-prompt modal (replaces native alert)
+function rpShowErr(msg){
+  let host = document.getElementById('rpInlineErr');
+  if (!host) {
+    const form = document.getElementById('rpForm');
+    if (!form) { return; }
+    host = document.createElement('div');
+    host.id = 'rpInlineErr';
+    host.style.cssText = 'background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-top:10px;line-height:1.45';
+    form.appendChild(host);
+  }
+  host.textContent = msg;
+  host.style.display = '';
+  setTimeout(() => { if (host) host.style.display = 'none'; }, 6000);
+}
+
 async function submitReviewPrompt(){
   if (!BIZ || !BIZ.id || RP_RATING < 1) return;
   const c = ShopDB.client;
   const name  = (document.getElementById('rpName').value || '').trim();
   const phone = (document.getElementById('rpPhone').value || '').replace(/\D/g, '');
   const text  = (document.getElementById('rpText').value || '').trim();
-  if (phone.length !== 10){ alert('Enter valid 10-digit mobile'); return; }
+  if (phone.length !== 10){
+    rpShowErr('Please enter a valid 10-digit mobile number starting 6-9.');
+    return;
+  }
 
   const btn = document.getElementById('rpSubmitBtn');
   btn.disabled = true;
@@ -2707,7 +2726,20 @@ async function submitReviewPrompt(){
       if (typeof loadReviews === 'function') loadReviews(BIZ.id);
     }, 2500);
   } catch(e){
-    alert('Failed to post review: ' + (e.message || 'Unknown error'));
+    // Friendly mapping for common server errors
+    let msg = String(e.message || e);
+    if (/Too many reviews/i.test(msg)) {
+      msg = 'This listing has received many reviews recently. Please try again in a few minutes.';
+    } else if (/duplicate|unique|already/i.test(msg)) {
+      msg = 'You\'ve already reviewed this listing from this mobile number.';
+    } else if (/Review blocked|check_violation/i.test(msg)) {
+      msg = 'Review rejected — please remove URLs, contact info or inappropriate language.';
+    } else if (/network|fetch/i.test(msg)) {
+      msg = 'Network issue. Check your connection and try again.';
+    } else {
+      msg = 'Could not post review. Please try again.';
+    }
+    rpShowErr(msg);
     btn.disabled = false;
     btn.textContent = 'Post review';
   }
@@ -3339,32 +3371,4 @@ function renderOwnerCredit(){
 /* Social links row — runs after BIZ is loaded */
 function renderSocialRow(){
   if (!BIZ) return;
-  const wrap = document.getElementById('socialCardWrap');
-  const el = document.getElementById('socialRow');
-  if (!el || !wrap) return;
-  const items = [
-    { url: BIZ.website_url,   cls: 'web', icon: '\ud83c\udf10', label: 'Website' },
-    { url: BIZ.facebook_url,  cls: 'fb',  icon: 'f',                label: 'Facebook' },
-    { url: BIZ.instagram_url, cls: 'ig',  icon: '\ud83d\udcf7', label: 'Instagram' },
-    { url: BIZ.youtube_url,   cls: 'yt',  icon: '\u25b6',          label: 'YouTube' },
-    { url: BIZ.x_twitter_url, cls: 'tw',  icon: 'X',                label: 'X' },
-    { url: BIZ.linkedin_url,  cls: 'li',  icon: 'in',               label: 'LinkedIn' }
-  ].filter(x => x.url && /^https?:\/\//i.test(x.url));
-  if (!items.length){ wrap.style.display = 'none'; return; }
-  wrap.style.display = '';
-  el.innerHTML = items.map(l => '<a class="social-pill ' + l.cls + '" href="'
-    + escapeAttr(l.url) + '" target="_blank" rel="nofollow noopener">'
-    + '<span style="font-weight:900;min-width:14px;text-align:center">'
-    + l.icon + '</span>' + l.label + '</a>').join('');
-}
-
-function prefillQA(text){
-  if (typeof openQAModal === 'function') openQAModal();
-  setTimeout(function(){
-    var t = document.getElementById('qaQuestionText');
-    if (t){ t.value = text; t.focus(); try{ t.setSelectionRange(t.value.length, t.value.length) }catch(_){} }
-  }, 150);
-}
-</script>
-</body>
-</html>
+  const wrap = document.getElementById('soc

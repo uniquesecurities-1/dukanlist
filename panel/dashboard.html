@@ -1118,7 +1118,7 @@ function renderDashboard(b){
   document.getElementById('kpiViews').textContent  = (b.view_count || 0).toLocaleString();
   document.getElementById('kpiLeads').textContent  = (b.lead_count || 0).toLocaleString();
   document.getElementById('kpiRating').textContent = b.rating_avg > 0 ? Number(b.rating_avg).toFixed(1) + ' ⭐' : '—';
-  document.getElementById('kpiRatingCount').textContent = b.rating_count > 0 ? '(' + b.rating_count + ' reviews)' : '';
+  document.getElementById('kpiRatingCount').textContent = b.rating_count > 0 ? '(' + b.rating_count + ' review' + (Number(b.rating_count)===1?'':'s') + ')' : '';
   document.getElementById('kpiTrust').innerHTML    = b.verified_score + '<span style="font-size:.6em;color:var(--muted)">/5</span>';
 
   // Photo upload alert
