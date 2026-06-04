@@ -118,4 +118,20 @@ color 0A
 echo.
 echo ================================================
 echo    BACKUP SUCCESSFUL
-echo ===============================================
+echo ================================================
+echo.
+echo OneDrive will sync the new ZIP to the cloud in
+echo the next 1-2 minutes. Once synced, your project
+echo is safe even if this laptop crashes.
+echo.
+echo Recovery steps (in case of laptop loss):
+echo  1. Install OneDrive on new PC, sign in
+echo  2. Open folder: %BACKUP_ROOT%
+echo  3. Unzip the latest dukanlist_*.zip
+echo  4. (or) git clone from GitHub for live history
+echo.
+echo Recommended: run this backup every Sunday.
+echo ================================================
+echo.
+timeout /t 10 /nobreak >nul
+exit /b 0
