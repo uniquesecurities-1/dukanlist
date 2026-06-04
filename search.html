@@ -362,11 +362,12 @@
         <span data-i18n-en>Sort:</span><span data-i18n-hi>क्रम:</span>
       </label>
       <select id="sortSel" onchange="setSort(this.value)" style="font-size:.82rem;font-weight:600;padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#0F172A;cursor:pointer">
+        <!-- "Featured first" + "Newest" removed: search RPC doesn't
+             return is_featured / created_at columns, so those sorts
+             were silent no-ops (audit finding). -->
         <option value="relevance">Relevance</option>
-        <option value="featured">Featured first</option>
         <option value="rating">Highest rated</option>
         <option value="reviews">Most reviewed</option>
-        <option value="newest">Newest</option>
       </select>
       <div class="view-toggle" role="tablist" aria-label="View toggle">
         <button id="viewListBtn" class="vt-btn active" onclick="setView('list')" aria-pressed="true">📋 List</button>
@@ -1282,7 +1283,4 @@ window.addEventListener('popstate', runSearch);
 <script src="/assets/js/city-persist.js"></script>
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
-<script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
-</body>
-</html>
+<script src="/assets/js/error-reporter.js" def

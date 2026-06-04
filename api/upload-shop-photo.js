@@ -277,30 +277,4 @@ module.exports = async (req, res) => {
   }
   const updatedPhotos = (rpcRes.body && rpcRes.body.photos) || null;
 
-  // ===== 10. Best-effort activate pending business after first photo =====
-  try {
-    if (biz.status === 'pending' && currentPhotos.length === 0) {
-      await sbAdmin('/rest/v1/rpc/activate_business_after_photos', {
-        method: 'POST',
-        body: JSON.stringify({ p_business_id: businessId })
-      });
-    }
-  } catch(_){}
-
-  return res.status(200).json({
-    ok: true,
-    url: publicUrl,
-    path: storagePath,
-    business_id: businessId,
-    photos_now: newPhotos.length
-  });
-};
-
-// Allow up to 15MB JSON body (10MB raw file = ~13.3MB base64)
-module.exports.config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '15mb'
-    }
-  }
-};
+  /

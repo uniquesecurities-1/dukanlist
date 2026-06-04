@@ -131,7 +131,7 @@
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-secondary" onclick="loadFilter('pending')">📋 All Pending</button>
       <button class="btn btn-secondary" onclick="loadFilter('active')">✓ All Active</button>
-      <button class="btn btn-secondary" onclick="loadFilter('rejected')">✗ All Rejected</button>
+      <button class="btn btn-secondary" onclick="loadFilter('banned')">✗ All Banned/Rejected</button>
       <button class="btn btn-secondary" onclick="loadFilter('all')">📦 All Shops</button>
       <button class="btn btn-secondary" onclick="loadFilter('test_keywords')">🔎 Test/Dummy Keywords</button>
     </div>
@@ -157,7 +157,7 @@
     <div class="desc">For wiping the entire test database. Use very carefully.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-nuclear" onclick="nuclearDelete('pending')">🔥 Delete ALL Pending</button>
-      <button class="btn btn-nuclear" onclick="nuclearDelete('rejected')">🔥 Delete ALL Rejected</button>
+      <button class="btn btn-nuclear" onclick="nuclearDelete('banned')">🔥 Delete ALL Banned/Rejected</button>
       <button class="btn btn-nuclear" onclick="nuclearDelete('all')">☢️ Wipe EVERY Business (Nuclear)</button>
     </div>
   </div>
@@ -203,7 +203,7 @@ async function loadStats(){
     return error ? '?' : (count || 0);
   };
   const [tot, pen, act, rej] = await Promise.all([
-    fetchCount(null), fetchCount('pending'), fetchCount('active'), fetchCount('rejected')
+    fetchCount(null), fetchCount('pending'), fetchCount('active'), fetchCount('banned')
   ]);
   grid.innerHTML = `
     <div class="stat-box"><div class="n">${tot}</div><div class="l">Total</div></div>
@@ -229,7 +229,7 @@ async function loadFilter(kind){
   let label = '';
   if (kind === 'pending'){ query = query.eq('status', 'pending'); label = 'All Pending'; }
   else if (kind === 'active'){ query = query.eq('status', 'active'); label = 'All Active'; }
-  else if (kind === 'rejected'){ query = query.eq('status', 'rejected'); label = 'All Rejected'; }
+  else if (kind === 'banned'){ query = query.eq('status', 'banned'); label = 'All Banned (rejected by admin)'; }
   else if (kind === 'all'){ label = 'All Shops'; }
   else if (kind === 'test_keywords'){
     query = query.or('name.ilike.%test%,name.ilike.%dummy%,name.ilike.%demo%,name.ilike.%abc%,name.ilike.%xyz%,name.ilike.%sample%');
@@ -313,7 +313,7 @@ async function bulkDelete(){
 async function nuclearDelete(kind){
   let label, query;
   if (kind === 'pending'){ label = 'ALL PENDING'; query = C.from('businesses').select('id').eq('status','pending'); }
-  else if (kind === 'rejected'){ label = 'ALL REJECTED'; query = C.from('businesses').select('id').eq('status','rejected'); }
+  else if (kind === 'banned'){ label = 'ALL BANNED'; query = C.from('businesses').select('id').eq('status','banned'); }
   else { label = 'EVERY SINGLE BUSINESS'; query = C.from('businesses').select('id'); }
 
   if (!confirm('☢️ NUCLEAR DELETE\n\nThis will delete ' + label + '. Photos, reviews, leads, analytics — all gone. This CANNOT be undone.\n\nAre you absolutely sure?')) return;
