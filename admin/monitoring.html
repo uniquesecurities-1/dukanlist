@@ -180,8 +180,11 @@ async function refreshHealth(){
 }
 
 async function loadErrors(){
-  const c = window.c || window.supabase || (window.ShopDB && window.ShopDB.client);
-  if (!c) { document.getElementById('errTableHost').innerHTML = '<div class="empty">Supabase client not ready</div>'; return; }
+  const c = (window.ShopDB && window.ShopDB.client) || null;
+  if (!c || typeof c.rpc !== 'function') {
+    document.getElementById('errTableHost').innerHTML = '<div class="empty"><div class="empty-emoji">⏳</div>Supabase client not ready — wait a second and click Refresh.</div>';
+    return;
+  }
   const hours = parseInt(document.getElementById('hoursSelect').value, 10) || 24;
   const host = document.getElementById('errTableHost');
   host.innerHTML = '<div class="empty"><div class="empty-emoji">⏳</div>Loading errors from last ' + hours + 'h…</div>';
@@ -191,7 +194,18 @@ async function loadErrors(){
     renderKpis(data);
     renderTable(data);
   } catch (e) {
-    host.innerHTML = '<div class="empty"><div class="empty-emoji">❌</div>Failed to load: ' + escapeHtml(String(e.message || e)) + '<br><br><small>Run db/97-monitoring-error-logs.sql in Supabase first.</small></div>';
+    const msg = String(e.message || e);
+    // Friendly state if the SQL hasn't been applied yet
+    if (/function .* does not exist|404|Not Found|PGRST202/i.test(msg)) {
+      host.innerHTML = '<div class="empty"><div class="empty-emoji">📋</div>'
+        + '<div style="font-weight:700;color:#0F1729;margin-bottom:6px">Error logging table not set up yet</div>'
+        + 'Run <code style="background:#F1F4F9;padding:2px 6px;border-radius:4px">db/97-monitoring-error-logs.sql</code> in Supabase SQL Editor to enable this dashboard.'
+        + '</div>';
+    } else if (/admin only|permission/i.test(msg)) {
+      host.innerHTML = '<div class="empty"><div class="empty-emoji">🔒</div>Admin access required. Sign in via /admin/login.html first.</div>';
+    } else {
+      host.innerHTML = '<div class="empty"><div class="empty-emoji">❌</div>Failed to load: ' + escapeHtml(msg) + '</div>';
+    }
   }
 }
 
@@ -244,27 +258,3 @@ function timeAgo(ts){
   if (!ts) return '';
   const d = new Date(ts);
   const s = Math.round((Date.now() - d.getTime())/1000);
-  if (s < 60) return s + 's ago';
-  if (s < 3600) return Math.round(s/60) + 'm ago';
-  if (s < 86400) return Math.round(s/3600) + 'h ago';
-  return Math.round(s/86400) + 'd ago';
-}
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-async function clearOld(){
-  if (!confirm('Delete error logs older than 30 days? This cannot be undone.')) return;
-  const c = window.c || window.supabase;
-  try {
-    const { data, error } = await c.rpc('admin_clear_error_logs', { p_older_than_days: 30 });
-    if (error) throw error;
-    alert('Deleted ' + (data || 0) + ' old rows.');
-    loadErrors();
-  } catch(e){
-    alert('Failed: ' + (e.message || e));
-  }
-}
-</script>
-</body>
-</html>
