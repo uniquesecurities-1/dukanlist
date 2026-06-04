@@ -3317,4 +3317,54 @@ function renderOwnerCredit(){
   else if (roleLower.includes('chartered accountant') || roleLower === 'ca') prefix = 'CA';
   else if (roleLower.includes('advocate'))        prefix = 'Adv.';
   else if (roleLower.includes('pandit') || roleLower.includes('acharya')) prefix = 'Pt.';
-  else if (roleLower.includes('architect'))       prefix =
+  else if (roleLower.includes('architect'))       prefix = 'Ar.';
+  else if (roleLower.includes('engineer'))        prefix = 'Er.';
+  if (prefix && name && !name.match(/^(dr|ca|adv|pt|ar|er)\.?\s/i)){
+    displayName = prefix + ' ' + name;
+  }
+
+  const initial = (displayName.charAt(0) || '?').toUpperCase();
+  const safeName = escapeHTML(displayName || 'Listed by');
+  const safeRole = role ? escapeHTML(role) : '';
+
+  el.innerHTML =
+    '<div class="oc-avatar">' + initial + '</div>'
+    + '<div class="oc-info">'
+    + (safeName ? '<div class="oc-name">' + safeName + '</div>' : '')
+    + (safeRole ? '<div class="oc-role">' + safeRole + '</div>' : '<div class="oc-role" data-i18n-en="Listed & managed by owner" data-i18n-hi="मालिक द्वारा सूचीबद्ध">Listed &amp; managed by owner</div>')
+    + '</div>';
+  el.style.display = '';
+}
+
+/* Social links row — runs after BIZ is loaded */
+function renderSocialRow(){
+  if (!BIZ) return;
+  const wrap = document.getElementById('socialCardWrap');
+  const el = document.getElementById('socialRow');
+  if (!el || !wrap) return;
+  const items = [
+    { url: BIZ.website_url,   cls: 'web', icon: '\ud83c\udf10', label: 'Website' },
+    { url: BIZ.facebook_url,  cls: 'fb',  icon: 'f',                label: 'Facebook' },
+    { url: BIZ.instagram_url, cls: 'ig',  icon: '\ud83d\udcf7', label: 'Instagram' },
+    { url: BIZ.youtube_url,   cls: 'yt',  icon: '\u25b6',          label: 'YouTube' },
+    { url: BIZ.x_twitter_url, cls: 'tw',  icon: 'X',                label: 'X' },
+    { url: BIZ.linkedin_url,  cls: 'li',  icon: 'in',               label: 'LinkedIn' }
+  ].filter(x => x.url && /^https?:\/\//i.test(x.url));
+  if (!items.length){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  el.innerHTML = items.map(l => '<a class="social-pill ' + l.cls + '" href="'
+    + escapeAttr(l.url) + '" target="_blank" rel="nofollow noopener">'
+    + '<span style="font-weight:900;min-width:14px;text-align:center">'
+    + l.icon + '</span>' + l.label + '</a>').join('');
+}
+
+function prefillQA(text){
+  if (typeof openQAModal === 'function') openQAModal();
+  setTimeout(function(){
+    var t = document.getElementById('qaQuestionText');
+    if (t){ t.value = text; t.focus(); try{ t.setSelectionRange(t.value.length, t.value.length) }catch(_){} }
+  }, 150);
+}
+</script>
+</body>
+</html>

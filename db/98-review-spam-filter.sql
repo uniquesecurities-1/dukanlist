@@ -128,7 +128,7 @@ AS $$
 DECLARE
   v_check TEXT;
 BEGIN
-  v_check := check_review_content(COALESCE(NEW.comment, NEW.review_text, ''));
+  v_check := check_review_content(COALESCE(NEW.text, ''));
   IF v_check LIKE 'block:%' THEN
     RAISE EXCEPTION 'Review blocked: %', substring(v_check from 7)
       USING ERRCODE = 'check_violation';
@@ -174,8 +174,8 @@ BEGIN
     'business_name',   b.name,
     'business_slug',   b.slug,
     'rating',          r.rating,
-    'comment',         COALESCE(r.comment, r.review_text),
-    'reviewer_name',   r.reviewer_name,
+    'comment',         r.text,
+    'reviewer_name',   r.customer_name,
     'flagged_reason',  r.flagged_reason,
     'auto_flagged_at', r.auto_flagged_at,
     'created_at',      r.created_at
@@ -184,7 +184,7 @@ BEGIN
   FROM reviews r
   LEFT JOIN businesses b ON b.id = r.business_id
   WHERE r.flagged_reason IS NOT NULL
-    AND COALESCE(r.status, 'pending') NOT IN ('rejected', 'deleted')
+    AND COALESCE(r.status, 'active') != 'removed'
   LIMIT p_limit;
 
   RETURN jsonb_build_object(

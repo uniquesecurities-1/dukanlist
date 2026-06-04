@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1E3A8A">
 <title>For Doctors, CAs, Lawyers & Professionals — DukanList</title>
-<meta name="description" content="A dignified, free local directory for every professional in Sirsa · Bathinda · Mansa · Muktsar. Doctors, CAs, Lawyers, Principals, NGOs, Factory owners — listed with pride. No commission. No paid ranking. Forever free.">
+<meta name="description" content="A dignified, free local directory for every professional in Sirsa-Bathinda. Doctors, CAs, Lawyers, Principals, NGOs, Factory owners — listed with pride. No commission. No paid ranking. Forever free.">
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css?v=20260531">
+<link rel="stylesheet" href="/assets/css/main.css">
 <style>
   /* ===== Premium dignified landing — calmer palette than the shop hero ===== */
   body{ background:linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 60%) }
@@ -197,12 +197,13 @@
   html[data-lang="en"] [data-i18n-hi]{ display:none }
 </style>
 
-<!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
+<!-- Premium polish layer -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=3">
 
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
+<!-- Monitoring: client error capture + Vercel Analytics -->
 <script src="/assets/js/error-reporter.js" defer></script>
 <script src="/_vercel/insights/script.js" defer></script>
+
 </head>
 <body>
 
@@ -235,8 +236,8 @@
     <span data-i18n-hi>आपके काम को <span class="accent">सम्मान</span> चाहिए,<br>discount नहीं।</span>
   </h1>
   <p class="pro-sub">
-    <span data-i18n-en>DukanList is a free, no-commission, no-paid-ranking local directory for Sirsa, Bathinda, Mansa & Muktsar. Doctors, advocates, principals, factory owners, NGOs — every professional listed with their own role, their own dignity. Not as a "shopkeeper" — as <b>you, with your own identity.</b></span>
-    <span data-i18n-hi>DukanList एक FREE, बिना commission वाला local directory है Sirsa · Bathinda · Mansa · Muktsar के लिए। Doctor, वकील, प्राचार्य, factory owner, NGO — हर professional को अपनी पहचान के साथ listed किया जाता है। दुकानदार नहीं, <b>आप — अपनी पूरी पहचान के साथ।</b></span>
+    <span data-i18n-en>DukanList is a free, no-commission, no-paid-ranking local directory for Sirsa & Bathinda. Doctors, advocates, principals, factory owners, NGOs — every professional listed with their own role, their own dignity. Not as a "shopkeeper" — as <b>you, with your own identity.</b></span>
+    <span data-i18n-hi>DukanList एक FREE, बिना commission वाला local directory है Sirsa-Bathinda के लिए। Doctor, वकील, प्राचार्य, factory owner, NGO — हर professional को अपनी पहचान के साथ listed किया जाता है। दुकानदार नहीं, <b>आप — अपनी पूरी पहचान के साथ।</b></span>
   </p>
   <div class="pro-cta-row">
     <a class="pro-cta-pri" href="/register.html?ref=pro">
@@ -268,7 +269,7 @@
   <div class="promise-card">
     <div class="pc-ico">📍</div>
     <h4><span data-i18n-en>Local Only</span><span data-i18n-hi>केवल स्थानीय</span></h4>
-    <p><span data-i18n-en>Sirsa · Bathinda · Mansa · Muktsar only. No national spam. Real neighbours find real names.</span><span data-i18n-hi>केवल Sirsa · Bathinda · Mansa · Muktsar। National spam नहीं।</span></p>
+    <p><span data-i18n-en>Sirsa-Bathinda only. No national spam. Real neighbours find real names.</span><span data-i18n-hi>केवल Sirsa-Bathinda। National spam नहीं।</span></p>
   </div>
   <div class="promise-card">
     <div class="pc-ico">🛡️</div>
@@ -399,8 +400,8 @@
     <span data-i18n-en>Our promise</span><span data-i18n-hi>हमारा वादा</span>
   </h3>
   <p>
-    <span data-i18n-en>"Har local professional ki ek dignified online pehchaan honi chahiye — doctors, lawyers, CAs, principals, factory owners, NGO heads — sabke liye. Verified, respected, aur apni sahi role ke saath. DukanList isi soch par bana hai. Yahi hamara mission hai."</span>
-    <span data-i18n-hi>"हर स्थानीय professional की एक dignified online पहचान होनी चाहिए — doctors, lawyers, CAs, principals, factory owners, NGO heads — सबके लिए। Verified, respected, और अपनी सही role के साथ। DukanList इसी सोच पर बना है। यही हमारा mission है।"</span>
+    <span data-i18n-en>"DukanList ek naam hai — par concept nahin. Yeh platform doctors, lawyers, CAs, principals, factory owners, NGO heads — har local naam ka hai. Paisa baad mein kamayenge — pehle har professional ko apni garima (dignity) mile."</span>
+    <span data-i18n-hi>"DukanList एक नाम है — पर concept नहीं। यह platform doctors, lawyers, CAs, principals, factory owners, NGO heads — हर स्थानीय नाम का है। पैसा बाद में कमायेंगे — पहले हर professional को अपनी गरिमा मिले।"</span>
   </p>
   <p style="margin-top:14px; font-size:.84rem; color:#94A3B8">
     <span data-i18n-en>— Deepak & Navneet Singla, Founders</span>
@@ -461,4 +462,10 @@ function setLang(lang){
 }
 (function(){
   var saved = 'en';
-  try { saved = localStorage.getItem('site_lang') || 'en'; 
+  try { saved = localStorage.getItem('site_lang') || 'en'; } catch(_){}
+  setLang(saved);
+})();
+</script>
+
+</body>
+</html>
