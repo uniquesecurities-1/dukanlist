@@ -1201,4 +1201,55 @@ function toggleFAQ(qEl){
   item.classList.toggle('open');
   // Toggle + / x icon
   const icon = qEl.querySelector('.faq-q-icon');
-  if (icon) icon.textContent = item.classList.contains('open') ? '\u00d7
+  if (icon) icon.textContent = item.classList.contains('open') ? '\u00d7' : '+';
+}
+
+// ============= Mock Dashboard KPI Counter =============
+function animateMockKPIs(){
+  document.querySelectorAll('.mock-kpi-val[data-target]').forEach(el => {
+    const target = parseInt(el.dataset.target || '0', 10);
+    if (!target) return;
+    const dur = 1500;
+    const start = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.floor(eased * target);
+      if (t < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Initialize Phase 2 features
+(function(){
+  function initPhase2(){
+    renderTestimonial();
+    setInterval(rotateTestimonial, 6000);
+    // Animate KPIs when scrolled into view
+    const mock = document.querySelector('.mock-dash');
+    if (mock && 'IntersectionObserver' in window){
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting){
+            animateMockKPIs();
+            obs.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+      obs.observe(mock);
+    } else {
+      animateMockKPIs();
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPhase2);
+  else initPhase2();
+})();
+</script>
+
+<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
+<script src="/assets/js/error-reporter.js" defer></script>
+<script src="/_vercel/insights/script.js" defer></script>
+</body>
+</html>
