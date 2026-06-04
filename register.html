@@ -2174,4 +2174,37 @@ async function runHindiAutoFill(){
 }
 </script>
 <script>
-// ============= Referral Tracking ======
+// ============= Referral Tracking =============
+(function(){
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && /^[a-z][a-z0-9-]{2,60}$/.test(ref)){
+      // Save in sessionStorage for use on submit
+      sessionStorage.setItem('dl_ref_track', ref);
+      // Increment referrer's click counter in localStorage (visible only on owner's device, but useful for self-tracking)
+      const key = 'dl_ref_clicks_' + ref;
+      const n = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+      localStorage.setItem(key, String(n));
+      // Show a friendly banner
+      setTimeout(() => {
+        const banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#FFF7ED;border:2px solid #FB923C;color:#9A3412;padding:10px 18px;border-radius:99px;font-size:.88rem;font-weight:700;box-shadow:0 6px 20px rgba(251,146,60,0.3);z-index:100;animation:slideDownRef 0.5s ease-out';
+        banner.innerHTML = '🎁 Referred by a DukanList member &mdash; welcome!';
+        document.body.appendChild(banner);
+        const style = document.createElement('style');
+        style.textContent = '@keyframes slideDownRef { from { opacity:0; transform: translateX(-50%) translateY(-20px) } to { opacity:1; transform: translateX(-50%) translateY(0) } }';
+        document.head.appendChild(style);
+        setTimeout(() => { banner.style.opacity = '0'; banner.style.transition = 'opacity 0.5s'; }, 4500);
+        setTimeout(() => banner.remove(), 5000);
+      }, 600);
+    }
+  } catch(_){}
+})();
+</script>
+
+<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
+<script src="/assets/js/error-reporter.js" defer></script>
+<script src="/_vercel/insights/script.js" defer></script>
+</body>
+</html>
