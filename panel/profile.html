@@ -871,9 +871,11 @@ async function saveProfile(){
     .map(f => ({ q: (f.q||'').trim(), a: (f.a||'').trim() }))
     .filter(f => f.q && f.a);
 
-  // Collect trust signals
+  // Collect trust signals — cap establishedYear at current year (future
+  // founding dates are nonsensical and were being silently accepted).
+  const currentYear = new Date().getFullYear();
   const yearVal = parseInt(document.getElementById('establishedYear').value, 10);
-  const establishedYear = (yearVal >= 1900 && yearVal <= 2030) ? yearVal : null;
+  const establishedYear = (yearVal >= 1900 && yearVal <= currentYear) ? yearVal : null;
   const paymentMethods = Array.from(document.querySelectorAll('input[data-payment]:checked')).map(cb => cb.value);
   const specialFeatures = document.getElementById('specialFeatures').value
     .split(',').map(s => s.trim()).filter(s => s.length > 0 && s.length < 60).slice(0, 6);
@@ -1118,8 +1120,4 @@ window.addEventListener('DOMContentLoaded', () => {
 <!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
 <script src="/assets/js/owner-notifications.js" defer></script>
 
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
-<script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
-</body>
-</html>
+<!-- Monitoring: client error capture + Vercel Analytics (defer

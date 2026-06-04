@@ -1554,8 +1554,10 @@ async function handleSubmit(){
   // NEW: Email + password validation
   const loginEmail = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
   const loginPassword = document.getElementById('loginPassword').value || '';
-  if (!loginEmail || loginEmail.indexOf('@') === -1){
-    return showErr(errEl, 'Please enter a valid email — needed to manage your shop later.');
+  // Proper email validation — was loginEmail.indexOf('@') === -1 which
+  // accepted strings like "a@b", "@", "foo@.". Now uses RFC-friendly regex.
+  if (!loginEmail || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(loginEmail)){
+    return showErr(errEl, 'Please enter a valid email address (e.g. you@gmail.com) — needed to manage your shop later.');
   }
   if (loginPassword.length < 8){
     return showErr(errEl, 'Password must be at least 8 characters — pick a strong one.');
@@ -2167,11 +2169,4 @@ async function runHindiAutoFill(){
       hiEl.value = hindiResult;
       _lastTransliteratedSource = hindiResult;
     }
-    if (status) status.textContent = '✓ Auto-filled (edit if wrong)';
-  } catch (e) {
-    if (status) status.textContent = '⚠️ Auto-fill failed — please type Hindi name manually';
-  }
-}
-</script>
-<script>
-// ============= Referral Tracking ======
+    if (status) status.textContent = '✓ Auto-filled (

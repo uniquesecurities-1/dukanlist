@@ -170,6 +170,33 @@ module.exports = async (req, res) => {
     });
   }
 
+  // ===== 5.5 MIME magic-byte verification =====
+  // Don't trust the declared mime — sniff the first few bytes to confirm
+  // it's actually a real image. Prevents disguised binary uploads.
+  function detectMime(buf) {
+    if (!buf || buf.length < 12) return null;
+    // JPEG: FF D8 FF
+    if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return 'image/jpeg';
+    // PNG: 89 50 4E 47 0D 0A 1A 0A
+    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return 'image/png';
+    // WebP: RIFF .... WEBP
+    if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
+        buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return 'image/webp';
+    return null;
+  }
+  const realMime = detectMime(fileBuf);
+  if (!realMime) {
+    return res.status(400).json({
+      error: 'File is not a valid image',
+      detail: 'Only JPEG, PNG, or WebP images are allowed. Magic-byte check failed.'
+    });
+  }
+  // Normalize declared mime to detected one (handle image/jpg alias)
+  if (realMime !== mime.replace('image/jpg', 'image/jpeg')) {
+    // Declared mime doesn't match actual bytes — use detected one and continue
+    console.warn('[upload] declared mime', mime, 'but detected', realMime, '— using detected.');
+  }
+
   // ===== 5.5 OPTIONAL: AI image moderation =====
   // Only runs if both env vars are set (Cloudflare Worker deployed).
   // See workers/image-moderation/worker.js + IMAGE-MODERATION-SETUP.md
@@ -246,35 +273,4 @@ module.exports = async (req, res) => {
     + '/storage/v1/object/public/' + BUCKET + '/' + storagePath;
 
   // ===== 9. Append to businesses.photos — ATOMIC via RPC =====
-  // Old version did read-then-PATCH-whole-array which had a lost-update
-  // race when 2 photos uploaded concurrently. db/100 added
-  // owner_append_shop_photo() which does the append in a single
-  // SELECT FOR UPDATE → array_append → UPDATE transaction.
-  // Call the atomic RPC with the user's JWT so auth.uid() resolves
-  // correctly inside the SECURITY DEFINER function (it checks the
-  // business_owners table to verify the caller owns this business).
-  const rpcRes = await sbAdmin('/rest/v1/rpc/owner_append_shop_photo', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + jwt },  // override service-role with user JWT
-    body: JSON.stringify({
-      p_business_id: businessId,
-      p_url:         publicUrl,
-      p_max_photos:  MAX_PHOTOS
-    })
-  });
-  if (!rpcRes.ok) {
-    // Race-aware fallback: clean up the uploaded storage blob
-    try {
-      await fetch(SUPABASE_URL + '/storage/v1/object/' + BUCKET + '/' + storagePath, {
-        method: 'DELETE',
-        headers: { apikey: SERVICE_KEY, Authorization: 'Bearer ' + SERVICE_KEY }
-      });
-    } catch(_){}
-    return res.status(500).json({
-      error: 'Failed to update business photos',
-      detail: (rpcRes.body && rpcRes.body.message) || rpcRes.body || 'RPC error'
-    });
-  }
-  const updatedPhotos = (rpcRes.body && rpcRes.body.photos) || null;
-
-  /
+  // Old version did read-then-PATCH-whole-arra
