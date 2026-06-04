@@ -237,4 +237,59 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       error: 'Storage upload failed',
       detail: errTxt,
-      sta
+      status: uploadRes.status
+    });
+  }
+
+  // ===== 8. Build public URL =====
+  const publicUrl = SUPABASE_URL.replace(/\/$/, '')
+    + '/storage/v1/object/public/' + BUCKET + '/' + storagePath;
+
+  // ===== 9. Append to businesses.photos =====
+  const newPhotos = [...currentPhotos, publicUrl];
+  const updRes = await sbAdmin(
+    '/rest/v1/businesses?id=eq.' + encodeURIComponent(businessId),
+    {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ photos: newPhotos, updated_at: new Date().toISOString() })
+    }
+  );
+  if (!updRes.ok) {
+    // Try to clean up uploaded file
+    try {
+      await fetch(SUPABASE_URL + '/storage/v1/object/' + BUCKET + '/' + storagePath, {
+        method: 'DELETE',
+        headers: { apikey: SERVICE_KEY, Authorization: 'Bearer ' + SERVICE_KEY }
+      });
+    } catch(_){}
+    return res.status(500).json({ error: 'Failed to update business photos', detail: updRes.body });
+  }
+
+  // ===== 10. Best-effort activate pending business after first photo =====
+  try {
+    if (biz.status === 'pending' && currentPhotos.length === 0) {
+      await sbAdmin('/rest/v1/rpc/activate_business_after_photos', {
+        method: 'POST',
+        body: JSON.stringify({ p_business_id: businessId })
+      });
+    }
+  } catch(_){}
+
+  return res.status(200).json({
+    ok: true,
+    url: publicUrl,
+    path: storagePath,
+    business_id: businessId,
+    photos_now: newPhotos.length
+  });
+};
+
+// Allow up to 15MB JSON body (10MB raw file = ~13.3MB base64)
+module.exports.config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '15mb'
+    }
+  }
+};

@@ -258,3 +258,28 @@ function timeAgo(ts){
   if (!ts) return '';
   const d = new Date(ts);
   const s = Math.round((Date.now() - d.getTime())/1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.round(s/60) + 'm ago';
+  if (s < 86400) return Math.round(s/3600) + 'h ago';
+  return Math.round(s/86400) + 'd ago';
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function clearOld(){
+  if (!confirm('Delete error logs older than 30 days? This cannot be undone.')) return;
+  const c = (window.ShopDB && window.ShopDB.client) || null;
+  if (!c) { alert('Supabase client not ready'); return; }
+  try {
+    const { data, error } = await c.rpc('admin_clear_error_logs', { p_older_than_days: 30 });
+    if (error) throw error;
+    alert('Deleted ' + (data || 0) + ' old rows.');
+    loadErrors();
+  } catch(e){
+    alert('Failed: ' + (e.message || e));
+  }
+}
+</script>
+</body>
+</html>
