@@ -994,35 +994,4 @@ async function performBulkAction(action){
     alert('Bulk action failed: ' + r.error.message);
     return;
   }
-  const changed = r.data?.changed_count ?? 0;
-  showToast('✓ ' + changed + ' shop' + (changed === 1 ? '' : 's') + ' updated', 'success');
-  clearBulkSelection();
-  // Reload all panels so the moved shops disappear from their old tabs
-  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
-}
-
-function showToast(msg, kind){
-  // Use existing toast() if available, else fallback
-  if (typeof toast === 'function'){ toast(msg, kind); return; }
-  alert(msg);
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-function escapeJs(s){
-  return String(s == null ? '' : s).replace(/[\\'"]/g, ch => '\\' + ch);
-}
-
-async function logout(){
-  if (!confirm('Logout from admin panel?')) return;
-  await C.auth.signOut();
-  window.location.href = '/admin/login';
-}
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+  const changed = r.data?.changed_coun
