@@ -1208,7 +1208,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               <div class="vg-t-main" data-i18n-en>WhatsApp is fastest</div>
               <div class="vg-t-main" data-i18n-hi>WhatsApp सबसे तेज़</div>
               <div class="vg-t-sub" data-i18n-en>Most owners reply within 30 minutes</div>
-              <div class="vg-t-sub" data-i18n-hi>ज़्यादातर दुकानदार 30 minutes में जवाब देते हैं</div>
+              <div class="vg-t-sub" data-i18n-hi>ज़्यादातर मालिक 30 minutes में जवाब देते हैं</div>
             </div>
           </div>
           <div class="vg-row">
@@ -1226,7 +1226,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               <div class="vg-t-main" data-i18n-en>Mention DukanList</div>
               <div class="vg-t-main" data-i18n-hi>DukanList का नाम लें</div>
               <div class="vg-t-sub" data-i18n-en>Owner will know you found them here — better service</div>
-              <div class="vg-t-sub" data-i18n-hi>दुकानदार समझेगा कि आप यहाँ से आए हैं — बेहतर service</div>
+              <div class="vg-t-sub" data-i18n-hi>मालिक समझेगा कि आप यहाँ से आए हैं — बेहतर service</div>
             </div>
           </div>
         </div>
@@ -1477,7 +1477,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <div class="modal-card" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeQAModal()" aria-label="Close">×</button>
     <h3 style="font-family:'Manrope',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:6px"><span data-i18n-en>Ask a public question</span><span data-i18n-hi>सार्वजनिक सवाल पूछें</span></h3>
-    <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;line-height:1.5"><span data-i18n-en>Your question will be visible to everyone. The shop owner will answer publicly. Don\'t share personal info.</span><span data-i18n-hi>आपका सवाल सबको दिखेगा। दुकानदार जवाब सबके सामने देगा। निजी जानकारी न लिखें।</span></p>
+    <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;line-height:1.5"><span data-i18n-en>Your question will be visible to everyone. The shop owner will answer publicly. Don\'t share personal info.</span><span data-i18n-hi>आपका सवाल सबको दिखेगा। मालिक जवाब सबके सामने देगा। निजी जानकारी न लिखें।</span></p>
     <div style="margin-bottom:12px">
       <label style="display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px"><span data-i18n-en>Your name (optional)</span><span data-i18n-hi>आपका नाम (वैकल्पिक)</span></label>
       <input id="qaAskerName" type="text" maxlength="60" placeholder="e.g., Ramesh" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.92rem;font-family:inherit">
@@ -3072,7 +3072,7 @@ async function loadShopQA(bizId){
       const ago = fmtAgo(q.created_at);
       const aBlock = q.answer_text
         ? '<div style="background:#F0FDF4;border-left:3px solid #15803D;padding:10px 12px;border-radius:0 8px 8px 0;margin-top:8px">'
-          + '<div style="font-size:.74rem;font-weight:800;color:#15803D;margin-bottom:4px">✓ ' + (lang === 'hi' ? 'दुकानदार का जवाब' : 'Owner answered') + ' · ' + fmtAgo(q.answered_at) + '</div>'
+          + '<div style="font-size:.74rem;font-weight:800;color:#15803D;margin-bottom:4px">✓ ' + (lang === 'hi' ? 'मालिक का जवाब' : 'Owner answered') + ' · ' + fmtAgo(q.answered_at) + '</div>'
           + '<div style="font-size:.88rem;color:#14532D;line-height:1.5">' + escapeHTML(q.answer_text) + '</div></div>'
         : '<div style="font-size:.76rem;color:#94a3b8;margin-top:6px;font-style:italic">'
           + (lang === 'hi' ? '⏳ जवाब का इंतज़ार' : '⏳ Awaiting owner reply') + '</div>';
@@ -3174,7 +3174,7 @@ function copyShopUrl(){
     <div id="rpForm">
       <div class="rp-emoji">⭐</div>
       <div class="rp-title" id="rpTitle"><span data-i18n-en>Did you reach <span id="rpShopName">them</span>?</span><span data-i18n-hi>क्या आप <span id="rpShopNameHi">उनसे</span> मिल पाए?</span></div>
-      <div class="rp-sub"><span data-i18n-en>Your review helps other customers and the shop owner.</span><span data-i18n-hi>आपका रिव्यू दूसरे ग्राहकों और दुकानदार दोनों के काम आता है।</span></div>
+      <div class="rp-sub"><span data-i18n-en>Your review helps other customers and the shop owner.</span><span data-i18n-hi>आपका रिव्यू दूसरे ग्राहकों और व्यवसायी दोनों के काम आता है।</span></div>
       <div class="rp-stars" id="rpStars" role="radiogroup" aria-label="Rate 1 to 5 stars">
         <span class="rp-star" data-rating="1" role="radio" aria-label="1 star">★</span>
         <span class="rp-star" data-rating="2" role="radio" aria-label="2 stars">★</span>

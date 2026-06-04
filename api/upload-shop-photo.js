@@ -245,51 +245,36 @@ module.exports = async (req, res) => {
   const publicUrl = SUPABASE_URL.replace(/\/$/, '')
     + '/storage/v1/object/public/' + BUCKET + '/' + storagePath;
 
-  // ===== 9. Append to businesses.photos =====
-  const newPhotos = [...currentPhotos, publicUrl];
-  const updRes = await sbAdmin(
-    '/rest/v1/businesses?id=eq.' + encodeURIComponent(businessId),
-    {
-      method: 'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({ photos: newPhotos, updated_at: new Date().toISOString() })
-    }
-  );
-  if (!updRes.ok) {
-    // Try to clean up uploaded file
+  // ===== 9. Append to businesses.photos — ATOMIC via RPC =====
+  // Old version did read-then-PATCH-whole-array which had a lost-update
+  // race when 2 photos uploaded concurrently. db/100 added
+  // owner_append_shop_photo() which does the append in a single
+  // SELECT FOR UPDATE → array_append → UPDATE transaction.
+  // Call the atomic RPC with the user's JWT so auth.uid() resolves
+  // correctly inside the SECURITY DEFINER function (it checks the
+  // business_owners table to verify the caller owns this business).
+  const rpcRes = await sbAdmin('/rest/v1/rpc/owner_append_shop_photo', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + jwt },  // override service-role with user JWT
+    body: JSON.stringify({
+      p_business_id: businessId,
+      p_url:         publicUrl,
+      p_max_photos:  MAX_PHOTOS
+    })
+  });
+  if (!rpcRes.ok) {
+    // Race-aware fallback: clean up the uploaded storage blob
     try {
       await fetch(SUPABASE_URL + '/storage/v1/object/' + BUCKET + '/' + storagePath, {
         method: 'DELETE',
         headers: { apikey: SERVICE_KEY, Authorization: 'Bearer ' + SERVICE_KEY }
       });
     } catch(_){}
-    return res.status(500).json({ error: 'Failed to update business photos', detail: updRes.body });
+    return res.status(500).json({
+      error: 'Failed to update business photos',
+      detail: (rpcRes.body && rpcRes.body.message) || rpcRes.body || 'RPC error'
+    });
   }
+  const updatedPhotos = (rpcRes.body && rpcRes.body.photos) || null;
 
-  // ===== 10. Best-effort activate pending business after first photo =====
-  try {
-    if (biz.status === 'pending' && currentPhotos.length === 0) {
-      await sbAdmin('/rest/v1/rpc/activate_business_after_photos', {
-        method: 'POST',
-        body: JSON.stringify({ p_business_id: businessId })
-      });
-    }
-  } catch(_){}
-
-  return res.status(200).json({
-    ok: true,
-    url: publicUrl,
-    path: storagePath,
-    business_id: businessId,
-    photos_now: newPhotos.length
-  });
-};
-
-// Allow up to 15MB JSON body (10MB raw file = ~13.3MB base64)
-module.exports.config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '15mb'
-    }
-  }
-};
+  /
