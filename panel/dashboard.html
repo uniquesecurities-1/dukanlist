@@ -534,6 +534,137 @@
 }
 .ps-lang-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A }
 .ps-photo-bg-toggle{ margin-left:auto }
+/* Phase 8.6 Studio Pro — Filter tabs, search, edit, stickers, color, fullscreen */
+.ps-toolbar{ display:flex; gap:6px; align-items:center; margin-bottom:10px; flex-wrap:wrap; position:relative; z-index:1 }
+.ps-search{
+  flex:1; min-width:160px; background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.08); color:#fff;
+  padding:8px 12px; border-radius:10px; font-size:.86rem;
+  font-family:inherit; outline:none;
+}
+.ps-search::placeholder{ color:rgba(255,255,255,.4) }
+.ps-search:focus{ border-color:#FBBF24 }
+.ps-filter-tabs{ display:flex; gap:4px; padding:3px; background:rgba(0,0,0,.25); border-radius:99px; border:1px solid rgba(255,255,255,.06); overflow-x:auto; scrollbar-width:none }
+.ps-filter-tabs::-webkit-scrollbar{ display:none }
+.ps-filter-btn{
+  background:transparent; border:none; color:rgba(255,255,255,.55);
+  padding:5px 10px; font-size:.7rem; font-weight:800; cursor:pointer;
+  border-radius:99px; transition:.15s; font-family:inherit;
+  letter-spacing:.04em; white-space:nowrap;
+}
+.ps-filter-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A }
+.ps-filter-btn:hover:not(.active){ color:#fff }
+
+/* Template heart (favorite) */
+.ps-tmpl-fav{
+  position:absolute; top:4px; right:4px;
+  width:22px; height:22px; border-radius:50%;
+  background:rgba(0,0,0,.55); display:grid; place-items:center;
+  cursor:pointer; transition:.15s; z-index:2; font-size:11px;
+}
+.ps-tmpl-fav:hover{ transform:scale(1.15) }
+.ps-tmpl-fav.faved{ background:#FBBF24; color:#0F172A }
+
+/* Edit text panel — collapsible */
+.ps-edit-panel{
+  background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.06);
+  border-radius:14px; padding:12px; margin-bottom:14px;
+  position:relative; z-index:1; display:none;
+}
+.ps-edit-panel.open{ display:block }
+.ps-edit-toggle{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  color:#fff; padding:7px 14px; border-radius:99px;
+  font-weight:700; font-size:.76rem; cursor:pointer;
+  font-family:inherit; transition:.15s; margin-right:6px; margin-bottom:8px;
+}
+.ps-edit-toggle:hover{ background:rgba(255,255,255,.12) }
+.ps-edit-toggle.active{ background:rgba(251,191,36,.18); color:#FBBF24; border-color:rgba(251,191,36,.35) }
+.ps-edit-row{ margin-bottom:9px }
+.ps-edit-row:last-child{ margin-bottom:0 }
+.ps-edit-label{
+  display:block; font-size:.66rem; color:rgba(255,255,255,.55);
+  text-transform:uppercase; letter-spacing:.1em; font-weight:800;
+  margin-bottom:4px;
+}
+.ps-edit-input{
+  width:100%; background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08); color:#fff;
+  padding:8px 10px; border-radius:8px; font-size:.86rem;
+  font-family:inherit; outline:none;
+}
+.ps-edit-input:focus{ border-color:#FBBF24 }
+
+/* Sticker chips */
+.ps-stickers{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px }
+.ps-sticker-btn{
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  color:#fff; padding:6px 12px; border-radius:99px;
+  font-weight:900; font-size:.72rem; cursor:pointer;
+  font-family:inherit; letter-spacing:.05em; transition:.15s;
+}
+.ps-sticker-btn:hover{ background:rgba(255,255,255,.12) }
+.ps-sticker-btn.on{ border-color:transparent; transform:scale(1.05) }
+.ps-sticker-btn[data-sticker="NEW"].on   { background:#10B981; color:#fff }
+.ps-sticker-btn[data-sticker="SALE"].on  { background:#DC2626; color:#fff }
+.ps-sticker-btn[data-sticker="OFFER"].on { background:#F97316; color:#fff }
+.ps-sticker-btn[data-sticker="FREE"].on  { background:#A855F7; color:#fff }
+.ps-sticker-btn[data-sticker="HOT"].on   { background:#EF4444; color:#fff }
+.ps-sticker-btn[data-sticker="TOP"].on   { background:#FBBF24; color:#0F172A }
+
+/* Color picker */
+.ps-color-row{ display:flex; align-items:center; gap:10px; margin-top:6px }
+.ps-color-swatches{ display:flex; gap:5px; flex-wrap:wrap }
+.ps-color-swatch{
+  width:28px; height:28px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; transition:.15s;
+  display:grid; place-items:center;
+}
+.ps-color-swatch:hover{ transform:scale(1.15) }
+.ps-color-swatch.active{ border-color:#fff; box-shadow:0 0 0 2px #FBBF24 }
+
+/* Multi-photo picker (when shop has multiple photos) */
+.ps-photo-picker{ display:flex; gap:6px; overflow-x:auto; margin-top:6px; scrollbar-width:none }
+.ps-photo-picker::-webkit-scrollbar{ display:none }
+.ps-photo-thumb{
+  flex:0 0 56px; width:56px; height:56px; border-radius:8px;
+  background-size:cover; background-position:center; cursor:pointer;
+  border:2px solid transparent; transition:.15s;
+}
+.ps-photo-thumb:hover{ transform:scale(1.05) }
+.ps-photo-thumb.active{ border-color:#FBBF24; box-shadow:0 0 0 2px rgba(251,191,36,.3) }
+
+/* Fullscreen preview modal */
+.ps-fs-btn{
+  position:absolute; top:24px; right:24px;
+  width:34px; height:34px; border-radius:8px;
+  background:rgba(0,0,0,.5); color:#fff; border:none;
+  cursor:pointer; font-size:1.1rem; z-index:5; transition:.15s;
+}
+.ps-fs-btn:hover{ background:rgba(0,0,0,.75); transform:scale(1.05) }
+.ps-fs-modal{
+  position:fixed; inset:0; background:rgba(0,0,0,.92);
+  z-index:99999; display:none; align-items:center; justify-content:center;
+  padding:20px; backdrop-filter:blur(8px);
+}
+.ps-fs-modal.open{ display:flex }
+.ps-fs-modal canvas{ max-width:95%; max-height:90vh; border-radius:14px; box-shadow:0 40px 80px rgba(0,0,0,.7) }
+.ps-fs-close{
+  position:absolute; top:20px; right:20px;
+  width:42px; height:42px; border-radius:50%;
+  background:#fff; color:#000; border:none; font-size:1.3rem;
+  cursor:pointer; font-weight:900;
+}
+
+/* Share count badge */
+.ps-share-count{
+  display:inline-flex; align-items:center; gap:4px;
+  background:rgba(255,255,255,.08); color:rgba(255,255,255,.7);
+  padding:3px 9px; border-radius:99px; font-size:.66rem; font-weight:800;
+  margin-left:6px; letter-spacing:.04em;
+}
+
 @media (max-width:540px){
   .ps-gallery{ grid-template-columns:repeat(3,1fr); max-height:280px }
   .ps-tmpl-name{ font-size:.5rem }
@@ -828,20 +959,84 @@
 
       <!-- Live preview -->
       <div class="ps-preview-wrap" id="psPreviewWrap">
+        <button type="button" class="ps-fs-btn" id="psFsBtn" title="Fullscreen preview">⛶</button>
         <canvas id="aajPosterCanvas" width="1080" height="1080"></canvas>
       </div>
 
-      <!-- Template Gallery (30+ designs) -->
+      <!-- Template Gallery (30+ designs) — Studio Pro -->
       <div class="ps-gallery-label">
         <span>Choose template <span class="ps-count" id="psTmplCount">30</span></span>
         <span style="display:flex;align-items:center;gap:8px">
+          <span class="ps-share-count" id="psShareCount">📤 0 shared</span>
           <span class="ps-lang-toggle" id="psLangToggle">
             <button type="button" class="ps-lang-btn active" data-lang="en">EN</button>
             <button type="button" class="ps-lang-btn" data-lang="hi">हिं</button>
           </span>
         </span>
       </div>
+
+      <!-- Toolbar: Search + Filter tabs -->
+      <div class="ps-toolbar">
+        <input type="text" class="ps-search" id="psSearch" placeholder="🔎 Search templates…">
+        <div class="ps-filter-tabs">
+          <button type="button" class="ps-filter-btn active" data-filter="all">All</button>
+          <button type="button" class="ps-filter-btn" data-filter="favorites">★ Saved</button>
+          <button type="button" class="ps-filter-btn" data-filter="festival">🎉 Festival</button>
+          <button type="button" class="ps-filter-btn" data-filter="minimal">Minimal</button>
+          <button type="button" class="ps-filter-btn" data-filter="bold">Bold</button>
+          <button type="button" class="ps-filter-btn" data-filter="photo">📷 Photo</button>
+        </div>
+      </div>
+
       <div class="ps-gallery" id="psGallery"></div>
+
+      <!-- Edit panel toggles -->
+      <button type="button" class="ps-edit-toggle" id="psEditTextBtn">✏️ Edit Text</button>
+      <button type="button" class="ps-edit-toggle" id="psStickersBtn">🏷️ Stickers</button>
+      <button type="button" class="ps-edit-toggle" id="psColorBtn">🎨 Color</button>
+
+      <!-- Edit Text Panel -->
+      <div class="ps-edit-panel" id="psEditTextPanel">
+        <div class="ps-edit-row">
+          <label class="ps-edit-label">Custom Headline</label>
+          <input type="text" class="ps-edit-input" id="psCustomHeadline" placeholder="e.g. Special Diwali Offer" maxlength="60">
+        </div>
+        <div class="ps-edit-row">
+          <label class="ps-edit-label">Custom Subline</label>
+          <input type="text" class="ps-edit-input" id="psCustomSubline" placeholder="e.g. Up to 30% off this week" maxlength="80">
+        </div>
+      </div>
+
+      <!-- Sticker Panel -->
+      <div class="ps-edit-panel" id="psStickersPanel">
+        <label class="ps-edit-label">Add badges (tap to toggle)</label>
+        <div class="ps-stickers">
+          <button type="button" class="ps-sticker-btn" data-sticker="NEW">NEW</button>
+          <button type="button" class="ps-sticker-btn" data-sticker="SALE">SALE</button>
+          <button type="button" class="ps-sticker-btn" data-sticker="OFFER">OFFER</button>
+          <button type="button" class="ps-sticker-btn" data-sticker="FREE">FREE</button>
+          <button type="button" class="ps-sticker-btn" data-sticker="HOT">HOT</button>
+          <button type="button" class="ps-sticker-btn" data-sticker="TOP">TOP</button>
+        </div>
+      </div>
+
+      <!-- Color Panel -->
+      <div class="ps-edit-panel" id="psColorPanel">
+        <label class="ps-edit-label">Accent color (overrides template)</label>
+        <div class="ps-color-row">
+          <div class="ps-color-swatches" id="psColorSwatches">
+            <span class="ps-color-swatch active" data-color="" style="background:linear-gradient(135deg,#fff 50%,#000 50%)" title="Template default"></span>
+            <span class="ps-color-swatch" data-color="#FBBF24" style="background:#FBBF24"></span>
+            <span class="ps-color-swatch" data-color="#FF6B1A" style="background:#FF6B1A"></span>
+            <span class="ps-color-swatch" data-color="#DC2626" style="background:#DC2626"></span>
+            <span class="ps-color-swatch" data-color="#A855F7" style="background:#A855F7"></span>
+            <span class="ps-color-swatch" data-color="#10B981" style="background:#10B981"></span>
+            <span class="ps-color-swatch" data-color="#1E3A8A" style="background:#1E3A8A"></span>
+            <span class="ps-color-swatch" data-color="#FFFFFF" style="background:#fff;border:1px solid #ccc"></span>
+            <span class="ps-color-swatch" data-color="#0F172A" style="background:#0F172A"></span>
+          </div>
+        </div>
+      </div>
 
       <!-- Quick toggles -->
       <div class="ps-toggles">
@@ -2392,16 +2587,13 @@ function initAajKaPoster(biz){
   const card = document.getElementById('aajPosterCard');
   if (!card) return;
 
-  // ── Build shop data ─────────────────────────────────────
+  // ── Shop data ──────────────────────────────────────────
   let categorySlug = '';
   try {
     if (biz.categories && Array.isArray(biz.categories) && biz.categories.length) {
       categorySlug = String(biz.categories[0]?.slug || biz.categories[0] || '').toLowerCase();
-    } else if (biz.category) {
-      categorySlug = String(biz.category).toLowerCase();
-    } else if (biz.primary_category_slug) {
-      categorySlug = String(biz.primary_category_slug).toLowerCase();
-    }
+    } else if (biz.category) categorySlug = String(biz.category).toLowerCase();
+    else if (biz.primary_category_slug) categorySlug = String(biz.primary_category_slug).toLowerCase();
   } catch(_){}
 
   const shopData = {
@@ -2416,6 +2608,9 @@ function initAajKaPoster(biz){
     photo: (Array.isArray(biz.photos) && biz.photos[0]) || ''
   };
 
+  const allPhotos = Array.isArray(biz.photos) ? biz.photos.filter(Boolean) : [];
+
+  // ── State ──────────────────────────────────────────────
   const state = {
     format: 'square',
     tmpl: null,
@@ -2424,59 +2619,121 @@ function initAajKaPoster(biz){
     showRating: true,
     showPhone: true,
     showAddress: false,
-    usePhotoBg: false
+    usePhotoBg: false,
+    photoOverride: null,
+    filter: 'all',
+    search: '',
+    customHeadline: '',
+    customSubline: '',
+    customAccent: '',
+    stickers: []
   };
 
-  // ── Festival banner ────────────────────────────────────
-  let festival = null;
-  if (window.FestivalEngine && FestivalEngine.getActiveFestival) {
-    festival = FestivalEngine.getActiveFestival();
+  // Favorites + share count from localStorage
+  function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_tmpl_favs') || '[]'); } catch(_){ return []; } }
+  function setFavs(arr){ try { localStorage.setItem('dl_tmpl_favs', JSON.stringify(arr)); } catch(_){} }
+  function isFav(id){ return getFavs().indexOf(id) > -1; }
+  function toggleFav(id){
+    let f = getFavs();
+    const i = f.indexOf(id);
+    if (i > -1) f.splice(i, 1); else f.push(id);
+    setFavs(f);
+    return f.indexOf(id) > -1;
   }
-  const fbEl = document.getElementById('psFestivalBanner');
-  if (festival && fbEl) {
+
+  function getShareCount(){ try { return parseInt(localStorage.getItem('dl_tmpl_shares')||'0',10)||0; } catch(_){ return 0; } }
+  function bumpShareCount(){
+    try {
+      const n = getShareCount() + 1;
+      localStorage.setItem('dl_tmpl_shares', String(n));
+      const el = document.getElementById('psShareCount');
+      if (el) el.textContent = '📤 ' + n + ' shared';
+    } catch(_){}
+  }
+  document.getElementById('psShareCount').textContent = '📤 ' + getShareCount() + ' shared';
+
+  // Festival banner
+  let festival = null;
+  if (window.FestivalEngine && FestivalEngine.getActiveFestival) festival = FestivalEngine.getActiveFestival();
+  if (festival) {
+    const fbEl = document.getElementById('psFestivalBanner');
     document.getElementById('psFestivalIcon').textContent = festival.emoji || '🎉';
     document.getElementById('psFestivalText').textContent = festival.nameEn + ' theme available';
     const days = festival.daysAway;
-    const dayLbl = days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : days + ' days away';
-    document.getElementById('psFestivalDays').textContent = dayLbl + ' — pick a festival template';
+    document.getElementById('psFestivalDays').textContent = (days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : days + ' days away') + ' — pick festival template';
     fbEl.style.display = 'flex';
   }
 
-  // ── Build template gallery ─────────────────────────────
-  const templates = TemplateMegaPack.getRelevantTemplates(shopData.category);
-  document.getElementById('psTmplCount').textContent = templates.length;
-  state.tmpl = templates[0];
+  // ── Filter helpers ─────────────────────────────────────
+  const allTemplates = TemplateMegaPack.getRelevantTemplates(shopData.category);
+  document.getElementById('psTmplCount').textContent = allTemplates.length;
 
+  function styleMatchesFilter(t, filt){
+    if (filt === 'all') return true;
+    if (filt === 'favorites') return isFav(t.id);
+    if (filt === 'festival') return t.style === 'festival' || t.id.indexOf('fest-') === 0;
+    if (filt === 'minimal') return t.style === 'minimal';
+    if (filt === 'bold') return t.style === 'bold-name' || t.style === 'cta';
+    if (filt === 'photo') return t.needsPhoto || t.style === 'photo-hero';
+    return true;
+  }
+
+  function filteredTemplates(){
+    const q = (state.search || '').toLowerCase().trim();
+    return allTemplates.filter(t => {
+      if (!styleMatchesFilter(t, state.filter)) return false;
+      if (q) return (t.name + ' ' + (t.nameHi||'') + ' ' + (t.category||'')).toLowerCase().indexOf(q) > -1;
+      return true;
+    });
+  }
+
+  state.tmpl = allTemplates[0];
+
+  // ── Build gallery ──────────────────────────────────────
   const gallery = document.getElementById('psGallery');
-  gallery.innerHTML = templates.map((t, i) =>
-    '<div class="ps-tmpl ' + (i === 0 ? 'active' : '') + '" data-tid="' + t.id + '">' +
-    '  <canvas data-thumb-for="' + t.id + '"></canvas>' +
-    '  <div class="ps-tmpl-name">' + t.name + '</div>' +
-    '</div>'
-  ).join('');
 
-  // Render thumbnails (small, async)
-  setTimeout(async () => {
-    for (const t of templates) {
+  async function rebuildGallery(){
+    const tmpls = filteredTemplates();
+    gallery.innerHTML = tmpls.map(t =>
+      '<div class="ps-tmpl ' + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
+      '  <div class="ps-tmpl-fav ' + (isFav(t.id) ? 'faved' : '') + '" data-fav="' + t.id + '">★</div>' +
+      '  <canvas data-thumb-for="' + t.id + '"></canvas>' +
+      '  <div class="ps-tmpl-name">' + t.name + '</div>' +
+      '</div>'
+    ).join('');
+    if (tmpls.length === 0) {
+      gallery.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:rgba(255,255,255,.5);font-size:.86rem">No templates match your filter</div>';
+      return;
+    }
+    // Render thumbs async
+    for (const t of tmpls) {
       const thumb = gallery.querySelector('[data-thumb-for="' + t.id + '"]');
       if (thumb) {
         try { await TemplateMegaPack.renderTemplate(thumb, shopData, t, { size: 200, lang: state.lang }); }
         catch(e){}
       }
     }
-  }, 200);
-
-  // Click handler
-  gallery.querySelectorAll('.ps-tmpl').forEach(el => {
-    el.addEventListener('click', () => {
-      gallery.querySelectorAll('.ps-tmpl').forEach(x => x.classList.remove('active'));
-      el.classList.add('active');
-      state.tmpl = templates.find(t => t.id === el.dataset.tid);
-      renderMain();
+    // Wire click + fav buttons
+    gallery.querySelectorAll('.ps-tmpl').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.classList.contains('ps-tmpl-fav')) return;
+        gallery.querySelectorAll('.ps-tmpl').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        state.tmpl = allTemplates.find(t => t.id === el.dataset.tid);
+        renderMain();
+      });
     });
-  });
+    gallery.querySelectorAll('.ps-tmpl-fav').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isNow = toggleFav(el.dataset.fav);
+        el.classList.toggle('faved', isNow);
+      });
+    });
+  }
+  setTimeout(rebuildGallery, 200);
 
-  // ── Format tabs ─────────────────────────────────────────
+  // ── Format tabs ────────────────────────────────────────
   card.querySelectorAll('.ps-format-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       card.querySelectorAll('.ps-format-btn').forEach(b => b.classList.remove('active'));
@@ -2489,6 +2746,29 @@ function initAajKaPoster(biz){
     });
   });
 
+  // ── Filter tabs ────────────────────────────────────────
+  card.querySelectorAll('.ps-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      card.querySelectorAll('.ps-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.filter = btn.dataset.filter;
+      rebuildGallery();
+    });
+  });
+
+  // ── Search ─────────────────────────────────────────────
+  const searchEl = document.getElementById('psSearch');
+  if (searchEl) {
+    let searchTimer;
+    searchEl.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        state.search = searchEl.value;
+        rebuildGallery();
+      }, 250);
+    });
+  }
+
   // ── Language toggle ────────────────────────────────────
   const langToggle = document.getElementById('psLangToggle');
   if (langToggle) {
@@ -2498,20 +2778,12 @@ function initAajKaPoster(biz){
         b.classList.add('active');
         state.lang = b.dataset.lang;
         renderMain();
-        // Re-render thumbnails in new lang
-        setTimeout(async () => {
-          for (const t of templates) {
-            const thumb = gallery.querySelector('[data-thumb-for="' + t.id + '"]');
-            if (thumb) {
-              try { await TemplateMegaPack.renderTemplate(thumb, shopData, t, { size: 200, lang: state.lang }); } catch(e){}
-            }
-          }
-        }, 50);
+        rebuildGallery();
       });
     });
   }
 
-  // ── Quick toggles ──────────────────────────────────────
+  // ── Quick toggles (photo/rating/phone/address + photoBg) ─
   card.querySelectorAll('.ps-toggle').forEach(t => {
     t.addEventListener('click', () => {
       t.classList.toggle('on');
@@ -2522,33 +2794,75 @@ function initAajKaPoster(biz){
     });
   });
 
-  // ── Streak ─────────────────────────────────────────────
-  function updateStreak(){
-    try {
-      const s = JSON.parse(localStorage.getItem('dl_poster_streak') || '{}');
-      const streak = parseInt(s.streak, 10) || 0;
-      const el = document.getElementById('psStreak');
-      if (el) el.textContent = streak > 0 ? ('🔥 ' + streak + ' day' + (streak !== 1 ? 's' : '')) : '🔥 Share to start';
-    } catch(_){}
+  // ── Edit panels (collapsible) ──────────────────────────
+  function togglePanel(btnId, panelId){
+    const btn = document.getElementById(btnId);
+    const panel = document.getElementById(panelId);
+    if (!btn || !panel) return;
+    btn.addEventListener('click', () => {
+      const isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('active', isOpen);
+    });
   }
-  function bumpStreak(){
-    try {
-      const today = new Date().toISOString().slice(0,10);
-      let s = JSON.parse(localStorage.getItem('dl_poster_streak') || '{}');
-      const last = s.last_date;
-      let streak = parseInt(s.streak, 10) || 0;
-      if (last === today) return;
-      if (last) {
-        const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
-        streak = (diff === 1) ? streak + 1 : 1;
-      } else streak = 1;
-      localStorage.setItem('dl_poster_streak', JSON.stringify({ last_date: today, streak }));
-      updateStreak();
-    } catch(_){}
-  }
-  updateStreak();
+  togglePanel('psEditTextBtn', 'psEditTextPanel');
+  togglePanel('psStickersBtn', 'psStickersPanel');
+  togglePanel('psColorBtn', 'psColorPanel');
 
-  // ── Effective shop data based on toggles ───────────────
+  // Custom text inputs
+  const headEl = document.getElementById('psCustomHeadline');
+  const subEl  = document.getElementById('psCustomSubline');
+  if (headEl) {
+    let t1;
+    headEl.addEventListener('input', () => {
+      clearTimeout(t1);
+      t1 = setTimeout(() => { state.customHeadline = headEl.value; renderMain(); }, 300);
+    });
+  }
+  if (subEl) {
+    let t2;
+    subEl.addEventListener('input', () => {
+      clearTimeout(t2);
+      t2 = setTimeout(() => { state.customSubline = subEl.value; renderMain(); }, 300);
+    });
+  }
+
+  // Sticker buttons
+  card.querySelectorAll('.ps-sticker-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      const s = b.dataset.sticker;
+      const i = state.stickers.indexOf(s);
+      if (i > -1) { state.stickers.splice(i, 1); b.classList.remove('on'); }
+      else if (state.stickers.length < 4) { state.stickers.push(s); b.classList.add('on'); }
+      renderMain();
+    });
+  });
+
+  // Color swatches
+  card.querySelectorAll('.ps-color-swatch').forEach(s => {
+    s.addEventListener('click', () => {
+      card.querySelectorAll('.ps-color-swatch').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+      state.customAccent = s.dataset.color || '';
+      renderMain();
+    });
+  });
+
+  // Fullscreen
+  const fsBtn = document.getElementById('psFsBtn');
+  const fsModal = document.getElementById('psFsModal');
+  const fsClose = document.getElementById('psFsClose');
+  if (fsBtn) {
+    fsBtn.addEventListener('click', async () => {
+      fsModal.classList.add('open');
+      const fsCanvas = document.getElementById('psFsCanvas');
+      try { await TemplateMegaPack.renderTemplate(fsCanvas, effective(), state.tmpl, opts()); }
+      catch(e){}
+    });
+  }
+  if (fsClose) fsClose.addEventListener('click', () => fsModal.classList.remove('open'));
+  if (fsModal) fsModal.addEventListener('click', (e) => { if (e.target === fsModal) fsModal.classList.remove('open'); });
+
+  // ── Effective data + opts ──────────────────────────────
   function effective(){
     return {
       name: shopData.name,
@@ -2562,9 +2876,17 @@ function initAajKaPoster(biz){
       photo: shopData.photo
     };
   }
-
   function opts(){
-    return { size: 1080, lang: state.lang, usePhotoBg: state.usePhotoBg };
+    return {
+      size: 1080,
+      lang: state.lang,
+      usePhotoBg: state.usePhotoBg,
+      photoOverride: state.photoOverride,
+      customHeadline: state.customHeadline || null,
+      customSubline:  state.customSubline  || null,
+      customAccent:   state.customAccent   || null,
+      stickers: state.stickers
+    };
   }
 
   async function renderMain(){
@@ -2575,13 +2897,13 @@ function initAajKaPoster(biz){
   }
   setTimeout(renderMain, 250);
 
-  // ── Share handlers ─────────────────────────────────────
+  // ── Share ──────────────────────────────────────────────
   async function share(platform, btnId){
     const btn = document.getElementById(btnId);
     btn.disabled = true;
     try {
       await TemplateMegaPack.shareToPlatform(platform, effective(), state.tmpl, opts());
-      bumpStreak();
+      bumpShareCount();
     } catch(e){ console.warn(platform, e); }
     finally { btn.disabled = false; }
   }
@@ -2591,7 +2913,7 @@ function initAajKaPoster(biz){
   document.getElementById('psShareDl').addEventListener('click', async () => {
     const btn = document.getElementById('psShareDl');
     btn.disabled = true;
-    try { await TemplateMegaPack.downloadPoster(effective(), state.tmpl, opts()); }
+    try { await TemplateMegaPack.downloadPoster(effective(), state.tmpl, opts()); bumpShareCount(); }
     catch(e){}
     finally { btn.disabled = false; }
   });
@@ -2996,5 +3318,11 @@ t on first paint) -->
   setTimeout(attach, 1500);
 })();
 </script>
+
+<!-- Fullscreen preview modal -->
+<div class="ps-fs-modal" id="psFsModal">
+  <button type="button" class="ps-fs-close" id="psFsClose">✕</button>
+  <canvas id="psFsCanvas" width="1080" height="1080"></canvas>
+</div>
 </body>
 </html>

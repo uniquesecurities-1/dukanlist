@@ -484,6 +484,14 @@ async function renderTemplate(canvas, shop, tmpl, opts){
   opts = opts || {};
   const size = opts.size || 1080;
   const lang = opts.lang || 'en';
+  // Apply overrides
+  if (opts.customAccent && /^#[0-9a-f]{6}$/i.test(opts.customAccent)) {
+    tmpl = Object.assign({}, tmpl, { accent: opts.customAccent });
+  }
+  if (opts.customHeadline) shop = Object.assign({}, shop, { _customHeadline: opts.customHeadline });
+  if (opts.customSubline)  shop = Object.assign({}, shop, { _customSubline: opts.customSubline });
+  if (opts.photoOverride)  shop = Object.assign({}, shop, { photo: opts.photoOverride });
+  const stickers = Array.isArray(opts.stickers) ? opts.stickers : [];
   const usePhotoBg = !!opts.usePhotoBg && !!shop.photo;
   canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext('2d');
@@ -548,7 +556,66 @@ async function renderTemplate(canvas, shop, tmpl, opts){
   // 6. Watermark
   drawWatermark(ctx, tmpl, size);
 
+  // 7. Sticker layer (NEW / SALE / OFFER / FREE)
+  if (stickers.length > 0) {
+    stickers.forEach((st, idx) => drawSticker(ctx, st, size, idx));
+  }
+
   return canvas;
+}
+
+// ─── Sticker badges ───────────────────────────────────────
+function drawSticker(ctx, sticker, sz, idx){
+  const corners = [
+    { x: sz*0.10, y: sz*0.15 },   // top-left
+    { x: sz*0.78, y: sz*0.15 },   // top-right
+    { x: sz*0.10, y: sz*0.55 },   // mid-left
+    { x: sz*0.78, y: sz*0.55 }    // mid-right
+  ];
+  const pos = corners[idx % 4];
+  const r = sz * 0.085;
+
+  let bg = '#FBBF24', fg = '#0F172A', label = sticker;
+  if (sticker === 'NEW')    { bg = '#10B981'; fg = '#fff'; }
+  if (sticker === 'SALE')   { bg = '#DC2626'; fg = '#fff'; }
+  if (sticker === 'OFFER')  { bg = '#F97316'; fg = '#fff'; }
+  if (sticker === 'FREE')   { bg = '#A855F7'; fg = '#fff'; }
+  if (sticker === 'HOT')    { bg = '#EF4444'; fg = '#fff'; }
+  if (sticker === 'TOP')    { bg = '#FBBF24'; fg = '#0F172A'; }
+
+  ctx.save();
+  ctx.translate(pos.x + r, pos.y + r);
+  ctx.rotate(-Math.PI / 12);  // slight tilt
+
+  // Star burst
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  const points = 10;
+  for (let i = 0; i < points * 2; i++) {
+    const angle = (Math.PI / points) * i;
+    const radius = (i % 2 === 0) ? r : r * 0.78;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  // Drop shadow
+  ctx.shadowColor = 'rgba(0,0,0,.35)';
+  ctx.shadowBlur = sz * 0.012;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Label
+  ctx.fillStyle = fg;
+  ctx.font = `900 ${Math.floor(sz*0.028)}px 'Manrope', Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, 0, 0);
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.restore();
 }
 
 // ─── Layout: Bold Name ─────────────────────────────────────
@@ -556,11 +623,12 @@ function drawBoldName(ctx, s, t, sz, lang){
   ctx.textAlign = 'center';
   ctx.fillStyle = t.ink;
   ctx.font = `900 ${Math.floor(sz*0.10)}px 'Manrope', Arial`;
-  wrapText(ctx, (s.name || 'Your Business').toUpperCase(), sz/2, sz*0.32, sz*0.82, Math.floor(sz*0.11), 3);
+  const headline = (s._customHeadline || s.name || 'Your Business').toUpperCase();
+  wrapText(ctx, headline, sz/2, sz*0.32, sz*0.82, Math.floor(sz*0.11), 3);
 
   ctx.font = `700 ${Math.floor(sz*0.034)}px 'Plus Jakarta Sans', Arial`;
   ctx.fillStyle = t.accent;
-  ctx.fillText(txt(lang, 'Visit Today', 'आज ही आएँ'), sz/2, sz*0.62);
+  ctx.fillText(s._customSubline || txt(lang, 'Visit Today', 'आज ही आएँ'), sz/2, sz*0.62);
 
   // Phone strip
   if (s.mobile) {
