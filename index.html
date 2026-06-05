@@ -1016,6 +1016,8 @@ function dismissFestBanner(){
 
 <div id="openNearYou"></div>
 
+<div id="homepageBuzz" style="display:none"></div>
+
 <section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
   <div style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:18px 8px;box-shadow:0 1px 3px rgba(15,23,42,.04)">
     <div id="catStripScroll" style="display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
@@ -1510,6 +1512,7 @@ function dismissFestBanner(){
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/daily-buzz.js" defer></script>
 <script src="/assets/js/geo-nearby.js" defer></script>
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/voice.js"></script>
@@ -2308,6 +2311,24 @@ function dismissActTicker(){
   function init(){
     if (window.GeoNearby) {
       GeoNearby.renderWidget('openNearYou');
+    } else {
+      setTimeout(init, 400);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+<script>
+(function(){
+  function init(){
+    if (window.DailyBuzz && window.ShopDB && ShopDB.client) {
+      let citySlug = null;
+      try {
+        if (window.CityPersist && CityPersist.getCity) citySlug = (CityPersist.getCity() || {}).slug || null;
+        if (!citySlug) citySlug = localStorage.getItem('dukanlist.city') || null;
+      } catch(_){}
+      DailyBuzz.renderHomepageCarousel('homepageBuzz', ShopDB.client, citySlug);
     } else {
       setTimeout(init, 400);
     }

@@ -991,8 +991,46 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
 <script src="/_vercel/insights/script.js" defer></script>
+
+<style>
+/* Daily Buzz strip + viewer */
+.db-strip{ background:#fff; border:1px solid #E5E7EB; border-radius:14px; padding:14px 16px; margin:12px 0 }
+.db-strip-label{ font-size:.74rem; color:#64748B; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px }
+.db-strip-items{ display:flex; gap:8px; overflow-x:auto; scrollbar-width:none }
+.db-strip-items::-webkit-scrollbar{ display:none }
+.db-strip-item{ flex:0 0 160px; border:none; border-radius:11px; padding:12px; color:#fff; cursor:pointer; text-align:left; transition:.15s }
+.db-strip-item:hover{ transform:translateY(-2px); filter:brightness(1.08) }
+.db-strip-text{ font-size:.84rem; line-height:1.3; font-weight:700; max-height:3.4em; overflow:hidden; margin-bottom:6px }
+.db-strip-age{ font-size:.66rem; opacity:.85; font-weight:700 }
+.db-home{ max-width:1180px; margin:0 auto 24px; padding:0 20px }
+.db-home-label{ display:flex; align-items:center; gap:8px; margin-bottom:10px }
+.db-home-emoji{ font-size:1.3rem }
+.db-home-label > span:nth-child(2){ font-family:'Manrope',sans-serif; font-weight:800; font-size:.94rem; color:#0F172A; letter-spacing:-.015em; flex:1 }
+.db-home-count{ background:#FBBF24; color:#0F172A; padding:2px 9px; border-radius:99px; font-size:.66rem; font-weight:900; letter-spacing:.04em }
+.db-home-scroll{ display:flex; gap:10px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px }
+.db-home-scroll::-webkit-scrollbar{ display:none }
+.db-home-card{ flex:0 0 220px; aspect-ratio:9/12; border:none; border-radius:14px; padding:14px; color:#fff; cursor:pointer; text-align:left; display:flex; flex-direction:column; transition:.15s; box-shadow:0 8px 22px rgba(0,0,0,.16) }
+.db-home-card:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(0,0,0,.22) }
+.db-home-shop{ font-size:.7rem; font-weight:800; opacity:.85; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px }
+.db-home-text{ flex:1; font-size:.96rem; line-height:1.32; font-weight:700 }
+.db-home-age{ font-size:.66rem; opacity:.8; font-weight:700; margin-top:8px }
+.db-viewer{ position:fixed; inset:0; background:#000; z-index:100000; display:flex; flex-direction:column; padding:20px 16px }
+.db-v-close{ position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.18); color:#fff; border:none; font-size:1.2rem; cursor:pointer; z-index:10 }
+.db-v-progress{ display:flex; gap:4px; margin-bottom:14px; padding-right:48px; z-index:5 }
+.db-v-bar{ flex:1; height:3px; background:rgba(255,255,255,.25); border-radius:99px; overflow:hidden }
+.db-v-bar-fill{ height:100%; background:#fff; width:0; border-radius:99px }
+.db-v-content{ flex:1; border-radius:18px; padding:30px; display:flex; flex-direction:column; justify-content:center; color:#fff; position:relative; max-width:520px; margin:0 auto; width:100%; min-height:60vh }
+.db-v-head{ position:absolute; top:20px; left:24px; right:24px; display:flex; justify-content:space-between }
+.db-v-shop-name{ font-weight:800; font-size:1rem; letter-spacing:-.01em }
+.db-v-age{ font-size:.78rem; opacity:.8; font-weight:700 }
+.db-v-text{ font-size:1.6rem; font-weight:800; line-height:1.3; letter-spacing:-.015em }
+.db-v-cta{ display:inline-block; align-self:flex-start; margin-top:24px; background:rgba(255,255,255,.18); color:#fff; padding:10px 20px; border-radius:99px; font-weight:800; font-size:.86rem; text-decoration:none; backdrop-filter:blur(8px) }
+.db-v-tap-left, .db-v-tap-right{ position:absolute; top:0; bottom:0; width:30%; cursor:pointer; z-index:5 }
+.db-v-tap-left{ left:0 } .db-v-tap-right{ right:0 }
+</style>
 </head>
 <body>
+<div id="businessBuzzStrip" style="display:none"></div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -1543,6 +1581,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/daily-buzz.js" defer></script>
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/mobile-nav.js"></script>
 <script src="/assets/js/breadcrumbs.js"></script>
@@ -2002,6 +2041,7 @@ function render(){
 
   // Profile Highlights — fills empty left-column space, builds trust
   try { renderShopHighlights(b); } catch(e){ console.warn('highlights render failed', e); }
+  try { if (window.DailyBuzz && window.ShopDB) DailyBuzz.renderShopStrip('businessBuzzStrip', ShopDB.client, b.id); } catch(_){}
   try { loadPublicLoyaltyCount(); } catch(_){}
   try { loadShopQA(b.id); } catch(e){ console.warn('Q&A load failed', e); }
 

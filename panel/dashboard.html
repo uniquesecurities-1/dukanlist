@@ -28,6 +28,31 @@
 .qa .ico{ font-size:1.7rem }
 .qa .name{ font-weight:800; font-size:.92rem; color:var(--ink) }
 .qa .desc{ font-size:.75rem; color:var(--muted); margin-top:1px }
+
+/* Phase 9 (2026-06-05): Daily Buzz Stories */
+.db-card{ background:#fff; border:1px solid #E5E7EB; border-radius:18px; padding:18px 20px; margin-top:16px; box-shadow:0 8px 24px rgba(15,23,42,.06) }
+.db-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap }
+.db-icon{ font-size:1.3rem }
+.db-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#0F172A; letter-spacing:-.015em; flex:1 }
+.db-sub{ font-size:.72rem; color:#94A3B8; font-weight:700 }
+.db-input{ width:100%; min-height:80px; resize:vertical; padding:12px 14px; border:1px solid #E2E8F0; border-radius:12px; font-family:inherit; font-size:.95rem; color:#0F172A; outline:none; font-weight:500 }
+.db-input:focus{ border-color:#FBBF24 }
+.db-input::placeholder{ color:#94A3B8 }
+.db-meta{ display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap }
+.db-count{ font-size:.74rem; color:#64748B; font-weight:700 }
+.db-bg-picker{ display:flex; gap:5px; flex:1 }
+.db-bg-dot{ width:24px; height:24px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:.15s }
+.db-bg-dot:hover{ transform:scale(1.15) }
+.db-bg-dot.active{ border-color:#0F172A; box-shadow:0 0 0 2px #FBBF24 }
+.db-post-btn{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A; border:none; padding:9px 18px; border-radius:10px; font-weight:900; font-size:.86rem; cursor:pointer; font-family:inherit; box-shadow:0 6px 16px rgba(251,191,36,.32); transition:.15s }
+.db-post-btn:hover:not(:disabled){ transform:translateY(-1px) }
+.db-post-btn:disabled{ opacity:.6; cursor:wait }
+.db-preview-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap }
+.db-active-story{ flex:1; min-width:140px; border-radius:12px; padding:12px 14px; color:#fff; position:relative; overflow:hidden }
+.db-active-text{ font-size:.86rem; line-height:1.35; font-weight:600; margin-bottom:6px; max-height:3.5em; overflow:hidden }
+.db-active-meta{ display:flex; justify-content:space-between; align-items:center; font-size:.7rem; opacity:.85 }
+.db-del-btn{ background:rgba(0,0,0,.3); color:#fff; border:none; width:20px; height:20px; border-radius:50%; cursor:pointer; font-size:.8rem; line-height:1 }
+.db-empty{ color:#94A3B8; font-size:.86rem; padding:12px; text-align:center; font-weight:600 }
 </style>
 
 <!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
@@ -359,319 +384,37 @@
   font-weight:700; margin-top:5px; display:block;
 }
 
-/* ===== POSTER STUDIO v2 (2026-06-05): Premium hero card ===== */
-.poster-studio{
-  background:linear-gradient(135deg,#0F172A 0%,#1E293B 45%,#312E81 100%);
-  color:#fff; border-radius:22px; padding:22px;
-  margin-top:16px; box-shadow:0 28px 60px rgba(15,23,42,.32);
-  position:relative; overflow:hidden;
+/* ===== Compact Poster Studio highlight (Phase 8.7) ===== */
+.poster-highlight{
+  display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+  color:#fff; border-radius:18px; padding:18px 22px;
+  margin-top:16px; text-decoration:none;
+  box-shadow:0 14px 36px rgba(15,23,42,.20);
+  transition:.18s; position:relative; overflow:hidden;
 }
-.poster-studio::before{
-  content:""; position:absolute; top:-80px; right:-80px;
-  width:340px; height:340px; border-radius:50%;
-  background:radial-gradient(circle,rgba(251,191,36,.22),transparent 70%);
+.poster-highlight::before{
+  content:""; position:absolute; top:-50px; right:-50px;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle,rgba(251,191,36,.20),transparent 70%);
   pointer-events:none;
 }
-.poster-studio::after{
-  content:""; position:absolute; bottom:-100px; left:-60px;
-  width:280px; height:280px; border-radius:50%;
-  background:radial-gradient(circle,rgba(236,72,153,.16),transparent 70%);
-  pointer-events:none;
+.poster-highlight:hover{ transform:translateY(-2px); box-shadow:0 20px 44px rgba(15,23,42,.28); text-decoration:none; color:#fff }
+.ph-icon{
+  width:48px; height:48px; border-radius:12px;
+  background:linear-gradient(135deg,#FBBF24,#F97316);
+  display:grid; place-items:center; font-size:1.4rem;
+  box-shadow:0 8px 20px rgba(251,191,36,.4);
+  flex-shrink:0; z-index:1;
 }
-.ps-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; position:relative; z-index:1 }
-.ps-logo{ width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#FBBF24,#F97316); display:grid; place-items:center; font-size:1.2rem; box-shadow:0 6px 18px rgba(251,191,36,.4) }
-.ps-title{ font-family:'Manrope',sans-serif; font-weight:900; font-size:1.15rem; letter-spacing:-.022em; flex:1 }
-.ps-streak{
-  display:inline-flex; align-items:center; gap:4px;
-  background:rgba(251,191,36,.22); color:#FBBF24;
-  padding:5px 11px; border-radius:99px; font-size:.74rem;
-  font-weight:900; letter-spacing:.02em;
+.ph-body{ flex:1; z-index:1; min-width:0 }
+.ph-label{
+  font-size:.66rem; color:rgba(251,191,36,.9); font-weight:800;
+  letter-spacing:.12em; margin-bottom:4px;
 }
-.ps-sub{ font-size:.84rem; color:rgba(255,255,255,.65); margin-bottom:14px; position:relative; z-index:1; font-weight:600 }
-.ps-festival-banner{
-  display:none; align-items:center; gap:10px;
-  background:linear-gradient(135deg,#DC2626 0%,#F97316 50%,#FBBF24 100%);
-  color:#fff; padding:10px 14px; border-radius:12px;
-  margin-bottom:14px; position:relative; z-index:1;
-  box-shadow:0 8px 24px rgba(220,38,38,.32);
-  animation:festivalPulse 2.4s ease-in-out infinite;
-}
-@keyframes festivalPulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.015) } }
-.ps-festival-icon{ font-size:1.6rem }
-.ps-festival-text{ flex:1; font-weight:800; line-height:1.25; font-size:.92rem }
-.ps-festival-days{ font-size:.74rem; opacity:.9; margin-top:2px; font-weight:700 }
-
-/* Format switcher tabs */
-.ps-format-tabs{
-  display:flex; gap:5px; background:rgba(0,0,0,.25); padding:4px;
-  border-radius:99px; margin-bottom:14px; position:relative; z-index:1;
-  border:1px solid rgba(255,255,255,.06);
-}
-.ps-format-btn{
-  flex:1; background:transparent; border:none; color:rgba(255,255,255,.55);
-  padding:8px 6px; border-radius:99px; font-weight:800; font-size:.78rem;
-  cursor:pointer; font-family:inherit; transition:.18s; letter-spacing:.02em;
-}
-.ps-format-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A; box-shadow:0 4px 12px rgba(251,191,36,.35) }
-.ps-format-btn:hover:not(.active){ color:#fff }
-
-/* Preview area — BIG */
-.ps-preview-wrap{
-  position:relative; z-index:1; margin-bottom:14px;
-  display:grid; place-items:center;
-  background:rgba(0,0,0,.18); border-radius:18px; padding:14px;
-  border:1px solid rgba(255,255,255,.04);
-  min-height:160px;
-}
-#aajPosterCanvas{
-  width:100%; max-width:280px; height:auto; aspect-ratio:1/1;
-  border-radius:14px; box-shadow:0 30px 60px rgba(0,0,0,.5);
-  background:#fff; display:block; transition:max-width .25s ease;
-}
-.ps-preview-wrap.fmt-story #aajPosterCanvas{ max-width:170px; aspect-ratio:9/16 }
-.ps-preview-wrap.fmt-card #aajPosterCanvas{ max-width:320px; aspect-ratio:16/9 }
-
-/* Theme carousel */
-.ps-theme-carousel-label{ font-size:.7rem; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin-bottom:8px; position:relative; z-index:1 }
-.ps-theme-carousel{
-  display:flex; gap:8px; overflow-x:auto; padding-bottom:6px;
-  margin-bottom:14px; position:relative; z-index:1;
-  scrollbar-width:none; -webkit-overflow-scrolling:touch;
-}
-.ps-theme-carousel::-webkit-scrollbar{ display:none }
-.ps-theme-chip{
-  flex:0 0 auto; background:rgba(255,255,255,.06); border:1.5px solid transparent;
-  color:#fff; padding:8px 13px; border-radius:11px; font-weight:700;
-  font-size:.78rem; cursor:pointer; font-family:inherit; transition:.15s;
-  display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
-}
-.ps-theme-chip:hover{ background:rgba(255,255,255,.12) }
-.ps-theme-chip.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A; border-color:rgba(255,255,255,.15); box-shadow:0 4px 14px rgba(251,191,36,.32) }
-.ps-theme-chip-emoji{ font-size:.95rem }
-.ps-theme-chip.festival{ background:linear-gradient(135deg,#DC2626,#F97316); color:#fff }
-
-/* Quick toggles */
-.ps-toggles{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; position:relative; z-index:1 }
-.ps-toggle{
-  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
-  color:rgba(255,255,255,.75); padding:6px 11px; border-radius:99px;
-  font-weight:700; font-size:.75rem; cursor:pointer; font-family:inherit;
-  display:inline-flex; align-items:center; gap:5px; transition:.15s;
-}
-.ps-toggle:hover{ background:rgba(255,255,255,.12); color:#fff }
-.ps-toggle.on{ background:rgba(16,185,129,.18); border-color:rgba(16,185,129,.4); color:#34D399 }
-.ps-toggle .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.5 }
-.ps-toggle.on .dot{ opacity:1 }
-
-/* Share buttons row */
-.ps-share-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:8px; position:relative; z-index:1 }
-.ps-share-btn{
-  border:none; padding:11px 4px; border-radius:11px; font-weight:800;
-  font-size:.78rem; cursor:pointer; font-family:inherit;
-  display:flex; flex-direction:column; align-items:center; gap:4px;
-  color:#fff; transition:.18s;
-}
-.ps-share-btn:hover:not(:disabled){ transform:translateY(-2px) }
-.ps-share-btn:disabled{ opacity:.5; cursor:wait }
-.ps-share-wa{ background:linear-gradient(135deg,#25D366,#128C7E); box-shadow:0 6px 16px rgba(37,211,102,.32) }
-.ps-share-ig{ background:linear-gradient(135deg,#F58529 0%,#DD2A7B 50%,#8134AF 100%); box-shadow:0 6px 16px rgba(221,42,123,.3) }
-.ps-share-fb{ background:#1877F2; box-shadow:0 6px 16px rgba(24,119,242,.3) }
-.ps-share-dl{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.16) }
-.ps-share-btn .lbl{ font-size:.7rem; letter-spacing:.02em }
-.ps-share-btn .ico{ font-size:1.1rem }
-
-.ps-customize{
-  display:block; text-align:center; padding:9px;
-  margin-top:6px; background:rgba(255,255,255,.06);
-  color:rgba(255,255,255,.75); text-decoration:none;
-  border-radius:11px; font-weight:700; font-size:.82rem;
-  border:1px dashed rgba(255,255,255,.16); position:relative; z-index:1;
-  transition:.15s;
-}
-.ps-customize:hover{ background:rgba(255,255,255,.12); color:#fff; text-decoration:none }
-
-@media (max-width:540px){
-  #aajPosterCanvas{ max-width:240px }
-  .ps-preview-wrap.fmt-story #aajPosterCanvas{ max-width:150px }
-  .ps-preview-wrap.fmt-card #aajPosterCanvas{ max-width:280px }
-  .ps-share-row{ grid-template-columns:repeat(2,1fr) }
-/* Template Mega Pack (2026-06-05) v2.5 — Gallery grid + Hindi toggle */
-.ps-gallery-label{ display:flex; align-items:center; justify-content:space-between; font-size:.7rem; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin:6px 0 8px; position:relative; z-index:1 }
-.ps-gallery-label .ps-count{ background:rgba(251,191,36,.18); color:#FBBF24; padding:2px 9px; border-radius:99px; font-size:.66rem; letter-spacing:.04em }
-.ps-gallery{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
-  max-height:300px; overflow-y:auto; padding:8px;
-  background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.04);
-  border-radius:14px; margin-bottom:14px; position:relative; z-index:1;
-  scrollbar-width:thin; scrollbar-color:rgba(251,191,36,.3) transparent;
-}
-.ps-gallery::-webkit-scrollbar{ width:6px }
-.ps-gallery::-webkit-scrollbar-thumb{ background:rgba(251,191,36,.3); border-radius:99px }
-.ps-tmpl{
-  aspect-ratio:1/1; border-radius:9px; cursor:pointer;
-  border:2px solid transparent; overflow:hidden;
-  position:relative; transition:.15s; background:#0F172A;
-  display:grid; place-items:center;
-}
-.ps-tmpl:hover{ transform:scale(1.05); border-color:rgba(251,191,36,.5) }
-.ps-tmpl.active{ border-color:#FBBF24; box-shadow:0 0 0 3px rgba(251,191,36,.25); transform:scale(1.05) }
-.ps-tmpl canvas{ width:100%; height:100%; display:block }
-.ps-tmpl .ps-tmpl-name{
-  position:absolute; bottom:0; left:0; right:0;
-  background:linear-gradient(to top, rgba(0,0,0,.85), transparent);
-  color:#fff; padding:14px 4px 4px; font-size:.55rem;
-  font-weight:800; letter-spacing:.04em; text-align:center;
-  text-transform:uppercase; line-height:1.1;
-}
-.ps-lang-toggle{
-  display:inline-flex; background:rgba(0,0,0,.25); border-radius:99px;
-  padding:3px; gap:0; border:1px solid rgba(255,255,255,.06);
-}
-.ps-lang-btn{
-  background:transparent; border:none; color:rgba(255,255,255,.55);
-  padding:4px 11px; font-size:.7rem; font-weight:800; cursor:pointer;
-  border-radius:99px; transition:.15s; font-family:inherit; letter-spacing:.04em;
-}
-.ps-lang-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A }
-.ps-photo-bg-toggle{ margin-left:auto }
-/* Phase 8.6 Studio Pro — Filter tabs, search, edit, stickers, color, fullscreen */
-.ps-toolbar{ display:flex; gap:6px; align-items:center; margin-bottom:10px; flex-wrap:wrap; position:relative; z-index:1 }
-.ps-search{
-  flex:1; min-width:160px; background:rgba(0,0,0,.25);
-  border:1px solid rgba(255,255,255,.08); color:#fff;
-  padding:8px 12px; border-radius:10px; font-size:.86rem;
-  font-family:inherit; outline:none;
-}
-.ps-search::placeholder{ color:rgba(255,255,255,.4) }
-.ps-search:focus{ border-color:#FBBF24 }
-.ps-filter-tabs{ display:flex; gap:4px; padding:3px; background:rgba(0,0,0,.25); border-radius:99px; border:1px solid rgba(255,255,255,.06); overflow-x:auto; scrollbar-width:none }
-.ps-filter-tabs::-webkit-scrollbar{ display:none }
-.ps-filter-btn{
-  background:transparent; border:none; color:rgba(255,255,255,.55);
-  padding:5px 10px; font-size:.7rem; font-weight:800; cursor:pointer;
-  border-radius:99px; transition:.15s; font-family:inherit;
-  letter-spacing:.04em; white-space:nowrap;
-}
-.ps-filter-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A }
-.ps-filter-btn:hover:not(.active){ color:#fff }
-
-/* Template heart (favorite) */
-.ps-tmpl-fav{
-  position:absolute; top:4px; right:4px;
-  width:22px; height:22px; border-radius:50%;
-  background:rgba(0,0,0,.55); display:grid; place-items:center;
-  cursor:pointer; transition:.15s; z-index:2; font-size:11px;
-}
-.ps-tmpl-fav:hover{ transform:scale(1.15) }
-.ps-tmpl-fav.faved{ background:#FBBF24; color:#0F172A }
-
-/* Edit text panel — collapsible */
-.ps-edit-panel{
-  background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.06);
-  border-radius:14px; padding:12px; margin-bottom:14px;
-  position:relative; z-index:1; display:none;
-}
-.ps-edit-panel.open{ display:block }
-.ps-edit-toggle{
-  display:inline-flex; align-items:center; gap:6px;
-  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
-  color:#fff; padding:7px 14px; border-radius:99px;
-  font-weight:700; font-size:.76rem; cursor:pointer;
-  font-family:inherit; transition:.15s; margin-right:6px; margin-bottom:8px;
-}
-.ps-edit-toggle:hover{ background:rgba(255,255,255,.12) }
-.ps-edit-toggle.active{ background:rgba(251,191,36,.18); color:#FBBF24; border-color:rgba(251,191,36,.35) }
-.ps-edit-row{ margin-bottom:9px }
-.ps-edit-row:last-child{ margin-bottom:0 }
-.ps-edit-label{
-  display:block; font-size:.66rem; color:rgba(255,255,255,.55);
-  text-transform:uppercase; letter-spacing:.1em; font-weight:800;
-  margin-bottom:4px;
-}
-.ps-edit-input{
-  width:100%; background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.08); color:#fff;
-  padding:8px 10px; border-radius:8px; font-size:.86rem;
-  font-family:inherit; outline:none;
-}
-.ps-edit-input:focus{ border-color:#FBBF24 }
-
-/* Sticker chips */
-.ps-stickers{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px }
-.ps-sticker-btn{
-  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
-  color:#fff; padding:6px 12px; border-radius:99px;
-  font-weight:900; font-size:.72rem; cursor:pointer;
-  font-family:inherit; letter-spacing:.05em; transition:.15s;
-}
-.ps-sticker-btn:hover{ background:rgba(255,255,255,.12) }
-.ps-sticker-btn.on{ border-color:transparent; transform:scale(1.05) }
-.ps-sticker-btn[data-sticker="NEW"].on   { background:#10B981; color:#fff }
-.ps-sticker-btn[data-sticker="SALE"].on  { background:#DC2626; color:#fff }
-.ps-sticker-btn[data-sticker="OFFER"].on { background:#F97316; color:#fff }
-.ps-sticker-btn[data-sticker="FREE"].on  { background:#A855F7; color:#fff }
-.ps-sticker-btn[data-sticker="HOT"].on   { background:#EF4444; color:#fff }
-.ps-sticker-btn[data-sticker="TOP"].on   { background:#FBBF24; color:#0F172A }
-
-/* Color picker */
-.ps-color-row{ display:flex; align-items:center; gap:10px; margin-top:6px }
-.ps-color-swatches{ display:flex; gap:5px; flex-wrap:wrap }
-.ps-color-swatch{
-  width:28px; height:28px; border-radius:50%; cursor:pointer;
-  border:2px solid transparent; transition:.15s;
-  display:grid; place-items:center;
-}
-.ps-color-swatch:hover{ transform:scale(1.15) }
-.ps-color-swatch.active{ border-color:#fff; box-shadow:0 0 0 2px #FBBF24 }
-
-/* Multi-photo picker (when shop has multiple photos) */
-.ps-photo-picker{ display:flex; gap:6px; overflow-x:auto; margin-top:6px; scrollbar-width:none }
-.ps-photo-picker::-webkit-scrollbar{ display:none }
-.ps-photo-thumb{
-  flex:0 0 56px; width:56px; height:56px; border-radius:8px;
-  background-size:cover; background-position:center; cursor:pointer;
-  border:2px solid transparent; transition:.15s;
-}
-.ps-photo-thumb:hover{ transform:scale(1.05) }
-.ps-photo-thumb.active{ border-color:#FBBF24; box-shadow:0 0 0 2px rgba(251,191,36,.3) }
-
-/* Fullscreen preview modal */
-.ps-fs-btn{
-  position:absolute; top:24px; right:24px;
-  width:34px; height:34px; border-radius:8px;
-  background:rgba(0,0,0,.5); color:#fff; border:none;
-  cursor:pointer; font-size:1.1rem; z-index:5; transition:.15s;
-}
-.ps-fs-btn:hover{ background:rgba(0,0,0,.75); transform:scale(1.05) }
-.ps-fs-modal{
-  position:fixed; inset:0; background:rgba(0,0,0,.92);
-  z-index:99999; display:none; align-items:center; justify-content:center;
-  padding:20px; backdrop-filter:blur(8px);
-}
-.ps-fs-modal.open{ display:flex }
-.ps-fs-modal canvas{ max-width:95%; max-height:90vh; border-radius:14px; box-shadow:0 40px 80px rgba(0,0,0,.7) }
-.ps-fs-close{
-  position:absolute; top:20px; right:20px;
-  width:42px; height:42px; border-radius:50%;
-  background:#fff; color:#000; border:none; font-size:1.3rem;
-  cursor:pointer; font-weight:900;
-}
-
-/* Share count badge */
-.ps-share-count{
-  display:inline-flex; align-items:center; gap:4px;
-  background:rgba(255,255,255,.08); color:rgba(255,255,255,.7);
-  padding:3px 9px; border-radius:99px; font-size:.66rem; font-weight:800;
-  margin-left:6px; letter-spacing:.04em;
-}
-
-@media (max-width:540px){
-  .ps-gallery{ grid-template-columns:repeat(3,1fr); max-height:280px }
-  .ps-tmpl-name{ font-size:.5rem }
-}
-
-}
-
+.ph-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:-.015em; line-height:1.2 }
+.ph-sub{ font-size:.78rem; color:rgba(255,255,255,.6); font-weight:600; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.ph-arrow{ font-size:1.4rem; color:rgba(251,191,36,.9); font-weight:900; z-index:1 }
 
 /* ============================================================
    PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements
@@ -931,144 +674,23 @@
       </div>
     </div>
 
-    <!-- ===== AAJ KA POSTER STUDIO v2 (2026-06-05): Premium hero card ===== -->
-    <div class="poster-studio" id="aajPosterCard" style="display:none">
-      <div class="ps-head">
-        <span class="ps-logo">✨</span>
-        <span class="ps-title" data-i18n-en>Poster Studio</span>
-        <span class="ps-title" data-i18n-hi style="display:none">पोस्टर स्टूडियो</span>
-        <span class="ps-streak" id="psStreak">🔥 0 days</span>
+    <!-- ===== Phase 8.7: Compact Poster Studio highlight card ===== -->
+    <a href="/panel/poster-studio.html" id="aajPosterCard" class="poster-highlight" style="display:flex">
+      <div class="ph-icon">✨</div>
+      <div class="ph-body">
+        <div class="ph-label">POSTER STUDIO</div>
+        <div class="ph-title" id="phTitle">Today's poster is ready</div>
+        <div class="ph-sub" id="phSub">30+ templates · QR · Photo background · Festival ready</div>
       </div>
-      <div class="ps-sub" id="psSub">Pick a theme, format, and share to your network in one tap.</div>
-
-      <!-- Festival mega-banner (shown when festival within 7 days) -->
-      <div class="ps-festival-banner" id="psFestivalBanner">
-        <span class="ps-festival-icon" id="psFestivalIcon">🪔</span>
-        <div>
-          <div class="ps-festival-text" id="psFestivalText">Festival theme ready</div>
-          <div class="ps-festival-days" id="psFestivalDays"></div>
-        </div>
-      </div>
-
-      <!-- Format switcher: Square / Story / Card -->
-      <div class="ps-format-tabs">
-        <button type="button" class="ps-format-btn active" data-fmt="square">⬛ Square</button>
-        <button type="button" class="ps-format-btn" data-fmt="story">📱 Story</button>
-        <button type="button" class="ps-format-btn" data-fmt="card">▭ Card</button>
-      </div>
-
-      <!-- Live preview -->
-      <div class="ps-preview-wrap" id="psPreviewWrap">
-        <button type="button" class="ps-fs-btn" id="psFsBtn" title="Fullscreen preview">⛶</button>
-        <canvas id="aajPosterCanvas" width="1080" height="1080"></canvas>
-      </div>
-
-      <!-- Template Gallery (30+ designs) — Studio Pro -->
-      <div class="ps-gallery-label">
-        <span>Choose template <span class="ps-count" id="psTmplCount">30</span></span>
-        <span style="display:flex;align-items:center;gap:8px">
-          <span class="ps-share-count" id="psShareCount">📤 0 shared</span>
-          <span class="ps-lang-toggle" id="psLangToggle">
-            <button type="button" class="ps-lang-btn active" data-lang="en">EN</button>
-            <button type="button" class="ps-lang-btn" data-lang="hi">हिं</button>
-          </span>
-        </span>
-      </div>
-
-      <!-- Toolbar: Search + Filter tabs -->
-      <div class="ps-toolbar">
-        <input type="text" class="ps-search" id="psSearch" placeholder="🔎 Search templates…">
-        <div class="ps-filter-tabs">
-          <button type="button" class="ps-filter-btn active" data-filter="all">All</button>
-          <button type="button" class="ps-filter-btn" data-filter="favorites">★ Saved</button>
-          <button type="button" class="ps-filter-btn" data-filter="festival">🎉 Festival</button>
-          <button type="button" class="ps-filter-btn" data-filter="minimal">Minimal</button>
-          <button type="button" class="ps-filter-btn" data-filter="bold">Bold</button>
-          <button type="button" class="ps-filter-btn" data-filter="photo">📷 Photo</button>
-        </div>
-      </div>
-
-      <div class="ps-gallery" id="psGallery"></div>
-
-      <!-- Edit panel toggles -->
-      <button type="button" class="ps-edit-toggle" id="psEditTextBtn">✏️ Edit Text</button>
-      <button type="button" class="ps-edit-toggle" id="psStickersBtn">🏷️ Stickers</button>
-      <button type="button" class="ps-edit-toggle" id="psColorBtn">🎨 Color</button>
-
-      <!-- Edit Text Panel -->
-      <div class="ps-edit-panel" id="psEditTextPanel">
-        <div class="ps-edit-row">
-          <label class="ps-edit-label">Custom Headline</label>
-          <input type="text" class="ps-edit-input" id="psCustomHeadline" placeholder="e.g. Special Diwali Offer" maxlength="60">
-        </div>
-        <div class="ps-edit-row">
-          <label class="ps-edit-label">Custom Subline</label>
-          <input type="text" class="ps-edit-input" id="psCustomSubline" placeholder="e.g. Up to 30% off this week" maxlength="80">
-        </div>
-      </div>
-
-      <!-- Sticker Panel -->
-      <div class="ps-edit-panel" id="psStickersPanel">
-        <label class="ps-edit-label">Add badges (tap to toggle)</label>
-        <div class="ps-stickers">
-          <button type="button" class="ps-sticker-btn" data-sticker="NEW">NEW</button>
-          <button type="button" class="ps-sticker-btn" data-sticker="SALE">SALE</button>
-          <button type="button" class="ps-sticker-btn" data-sticker="OFFER">OFFER</button>
-          <button type="button" class="ps-sticker-btn" data-sticker="FREE">FREE</button>
-          <button type="button" class="ps-sticker-btn" data-sticker="HOT">HOT</button>
-          <button type="button" class="ps-sticker-btn" data-sticker="TOP">TOP</button>
-        </div>
-      </div>
-
-      <!-- Color Panel -->
-      <div class="ps-edit-panel" id="psColorPanel">
-        <label class="ps-edit-label">Accent color (overrides template)</label>
-        <div class="ps-color-row">
-          <div class="ps-color-swatches" id="psColorSwatches">
-            <span class="ps-color-swatch active" data-color="" style="background:linear-gradient(135deg,#fff 50%,#000 50%)" title="Template default"></span>
-            <span class="ps-color-swatch" data-color="#FBBF24" style="background:#FBBF24"></span>
-            <span class="ps-color-swatch" data-color="#FF6B1A" style="background:#FF6B1A"></span>
-            <span class="ps-color-swatch" data-color="#DC2626" style="background:#DC2626"></span>
-            <span class="ps-color-swatch" data-color="#A855F7" style="background:#A855F7"></span>
-            <span class="ps-color-swatch" data-color="#10B981" style="background:#10B981"></span>
-            <span class="ps-color-swatch" data-color="#1E3A8A" style="background:#1E3A8A"></span>
-            <span class="ps-color-swatch" data-color="#FFFFFF" style="background:#fff;border:1px solid #ccc"></span>
-            <span class="ps-color-swatch" data-color="#0F172A" style="background:#0F172A"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick toggles -->
-      <div class="ps-toggles">
-        <button type="button" class="ps-toggle on" data-toggle="photo"><span class="dot"></span> Photo</button>
-        <button type="button" class="ps-toggle on" data-toggle="rating"><span class="dot"></span> Rating</button>
-        <button type="button" class="ps-toggle on" data-toggle="phone"><span class="dot"></span> Phone</button>
-        <button type="button" class="ps-toggle" data-toggle="address"><span class="dot"></span> Address</button>
-        <button type="button" class="ps-toggle ps-photo-bg-toggle" data-toggle="photoBg"><span class="dot"></span> 📷 Photo Bg</button>
-      </div>
-
-      <!-- Share to 4 platforms -->
-      <div class="ps-share-row">
-        <button type="button" class="ps-share-btn ps-share-wa" id="psShareWa">
-          <span class="ico">💬</span><span class="lbl">WhatsApp</span>
-        </button>
-        <button type="button" class="ps-share-btn ps-share-ig" id="psShareIg">
-          <span class="ico">📷</span><span class="lbl">Instagram</span>
-        </button>
-        <button type="button" class="ps-share-btn ps-share-fb" id="psShareFb">
-          <span class="ico">f</span><span class="lbl">Facebook</span>
-        </button>
-        <button type="button" class="ps-share-btn ps-share-dl" id="psShareDl">
-          <span class="ico">⬇</span><span class="lbl">Download</span>
-        </button>
-      </div>
-
-      <a href="/panel/wa-poster.html" class="ps-customize">Open full editor for more options →</a>
-    </div>
+      <div class="ph-arrow">→</div>
+    </a>
 
     <!-- ===== PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements ===== -->
     <div id="townRankCard" style="display:none"></div>
     <div id="smartTipsCard" style="display:none"></div>
+    
+    <!-- ===== Phase 9: Daily Buzz post widget ===== -->
+    <div id="dailyBuzzWidget"></div>
     <div id="loyaltyCard" style="display:none"></div>
     <div id="badgeWallCard"></div>
 
@@ -1763,6 +1385,7 @@ async function loadDashboard(){
   // ===== STRATEGIC (2026-06-05) — Aaj ka Score + Aaj ka Poster =====
   try { initAajKaScore(biz, c); } catch(e){ console.warn('Aaj Score:', e); }
   try { initAajKaPoster(biz); }   catch(e){ console.warn('Aaj Poster:', e); }
+  try { if (window.DailyBuzz) DailyBuzz.renderOwnerWidget('dailyBuzzWidget', c, biz); else setTimeout(() => window.DailyBuzz && DailyBuzz.renderOwnerWidget('dailyBuzzWidget', c, biz), 800); } catch(e){ console.warn('DailyBuzz:', e); }
 
   // ===== STRATEGIC PHASE 2 (2026-06-05) — Town Rank + Smart Tips + Badges + Streak =====
   try { initPhase2Cards(biz, c); } catch(e){ console.warn('Phase 2:', e); }
@@ -2580,345 +2203,27 @@ function animateAajScore(d){
 
 // ─── Aaj ka Poster: Daily auto-rotating WhatsApp share ───────
 function initAajKaPoster(biz){
-  if (!biz || !window.TemplateMegaPack || !window.DailyPoster) {
-    setTimeout(() => initAajKaPoster(biz), 600);
-    return;
-  }
-  const card = document.getElementById('aajPosterCard');
-  if (!card) return;
-
-  // ── Shop data ──────────────────────────────────────────
-  let categorySlug = '';
+  // Phase 8.7: Studio moved to dedicated page (/panel/poster-studio.html)
+  // Dashboard now shows compact highlight card with date-aware sub text.
+  const el = document.getElementById('aajPosterCard');
+  if (!el) return;
+  el.style.display = 'flex';
+  // Update sub text with festival info if active
   try {
-    if (biz.categories && Array.isArray(biz.categories) && biz.categories.length) {
-      categorySlug = String(biz.categories[0]?.slug || biz.categories[0] || '').toLowerCase();
-    } else if (biz.category) categorySlug = String(biz.category).toLowerCase();
-    else if (biz.primary_category_slug) categorySlug = String(biz.primary_category_slug).toLowerCase();
-  } catch(_){}
-
-  const shopData = {
-    name: biz.name || 'Your Business',
-    slug: biz.slug || '',
-    mobile: biz.mobile || biz.phone || '',
-    city: biz.city_name || biz.city || '',
-    category: categorySlug,
-    established_year: biz.established_year || null,
-    rating: biz.rating_avg || biz.rating || 0,
-    address: biz.address || '',
-    photo: (Array.isArray(biz.photos) && biz.photos[0]) || ''
-  };
-
-  const allPhotos = Array.isArray(biz.photos) ? biz.photos.filter(Boolean) : [];
-
-  // ── State ──────────────────────────────────────────────
-  const state = {
-    format: 'square',
-    tmpl: null,
-    lang: 'en',
-    showPhoto: true,
-    showRating: true,
-    showPhone: true,
-    showAddress: false,
-    usePhotoBg: false,
-    photoOverride: null,
-    filter: 'all',
-    search: '',
-    customHeadline: '',
-    customSubline: '',
-    customAccent: '',
-    stickers: []
-  };
-
-  // Favorites + share count from localStorage
-  function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_tmpl_favs') || '[]'); } catch(_){ return []; } }
-  function setFavs(arr){ try { localStorage.setItem('dl_tmpl_favs', JSON.stringify(arr)); } catch(_){} }
-  function isFav(id){ return getFavs().indexOf(id) > -1; }
-  function toggleFav(id){
-    let f = getFavs();
-    const i = f.indexOf(id);
-    if (i > -1) f.splice(i, 1); else f.push(id);
-    setFavs(f);
-    return f.indexOf(id) > -1;
-  }
-
-  function getShareCount(){ try { return parseInt(localStorage.getItem('dl_tmpl_shares')||'0',10)||0; } catch(_){ return 0; } }
-  function bumpShareCount(){
-    try {
-      const n = getShareCount() + 1;
-      localStorage.setItem('dl_tmpl_shares', String(n));
-      const el = document.getElementById('psShareCount');
-      if (el) el.textContent = '📤 ' + n + ' shared';
-    } catch(_){}
-  }
-  document.getElementById('psShareCount').textContent = '📤 ' + getShareCount() + ' shared';
-
-  // Festival banner
-  let festival = null;
-  if (window.FestivalEngine && FestivalEngine.getActiveFestival) festival = FestivalEngine.getActiveFestival();
-  if (festival) {
-    const fbEl = document.getElementById('psFestivalBanner');
-    document.getElementById('psFestivalIcon').textContent = festival.emoji || '🎉';
-    document.getElementById('psFestivalText').textContent = festival.nameEn + ' theme available';
-    const days = festival.daysAway;
-    document.getElementById('psFestivalDays').textContent = (days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : days + ' days away') + ' — pick festival template';
-    fbEl.style.display = 'flex';
-  }
-
-  // ── Filter helpers ─────────────────────────────────────
-  const allTemplates = TemplateMegaPack.getRelevantTemplates(shopData.category);
-  document.getElementById('psTmplCount').textContent = allTemplates.length;
-
-  function styleMatchesFilter(t, filt){
-    if (filt === 'all') return true;
-    if (filt === 'favorites') return isFav(t.id);
-    if (filt === 'festival') return t.style === 'festival' || t.id.indexOf('fest-') === 0;
-    if (filt === 'minimal') return t.style === 'minimal';
-    if (filt === 'bold') return t.style === 'bold-name' || t.style === 'cta';
-    if (filt === 'photo') return t.needsPhoto || t.style === 'photo-hero';
-    return true;
-  }
-
-  function filteredTemplates(){
-    const q = (state.search || '').toLowerCase().trim();
-    return allTemplates.filter(t => {
-      if (!styleMatchesFilter(t, state.filter)) return false;
-      if (q) return (t.name + ' ' + (t.nameHi||'') + ' ' + (t.category||'')).toLowerCase().indexOf(q) > -1;
-      return true;
-    });
-  }
-
-  state.tmpl = allTemplates[0];
-
-  // ── Build gallery ──────────────────────────────────────
-  const gallery = document.getElementById('psGallery');
-
-  async function rebuildGallery(){
-    const tmpls = filteredTemplates();
-    gallery.innerHTML = tmpls.map(t =>
-      '<div class="ps-tmpl ' + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
-      '  <div class="ps-tmpl-fav ' + (isFav(t.id) ? 'faved' : '') + '" data-fav="' + t.id + '">★</div>' +
-      '  <canvas data-thumb-for="' + t.id + '"></canvas>' +
-      '  <div class="ps-tmpl-name">' + t.name + '</div>' +
-      '</div>'
-    ).join('');
-    if (tmpls.length === 0) {
-      gallery.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:rgba(255,255,255,.5);font-size:.86rem">No templates match your filter</div>';
-      return;
-    }
-    // Render thumbs async
-    for (const t of tmpls) {
-      const thumb = gallery.querySelector('[data-thumb-for="' + t.id + '"]');
-      if (thumb) {
-        try { await TemplateMegaPack.renderTemplate(thumb, shopData, t, { size: 200, lang: state.lang }); }
-        catch(e){}
+    if (window.FestivalEngine && FestivalEngine.getActiveFestival) {
+      const f = FestivalEngine.getActiveFestival();
+      if (f) {
+        const subEl = document.getElementById('phSub');
+        const titleEl = document.getElementById('phTitle');
+        if (titleEl) titleEl.textContent = f.nameEn + ' poster is ready';
+        if (subEl) {
+          const d = f.daysAway;
+          const dayLbl = d <= 0 ? 'Today' : d === 1 ? 'Tomorrow' : d + ' days away';
+          subEl.textContent = dayLbl + ' · 30+ designs · Open Studio →';
+        }
       }
     }
-    // Wire click + fav buttons
-    gallery.querySelectorAll('.ps-tmpl').forEach(el => {
-      el.addEventListener('click', (e) => {
-        if (e.target.classList.contains('ps-tmpl-fav')) return;
-        gallery.querySelectorAll('.ps-tmpl').forEach(x => x.classList.remove('active'));
-        el.classList.add('active');
-        state.tmpl = allTemplates.find(t => t.id === el.dataset.tid);
-        renderMain();
-      });
-    });
-    gallery.querySelectorAll('.ps-tmpl-fav').forEach(el => {
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isNow = toggleFav(el.dataset.fav);
-        el.classList.toggle('faved', isNow);
-      });
-    });
-  }
-  setTimeout(rebuildGallery, 200);
-
-  // ── Format tabs ────────────────────────────────────────
-  card.querySelectorAll('.ps-format-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      card.querySelectorAll('.ps-format-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.format = btn.dataset.fmt;
-      const wrap = document.getElementById('psPreviewWrap');
-      wrap.classList.remove('fmt-square','fmt-story','fmt-card');
-      wrap.classList.add('fmt-' + state.format);
-      renderMain();
-    });
-  });
-
-  // ── Filter tabs ────────────────────────────────────────
-  card.querySelectorAll('.ps-filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      card.querySelectorAll('.ps-filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.filter = btn.dataset.filter;
-      rebuildGallery();
-    });
-  });
-
-  // ── Search ─────────────────────────────────────────────
-  const searchEl = document.getElementById('psSearch');
-  if (searchEl) {
-    let searchTimer;
-    searchEl.addEventListener('input', () => {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => {
-        state.search = searchEl.value;
-        rebuildGallery();
-      }, 250);
-    });
-  }
-
-  // ── Language toggle ────────────────────────────────────
-  const langToggle = document.getElementById('psLangToggle');
-  if (langToggle) {
-    langToggle.querySelectorAll('.ps-lang-btn').forEach(b => {
-      b.addEventListener('click', () => {
-        langToggle.querySelectorAll('.ps-lang-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        state.lang = b.dataset.lang;
-        renderMain();
-        rebuildGallery();
-      });
-    });
-  }
-
-  // ── Quick toggles (photo/rating/phone/address + photoBg) ─
-  card.querySelectorAll('.ps-toggle').forEach(t => {
-    t.addEventListener('click', () => {
-      t.classList.toggle('on');
-      const key = t.dataset.toggle;
-      if (key === 'photoBg') state.usePhotoBg = t.classList.contains('on');
-      else state['show' + key.charAt(0).toUpperCase() + key.slice(1)] = t.classList.contains('on');
-      renderMain();
-    });
-  });
-
-  // ── Edit panels (collapsible) ──────────────────────────
-  function togglePanel(btnId, panelId){
-    const btn = document.getElementById(btnId);
-    const panel = document.getElementById(panelId);
-    if (!btn || !panel) return;
-    btn.addEventListener('click', () => {
-      const isOpen = panel.classList.toggle('open');
-      btn.classList.toggle('active', isOpen);
-    });
-  }
-  togglePanel('psEditTextBtn', 'psEditTextPanel');
-  togglePanel('psStickersBtn', 'psStickersPanel');
-  togglePanel('psColorBtn', 'psColorPanel');
-
-  // Custom text inputs
-  const headEl = document.getElementById('psCustomHeadline');
-  const subEl  = document.getElementById('psCustomSubline');
-  if (headEl) {
-    let t1;
-    headEl.addEventListener('input', () => {
-      clearTimeout(t1);
-      t1 = setTimeout(() => { state.customHeadline = headEl.value; renderMain(); }, 300);
-    });
-  }
-  if (subEl) {
-    let t2;
-    subEl.addEventListener('input', () => {
-      clearTimeout(t2);
-      t2 = setTimeout(() => { state.customSubline = subEl.value; renderMain(); }, 300);
-    });
-  }
-
-  // Sticker buttons
-  card.querySelectorAll('.ps-sticker-btn').forEach(b => {
-    b.addEventListener('click', () => {
-      const s = b.dataset.sticker;
-      const i = state.stickers.indexOf(s);
-      if (i > -1) { state.stickers.splice(i, 1); b.classList.remove('on'); }
-      else if (state.stickers.length < 4) { state.stickers.push(s); b.classList.add('on'); }
-      renderMain();
-    });
-  });
-
-  // Color swatches
-  card.querySelectorAll('.ps-color-swatch').forEach(s => {
-    s.addEventListener('click', () => {
-      card.querySelectorAll('.ps-color-swatch').forEach(x => x.classList.remove('active'));
-      s.classList.add('active');
-      state.customAccent = s.dataset.color || '';
-      renderMain();
-    });
-  });
-
-  // Fullscreen
-  const fsBtn = document.getElementById('psFsBtn');
-  const fsModal = document.getElementById('psFsModal');
-  const fsClose = document.getElementById('psFsClose');
-  if (fsBtn) {
-    fsBtn.addEventListener('click', async () => {
-      fsModal.classList.add('open');
-      const fsCanvas = document.getElementById('psFsCanvas');
-      try { await TemplateMegaPack.renderTemplate(fsCanvas, effective(), state.tmpl, opts()); }
-      catch(e){}
-    });
-  }
-  if (fsClose) fsClose.addEventListener('click', () => fsModal.classList.remove('open'));
-  if (fsModal) fsModal.addEventListener('click', (e) => { if (e.target === fsModal) fsModal.classList.remove('open'); });
-
-  // ── Effective data + opts ──────────────────────────────
-  function effective(){
-    return {
-      name: shopData.name,
-      slug: shopData.slug,
-      mobile: state.showPhone ? shopData.mobile : '',
-      city: shopData.city,
-      category: shopData.category,
-      established_year: shopData.established_year,
-      rating: state.showRating ? shopData.rating : 0,
-      address: state.showAddress ? shopData.address : '',
-      photo: shopData.photo
-    };
-  }
-  function opts(){
-    return {
-      size: 1080,
-      lang: state.lang,
-      usePhotoBg: state.usePhotoBg,
-      photoOverride: state.photoOverride,
-      customHeadline: state.customHeadline || null,
-      customSubline:  state.customSubline  || null,
-      customAccent:   state.customAccent   || null,
-      stickers: state.stickers
-    };
-  }
-
-  async function renderMain(){
-    const canvas = document.getElementById('aajPosterCanvas');
-    if (!canvas || !state.tmpl) return;
-    try { await TemplateMegaPack.renderTemplate(canvas, effective(), state.tmpl, opts()); }
-    catch(e){ console.warn('render', e); }
-  }
-  setTimeout(renderMain, 250);
-
-  // ── Share ──────────────────────────────────────────────
-  async function share(platform, btnId){
-    const btn = document.getElementById(btnId);
-    btn.disabled = true;
-    try {
-      await TemplateMegaPack.shareToPlatform(platform, effective(), state.tmpl, opts());
-      bumpShareCount();
-    } catch(e){ console.warn(platform, e); }
-    finally { btn.disabled = false; }
-  }
-  document.getElementById('psShareWa').addEventListener('click', () => share('whatsapp', 'psShareWa'));
-  document.getElementById('psShareIg').addEventListener('click', () => share('instagram', 'psShareIg'));
-  document.getElementById('psShareFb').addEventListener('click', () => share('facebook', 'psShareFb'));
-  document.getElementById('psShareDl').addEventListener('click', async () => {
-    const btn = document.getElementById('psShareDl');
-    btn.disabled = true;
-    try { await TemplateMegaPack.downloadPoster(effective(), state.tmpl, opts()); bumpShareCount(); }
-    catch(e){}
-    finally { btn.disabled = false; }
-  });
-
-  card.style.display = 'block';
+  } catch(_){}
 }
 
 // ─── Phase 4: Loyalty Tracker render ───────────────────────────
@@ -3267,6 +2572,8 @@ function shareReferralWhatsApp(){
 <script src="/assets/js/festival-engine.js" defer></script>
 <!-- Template Mega Pack (2026-06-05): 30+ designs -->
 <script src="/assets/js/template-mega-pack.js" defer></script>
+<!-- Daily Buzz Stories (Phase 9) -->
+<script src="/assets/js/daily-buzz.js" defer></script>
 <!-- Engagement Engine (2026-06-05) -->
 <script src="/assets/js/engagement-engine.js" defer></script>
 
