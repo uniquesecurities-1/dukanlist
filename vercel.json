@@ -4,6 +4,22 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/top/:cat([a-z][a-z0-9-]{1,60})/:city([a-z][a-z0-9-]{1,40})/",
+      "destination": "/top.html?cat=:cat&city=:city"
+    },
+    {
+      "source": "/top/:cat([a-z][a-z0-9-]{1,60})/:city([a-z][a-z0-9-]{1,40})",
+      "destination": "/top.html?cat=:cat&city=:city"
+    },
+    {
+      "source": "/top/:cat([a-z][a-z0-9-]{1,60})/",
+      "destination": "/top.html?cat=:cat"
+    },
+    {
+      "source": "/top/:cat([a-z][a-z0-9-]{1,60})",
+      "destination": "/top.html?cat=:cat"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
     },

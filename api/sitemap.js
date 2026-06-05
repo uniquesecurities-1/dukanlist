@@ -14,6 +14,7 @@ const ORIGIN = 'https://dukanlist.com';
 const STATIC_PAGES = [
   { path: '/',             priority: '1.0', freq: 'daily'   },
   { path: '/browse.html',  priority: '0.9', freq: 'daily'   },
+  { path: '/top.html',     priority: '0.9', freq: 'daily'   },
   { path: '/search.html',  priority: '0.9', freq: 'daily'   },
   { path: '/pucho-bhai.html', priority: '0.9', freq: 'hourly' },
   { path: '/register.html',priority: '0.8', freq: 'monthly' },
@@ -22,6 +23,31 @@ const STATIC_PAGES = [
   { path: '/privacy.html', priority: '0.4', freq: 'yearly'  },
   { path: '/terms.html',   priority: '0.4', freq: 'yearly'  },
 ];
+
+
+
+// Phase 7: Fetch /top/:cat/:city SEO combinations
+async function fetchSeoTopUrls(){
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/list_seo_combinations`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ p_limit: 200 })
+    });
+    if (!res.ok) return [];
+    const arr = await res.json();
+    if (!Array.isArray(arr)) return [];
+    return arr.map(x => ({
+      path: `/top/${x.category_slug}/${x.city_slug}/`,
+      priority: '0.8',
+      freq: 'weekly'
+    }));
+  } catch(_){ return []; }
+}
 
 async function fetchFromSupabase(endpoint){
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
@@ -65,6 +91,14 @@ export default async function handler(req, res){
     STATIC_PAGES.forEach(p => {
       urls.push(urlBlock(ORIGIN + p.path, p.priority, p.freq));
     });
+
+    // 1b. Phase 7 SEO honeypot — Top X in [city] dynamic URLs
+    try {
+      const seoUrls = await fetchSeoTopUrls();
+      seoUrls.forEach(u => {
+        urls.push(urlBlock(ORIGIN + u.path, u.priority, u.freq));
+      });
+    } catch(_){}
 
     // 2. Hometown landing
     urls.push(urlBlock(ORIGIN + '/dabwali.html', '0.9', 'weekly'));
