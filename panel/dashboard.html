@@ -421,6 +421,140 @@
   #aajPosterCanvas{ max-width:200px }
 }
 
+/* ============================================================
+   PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements
+   Professional palette, no Hinglish.
+   ============================================================ */
+
+/* ===== Town Rank Card ===== */
+.tr-card{
+  background:#fff; border:1px solid #E5E7EB; border-radius:18px;
+  padding:18px 20px; margin-top:16px;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+.tr-card.leader{ background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%); border-color:#D97706 }
+.tr-card.top3{ background:linear-gradient(135deg,#DBEAFE 0%,#BFDBFE 100%); border-color:#3B82F6 }
+.tr-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px }
+.tr-emoji{ font-size:1.3rem }
+.tr-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#0F172A; letter-spacing:-.015em }
+.tr-rank-row{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap }
+.tr-rank-big{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:3rem; line-height:1; color:#1E3A8A; letter-spacing:-.04em;
+}
+.tr-card.leader .tr-rank-big{ color:#92400E }
+.tr-rank-of{ font-size:1.1rem; font-weight:700; color:#64748B }
+.tr-segment{ font-size:.82rem; color:#64748B; margin-left:8px; font-weight:600 }
+.tr-sub{ color:#475569; font-size:.92rem; font-weight:600; margin-top:10px }
+.tr-leader{
+  margin-top:14px; padding-top:14px; border-top:1px dashed #E5E7EB;
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+}
+.tr-leader-label{ font-size:.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.06em; font-weight:700 }
+.tr-leader-name{ font-weight:800; color:#0F172A; font-size:.95rem }
+.tr-card.empty{ text-align:center; padding:24px 18px }
+.tr-empty-icon{ font-size:2rem; margin-bottom:8px; opacity:.6 }
+.tr-empty-msg{ color:#64748B; font-size:.92rem; font-weight:600 }
+
+/* ===== Smart Tips Card ===== */
+.st-card{
+  background:#fff; border:1px solid #E5E7EB; border-radius:18px;
+  padding:18px 20px; margin-top:16px;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+.st-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px }
+.st-emoji{ font-size:1.3rem }
+.st-title{
+  font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem;
+  color:#0F172A; letter-spacing:-.015em; flex:1;
+}
+.st-count{
+  background:#1E3A8A; color:#fff; font-size:.7rem; font-weight:800;
+  padding:3px 10px; border-radius:99px; letter-spacing:.05em;
+}
+.st-list{ display:flex; flex-direction:column; gap:10px }
+.st-row{
+  display:grid; grid-template-columns:36px 1fr auto; gap:12px;
+  padding:12px 14px; background:#F8FAFC; border:1px solid #E2E8F0;
+  border-radius:12px; text-decoration:none; color:#0F172A;
+  transition:.15s; align-items:center;
+}
+.st-row:hover{ background:#F1F5F9; border-color:#CBD5E1; transform:translateX(2px); text-decoration:none }
+.st-row.prio-high{ border-left:3px solid #EF4444 }
+.st-row.prio-medium{ border-left:3px solid #F59E0B }
+.st-row.prio-low{ border-left:3px solid #94A3B8 }
+.st-row-icon{
+  width:36px; height:36px; display:grid; place-items:center;
+  background:#fff; border:1px solid #E5E7EB; border-radius:9px;
+  font-size:1.1rem;
+}
+.st-row-title{ font-weight:800; font-size:.92rem; line-height:1.3; color:#0F172A; margin-bottom:3px }
+.st-row-detail{ font-size:.78rem; color:#64748B; font-weight:500; line-height:1.4 }
+.st-row-cta{ font-weight:700; font-size:.82rem; color:#1E3A8A; white-space:nowrap }
+.st-card.empty{ text-align:center; padding:24px 18px }
+.st-empty-icon{ font-size:2rem; margin-bottom:6px }
+.st-empty-msg{ color:#64748B; font-size:.92rem; font-weight:600 }
+
+/* ===== Badge Wall ===== */
+.badge-wall-card{
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+  color:#fff; border-radius:18px; padding:20px;
+  margin-top:16px; box-shadow:0 14px 40px rgba(15,23,42,.16);
+}
+.bw-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px }
+.bw-title{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem;
+  letter-spacing:-.015em;
+}
+.bw-emoji{ font-size:1.3rem }
+.bw-count{ font-size:.78rem; color:rgba(255,255,255,.65); font-weight:700 }
+.bw-bar{
+  background:rgba(255,255,255,.08); border-radius:99px; height:6px;
+  overflow:hidden; margin-bottom:16px;
+}
+.bw-bar-fill{
+  background:linear-gradient(90deg,#FBBF24,#F97316);
+  height:100%; transition:width .8s ease-out;
+}
+.bw-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr));
+  gap:10px;
+}
+.bw-chip{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  padding:10px 4px; border-radius:12px; cursor:default;
+}
+.bw-chip.unlocked{ background:rgba(255,255,255,.06) }
+.bw-chip.locked{ opacity:.4 }
+.bw-chip-icon{
+  width:38px; height:38px; display:grid; place-items:center;
+  background:rgba(255,255,255,.12); border-radius:10px;
+  font-size:1.3rem;
+}
+.bw-chip-label{
+  font-size:.66rem; font-weight:700; text-align:center;
+  line-height:1.2; color:rgba(255,255,255,.88);
+}
+.bw-share-btn{
+  margin-top:14px; width:100%; background:rgba(255,255,255,.08);
+  color:#fff; border:1px solid rgba(255,255,255,.16);
+  padding:10px; border-radius:10px; font-weight:700; font-size:.85rem;
+  cursor:pointer; font-family:inherit; transition:.15s;
+}
+.bw-share-btn:hover{ background:rgba(255,255,255,.14) }
+
+/* ===== Streak pill (inline in hero) ===== */
+.streak-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(251,191,36,.18); color:#FBBF24;
+  padding:5px 12px; border-radius:99px; font-size:.78rem;
+  font-weight:800; letter-spacing:.02em; margin-left:8px;
+}
+.streak-pill .streak-num{ font-family:'Manrope',sans-serif; font-size:.95rem; font-weight:900 }
+.streak-pill .streak-lbl{ opacity:.85; font-size:.72rem }
+.streak-pill .streak-emoji{ font-size:.95rem }
+
 </style>
 
 
@@ -473,7 +607,7 @@
       </div>
       <div class="aaj-sub">
         <span data-i18n-en>people viewed your shop today</span>
-        <span data-i18n-hi>logon ne aaj aapka shop dekha</span>
+        <span data-i18n-hi>लोगों ने आज आपकी listing देखी</span>
       </div>
       <div class="aaj-chips">
         <div class="aaj-chip">
@@ -500,18 +634,18 @@
         <div class="aaj-poster-label">
           <span class="sparkle">✨</span>
           <span data-i18n-en>Today's Poster Ready</span>
-          <span data-i18n-hi>Aaj Ka Poster Tayyaar</span>
+          <span data-i18n-hi>आज का पोस्टर तैयार</span>
         </div>
         <div class="aaj-poster-theme" id="aajPosterTheme">Loading…</div>
         <p class="aaj-poster-desc">
           <span data-i18n-en>One tap and share on WhatsApp Status — fresh design every day.</span>
-          <span data-i18n-hi>Ek tap mein WhatsApp Status par share — roz naya design.</span>
+          <span data-i18n-hi>एक टैप में WhatsApp Status पर शेयर करें। हर रोज़ नया design।</span>
         </p>
         <div class="aaj-poster-actions">
           <button class="poster-share-btn" id="aajPosterShareBtn" type="button">
             <span style="font-size:16px">📤</span>
             <span data-i18n-en>Share to WhatsApp</span>
-            <span data-i18n-hi>WhatsApp par Share</span>
+            <span data-i18n-hi>WhatsApp पर शेयर</span>
           </button>
           <a href="/panel/wa-poster.html" class="poster-customize-btn">
             <span data-i18n-en>Customize →</span>
@@ -523,6 +657,11 @@
         <canvas id="aajPosterCanvas" width="540" height="540"></canvas>
       </div>
     </div>
+
+    <!-- ===== PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements ===== -->
+    <div id="townRankCard" style="display:none"></div>
+    <div id="smartTipsCard" style="display:none"></div>
+    <div id="badgeWallCard"></div>
 
   <!-- Profile completeness widget -->
     <div id="completenessWidget" style="margin-top:18px"></div>
@@ -1166,6 +1305,9 @@ async function loadDashboard(){
   // ===== STRATEGIC (2026-06-05) — Aaj ka Score + Aaj ka Poster =====
   try { initAajKaScore(biz, c); } catch(e){ console.warn('Aaj Score:', e); }
   try { initAajKaPoster(biz); }   catch(e){ console.warn('Aaj Poster:', e); }
+
+  // ===== STRATEGIC PHASE 2 (2026-06-05) — Town Rank + Smart Tips + Badges + Streak =====
+  try { initPhase2Cards(biz, c); } catch(e){ console.warn('Phase 2:', e); }
 
   // ===== OG SHARE CARD auto-generation (DISABLED 2026-06-01) =====
   // Disabled on dashboard load to keep console clean. The auto-hook was
@@ -2051,6 +2193,33 @@ function initAajKaPoster(biz){
     });
   }
 }
+
+// ─── Phase 2: Town Rank + Smart Tips + Badge Wall + Streak ───
+function initPhase2Cards(biz, c){
+  if (!biz || !biz.id) return;
+  if (!window.EngagementEngine) {
+    setTimeout(() => initPhase2Cards(biz, c), 500);
+    return;
+  }
+  try { EngagementEngine.renderTownRank('townRankCard', c, biz.id); }
+  catch(e){ console.warn('Town Rank:', e); }
+  try { EngagementEngine.renderSmartTips('smartTipsCard', c, biz.id); }
+  catch(e){ console.warn('Smart Tips:', e); }
+  try { EngagementEngine.renderBadgeWall('badgeWallCard', biz); }
+  catch(e){ console.warn('Badge Wall:', e); }
+  try {
+    var streakHostId = 'aajStreakHost';
+    var dateEl = document.getElementById('aajDate');
+    if (dateEl && !document.getElementById(streakHostId)) {
+      var span = document.createElement('span');
+      span.id = streakHostId;
+      span.style.display = 'inline-block';
+      span.style.marginLeft = '6px';
+      dateEl.parentNode.appendChild(span);
+    }
+    EngagementEngine.renderStreakBadge(streakHostId);
+  } catch(e){ console.warn('Streak:', e); }
+}
 </script>
 
 <script>
@@ -2231,7 +2400,6 @@ async function loadRankingBattle(b){
 
     const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
     let html = '';
-    if (isTop){
       html = '<div style="text-align:center;padding:4px"><div style="font-size:2rem;margin-bottom:4px">🥇</div>' +
         '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">' + (lang === 'hi' ? '#1 — आप टॉप पर हैं!' : '#1 — You\'re the top!') + '</div>' +
         '<div style="font-size:.78rem;color:#6B21A8;opacity:.8;margin-top:4px">' + (lang === 'hi' ? 'आपकी category में ' + total + ' shops में सबसे आगे' : 'Leading ' + total + ' listings in your category') + '</div></div>';
@@ -2348,6 +2516,8 @@ function shareReferralWhatsApp(){
 
 <!-- Daily Poster Engine (2026-06-05) — 7-day theme rotation for Aaj ka Poster card -->
 <script src="/assets/js/daily-poster-engine.js" defer></script>
+<!-- Engagement Engine (2026-06-05) -->
+<script src="/assets/js/engagement-engine.js" defer></script>
 
 <!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
 <script src="/assets/js/owner-notifications.js" defer></script>

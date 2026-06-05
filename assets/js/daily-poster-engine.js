@@ -26,33 +26,33 @@ const THEMES = {
   0: { // Sunday
     id: 'sunday',
     nameEn: 'Family & Trust',
-    nameHi: 'Family & Bharosa',
+    nameHi: 'Family & Trust',
     bgGradient: ['#FEF3C7', '#FDE68A', '#FBBF24'],
     accent: '#92400E',
     ink: '#451A03',
-    headline: (s) => `Apke parivaar ka apna shop`,
-    subline: (s) => `${yearsLine(s)} se aapki seva mein`,
+    headline: (s) => `Your trusted neighbourhood business`,
+    subline: (s) => `Serving the community for ${yearsLine(s)}`,
     emoji: '🏠',
     layout: 'family',
-    cta: 'Visit ya Call karein — Hum hain aapke saath'
+    cta: 'Visit us or call today'
   },
   1: { // Monday
     id: 'monday',
     nameEn: 'Fresh Week Special',
-    nameHi: 'Naya Hafta',
+    nameHi: 'Fresh Week',
     bgGradient: ['#FF6B1A', '#F97316', '#EA580C'],
     accent: '#FFF',
     ink: '#FFFFFF',
-    headline: (s) => `Naya hafta, fresh stock`,
-    subline: (s) => `Aaj hi visit karein`,
+    headline: (s) => `Fresh stock for a new week`,
+    subline: (s) => `Visit today`,
     emoji: '🔥',
     layout: 'big-name',
-    cta: 'Open Now — Aaj khareedari karein'
+    cta: 'Open today — shop with confidence'
   },
   2: { // Tuesday
     id: 'tuesday',
     nameEn: 'Pro Tip Tuesday',
-    nameHi: 'Aaj ka Tip',
+    nameHi: 'Pro Tip',
     bgGradient: ['#1E3A8A', '#3730A3', '#5B21B6'],
     accent: '#FBBF24',
     ink: '#FFFFFF',
@@ -60,25 +60,25 @@ const THEMES = {
     subline: (s) => `— ${s.name}`,
     emoji: '💡',
     layout: 'tip-card',
-    cta: 'Trusted expert advice'
+    cta: 'Expert advice you can trust'
   },
   3: { // Wednesday
     id: 'wednesday',
     nameEn: 'Customer Voice',
-    nameHi: 'Customer ki Awaaz',
+    nameHi: 'Customer Voice',
     bgGradient: ['#FDFBF7', '#FBEFD9', '#F3E2C0'],
     accent: '#C24A0A',
     ink: '#1F2937',
-    headline: (s) => s.reviewText || `Bahut accha service hai!`,
-    subline: (s) => s.reviewer || `Khush customer`,
+    headline: (s) => s.reviewText || `Excellent service experience`,
+    subline: (s) => s.reviewer || `Verified customer`,
     emoji: '⭐',
     layout: 'review-card',
-    cta: 'Aap bhi try karein'
+    cta: 'Experience it yourself'
   },
   4: { // Thursday
     id: 'thursday',
     nameEn: 'Trust Verified',
-    nameHi: 'DukanList Verified',
+    nameHi: 'Verified Trust',
     bgGradient: ['#064E3B', '#065F46', '#047857'],
     accent: '#FBBF24',
     ink: '#FFFFFF',
@@ -95,24 +95,24 @@ const THEMES = {
     bgGradient: ['#7C3AED', '#A21CAF', '#DB2777'],
     accent: '#FCD34D',
     ink: '#FFFFFF',
-    headline: (s) => `Weekend hai — Visit karein`,
-    subline: (s) => `Saturday-Sunday open`,
+    headline: (s) => `Weekend hours, full service`,
+    subline: (s) => `Saturday and Sunday open`,
     emoji: '🎉',
     layout: 'weekend',
-    cta: 'Special weekend offers'
+    cta: 'Visit us this weekend'
   },
   6: { // Saturday
     id: 'saturday',
     nameEn: 'Trending in City',
-    nameHi: 'Aaj Trending',
+    nameHi: 'Trending Now',
     bgGradient: ['#DC2626', '#EA580C', '#F59E0B'],
     accent: '#FFFFFF',
     ink: '#FFFFFF',
-    headline: (s) => `${s.city || 'Aapke shaher'} mein trending`,
-    subline: (s) => `Top rated shop`,
+    headline: (s) => `Trending in ${s.city || 'your city'}`,
+    subline: (s) => `Top rated locally`,
     emoji: '🔥',
     layout: 'trending',
-    cta: 'Sabse zyada visit kiya jaane wala shop'
+    cta: 'Most visited business in the area'
   }
 };
 
@@ -120,28 +120,28 @@ const THEMES = {
 function yearsLine(s){
   if (s && s.established_year && s.established_year > 1900) {
     const yrs = new Date().getFullYear() - s.established_year;
-    if (yrs > 0) return `${yrs}+ saal`;
+    if (yrs > 0) return `${yrs}+ years`;
   }
-  return 'Kayi saalon';
+  return 'many years';
 }
 
 function getCategoryTip(s){
   const tips = {
-    'kirana': 'Hamesha taza maal le — date check karein',
-    'grocery': 'Hamesha taza maal le — date check karein',
-    'medical': 'Doctor ki prescription zaroor dikhayein',
-    'pharmacy': 'Doctor ki prescription zaroor dikhayein',
-    'mobile': 'Original bill aur warranty lena na bhulein',
-    'electronics': 'Original bill aur warranty lena na bhulein',
-    'restaurant': 'Hygiene aur fresh ingredients ka khayal',
-    'sweets': 'Festival ke time fresh order karein',
-    'salon': 'Apni skin type batao expert se',
-    'beauty': 'Apni skin type batao expert se',
-    'mechanic': 'Service ke time bill aur warranty lein',
-    'tailor': 'Measurements double-check karwayein',
-    'clothes': 'Wash care symbols dekh kar khareeden',
-    'jewellery': 'Hallmark check karein — purity guarantee',
-    'default': 'Quality, trust aur service — yahi sab kuch'
+    'kirana': 'Always check freshness and expiry dates before buying',
+    'grocery': 'Always check freshness and expiry dates before buying',
+    'medical': 'Always carry your prescription for accurate medicine',
+    'pharmacy': 'Always carry your prescription for accurate medicine',
+    'mobile': 'Always collect original bill and warranty card',
+    'electronics': 'Always collect original bill and warranty card',
+    'restaurant': 'Hygiene-first kitchen with fresh ingredients',
+    'sweets': 'Order fresh sweets ahead of festivals',
+    'salon': 'Consult our experts about your skin type',
+    'beauty': 'Consult our experts about your skin type',
+    'mechanic': 'Insist on service bill and parts warranty',
+    'tailor': 'Always double-check your measurements with us',
+    'clothes': 'Check fabric care symbols before buying',
+    'jewellery': 'Look for hallmark for guaranteed purity',
+    'default': 'Quality, trust and service — every time'
   };
   if (!s || !s.category) return tips.default;
   const c = String(s.category).toLowerCase();
@@ -378,7 +378,7 @@ function composeCaption(shopData, theme){
   if (shopData.mobile) lines.push('📞 ' + shopData.mobile);
   if (shopData.slug)   lines.push('🔗 https://dukanlist.com/business.html?slug=' + shopData.slug);
   lines.push('');
-  lines.push((theme.cta || 'Aapka local trusted shop'));
+  lines.push((theme.cta || 'Your trusted local business'));
   lines.push('');
   lines.push('— DukanList');
   return lines.join('\n');
