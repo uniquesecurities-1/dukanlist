@@ -298,6 +298,129 @@
 .mini-pulse-num { font-family: 'Manrope', sans-serif; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg,#FFD56A,#FF9D2E); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1 }
 .mini-pulse-lbl { font-size: .62rem; color: #9DB1D4; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 700 }
 
+/* ============================================================
+   STRATEGIC (2026-06-05): Aaj ka Score + Aaj ka Poster
+   ============================================================ */
+.aaj-score-hero{
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #312E81 100%);
+  color:#fff; border-radius:20px; padding:22px 22px 18px;
+  margin-top:18px; box-shadow:0 14px 40px rgba(15,23,42,.18);
+  position:relative; overflow:hidden;
+}
+.aaj-score-hero::before{
+  content:""; position:absolute; top:-40px; right:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle, rgba(251,191,36,.18), transparent 70%);
+  pointer-events:none;
+}
+.aaj-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; position:relative; z-index:1 }
+.live-pulse{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(16,185,129,.18); color:#10B981;
+  padding:5px 11px; border-radius:99px; font-size:.7rem;
+  font-weight:900; letter-spacing:.08em;
+}
+.live-pulse .dot{
+  width:8px; height:8px; border-radius:50%; background:#10B981;
+  animation:livePulse 1.6s ease-in-out infinite;
+}
+@keyframes livePulse{
+  0%,100%{ transform:scale(1); opacity:1 }
+  50%{ transform:scale(1.4); opacity:.65 }
+}
+.aaj-date{ font-size:.78rem; color:rgba(255,255,255,.55); font-weight:600 }
+.aaj-big{ display:flex; align-items:baseline; gap:14px; margin-bottom:4px; position:relative; z-index:1 }
+.big-num{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:3.4rem; line-height:1; letter-spacing:-.04em;
+  background:linear-gradient(135deg,#FBBF24,#F97316);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.trend-arrow{
+  font-size:.85rem; font-weight:800; padding:4px 10px; border-radius:8px;
+  background:rgba(16,185,129,.18); color:#34D399;
+}
+.trend-arrow.down{ background:rgba(239,68,68,.18); color:#FCA5A5 }
+.trend-arrow.flat{ background:rgba(148,163,184,.18); color:#CBD5E1 }
+.aaj-sub{ color:rgba(255,255,255,.78); font-size:.92rem; font-weight:600; margin-bottom:18px; position:relative; z-index:1 }
+.aaj-chips{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; position:relative; z-index:1 }
+.aaj-chip{
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; padding:12px 8px; text-align:center;
+}
+.aaj-chip .ico{ font-size:1.2rem; display:block; margin-bottom:4px }
+.aaj-chip .num{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:1.3rem; color:#fff; display:block; line-height:1;
+}
+.aaj-chip .lab{
+  font-size:.65rem; color:rgba(255,255,255,.55);
+  text-transform:uppercase; letter-spacing:.1em;
+  font-weight:700; margin-top:5px; display:block;
+}
+
+/* ===== Aaj ka Poster Card ===== */
+.aaj-poster-card{
+  background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 60%,#FCD34D 100%);
+  border-radius:20px; padding:20px; margin-top:16px;
+  display:grid; grid-template-columns:1fr 140px; gap:16px;
+  align-items:center; box-shadow:0 14px 40px rgba(251,191,36,.18);
+  position:relative; overflow:hidden;
+}
+.aaj-poster-card::before{
+  content:""; position:absolute; bottom:-30px; left:-30px;
+  width:160px; height:160px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,107,26,.22), transparent 70%);
+  pointer-events:none;
+}
+.aaj-poster-label{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.72rem; font-weight:900; color:#92400E;
+  text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;
+}
+.aaj-poster-label .sparkle{ font-size:1rem; animation:sparkle 2s ease-in-out infinite }
+@keyframes sparkle{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(20deg)} }
+.aaj-poster-theme{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:1.15rem; color:#451A03; letter-spacing:-.02em;
+  line-height:1.2; margin-bottom:6px;
+}
+.aaj-poster-desc{
+  color:#78350F; font-size:.82rem; line-height:1.5;
+  margin-bottom:12px; font-weight:600;
+}
+.aaj-poster-actions{ display:flex; gap:8px; flex-wrap:wrap }
+.poster-share-btn{
+  background:#25D366; color:#fff; border:none;
+  padding:10px 16px; border-radius:10px;
+  font-weight:800; font-size:.85rem; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:inherit; box-shadow:0 6px 16px rgba(37,211,102,.35);
+  transition:.15s;
+}
+.poster-share-btn:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 8px 20px rgba(37,211,102,.45) }
+.poster-share-btn:disabled{ opacity:.6; cursor:wait }
+.poster-customize-btn{
+  background:rgba(146,64,14,.08); color:#92400E; border:1.5px solid rgba(146,64,14,.18);
+  padding:9px 14px; border-radius:10px; font-weight:800; font-size:.82rem;
+  text-decoration:none; font-family:inherit; transition:.15s;
+}
+.poster-customize-btn:hover{ background:rgba(146,64,14,.15); text-decoration:none }
+.aaj-poster-right{
+  position:relative; z-index:1;
+  display:flex; align-items:center; justify-content:center;
+}
+#aajPosterCanvas{
+  width:100%; max-width:140px; aspect-ratio:1/1; height:auto;
+  border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.18);
+  background:#fff;
+}
+@media (max-width:540px){
+  .aaj-poster-card{ grid-template-columns:1fr; gap:14px }
+  .aaj-poster-right{ order:-1 }
+  #aajPosterCanvas{ max-width:200px }
+}
+
 </style>
 
 
@@ -337,6 +460,70 @@
 
     <div class="dash-layout-v2">
   <div class="dash-main-v2">
+
+    <!-- ===== AAJ KA SCORE — Live dopamine hero ===== -->
+    <div class="aaj-score-hero" id="aajScoreHero" style="display:none">
+      <div class="aaj-top">
+        <span class="live-pulse"><span class="dot"></span>LIVE</span>
+        <span class="aaj-date" id="aajDate">Aaj</span>
+      </div>
+      <div class="aaj-big">
+        <span class="big-num" id="aajViewsBig">0</span>
+        <span class="trend-arrow flat" id="aajTrend">— 0%</span>
+      </div>
+      <div class="aaj-sub">
+        <span data-i18n-en>people viewed your shop today</span>
+        <span data-i18n-hi>logon ne aaj aapka shop dekha</span>
+      </div>
+      <div class="aaj-chips">
+        <div class="aaj-chip">
+          <span class="ico">📞</span>
+          <span class="num" id="aajCalls">0</span>
+          <span class="lab">Calls</span>
+        </div>
+        <div class="aaj-chip">
+          <span class="ico">❤️</span>
+          <span class="num" id="aajSaves">0</span>
+          <span class="lab">Saves</span>
+        </div>
+        <div class="aaj-chip">
+          <span class="ico">⭐</span>
+          <span class="num" id="aajRating">—</span>
+          <span class="lab">Rating</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AAJ KA POSTER — Daily auto-rotating WhatsApp Status ===== -->
+    <div class="aaj-poster-card" id="aajPosterCard" style="display:none">
+      <div class="aaj-poster-left">
+        <div class="aaj-poster-label">
+          <span class="sparkle">✨</span>
+          <span data-i18n-en>Today's Poster Ready</span>
+          <span data-i18n-hi>Aaj Ka Poster Tayyaar</span>
+        </div>
+        <div class="aaj-poster-theme" id="aajPosterTheme">Loading…</div>
+        <p class="aaj-poster-desc">
+          <span data-i18n-en>One tap and share on WhatsApp Status — fresh design every day.</span>
+          <span data-i18n-hi>Ek tap mein WhatsApp Status par share — roz naya design.</span>
+        </p>
+        <div class="aaj-poster-actions">
+          <button class="poster-share-btn" id="aajPosterShareBtn" type="button">
+            <span style="font-size:16px">📤</span>
+            <span data-i18n-en>Share to WhatsApp</span>
+            <span data-i18n-hi>WhatsApp par Share</span>
+          </button>
+          <a href="/panel/wa-poster.html" class="poster-customize-btn">
+            <span data-i18n-en>Customize →</span>
+            <span data-i18n-hi>Customize →</span>
+          </a>
+        </div>
+      </div>
+      <div class="aaj-poster-right">
+        <canvas id="aajPosterCanvas" width="540" height="540"></canvas>
+      </div>
+    </div>
+
   <!-- Profile completeness widget -->
     <div id="completenessWidget" style="margin-top:18px"></div>
 
@@ -975,6 +1162,10 @@ async function loadDashboard(){
 
   // ===== Verification CTA (only show if approved + not yet verified) =====
   try { renderVerificationCta(biz, c); } catch(e){ console.warn('Verification CTA:', e); }
+
+  // ===== STRATEGIC (2026-06-05) — Aaj ka Score + Aaj ka Poster =====
+  try { initAajKaScore(biz, c); } catch(e){ console.warn('Aaj Score:', e); }
+  try { initAajKaPoster(biz); }   catch(e){ console.warn('Aaj Poster:', e); }
 
   // ===== OG SHARE CARD auto-generation (DISABLED 2026-06-01) =====
   // Disabled on dashboard load to keep console clean. The auto-hook was
@@ -1713,6 +1904,153 @@ function renderDashActivity(){
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSidebarWidgets);
   else initSidebarWidgets();
 })();
+
+// ============================================================
+// STRATEGIC (2026-06-05) — Aaj ka Score + Aaj ka Poster
+// ============================================================
+
+// ─── Aaj ka Score: Live engagement hero card ─────────────────
+async function initAajKaScore(biz, c){
+  if (!biz || !biz.id) return;
+  const heroEl = document.getElementById('aajScoreHero');
+  if (!heroEl) return;
+
+  // Date label (local)
+  try {
+    const d = new Date();
+    const lang = (document.documentElement.getAttribute('data-lang') || 'en') === 'hi' ? 'hi-IN' : 'en-IN';
+    const dateLabel = d.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'short' });
+    const dEl = document.getElementById('aajDate');
+    if (dEl) dEl.textContent = (lang === 'hi-IN' ? '' : 'Today — ') + dateLabel;
+  } catch(_) {}
+
+  heroEl.style.display = 'block';
+
+  // Fetch RPC
+  try {
+    const { data, error } = await c.rpc('get_owner_today_pulse', { p_business_id: biz.id });
+    if (error || !data) {
+      console.warn('aaj-score rpc:', error);
+      // Show zeros, still display card
+      return;
+    }
+    animateAajScore(data);
+  } catch(e) {
+    console.warn('aaj-score fail:', e);
+  }
+}
+
+function animateAajScore(d){
+  const setNum = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const target = parseInt(val, 10) || 0;
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target / 18));
+    const t = setInterval(() => {
+      cur += step;
+      if (cur >= target) { cur = target; clearInterval(t); }
+      el.textContent = cur.toLocaleString('en-IN');
+    }, 35);
+    if (target === 0) el.textContent = '0';
+  };
+
+  setNum('aajViewsBig', d.today_views || 0);
+  setNum('aajCalls',    d.today_calls || 0);
+  setNum('aajSaves',    d.today_saves || 0);
+
+  // Rating
+  const rEl = document.getElementById('aajRating');
+  if (rEl) {
+    const r = parseFloat(d.rating);
+    rEl.textContent = (r > 0) ? r.toFixed(1) : '—';
+  }
+
+  // Trend arrow
+  const tEl = document.getElementById('aajTrend');
+  if (tEl) {
+    const delta = parseInt(d.delta_pct, 10) || 0;
+    const trend = d.trend || 'flat';
+    tEl.className = 'trend-arrow ' + trend;
+    if (trend === 'up')    tEl.textContent = '↑ ' + delta + '%';
+    else if (trend === 'down') tEl.textContent = '↓ ' + Math.abs(delta) + '%';
+    else tEl.textContent = '— 0%';
+  }
+}
+
+// ─── Aaj ka Poster: Daily auto-rotating WhatsApp share ───────
+function initAajKaPoster(biz){
+  if (!biz || !window.DailyPoster) {
+    // Engine might still be loading (defer)
+    setTimeout(() => initAajKaPoster(biz), 600);
+    return;
+  }
+  const card = document.getElementById('aajPosterCard');
+  if (!card) return;
+
+  const theme = DailyPoster.getTodayTheme();
+  const lang  = (document.documentElement.getAttribute('data-lang') || 'en') === 'hi' ? 'hi' : 'en';
+
+  // Pick first category slug as a hint for tips
+  let categorySlug = '';
+  try {
+    if (biz.categories && Array.isArray(biz.categories) && biz.categories.length) {
+      categorySlug = String(biz.categories[0]?.slug || biz.categories[0] || '').toLowerCase();
+    } else if (biz.category) {
+      categorySlug = String(biz.category).toLowerCase();
+    } else if (biz.primary_category_slug) {
+      categorySlug = String(biz.primary_category_slug).toLowerCase();
+    }
+  } catch(_) {}
+
+  // Compose shop data for engine
+  const shopData = {
+    name: biz.name || 'Aapka Shop',
+    slug: biz.slug || '',
+    mobile: biz.mobile || biz.phone || '',
+    city: biz.city_name || biz.city || '',
+    category: categorySlug,
+    established_year: biz.established_year || null,
+    rating: biz.rating_avg || biz.rating || 0
+  };
+
+  // Theme label
+  const themeEl = document.getElementById('aajPosterTheme');
+  if (themeEl) {
+    const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][theme.dayIndex];
+    themeEl.textContent = dayName + ' — ' + (lang === 'hi' ? theme.nameHi : theme.nameEn);
+  }
+
+  // Render small preview canvas (smaller size = faster)
+  const canvas = document.getElementById('aajPosterCanvas');
+  if (canvas) {
+    DailyPoster.renderToCanvas(canvas, shopData, theme, 540)
+      .catch(err => console.warn('poster preview:', err));
+  }
+
+  card.style.display = 'grid';
+
+  // Wire share button
+  const btn = document.getElementById('aajPosterShareBtn');
+  if (btn && !btn._wired) {
+    btn._wired = true;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      const origHTML = btn.innerHTML;
+      btn.innerHTML = '<span style="font-size:14px">⏳</span> Preparing…';
+      try {
+        await DailyPoster.shareToWhatsApp(shopData, theme, 1080);
+        btn.innerHTML = '<span style="font-size:14px">✓</span> Shared!';
+        setTimeout(() => { btn.innerHTML = origHTML; btn.disabled = false; }, 1800);
+      } catch(e) {
+        console.warn('share fail:', e);
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+        alert('Could not share. Try Customize → for full editor.');
+      }
+    });
+  }
+}
 </script>
 
 <script>
@@ -2008,10 +2346,18 @@ function shareReferralWhatsApp(){
 })();
 </script>
 
+<!-- Daily Poster Engine (2026-06-05) — 7-day theme rotation for Aaj ka Poster card -->
+<script src="/assets/js/daily-poster-engine.js" defer></script>
+
 <!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
 <script src="/assets/js/owner-notifications.js" defer></script>
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
+<script src="/assets/js/error-reporter.js" defer></script>
+<script src="/_vercel/insights/script.js" defer></script>
+</body>
+</html>
+t on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
 <script src="/_vercel/insights/script.js" defer></script>
 </body>
