@@ -296,4 +296,36 @@ textarea:focus-visible{
 
 /* ============================================================
    MOBILE PWA — Lock horizontal pan / float
-   --------------------------------------------
+   ----------------------------------------------------------------
+   USER REPORT (2026-06-05):
+     "Apni app PWA mobile screen par touch karne par float kar
+      rahi hai" — touching/swiping the page would let it drag
+     horizontally exposing background.
+
+   ROOT CAUSE:
+     html/body in main.css have no overflow-x lock. Any element
+     even 1px wider than viewport (long URL, sticky strip, embed,
+     shadow with negative margin) makes the WHOLE page horizontally
+     pannable. PWA standalone mode amplifies this — no browser
+     chrome to "snap back".
+
+   FIX (no layout impact — purely behaviour):
+     - overflow-x:hidden + max-width:100% on html/body
+     - overscroll-behavior-x:none → no rubber-band swipe gestures
+     - touch-action:pan-y → allow vertical scroll, block horizontal
+       drag at the touch-event level (PWA-aware)
+   ============================================================ */
+html, body{
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+/* Defensive: any top-level wrapper wider than viewport gets clipped */
+body > *{
+  max-width: 100vw;
+}
+
+/* ============================================================
+   END public-premium.css
+   ============================================================ */
