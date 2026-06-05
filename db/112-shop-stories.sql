@@ -52,12 +52,13 @@ CREATE TABLE IF NOT EXISTS shop_stories (
   CONSTRAINT story_text_len CHECK (length(text) BETWEEN 1 AND 280)
 );
 
+-- NOTE: NOW() is STABLE, not IMMUTABLE — can't be used in partial
+-- index predicates. We index ALL rows; the query-time filter
+-- (WHERE expires_at > NOW()) still works fine.
 CREATE INDEX IF NOT EXISTS idx_stories_biz_active
-  ON shop_stories (business_id, expires_at DESC)
-  WHERE expires_at > NOW();
+  ON shop_stories (business_id, expires_at DESC);
 CREATE INDEX IF NOT EXISTS idx_stories_recent
-  ON shop_stories (expires_at DESC, created_at DESC)
-  WHERE expires_at > NOW();
+  ON shop_stories (expires_at DESC, created_at DESC);
 
 
 -- RLS — read-public, write-owner-only
@@ -73,7 +74,7 @@ CREATE POLICY shop_stories_owner_write ON shop_stories
     EXISTS (
       SELECT 1 FROM business_owners
       WHERE business_id = shop_stories.business_id
-        AND user_id = auth.uid()
+        AND auth_user_id = auth.uid()
     )
   );
 
@@ -107,7 +108,7 @@ BEGIN
   -- Find owner's business (first one if multiple)
   SELECT business_id INTO v_business_id
   FROM business_owners
-  WHERE user_id = v_user_id
+  WHERE auth_user_id = v_user_id
   LIMIT 1;
 
   IF v_business_id IS NULL THEN
@@ -176,7 +177,7 @@ BEGIN
 
   SELECT EXISTS (
     SELECT 1 FROM business_owners
-    WHERE business_id = v_story_biz AND user_id = v_user_id
+    WHERE business_id = v_story_biz AND auth_user_id = v_user_id
   ) INTO v_is_owner;
 
   IF NOT v_is_owner THEN
