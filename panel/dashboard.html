@@ -495,6 +495,50 @@
   .ps-preview-wrap.fmt-story #aajPosterCanvas{ max-width:150px }
   .ps-preview-wrap.fmt-card #aajPosterCanvas{ max-width:280px }
   .ps-share-row{ grid-template-columns:repeat(2,1fr) }
+/* Template Mega Pack (2026-06-05) v2.5 — Gallery grid + Hindi toggle */
+.ps-gallery-label{ display:flex; align-items:center; justify-content:space-between; font-size:.7rem; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin:6px 0 8px; position:relative; z-index:1 }
+.ps-gallery-label .ps-count{ background:rgba(251,191,36,.18); color:#FBBF24; padding:2px 9px; border-radius:99px; font-size:.66rem; letter-spacing:.04em }
+.ps-gallery{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
+  max-height:300px; overflow-y:auto; padding:8px;
+  background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.04);
+  border-radius:14px; margin-bottom:14px; position:relative; z-index:1;
+  scrollbar-width:thin; scrollbar-color:rgba(251,191,36,.3) transparent;
+}
+.ps-gallery::-webkit-scrollbar{ width:6px }
+.ps-gallery::-webkit-scrollbar-thumb{ background:rgba(251,191,36,.3); border-radius:99px }
+.ps-tmpl{
+  aspect-ratio:1/1; border-radius:9px; cursor:pointer;
+  border:2px solid transparent; overflow:hidden;
+  position:relative; transition:.15s; background:#0F172A;
+  display:grid; place-items:center;
+}
+.ps-tmpl:hover{ transform:scale(1.05); border-color:rgba(251,191,36,.5) }
+.ps-tmpl.active{ border-color:#FBBF24; box-shadow:0 0 0 3px rgba(251,191,36,.25); transform:scale(1.05) }
+.ps-tmpl canvas{ width:100%; height:100%; display:block }
+.ps-tmpl .ps-tmpl-name{
+  position:absolute; bottom:0; left:0; right:0;
+  background:linear-gradient(to top, rgba(0,0,0,.85), transparent);
+  color:#fff; padding:14px 4px 4px; font-size:.55rem;
+  font-weight:800; letter-spacing:.04em; text-align:center;
+  text-transform:uppercase; line-height:1.1;
+}
+.ps-lang-toggle{
+  display:inline-flex; background:rgba(0,0,0,.25); border-radius:99px;
+  padding:3px; gap:0; border:1px solid rgba(255,255,255,.06);
+}
+.ps-lang-btn{
+  background:transparent; border:none; color:rgba(255,255,255,.55);
+  padding:4px 11px; font-size:.7rem; font-weight:800; cursor:pointer;
+  border-radius:99px; transition:.15s; font-family:inherit; letter-spacing:.04em;
+}
+.ps-lang-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A }
+.ps-photo-bg-toggle{ margin-left:auto }
+@media (max-width:540px){
+  .ps-gallery{ grid-template-columns:repeat(3,1fr); max-height:280px }
+  .ps-tmpl-name{ font-size:.5rem }
+}
+
 }
 
 
@@ -787,9 +831,17 @@
         <canvas id="aajPosterCanvas" width="1080" height="1080"></canvas>
       </div>
 
-      <!-- Theme carousel -->
-      <div class="ps-theme-carousel-label">Pick a theme</div>
-      <div class="ps-theme-carousel" id="psThemeCarousel"></div>
+      <!-- Template Gallery (30+ designs) -->
+      <div class="ps-gallery-label">
+        <span>Choose template <span class="ps-count" id="psTmplCount">30</span></span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span class="ps-lang-toggle" id="psLangToggle">
+            <button type="button" class="ps-lang-btn active" data-lang="en">EN</button>
+            <button type="button" class="ps-lang-btn" data-lang="hi">हिं</button>
+          </span>
+        </span>
+      </div>
+      <div class="ps-gallery" id="psGallery"></div>
 
       <!-- Quick toggles -->
       <div class="ps-toggles">
@@ -797,6 +849,7 @@
         <button type="button" class="ps-toggle on" data-toggle="rating"><span class="dot"></span> Rating</button>
         <button type="button" class="ps-toggle on" data-toggle="phone"><span class="dot"></span> Phone</button>
         <button type="button" class="ps-toggle" data-toggle="address"><span class="dot"></span> Address</button>
+        <button type="button" class="ps-toggle ps-photo-bg-toggle" data-toggle="photoBg"><span class="dot"></span> 📷 Photo Bg</button>
       </div>
 
       <!-- Share to 4 platforms -->
@@ -2332,14 +2385,14 @@ function animateAajScore(d){
 
 // ─── Aaj ka Poster: Daily auto-rotating WhatsApp share ───────
 function initAajKaPoster(biz){
-  if (!biz || !window.DailyPoster) {
+  if (!biz || !window.TemplateMegaPack || !window.DailyPoster) {
     setTimeout(() => initAajKaPoster(biz), 600);
     return;
   }
   const card = document.getElementById('aajPosterCard');
   if (!card) return;
 
-  // ── Build shop data once ─────────────────────────────────
+  // ── Build shop data ─────────────────────────────────────
   let categorySlug = '';
   try {
     if (biz.categories && Array.isArray(biz.categories) && biz.categories.length) {
@@ -2349,7 +2402,7 @@ function initAajKaPoster(biz){
     } else if (biz.primary_category_slug) {
       categorySlug = String(biz.primary_category_slug).toLowerCase();
     }
-  } catch(_) {}
+  } catch(_){}
 
   const shopData = {
     name: biz.name || 'Your Business',
@@ -2359,85 +2412,71 @@ function initAajKaPoster(biz){
     category: categorySlug,
     established_year: biz.established_year || null,
     rating: biz.rating_avg || biz.rating || 0,
-    address: biz.address || ''
+    address: biz.address || '',
+    photo: (Array.isArray(biz.photos) && biz.photos[0]) || ''
   };
 
-  // ── State ────────────────────────────────────────────────
   const state = {
-    format: 'square',  // square / story / card
-    themeIdx: new Date().getDay(),
+    format: 'square',
+    tmpl: null,
+    lang: 'en',
     showPhoto: true,
     showRating: true,
     showPhone: true,
     showAddress: false,
-    festival: null
+    usePhotoBg: false
   };
 
-  // Check festival
+  // ── Festival banner ────────────────────────────────────
+  let festival = null;
   if (window.FestivalEngine && FestivalEngine.getActiveFestival) {
-    state.festival = FestivalEngine.getActiveFestival();
+    festival = FestivalEngine.getActiveFestival();
   }
-
-  // ── Render festival banner if active ─────────────────────
   const fbEl = document.getElementById('psFestivalBanner');
-  if (state.festival && fbEl) {
-    document.getElementById('psFestivalIcon').textContent = state.festival.emoji || '🎉';
-    document.getElementById('psFestivalText').textContent = state.festival.nameEn + ' theme is ready';
-    const days = state.festival.daysAway;
+  if (festival && fbEl) {
+    document.getElementById('psFestivalIcon').textContent = festival.emoji || '🎉';
+    document.getElementById('psFestivalText').textContent = festival.nameEn + ' theme available';
+    const days = festival.daysAway;
     const dayLbl = days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : days + ' days away';
-    document.getElementById('psFestivalDays').textContent = dayLbl + ' — share it 7 days ahead';
+    document.getElementById('psFestivalDays').textContent = dayLbl + ' — pick a festival template';
     fbEl.style.display = 'flex';
   }
 
-  // ── Build theme carousel ─────────────────────────────────
-  const carousel = document.getElementById('psThemeCarousel');
-  if (carousel) {
-    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const todayIdx = new Date().getDay();
-    let chips = [];
+  // ── Build template gallery ─────────────────────────────
+  const templates = TemplateMegaPack.getRelevantTemplates(shopData.category);
+  document.getElementById('psTmplCount').textContent = templates.length;
+  state.tmpl = templates[0];
 
-    // Festival first (if active)
-    if (state.festival) {
-      chips.push({
-        idx: 'festival',
-        label: state.festival.emoji + ' ' + state.festival.nameEn,
-        festival: true
-      });
+  const gallery = document.getElementById('psGallery');
+  gallery.innerHTML = templates.map((t, i) =>
+    '<div class="ps-tmpl ' + (i === 0 ? 'active' : '') + '" data-tid="' + t.id + '">' +
+    '  <canvas data-thumb-for="' + t.id + '"></canvas>' +
+    '  <div class="ps-tmpl-name">' + t.name + '</div>' +
+    '</div>'
+  ).join('');
+
+  // Render thumbnails (small, async)
+  setTimeout(async () => {
+    for (const t of templates) {
+      const thumb = gallery.querySelector('[data-thumb-for="' + t.id + '"]');
+      if (thumb) {
+        try { await TemplateMegaPack.renderTemplate(thumb, shopData, t, { size: 200, lang: state.lang }); }
+        catch(e){}
+      }
     }
+  }, 200);
 
-    // 7-day rotation starting from today
-    for (let i = 0; i < 7; i++) {
-      const dIdx = (todayIdx + i) % 7;
-      const theme = DailyPoster.getThemeByIndex(dIdx);
-      const isToday = i === 0;
-      chips.push({
-        idx: dIdx,
-        label: (theme.emoji || '✨') + ' ' + dayNames[dIdx] + ' · ' + theme.nameEn,
-        isToday: isToday
-      });
-    }
-
-    carousel.innerHTML = chips.map((ch, i) =>
-      '<button type="button" class="ps-theme-chip ' +
-      (ch.festival ? 'festival ' : '') +
-      (i === 0 ? 'active' : '') +
-      '" data-theme="' + ch.idx + '">' + ch.label + '</button>'
-    ).join('');
-
-    // Activate first chip (festival if present, else today)
-    state.themeIdx = (state.festival && state.festival) ? 'festival' : todayIdx;
-
-    carousel.querySelectorAll('.ps-theme-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        carousel.querySelectorAll('.ps-theme-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.themeIdx = chip.dataset.theme;
-        render();
-      });
+  // Click handler
+  gallery.querySelectorAll('.ps-tmpl').forEach(el => {
+    el.addEventListener('click', () => {
+      gallery.querySelectorAll('.ps-tmpl').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      state.tmpl = templates.find(t => t.id === el.dataset.tid);
+      renderMain();
     });
-  }
+  });
 
-  // ── Format tabs ──────────────────────────────────────────
+  // ── Format tabs ─────────────────────────────────────────
   card.querySelectorAll('.ps-format-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       card.querySelectorAll('.ps-format-btn').forEach(b => b.classList.remove('active'));
@@ -2446,195 +2485,119 @@ function initAajKaPoster(biz){
       const wrap = document.getElementById('psPreviewWrap');
       wrap.classList.remove('fmt-square','fmt-story','fmt-card');
       wrap.classList.add('fmt-' + state.format);
-      render();
+      renderMain();
     });
   });
 
-  // ── Quick toggles ────────────────────────────────────────
+  // ── Language toggle ────────────────────────────────────
+  const langToggle = document.getElementById('psLangToggle');
+  if (langToggle) {
+    langToggle.querySelectorAll('.ps-lang-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        langToggle.querySelectorAll('.ps-lang-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        state.lang = b.dataset.lang;
+        renderMain();
+        // Re-render thumbnails in new lang
+        setTimeout(async () => {
+          for (const t of templates) {
+            const thumb = gallery.querySelector('[data-thumb-for="' + t.id + '"]');
+            if (thumb) {
+              try { await TemplateMegaPack.renderTemplate(thumb, shopData, t, { size: 200, lang: state.lang }); } catch(e){}
+            }
+          }
+        }, 50);
+      });
+    });
+  }
+
+  // ── Quick toggles ──────────────────────────────────────
   card.querySelectorAll('.ps-toggle').forEach(t => {
     t.addEventListener('click', () => {
       t.classList.toggle('on');
-      state[
-        'show' + t.dataset.toggle.charAt(0).toUpperCase() + t.dataset.toggle.slice(1)
-      ] = t.classList.contains('on');
-      render();
+      const key = t.dataset.toggle;
+      if (key === 'photoBg') state.usePhotoBg = t.classList.contains('on');
+      else state['show' + key.charAt(0).toUpperCase() + key.slice(1)] = t.classList.contains('on');
+      renderMain();
     });
   });
 
-  // ── Streak counter (localStorage) ────────────────────────
+  // ── Streak ─────────────────────────────────────────────
   function updateStreak(){
     try {
-      const KEY = 'dl_poster_streak';
-      const today = new Date().toISOString().slice(0,10);
-      let s = JSON.parse(localStorage.getItem(KEY) || '{}');
+      const s = JSON.parse(localStorage.getItem('dl_poster_streak') || '{}');
       const streak = parseInt(s.streak, 10) || 0;
       const el = document.getElementById('psStreak');
-      if (el) el.textContent = streak > 0 ? ('🔥 ' + streak + ' day' + (streak !== 1 ? 's' : '')) : '🔥 Start sharing';
+      if (el) el.textContent = streak > 0 ? ('🔥 ' + streak + ' day' + (streak !== 1 ? 's' : '')) : '🔥 Share to start';
     } catch(_){}
   }
   function bumpStreak(){
     try {
-      const KEY = 'dl_poster_streak';
       const today = new Date().toISOString().slice(0,10);
-      let s = JSON.parse(localStorage.getItem(KEY) || '{}');
+      let s = JSON.parse(localStorage.getItem('dl_poster_streak') || '{}');
       const last = s.last_date;
       let streak = parseInt(s.streak, 10) || 0;
-      if (last === today) return; // already counted
+      if (last === today) return;
       if (last) {
-        const lastD = new Date(last + 'T00:00:00');
-        const todayD = new Date(today + 'T00:00:00');
-        const diff = Math.round((todayD - lastD) / 86400000);
+        const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
         streak = (diff === 1) ? streak + 1 : 1;
-      } else {
-        streak = 1;
-      }
-      localStorage.setItem(KEY, JSON.stringify({ last_date: today, streak: streak }));
+      } else streak = 1;
+      localStorage.setItem('dl_poster_streak', JSON.stringify({ last_date: today, streak }));
       updateStreak();
     } catch(_){}
   }
   updateStreak();
 
-  // ── Resolve current theme ────────────────────────────────
-  function currentTheme(){
-    if (state.themeIdx === 'festival' && state.festival && window.FestivalEngine) {
-      return Object.assign({ dayIndex: new Date().getDay() },
-        FestivalEngine.festivalAsTheme(state.festival));
-    }
-    return DailyPoster.getThemeByIndex(parseInt(state.themeIdx, 10) || new Date().getDay());
-  }
-
-  // ── Build effective shopData based on toggles ────────────
-  function effectiveShopData(){
+  // ── Effective shop data based on toggles ───────────────
+  function effective(){
     return {
-      name:    shopData.name,
-      slug:    shopData.slug,
-      mobile:  state.showPhone   ? shopData.mobile  : '',
-      city:    shopData.city,
+      name: shopData.name,
+      slug: shopData.slug,
+      mobile: state.showPhone ? shopData.mobile : '',
+      city: shopData.city,
       category: shopData.category,
       established_year: shopData.established_year,
-      rating:  state.showRating  ? shopData.rating  : 0,
-      address: state.showAddress ? shopData.address : ''
+      rating: state.showRating ? shopData.rating : 0,
+      address: state.showAddress ? shopData.address : '',
+      photo: shopData.photo
     };
   }
 
-  // ── Render preview ───────────────────────────────────────
-  function render(){
+  function opts(){
+    return { size: 1080, lang: state.lang, usePhotoBg: state.usePhotoBg };
+  }
+
+  async function renderMain(){
     const canvas = document.getElementById('aajPosterCanvas');
-    if (!canvas) return;
-    const theme = currentTheme();
-    const data  = effectiveShopData();
-    // Note: canvas size is fixed (1080) by engine — CSS controls display
-    DailyPoster.renderToCanvas(canvas, data, theme, 1080).catch(e => console.warn('render', e));
+    if (!canvas || !state.tmpl) return;
+    try { await TemplateMegaPack.renderTemplate(canvas, effective(), state.tmpl, opts()); }
+    catch(e){ console.warn('render', e); }
   }
+  setTimeout(renderMain, 250);
 
-  // Initial render
-  setTimeout(render, 100);
-
-  // ── Share helpers ────────────────────────────────────────
-  async function generateBlob(targetSize){
-    const theme = currentTheme();
-    const data  = effectiveShopData();
-    let size = targetSize || 1080;
-    // For story format, render taller
-    if (state.format === 'story') size = 1080; // engine handles square; future: full-bleed story
-    return await DailyPoster.renderToBlob(data, theme, size);
-  }
-
-  async function shareWA(){
-    const btn = document.getElementById('psShareWa');
+  // ── Share handlers ─────────────────────────────────────
+  async function share(platform, btnId){
+    const btn = document.getElementById(btnId);
     btn.disabled = true;
     try {
-      await DailyPoster.shareToWhatsApp(effectiveShopData(), currentTheme(), 1080);
+      await TemplateMegaPack.shareToPlatform(platform, effective(), state.tmpl, opts());
       bumpStreak();
-    } catch(e) { console.warn('wa share', e); }
+    } catch(e){ console.warn(platform, e); }
     finally { btn.disabled = false; }
   }
-
-  async function shareIG(){
-    const btn = document.getElementById('psShareIg');
-    btn.disabled = true;
-    try {
-      const blob = await generateBlob(1080);
-      const file = new File([blob], 'dukanlist-instagram.jpg', { type: 'image/jpeg' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'Share to Instagram' });
-        bumpStreak();
-      } else {
-        // Fallback: download — user uploads to Instagram manually
-        await DailyPoster.downloadPoster(effectiveShopData(), currentTheme(), 1080);
-        alert('Image downloaded. Open Instagram and upload as Story or Post.');
-        bumpStreak();
-      }
-    } catch(e) { console.warn('ig share', e); }
-    finally { btn.disabled = false; }
-  }
-
-  async function shareFB(){
-    const btn = document.getElementById('psShareFb');
-    btn.disabled = true;
-    try {
-      const blob = await generateBlob(1080);
-      const file = new File([blob], 'dukanlist-facebook.jpg', { type: 'image/jpeg' });
-      const url = 'https://dukanlist.com/business.html?slug=' + (effectiveShopData().slug || '');
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text: effectiveShopData().name + ' on DukanList\n' + url });
-        bumpStreak();
-      } else {
-        // Fallback: download + open FB sharer with URL only
-        await DailyPoster.downloadPoster(effectiveShopData(), currentTheme(), 1080);
-        const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
-        window.open(fbUrl, '_blank');
-        bumpStreak();
-      }
-    } catch(e) { console.warn('fb share', e); }
-    finally { btn.disabled = false; }
-  }
-
-  async function downloadOnly(){
+  document.getElementById('psShareWa').addEventListener('click', () => share('whatsapp', 'psShareWa'));
+  document.getElementById('psShareIg').addEventListener('click', () => share('instagram', 'psShareIg'));
+  document.getElementById('psShareFb').addEventListener('click', () => share('facebook', 'psShareFb'));
+  document.getElementById('psShareDl').addEventListener('click', async () => {
     const btn = document.getElementById('psShareDl');
     btn.disabled = true;
-    try {
-      await DailyPoster.downloadPoster(effectiveShopData(), currentTheme(), 1080);
-    } catch(e) { console.warn('download', e); }
+    try { await TemplateMegaPack.downloadPoster(effective(), state.tmpl, opts()); }
+    catch(e){}
     finally { btn.disabled = false; }
-  }
-
-  document.getElementById('psShareWa').addEventListener('click', shareWA);
-  document.getElementById('psShareIg').addEventListener('click', shareIG);
-  document.getElementById('psShareFb').addEventListener('click', shareFB);
-  document.getElementById('psShareDl').addEventListener('click', downloadOnly);
+  });
 
   card.style.display = 'block';
 }
-
-// ─── Phase 2: Town Rank + Smart Tips + Badge Wall + Streak ───
-function initPhase2Cards(biz, c){
-  if (!biz || !biz.id) return;
-  if (!window.EngagementEngine) {
-    setTimeout(() => initPhase2Cards(biz, c), 500);
-    return;
-  }
-  try { EngagementEngine.renderTownRank('townRankCard', c, biz.id); }
-  catch(e){ console.warn('Town Rank:', e); }
-  try { EngagementEngine.renderSmartTips('smartTipsCard', c, biz.id); }
-  catch(e){ console.warn('Smart Tips:', e); }
-  renderLoyaltyCard(biz.id, c).catch(()=>{});
-  try { EngagementEngine.renderBadgeWall('badgeWallCard', biz); }
-  catch(e){ console.warn('Badge Wall:', e); }
-  try {
-    var streakHostId = 'aajStreakHost';
-    var dateEl = document.getElementById('aajDate');
-    if (dateEl && !document.getElementById(streakHostId)) {
-      var span = document.createElement('span');
-      span.id = streakHostId;
-      span.style.display = 'inline-block';
-      span.style.marginLeft = '6px';
-      dateEl.parentNode.appendChild(span);
-    }
-    EngagementEngine.renderStreakBadge(streakHostId);
-  } catch(e){ console.warn('Streak:', e); }
-}
-
 
 // ─── Phase 4: Loyalty Tracker render ───────────────────────────
 async function renderLoyaltyCard(businessId, supaClient){
@@ -2980,6 +2943,8 @@ function shareReferralWhatsApp(){
 <script src="/assets/js/daily-poster-engine.js" defer></script>
 <!-- Festival Engine (2026-06-05): Auto-override poster theme on festival days -->
 <script src="/assets/js/festival-engine.js" defer></script>
+<!-- Template Mega Pack (2026-06-05): 30+ designs -->
+<script src="/assets/js/template-mega-pack.js" defer></script>
 <!-- Engagement Engine (2026-06-05) -->
 <script src="/assets/js/engagement-engine.js" defer></script>
 
