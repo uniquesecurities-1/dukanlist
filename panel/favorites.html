@@ -28,6 +28,21 @@
   .empty .ico{ font-size:3.4rem; margin-bottom:8px; opacity:.55 }
   .empty h2{ font-size:1.2rem; font-weight:800; color:var(--ink); margin-bottom:8px }
   .empty p{ color:var(--muted); margin-bottom:18px; line-height:1.55 }
+
+  .feed-card{ background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:16px; padding:16px; margin-bottom:18px; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+  .feed-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px }
+  .feed-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:.96rem; color:#0F172A; letter-spacing:-.015em; flex:1 }
+  .feed-count{ background:#1E3A8A; color:#fff; font-size:.66rem; font-weight:800; padding:3px 9px; border-radius:99px; letter-spacing:.04em }
+  .feed-row{ display:grid; grid-template-columns:42px 1fr auto; gap:12px; padding:11px 12px; border-radius:11px; align-items:center; text-decoration:none; color:#0F172A; transition:.15s; background:#F8FAFC; margin-bottom:8px }
+  .feed-row:hover{ background:#F1F5F9; text-decoration:none }
+  .feed-row-ico{ width:42px; height:42px; display:grid; place-items:center; background:#fff; border:1px solid #E5E7EB; border-radius:10px; font-size:1.25rem; overflow:hidden }
+  .feed-row-ico img{ width:100%; height:100%; object-fit:cover; border-radius:9px }
+  .feed-row-body{ min-width:0 }
+  .feed-row-title{ font-weight:700; font-size:.92rem; color:#0F172A; margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .feed-row-shop{ font-size:.78rem; color:#64748B; font-weight:600 }
+  .feed-row-time{ font-size:.72rem; color:#94A3B8; white-space:nowrap; font-weight:600 }
+  .feed-empty{ text-align:center; padding:18px; color:#64748B; font-size:.88rem }
+
   .btn-go{ display:inline-block; background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; padding:11px 24px; border-radius:99px; text-decoration:none; font-weight:700; box-shadow:0 4px 14px rgba(255,107,26,.35); font-size:.92rem }
   .loader{ text-align:center; padding:60px 20px; color:var(--muted); font-size:.95rem }
   .toast{ position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#0F172A; color:#fff; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; z-index:99999; box-shadow:0 8px 24px rgba(15,23,42,.25); opacity:0; transition:opacity .2s }
@@ -67,6 +82,8 @@
     <h1>♥ <span data-i18n-en>My Favorite Shops</span><span data-i18n-hi>मेरी पसंदीदा दुकानें</span></h1>
     <p><span data-i18n-en>Quick access to shops you've saved.</span><span data-i18n-hi>आपके द्वारा सहेजी गई दुकानों तक त्वरित पहुँच।</span></p>
   </div>
+
+  <div id="favFeedCard" style="display:none"></div>
 
   <div id="loading" class="loader">⏳ Loading your favorites...</div>
 
@@ -213,5 +230,66 @@ load();
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
 <script src="/_vercel/insights/script.js" defer></script>
+<script>
+async function loadFavoritesFeed(){
+  if (!window.ShopDB || !ShopDB.client) return;
+  const c = ShopDB.client;
+  try {
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user) return;
+    const { data, error } = await c.rpc('get_customer_favorite_feed', { p_limit: 12 });
+    if (error || !data || data.empty) return;
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (items.length === 0) return;
+
+    const card = document.getElementById('favFeedCard');
+    if (!card) return;
+
+    const rowsHtml = items.map(function(it){
+      const ico = it.kind === 'deal' ? '🎁' : it.kind === 'review' ? '⭐' : '✨';
+      const ts = it.activity_at ? new Date(it.activity_at) : null;
+      const timeStr = ts ? niceTime(ts) : '';
+      const photo = it.shop_photo ? '<img src="'+escAttr(it.shop_photo)+'" alt="">' : ico;
+      return '<a class="feed-row" href="/business.html?slug='+encodeURIComponent(it.shop_slug||'')+'">'+
+             '<div class="feed-row-ico">'+photo+'</div>'+
+             '<div class="feed-row-body">'+
+               '<div class="feed-row-title">'+escHtml(it.title||'Activity')+'</div>'+
+               '<div class="feed-row-shop">'+escHtml(it.shop_name||'')+'</div>'+
+             '</div>'+
+             '<div class="feed-row-time">'+timeStr+'</div>'+
+             '</a>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="feed-card">'+
+        '<div class="feed-head">'+
+          '<span style="font-size:1.2rem">✨</span>'+
+          '<span class="feed-title">What is new from your favorites</span>'+
+          '<span class="feed-count">'+items.length+'</span>'+
+        '</div>'+
+        rowsHtml +
+      '</div>';
+    card.style.display = 'block';
+  } catch(_){}
+}
+
+function escHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return escHtml(s).replace(/"/g,'&quot;'); }
+function niceTime(d){
+  const now = new Date();
+  const ms = now - d;
+  const mins = Math.floor(ms / 60000);
+  if (mins < 60) return mins + 'm';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h';
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return days + 'd';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(loadFavoritesFeed, 800);
+});
+</script>
 </body>
 </html>

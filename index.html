@@ -177,6 +177,27 @@ html[data-lang="hi"] .hero-tag{ font-family:'Noto Sans Devanagari',sans-serif }
 
 @media (min-width:760px){ #catStrip{display:none !important} }
 /* CATSTRIP_DESKTOP_HIDE */
+
+/* Phase 5 (2026-06-05): Local Pulse widget on homepage */
+.pulse-widget{ background:linear-gradient(135deg,#FAFBFD 0%,#F0F6FF 100%); border:1px solid #E2E8F0; border-radius:18px; padding:18px 22px; margin:0 auto 28px; max-width:1180px; box-shadow:0 2px 8px rgba(15,23,42,.04); display:flex; align-items:center; gap:18px; flex-wrap:wrap }
+.pulse-head{ display:flex; align-items:center; gap:8px; flex:0 0 auto }
+.pulse-dot{ width:9px; height:9px; border-radius:50%; background:#10B981; box-shadow:0 0 0 3px rgba(16,185,129,.18); animation:pulseGlow 1.6s ease-in-out infinite }
+@keyframes pulseGlow{ 0%,100%{ box-shadow:0 0 0 3px rgba(16,185,129,.18) } 50%{ box-shadow:0 0 0 7px rgba(16,185,129,.04) } }
+.pulse-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:.86rem; color:#0F172A; letter-spacing:-.01em }
+.pulse-stats{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; flex:1 }
+.pulse-stat{ display:flex; align-items:baseline; gap:6px }
+.pulse-stat-num{ font-family:'Manrope',sans-serif; font-weight:900; font-size:1.15rem; color:#1E3A8A; letter-spacing:-.025em }
+.pulse-stat-lbl{ font-size:.78rem; color:#64748B; font-weight:600 }
+.pulse-cats{ display:flex; gap:6px; flex-wrap:wrap; align-items:center }
+.pulse-cat-pill{ font-size:.72rem; font-weight:700; padding:4px 9px; background:#fff; border:1px solid #CBD5E1; border-radius:99px; color:#475569; text-decoration:none }
+.pulse-cat-pill:hover{ background:#1E3A8A; color:#fff; border-color:#1E3A8A; text-decoration:none }
+@media (max-width:600px){
+  .pulse-widget{ padding:14px 16px; gap:10px; margin-bottom:20px }
+  .pulse-stats{ gap:10px; width:100% }
+  .pulse-stat-num{ font-size:1rem }
+  .pulse-stat-lbl{ font-size:.7rem }
+}
+
 </style>
 
 <style>
@@ -945,6 +966,19 @@ function dismissFestBanner(){
     .trend-chip:hover{background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C;color:#9A3412;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,0.15);text-decoration:none}
   </style>
 </section>
+
+<div id="localPulse" class="pulse-widget" style="display:none">
+  <div class="pulse-head">
+    <span class="pulse-dot"></span>
+    <span class="pulse-title">Live in <span id="pulseCity">your city</span></span>
+  </div>
+  <div class="pulse-stats">
+    <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewShops">0</span><span class="pulse-stat-lbl">new shops today</span></div>
+    <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewDeals">0</span><span class="pulse-stat-lbl">new deals</span></div>
+    <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewReviews">0</span><span class="pulse-stat-lbl">new reviews</span></div>
+  </div>
+  <div class="pulse-cats" id="pulseCats"></div>
+</div>
 
 <section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
   <div style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:18px 8px;box-shadow:0 1px 3px rgba(15,23,42,.04)">
@@ -2192,5 +2226,44 @@ function dismissActTicker(){
 }
 </script>
 
+<script>
+// Phase 5: Local Pulse widget
+(async function(){
+  if (!window.ShopDB || !ShopDB.client) {
+    setTimeout(arguments.callee, 500);
+    return;
+  }
+  let citySlug = null;
+  try {
+    if (window.CityPersist && CityPersist.getCity) {
+      citySlug = (CityPersist.getCity() || {}).slug || null;
+    }
+    if (!citySlug) {
+      citySlug = localStorage.getItem('dukanlist.city') || null;
+    }
+  } catch(_){}
+  try {
+    const { data, error } = await ShopDB.client.rpc('get_local_pulse', { p_city_slug: citySlug });
+    if (error || !data) return;
+    const newShops = parseInt(data.new_shops, 10) || 0;
+    const newDeals = parseInt(data.new_deals, 10) || 0;
+    const newRev   = parseInt(data.new_reviews, 10) || 0;
+    if (newShops + newDeals + newRev === 0) return;
+    const el = document.getElementById('localPulse');
+    if (!el) return;
+    document.getElementById('pulseCity').textContent = data.city_name || 'your city';
+    document.getElementById('pulseNewShops').textContent = newShops;
+    document.getElementById('pulseNewDeals').textContent = newDeals;
+    document.getElementById('pulseNewReviews').textContent = newRev;
+    const catsEl = document.getElementById('pulseCats');
+    if (catsEl && Array.isArray(data.top_categories)) {
+      catsEl.innerHTML = data.top_categories.slice(0, 3).map(function(c){
+        return '<a class="pulse-cat-pill" href="/search.html?cat='+encodeURIComponent(c.category_id||'')+'">#'+(c.category_name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</a>';
+      }).join('');
+    }
+    el.style.display = 'flex';
+  } catch(_){}
+})();
+</script>
 </body>
 </html>
