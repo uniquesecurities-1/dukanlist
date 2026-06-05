@@ -359,67 +359,144 @@
   font-weight:700; margin-top:5px; display:block;
 }
 
-/* ===== Aaj ka Poster Card ===== */
-.aaj-poster-card{
-  background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 60%,#FCD34D 100%);
-  border-radius:20px; padding:20px; margin-top:16px;
-  display:grid; grid-template-columns:1fr 140px; gap:16px;
-  align-items:center; box-shadow:0 14px 40px rgba(251,191,36,.18);
+/* ===== POSTER STUDIO v2 (2026-06-05): Premium hero card ===== */
+.poster-studio{
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 45%,#312E81 100%);
+  color:#fff; border-radius:22px; padding:22px;
+  margin-top:16px; box-shadow:0 28px 60px rgba(15,23,42,.32);
   position:relative; overflow:hidden;
 }
-.aaj-poster-card::before{
-  content:""; position:absolute; bottom:-30px; left:-30px;
-  width:160px; height:160px; border-radius:50%;
-  background:radial-gradient(circle, rgba(255,107,26,.22), transparent 70%);
+.poster-studio::before{
+  content:""; position:absolute; top:-80px; right:-80px;
+  width:340px; height:340px; border-radius:50%;
+  background:radial-gradient(circle,rgba(251,191,36,.22),transparent 70%);
   pointer-events:none;
 }
-.aaj-poster-label{
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:.72rem; font-weight:900; color:#92400E;
-  text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;
+.poster-studio::after{
+  content:""; position:absolute; bottom:-100px; left:-60px;
+  width:280px; height:280px; border-radius:50%;
+  background:radial-gradient(circle,rgba(236,72,153,.16),transparent 70%);
+  pointer-events:none;
 }
-.aaj-poster-label .sparkle{ font-size:1rem; animation:sparkle 2s ease-in-out infinite }
-@keyframes sparkle{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(20deg)} }
-.aaj-poster-theme{
-  font-family:'Manrope',sans-serif; font-weight:900;
-  font-size:1.15rem; color:#451A03; letter-spacing:-.02em;
-  line-height:1.2; margin-bottom:6px;
+.ps-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; position:relative; z-index:1 }
+.ps-logo{ width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#FBBF24,#F97316); display:grid; place-items:center; font-size:1.2rem; box-shadow:0 6px 18px rgba(251,191,36,.4) }
+.ps-title{ font-family:'Manrope',sans-serif; font-weight:900; font-size:1.15rem; letter-spacing:-.022em; flex:1 }
+.ps-streak{
+  display:inline-flex; align-items:center; gap:4px;
+  background:rgba(251,191,36,.22); color:#FBBF24;
+  padding:5px 11px; border-radius:99px; font-size:.74rem;
+  font-weight:900; letter-spacing:.02em;
 }
-.aaj-poster-desc{
-  color:#78350F; font-size:.82rem; line-height:1.5;
-  margin-bottom:12px; font-weight:600;
+.ps-sub{ font-size:.84rem; color:rgba(255,255,255,.65); margin-bottom:14px; position:relative; z-index:1; font-weight:600 }
+.ps-festival-banner{
+  display:none; align-items:center; gap:10px;
+  background:linear-gradient(135deg,#DC2626 0%,#F97316 50%,#FBBF24 100%);
+  color:#fff; padding:10px 14px; border-radius:12px;
+  margin-bottom:14px; position:relative; z-index:1;
+  box-shadow:0 8px 24px rgba(220,38,38,.32);
+  animation:festivalPulse 2.4s ease-in-out infinite;
 }
-.aaj-poster-actions{ display:flex; gap:8px; flex-wrap:wrap }
-.poster-share-btn{
-  background:#25D366; color:#fff; border:none;
-  padding:10px 16px; border-radius:10px;
-  font-weight:800; font-size:.85rem; cursor:pointer;
-  display:inline-flex; align-items:center; gap:6px;
-  font-family:inherit; box-shadow:0 6px 16px rgba(37,211,102,.35);
-  transition:.15s;
+@keyframes festivalPulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.015) } }
+.ps-festival-icon{ font-size:1.6rem }
+.ps-festival-text{ flex:1; font-weight:800; line-height:1.25; font-size:.92rem }
+.ps-festival-days{ font-size:.74rem; opacity:.9; margin-top:2px; font-weight:700 }
+
+/* Format switcher tabs */
+.ps-format-tabs{
+  display:flex; gap:5px; background:rgba(0,0,0,.25); padding:4px;
+  border-radius:99px; margin-bottom:14px; position:relative; z-index:1;
+  border:1px solid rgba(255,255,255,.06);
 }
-.poster-share-btn:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 8px 20px rgba(37,211,102,.45) }
-.poster-share-btn:disabled{ opacity:.6; cursor:wait }
-.poster-customize-btn{
-  background:rgba(146,64,14,.08); color:#92400E; border:1.5px solid rgba(146,64,14,.18);
-  padding:9px 14px; border-radius:10px; font-weight:800; font-size:.82rem;
-  text-decoration:none; font-family:inherit; transition:.15s;
+.ps-format-btn{
+  flex:1; background:transparent; border:none; color:rgba(255,255,255,.55);
+  padding:8px 6px; border-radius:99px; font-weight:800; font-size:.78rem;
+  cursor:pointer; font-family:inherit; transition:.18s; letter-spacing:.02em;
 }
-.poster-customize-btn:hover{ background:rgba(146,64,14,.15); text-decoration:none }
-.aaj-poster-right{
-  position:relative; z-index:1;
-  display:flex; align-items:center; justify-content:center;
+.ps-format-btn.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A; box-shadow:0 4px 12px rgba(251,191,36,.35) }
+.ps-format-btn:hover:not(.active){ color:#fff }
+
+/* Preview area — BIG */
+.ps-preview-wrap{
+  position:relative; z-index:1; margin-bottom:14px;
+  display:grid; place-items:center;
+  background:rgba(0,0,0,.18); border-radius:18px; padding:14px;
+  border:1px solid rgba(255,255,255,.04);
+  min-height:160px;
 }
 #aajPosterCanvas{
-  width:100%; max-width:140px; aspect-ratio:1/1; height:auto;
-  border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.18);
-  background:#fff;
+  width:100%; max-width:280px; height:auto; aspect-ratio:1/1;
+  border-radius:14px; box-shadow:0 30px 60px rgba(0,0,0,.5);
+  background:#fff; display:block; transition:max-width .25s ease;
 }
+.ps-preview-wrap.fmt-story #aajPosterCanvas{ max-width:170px; aspect-ratio:9/16 }
+.ps-preview-wrap.fmt-card #aajPosterCanvas{ max-width:320px; aspect-ratio:16/9 }
+
+/* Theme carousel */
+.ps-theme-carousel-label{ font-size:.7rem; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin-bottom:8px; position:relative; z-index:1 }
+.ps-theme-carousel{
+  display:flex; gap:8px; overflow-x:auto; padding-bottom:6px;
+  margin-bottom:14px; position:relative; z-index:1;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.ps-theme-carousel::-webkit-scrollbar{ display:none }
+.ps-theme-chip{
+  flex:0 0 auto; background:rgba(255,255,255,.06); border:1.5px solid transparent;
+  color:#fff; padding:8px 13px; border-radius:11px; font-weight:700;
+  font-size:.78rem; cursor:pointer; font-family:inherit; transition:.15s;
+  display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.ps-theme-chip:hover{ background:rgba(255,255,255,.12) }
+.ps-theme-chip.active{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A; border-color:rgba(255,255,255,.15); box-shadow:0 4px 14px rgba(251,191,36,.32) }
+.ps-theme-chip-emoji{ font-size:.95rem }
+.ps-theme-chip.festival{ background:linear-gradient(135deg,#DC2626,#F97316); color:#fff }
+
+/* Quick toggles */
+.ps-toggles{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; position:relative; z-index:1 }
+.ps-toggle{
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.75); padding:6px 11px; border-radius:99px;
+  font-weight:700; font-size:.75rem; cursor:pointer; font-family:inherit;
+  display:inline-flex; align-items:center; gap:5px; transition:.15s;
+}
+.ps-toggle:hover{ background:rgba(255,255,255,.12); color:#fff }
+.ps-toggle.on{ background:rgba(16,185,129,.18); border-color:rgba(16,185,129,.4); color:#34D399 }
+.ps-toggle .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.5 }
+.ps-toggle.on .dot{ opacity:1 }
+
+/* Share buttons row */
+.ps-share-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:8px; position:relative; z-index:1 }
+.ps-share-btn{
+  border:none; padding:11px 4px; border-radius:11px; font-weight:800;
+  font-size:.78rem; cursor:pointer; font-family:inherit;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  color:#fff; transition:.18s;
+}
+.ps-share-btn:hover:not(:disabled){ transform:translateY(-2px) }
+.ps-share-btn:disabled{ opacity:.5; cursor:wait }
+.ps-share-wa{ background:linear-gradient(135deg,#25D366,#128C7E); box-shadow:0 6px 16px rgba(37,211,102,.32) }
+.ps-share-ig{ background:linear-gradient(135deg,#F58529 0%,#DD2A7B 50%,#8134AF 100%); box-shadow:0 6px 16px rgba(221,42,123,.3) }
+.ps-share-fb{ background:#1877F2; box-shadow:0 6px 16px rgba(24,119,242,.3) }
+.ps-share-dl{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.16) }
+.ps-share-btn .lbl{ font-size:.7rem; letter-spacing:.02em }
+.ps-share-btn .ico{ font-size:1.1rem }
+
+.ps-customize{
+  display:block; text-align:center; padding:9px;
+  margin-top:6px; background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.75); text-decoration:none;
+  border-radius:11px; font-weight:700; font-size:.82rem;
+  border:1px dashed rgba(255,255,255,.16); position:relative; z-index:1;
+  transition:.15s;
+}
+.ps-customize:hover{ background:rgba(255,255,255,.12); color:#fff; text-decoration:none }
+
 @media (max-width:540px){
-  .aaj-poster-card{ grid-template-columns:1fr; gap:14px }
-  .aaj-poster-right{ order:-1 }
-  #aajPosterCanvas{ max-width:200px }
+  #aajPosterCanvas{ max-width:240px }
+  .ps-preview-wrap.fmt-story #aajPosterCanvas{ max-width:150px }
+  .ps-preview-wrap.fmt-card #aajPosterCanvas{ max-width:280px }
+  .ps-share-row{ grid-template-columns:repeat(2,1fr) }
 }
+
 
 /* ============================================================
    PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements
@@ -679,34 +756,66 @@
       </div>
     </div>
 
-    <!-- ===== AAJ KA POSTER — Daily auto-rotating WhatsApp Status ===== -->
-    <div class="aaj-poster-card" id="aajPosterCard" style="display:none">
-      <div class="aaj-poster-left">
-        <div class="aaj-poster-label">
-          <span class="sparkle">✨</span>
-          <span data-i18n-en>Today's Poster Ready</span>
-          <span data-i18n-hi>आज का पोस्टर तैयार</span>
-        </div>
-        <div class="aaj-poster-theme" id="aajPosterTheme">Loading…</div>
-        <p class="aaj-poster-desc">
-          <span data-i18n-en>One tap and share on WhatsApp Status — fresh design every day.</span>
-          <span data-i18n-hi>एक टैप में WhatsApp Status पर शेयर करें। हर रोज़ नया design।</span>
-        </p>
-        <div class="aaj-poster-actions">
-          <button class="poster-share-btn" id="aajPosterShareBtn" type="button">
-            <span style="font-size:16px">📤</span>
-            <span data-i18n-en>Share to WhatsApp</span>
-            <span data-i18n-hi>WhatsApp पर शेयर</span>
-          </button>
-          <a href="/panel/wa-poster.html" class="poster-customize-btn">
-            <span data-i18n-en>Customize →</span>
-            <span data-i18n-hi>Customize →</span>
-          </a>
+    <!-- ===== AAJ KA POSTER STUDIO v2 (2026-06-05): Premium hero card ===== -->
+    <div class="poster-studio" id="aajPosterCard" style="display:none">
+      <div class="ps-head">
+        <span class="ps-logo">✨</span>
+        <span class="ps-title" data-i18n-en>Poster Studio</span>
+        <span class="ps-title" data-i18n-hi style="display:none">पोस्टर स्टूडियो</span>
+        <span class="ps-streak" id="psStreak">🔥 0 days</span>
+      </div>
+      <div class="ps-sub" id="psSub">Pick a theme, format, and share to your network in one tap.</div>
+
+      <!-- Festival mega-banner (shown when festival within 7 days) -->
+      <div class="ps-festival-banner" id="psFestivalBanner">
+        <span class="ps-festival-icon" id="psFestivalIcon">🪔</span>
+        <div>
+          <div class="ps-festival-text" id="psFestivalText">Festival theme ready</div>
+          <div class="ps-festival-days" id="psFestivalDays"></div>
         </div>
       </div>
-      <div class="aaj-poster-right">
-        <canvas id="aajPosterCanvas" width="540" height="540"></canvas>
+
+      <!-- Format switcher: Square / Story / Card -->
+      <div class="ps-format-tabs">
+        <button type="button" class="ps-format-btn active" data-fmt="square">⬛ Square</button>
+        <button type="button" class="ps-format-btn" data-fmt="story">📱 Story</button>
+        <button type="button" class="ps-format-btn" data-fmt="card">▭ Card</button>
       </div>
+
+      <!-- Live preview -->
+      <div class="ps-preview-wrap" id="psPreviewWrap">
+        <canvas id="aajPosterCanvas" width="1080" height="1080"></canvas>
+      </div>
+
+      <!-- Theme carousel -->
+      <div class="ps-theme-carousel-label">Pick a theme</div>
+      <div class="ps-theme-carousel" id="psThemeCarousel"></div>
+
+      <!-- Quick toggles -->
+      <div class="ps-toggles">
+        <button type="button" class="ps-toggle on" data-toggle="photo"><span class="dot"></span> Photo</button>
+        <button type="button" class="ps-toggle on" data-toggle="rating"><span class="dot"></span> Rating</button>
+        <button type="button" class="ps-toggle on" data-toggle="phone"><span class="dot"></span> Phone</button>
+        <button type="button" class="ps-toggle" data-toggle="address"><span class="dot"></span> Address</button>
+      </div>
+
+      <!-- Share to 4 platforms -->
+      <div class="ps-share-row">
+        <button type="button" class="ps-share-btn ps-share-wa" id="psShareWa">
+          <span class="ico">💬</span><span class="lbl">WhatsApp</span>
+        </button>
+        <button type="button" class="ps-share-btn ps-share-ig" id="psShareIg">
+          <span class="ico">📷</span><span class="lbl">Instagram</span>
+        </button>
+        <button type="button" class="ps-share-btn ps-share-fb" id="psShareFb">
+          <span class="ico">f</span><span class="lbl">Facebook</span>
+        </button>
+        <button type="button" class="ps-share-btn ps-share-dl" id="psShareDl">
+          <span class="ico">⬇</span><span class="lbl">Download</span>
+        </button>
+      </div>
+
+      <a href="/panel/wa-poster.html" class="ps-customize">Open full editor for more options →</a>
     </div>
 
     <!-- ===== PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements ===== -->
@@ -2224,20 +2333,13 @@ function animateAajScore(d){
 // ─── Aaj ka Poster: Daily auto-rotating WhatsApp share ───────
 function initAajKaPoster(biz){
   if (!biz || !window.DailyPoster) {
-    // Engine might still be loading (defer)
     setTimeout(() => initAajKaPoster(biz), 600);
     return;
   }
   const card = document.getElementById('aajPosterCard');
   if (!card) return;
 
-  // Phase 4 (2026-06-05): If festival within 7 days, override daily theme
-  const theme = (window.FestivalEngine && FestivalEngine.getTodayThemeWithFestival)
-    ? FestivalEngine.getTodayThemeWithFestival()
-    : DailyPoster.getTodayTheme();
-  const lang  = (document.documentElement.getAttribute('data-lang') || 'en') === 'hi' ? 'hi' : 'en';
-
-  // Pick first category slug as a hint for tips
+  // ── Build shop data once ─────────────────────────────────
   let categorySlug = '';
   try {
     if (biz.categories && Array.isArray(biz.categories) && biz.categories.length) {
@@ -2249,53 +2351,260 @@ function initAajKaPoster(biz){
     }
   } catch(_) {}
 
-  // Compose shop data for engine
   const shopData = {
-    name: biz.name || 'Aapka Shop',
+    name: biz.name || 'Your Business',
     slug: biz.slug || '',
     mobile: biz.mobile || biz.phone || '',
     city: biz.city_name || biz.city || '',
     category: categorySlug,
     established_year: biz.established_year || null,
-    rating: biz.rating_avg || biz.rating || 0
+    rating: biz.rating_avg || biz.rating || 0,
+    address: biz.address || ''
   };
 
-  // Theme label
-  const themeEl = document.getElementById('aajPosterTheme');
-  if (themeEl) {
-    const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][theme.dayIndex];
-    themeEl.textContent = dayName + ' — ' + (lang === 'hi' ? theme.nameHi : theme.nameEn);
+  // ── State ────────────────────────────────────────────────
+  const state = {
+    format: 'square',  // square / story / card
+    themeIdx: new Date().getDay(),
+    showPhoto: true,
+    showRating: true,
+    showPhone: true,
+    showAddress: false,
+    festival: null
+  };
+
+  // Check festival
+  if (window.FestivalEngine && FestivalEngine.getActiveFestival) {
+    state.festival = FestivalEngine.getActiveFestival();
   }
 
-  // Render small preview canvas (smaller size = faster)
-  const canvas = document.getElementById('aajPosterCanvas');
-  if (canvas) {
-    DailyPoster.renderToCanvas(canvas, shopData, theme, 540)
-      .catch(err => console.warn('poster preview:', err));
+  // ── Render festival banner if active ─────────────────────
+  const fbEl = document.getElementById('psFestivalBanner');
+  if (state.festival && fbEl) {
+    document.getElementById('psFestivalIcon').textContent = state.festival.emoji || '🎉';
+    document.getElementById('psFestivalText').textContent = state.festival.nameEn + ' theme is ready';
+    const days = state.festival.daysAway;
+    const dayLbl = days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : days + ' days away';
+    document.getElementById('psFestivalDays').textContent = dayLbl + ' — share it 7 days ahead';
+    fbEl.style.display = 'flex';
   }
 
-  card.style.display = 'grid';
+  // ── Build theme carousel ─────────────────────────────────
+  const carousel = document.getElementById('psThemeCarousel');
+  if (carousel) {
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const todayIdx = new Date().getDay();
+    let chips = [];
 
-  // Wire share button
-  const btn = document.getElementById('aajPosterShareBtn');
-  if (btn && !btn._wired) {
-    btn._wired = true;
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      const origHTML = btn.innerHTML;
-      btn.innerHTML = '<span style="font-size:14px">⏳</span> Preparing…';
-      try {
-        await DailyPoster.shareToWhatsApp(shopData, theme, 1080);
-        btn.innerHTML = '<span style="font-size:14px">✓</span> Shared!';
-        setTimeout(() => { btn.innerHTML = origHTML; btn.disabled = false; }, 1800);
-      } catch(e) {
-        console.warn('share fail:', e);
-        btn.innerHTML = origHTML;
-        btn.disabled = false;
-        alert('Could not share. Try Customize → for full editor.');
-      }
+    // Festival first (if active)
+    if (state.festival) {
+      chips.push({
+        idx: 'festival',
+        label: state.festival.emoji + ' ' + state.festival.nameEn,
+        festival: true
+      });
+    }
+
+    // 7-day rotation starting from today
+    for (let i = 0; i < 7; i++) {
+      const dIdx = (todayIdx + i) % 7;
+      const theme = DailyPoster.getThemeByIndex(dIdx);
+      const isToday = i === 0;
+      chips.push({
+        idx: dIdx,
+        label: (theme.emoji || '✨') + ' ' + dayNames[dIdx] + ' · ' + theme.nameEn,
+        isToday: isToday
+      });
+    }
+
+    carousel.innerHTML = chips.map((ch, i) =>
+      '<button type="button" class="ps-theme-chip ' +
+      (ch.festival ? 'festival ' : '') +
+      (i === 0 ? 'active' : '') +
+      '" data-theme="' + ch.idx + '">' + ch.label + '</button>'
+    ).join('');
+
+    // Activate first chip (festival if present, else today)
+    state.themeIdx = (state.festival && state.festival) ? 'festival' : todayIdx;
+
+    carousel.querySelectorAll('.ps-theme-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        carousel.querySelectorAll('.ps-theme-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.themeIdx = chip.dataset.theme;
+        render();
+      });
     });
   }
+
+  // ── Format tabs ──────────────────────────────────────────
+  card.querySelectorAll('.ps-format-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      card.querySelectorAll('.ps-format-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.format = btn.dataset.fmt;
+      const wrap = document.getElementById('psPreviewWrap');
+      wrap.classList.remove('fmt-square','fmt-story','fmt-card');
+      wrap.classList.add('fmt-' + state.format);
+      render();
+    });
+  });
+
+  // ── Quick toggles ────────────────────────────────────────
+  card.querySelectorAll('.ps-toggle').forEach(t => {
+    t.addEventListener('click', () => {
+      t.classList.toggle('on');
+      state[
+        'show' + t.dataset.toggle.charAt(0).toUpperCase() + t.dataset.toggle.slice(1)
+      ] = t.classList.contains('on');
+      render();
+    });
+  });
+
+  // ── Streak counter (localStorage) ────────────────────────
+  function updateStreak(){
+    try {
+      const KEY = 'dl_poster_streak';
+      const today = new Date().toISOString().slice(0,10);
+      let s = JSON.parse(localStorage.getItem(KEY) || '{}');
+      const streak = parseInt(s.streak, 10) || 0;
+      const el = document.getElementById('psStreak');
+      if (el) el.textContent = streak > 0 ? ('🔥 ' + streak + ' day' + (streak !== 1 ? 's' : '')) : '🔥 Start sharing';
+    } catch(_){}
+  }
+  function bumpStreak(){
+    try {
+      const KEY = 'dl_poster_streak';
+      const today = new Date().toISOString().slice(0,10);
+      let s = JSON.parse(localStorage.getItem(KEY) || '{}');
+      const last = s.last_date;
+      let streak = parseInt(s.streak, 10) || 0;
+      if (last === today) return; // already counted
+      if (last) {
+        const lastD = new Date(last + 'T00:00:00');
+        const todayD = new Date(today + 'T00:00:00');
+        const diff = Math.round((todayD - lastD) / 86400000);
+        streak = (diff === 1) ? streak + 1 : 1;
+      } else {
+        streak = 1;
+      }
+      localStorage.setItem(KEY, JSON.stringify({ last_date: today, streak: streak }));
+      updateStreak();
+    } catch(_){}
+  }
+  updateStreak();
+
+  // ── Resolve current theme ────────────────────────────────
+  function currentTheme(){
+    if (state.themeIdx === 'festival' && state.festival && window.FestivalEngine) {
+      return Object.assign({ dayIndex: new Date().getDay() },
+        FestivalEngine.festivalAsTheme(state.festival));
+    }
+    return DailyPoster.getThemeByIndex(parseInt(state.themeIdx, 10) || new Date().getDay());
+  }
+
+  // ── Build effective shopData based on toggles ────────────
+  function effectiveShopData(){
+    return {
+      name:    shopData.name,
+      slug:    shopData.slug,
+      mobile:  state.showPhone   ? shopData.mobile  : '',
+      city:    shopData.city,
+      category: shopData.category,
+      established_year: shopData.established_year,
+      rating:  state.showRating  ? shopData.rating  : 0,
+      address: state.showAddress ? shopData.address : ''
+    };
+  }
+
+  // ── Render preview ───────────────────────────────────────
+  function render(){
+    const canvas = document.getElementById('aajPosterCanvas');
+    if (!canvas) return;
+    const theme = currentTheme();
+    const data  = effectiveShopData();
+    // Note: canvas size is fixed (1080) by engine — CSS controls display
+    DailyPoster.renderToCanvas(canvas, data, theme, 1080).catch(e => console.warn('render', e));
+  }
+
+  // Initial render
+  setTimeout(render, 100);
+
+  // ── Share helpers ────────────────────────────────────────
+  async function generateBlob(targetSize){
+    const theme = currentTheme();
+    const data  = effectiveShopData();
+    let size = targetSize || 1080;
+    // For story format, render taller
+    if (state.format === 'story') size = 1080; // engine handles square; future: full-bleed story
+    return await DailyPoster.renderToBlob(data, theme, size);
+  }
+
+  async function shareWA(){
+    const btn = document.getElementById('psShareWa');
+    btn.disabled = true;
+    try {
+      await DailyPoster.shareToWhatsApp(effectiveShopData(), currentTheme(), 1080);
+      bumpStreak();
+    } catch(e) { console.warn('wa share', e); }
+    finally { btn.disabled = false; }
+  }
+
+  async function shareIG(){
+    const btn = document.getElementById('psShareIg');
+    btn.disabled = true;
+    try {
+      const blob = await generateBlob(1080);
+      const file = new File([blob], 'dukanlist-instagram.jpg', { type: 'image/jpeg' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Share to Instagram' });
+        bumpStreak();
+      } else {
+        // Fallback: download — user uploads to Instagram manually
+        await DailyPoster.downloadPoster(effectiveShopData(), currentTheme(), 1080);
+        alert('Image downloaded. Open Instagram and upload as Story or Post.');
+        bumpStreak();
+      }
+    } catch(e) { console.warn('ig share', e); }
+    finally { btn.disabled = false; }
+  }
+
+  async function shareFB(){
+    const btn = document.getElementById('psShareFb');
+    btn.disabled = true;
+    try {
+      const blob = await generateBlob(1080);
+      const file = new File([blob], 'dukanlist-facebook.jpg', { type: 'image/jpeg' });
+      const url = 'https://dukanlist.com/business.html?slug=' + (effectiveShopData().slug || '');
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: effectiveShopData().name + ' on DukanList\n' + url });
+        bumpStreak();
+      } else {
+        // Fallback: download + open FB sharer with URL only
+        await DailyPoster.downloadPoster(effectiveShopData(), currentTheme(), 1080);
+        const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+        window.open(fbUrl, '_blank');
+        bumpStreak();
+      }
+    } catch(e) { console.warn('fb share', e); }
+    finally { btn.disabled = false; }
+  }
+
+  async function downloadOnly(){
+    const btn = document.getElementById('psShareDl');
+    btn.disabled = true;
+    try {
+      await DailyPoster.downloadPoster(effectiveShopData(), currentTheme(), 1080);
+    } catch(e) { console.warn('download', e); }
+    finally { btn.disabled = false; }
+  }
+
+  document.getElementById('psShareWa').addEventListener('click', shareWA);
+  document.getElementById('psShareIg').addEventListener('click', shareIG);
+  document.getElementById('psShareFb').addEventListener('click', shareFB);
+  document.getElementById('psShareDl').addEventListener('click', downloadOnly);
+
+  card.style.display = 'block';
 }
 
 // ─── Phase 2: Town Rank + Smart Tips + Badge Wall + Streak ───
