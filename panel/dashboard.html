@@ -554,6 +554,51 @@
 .streak-pill .streak-num{ font-family:'Manrope',sans-serif; font-size:.95rem; font-weight:900 }
 .streak-pill .streak-lbl{ opacity:.85; font-size:.72rem }
 .streak-pill .streak-emoji{ font-size:.95rem }
+/* ===== Phase 4 (2026-06-05): Loyalty Tracker Card ===== */
+.loyalty-card{
+  background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 50%,#FCD34D 100%);
+  border-radius:18px; padding:20px;
+  margin-top:16px; box-shadow:0 14px 40px rgba(251,191,36,.15);
+  position:relative; overflow:hidden;
+}
+.loyalty-card::before{
+  content:""; position:absolute; top:-30px; right:-30px;
+  width:140px; height:140px; border-radius:50%;
+  background:radial-gradient(circle, rgba(220,38,38,.15), transparent 70%);
+  pointer-events:none;
+}
+.lc-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px; position:relative; z-index:1 }
+.lc-emoji{ font-size:1.3rem }
+.lc-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#451A03; letter-spacing:-.015em; flex:1 }
+.lc-tier{
+  display:inline-flex; align-items:center; gap:4px;
+  background:#fff; color:#92400E; font-size:.7rem; font-weight:900;
+  padding:4px 10px; border-radius:99px; letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.lc-tier.gold   { background:linear-gradient(135deg,#FBBF24,#D97706); color:#fff }
+.lc-tier.silver { background:linear-gradient(135deg,#94A3B8,#475569); color:#fff }
+.lc-tier.bronze { background:linear-gradient(135deg,#D97706,#92400E); color:#fff }
+.lc-main{ display:flex; align-items:baseline; gap:12px; margin-bottom:6px; position:relative; z-index:1 }
+.lc-num{ font-family:'Manrope',sans-serif; font-weight:900; font-size:2.8rem; line-height:1; color:#92400E; letter-spacing:-.04em }
+.lc-label{ color:#78350F; font-weight:700; font-size:.95rem }
+.lc-growth{
+  font-size:.78rem; font-weight:800; padding:3px 9px; border-radius:8px;
+  background:rgba(16,185,129,.18); color:#047857;
+}
+.lc-growth.down{ background:rgba(239,68,68,.15); color:#991B1B }
+.lc-growth.flat{ background:rgba(148,163,184,.18); color:#475569 }
+.lc-sub{ color:#78350F; font-size:.85rem; font-weight:600; margin-top:8px; position:relative; z-index:1 }
+.lc-progress{
+  margin-top:12px; height:8px; background:rgba(146,64,14,.12);
+  border-radius:99px; overflow:hidden; position:relative; z-index:1;
+}
+.lc-progress-fill{
+  height:100%; background:linear-gradient(90deg,#FBBF24,#F97316);
+  border-radius:99px; transition:width .8s ease-out;
+}
+
+
 
 </style>
 
@@ -661,6 +706,7 @@
     <!-- ===== PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements ===== -->
     <div id="townRankCard" style="display:none"></div>
     <div id="smartTipsCard" style="display:none"></div>
+    <div id="loyaltyCard" style="display:none"></div>
     <div id="badgeWallCard"></div>
 
   <!-- Profile completeness widget -->
@@ -2130,7 +2176,10 @@ function initAajKaPoster(biz){
   const card = document.getElementById('aajPosterCard');
   if (!card) return;
 
-  const theme = DailyPoster.getTodayTheme();
+  // Phase 4 (2026-06-05): If festival within 7 days, override daily theme
+  const theme = (window.FestivalEngine && FestivalEngine.getTodayThemeWithFestival)
+    ? FestivalEngine.getTodayThemeWithFestival()
+    : DailyPoster.getTodayTheme();
   const lang  = (document.documentElement.getAttribute('data-lang') || 'en') === 'hi' ? 'hi' : 'en';
 
   // Pick first category slug as a hint for tips
@@ -2205,6 +2254,7 @@ function initPhase2Cards(biz, c){
   catch(e){ console.warn('Town Rank:', e); }
   try { EngagementEngine.renderSmartTips('smartTipsCard', c, biz.id); }
   catch(e){ console.warn('Smart Tips:', e); }
+  renderLoyaltyCard(biz.id, c).catch(()=>{});
   try { EngagementEngine.renderBadgeWall('badgeWallCard', biz); }
   catch(e){ console.warn('Badge Wall:', e); }
   try {
@@ -2219,6 +2269,54 @@ function initPhase2Cards(biz, c){
     }
     EngagementEngine.renderStreakBadge(streakHostId);
   } catch(e){ console.warn('Streak:', e); }
+}
+
+
+// ─── Phase 4: Loyalty Tracker render ───────────────────────────
+async function renderLoyaltyCard(businessId, supaClient){
+  const el = document.getElementById('loyaltyCard');
+  if (!el || !supaClient || !businessId) return;
+  try {
+    const { data, error } = await supaClient.rpc('get_shop_loyalty_stats', { p_business_id: businessId });
+    if (error || !data) { console.warn('loyalty rpc:', error); return; }
+
+    const total = parseInt(data.total_followers, 10) || 0;
+    const thisWeek = parseInt(data.this_week, 10) || 0;
+    const growth = parseInt(data.growth_pct, 10) || 0;
+    const tier = String(data.tier || 'none').toLowerCase();
+    const tierLabel = data.tier_label || 'Build your loyalty';
+    const nextAt = parseInt(data.next_tier_at, 10) || 10;
+    const gap = parseInt(data.gap_to_next_tier, 10) || 0;
+
+    const trendClass = growth > 0 ? '' : growth < 0 ? 'down' : 'flat';
+    const trendArrow = growth > 0 ? '↑' : growth < 0 ? '↓' : '—';
+
+    const tierClass = (tier === 'none') ? '' : tier;
+    const progressPct = Math.min(100, Math.round((total / nextAt) * 100));
+
+    const subText = (total === 0)
+      ? 'When customers save your business, they become your loyal followers.'
+      : (gap > 0)
+        ? gap + ' more to reach ' + (tier === 'none' ? 'Bronze' : tier === 'bronze' ? 'Silver' : tier === 'silver' ? 'Gold' : 'next tier')
+        : 'You have reached the top tier. Congratulations!';
+
+    el.innerHTML =
+      '<div class="loyalty-card">' +
+      '  <div class="lc-head">' +
+      '    <span class="lc-emoji">❤️</span>' +
+      '    <span class="lc-title">Your Loyalty Hub</span>' +
+      '    <span class="lc-tier ' + tierClass + '">' + tierLabel + '</span>' +
+      '  </div>' +
+      '  <div class="lc-main">' +
+      '    <span class="lc-num">' + total + '</span>' +
+      '    <span class="lc-label">customers saved your business</span>' +
+      '    ' + (thisWeek > 0 ? '<span class="lc-growth ' + trendClass + '">' + trendArrow + ' ' + thisWeek + ' this week</span>' : '') +
+      '  </div>' +
+      '  <div class="lc-sub">' + subText + '</div>' +
+      '  <div class="lc-progress"><div class="lc-progress-fill" style="width:' + progressPct + '%"></div></div>' +
+      '</div>';
+    el.style.display = 'block';
+  } catch(e) { console.warn('Loyalty render fail:', e); }
 }
 </script>
 
@@ -2516,6 +2614,8 @@ function shareReferralWhatsApp(){
 
 <!-- Daily Poster Engine (2026-06-05) — 7-day theme rotation for Aaj ka Poster card -->
 <script src="/assets/js/daily-poster-engine.js" defer></script>
+<!-- Festival Engine (2026-06-05): Auto-override poster theme on festival days -->
+<script src="/assets/js/festival-engine.js" defer></script>
 <!-- Engagement Engine (2026-06-05) -->
 <script src="/assets/js/engagement-engine.js" defer></script>
 

@@ -1099,6 +1099,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <span class="biz-cat-pill" id="bizCatPill"></span>
           <div class="cat-badges" id="catBadges"></div>
           <h1 class="biz-title" id="bizName"></h1>
+      <span id="publicLoyaltyBadge" style="display:none;margin-left:8px"></span>
           <div class="owner-credit" id="ownerCredit" style="display:none"></div>
           <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
           <div class="biz-rating-row">
@@ -2001,6 +2002,7 @@ function render(){
 
   // Profile Highlights — fills empty left-column space, builds trust
   try { renderShopHighlights(b); } catch(e){ console.warn('highlights render failed', e); }
+  try { loadPublicLoyaltyCount(); } catch(_){}
   try { loadShopQA(b.id); } catch(e){ console.warn('Q&A load failed', e); }
 
   // Hours
@@ -3452,6 +3454,21 @@ function prefillQA(text){
     }
   }, 500);
 })();
+
+// Phase 4: Public loyalty count badge on business page
+async function loadPublicLoyaltyCount(){
+  if (!BIZ || !BIZ.id || !ShopDB || !ShopDB.client) return;
+  try {
+    const r = await ShopDB.client.rpc('get_public_loyalty_count', { p_business_id: BIZ.id });
+    const count = parseInt(r.data, 10) || 0;
+    if (count < 3) return; // Don't show until socially meaningful
+    const el = document.getElementById('publicLoyaltyBadge');
+    if (el) {
+      el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#FEE2E2,#FECACA);color:#991B1B;padding:5px 11px;border-radius:99px;font-size:.78rem;font-weight:800;border:1px solid #FCA5A5">❤️ ' + count + ' customers love this</span>';
+      el.style.display = 'inline-block';
+    }
+  } catch(_){}
+}
 </script>
 </body>
 </html>
