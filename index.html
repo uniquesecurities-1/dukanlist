@@ -198,6 +198,40 @@ html[data-lang="hi"] .hero-tag{ font-family:'Noto Sans Devanagari',sans-serif }
   .pulse-stat-lbl{ font-size:.7rem }
 }
 
+
+/* Phase 6 (2026-06-05): Open Near You widget */
+.ony-card{ background:#fff; border:1px solid #E2E8F0; border-radius:18px; padding:18px 20px; margin:0 auto 28px; max-width:1180px; box-shadow:0 2px 8px rgba(15,23,42,.04); }
+.ony-head{ display:flex; align-items:center; gap:14px; flex-wrap:wrap }
+.ony-emoji{ font-size:1.8rem; flex:0 0 auto }
+.ony-head-text{ flex:1; min-width:160px }
+.ony-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#0F172A; letter-spacing:-.015em }
+.ony-sub{ font-size:.82rem; color:#64748B; font-weight:600; margin-top:2px }
+.ony-cta{ background:linear-gradient(135deg,#FF6B1A,#EA580C); color:#fff; border:none; padding:10px 20px; border-radius:10px; font-weight:800; font-size:.86rem; cursor:pointer; font-family:inherit; box-shadow:0 6px 16px rgba(255,107,26,.28); transition:.15s }
+.ony-cta:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 8px 20px rgba(255,107,26,.36) }
+.ony-cta:disabled{ opacity:.6; cursor:wait }
+.ony-results{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; margin-top:14px }
+.ony-row{ display:grid; grid-template-columns:64px 1fr; gap:12px; padding:12px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; text-decoration:none; color:#0F172A; transition:.15s }
+.ony-row:hover{ background:#F1F5F9; border-color:#CBD5E1; text-decoration:none }
+.ony-row-photo{ width:64px; height:64px; border-radius:10px; overflow:hidden; background:linear-gradient(135deg,#E0F2FE,#BAE6FD); display:grid; place-items:center; font-size:1.6rem }
+.ony-row-photo img{ width:100%; height:100%; object-fit:cover }
+.ony-row-emoji{ font-size:1.6rem }
+.ony-row-body{ min-width:0 }
+.ony-row-name{ font-weight:800; font-size:.95rem; color:#0F172A; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2; letter-spacing:-.01em }
+.ony-row-meta{ display:flex; gap:8px; align-items:center; margin-top:4px }
+.ony-dist{ font-size:.78rem; color:#1E3A8A; font-weight:800 }
+.ony-rating{ font-size:.78rem; color:#92400E; font-weight:700 }
+.ony-row-actions{ display:flex; gap:6px; margin-top:8px }
+.ony-act{ flex:1; text-align:center; padding:6px 8px; border-radius:8px; text-decoration:none; font-weight:700; font-size:.78rem; transition:.15s }
+.ony-act.call{ background:#1E3A8A; color:#fff }
+.ony-act.wa{ background:#25D366; color:#fff }
+.ony-act:hover{ filter:brightness(1.05); text-decoration:none }
+.ony-empty{ padding:16px; text-align:center; color:#64748B; font-size:.88rem; font-weight:600 }
+@media (max-width:600px){
+  .ony-results{ grid-template-columns:1fr }
+  .ony-head{ gap:10px }
+  .ony-cta{ width:100% }
+}
+
 </style>
 
 <style>
@@ -980,6 +1014,8 @@ function dismissFestBanner(){
   <div class="pulse-cats" id="pulseCats"></div>
 </div>
 
+<div id="openNearYou"></div>
+
 <section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
   <div style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:18px 8px;box-shadow:0 1px 3px rgba(15,23,42,.04)">
     <div id="catStripScroll" style="display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
@@ -1474,6 +1510,7 @@ function dismissFestBanner(){
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/geo-nearby.js" defer></script>
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/voice.js"></script>
 <script src="/assets/js/install.js"></script>
@@ -2263,6 +2300,20 @@ function dismissActTicker(){
     }
     el.style.display = 'flex';
   } catch(_){}
+})();
+</script>
+<script>
+// Phase 6: Init Open Near You widget on homepage
+(function(){
+  function init(){
+    if (window.GeoNearby) {
+      GeoNearby.renderWidget('openNearYou');
+    } else {
+      setTimeout(init, 400);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 </body>
