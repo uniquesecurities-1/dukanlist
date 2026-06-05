@@ -2797,6 +2797,17 @@ async function toggleFav(){
   }
   IS_FAVED = !!r.data;
   paintFav();
+  // Phase 3 (2026-06-05): Fire favorite push to owner if newly added
+  if (IS_FAVED) {
+    try {
+      fetch('/api/lead-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_id: BIZ.id, action: 'favorite', shop_name: BIZ.name || '' }),
+        keepalive: true
+      });
+    } catch(_){}
+  }
   // Tiny toast
   const t = document.createElement('div');
   t.textContent = IS_FAVED ? '♥ Saved to your favorites' : 'Removed from favorites';
@@ -2891,6 +2902,15 @@ async function submitReview(){
     if (error){ throw error; }
 
     if (loadingRow) loadingRow.remove();
+    // Phase 3 (2026-06-05): Fire review push to owner
+    try {
+      fetch('/api/lead-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_id: BIZ.id, action: 'review', shop_name: BIZ.name || '' }),
+        keepalive: true
+      });
+    } catch(_){}
     okEl.textContent = '✓ Thank you! Your review is live.';
     okEl.style.display = 'block';
     btn.innerHTML = '<span>Submitted ✓</span>';
@@ -2972,6 +2992,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
 <script>
 // =============== Profile Highlights renderer ===============
+
+// Phase 3 (2026-06-05): View burst detection — check recent views after page load
+function _checkViewBurst(){
+  if (!BIZ || !BIZ.id) return;
+  if (!ShopDB || !ShopDB.client) return;
+  // Wait a few seconds for view to be recorded, then check
+  setTimeout(async () => {
+    try {
+      const r = await ShopDB.client.rpc('count_recent_views', { p_business_id: BIZ.id, p_minutes: 30 });
+      const count = parseInt(r.data, 10) || 0;
+      if (count >= 5) {
+        fetch('/api/lead-push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ business_id: BIZ.id, action: 'view_burst', shop_name: BIZ.name || '' }),
+          keepalive: true
+        }).catch(()=>{});
+      }
+    } catch(_){}
+  }, 5000);
+}
+
 function renderShopHighlights(b){
   const host = document.getElementById('shopHighlights');
   const grid = document.getElementById('shHighlightsGrid');
@@ -3397,6 +3439,19 @@ function prefillQA(text){
     if (t){ t.value = text; t.focus(); try{ t.setSelectionRange(t.value.length, t.value.length) }catch(_){} }
   }, 150);
 }
+
+// Phase 3: Trigger view burst check once BIZ is loaded
+(function(){
+  const startTime = Date.now();
+  const waitForBiz = setInterval(() => {
+    if (window.BIZ && window.BIZ.id) {
+      clearInterval(waitForBiz);
+      try { _checkViewBurst(); } catch(_){}
+    } else if (Date.now() - startTime > 15000) {
+      clearInterval(waitForBiz);
+    }
+  }, 500);
+})();
 </script>
 </body>
 </html>

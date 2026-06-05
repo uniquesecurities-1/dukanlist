@@ -162,8 +162,9 @@ export default async function handler(req, res){
     res.status(400).json({ error: 'invalid business_id' });
     return;
   }
-  if (action !== 'call' && action !== 'whatsapp'){
-    res.status(400).json({ error: 'action must be call or whatsapp' });
+  const ALLOWED_ACTIONS = ['call','whatsapp','favorite','review','view_burst'];
+  if (!ALLOWED_ACTIONS.includes(action)){
+    res.status(400).json({ error: 'invalid action — allowed: ' + ALLOWED_ACTIONS.join(',') });
     return;
   }
 
@@ -184,26 +185,54 @@ export default async function handler(req, res){
     } catch(_){}
   }
 
-  // Fetch owner subs
-  let subs;
+  // Call notify_owner_event RPC — checks throttle + returns subs in one call
+  let notifyResult;
   try {
-    subs = await sbRpc('list_owner_push_subs', { p_business_id: business_id });
-    if (!Array.isArray(subs)) subs = [];
+    notifyResult = await sbRpc('notify_owner_event', {
+      p_business_id: business_id,
+      p_event_type:  action
+    });
   } catch(e){
-    return res.status(500).json({ error: 'subs fetch failed', detail: String(e) });
+    return res.status(500).json({ error: 'notify rpc failed', detail: String(e) });
   }
 
+  if (!notifyResult || notifyResult.allowed === false){
+    return res.status(200).json({
+      sent: 0, total: 0,
+      throttled: true,
+      reason: notifyResult?.reason || 'unknown',
+      cooldown_minutes_remaining: notifyResult?.cooldown_minutes_remaining
+    });
+  }
+
+  const subs = Array.isArray(notifyResult.subscriptions) ? notifyResult.subscriptions : [];
   if (!subs.length){
     return res.status(200).json({ sent: 0, total: 0, note: 'no owner subscribed' });
   }
 
-  // Build the push payload
-  const verb = action === 'call' ? '\u{1F4DE} New call' : '\u{1F4AC} New WhatsApp';
+  // Use shop_name from server (RPC-provided) instead of caller-controlled
+  const liveShopName = notifyResult.shop_name || shop_name;
+  const shopSlug     = notifyResult.shop_slug || '';
+
+  // Per-event title and body
+  const messages = {
+    'call':       { title: '\u{1F4DE} Call interest received',
+                    body:  'Someone tapped your phone number on ' + liveShopName + '. Open dashboard.' },
+    'whatsapp':   { title: '\u{1F4AC} WhatsApp interest received',
+                    body:  'Someone tapped WhatsApp on ' + liveShopName + '. Open dashboard.' },
+    'favorite':   { title: '\u{2764}\uFE0F New favorite',
+                    body:  'A customer saved ' + liveShopName + ' to favorites.' },
+    'review':     { title: '\u{2B50} New review received',
+                    body:  'New review posted for ' + liveShopName + '. Open and reply.' },
+    'view_burst': { title: '\u{1F525} Activity surge',
+                    body:  liveShopName + ' is getting noticed. Multiple views in the last 30 minutes.' }
+  };
+  const m = messages[action] || messages.call;
   const message = {
-    title: verb + ' interest for ' + shop_name,
-    body:  'A customer just tapped to contact you. Open your dashboard to see analytics.',
+    title: m.title,
+    body:  m.body,
     url:   '/panel/dashboard.html',
-    tag:   'lead-' + business_id.slice(0, 8),
+    tag:   action + '-' + business_id.slice(0, 8),
     requireInteraction: false
   };
   const payloadStr = JSON.stringify(message);
