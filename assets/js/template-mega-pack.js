@@ -1185,7 +1185,6 @@ async function drawPremiumCard(ctx, s, t, sz, lang, opts){
     const ribY = sz * 0.030;
     ctx.fillStyle = '#0A0A0A';
     ctx.fillRect(0, ribY, sz, ribH);
-    // Gold accent line on left
     ctx.fillStyle = '#D4AF37';
     ctx.fillRect(0, ribY, sz * 0.018, ribH);
     ctx.fillStyle = '#FFFFFF';
@@ -1351,25 +1350,4 @@ async function shareToPlatform(platform, shop, tmpl, opts){
     catch(_){}
   }
   await downloadPoster(shop, tmpl, opts);
-  if (platform === 'whatsapp')   window.open('https://wa.me/?text=' + encodeURIComponent(caption), '_blank');
-  if (platform === 'facebook')   window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank');
-  return { method: 'download' };
-}
-
-// ─── Filter templates by shop category ────────────────────
-function getRelevantTemplates(shopCategory){
-  const c = (shopCategory || '').toLowerCase();
-  return TEMPLATES.filter(t => t.category === 'all' || c.includes(t.category));
-}
-
-// ─── Public API ───────────────────────────────────────────
-global.TemplateMegaPack = {
-  TEMPLATES,
-  renderTemplate,
-  renderToBlob,
-  downloadPoster,
-  shareToPlatform,
-  getRelevantTemplates
-};
-
-})(window);
+  if (platform === 'whatsapp')   window.ope
