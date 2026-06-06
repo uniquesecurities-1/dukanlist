@@ -492,6 +492,25 @@
       </div>
     </div>
 
+    <!-- Custom Address (override) -->
+    <div class="control-card">
+      <div class="control-title">📍 Address (saved permanently)</div>
+      <div class="edit-row">
+        <label class="edit-label">Full address as you want it shown</label>
+        <input type="text" class="edit-input" id="customAddress" placeholder="e.g. SCO-01, Near Indusind Bank, Aastha Hospital Street, Chotala Road, Mandi Dabwali-125104" maxlength="180">
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:4px">Saves on your device. Auto-wraps to 2 lines.</div>
+    </div>
+
+    <!-- QR Code toggle -->
+    <div class="control-card">
+      <div class="control-title">🔗 QR Code on Poster</div>
+      <div class="wpack-row">
+        <button type="button" class="wpack-btn on" id="qrToggle" data-on="1">🔗 Show QR code (bottom right)</button>
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:6px">Scanners reach your shop page directly.</div>
+    </div>
+
     <!-- Quick Pick Premium Templates -->
     <div class="control-card">
       <div class="section-flex">
@@ -621,9 +640,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js?v=722370"></script>
-<script src="/assets/js/daily-poster-engine.js?v=723034"></script>
+<script src="/assets/js/daily-poster-engine.js?v=723586"></script>
 <script src="/assets/js/festival-engine.js?v=723034"></script>
-<script src="/assets/js/template-mega-pack.js?v=723034"></script>
+<script src="/assets/js/template-mega-pack.js?v=723586"></script>
 
 <script>
 (async function init(){
@@ -664,6 +683,7 @@
     established_year: biz.established_year || null,
     rating: biz.rating_avg || 0,
     address: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
+    _autoAddress: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
     photo: (Array.isArray(biz.photos) && biz.photos[0]) || '',
     website: biz.website_url || ''
   };
@@ -939,7 +959,7 @@
       city: shopData.city, category: shopData.category,
       established_year: shopData.established_year,
       rating: state.showRating ? shopData.rating : 0,
-      address: state.showAddress ? shopData.address : '',
+      address: state.showAddress === false ? '' : (state.customAddress || shopData.address),
       photo: state.customPhoto || shopData.photo,
       website: shopData.website || ''
     };
@@ -952,6 +972,7 @@
       customSubline: state.customSubline || null,
       customAccent: state.customAccent || null,
       stickers: state.stickers,
+      showQr: state.showQr !== false,
       logoUrl: state.customLogo || null,
       dealText: state.useDeal ? state.dealText : null,
       dealAccent: '#F97316',
@@ -1196,10 +1217,5 @@
 
   setInterval(renderSuggestions, 60000);  // refresh every minute
 
-  buildGallery();
-  setTimeout(renderMain, 250);
-})();
-</script>
-
-</body>
-</html>
+  // Custom address — localStorage persistent
+  state.customAddress = localStora

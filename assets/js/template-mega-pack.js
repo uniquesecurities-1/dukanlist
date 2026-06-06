@@ -588,7 +588,7 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     case 'restaurant':      drawRestaurant(ctx, shop, tmpl, size, lang); break;
     case 'salon':           drawSalon(ctx, shop, tmpl, size, lang); break;
     case 'festival':        drawFestival(ctx, shop, tmpl, size, lang); break;
-    case 'premium-card':    await drawPremiumCard(ctx, shop, tmpl, size, lang); break;
+    case 'premium-card':    await drawPremiumCard(ctx, shop, tmpl, size, lang, opts); break;
     default:                drawBoldName(ctx, shop, tmpl, size, lang);
   }
 
@@ -1136,15 +1136,16 @@ function isColorDark(hex){
 
 
 // ─── Layout: Premium Business Card (Clean Reference Style) ─
-async function drawPremiumCard(ctx, s, t, sz, lang){
+async function drawPremiumCard(ctx, s, t, sz, lang, opts){
+  opts = opts || {};
+  const showQr = opts.showQr !== false;  // default true
+
   // ===== PURE WHITE BACKGROUND =====
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, sz, sz);
 
-  // ===== PHOTO 75% TOP, FULL BLEED =====
-  const photoH = sz * 0.75;
-
-  // Light gray placeholder backdrop
+  // ===== PHOTO 72% TOP, FULL BLEED =====
+  const photoH = sz * 0.72;
   ctx.fillStyle = '#F5F5F5';
   ctx.fillRect(0, 0, sz, photoH);
 
@@ -1161,8 +1162,7 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
         const h = img.height * ratio;
         ctx.drawImage(img, (sz - w) / 2, (photoH - h) / 2, w, h);
         ctx.restore();
-
-        // Soft white fade at very bottom of photo (smooth transition)
+        // Soft fade
         const fadeH = sz * 0.04;
         const grad = ctx.createLinearGradient(0, photoH - fadeH, 0, photoH);
         grad.addColorStop(0, 'rgba(255,255,255,0)');
@@ -1177,25 +1177,22 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
     drawPhotoPlaceholder(ctx, sz, photoH, 'rgba(0,0,0,0.30)');
   }
 
-  // ===== BOTTOM 25% — CONTENT ON WHITE =====
+  // ===== BOTTOM 28% — CONTENT ON WHITE =====
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
   const black = '#000000';
 
-  // Shop name — BIG BOLD CENTERED
+  // Shop name
   ctx.fillStyle = black;
   const nameTxt = (s.name || 'Your Business').trim();
-  const nameFont = nameTxt.length > 22 ? 0.042 : 0.052;
+  const nameFont = nameTxt.length > 22 ? 0.040 : 0.050;
   ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
-  ctx.fillText(nameTxt, sz / 2, sz * 0.817);
+  ctx.fillText(nameTxt, sz / 2, sz * 0.785);
 
-  // Tagline (years if available, else category)
+  // Tagline
   const yrs = s.established_year && s.established_year > 1900
     ? (new Date().getFullYear() - s.established_year) : null;
-
-  ctx.fillStyle = black;
-  ctx.font = '700 ' + Math.floor(sz * 0.026) + 'px Inter, Arial';
   let taglineTxt = '';
   if (yrs && yrs > 0) {
     taglineTxt = yrs + '+ Years of Trust.';
@@ -1209,27 +1206,31 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
     else if (cl.includes('kirana') || cl.includes('grocery')) taglineTxt = 'Family Grocery Store.';
     else taglineTxt = 'Trusted Local Business.';
   }
-  if (taglineTxt) ctx.fillText(taglineTxt, sz / 2, sz * 0.853);
+  if (taglineTxt) {
+    ctx.fillStyle = black;
+    ctx.font = '700 ' + Math.floor(sz * 0.026) + 'px Inter, Arial';
+    ctx.fillText(taglineTxt, sz / 2, sz * 0.818);
+  }
 
-  // Phone — "M: <number>" simple text
+  // Phone
   if (s.mobile) {
     const phone = String(s.mobile).replace(/\D/g, '').slice(-10);
     ctx.fillStyle = black;
     ctx.font = '600 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
-    ctx.fillText('M: ' + phone, sz / 2, sz * 0.886);
+    ctx.fillText('M: ' + phone, sz / 2, sz * 0.849);
   }
 
-  // Hairline divider (60% width, centered)
+  // Hairline divider
   ctx.fillStyle = black;
-  ctx.fillRect(sz * 0.20, sz * 0.908, sz * 0.60, sz * 0.0020);
+  ctx.fillRect(sz * 0.20, sz * 0.868, sz * 0.60, sz * 0.0020);
 
-  // Address — 2 lines centered
+  // Address — 2 lines, with proper wrap, allow longer text
   if (s.address) {
     ctx.fillStyle = black;
     ctx.font = '500 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
     let addr = String(s.address).trim();
-    const maxW = sz * 0.84;
-    const words = addr.split(' ');
+    const maxW = sz * 0.86;
+    const words = addr.split(/[\s]+/);
     let line = '';
     let lines = [];
     for (let i = 0; i < words.length; i++) {
@@ -1241,12 +1242,39 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
     }
     lines.push(line.trim());
     lines = lines.slice(0, 2);
-
-    const startY = sz * 0.940;
-    const gap = sz * 0.030;
+    const startY = sz * 0.898;
+    const gap = sz * 0.028;
     for (let i = 0; i < lines.length; i++) {
       ctx.fillText(lines[i], sz / 2, startY + i * gap);
     }
+  }
+
+  // ===== BOTTOM FOOTER: Watermark + QR =====
+  // dukanlist.com watermark (centered, subtle)
+  ctx.fillStyle = '#737373';
+  ctx.font = '700 ' + Math.floor(sz * 0.016) + 'px Inter, Arial';
+  ctx.textAlign = 'center';
+  const wmY = sz * 0.985;
+  let wmTxt = 'dukanlist.com';
+  if (s.slug) wmTxt = 'dukanlist.com/' + s.slug;
+  ctx.fillText(wmTxt, sz / 2, wmY);
+
+  // Small QR code bottom-right corner (subtle)
+  if (showQr && s.slug) {
+    try {
+      const qrSize = sz * 0.080;
+      const qrPad = sz * 0.020;
+      const qrText = 'https://dukanlist.com/business.html?slug=' + s.slug;
+      const qrImg = await loadQrImage(qrText, 150);
+      if (qrImg) {
+        ctx.save();
+        ctx.fillStyle = '#FFFFFF';
+        roundRect(ctx, sz - qrSize - qrPad - sz*0.004, sz - qrSize - qrPad - sz*0.004, qrSize + sz*0.008, qrSize + sz*0.008, sz*0.008);
+        ctx.fill();
+        ctx.drawImage(qrImg, sz - qrSize - qrPad, sz - qrSize - qrPad, qrSize, qrSize);
+        ctx.restore();
+      }
+    } catch(_){}
   }
 }
 
