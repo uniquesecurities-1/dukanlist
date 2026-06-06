@@ -581,6 +581,12 @@
           "icon": "👔"
         },
         {
+          "slug": "readymade-garments",
+          "name": "Readymade Garments",
+          "name_hi": "रेडीमेड कपड़े",
+          "icon": "🧥"
+        },
+        {
           "slug": "jewellery",
           "name": "Jewellery",
           "name_hi": "जौहरी / सोना-चाँदी",

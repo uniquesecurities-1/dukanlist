@@ -314,20 +314,14 @@ module.exports = async (req, res) => {
     }
   } catch(_){}
 
+  // photos_now: prefer the atomic RPC's authoritative count
+  const photosNow = Array.isArray(updatedPhotos)
+    ? updatedPhotos.length
+    : (currentPhotos.length + 1);
+
   return res.status(200).json({
     ok: true,
     url: publicUrl,
     path: storagePath,
     business_id: businessId,
-    photos_now: newPhotos.length
-  });
-};
-
-// Allow up to 15MB JSON body (10MB raw file = ~13.3MB base64)
-module.exports.config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '15mb'
-    }
-  }
-};
+    photos_now: photosNo
