@@ -1217,4 +1217,36 @@
 
   // Custom address — localStorage persistent
   state.customAddress = localStorage.getItem('dl_studio_address') || '';
-  state.showQr = (localStorage.getItem
+  state.showQr = (localStorage.getItem('dl_studio_qr') !== '0');
+  const addrInput = document.getElementById('customAddress');
+  if (addrInput) {
+    addrInput.value = state.customAddress;
+    let aT;
+    addrInput.addEventListener('input', () => {
+      clearTimeout(aT);
+      aT = setTimeout(() => {
+        state.customAddress = addrInput.value.trim();
+        try { localStorage.setItem('dl_studio_address', state.customAddress); } catch(_){}
+        renderMain();
+      }, 300);
+    });
+  }
+  const qrBtn = document.getElementById('qrToggle');
+  if (qrBtn) {
+    qrBtn.classList.toggle('on', state.showQr);
+    qrBtn.textContent = state.showQr ? '\ud83d\udd17 QR Code: ON' : '\ud83d\udd17 Show QR code';
+    qrBtn.addEventListener('click', () => {
+      state.showQr = !state.showQr;
+      qrBtn.classList.toggle('on', state.showQr);
+      qrBtn.textContent = state.showQr ? '\ud83d\udd17 QR Code: ON' : '\ud83d\udd17 Show QR code';
+      try { localStorage.setItem('dl_studio_qr', state.showQr ? '1' : '0'); } catch(_){}
+      renderMain();
+    });
+  }
+
+  buildGallery();
+  setTimeout(renderMain, 250);
+})();
+</script>
+</body>
+</html>
