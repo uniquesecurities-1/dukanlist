@@ -63,15 +63,19 @@
     word-break:break-all; margin:14px 0 8px;
   }
 
-  /* Card iframe preview */
+  /* Card iframe preview — fits full card without scrolling */
   .preview-wrap{
     background:linear-gradient(180deg,#F1F5F9 0%,#E2E8F0 100%);
-    border-radius:14px; padding:24px 16px; min-height:480px;
+    border-radius:14px; padding:16px 12px; min-height:500px;
     display:flex; align-items:flex-start; justify-content:center;
   }
   .preview-iframe{
-    width:100%; max-width:420px; height:580px; border:0;
+    width:100%; max-width:420px; height:1180px; border:0;
     background:transparent;
+  }
+  @media (max-width:680px){
+    .preview-wrap{ padding:10px 6px }
+    .preview-iframe{ height:1280px }
   }
 
   /* Help section */
@@ -206,7 +210,7 @@
       <div class="panel">
         <h2>👀 Live preview <span style="font-size:.72rem;color:#94a3b8;font-weight:600;margin-left:auto">(what customers will see)</span></h2>
         <div class="preview-wrap">
-          <iframe id="previewFrame" class="preview-iframe" src="about:blank" loading="lazy"></iframe>
+          <iframe id="previewFrame" class="preview-iframe" src="about:blank" loading="lazy" onload="autoResizePreview(this)"></iframe>
         </div>
         <p style="color:#64748b;font-size:.78rem;margin:14px 0 0;line-height:1.5">
           Data is pulled from your DukanList listing. Update name, mobile, email, address on the <a href="/panel/profile.html" style="color:#1E3A8A;font-weight:700">Edit Profile</a> page and it'll auto-reflect here.
@@ -263,6 +267,23 @@ function refreshPreview(){
   if (!url){ return; }
   frame.src = url;
   document.getElementById('cardLinkBox').textContent = url;
+}
+
+// Auto-resize iframe to fit full card content (same-origin safe)
+function autoResizePreview(frame){
+  try {
+    setTimeout(function(){
+      var doc = frame.contentDocument || frame.contentWindow.document;
+      if (!doc || !doc.body) return;
+      var h = Math.max(
+        doc.body.scrollHeight,
+        doc.documentElement.scrollHeight,
+        doc.body.offsetHeight,
+        doc.documentElement.offsetHeight
+      );
+      if (h > 500) frame.style.height = (h + 20) + 'px';
+    }, 800);  // wait for card content + photos to load
+  } catch(e){ /* cross-origin or not ready — silent fail */ }
 }
 
 function shareWhatsApp(){
@@ -331,27 +352,4 @@ async function init(){
   // Fetch category name (for theme auto-pick)
   var primaryCatId = BIZ.sub_category_id || BIZ.category_id;
   if (primaryCatId){
-    var cat = await c.from('categories').select('name').eq('id', primaryCatId).maybeSingle();
-    if (cat.data) BIZ.cat_name = cat.data.name;
-  }
-
-  // Auto-pick theme
-  CURRENT_THEME = pickAutoTheme(BIZ.owner_role, BIZ.cat_name);
-  document.querySelectorAll('.theme-chip').forEach(function(c){
-    c.classList.toggle('active', c.dataset.theme === CURRENT_THEME);
-  });
-
-  refreshPreview();
-}
-
-init();
-</script>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
-<script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
-</body>
-</html>
+    var cat = await c.from('categories').select('name').e
