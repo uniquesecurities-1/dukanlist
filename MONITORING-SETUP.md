@@ -61,7 +61,7 @@ Returns JSON: `{ ok: true, checks: { supabase: {...}, runtime: {...} } }`
 
 ## Layer 3 — Vercel Analytics 📊 (1 toggle, free 2500 events/month)
 
-**Already integrated:** Har public page me `<script src="/_vercel/insights/script.js" defer></script>` add ho gaya hai. Bas Vercel dashboard pe enable karna hai.
+**Already integrated:** Har public page me `` add ho gaya hai. Bas Vercel dashboard pe enable karna hai.
 
 ### Setup (1 minute):
 

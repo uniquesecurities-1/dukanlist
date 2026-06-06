@@ -260,7 +260,6 @@
   <button class="ss-btn" onclick="stickySearchSubmit()">Search</button>
 </div>
 
-
 <header class="topbar">
   <div class="topbar-inner">
     <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
@@ -391,7 +390,6 @@
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
     </div>
   </div>
-
 
     </div><!-- /.search-main -->
   </div><!-- /.search-layout -->
@@ -1204,7 +1202,6 @@ function restoreSidebarState(){
   }, 50);
 }
 
-
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
 function handleSearch(e){
@@ -1282,8 +1279,6 @@ window.addEventListener('popstate', runSearch);
 
 <script src="/assets/js/city-persist.js"></script>
 
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
 </body>
 </html>

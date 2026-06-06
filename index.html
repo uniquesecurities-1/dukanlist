@@ -198,7 +198,6 @@ html[data-lang="hi"] .hero-tag{ font-family:'Noto Sans Devanagari',sans-serif }
   .pulse-stat-lbl{ font-size:.7rem }
 }
 
-
 /* Phase 6 (2026-06-05): Open Near You widget */
 .ony-card{ background:#fff; border:1px solid #E2E8F0; border-radius:18px; padding:18px 20px; margin:0 auto 28px; max-width:1180px; box-shadow:0 2px 8px rgba(15,23,42,.04); }
 .ony-head{ display:flex; align-items:center; gap:14px; flex-wrap:wrap }
@@ -635,9 +634,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
 
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
 </head>
 <body>
 
@@ -2095,7 +2092,6 @@ if (window.DukanPTR){
   } else { setTimeout(loadTop10, 1200); setTimeout(loadFSOTW, 1500); setTimeout(loadTestimonials, 2000); }
 })();
 </script>
-
 
 <!-- ===== LIVE ACTIVITY TICKER (bottom strip with auto-rotate) ===== -->
 <div id="actTicker" style="display:none">

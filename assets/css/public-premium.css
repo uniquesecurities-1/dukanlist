@@ -322,11 +322,4 @@ html, body{
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }
-/* Defensive: any top-level wrapper wider than viewport gets clipped */
-body > *{
-  max-width: 100vw;
-}
-
-/* ============================================================
-   END public-premium.css
-   ============================================================ */
+/* Defensive: any top-level wrapper wider than viewport gets clippe

@@ -988,10 +988,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
 
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
-
 <style>
 /* Daily Buzz strip + viewer */
 .db-strip{ background:#fff; border:1px solid #E5E7EB; border-radius:14px; padding:14px 16px; margin:12px 0 }
@@ -3031,7 +3028,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 <script>
 // =============== Profile Highlights renderer ===============
 
@@ -3414,7 +3410,6 @@ function copyShopUrl(){
 })();
 </script>
 <script id="biz-premium-helpers">
-
 
 /* Owner-with-role credit — appears below shop name with dignity */
 function renderOwnerCredit(){
