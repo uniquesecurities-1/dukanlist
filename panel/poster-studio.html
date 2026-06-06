@@ -345,6 +345,41 @@
     transition:.15s;
   }
   .wpack-suggest-chip:hover{ background:#DBEAFE }
+
+  /* Premium template badge */
+  .tmpl.premium-tier{ border-color:#D4AF37 }
+  .tmpl.premium-tier .tmpl-name{
+    background:linear-gradient(to top, rgba(212,175,55,.95), transparent);
+    color:#000; font-weight:900;
+  }
+  .tmpl.premium-tier::before{
+    content:"PREMIUM"; position:absolute; top:6px; left:6px;
+    background:linear-gradient(135deg,#D4AF37,#996515);
+    color:#fff; font-size:.55rem; font-weight:900;
+    padding:3px 7px; border-radius:99px; letter-spacing:.05em;
+    z-index:3; box-shadow:0 2px 6px rgba(0,0,0,.3);
+  }
+  /* HERO photo upload card */
+  .hero-upload{
+    background:linear-gradient(135deg,#FDFBF6 0%,#F5F1E8 100%);
+    border:2px dashed #D4AF37;
+    border-radius:16px; padding:20px;
+    text-align:center; cursor:pointer;
+    transition:.15s;
+  }
+  .hero-upload:hover{ background:linear-gradient(135deg,#FAF6EC 0%,#EFE9D9 100%); transform:translateY(-1px) }
+  .hero-upload.has-photo{
+    background:none; border-style:solid; border-color:#D4AF37;
+    padding:14px;
+  }
+  .hero-upload-icon{ font-size:2.2rem; margin-bottom:6px }
+  .hero-upload-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:.95rem; color:#5D4920; margin-bottom:2px }
+  .hero-upload-sub{ font-size:.78rem; color:#8B6F47; font-weight:600 }
+  .hero-photo-preview{
+    width:100%; aspect-ratio:16/9;
+    border-radius:10px; background-size:cover; background-position:center;
+    margin-bottom:10px;
+  }
 </style>
 </head>
 <body>
@@ -404,6 +439,19 @@
 
   <!-- ========== RIGHT: Controls Column ========== -->
   <div class="controls-col">
+
+    <!-- HERO PHOTO UPLOAD - Premium Default -->
+    <div class="control-card" style="border:1px solid #D4AF37">
+      <div class="control-title" style="color:#5D4920">📸 Hero Photo</div>
+      <div class="hero-upload" id="heroUploadZone">
+        <div class="hero-upload-icon">📤</div>
+        <div class="hero-upload-title">Upload your shop photo</div>
+        <div class="hero-upload-sub">JPG / PNG · Max 8 MB · Tap to choose</div>
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:8px;line-height:1.4">
+        Premium templates highlight your photo at top. Choose a clean, well-lit shot of your shop, products, or workplace.
+      </div>
+    </div>
 
     <!-- Templates -->
     <div class="control-card">
@@ -546,7 +594,7 @@
     if (!u || !u.data || !u.data.user) { location.href = '/panel/login.html'; return; }
     const own = await c.from('business_owners').select('business_id').eq('auth_user_id', u.data.user.id).limit(1).maybeSingle();
     if (!own || !own.data) { console.error('No business owner row found for user'); alert('No business linked to your account.\nGoing back to dashboard.'); location.href = '/panel/dashboard.html'; return; }
-    const b = await c.from('businesses').select('id, name, slug, mobile, whatsapp, photos, rating_avg, established_year, pincode, city_id, category_id').eq('id', own.data.business_id).maybeSingle();
+    const b = await c.from('businesses').select('id, name, slug, mobile, whatsapp, photos, rating_avg, established_year, pincode, city_id, category_id, website_url').eq('id', own.data.business_id).maybeSingle();
     if (!b || !b.data) { console.error('Business fetch returned no data:', b); alert('Business data could not be loaded'); return; }
     biz = b.data;
     // Get city name
@@ -572,7 +620,8 @@
     established_year: biz.established_year || null,
     rating: biz.rating_avg || 0,
     address: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
-    photo: (Array.isArray(biz.photos) && biz.photos[0]) || ''
+    photo: (Array.isArray(biz.photos) && biz.photos[0]) || '',
+    website: biz.website_url || ''
   };
 
   const state = {
@@ -666,7 +715,7 @@
       return;
     }
     gal.innerHTML = tmpls.map(t =>
-      '<div class="tmpl ' + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
+      '<div class="tmpl ' + (t.premium ? 'premium-tier ' : '') + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
       '  <div class="tmpl-fav ' + (isFav(t.id) ? 'faved' : '') + '" data-fav="' + t.id + '">★</div>' +
       '  <canvas data-thumb-for="' + t.id + '"></canvas>' +
       '  <div class="tmpl-name">' + t.name + '</div>' +
@@ -793,7 +842,8 @@
       established_year: shopData.established_year,
       rating: state.showRating ? shopData.rating : 0,
       address: state.showAddress ? shopData.address : '',
-      photo: state.customPhoto || shopData.photo
+      photo: state.customPhoto || shopData.photo,
+      website: shopData.website || ''
     };
   }
   function opts(){
@@ -1027,7 +1077,25 @@
       });
     });
   }
-  renderSuggestions();
+  renderSuggestions();  // Hero upload zone — proxy to file input
+  const heroZone = document.getElementById('heroUploadZone');
+  if (heroZone) {
+    heroZone.addEventListener('click', () => document.getElementById('photoInput').click());
+    // Update hero zone when photo loads
+    const origPhotoInput = document.getElementById('photoInput');
+    if (origPhotoInput) {
+      origPhotoInput.addEventListener('change', () => {
+        setTimeout(() => {
+          if (state.customPhoto) {
+            heroZone.classList.add('has-photo');
+            heroZone.innerHTML = '<div class="hero-photo-preview" style="background-image:url(' + state.customPhoto + ')"></div>' +
+              '<button type="button" class="wpack-btn" style="width:100%">📸 Change photo</button>';
+          }
+        }, 600);
+      });
+    }
+  }
+
   setInterval(renderSuggestions, 60000);  // refresh every minute
 
   buildGallery();

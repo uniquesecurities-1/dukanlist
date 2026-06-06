@@ -22,6 +22,43 @@
 
 // ─── Template Catalogue (30 distinct designs) ──────────────
 const TEMPLATES = [
+  // ===== PREMIUM CARD COLLECTION (default + recommended) =====
+  {
+    id: 'premium-cream',
+    name: 'Premium Cream',
+    nameHi: 'प्रीमियम',
+    category: 'all',
+    bg: ['#FDFBF6', '#F5F1E8', '#EDE7D7'],
+    accent: '#1A1A1A',
+    ink: '#1A1A1A',
+    style: 'premium-card',
+    needsPhoto: true,
+    premium: true
+  },
+  {
+    id: 'premium-charcoal',
+    name: 'Premium Charcoal',
+    nameHi: 'चारकोल',
+    category: 'all',
+    bg: ['#1A1A1A', '#0F0F0F', '#000000'],
+    accent: '#D4AF37',
+    ink: '#FFFFFF',
+    style: 'premium-card',
+    needsPhoto: true,
+    premium: true
+  },
+  {
+    id: 'premium-ivory',
+    name: 'Premium Ivory',
+    nameHi: 'आइवरी',
+    category: 'all',
+    bg: ['#FFFFFF', '#FAFAFA', '#F4F4F5'],
+    accent: '#1E3A8A',
+    ink: '#0F172A',
+    style: 'premium-card',
+    needsPhoto: true,
+    premium: true
+  },
   {
     id: 'bold-brand',
     name: 'Bold Brand',
@@ -545,6 +582,7 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     case 'restaurant':      drawRestaurant(ctx, shop, tmpl, size, lang); break;
     case 'salon':           drawSalon(ctx, shop, tmpl, size, lang); break;
     case 'festival':        drawFestival(ctx, shop, tmpl, size, lang); break;
+    case 'premium-card':    await drawPremiumCard(ctx, shop, tmpl, size, lang); break;
     default:                drawBoldName(ctx, shop, tmpl, size, lang);
   }
 
@@ -1085,6 +1123,159 @@ function isColorDark(hex){
   const g = parseInt(hex.slice(2,4), 16);
   const b = parseInt(hex.slice(4,6), 16);
   return ((r*299 + g*587 + b*114) / 1000) < 128;
+}
+
+
+
+// ─── Layout: Premium Business Card ─────────────────────────
+async function drawPremiumCard(ctx, s, t, sz, lang){
+  // Background — soft gradient with subtle texture
+  const isDark = t.id === 'premium-charcoal' || (t.ink && t.ink === '#FFFFFF');
+  const subtleInk = isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)';
+  const dividerColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+
+  // ===== TOP 55% : HERO PHOTO =====
+  const photoY = sz * 0.06;
+  const photoH = sz * 0.46;
+  const photoX = sz * 0.06;
+  const photoW = sz * 0.88;
+  const radius = sz * 0.024;
+
+  // Photo frame
+  ctx.save();
+  // Subtle border / inner glow
+  ctx.shadowColor = 'rgba(0,0,0,0.08)';
+  ctx.shadowBlur = sz * 0.025;
+  ctx.shadowOffsetY = sz * 0.008;
+  roundRect(ctx, photoX, photoY, photoW, photoH, radius);
+  ctx.fillStyle = isDark ? '#262626' : '#F5F1E8';
+  ctx.fill();
+  ctx.restore();
+
+  // Load and draw photo within frame
+  if (s.photo) {
+    try {
+      const img = await loadPhotoImg(s.photo);
+      if (img) {
+        ctx.save();
+        roundRect(ctx, photoX, photoY, photoW, photoH, radius);
+        ctx.clip();
+        // cover-fit
+        const ratio = Math.max(photoW / img.width, photoH / img.height);
+        const w = img.width * ratio;
+        const h = img.height * ratio;
+        ctx.drawImage(img, photoX + (photoW - w) / 2, photoY + (photoH - h) / 2, w, h);
+        ctx.restore();
+      } else {
+        // Placeholder icon
+        ctx.fillStyle = subtleInk;
+        ctx.font = `${Math.floor(sz * 0.08)}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('📷', sz / 2, photoY + photoH / 2);
+        ctx.textBaseline = 'alphabetic';
+      }
+    } catch(_) {}
+  } else {
+    // Placeholder
+    ctx.fillStyle = subtleInk;
+    ctx.font = `${Math.floor(sz * 0.08)}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('📷', sz / 2, photoY + photoH / 2);
+    ctx.font = `600 ${Math.floor(sz * 0.020)}px 'Inter', Arial`;
+    ctx.fillText('Upload your photo', sz / 2, photoY + photoH / 2 + sz * 0.08);
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  // ===== MIDDLE : SHOP NAME + TAGLINE =====
+  ctx.textAlign = 'center';
+  ctx.fillStyle = t.ink;
+  ctx.font = `900 ${Math.floor(sz * 0.060)}px 'Manrope', Arial`;
+  let nameTxt = (s.name || 'Your Business').trim();
+  if (nameTxt.length > 30) {
+    ctx.font = `900 ${Math.floor(sz * 0.048)}px 'Manrope', Arial`;
+  }
+  wrapText(ctx, nameTxt, sz / 2, sz * 0.60, sz * 0.84, Math.floor(sz * 0.062), 2);
+
+  // Tagline (category-based)
+  ctx.fillStyle = t.accent;
+  ctx.font = `700 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
+  let tag = txt(lang, 'TRUSTED LOCAL BUSINESS', 'भरोसेमंद लोकल बिज़नेस');
+  if (s.category) {
+    const cl = s.category.toLowerCase();
+    if (cl.includes('mutual') || cl.includes('finance')) tag = 'CERTIFIED FINANCIAL ADVISOR';
+    else if (cl.includes('medical') || cl.includes('pharmacy')) tag = 'TRUSTED PHARMACY';
+    else if (cl.includes('jewel')) tag = 'HALLMARK GOLD JEWELLERY';
+    else if (cl.includes('restaurant')) tag = 'AUTHENTIC INDIAN CUISINE';
+    else if (cl.includes('salon') || cl.includes('beauty')) tag = 'PREMIUM BEAUTY EXPERTS';
+    else if (cl.includes('kirana') || cl.includes('grocery')) tag = 'FAMILY GROCERY STORE';
+  }
+  // Letter-spacing emulation by inserting spaces
+  let spaced = tag.split('').join(' ');
+  ctx.fillText(spaced, sz / 2, sz * 0.68);
+
+  // Divider line
+  ctx.fillStyle = dividerColor;
+  ctx.fillRect(sz * 0.30, sz * 0.715, sz * 0.40, sz * 0.0025);
+
+  // ===== BOTTOM : CONTACT DETAILS =====
+  ctx.textAlign = 'left';
+  ctx.fillStyle = t.ink;
+  ctx.font = `500 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
+  ctx.textBaseline = 'middle';
+
+  const startY = sz * 0.76;
+  const lineH = sz * 0.038;
+  let lineY = startY;
+
+  // Address
+  if (s.address) {
+    drawIcon(ctx, '📍', sz * 0.10, lineY, sz * 0.030);
+    let addr = String(s.address).trim();
+    if (addr.length > 60) addr = addr.slice(0, 57) + '...';
+    ctx.fillStyle = t.ink;
+    ctx.fillText(addr, sz * 0.16, lineY);
+    lineY += lineH;
+  }
+
+  // Mobile
+  if (s.mobile) {
+    drawIcon(ctx, '📞', sz * 0.10, lineY, sz * 0.030);
+    ctx.fillStyle = t.ink;
+    ctx.font = `600 ${Math.floor(sz * 0.026)}px 'Inter', Arial`;
+    ctx.fillText('+91 ' + String(s.mobile).replace(/\D/g, '').slice(-10), sz * 0.16, lineY);
+    lineY += lineH;
+  }
+
+  // Website (if set)
+  if (s.website) {
+    drawIcon(ctx, '🌐', sz * 0.10, lineY, sz * 0.030);
+    ctx.fillStyle = t.accent;
+    ctx.font = `600 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
+    let url = String(s.website).replace(/^https?:\/\//, '');
+    if (url.length > 45) url = url.slice(0, 42) + '...';
+    ctx.fillText(url, sz * 0.16, lineY);
+    lineY += lineH;
+  } else if (s.slug) {
+    // Use DukanList URL as default
+    drawIcon(ctx, '🌐', sz * 0.10, lineY, sz * 0.030);
+    ctx.fillStyle = t.accent;
+    ctx.font = `600 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
+    ctx.fillText('dukanlist.com/' + s.slug, sz * 0.16, lineY);
+    lineY += lineH;
+  }
+
+  ctx.textBaseline = 'alphabetic';
+}
+
+function drawIcon(ctx, emoji, x, y, size){
+  ctx.save();
+  ctx.font = `${Math.floor(size)}px serif`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(emoji, x, y);
+  ctx.restore();
 }
 
 // ─── Output helpers ───────────────────────────────────────
