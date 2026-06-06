@@ -553,7 +553,17 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     await drawQrCorner(ctx, shop, size);
   }
 
-  // 6. Watermark
+  // 6a. Logo overlay (if provided)
+  if (opts.logoUrl) {
+    try { await drawLogoOverlay(ctx, opts.logoUrl, size); } catch(_){}
+  }
+
+  // 6b. Deal banner (if provided)
+  if (opts.dealText) {
+    try { drawDealBanner(ctx, opts.dealText, opts.dealAccent || tmpl.accent, tmpl, size); } catch(_){}
+  }
+
+  // 7. Watermark
   drawWatermark(ctx, tmpl, size);
 
   // 7. Sticker layer (NEW / SALE / OFFER / FREE)
@@ -1015,6 +1025,66 @@ function drawFestival(ctx, s, t, sz, lang){
     ctx.font = `800 ${Math.floor(sz*0.030)}px 'Plus Jakarta Sans', Arial`;
     ctx.fillText('📞 ' + s.mobile, sz/2, sz*0.78);
   }
+}
+
+
+// ─── Logo overlay (top-left corner) ────────────────────────
+async function drawLogoOverlay(ctx, logoUrl, size){
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const logoSize = size * 0.10;
+      const padding = size * 0.03;
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      roundRect(ctx, padding, padding, logoSize + padding*0.7, logoSize + padding*0.7, size*0.012);
+      ctx.fill();
+      const ratio = Math.min(logoSize / img.width, logoSize / img.height);
+      const w = img.width * ratio;
+      const h = img.height * ratio;
+      ctx.drawImage(img, padding + (logoSize + padding*0.7 - w)/2, padding + (logoSize + padding*0.7 - h)/2, w, h);
+      ctx.restore();
+      resolve();
+    };
+    img.onerror = () => resolve();
+    img.src = logoUrl;
+    setTimeout(resolve, 3000);
+  });
+}
+
+// ─── Deal banner (bottom strip) ────────────────────────────
+function drawDealBanner(ctx, dealText, accent, tmpl, size){
+  const bannerH = size * 0.075;
+  const bannerY = size * 0.875;
+  ctx.save();
+  ctx.fillStyle = accent || '#FBBF24';
+  roundRect(ctx, size*0.06, bannerY, size*0.88, bannerH, size*0.012);
+  ctx.fill();
+  ctx.shadowColor = 'rgba(0,0,0,.18)';
+  ctx.shadowBlur = size * 0.015;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  const isDark = isColorDark(accent);
+  ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 ' + Math.floor(size*0.034) + 'px Manrope, Arial';
+  let txt = String(dealText || '').toUpperCase();
+  if (txt.length > 50) txt = txt.slice(0, 47) + '...';
+  ctx.fillText('🎁  ' + txt, size/2, bannerY + bannerH/2);
+  ctx.textBaseline = 'alphabetic';
+  ctx.restore();
+}
+
+function isColorDark(hex){
+  if (!hex || typeof hex !== 'string') return false;
+  hex = hex.replace('#','');
+  if (hex.length !== 6) return false;
+  const r = parseInt(hex.slice(0,2), 16);
+  const g = parseInt(hex.slice(2,4), 16);
+  const b = parseInt(hex.slice(4,6), 16);
+  return ((r*299 + g*587 + b*114) / 1000) < 128;
 }
 
 // ─── Output helpers ───────────────────────────────────────
