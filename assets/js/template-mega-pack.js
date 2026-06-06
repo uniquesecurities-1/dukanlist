@@ -222,13 +222,15 @@ const TEMPLATES = [
   },
   {
     id: 'years-experience',
-    name: 'Experienced',
+    name: 'Years of Trust',
     nameHi: 'अनुभवी',
     category: 'all',
-    bg: ['#451A03', '#92400E', '#D97706'],
-    accent: '#FEF3C7',
-    ink: '#FEF3C7',
-    style: 'years'
+    bg: ['#FDFBF6', '#F5F1E8', '#EDE7D7'],
+    accent: '#92400E',
+    ink: '#1A1A1A',
+    style: 'premium-card',
+    needsPhoto: true,
+    premium: true
   },
   {
     id: 'mono-sleek',
@@ -1127,145 +1129,167 @@ function isColorDark(hex){
 
 
 
-// ─── Layout: Premium Business Card ─────────────────────────
+// ─── Layout: Premium Business Card (MNC-class) ────────────
 async function drawPremiumCard(ctx, s, t, sz, lang){
-  // Background — soft gradient with subtle texture
   const isDark = t.id === 'premium-charcoal' || (t.ink && t.ink === '#FFFFFF');
-  const subtleInk = isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)';
-  const dividerColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+  const dividerColor = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)';
+  const mutedInk = isDark ? 'rgba(255,255,255,0.72)' : 'rgba(0,0,0,0.62)';
+  const bandBg = isDark ? '#0F0F0F' : '#FFFFFF';
 
-  // ===== TOP 55% : HERO PHOTO =====
-  const photoY = sz * 0.06;
-  const photoH = sz * 0.46;
-  const photoX = sz * 0.06;
-  const photoW = sz * 0.88;
-  const radius = sz * 0.024;
+  // ===== TOP 50% : HERO PHOTO (FULL BLEED, no padding) =====
+  const photoH = sz * 0.50;
 
-  // Photo frame
-  ctx.save();
-  // Subtle border / inner glow
-  ctx.shadowColor = 'rgba(0,0,0,0.08)';
-  ctx.shadowBlur = sz * 0.025;
-  ctx.shadowOffsetY = sz * 0.008;
-  roundRect(ctx, photoX, photoY, photoW, photoH, radius);
-  ctx.fillStyle = isDark ? '#262626' : '#F5F1E8';
-  ctx.fill();
-  ctx.restore();
+  // Photo placeholder backdrop
+  ctx.fillStyle = isDark ? '#1A1A1A' : '#F0EBE0';
+  ctx.fillRect(0, 0, sz, photoH);
 
-  // Load and draw photo within frame
   if (s.photo) {
     try {
       const img = await loadPhotoImg(s.photo);
       if (img) {
         ctx.save();
-        roundRect(ctx, photoX, photoY, photoW, photoH, radius);
+        ctx.beginPath();
+        ctx.rect(0, 0, sz, photoH);
         ctx.clip();
-        // cover-fit
-        const ratio = Math.max(photoW / img.width, photoH / img.height);
+        const ratio = Math.max(sz / img.width, photoH / img.height);
         const w = img.width * ratio;
         const h = img.height * ratio;
-        ctx.drawImage(img, photoX + (photoW - w) / 2, photoY + (photoH - h) / 2, w, h);
+        ctx.drawImage(img, (sz - w) / 2, (photoH - h) / 2, w, h);
+        // Subtle darkening overlay at bottom for legibility
+        const grad = ctx.createLinearGradient(0, photoH * 0.7, 0, photoH);
+        grad.addColorStop(0, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.18)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, photoH * 0.7, sz, photoH * 0.3);
         ctx.restore();
       } else {
-        // Placeholder icon
-        ctx.fillStyle = subtleInk;
-        ctx.font = `${Math.floor(sz * 0.08)}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('📷', sz / 2, photoY + photoH / 2);
-        ctx.textBaseline = 'alphabetic';
+        drawPhotoPlaceholder(ctx, sz, photoH, mutedInk);
       }
-    } catch(_) {}
+    } catch(_) { drawPhotoPlaceholder(ctx, sz, photoH, mutedInk); }
   } else {
-    // Placeholder
-    ctx.fillStyle = subtleInk;
-    ctx.font = `${Math.floor(sz * 0.08)}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('📷', sz / 2, photoY + photoH / 2);
-    ctx.font = `600 ${Math.floor(sz * 0.020)}px 'Inter', Arial`;
-    ctx.fillText('Upload your photo', sz / 2, photoY + photoH / 2 + sz * 0.08);
-    ctx.textBaseline = 'alphabetic';
+    drawPhotoPlaceholder(ctx, sz, photoH, mutedInk);
   }
 
-  // ===== MIDDLE : SHOP NAME + TAGLINE =====
+  // ===== BOTTOM 50% : SOLID BAND with content =====
+  ctx.fillStyle = bandBg;
+  ctx.fillRect(0, photoH, sz, sz - photoH);
+
+  // Top of band: shop name
   ctx.textAlign = 'center';
   ctx.fillStyle = t.ink;
-  ctx.font = `900 ${Math.floor(sz * 0.060)}px 'Manrope', Arial`;
-  let nameTxt = (s.name || 'Your Business').trim();
-  if (nameTxt.length > 30) {
-    ctx.font = `900 ${Math.floor(sz * 0.048)}px 'Manrope', Arial`;
-  }
-  wrapText(ctx, nameTxt, sz / 2, sz * 0.60, sz * 0.84, Math.floor(sz * 0.062), 2);
+  const nameTxt = (s.name || 'Your Business').trim();
+  const nameFont = nameTxt.length > 22 ? 0.044 : 0.054;
+  ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
+  ctx.fillText(nameTxt, sz / 2, photoH + sz * 0.075);
 
-  // Tagline (category-based)
-  ctx.fillStyle = t.accent;
-  ctx.font = `700 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
-  let tag = txt(lang, 'TRUSTED LOCAL BUSINESS', 'भरोसेमंद लोकल बिज़नेस');
-  if (s.category) {
-    const cl = s.category.toLowerCase();
-    if (cl.includes('mutual') || cl.includes('finance')) tag = 'CERTIFIED FINANCIAL ADVISOR';
-    else if (cl.includes('medical') || cl.includes('pharmacy')) tag = 'TRUSTED PHARMACY';
-    else if (cl.includes('jewel')) tag = 'HALLMARK GOLD JEWELLERY';
-    else if (cl.includes('restaurant')) tag = 'AUTHENTIC INDIAN CUISINE';
-    else if (cl.includes('salon') || cl.includes('beauty')) tag = 'PREMIUM BEAUTY EXPERTS';
-    else if (cl.includes('kirana') || cl.includes('grocery')) tag = 'FAMILY GROCERY STORE';
+  // ===== METRIC LINE — "17+ YEARS OF TRUST" style =====
+  // Compute years if available
+  const yrs = s.established_year && s.established_year > 1900
+    ? (new Date().getFullYear() - s.established_year) : null;
+
+  if (yrs && yrs > 0) {
+    // Big number
+    ctx.fillStyle = t.accent;
+    ctx.font = '900 ' + Math.floor(sz * 0.090) + 'px Manrope, Arial';
+    ctx.fillText(yrs + '+', sz / 2, photoH + sz * 0.175);
+    // Small caption tight below
+    ctx.fillStyle = mutedInk;
+    ctx.font = '800 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
+    const caption = txt(lang, 'YEARS OF TRUST', 'सालों का भरोसा');
+    ctx.fillText(caption.split('').join(' '), sz / 2, photoH + sz * 0.215);
+  } else {
+    // Fallback: tagline by category
+    ctx.fillStyle = t.accent;
+    ctx.font = '800 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
+    let tag = txt(lang, 'TRUSTED LOCAL BUSINESS', 'भरोसेमंद लोकल बिज़नेस');
+    if (s.category) {
+      const cl = s.category.toLowerCase();
+      if (cl.includes('mutual') || cl.includes('finance') || cl.includes('securit')) tag = 'CERTIFIED FINANCIAL ADVISOR';
+      else if (cl.includes('medical') || cl.includes('pharmacy')) tag = 'TRUSTED PHARMACY';
+      else if (cl.includes('jewel')) tag = 'HALLMARK GOLD JEWELLERY';
+      else if (cl.includes('restaurant')) tag = 'AUTHENTIC INDIAN CUISINE';
+      else if (cl.includes('salon') || cl.includes('beauty')) tag = 'PREMIUM BEAUTY EXPERTS';
+      else if (cl.includes('kirana') || cl.includes('grocery')) tag = 'FAMILY GROCERY STORE';
+      else if (cl.includes('mobile')) tag = 'AUTHORISED MOBILE DEALER';
+    }
+    ctx.fillText(tag.split('').join(' '), sz / 2, photoH + sz * 0.140);
   }
-  // Letter-spacing emulation by inserting spaces
-  let spaced = tag.split('').join(' ');
-  ctx.fillText(spaced, sz / 2, sz * 0.68);
 
   // Divider line
+  const divY = photoH + sz * 0.260;
   ctx.fillStyle = dividerColor;
-  ctx.fillRect(sz * 0.30, sz * 0.715, sz * 0.40, sz * 0.0025);
+  ctx.fillRect(sz * 0.30, divY, sz * 0.40, sz * 0.0025);
 
-  // ===== BOTTOM : CONTACT DETAILS =====
+  // ===== CONTACT BLOCK (left-aligned, proper pattern) =====
+  const contactStartY = photoH + sz * 0.305;
+  const lineH = sz * 0.045;
+  let lineY = contactStartY;
+  const leftX = sz * 0.10;
+  const iconX = sz * 0.10;
+  const textX = sz * 0.165;
+
   ctx.textAlign = 'left';
-  ctx.fillStyle = t.ink;
-  ctx.font = `500 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
   ctx.textBaseline = 'middle';
 
-  const startY = sz * 0.76;
-  const lineH = sz * 0.038;
-  let lineY = startY;
-
-  // Address
-  if (s.address) {
-    drawIcon(ctx, '📍', sz * 0.10, lineY, sz * 0.030);
-    let addr = String(s.address).trim();
-    if (addr.length > 60) addr = addr.slice(0, 57) + '...';
-    ctx.fillStyle = t.ink;
-    ctx.fillText(addr, sz * 0.16, lineY);
-    lineY += lineH;
-  }
-
-  // Mobile
+  // Phone
   if (s.mobile) {
-    drawIcon(ctx, '📞', sz * 0.10, lineY, sz * 0.030);
+    const phone = String(s.mobile).replace(/\D/g, '').slice(-10);
     ctx.fillStyle = t.ink;
-    ctx.font = `600 ${Math.floor(sz * 0.026)}px 'Inter', Arial`;
-    ctx.fillText('+91 ' + String(s.mobile).replace(/\D/g, '').slice(-10), sz * 0.16, lineY);
+    ctx.font = '700 ' + Math.floor(sz * 0.028) + 'px Inter, Arial';
+    drawIcon(ctx, '📞', iconX, lineY, sz * 0.032);
+    ctx.fillText('+91 ' + phone.slice(0,5) + ' ' + phone.slice(5), textX, lineY);
     lineY += lineH;
   }
 
-  // Website (if set)
-  if (s.website) {
-    drawIcon(ctx, '🌐', sz * 0.10, lineY, sz * 0.030);
-    ctx.fillStyle = t.accent;
-    ctx.font = `600 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
-    let url = String(s.website).replace(/^https?:\/\//, '');
-    if (url.length > 45) url = url.slice(0, 42) + '...';
-    ctx.fillText(url, sz * 0.16, lineY);
-    lineY += lineH;
-  } else if (s.slug) {
-    // Use DukanList URL as default
-    drawIcon(ctx, '🌐', sz * 0.10, lineY, sz * 0.030);
-    ctx.fillStyle = t.accent;
-    ctx.font = `600 ${Math.floor(sz * 0.024)}px 'Inter', Arial`;
-    ctx.fillText('dukanlist.com/' + s.slug, sz * 0.16, lineY);
-    lineY += lineH;
+  // Address (full)
+  if (s.address) {
+    ctx.fillStyle = mutedInk;
+    ctx.font = '500 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
+    drawIcon(ctx, '📍', iconX, lineY, sz * 0.032);
+    let addr = String(s.address).trim();
+    // Wrap to 2 lines if long
+    const maxW = sz * 0.78;
+    const words = addr.split(' ');
+    let line = '';
+    let lines = [];
+    for (let i = 0; i < words.length; i++) {
+      const test = line + words[i] + ' ';
+      if (ctx.measureText(test).width > maxW && line.length > 0) {
+        lines.push(line.trim());
+        line = words[i] + ' ';
+      } else { line = test; }
+    }
+    lines.push(line.trim());
+    lines = lines.slice(0, 2);
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], textX, lineY + i * (sz * 0.034));
+    }
+    lineY += lineH + (lines.length - 1) * (sz * 0.034);
   }
 
+  // Website
+  let websiteText = '';
+  if (s.website) websiteText = String(s.website).replace(/^https?:\/\//, '').replace(/\/$/, '');
+  else if (s.slug) websiteText = 'dukanlist.com/' + s.slug;
+  if (websiteText) {
+    ctx.fillStyle = t.accent;
+    ctx.font = '700 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
+    drawIcon(ctx, '🌐', iconX, lineY, sz * 0.032);
+    if (websiteText.length > 42) websiteText = websiteText.slice(0, 39) + '...';
+    ctx.fillText(websiteText, textX, lineY);
+  }
+
+  ctx.textBaseline = 'alphabetic';
+}
+
+function drawPhotoPlaceholder(ctx, sz, h, ink){
+  ctx.fillStyle = ink;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = Math.floor(sz * 0.08) + 'px serif';
+  ctx.fillText('📷', sz / 2, h / 2 - sz * 0.02);
+  ctx.font = '600 ' + Math.floor(sz * 0.020) + 'px Inter, Arial';
+  ctx.fillText('Upload your photo', sz / 2, h / 2 + sz * 0.06);
   ctx.textBaseline = 'alphabetic';
 }
 

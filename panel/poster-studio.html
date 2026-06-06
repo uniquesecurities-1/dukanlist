@@ -380,6 +380,45 @@
     border-radius:10px; background-size:cover; background-position:center;
     margin-bottom:10px;
   }
+
+  /* Quick Pick Hero Templates */
+  .quickpick{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+    margin-bottom:14px;
+  }
+  @media (min-width:600px){ .quickpick{ grid-template-columns:repeat(4,1fr) } }
+  .qp-tile{
+    aspect-ratio:9/12; border-radius:14px; overflow:hidden;
+    cursor:pointer; border:2px solid transparent; position:relative;
+    background:#FAFAFA; transition:.2s;
+    box-shadow:0 4px 14px rgba(0,0,0,.06);
+  }
+  .qp-tile:hover{ transform:translateY(-2px); box-shadow:0 12px 24px rgba(0,0,0,.10) }
+  .qp-tile.active{ border-color:#D4AF37; box-shadow:0 0 0 3px rgba(212,175,55,.25) }
+  .qp-tile canvas{ width:100%; height:100%; display:block }
+  .qp-tile-label{
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
+    color:#fff; padding:18px 8px 8px; font-size:.7rem;
+    font-weight:800; text-align:center; letter-spacing:.03em;
+  }
+  .qp-tile-badge{
+    position:absolute; top:6px; right:6px;
+    background:linear-gradient(135deg,#D4AF37,#B8860B);
+    color:#000; font-size:.55rem; font-weight:900;
+    padding:3px 7px; border-radius:99px; letter-spacing:.05em;
+  }
+
+  .show-all-btn{
+    background:#FAFAFA; border:1px solid #E5E5E5;
+    color:#525252; padding:9px 14px; border-radius:10px;
+    font-weight:700; font-size:.84rem; cursor:pointer;
+    font-family:inherit; width:100%; transition:.15s;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .show-all-btn:hover{ background:#F4F4F5; color:#0A0A0A }
+  .more-styles-section{ display:none }
+  .more-styles-section.open{ display:block }
 </style>
 </head>
 <body>
@@ -453,25 +492,30 @@
       </div>
     </div>
 
-    <!-- Templates -->
+    <!-- Quick Pick Premium Templates -->
     <div class="control-card">
       <div class="section-flex">
-        <div class="control-title">Templates <span id="tmplCount" style="color:#A3A3A3;font-weight:600">(30)</span></div>
+        <div class="control-title">⭐ Quick Pick — Premium Templates</div>
         <div class="lang-toggle" id="langToggle">
           <button type="button" class="lang-btn active" data-lang="en">EN</button>
           <button type="button" class="lang-btn" data-lang="hi">हिं</button>
         </div>
       </div>
-      <input type="text" class="search-input" id="searchInput" placeholder="Search templates...">
-      <div class="filter-tabs">
-        <button type="button" class="filter-tab active" data-filter="all">All</button>
-        <button type="button" class="filter-tab" data-filter="favorites">★ Saved</button>
-        <button type="button" class="filter-tab" data-filter="festival">Festival</button>
-        <button type="button" class="filter-tab" data-filter="minimal">Minimal</button>
-        <button type="button" class="filter-tab" data-filter="bold">Bold</button>
-        <button type="button" class="filter-tab" data-filter="photo">Photo</button>
+      <div style="font-size:.78rem;color:#737373;margin-bottom:12px">Pick a style below — all need just a photo upload.</div>
+      <div class="quickpick" id="quickpickTiles"></div>
+      <button type="button" class="show-all-btn" id="showAllBtn">▾ Show all styles (<span id="tmplCount">30</span>)</button>
+      <div class="more-styles-section" id="moreStyles">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search templates..." style="margin-top:12px">
+        <div class="filter-tabs">
+          <button type="button" class="filter-tab active" data-filter="all">All</button>
+          <button type="button" class="filter-tab" data-filter="favorites">★ Saved</button>
+          <button type="button" class="filter-tab" data-filter="festival">Festival</button>
+          <button type="button" class="filter-tab" data-filter="minimal">Minimal</button>
+          <button type="button" class="filter-tab" data-filter="bold">Bold</button>
+          <button type="button" class="filter-tab" data-filter="photo">Photo</button>
+        </div>
+        <div class="gallery" id="gallery" style="margin-top:14px"></div>
       </div>
-      <div class="gallery" id="gallery" style="margin-top:14px"></div>
     </div>
 
     <!-- What to show -->
@@ -764,7 +808,61 @@
       document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
       state.filter = b.dataset.filter;
-      buildGallery();
+        // ─── Quick Pick: Premium hero tiles ────────────────────
+  function renderQuickpick(){
+    const premiumOnes = allTemplates.filter(t => t.premium);
+    const el = document.getElementById('quickpickTiles');
+    if (!el || premiumOnes.length === 0) return;
+    el.innerHTML = premiumOnes.map((t, i) =>
+      '<div class="qp-tile ' + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
+      '  <div class="qp-tile-badge">PREMIUM</div>' +
+      '  <canvas data-qp-for="' + t.id + '"></canvas>' +
+      '  <div class="qp-tile-label">' + t.name + '</div>' +
+      '</div>'
+    ).join('');
+    // Render thumbs
+    setTimeout(async () => {
+      for (const t of premiumOnes) {
+        const cv = el.querySelector('[data-qp-for="' + t.id + '"]');
+        if (cv) {
+          try { await TemplateMegaPack.renderTemplate(cv, shopData, t, { size: 300, lang: state.lang }); } catch(_){}
+        }
+      }
+    }, 100);
+    // Wire clicks
+    el.querySelectorAll('.qp-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        el.querySelectorAll('.qp-tile').forEach(x => x.classList.remove('active'));
+        tile.classList.add('active');
+        state.tmpl = allTemplates.find(t => t.id === tile.dataset.tid);
+        // Also sync active state in hidden gallery
+        document.querySelectorAll('.gallery .tmpl').forEach(x => x.classList.remove('active'));
+        const g = document.querySelector('[data-tid="' + state.tmpl.id + '"]');
+        if (g && g.classList.contains('tmpl')) g.classList.add('active');
+        renderMain();
+      });
+    });
+  }
+  renderQuickpick();
+
+  // Default to first premium template on first load
+  const firstPremium = allTemplates.find(t => t.premium);
+  if (firstPremium && (!state.tmpl || !state.tmpl.premium)) {
+    state.tmpl = firstPremium;
+    setTimeout(renderMain, 300);
+  }
+
+  // Show All toggle
+  const showAllBtn = document.getElementById('showAllBtn');
+  const moreSection = document.getElementById('moreStyles');
+  if (showAllBtn && moreSection) {
+    showAllBtn.addEventListener('click', () => {
+      const isOpen = moreSection.classList.toggle('open');
+      showAllBtn.innerHTML = (isOpen ? '▴ Hide other styles' : '▾ Show all styles (<span id="tmplCount">' + allTemplates.length + '</span>)');
+    });
+  }
+
+  buildGallery();
     });
   });
 
