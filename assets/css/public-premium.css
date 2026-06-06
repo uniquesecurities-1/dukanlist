@@ -42,8 +42,10 @@ body{
   font-variant-numeric: tabular-nums !important;
 }
 
-/* ===== Generic card refinements ===== */
-.card,
+/* ===== Generic card refinements =====
+   NOTE: .card removed from selectors — too generic, was overriding
+   the Digital Business Card's dark gradient theme (card.html uses .card).
+   Use .shop-card, .biz-card etc which are specific to listing cards. */
 .shop-card,
 .biz-card,
 .feature-card,
@@ -57,7 +59,6 @@ body{
               box-shadow .22s cubic-bezier(.22,.61,.36,1),
               border-color .15s ease !important;
 }
-.card:hover,
 .shop-card:hover,
 .biz-card:hover,
 .feature-card:hover,

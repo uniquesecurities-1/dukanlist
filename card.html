@@ -41,6 +41,7 @@
   }
   /* Default theme: Imperial Navy + Gold */
   .card.theme-navy{
+    background-color:#0B1E3F;
     background:
       radial-gradient(120% 80% at -10% -20%, rgba(245,158,11,.18) 0%, transparent 55%),
       radial-gradient(140% 100% at 110% 120%, rgba(30,58,138,.55) 0%, transparent 60%),
@@ -60,6 +61,7 @@
   .card.theme-medical .c-brand-strip{ background:rgba(255,255,255,.6); color:#0F172A }
 
   .card.theme-legal{
+    background-color:#18181B;
     background:
       radial-gradient(120% 80% at -10% -20%, rgba(217,119,6,.22) 0%, transparent 55%),
       linear-gradient(135deg, #18181B 0%, #27272A 50%, #000 100%);
@@ -67,12 +69,14 @@
   .card.theme-legal .c-name{ font-family:'Cinzel','Plus Jakarta Sans',serif }
 
   .card.theme-finance{
+    background-color:#1E3A8A;
     background:
       radial-gradient(120% 80% at -10% -20%, rgba(255,255,255,.10) 0%, transparent 55%),
       linear-gradient(135deg, #1E40AF 0%, #1E3A8A 50%, #312E81 100%);
   }
 
   .card.theme-vibrant{
+    background-color:#C2410C;
     background:
       radial-gradient(120% 80% at -10% -20%, rgba(251,191,36,.22) 0%, transparent 55%),
       linear-gradient(135deg, #C2410C 0%, #FF6B1A 50%, #B91C1C 100%);
@@ -250,7 +254,7 @@
 </style>
 
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
-<link rel="stylesheet" href="/assets/css/public-premium.css?v=4">
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
 </head>
 <body>
 
@@ -656,4 +660,5 @@ loadCard();
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
 <script src="/_vercel/insights/script.js" defer></script>
-</bo
+</body>
+</html>
