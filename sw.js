@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.2.0';  // bumped — Web Push handler added
+const VERSION    = 'dukan-v1.3.0';  // bumped — bypass /assets/js so JS always fresh (fixes stale template engine cache)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
@@ -49,6 +49,8 @@ function shouldBypass(url, request) {
   if (url.pathname.startsWith('/admin/')) return true;
   if (url.pathname.startsWith('/panel/')) return true;
   if (url.pathname.startsWith('/api/')) return true;
+  // BYPASS all app JS — they update frequently, must always be fresh
+  if (url.pathname.startsWith('/assets/js/')) return true;
   // Supabase + auth endpoints
   if (url.hostname.endsWith('.supabase.co')) return true;
   if (url.hostname.endsWith('.supabase.in')) return true;
@@ -137,10 +139,4 @@ self.addEventListener('notificationclick', function(event){
   const url = (event.notification.data && event.notification.data.url) || '/';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list){
-      for (const c of list){
-        if (c.url.includes(url) && 'focus' in c) return c.focus();
-      }
-      if (clients.openWindow) return clients.openWindow(url);
-    })
-  );
-});
+ 
