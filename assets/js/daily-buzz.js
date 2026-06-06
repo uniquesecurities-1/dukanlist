@@ -63,7 +63,7 @@ function renderOwnerWidget(targetId, supaClient, biz){
     '    <span class="db-title">Post a Daily Buzz</span>' +
     '    <span class="db-sub">Expires in 24h · Max 3 active</span>' +
     '  </div>' +
-    '  <textarea class="db-input" id="dbText" maxlength="280" placeholder="Share an update: fresh stock, today\\'s offer, closed for lunch, etc..."></textarea>' +
+    '  <textarea class="db-input" id="dbText" maxlength="280" placeholder="Share an update: fresh stock, today\'s offer, closed for lunch, etc..."></textarea>' +
     '  <div class="db-meta">' +
     '    <span class="db-count" id="dbCount">0 / 280</span>' +
     '    <span class="db-bg-picker" id="dbBgPicker">' +

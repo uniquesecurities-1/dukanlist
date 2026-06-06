@@ -56,7 +56,7 @@ BEGIN
   -- Owner gate
   SELECT EXISTS (
     SELECT 1 FROM business_owners
-    WHERE business_id = p_business_id AND user_id = v_user_id
+    WHERE business_id = p_business_id AND auth_user_id = v_user_id
   ) INTO v_is_owner;
   IF NOT v_is_owner THEN
     RAISE EXCEPTION 'Not authorized for this business';

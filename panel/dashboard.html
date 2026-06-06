@@ -2481,6 +2481,7 @@ async function loadRankingBattle(b){
 
     const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
     let html = '';
+    if (isTop) {
       html = '<div style="text-align:center;padding:4px"><div style="font-size:2rem;margin-bottom:4px">🥇</div>' +
         '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">' + (lang === 'hi' ? '#1 — आप टॉप पर हैं!' : '#1 — You\'re the top!') + '</div>' +
         '<div style="font-size:.78rem;color:#6B21A8;opacity:.8;margin-top:4px">' + (lang === 'hi' ? 'आपकी category में ' + total + ' shops में सबसे आगे' : 'Leading ' + total + ' listings in your category') + '</div></div>';
@@ -2611,4 +2612,5 @@ function shareReferralWhatsApp(){
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insig
+</body>
+</html>
