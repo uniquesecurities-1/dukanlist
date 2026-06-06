@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>DukanList — Hindi Instagram Designs (1080×1080)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Noto+Sans+Devanagari:wght@400;700;900&family=Anek+Devanagari:wght@400;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    background: #F1F5F9;
+    padding: 40px;
+    min-height: 100vh;
+  }
+  h1.page-title {
+    font-size: 32px;
+    color: #0F172A;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  p.page-sub {
+    text-align: center;
+    color: #64748B;
+    margin-bottom: 40px;
+    font-size: 16px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(540px, 1fr));
+    gap: 36px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .design-wrap {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(15,23,42,.08);
+  }
+  .design-label {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 16px;
+  }
+  .design {
+    width: 540px;
+    height: 540px;
+    transform-origin: top left;
+    transform: scale(1);
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .design > .canvas {
+    width: 1080px;
+    height: 1080px;
+    transform-origin: top left;
+    transform: scale(0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .btn {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: #FF6B1A; color: #fff; }
+  .btn-secondary { background: #E2E8F0; color: #0F172A; }
+
+  /* =========================================================
+     DESIGN 1 — अपनी दुकान को ऑनलाइन लाएँ (Black + Saffron)
+     ========================================================= */
+  .d1 {
+    background: linear-gradient(180deg, #0A0A0A 0%, #1A0F08 100%);
+    color: #F5E6D3;
+    padding: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .d1 .badge {
+    background: #FF6B1A;
+    color: #fff;
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-size: 28px;
+    font-weight: 900;
+    font-family: 'Anek Devanagari', sans-serif;
+    letter-spacing: 1px;
+    margin-bottom: 32px;
+    align-self: center;
+  }
+  .d1 h1 {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-weight: 900;
+    font-size: 124px;
+    line-height: 1.05;
+    text-align: center;
+    color: #F5E6D3;
+    letter-spacing: -2px;
+  }
+  .d1 h1 .accent { color: #FFB200; }
+  .d1 .sub {
+    font-size: 38px;
+    color: #FCD9A4;
+    text-align: center;
+    font-weight: 700;
+    margin-top: 32px;
+  }
+  .d1 .stats {
+    display: flex;
+    justify-content: space-around;
+    background: #1A1A1A;
+    border: 3px solid #FF6B1A;
+    border-radius: 24px;
+    padding: 40px 20px;
+    margin-top: 30px;
+  }
+  .d1 .stat { text-align: center; }
+  .d1 .stat .num {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-size: 80px;
+    font-weight: 900;
+    color: #FFB200;
+    line-height: 1;
+  }
+  .d1 .stat .lbl {
+    font-size: 26px;
+    color: #F5E6D3;
+    font-weight: 700;
+    margin-top: 12px;
+  }
+  .d1 .cta {
+    background: linear-gradient(135deg, #FFB200, #FF6B1A);
+    color: #0A0A0A;
+    padding: 36px;
+    border-radius: 24px;
+    text-align: center;
+    margin-top: 24px;
+  }
+  .d1 .cta .cta-1 { font-size: 38px; font-weight: 900; margin-bottom: 12px; font-family: 'Anek Devanagari', sans-serif; }
+  .d1 .cta .cta-2 { font-size: 64px; font-weight: 900; letter-spacing: -1px; font-family: 'Anek Devanagari', sans-serif; }
+  .d1 .brand { text-align: center; color: #FF6B1A; font-weight: 900; font-size: 32px; letter-spacing: 8px; font-family: 'Anek Devanagari', sans-serif; }
+
+  /* =========================================================
+     DESIGN 2 — क्या आपकी दुकान गूगल पर दिखती है? (Navy + Orange)
+     ========================================================= */
+  .d2 {
+    background: linear-gradient(180deg, #0F1B36 0%, #1A2848 100%);
+    color: #fff;
+    padding: 90px 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .d2 .eyebrow {
+    font-size: 28px;
+    color: #8FA9DD;
+    letter-spacing: 6px;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .d2 h1 {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-weight: 900;
+    font-size: 96px;
+    line-height: 1.05;
+    text-align: center;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+  }
+  .d2 h1 .accent { color: #FF6B1A; display: block; margin-top: 16px; }
+  .d2 .pain {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid #FF6B1A;
+    border-radius: 20px;
+    padding: 36px;
+    margin-top: 32px;
+    width: 100%;
+  }
+  .d2 .pain .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 24px;
+    color: #E2E8F0;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .d2 .pain .row:last-child { margin-bottom: 0; }
+  .d2 .pain .icon {
+    width: 50px; height: 50px;
+    background: #DC2626;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .d2 .cta {
+    background: #FF6B1A;
+    color: #0F1B36;
+    padding: 36px;
+    border-radius: 20px;
+    text-align: center;
+    width: 100%;
+    margin-top: 24px;
+  }
+  .d2 .cta-1 { font-family: 'Anek Devanagari', sans-serif; font-size: 36px; font-weight: 900; margin-bottom: 8px; }
+  .d2 .cta-2 { font-family: 'Anek Devanagari', sans-serif; font-size: 64px; font-weight: 900; letter-spacing: -1px; }
+  .d2 .brand { color: #8FA9DD; font-weight: 900; font-size: 26px; letter-spacing: 8px; margin-top: 16px; font-family: 'Anek Devanagari', sans-serif; }
+
+  /* =========================================================
+     DESIGN 3 — मुफ़्त में दुकानदार 2.0 बनें (Orange gradient + benefits)
+     ========================================================= */
+  .d3 {
+    background: linear-gradient(135deg, #FF6B1A 0%, #C2410C 100%);
+    color: #fff;
+    padding: 70px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .d3::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: -100px;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .d3::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; right: -150px;
+    width: 500px; height: 500px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .d3 .top {
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .d3 .top .eyebrow {
+    font-size: 28px;
+    letter-spacing: 8px;
+    color: #FFE9D6;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .d3 h1 {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-weight: 900;
+    font-size: 108px;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -3px;
+  }
+  .d3 .benefits {
+    display: grid;
+    gap: 18px;
+    margin-top: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .d3 .benefit {
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .d3 .benefit .icon {
+    width: 80px; height: 80px;
+    background: #FF6B1A;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 40px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .d3 .benefit .txt {
+    color: #1F2937;
+    font-family: 'Anek Devanagari', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .d3 .benefit .sub {
+    color: #6B7280;
+    font-size: 22px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+  .d3 .cta {
+    background: #0F172A;
+    color: #fff;
+    border-radius: 18px;
+    padding: 28px;
+    text-align: center;
+    margin-top: 26px;
+    position: relative;
+    z-index: 1;
+  }
+  .d3 .cta-1 { font-family: 'Anek Devanagari', sans-serif; font-size: 36px; font-weight: 900; color: #FFB200; }
+  .d3 .cta-2 { font-family: 'Anek Devanagari', sans-serif; font-size: 60px; font-weight: 900; margin-top: 8px; }
+
+  /* =========================================================
+     DESIGN 4 — हर ग्राहक तक पहुँच (Premium gold + navy)
+     ========================================================= */
+  .d4 {
+    background: linear-gradient(180deg, #0A1B3E 0%, #0F2A5C 100%);
+    color: #fff;
+    padding: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .d4::before {
+    content: '';
+    position: absolute;
+    top: 40%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(201,169,97,0.18) 0%, transparent 70%);
+  }
+  .d4 .eyebrow {
+    text-align: center;
+    color: #C9A961;
+    letter-spacing: 8px;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .d4 h1 {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-weight: 900;
+    font-size: 124px;
+    text-align: center;
+    color: #fff;
+    line-height: 1.02;
+    letter-spacing: -3px;
+    background: linear-gradient(180deg, #F4D078 0%, #C9A961 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .d4 .tagline {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 38px;
+    text-align: center;
+    color: #9DB1D4;
+    font-style: italic;
+    margin: 32px 0 40px;
+    line-height: 1.4;
+  }
+  .d4 .feature-row {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid #C9A961;
+    border-radius: 24px;
+    padding: 36px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .d4 .feature {
+    text-align: center;
+    flex: 1;
+  }
+  .d4 .feature .icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #F4D078, #A67C2C);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #0A1B3E;
+    font-size: 40px;
+    font-weight: 900;
+    font-family: 'Anek Devanagari', sans-serif;
+  }
+  .d4 .feature .lbl {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .d4 .feature .sub {
+    color: #C9A961;
+    font-size: 20px;
+    margin-top: 6px;
+  }
+  .d4 .cta {
+    background: linear-gradient(135deg, #F4D078, #C9A961);
+    color: #0A1B3E;
+    padding: 36px;
+    border-radius: 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    margin-top: 8px;
+  }
+  .d4 .cta-1 { font-family: 'Anek Devanagari', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: 2px; }
+  .d4 .cta-2 { font-family: 'Anek Devanagari', sans-serif; font-size: 62px; font-weight: 900; margin-top: 8px; }
+
+  @media (max-width: 600px) {
+    body { padding: 16px; }
+    .design { width: 100%; height: auto; aspect-ratio: 1/1; }
+    .design > .canvas { transform: scale(calc(min(100%, 100vw - 100px) / 1080)); }
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">📲 DukanList — Hindi Instagram Designs</h1>
+<p class="page-sub">सब 1080 × 1080 (Insta Feed Post)। Browser me proper Devanagari font load hoga. "Download PNG" pe click karke save karein.</p>
+
+<div class="grid">
+
+  <!-- DESIGN 1 -->
+  <div class="design-wrap">
+    <div class="design-label">1. अपनी दुकान को ऑनलाइन लाएँ — मुफ़्त</div>
+    <div class="design"><div class="canvas d1" id="d1">
+      <div class="badge">सिरसा · बठिंडा · डबवाली</div>
+      <h1>अपनी दुकान<br><span class="accent">ऑनलाइन लाएँ</span></h1>
+      <div class="sub">पूरी तरह मुफ़्त — आज ही पंजीकरण करें</div>
+      <div class="stats">
+        <div class="stat"><div class="num">₹0</div><div class="lbl">मुफ़्त</div></div>
+        <div class="stat"><div class="num">2 मि.</div><div class="lbl">साइन-अप</div></div>
+        <div class="stat"><div class="num">✓</div><div class="lbl">वेरीफ़ाइड</div></div>
+      </div>
+      <div class="cta">
+        <div class="cta-1">अभी रजिस्टर करें</div>
+        <div class="cta-2">dukanlist.com</div>
+      </div>
+      <div class="brand">DUKANLIST</div>
+    </div></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="dl('d1','dukanlist-hindi-1.png')">⬇ Download PNG</button>
+    </div>
+  </div>
+
+  <!-- DESIGN 2 -->
+  <div class="design-wrap">
+    <div class="design-label">2. क्या Google पर आपकी दुकान दिखती है?</div>
+    <div class="design"><div class="canvas d2" id="d2">
+      <div class="eyebrow">ज़रा सोचिए...</div>
+      <h1>क्या Google पर<br>आपकी दुकान<br><span class="accent">दिखती है?</span></h1>
+      <div class="pain">
+        <div class="row"><span class="icon">!</span><span>पड़ोसी की दुकान दिखती है,<br>आपकी नहीं</span></div>
+        <div class="row"><span class="icon">!</span><span>नए ग्राहक आप तक<br>नहीं पहुँच पाते</span></div>
+        <div class="row"><span class="icon">!</span><span>कोई online पहचान<br>नहीं है आपकी</span></div>
+      </div>
+      <div class="cta">
+        <div class="cta-1">समाधान है DukanList</div>
+        <div class="cta-2">dukanlist.com</div>
+      </div>
+      <div class="brand" style="text-align:center;width:100%">DUKANLIST</div>
+    </div></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="dl('d2','dukanlist-hindi-2.png')">⬇ Download PNG</button>
+    </div>
+  </div>
+
+  <!-- DESIGN 3 -->
+  <div class="design-wrap">
+    <div class="design-label">3. ₹0 में दुकानदार 2.0 बनें — 5 फ़ायदे</div>
+    <div class="design"><div class="canvas d3" id="d3">
+      <div class="top">
+        <div class="eyebrow">DUKANLIST के</div>
+        <h1>5 फ़ायदे</h1>
+      </div>
+      <div class="benefits">
+        <div class="benefit">
+          <div class="icon">₹0</div>
+          <div><div class="txt">मुफ़्त पंजीकरण</div><div class="sub">कोई शुल्क नहीं</div></div>
+        </div>
+        <div class="benefit">
+          <div class="icon">📞</div>
+          <div><div class="txt">सीधे Call & WhatsApp</div><div class="sub">ग्राहक सीधे संपर्क करेगा</div></div>
+        </div>
+        <div class="benefit">
+          <div class="icon">✓</div>
+          <div><div class="txt">वेरीफ़ाइड बैज</div><div class="sub">ग्राहक का भरोसा बढ़ेगा</div></div>
+        </div>
+        <div class="benefit">
+          <div class="icon">★</div>
+          <div><div class="txt">रिव्यू & रेटिंग</div><div class="sub">खुश ग्राहक आपकी प्रशंसा देंगे</div></div>
+        </div>
+        <div class="benefit">
+          <div class="icon">🔍</div>
+          <div><div class="txt">Google पर दिखें</div><div class="sub">पूरे सिरसा-बठिंडा तक पहुँच</div></div>
+        </div>
+      </div>
+      <div class="cta">
+        <div class="cta-1">आज ही रजिस्टर करें — मुफ़्त</div>
+        <div class="cta-2">dukanlist.com</div>
+      </div>
+    </div></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="dl('d3','dukanlist-hindi-3.png')">⬇ Download PNG</button>
+    </div>
+  </div>
+
+  <!-- DESIGN 4 -->
+  <div class="design-wrap">
+    <div class="design-label">4. हर ग्राहक तक पहुँच — Premium Trust</div>
+    <div class="design"><div class="canvas d4" id="d4">
+      <div class="eyebrow">सिरसा · बठिंडा · डबवाली</div>
+      <h1>हर ग्राहक<br>तक पहुँच।</h1>
+      <div class="tagline">"आपकी दुकान का असली पता<br>अब online है।"</div>
+      <div class="feature-row">
+        <div class="feature"><div class="icon">₹0</div><div class="lbl">मुफ़्त</div><div class="sub">हमेशा के लिए</div></div>
+        <div class="feature"><div class="icon">⚡</div><div class="lbl">तुरंत</div><div class="sub">2 मिनट में live</div></div>
+        <div class="feature"><div class="icon">∞</div><div class="lbl">असीमित</div><div class="sub">ग्राहक रोज़</div></div>
+      </div>
+      <div class="cta">
+        <div class="cta-1">आज ही पंजीकरण करें</div>
+        <div class="cta-2">dukanlist.com</div>
+      </div>
+    </div></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="dl('d4','dukanlist-hindi-4.png')">⬇ Download PNG</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function dl(id, filename){
+  const node = document.getElementById(id);
+  // Temporarily remove scale transform for full-res capture
+  const wasTransform = node.style.transform;
+  node.style.transform = 'scale(1)';
+  node.parentElement.style.width = '1080px';
+  node.parentElement.style.height = '1080px';
+  await new Promise(r => setTimeout(r, 50));
+  try {
+    const canvas = await html2canvas(node, {
+      width: 1080,
+      height: 1080,
+      scale: 1,
+      backgroundColor: null,
+      useCORS: true,
+      allowTaint: true
+    });
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e){
+    alert('Download failed: ' + e.message);
+  } finally {
+    node.style.transform = wasTransform;
+    node.parentElement.style.width = '';
+    node.parentElement.style.height = '';
+  }
+}
+</script>
+
+</body>
+</html>

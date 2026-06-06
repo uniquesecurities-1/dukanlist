@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Analytics — dukanlist.com</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260528">
+<style>
+/* === Page === */
+.an-wrap{ max-width:1080px; margin:24px auto 80px; padding:0 16px }
+
+/* === Header / range picker === */
+.an-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:18px }
+.an-title{ margin:0; font-family:'Manrope',sans-serif; font-size:1.55rem; font-weight:900; letter-spacing:-.02em }
+.range-pick{ display:inline-flex; background:#fff; border:1.5px solid var(--line); border-radius:99px; padding:4px; gap:2px }
+.range-pick button{
+  padding:7px 16px; border:none; background:transparent;
+  border-radius:99px; font-weight:800; font-size:.85rem; cursor:pointer;
+  color:var(--ink-2); font-family:inherit;
+}
+.range-pick button.active{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff; box-shadow:0 4px 10px rgba(255,107,26,.3) }
+.range-pick button:hover:not(.active){ background:#FFF7ED; color:var(--saffron-deep) }
+
+/* === KPI cards === */
+.kpis{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:24px }
+.kpi-card{
+  background:#fff; border:1.5px solid var(--line); border-radius:14px;
+  padding:16px 18px; position:relative; transition:.18s;
+  display:flex; flex-direction:column; gap:4px;
+}
+.kpi-card:hover{ border-color:#CBD5E1; transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.05) }
+.kpi-card .kpi-icon{ font-size:1.6rem; margin-bottom:4px }
+.kpi-card .kpi-lab{ font-size:.7rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.06em }
+.kpi-card .kpi-val{ font-family:'Manrope',sans-serif; font-size:1.95rem; font-weight:900; color:var(--ink); letter-spacing:-.025em; line-height:1.1 }
+.kpi-card .kpi-delta{ font-size:.78rem; font-weight:800; margin-top:3px }
+.kpi-delta.up{ color:#16A34A }
+.kpi-delta.down{ color:#DC2626 }
+.kpi-delta.flat{ color:var(--muted) }
+.kpi-card.primary{ background:linear-gradient(135deg,#FFFBEB,#FEF3C7); border-color:#F59E0B }
+.kpi-card.primary .kpi-val{ background:linear-gradient(135deg,#92400E,#7C2D12); -webkit-background-clip:text; background-clip:text; color:transparent }
+
+/* === Section cards === */
+.an-card{
+  background:#fff; border:1.5px solid var(--line); border-radius:14px;
+  padding:18px 20px; margin-bottom:18px;
+}
+.an-card .an-card-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:14px;
+}
+.an-card h3{
+  margin:0; font-family:'Manrope',sans-serif;
+  font-size:1.05rem; font-weight:800; color:var(--ink); letter-spacing:-.01em;
+}
+.an-card .meta-sub{ font-size:.78rem; color:var(--muted); font-weight:600 }
+
+/* === Chart container === */
+.chart-wrap{ position:relative; height:280px; width:100% }
+@media (max-width:600px){ .chart-wrap{ height:220px } }
+
+/* === Conversion funnel === */
+.funnel{ display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center }
+.funnel-stage{ text-align:center; padding:18px 14px; border-radius:12px; border:1.5px dashed var(--line) }
+.funnel-stage.views{ background:#EFF6FF; border-color:#BFDBFE; color:#1E3A8A }
+.funnel-stage.leads{ background:#ECFDF5; border-color:#86EFAC; color:#065F46 }
+.funnel-stage .fnum{ font-family:'Manrope',sans-serif; font-size:2.2rem; font-weight:900; line-height:1 }
+.funnel-stage .flab{ font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-top:6px; opacity:.85 }
+.funnel-arrow{
+  font-size:1.8rem; color:var(--muted); font-weight:900;
+}
+.conversion-bar{
+  background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+  border:1.5px solid #FBBF24; border-radius:12px;
+  padding:14px 18px; text-align:center; margin-top:14px;
+}
+.conversion-bar .ctit{ font-size:.78rem; font-weight:800; color:#92400E; text-transform:uppercase; letter-spacing:.05em }
+.conversion-bar .cval{ font-family:'Manrope',sans-serif; font-size:2rem; font-weight:900; color:#92400E; line-height:1.1; margin:4px 0 0 }
+.conversion-bar .ctip{ font-size:.78rem; color:#92400E; opacity:.85; margin-top:4px }
+
+/* === Recent leads === */
+.lead-row{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 0; border-bottom:1px dashed var(--line);
+}
+.lead-row:last-child{ border-bottom:none }
+.lead-ico{
+  width:36px; height:36px; border-radius:50%;
+  display:grid; place-items:center;
+  font-size:1.05rem; flex-shrink:0;
+}
+.lead-ico.call{ background:#DBEAFE; color:#1E40AF }
+.lead-ico.whatsapp{ background:#DCFCE7; color:#065F46 }
+.lead-ico.direction{ background:#FEF3C7; color:#92400E }
+.lead-ico.share{ background:#EDE9FE; color:#5B21B6 }
+.lead-body{ flex:1; min-width:0 }
+.lead-act{ font-weight:800; color:var(--ink); font-size:.92rem; text-transform:capitalize }
+.lead-when{ font-size:.78rem; color:var(--muted); font-weight:600 }
+
+/* === Empty state === */
+.empty-state{
+  text-align:center; padding:32px 18px; color:var(--muted);
+  background:#fafafa; border-radius:12px; border:1.5px dashed var(--line);
+}
+.empty-state .emo{ font-size:2.5rem; margin-bottom:10px }
+.empty-state .et{ font-weight:800; color:var(--ink); font-size:1rem; margin-bottom:4px }
+.empty-state .es{ font-size:.85rem; line-height:1.55 }
+
+/* === Reviews quick stat === */
+.review-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px }
+.rev-stat{ padding:13px; background:#fafafa; border-radius:10px; text-align:center }
+.rev-stat .rv{ font-family:'Manrope',sans-serif; font-size:1.4rem; font-weight:900; color:var(--ink); line-height:1.1 }
+.rev-stat .rl{ font-size:.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-top:4px }
+.rev-stat.warn .rv{ color:#DC2626 }
+
+/* === Pro tips === */
+.tip-card{
+  background:linear-gradient(135deg,#F0F9FF,#E0F2FE);
+  border:1.5px solid #7DD3FC; border-radius:12px;
+  padding:14px 16px; margin-top:14px; font-size:.88rem; color:#075985; line-height:1.55;
+}
+.tip-card strong{ color:#0C4A6E }
+
+@media (max-width:600px){
+  .an-title{ font-size:1.3rem }
+  .funnel{ grid-template-columns:1fr; gap:8px }
+  .funnel-arrow{ transform:rotate(90deg) }
+  .kpi-card .kpi-val{ font-size:1.6rem }
+}
+</style>
+
+<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+</head>
+<body>
+<!-- Impersonation banner -->
+<script src="/assets/js/impersonation-banner.js"></script>
+<script src="/assets/js/email-verify-banner.js"></script>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
+      <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
+      <a href="/panel/digital-card.html"><span data-i18n-en>📇 Digital Card</span><span data-i18n-hi>📇 डिजिटल कार्ड</span></a>
+      <a href="/panel/reviews.html"><span data-i18n-en>⭐ Reviews</span><span data-i18n-hi>⭐ रिव्यू</span></a>
+      <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
+      <a href="/panel/deals.html"><span data-i18n-en>🎁 Deals</span><span data-i18n-hi>🎁 डील्स</span></a>
+      <a href="/panel/analytics.html"><span data-i18n-en>📊 Analytics</span><span data-i18n-hi>📊 आँकड़े</span></a>
+      <a href="/panel/services.html"><span data-i18n-en>🛠️ Services</span><span data-i18n-hi>🛠️ सेवाएँ</span></a>
+      <a href="/panel/poster-studio.html"><span data-i18n-en>✨ Poster Studio</span><span data-i18n-hi>📲 WA पोस्टर</span></a>
+      <a href="/pucho-bhai.html"><span data-i18n-en>💬 Pucho Bhai</span><span data-i18n-hi>💬 पूछो भाई</span></a>
+      <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support" target="_blank" rel="noopener"><span data-i18n-en>🆘 Get Help</span><span data-i18n-hi>🆘 सहायता</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="an-wrap">
+
+  <a href="/panel/dashboard.html" style="font-size:.85rem;color:var(--muted);font-weight:600;text-decoration:none">
+    ← <span data-i18n-en>Back to Dashboard</span><span data-i18n-hi>डैशबोर्ड पर वापस</span>
+  </a>
+
+  <div class="an-head" style="margin-top:10px">
+    <h1 class="an-title">
+      📊 <span data-i18n-en>Your <span class="grad">Analytics</span></span>
+      <span data-i18n-hi>आपका <span class="grad">डेटा</span></span>
+    </h1>
+    <div class="range-pick" id="rangePick">
+      <button data-days="7" onclick="setRange(7)">7d</button>
+      <button data-days="30" onclick="setRange(30)" class="active">30d</button>
+      <button data-days="90" onclick="setRange(90)">90d</button>
+    </div>
+  </div>
+
+  <div id="loading" style="text-align:center;padding:36px 0;color:var(--muted)">⏳ Loading analytics...</div>
+
+  <div id="content" style="display:none">
+
+    <!-- ===== KPI CARDS ===== -->
+    <div class="kpis">
+      <div class="kpi-card primary">
+        <div class="kpi-icon">👀</div>
+        <div class="kpi-lab"><span data-i18n-en>Profile Views</span><span data-i18n-hi>व्यूज</span></div>
+        <div class="kpi-val" id="kpiViews">0</div>
+        <div class="kpi-delta" id="kpiViewsDelta">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📞</div>
+        <div class="kpi-lab"><span data-i18n-en>Calls</span><span data-i18n-hi>कॉल</span></div>
+        <div class="kpi-val" id="kpiCalls">0</div>
+        <div class="kpi-delta" id="kpiCallsDelta">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💬</div>
+        <div class="kpi-lab"><span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span></div>
+        <div class="kpi-val" id="kpiWa">0</div>
+        <div class="kpi-delta" id="kpiWaDelta">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📍</div>
+        <div class="kpi-lab"><span data-i18n-en>Directions</span><span data-i18n-hi>दिशा</span></div>
+        <div class="kpi-val" id="kpiDir">0</div>
+        <div class="kpi-delta" id="kpiDirDelta">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🔗</div>
+        <div class="kpi-lab"><span data-i18n-en>Shares</span><span data-i18n-hi>शेयर</span></div>
+        <div class="kpi-val" id="kpiShare">0</div>
+        <div class="kpi-delta" id="kpiShareDelta">—</div>
+      </div>
+    </div>
+
+    <!-- ===== DAILY TREND CHART ===== -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h3>📈 <span data-i18n-en>Daily Activity</span><span data-i18n-hi>दैनिक एक्टिविटी</span></h3>
+        <span class="meta-sub" id="chartPeriod">Last 30 days</span>
+      </div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+
+    <!-- ===== PEAK HOURS (Owner Insights v2) ===== -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h3>⏰ <span data-i18n-en>Peak Hours</span><span data-i18n-hi>व्यस्त समय</span></h3>
+        <span class="meta-sub"><span data-i18n-en>When customers visit your shop</span><span data-i18n-hi>ग्राहक कब आते हैं</span></span>
+      </div>
+      <div class="chart-wrap"><canvas id="peakChart"></canvas></div>
+      <div id="peakInsight" style="margin-top:10px;font-size:.85rem;color:var(--muted);text-align:center;font-weight:600"></div>
+    </div>
+
+    <!-- ===== CONVERSION FUNNEL ===== -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h3>🎯 <span data-i18n-en>Conversion Funnel</span><span data-i18n-hi>कन्वर्ज़न</span></h3>
+        <span class="meta-sub"><span data-i18n-en>How many viewers turn into leads</span><span data-i18n-hi>व्यूज से लीड कितने बनते हैं</span></span>
+      </div>
+      <div class="funnel">
+        <div class="funnel-stage views">
+          <div class="fnum" id="funnelViews">0</div>
+          <div class="flab"><span data-i18n-en>Profile Views</span><span data-i18n-hi>व्यूज</span></div>
+        </div>
+        <div class="funnel-arrow">→</div>
+        <div class="funnel-stage leads">
+          <div class="fnum" id="funnelLeads">0</div>
+          <div class="flab"><span data-i18n-en>Total Leads</span><span data-i18n-hi>लीड</span></div>
+        </div>
+      </div>
+      <div class="conversion-bar">
+        <div class="ctit"><span data-i18n-en>Conversion Rate</span><span data-i18n-hi>कन्वर्ज़न रेट</span></div>
+        <div class="cval" id="convRate">0%</div>
+        <div class="ctip" id="convTip"><span data-i18n-en>Industry avg: 8–15%</span><span data-i18n-hi>औसत: 8–15%</span></div>
+      </div>
+    </div>
+
+    <!-- ===== REVIEWS QUICK STAT ===== -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h3>⭐ <span data-i18n-en>Reviews Summary</span><span data-i18n-hi>रिव्यू</span></h3>
+      </div>
+      <div class="review-grid">
+        <div class="rev-stat">
+          <div class="rv" id="revTotal">0</div>
+          <div class="rl"><span data-i18n-en>Total</span><span data-i18n-hi>कुल</span></div>
+        </div>
+        <div class="rev-stat">
+          <div class="rv" id="revAvg">0.0</div>
+          <div class="rl"><span data-i18n-en>Avg Rating</span><span data-i18n-hi>औसत</span></div>
+        </div>
+        <div class="rev-stat">
+          <div class="rv" id="revNew">0</div>
+          <div class="rl"><span data-i18n-en>New (period)</span><span data-i18n-hi>नए</span></div>
+        </div>
+        <div class="rev-stat warn" id="revUnrepBox">
+          <div class="rv" id="revUnrep">0</div>
+          <div class="rl"><span data-i18n-en>Unreplied</span><span data-i18n-hi>बिना जवाब</span></div>
+        </div>
+      </div>
+      <div id="reviewTip"></div>
+    </div>
+
+    <!-- ===== RECENT LEADS ===== -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h3>🔔 <span data-i18n-en>Recent Leads</span><span data-i18n-hi>हाल के लीड</span></h3>
+        <span class="meta-sub" id="leadsCount">0</span>
+      </div>
+      <div id="leadsList"></div>
+    </div>
+
+    <!-- ===== PRO TIPS ===== -->
+    <div class="an-card" id="tipsCard" style="display:none">
+      <div class="an-card-head">
+        <h3>💡 <span data-i18n-en>Tips to Grow</span><span data-i18n-hi>बढ़ाने के टिप्स</span></h3>
+      </div>
+      <div id="tipsList"></div>
+    </div>
+
+  </div>
+
+  <div id="errorBox" style="display:none;text-align:center;padding:24px;background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;color:#7F1D1D"></div>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/nav.js" defer></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  const en=document.getElementById('langBtnEn'),hi=document.getElementById('langBtnHi');
+  if(en) en.classList.toggle('active',lang==='en');
+  if(hi) hi.classList.toggle('active',lang==='hi');
+}
+
+let MY_BIZ_ID = null;
+let CURRENT_DAYS = 30;
+let TREND_CHART = null;
+
+async function loadAnalytics(days){
+  CURRENT_DAYS = days;
+  document.querySelectorAll('#rangePick button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.days, 10) === days);
+  });
+
+  document.getElementById('loading').style.display = '';
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+
+  const user = await ShopDB.requireAuth();
+  if (!user) return;
+  const c = ShopDB.client;
+
+  // Lazy-load business id once
+  if (!MY_BIZ_ID){
+    // SECURITY: use safe RPC to avoid non-deterministic .limit(1) cross-user leak
+    let owners = null;
+    try {
+      const safeRes = await c.rpc('get_my_business_safe');
+      if (!safeRes.error && safeRes.data && safeRes.data.length){
+        owners = safeRes.data.map(r => ({ business_id: r.business_id }));
+      }
+    } catch(e){ /* fallback */ }
+    if (!owners){
+      const fb = await c.from('business_owners')
+        .select('business_id').eq('auth_user_id', user.id).limit(1);
+      owners = fb.data;
+    }
+    if (!owners || !owners.length){
+      showError('No business found for this account. <a href="/register.html">Register your shop →</a>');
+      return;
+    }
+    MY_BIZ_ID = owners[0].business_id;
+  }
+
+  const { data, error } = await c.rpc('get_owner_analytics', {
+    p_business_id: MY_BIZ_ID,
+    p_days: days
+  });
+
+  if (error){
+    showError('Failed to load analytics: ' + (error.message || 'Unknown error'));
+    return;
+  }
+  if (!data){
+    showError('No analytics data available yet.');
+    return;
+  }
+
+  render(data);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = '';
+}
+
+function setRange(days){ loadAnalytics(days); }
+
+function render(d){
+  const s = d.summary || {}, p = d.previous || {}, biz = d.business || {};
+
+  // KPI values
+  setVal('kpiViews', s.views);
+  setVal('kpiCalls', s.call);
+  setVal('kpiWa',    s.whatsapp);
+  setVal('kpiDir',   s.direction);
+  setVal('kpiShare', s.share);
+
+  // Deltas vs previous period
+  setDelta('kpiViewsDelta', s.views,     p.views);
+  setDelta('kpiCallsDelta', s.call,      p.call);
+  setDelta('kpiWaDelta',    s.whatsapp,  p.whatsapp);
+  setDelta('kpiDirDelta',   s.direction, p.direction);
+  setDelta('kpiShareDelta', s.share,     p.share);
+
+  // Chart period label
+  document.getElementById('chartPeriod').textContent = 'Last ' + CURRENT_DAYS + ' days';
+
+  // Conversion
+  const views  = Number(s.views  || 0);
+  const leads  = Number(s.total_leads || 0);
+  setVal('funnelViews', views);
+  setVal('funnelLeads', leads);
+  const rate = views > 0 ? Math.round((leads / views) * 1000) / 10 : 0;
+  document.getElementById('convRate').textContent = rate + '%';
+  setConvTip(rate, views, leads);
+
+  // Reviews
+  const r = d.reviews || {};
+  setVal('revTotal', r.total || 0);
+  document.getElementById('revAvg').textContent = r.avg_rating ? Number(r.avg_rating).toFixed(1) : '—';
+  setVal('revNew', r.new_in_period || 0);
+  setVal('revUnrep', r.unreplied || 0);
+  document.getElementById('revUnrepBox').classList.toggle('warn', (r.unreplied||0) > 0);
+  renderReviewTip(r);
+
+  // Recent leads
+  renderLeads(d.recent_leads || []);
+
+  // Tips
+  renderTips(d, biz);
+
+  // Daily trend chart
+  drawChart(d.daily || []);
+  loadPeakHours();
+}
+
+function setVal(id, n){
+  const el = document.getElementById(id); if (!el) return;
+  el.textContent = (n == null ? '—' : Number(n).toLocaleString('en-IN'));
+}
+
+function setDelta(id, cur, prev){
+  const el = document.getElementById(id); if (!el) return;
+  const c = Number(cur||0), pv = Number(prev||0);
+  if (pv === 0 && c === 0){ el.textContent = '— vs prev'; el.className = 'kpi-delta flat'; return; }
+  if (pv === 0){ el.textContent = '↑ NEW · ' + c; el.className = 'kpi-delta up'; return; }
+  const change = ((c - pv) / pv) * 100;
+  const sign   = change >= 0 ? '↑' : '↓';
+  el.textContent = sign + ' ' + Math.abs(change).toFixed(0) + '% vs prev';
+  el.className   = 'kpi-delta ' + (change > 0 ? 'up' : (change < 0 ? 'down' : 'flat'));
+}
+
+function setConvTip(rate, views, leads){
+  const tip = document.getElementById('convTip');
+  if (views < 10){
+    tip.innerHTML = '<span data-i18n-en>Get more views first — share your profile!</span><span data-i18n-hi>पहले व्यूज़ बढ़ाएँ — प्रोफाइल शेयर करें!</span>';
+  } else if (rate >= 15){
+    tip.innerHTML = '🎉 <span data-i18n-en>Excellent! You convert ' + rate + '% of viewers</span><span data-i18n-hi>शानदार! ' + rate + '% लोग संपर्क करते हैं</span>';
+  } else if (rate >= 8){
+    tip.innerHTML = '<span data-i18n-en>Good — industry avg 8–15%</span><span data-i18n-hi>अच्छा — औसत 8–15%</span>';
+  } else if (rate >= 3){
+    tip.innerHTML = '<span data-i18n-en>Below average — improve photos &amp; USP</span><span data-i18n-hi>औसत से कम — फोटो और USP बेहतर करें</span>';
+  } else {
+    tip.innerHTML = '⚠ <span data-i18n-en>Conversion is low — add photos, complete profile, ask for reviews</span><span data-i18n-hi>कम है — फोटो जोड़ें, प्रोफाइल पूरा करें</span>';
+  }
+}
+
+function renderReviewTip(r){
+  const box = document.getElementById('reviewTip');
+  if ((r.unreplied||0) > 0){
+    box.innerHTML = '<div class="tip-card">⚠ <strong>' + r.unreplied + ' unreplied review' + (r.unreplied>1?'s':'') + '.</strong> ' +
+      '<span data-i18n-en>Reply to reviews to show you care — boosts trust + ranking.</span>' +
+      '<span data-i18n-hi>रिव्यू का जवाब दें — भरोसा बढ़ता है और रैंकिंग सुधरती है।</span></div>';
+  } else if ((r.total||0) === 0){
+    box.innerHTML = '<div class="tip-card">💬 <strong>No reviews yet.</strong> ' +
+      '<span data-i18n-en>Ask happy customers to leave a review on your profile.</span>' +
+      '<span data-i18n-hi>संतुष्ट ग्राहकों से रिव्यू माँगें।</span></div>';
+  } else {
+    box.innerHTML = '';
+  }
+}
+
+function renderLeads(leads){
+  const list = document.getElementById('leadsList');
+  document.getElementById('leadsCount').textContent = leads.length + ' shown';
+  if (!leads.length){
+    list.innerHTML = '<div class="empty-state">' +
+      '<div class="emo">📭</div>' +
+      '<div class="et"><span data-i18n-en>No leads yet</span><span data-i18n-hi>अभी कोई लीड नहीं</span></div>' +
+      '<div class="es"><span data-i18n-en>Share your profile on WhatsApp / social media to get more views and leads.</span>' +
+      '<span data-i18n-hi>WhatsApp / सोशल मीडिया पर प्रोफाइल शेयर करें।</span></div></div>';
+    return;
+  }
+  const icoMap = { call: '📞', whatsapp: '💬', direction: '📍', share: '🔗' };
+  list.innerHTML = leads.map(l => `
+    <div class="lead-row">
+      <div class="lead-ico ${l.action}">${icoMap[l.action] || '✨'}</div>
+      <div class="lead-body">
+        <div class="lead-act">${l.action}</div>
+        <div class="lead-when">${l.when || ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTips(d, biz){
+  const tips = [];
+  const s = d.summary || {};
+  const r = d.reviews || {};
+  const views = Number(s.views || 0);
+  const leads = Number(s.total_leads || 0);
+  const daysOld = Number(biz.days_old || 0);
+
+  if (views < 10 && daysOld > 7){
+    tips.push({ ico:'📢', en:'Share your profile on WhatsApp groups, community pages, and family chats — first 100 views are critical.', hi:'WhatsApp ग्रुप्स में प्रोफाइल शेयर करें — पहले 100 views ज़रूरी हैं।' });
+  }
+  if (views > 30 && leads === 0){
+    tips.push({ ico:'⚠', en:'People see your profile but don\'t contact — improve USP, photos, and add FAQs.', hi:'लोग देखते हैं पर संपर्क नहीं करते — USP, फोटो, FAQ बेहतर करें।' });
+  }
+  if ((r.total || 0) < 3 && daysOld > 30){
+    tips.push({ ico:'⭐', en:'Ask 5 happy customers for reviews this week — reviews boost trust by 3x.', hi:'इस हफ्ते 5 ग्राहकों से रिव्यू माँगें — भरोसा 3x बढ़ता है।' });
+  }
+  if (views > 100 && Number(biz.rating_count || 0) < (views / 50)){
+    tips.push({ ico:'📈', en:'High views but few reviews — share review link via WhatsApp after each interaction.', hi:'व्यूज़ ज़्यादा, रिव्यू कम — हर ग्राहक के बाद रिव्यू लिंक भेजें।' });
+  }
+  if (s.whatsapp > 0 && s.whatsapp > s.call * 2){
+    tips.push({ ico:'💡', en:'WhatsApp leads are 2x your calls — make sure replies are quick (< 30 min).', hi:'WhatsApp लीड कॉल से 2x — 30 मिनट में जवाब दें।' });
+  }
+  if (s.direction > leads / 3 && leads > 5){
+    tips.push({ ico:'📍', en:'Many people seek directions — physical visits coming! Be ready at the shop.', hi:'लोग रास्ता ढूँढ रहे हैं — दुकान पर तैयार रहें।' });
+  }
+
+  if (!tips.length){ document.getElementById('tipsCard').style.display = 'none'; return; }
+
+  document.getElementById('tipsCard').style.display = '';
+  document.getElementById('tipsList').innerHTML = tips.map(t => `
+    <div class="tip-card" style="margin-top:8px">
+      ${t.ico} <strong data-i18n-en>Tip:</strong><strong data-i18n-hi>टिप:</strong>
+      <span data-i18n-en>${t.en}</span><span data-i18n-hi>${t.hi}</span>
+    </div>
+  `).join('');
+}
+
+let PEAK_CHART = null;
+
+async function loadPeakHours(){
+  const c = ShopDB.client;
+  if (!c || !BIZ_ID) return;
+  try {
+    const { data, error } = await c.rpc('owner_peak_hours', { p_business_id: BIZ_ID, p_days: 30 });
+    if (error){
+      const insight = document.getElementById('peakInsight');
+      if (insight) insight.textContent = 'Run db/44-owner-peak-hours.sql to enable this chart';
+      return;
+    }
+    drawPeakChart(data && data.buckets ? data.buckets : []);
+  } catch(e){
+    console.warn('loadPeakHours failed', e);
+  }
+}
+
+function drawPeakChart(buckets){
+  if (!window.Chart) return;
+  const canvas = document.getElementById('peakChart');
+  if (!canvas) return;
+  const labels = buckets.map(b => {
+    const h = b.hour;
+    return h === 0 ? '12 AM' : h < 12 ? h + ' AM' : h === 12 ? '12 PM' : (h - 12) + ' PM';
+  });
+  const totals = buckets.map(b => Number(b.total || 0));
+  const views  = buckets.map(b => Number(b.views || 0));
+  const leads  = buckets.map(b => Number(b.leads || 0));
+  let peakIdx = 0, peakVal = 0;
+  totals.forEach((v, i) => { if (v > peakVal){ peakVal = v; peakIdx = i; } });
+  const insight = document.getElementById('peakInsight');
+  if (insight){
+    if (peakVal === 0){
+      insight.textContent = 'Not enough data yet — come back after a week of activity.';
+    } else {
+      insight.innerHTML = '\u{1F4A1} Peak hour: <b>' + labels[peakIdx] + '</b> with ' + peakVal + ' interactions in last 30 days';
+    }
+  }
+  if (PEAK_CHART){ PEAK_CHART.destroy(); }
+  const ctx = canvas.getContext('2d');
+  PEAK_CHART = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Views', data: views, backgroundColor: 'rgba(255,107,26,.55)', borderColor: '#FF6B1A', borderWidth: 1, borderRadius: 4, stack: 'a' },
+        { label: 'Leads', data: leads, backgroundColor: 'rgba(5,150,105,.75)', borderColor: '#059669', borderWidth: 1, borderRadius: 4, stack: 'a' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { stacked: true, ticks: { font: { size: 9 } }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { precision: 0, font: { size: 10 } }, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+}
+
+function drawChart(daily){
+  if (!window.Chart){ console.warn('Chart.js not loaded'); return; }
+  const canvas = document.getElementById('trendChart');
+  if (!canvas) return;
+
+  // Format labels (DD MMM)
+  const labels = daily.map(d => {
+    if (!d.date) return '';
+    const dt = new Date(d.date);
+    return dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+  });
+  const viewsData = daily.map(d => Number(d.views || 0));
+  const leadsData = daily.map(d => Number(d.leads || 0));
+
+  if (TREND_CHART){ TREND_CHART.destroy(); }
+
+  const ctx = canvas.getContext('2d');
+  TREND_CHART = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Views',
+          data: viewsData,
+          borderColor: '#FF6B1A',
+          backgroundColor: 'rgba(255,107,26,.12)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#FF6B1A',
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Leads',
+          data: leadsData,
+          borderColor: '#16A34A',
+          backgroundColor: 'rgba(22,163,74,.10)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#16A34A',
+          pointHoverRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font:{ family:'Inter, sans-serif', weight:'700', size:12 }, boxWidth:14, boxHeight:14, padding:14 }
+        },
+        tooltip: {
+          backgroundColor:'rgba(15,23,42,.92)',
+          padding:10,
+          titleFont:{ family:'Manrope, sans-serif', weight:'800', size:13 },
+          bodyFont:{ family:'Inter, sans-serif', size:12 },
+          borderColor:'rgba(255,255,255,.1)', borderWidth:1
+        }
+      },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ font:{ size:10, family:'Inter, sans-serif' }, color:'#64748B', maxRotation:0, autoSkip:true, maxTicksLimit:10 } },
+        y: { beginAtZero:true, ticks:{ font:{ size:11, family:'Inter, sans-serif' }, color:'#64748B', precision:0 }, grid:{ color:'rgba(0,0,0,.05)' } }
+      }
+    }
+  });
+}
+
+function showError(msg){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'none';
+  const eb = document.getElementById('errorBox');
+  eb.innerHTML = msg;
+  eb.style.display = '';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadAnalytics(30);
+});
+</script>
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
+
+<script src="/assets/js/error-reporter.js" defer></script>
+</body>
+</html>

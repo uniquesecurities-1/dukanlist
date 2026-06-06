@@ -1,0 +1,1691 @@
+{
+  "version": "3.4",
+  "updated": "2026-06-04T05:09:00.214669Z",
+  "note": "v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL.",
+  "parents": [
+    {
+      "slug": "healthcare",
+      "name": "Healthcare & Medical",
+      "name_hi": "स्वास्थ्य एवं चिकित्सा",
+      "icon": "🏥",
+      "color": "#0EA5E9",
+      "subs": [
+        {
+          "slug": "doctor",
+          "name": "Doctors & Clinics",
+          "name_hi": "डॉक्टर एवं क्लिनिक",
+          "icon": "🩺"
+        },
+        {
+          "slug": "pharmacy",
+          "name": "Medical Store / Pharmacy",
+          "name_hi": "मेडिकल स्टोर",
+          "icon": "💊"
+        },
+        {
+          "slug": "dentist",
+          "name": "Dentist / Dental Clinic",
+          "name_hi": "डेंटिस्ट / दांत डॉक्टर",
+          "icon": "🦷"
+        },
+        {
+          "slug": "pathology-lab",
+          "name": "Pathology Lab",
+          "name_hi": "पैथोलॉजी लैब",
+          "icon": "🧪"
+        },
+        {
+          "slug": "physiotherapist",
+          "name": "Physiotherapist",
+          "name_hi": "फिजियोथेरेपिस्ट",
+          "icon": "🧑‍⚕️"
+        },
+        {
+          "slug": "hospital",
+          "name": "Hospital / Nursing Home",
+          "name_hi": "अस्पताल / नर्सिंग होम",
+          "icon": "🏨"
+        },
+        {
+          "slug": "ayurveda",
+          "name": "Ayurvedic Doctor",
+          "name_hi": "आयुर्वेदिक डॉक्टर",
+          "icon": "🌿"
+        },
+        {
+          "slug": "homeopathy",
+          "name": "Homeopathy Doctor",
+          "name_hi": "होम्योपैथी डॉक्टर",
+          "icon": "⚪"
+        },
+        {
+          "slug": "eye-care",
+          "name": "Eye Care / Optometrist",
+          "name_hi": "नेत्र चिकित्सक / चश्मा",
+          "icon": "👓"
+        },
+        {
+          "slug": "veterinary",
+          "name": "Veterinary / Pet Doctor",
+          "name_hi": "पशु चिकित्सक",
+          "icon": "🐾"
+        },
+        {
+          "slug": "hearing-aid-mobility",
+          "name": "Hearing Aid / Mobility Aids",
+          "name_hi": "श्रवण यंत्र / सहायक उपकरण",
+          "icon": "🦽"
+        }
+      ]
+    },
+    {
+      "slug": "financial-services",
+      "name": "Financial Services",
+      "name_hi": "वित्तीय सेवाएं",
+      "icon": "💰",
+      "color": "#1E40AF",
+      "subs": [
+        {
+          "slug": "mutual-fund-distributor",
+          "name": "Mutual Fund Distributor",
+          "name_hi": "म्यूचुअल फंड डिस्ट्रीब्यूटर",
+          "icon": "📊"
+        },
+        {
+          "slug": "stock-broker",
+          "name": "Stock Broker / Sub-Broker",
+          "name_hi": "स्टॉक ब्रोकर / सब ब्रोकर",
+          "icon": "📈"
+        },
+        {
+          "slug": "ca",
+          "name": "CA / Tax Consultants",
+          "name_hi": "CA / टैक्स कंसल्टेंट",
+          "icon": "🧮"
+        },
+        {
+          "slug": "tax-consultant",
+          "name": "Tax Consultant (ITR / GST)",
+          "name_hi": "टैक्स कंसल्टेंट",
+          "icon": "🧾"
+        },
+        {
+          "slug": "financial-advisor",
+          "name": "Financial Advisor / Planner",
+          "name_hi": "फाइनेंशियल एडवाइजर",
+          "icon": "💼"
+        },
+        {
+          "slug": "loan-agent",
+          "name": "Loan Agent / DSA",
+          "name_hi": "लोन एजेंट",
+          "icon": "🏦"
+        }
+      ]
+    },
+    {
+      "slug": "insurance",
+      "name": "Insurance",
+      "name_hi": "बीमा",
+      "icon": "🛡️",
+      "color": "#047857",
+      "subs": [
+        {
+          "slug": "insurance-life",
+          "name": "Insurance Advisor — Life",
+          "name_hi": "जीवन बीमा सलाहकार",
+          "icon": "❤️"
+        },
+        {
+          "slug": "insurance-health",
+          "name": "Insurance Advisor — Health",
+          "name_hi": "स्वास्थ्य बीमा सलाहकार",
+          "icon": "🏥"
+        },
+        {
+          "slug": "insurance-general",
+          "name": "Insurance Advisor — General",
+          "name_hi": "सामान्य बीमा सलाहकार",
+          "icon": "🚙"
+        }
+      ]
+    },
+    {
+      "slug": "home-services",
+      "name": "Home Services",
+      "name_hi": "घरेलू सेवाएं",
+      "icon": "🔧",
+      "color": "#92400E",
+      "subs": [
+        {
+          "slug": "carpenter",
+          "name": "Carpenter (Lakdi-Mistri)",
+          "name_hi": "बढ़ई / लकड़ी का मिस्त्री",
+          "icon": "🔨"
+        },
+        {
+          "slug": "plumber",
+          "name": "Plumber",
+          "name_hi": "प्लंबर / नलसाज़",
+          "icon": "🚰"
+        },
+        {
+          "slug": "electrician",
+          "name": "Electrician",
+          "name_hi": "इलेक्ट्रीशियन",
+          "icon": "⚡"
+        },
+        {
+          "slug": "painter",
+          "name": "Painter (House / Commercial)",
+          "name_hi": "पेंटर / रंगाई",
+          "icon": "🎨"
+        },
+        {
+          "slug": "ac-repair",
+          "name": "AC / Fridge Repair",
+          "name_hi": "AC / फ्रिज मरम्मत",
+          "icon": "❄️"
+        },
+        {
+          "slug": "ro-repair",
+          "name": "RO / Water Purifier",
+          "name_hi": "RO / वाटर प्यूरिफायर",
+          "icon": "💧"
+        },
+        {
+          "slug": "pest-control",
+          "name": "Pest Control",
+          "name_hi": "पेस्ट कंट्रोल",
+          "icon": "🐜"
+        },
+        {
+          "slug": "maid-service",
+          "name": "Maid / Cook Service",
+          "name_hi": "मेड / कुक सेवा",
+          "icon": "🧹"
+        },
+        {
+          "slug": "cleaning-service",
+          "name": "Cleaning Service",
+          "name_hi": "क्लीनिंग सर्विस",
+          "icon": "🧽"
+        },
+        {
+          "slug": "packers-movers",
+          "name": "Packers & Movers",
+          "name_hi": "पैकर्स एंड मूवर्स",
+          "icon": "📦"
+        },
+        {
+          "slug": "furniture-wood",
+          "name": "Furniture / Wood Works",
+          "name_hi": "फर्नीचर / लकड़ी",
+          "icon": "🪑"
+        },
+        {
+          "slug": "welding-iron",
+          "name": "Welding / Iron Works",
+          "name_hi": "वेल्डिंग / लोहार",
+          "icon": "🔥"
+        },
+        {
+          "slug": "cooler-fan-repair",
+          "name": "Cooler / Fan Repair",
+          "name_hi": "कूलर / पंखा",
+          "icon": "💨"
+        },
+        {
+          "slug": "led-lighting",
+          "name": "LED / Lighting Shop",
+          "name_hi": "LED / लाइटिंग",
+          "icon": "💡"
+        },
+        {
+          "slug": "solar-inverter",
+          "name": "Solar / Inverter / Battery",
+          "name_hi": "सोलर / इन्वर्टर",
+          "icon": "🔋"
+        },
+        {
+          "slug": "computer-laptop-repair",
+          "name": "Computer / Laptop Repair",
+          "name_hi": "कंप्यूटर रिपेयर",
+          "icon": "💻"
+        },
+        {
+          "slug": "borewell-water",
+          "name": "Borewell / Submersible Pump",
+          "name_hi": "बोरवेल / पम्प",
+          "icon": "⛲"
+        },
+        {
+          "slug": "curtain-upholstery",
+          "name": "Curtain / Upholstery / Sofa",
+          "name_hi": "पर्दा / सोफा",
+          "icon": "🛋️"
+        },
+        {
+          "slug": "carpet-mat",
+          "name": "Carpet / Mat / Durries",
+          "name_hi": "कालीन / दरी",
+          "icon": "🟫"
+        },
+        {
+          "slug": "mandap-tent",
+          "name": "Mandap / Tent House",
+          "name_hi": "टेंट हाउस",
+          "icon": "⛺"
+        },
+        {
+          "slug": "dj-sound-system",
+          "name": "DJ / Sound System / Light",
+          "name_hi": "DJ / साउंड",
+          "icon": "🔊"
+        },
+        {
+          "slug": "cctv-camera",
+          "name": "CCTV / Security Camera",
+          "name_hi": "CCTV / सुरक्षा कैमरा",
+          "icon": "📹"
+        },
+        {
+          "slug": "almirah-maker",
+          "name": "Steel / Aluminum Almirah",
+          "name_hi": "स्टील अलमारी",
+          "icon": "🪟"
+        },
+        {
+          "slug": "water-tank-cleaning",
+          "name": "Water Tank / Sump Cleaning",
+          "name_hi": "पानी की टंकी सफाई",
+          "icon": "🚰"
+        },
+        {
+          "slug": "aluminum-fabricator",
+          "name": "Aluminium Fabricator / Window",
+          "name_hi": "एल्युमिनियम",
+          "icon": "🪟"
+        },
+        {
+          "slug": "iron-grills",
+          "name": "Iron Grills / Steel Gate Maker",
+          "name_hi": "लोहे की ग्रिल / गेट",
+          "icon": "🚪"
+        },
+        {
+          "slug": "refrigerator-washing-repair",
+          "name": "Fridge / Washing Machine Repair",
+          "name_hi": "फ्रिज / वॉशिंग मशीन रिपेयर",
+          "icon": "🧺"
+        }
+      ]
+    },
+    {
+      "slug": "automotive",
+      "name": "Automotive",
+      "name_hi": "ऑटोमोटिव",
+      "icon": "🚗",
+      "color": "#7C3AED",
+      "subs": [
+        {
+          "slug": "used-car",
+          "name": "Second-hand Car Dealers",
+          "name_hi": "सेकंड हैंड कार डीलर",
+          "icon": "🚗"
+        },
+        {
+          "slug": "new-car",
+          "name": "New Car / Bike Showroom",
+          "name_hi": "नई कार / बाइक शोरूम",
+          "icon": "🚙"
+        },
+        {
+          "slug": "mechanic-2w",
+          "name": "Mechanic — 2 Wheeler",
+          "name_hi": "मैकेनिक — दोपहिया",
+          "icon": "🏍️"
+        },
+        {
+          "slug": "mechanic-4w",
+          "name": "Mechanic — 4 Wheeler",
+          "name_hi": "मैकेनिक — चारपहिया",
+          "icon": "🚙"
+        },
+        {
+          "slug": "car-service",
+          "name": "Car Service Station",
+          "name_hi": "कार सर्विस सेंटर",
+          "icon": "🔧"
+        },
+        {
+          "slug": "tyre-shop",
+          "name": "Tyre Shop",
+          "name_hi": "टायर शॉप",
+          "icon": "🛞"
+        },
+        {
+          "slug": "spare-parts",
+          "name": "Auto Spare Parts",
+          "name_hi": "ऑटो स्पेयर पार्ट्स",
+          "icon": "⚙️"
+        },
+        {
+          "slug": "battery-shop",
+          "name": "Battery Shop",
+          "name_hi": "बैटरी की दुकान",
+          "icon": "🔋"
+        },
+        {
+          "slug": "car-wash",
+          "name": "Car / Bike Wash",
+          "name_hi": "कार / बाइक वॉश",
+          "icon": "🚿"
+        },
+        {
+          "slug": "tractor-parts",
+          "name": "Tractor Parts / Spares",
+          "name_hi": "ट्रैक्टर पार्ट्स",
+          "icon": "🚜"
+        },
+        {
+          "slug": "cycle-shop",
+          "name": "Bicycle Shop / Repair",
+          "name_hi": "साइकिल की दुकान",
+          "icon": "🚲"
+        },
+        {
+          "slug": "puncture-shop",
+          "name": "Puncture / Tyre Shop",
+          "name_hi": "पंक्चर / टायर",
+          "icon": "🛞"
+        },
+        {
+          "slug": "commercial-vehicle",
+          "name": "Commercial Vehicle Parts",
+          "name_hi": "कमर्शियल व्हीकल",
+          "icon": "🚛"
+        },
+        {
+          "slug": "petrol-pump",
+          "name": "Petrol / Diesel Pump",
+          "name_hi": "पेट्रोल पंप",
+          "icon": "⛽"
+        },
+        {
+          "slug": "vehicle-rental",
+          "name": "Car / Bike Rental",
+          "name_hi": "कार / बाइक किराये पर",
+          "icon": "🚙"
+        },
+        {
+          "slug": "generator-dg-set",
+          "name": "Generator / DG Set Sales / Rental",
+          "name_hi": "जनरेटर / DG सेट",
+          "icon": "⚙️"
+        }
+      ]
+    },
+    {
+      "slug": "food-beverage",
+      "name": "Food & Beverage",
+      "name_hi": "खाद्य एवं पेय",
+      "icon": "🍴",
+      "color": "#DC2626",
+      "subs": [
+        {
+          "slug": "restaurant",
+          "name": "Restaurants & Dhaba",
+          "name_hi": "रेस्टोरेंट एवं ढाबा",
+          "icon": "🍴"
+        },
+        {
+          "slug": "sweets",
+          "name": "Sweets & Caterers",
+          "name_hi": "मिठाई एवं केटरर",
+          "icon": "🍬"
+        },
+        {
+          "slug": "bakery",
+          "name": "Bakery / Cake Shop",
+          "name_hi": "बेकरी / केक शॉप",
+          "icon": "🎂"
+        },
+        {
+          "slug": "tiffin-service",
+          "name": "Tiffin / Mess Service",
+          "name_hi": "टिफिन सर्विस / मेस",
+          "icon": "🍱"
+        },
+        {
+          "slug": "cafe",
+          "name": "Cafe / Coffee Shop",
+          "name_hi": "कैफे / कॉफी शॉप",
+          "icon": "☕"
+        },
+        {
+          "slug": "juice-corner",
+          "name": "Juice / Shake Corner",
+          "name_hi": "जूस / शेक कॉर्नर",
+          "icon": "🥤"
+        },
+        {
+          "slug": "ice-cream",
+          "name": "Ice Cream Parlour",
+          "name_hi": "आइसक्रीम पार्लर",
+          "icon": "🍦"
+        },
+        {
+          "slug": "halwai-mithai",
+          "name": "Halwai / Mithai Shop",
+          "name_hi": "हलवाई / मिठाई की दुकान",
+          "icon": "🍬"
+        },
+        {
+          "slug": "bakery-cake",
+          "name": "Bakery / Cake Shop",
+          "name_hi": "बेकरी / केक शॉप",
+          "icon": "🎂"
+        },
+        {
+          "slug": "dhaba-roadside",
+          "name": "Dhaba / Roadside Eatery",
+          "name_hi": "ढाबा",
+          "icon": "🍛"
+        },
+        {
+          "slug": "tea-stall",
+          "name": "Tea Stall / Chai Kiosk",
+          "name_hi": "चाय की दुकान",
+          "icon": "🫖"
+        },
+        {
+          "slug": "juice-shake",
+          "name": "Juice / Shake / Cold Drink",
+          "name_hi": "जूस / शेक",
+          "icon": "🥤"
+        },
+        {
+          "slug": "ice-cream-parlour",
+          "name": "Ice Cream Parlour",
+          "name_hi": "आइसक्रीम पार्लर",
+          "icon": "🍦"
+        },
+        {
+          "slug": "dairy-milk",
+          "name": "Dairy / Milk Shop",
+          "name_hi": "डेयरी / दूध",
+          "icon": "🥛"
+        },
+        {
+          "slug": "fruit-vegetable",
+          "name": "Fruit / Vegetable / Sabzi",
+          "name_hi": "फल-सब्ज़ी",
+          "icon": "🥬"
+        },
+        {
+          "slug": "meat-chicken",
+          "name": "Meat / Chicken / Fish Shop",
+          "name_hi": "मांस / चिकन",
+          "icon": "🍗"
+        },
+        {
+          "slug": "kirana-grocery",
+          "name": "Kirana / Grocery Store",
+          "name_hi": "किराना स्टोर",
+          "icon": "🛒"
+        },
+        {
+          "slug": "catering-service",
+          "name": "Catering Service",
+          "name_hi": "कैटरिंग सेवा",
+          "icon": "🍴"
+        },
+        {
+          "slug": "gas-agency",
+          "name": "LPG Gas Agency",
+          "name_hi": "गैस एजेंसी",
+          "icon": "🔥"
+        },
+        {
+          "slug": "pan-shop",
+          "name": "Pan / Tobacco / Cigarette Shop",
+          "name_hi": "पान / तंबाकू",
+          "icon": "🚬"
+        },
+        {
+          "slug": "honey-ghee-organic",
+          "name": "Honey / Pure Ghee / Organic",
+          "name_hi": "शहद / देसी घी / जैविक",
+          "icon": "🍯"
+        }
+      ]
+    },
+    {
+      "slug": "retail-shopping",
+      "name": "Retail & Shopping",
+      "name_hi": "रिटेल / दुकान",
+      "icon": "🛍️",
+      "color": "#16A34A",
+      "subs": [
+        {
+          "slug": "grocery",
+          "name": "Grocery / Kirana Store",
+          "name_hi": "किराना स्टोर",
+          "icon": "🛒"
+        },
+        {
+          "slug": "clothes",
+          "name": "Clothes / Tailor",
+          "name_hi": "कपड़ा / दर्ज़ी",
+          "icon": "👔"
+        },
+        {
+          "slug": "readymade-garments",
+          "name": "Readymade Garments",
+          "name_hi": "रेडीमेड कपड़े",
+          "icon": "🧥"
+        },
+        {
+          "slug": "jewellery",
+          "name": "Jewellery",
+          "name_hi": "जौहरी / सोना-चाँदी",
+          "icon": "💍"
+        },
+        {
+          "slug": "mobile-shop",
+          "name": "Mobile / Recharge Shop",
+          "name_hi": "मोबाइल / रिचार्ज शॉप",
+          "icon": "📱"
+        },
+        {
+          "slug": "electronics",
+          "name": "Electronics / Appliances",
+          "name_hi": "इलेक्ट्रॉनिक्स",
+          "icon": "📺"
+        },
+        {
+          "slug": "footwear",
+          "name": "Footwear / Shoes",
+          "name_hi": "जूते / चप्पल",
+          "icon": "👞"
+        },
+        {
+          "slug": "stationery",
+          "name": "Stationery / Books",
+          "name_hi": "स्टेशनरी / किताबें",
+          "icon": "📚"
+        },
+        {
+          "slug": "gift-shop",
+          "name": "Gift Shop / Cards",
+          "name_hi": "गिफ्ट शॉप",
+          "icon": "🎁"
+        },
+        {
+          "slug": "general-store",
+          "name": "General Store",
+          "name_hi": "जनरल स्टोर",
+          "icon": "🏪"
+        },
+        {
+          "slug": "handloom-shop",
+          "name": "Handloom / Khadi Shop",
+          "name_hi": "हथकरघा / खादी",
+          "icon": "🧵"
+        },
+        {
+          "slug": "saree-shop",
+          "name": "Saree Shop",
+          "name_hi": "साड़ी की दुकान",
+          "icon": "🥻"
+        },
+        {
+          "slug": "lehenga-bridal",
+          "name": "Lehenga / Bridal Wear",
+          "name_hi": "लहंगा / दुल्हन परिधान",
+          "icon": "👰"
+        },
+        {
+          "slug": "boutique-designer",
+          "name": "Boutique / Designer Wear",
+          "name_hi": "बूटीक / डिज़ाइनर वियर",
+          "icon": "👗"
+        },
+        {
+          "slug": "kids-wear",
+          "name": "Kids Wear",
+          "name_hi": "बच्चों के कपड़े",
+          "icon": "👶"
+        },
+        {
+          "slug": "mens-wear",
+          "name": "Men's Wear / Suiting",
+          "name_hi": "पुरुष परिधान / सूटिंग",
+          "icon": "👔"
+        },
+        {
+          "slug": "cloth-merchant",
+          "name": "Cloth Merchant / Fabric",
+          "name_hi": "कपड़ा व्यापारी",
+          "icon": "🧶"
+        },
+        {
+          "slug": "undergarment",
+          "name": "Hosiery / Undergarments",
+          "name_hi": "होज़री",
+          "icon": "👙"
+        },
+        {
+          "slug": "utensils-shop",
+          "name": "Utensils / Bartan Shop",
+          "name_hi": "बर्तन की दुकान",
+          "icon": "🍳"
+        },
+        {
+          "slug": "crockery-glassware",
+          "name": "Crockery / Glassware",
+          "name_hi": "क्रॉकरी / काँच के बर्तन",
+          "icon": "🍽️"
+        },
+        {
+          "slug": "plastic-items",
+          "name": "Plastic Items / Containers",
+          "name_hi": "प्लास्टिक सामान",
+          "icon": "🪣"
+        },
+        {
+          "slug": "pottery-shop",
+          "name": "Pottery / Mitti ke Bartan",
+          "name_hi": "मिट्टी के बर्तन",
+          "icon": "🏺"
+        },
+        {
+          "slug": "footwear-shop",
+          "name": "Footwear / Shoes / Chappal",
+          "name_hi": "जूते-चप्पल",
+          "icon": "👞"
+        },
+        {
+          "slug": "watch-shop",
+          "name": "Watch Shop / Repair",
+          "name_hi": "घड़ी की दुकान",
+          "icon": "⌚"
+        },
+        {
+          "slug": "optical-shop",
+          "name": "Optical / Spectacles",
+          "name_hi": "चश्मे की दुकान",
+          "icon": "👓"
+        },
+        {
+          "slug": "jewellery-imitation",
+          "name": "Imitation Jewellery / Bangles",
+          "name_hi": "इमिटेशन ज्वेलरी",
+          "icon": "💍"
+        },
+        {
+          "slug": "bookstore",
+          "name": "Book Store / Stationery",
+          "name_hi": "किताब / स्टेशनरी",
+          "icon": "📚"
+        },
+        {
+          "slug": "photocopy-cyber",
+          "name": "Photocopy / Cyber Cafe",
+          "name_hi": "फोटोकॉपी / साइबर",
+          "icon": "🖨️"
+        },
+        {
+          "slug": "gift-stationery",
+          "name": "Gift Shop / Cards",
+          "name_hi": "गिफ्ट / कार्ड शॉप",
+          "icon": "🎁"
+        },
+        {
+          "slug": "toy-shop",
+          "name": "Toy Shop",
+          "name_hi": "खिलौने की दुकान",
+          "icon": "🧸"
+        },
+        {
+          "slug": "cosmetic-shop",
+          "name": "Cosmetic / Beauty Products",
+          "name_hi": "कॉस्मेटिक की दुकान",
+          "icon": "💄"
+        },
+        {
+          "slug": "pooja-samagri",
+          "name": "Pooja Samagri Shop",
+          "name_hi": "पूजा सामग्री",
+          "icon": "🪔"
+        },
+        {
+          "slug": "florist",
+          "name": "Florist / Flower Shop",
+          "name_hi": "फूलवाला",
+          "icon": "💐"
+        },
+        {
+          "slug": "wholesale-dealer",
+          "name": "Wholesale / Galla Mandi Dealer",
+          "name_hi": "थोक विक्रेता",
+          "icon": "📦"
+        },
+        {
+          "slug": "manufacturer",
+          "name": "Manufacturer / Factory / Production Unit",
+          "name_hi": "निर्माता / फैक्ट्री",
+          "icon": "🏭"
+        },
+        {
+          "slug": "manufacturer-textile",
+          "name": "Textile / Garment Manufacturer",
+          "name_hi": "टेक्सटाइल / गारमेंट निर्माता",
+          "icon": "🧵"
+        },
+        {
+          "slug": "manufacturer-food",
+          "name": "Food / Snacks Manufacturer",
+          "name_hi": "खाद्य / स्नैक्स निर्माता",
+          "icon": "🍱"
+        },
+        {
+          "slug": "manufacturer-furniture",
+          "name": "Furniture Manufacturer",
+          "name_hi": "फर्नीचर निर्माता",
+          "icon": "🪑"
+        },
+        {
+          "slug": "manufacturer-agri",
+          "name": "Agri Equipment / Tools Manufacturer",
+          "name_hi": "कृषि उपकरण निर्माता",
+          "icon": "🚜"
+        },
+        {
+          "slug": "manufacturer-metal",
+          "name": "Metal / Steel Fabrication Manufacturer",
+          "name_hi": "धातु / स्टील निर्माता",
+          "icon": "⚙️"
+        },
+        {
+          "slug": "manufacturer-plastic",
+          "name": "Plastic / Packaging Manufacturer",
+          "name_hi": "प्लास्टिक / पैकेजिंग निर्माता",
+          "icon": "🛍️"
+        },
+        {
+          "slug": "manufacturer-chemical",
+          "name": "Chemical / Industrial Manufacturer",
+          "name_hi": "रसायन / औद्योगिक निर्माता",
+          "icon": "🧪"
+        },
+        {
+          "slug": "manufacturer-leather",
+          "name": "Leather Goods Manufacturer",
+          "name_hi": "चमड़ा उत्पाद निर्माता",
+          "icon": "👜"
+        },
+        {
+          "slug": "manufacturer-paper",
+          "name": "Paper / Cardboard Manufacturer",
+          "name_hi": "कागज / कार्डबोर्ड निर्माता",
+          "icon": "📦"
+        },
+        {
+          "slug": "manufacturer-electronics",
+          "name": "Electronics / LED Manufacturer",
+          "name_hi": "इलेक्ट्रॉनिक्स / LED निर्माता",
+          "icon": "💡"
+        },
+        {
+          "slug": "manufacturer-machinery",
+          "name": "Machinery / Equipment Manufacturer",
+          "name_hi": "मशीनरी / उपकरण निर्माता",
+          "icon": "🏗️"
+        },
+        {
+          "slug": "manufacturer-construction",
+          "name": "Construction Material Manufacturer",
+          "name_hi": "निर्माण सामग्री निर्माता",
+          "icon": "🧱"
+        },
+        {
+          "slug": "manufacturer-handicraft",
+          "name": "Handicraft / Art Manufacturer",
+          "name_hi": "हस्तशिल्प निर्माता",
+          "icon": "🎨"
+        },
+        {
+          "slug": "manufacturer-spices",
+          "name": "Spices / Masala Manufacturer",
+          "name_hi": "मसाला / स्पाइस निर्माता",
+          "icon": "🌶️"
+        },
+        {
+          "slug": "manufacturer-cosmetic",
+          "name": "Cosmetic / Personal Care Manufacturer",
+          "name_hi": "कॉस्मेटिक निर्माता",
+          "icon": "💄"
+        },
+        {
+          "slug": "manufacturer-pharma",
+          "name": "Pharma / Medicine Manufacturer",
+          "name_hi": "फार्मा / दवा निर्माता",
+          "icon": "💊"
+        },
+        {
+          "slug": "bistar-bhandar",
+          "name": "Bistar Bhandar / Razai-Gadda",
+          "name_hi": "बिस्तर भंडार / रजाई-गद्दा",
+          "icon": "🛏️"
+        },
+        {
+          "slug": "mattress-shop",
+          "name": "Mattress / Foam Mattress Shop",
+          "name_hi": "मैट्रेस / फोम गद्दा",
+          "icon": "🛌"
+        },
+        {
+          "slug": "ro-aquaguard-sales",
+          "name": "RO / Aquaguard Sales Showroom",
+          "name_hi": "RO / एक्वागार्ड शोरूम",
+          "icon": "💧"
+        },
+        {
+          "slug": "plant-nursery",
+          "name": "Plant Nursery / Garden Centre",
+          "name_hi": "पौधा नर्सरी",
+          "icon": "🌱"
+        },
+        {
+          "slug": "pet-shop",
+          "name": "Pet Shop / Aquarium",
+          "name_hi": "पेट शॉप / एक्वेरियम",
+          "icon": "🐕"
+        },
+        {
+          "slug": "scrap-kabadi",
+          "name": "Scrap / Kabadi / Old Material",
+          "name_hi": "कबाड़ी / पुराना सामान",
+          "icon": "♻️"
+        },
+        {
+          "slug": "old-furniture",
+          "name": "Old / Second-Hand Furniture",
+          "name_hi": "पुराना फर्नीचर",
+          "icon": "🪑"
+        },
+        {
+          "slug": "music-instruments",
+          "name": "Music Instruments Shop",
+          "name_hi": "संगीत वाद्ययंत्र",
+          "icon": "🎹"
+        },
+        {
+          "slug": "sports-goods",
+          "name": "Sports Goods / Cricket Shop",
+          "name_hi": "खेल का सामान / क्रिकेट",
+          "icon": "🏏"
+        },
+        {
+          "slug": "mewa-dryfruits",
+          "name": "Dry Fruits / Mewa Shop",
+          "name_hi": "मेवा / सूखे मेवे",
+          "icon": "🥜"
+        },
+        {
+          "slug": "namkeen-snacks",
+          "name": "Namkeen / Bhujia / Snacks",
+          "name_hi": "नमकीन / भुजिया",
+          "icon": "🍿"
+        },
+        {
+          "slug": "sofa-set",
+          "name": "Sofa Set / Furniture Showroom",
+          "name_hi": "सोफा सेट / फर्नीचर",
+          "icon": "🛋️"
+        },
+        {
+          "slug": "glass-mirror",
+          "name": "Glass / Mirror Shop",
+          "name_hi": "शीशा / आइना",
+          "icon": "🪞"
+        },
+        {
+          "slug": "sofa-furniture",
+          "name": "Office Furniture",
+          "name_hi": "ऑफिस फर्नीचर",
+          "icon": "🗄️"
+        },
+        {
+          "slug": "mithai-wholesale",
+          "name": "Mithai Wholesale / Halwai Supplier",
+          "name_hi": "मिठाई होलसेल",
+          "icon": "🧁"
+        },
+        {
+          "slug": "gift-bouquet",
+          "name": "Gift Shop / Flower Bouquet",
+          "name_hi": "गिफ्ट / फूल बुके",
+          "icon": "🎁"
+        }
+      ]
+    },
+    {
+      "slug": "construction-material",
+      "name": "Building & Construction Material",
+      "name_hi": "भवन निर्माण सामग्री",
+      "icon": "🧱",
+      "subs": [
+        {
+          "slug": "paint-shop",
+          "name": "Paint Shop",
+          "name_hi": "पेंट की दुकान",
+          "icon": "🎨"
+        },
+        {
+          "slug": "hardware-shop",
+          "name": "Hardware Shop",
+          "name_hi": "हार्डवेयर की दुकान",
+          "icon": "🔩"
+        },
+        {
+          "slug": "building-material",
+          "name": "Cement / Building Material",
+          "name_hi": "सीमेंट / निर्माण सामग्री",
+          "icon": "🏗️"
+        },
+        {
+          "slug": "chuna-lime",
+          "name": "Chuna / Lime / White-wash Material",
+          "name_hi": "चूना / कली / सफेदी सामग्री",
+          "icon": "🪣"
+        },
+        {
+          "slug": "sariya-tmt",
+          "name": "Sariya / TMT / Steel Bars",
+          "name_hi": "सरिया / टीएमटी / स्टील",
+          "icon": "⛓️"
+        },
+        {
+          "slug": "tiles-marble",
+          "name": "Tiles / Marble / Granite",
+          "name_hi": "टाइल्स / मार्बल / ग्रेनाइट",
+          "icon": "🟧"
+        },
+        {
+          "slug": "sanitary-bathroom",
+          "name": "Sanitary / Bathroom Fittings",
+          "name_hi": "सेनेटरी / बाथरूम फिटिंग",
+          "icon": "🚿"
+        },
+        {
+          "slug": "plywood-laminate",
+          "name": "Plywood, Laminate & Ply",
+          "name_hi": "प्लाइवुड / लैमिनेट",
+          "icon": "🪵"
+        },
+        {
+          "slug": "sand-gravel",
+          "name": "Sand / Bajri / Gravel Supplier",
+          "name_hi": "रेत / बजरी / रोड़ी",
+          "icon": "🏖️"
+        },
+        {
+          "slug": "pipes-fittings",
+          "name": "Pipes & Fittings (PVC/CPVC)",
+          "name_hi": "पाइप / फिटिंग",
+          "icon": "🚰"
+        },
+        {
+          "slug": "electrical-hardware",
+          "name": "Electrical Hardware (Wire/Switch/MCB)",
+          "name_hi": "इलेक्ट्रिकल हार्डवेयर",
+          "icon": "⚡"
+        },
+        {
+          "slug": "doors-windows-grills",
+          "name": "Doors, Windows & Grills",
+          "name_hi": "दरवाजे / खिड़की / ग्रिल",
+          "icon": "🚪"
+        },
+        {
+          "slug": "pop-false-ceiling",
+          "name": "POP / False Ceiling Material",
+          "name_hi": "POP / सीलिंग सामग्री",
+          "icon": "🏠"
+        }
+      ]
+    },
+    {
+      "slug": "beauty-wellness",
+      "name": "Beauty & Wellness",
+      "name_hi": "सौंदर्य एवं स्वास्थ्य",
+      "icon": "💇",
+      "color": "#EC4899",
+      "subs": [
+        {
+          "slug": "salon",
+          "name": "Salon / Beauty Parlour",
+          "name_hi": "सैलून / ब्यूटी पार्लर",
+          "icon": "💇"
+        },
+        {
+          "slug": "gym",
+          "name": "Gym / Fitness Center",
+          "name_hi": "जिम / फिटनेस सेंटर",
+          "icon": "💪"
+        },
+        {
+          "slug": "yoga-center",
+          "name": "Yoga / Meditation Center",
+          "name_hi": "योग केंद्र",
+          "icon": "🧘"
+        },
+        {
+          "slug": "spa",
+          "name": "Spa / Massage Center",
+          "name_hi": "स्पा / मसाज सेंटर",
+          "icon": "💆"
+        },
+        {
+          "slug": "mehndi-artist",
+          "name": "Mehndi / Henna Artist",
+          "name_hi": "मेहंदी आर्टिस्ट",
+          "icon": "🌿"
+        },
+        {
+          "slug": "beauty-parlour",
+          "name": "Beauty Parlour (Ladies)",
+          "name_hi": "ब्यूटी पार्लर",
+          "icon": "💋"
+        },
+        {
+          "slug": "mehendi-artist",
+          "name": "Mehendi / Henna Artist",
+          "name_hi": "मेहंदी आर्टिस्ट",
+          "icon": "🌿"
+        },
+        {
+          "slug": "tattoo-piercing",
+          "name": "Tattoo / Piercing Studio",
+          "name_hi": "टैटू स्टूडियो",
+          "icon": "🎨"
+        },
+        {
+          "slug": "dietician",
+          "name": "Dietician / Nutritionist",
+          "name_hi": "डायटीशियन",
+          "icon": "🥗"
+        }
+      ]
+    },
+    {
+      "slug": "education",
+      "name": "Education & Training",
+      "name_hi": "शिक्षा एवं प्रशिक्षण",
+      "icon": "🎓",
+      "color": "#4F46E5",
+      "subs": [
+        {
+          "slug": "tuition-coaching",
+          "name": "Tuition / Coaching Center",
+          "name_hi": "ट्यूशन / कोचिंग",
+          "icon": "✏️"
+        },
+        {
+          "slug": "music-dance",
+          "name": "Music / Dance Classes",
+          "name_hi": "संगीत / नृत्य क्लास",
+          "icon": "🎵"
+        },
+        {
+          "slug": "computer-classes",
+          "name": "Computer / IT Classes",
+          "name_hi": "कंप्यूटर क्लासेस",
+          "icon": "💻"
+        },
+        {
+          "slug": "english-speaking",
+          "name": "English Speaking Classes",
+          "name_hi": "अंग्रेजी भाषा क्लास",
+          "icon": "🗣️"
+        },
+        {
+          "slug": "driving-school",
+          "name": "Driving School",
+          "name_hi": "ड्राइविंग स्कूल",
+          "icon": "🚦"
+        },
+        {
+          "slug": "school",
+          "name": "School",
+          "name_hi": "स्कूल",
+          "icon": "🏫"
+        },
+        {
+          "slug": "college",
+          "name": "College",
+          "name_hi": "कॉलेज",
+          "icon": "🎓"
+        },
+        {
+          "slug": "university",
+          "name": "University",
+          "name_hi": "विश्वविद्यालय",
+          "icon": "🏛️"
+        },
+        {
+          "slug": "coaching-institute",
+          "name": "Coaching Institute",
+          "name_hi": "कोचिंग संस्थान",
+          "icon": "📘"
+        },
+        {
+          "slug": "skill-vocational",
+          "name": "Skill / Vocational Training",
+          "name_hi": "स्किल / व्यावसायिक प्रशिक्षण",
+          "icon": "🛠️"
+        },
+        {
+          "slug": "library",
+          "name": "Library / Study Center",
+          "name_hi": "लाइब्रेरी / स्टडी सेंटर",
+          "icon": "📚"
+        },
+        {
+          "slug": "music-class",
+          "name": "Music / Dance Class",
+          "name_hi": "संगीत / नृत्य",
+          "icon": "🎵"
+        },
+        {
+          "slug": "computer-class",
+          "name": "Computer Class / Tally / Typing",
+          "name_hi": "कंप्यूटर क्लास",
+          "icon": "💻"
+        },
+        {
+          "slug": "music-dance-class",
+          "name": "Music / Singing / Dance Class",
+          "name_hi": "संगीत / नृत्य कक्षा",
+          "icon": "🎵"
+        },
+        {
+          "slug": "art-craft-class",
+          "name": "Art / Craft / Drawing Class",
+          "name_hi": "कला / ड्राइंग",
+          "icon": "🎨"
+        }
+      ]
+    },
+    {
+      "slug": "professional-services",
+      "name": "Professional Services",
+      "name_hi": "पेशेवर सेवाएं",
+      "icon": "👔",
+      "color": "#1F2937",
+      "subs": [
+        {
+          "slug": "lawyer",
+          "name": "Lawyers & Notaries",
+          "name_hi": "वकील एवं नोटरी",
+          "icon": "⚖️"
+        },
+        {
+          "slug": "architect",
+          "name": "Architect / Civil Engineer",
+          "name_hi": "आर्किटेक्ट / इंजीनियर",
+          "icon": "📐"
+        },
+        {
+          "slug": "interior-designer",
+          "name": "Interior Designer",
+          "name_hi": "इंटीरियर डिज़ाइनर",
+          "icon": "🛋️"
+        },
+        {
+          "slug": "property-dealer",
+          "name": "Property Dealer / Real Estate",
+          "name_hi": "प्रॉपर्टी डीलर",
+          "icon": "🏘️"
+        },
+        {
+          "slug": "photographer",
+          "name": "Photographer / Videographer",
+          "name_hi": "फोटोग्राफर",
+          "icon": "📷"
+        },
+        {
+          "slug": "wedding-planner",
+          "name": "Wedding / Event Planner",
+          "name_hi": "वेडिंग प्लानर",
+          "icon": "💐"
+        },
+        {
+          "slug": "event-management",
+          "name": "Event Management",
+          "name_hi": "इवेंट मैनेजमेंट",
+          "icon": "🎪"
+        },
+        {
+          "slug": "printing-press",
+          "name": "Printing Press / Visiting Cards",
+          "name_hi": "प्रिंटिंग प्रेस",
+          "icon": "🖨️"
+        },
+        {
+          "slug": "pesticide-agri",
+          "name": "Pesticide / Agri Inputs",
+          "name_hi": "कीटनाशक / कृषि",
+          "icon": "🌾"
+        },
+        {
+          "slug": "seeds-fertilizer",
+          "name": "Seeds / Fertilizer Shop",
+          "name_hi": "बीज / खाद",
+          "icon": "🌱"
+        },
+        {
+          "slug": "veterinary-doctor",
+          "name": "Veterinary Doctor",
+          "name_hi": "पशु चिकित्सक",
+          "icon": "🐄"
+        },
+        {
+          "slug": "cattle-feed",
+          "name": "Cattle Feed / Dana",
+          "name_hi": "पशु आहार",
+          "icon": "🐂"
+        },
+        {
+          "slug": "photo-studio",
+          "name": "Photo Studio / Videography",
+          "name_hi": "फोटो स्टूडियो",
+          "icon": "📸"
+        },
+        {
+          "slug": "cement-dealer",
+          "name": "Cement / Steel Dealer",
+          "name_hi": "सीमेंट / सरिया",
+          "icon": "🏗️"
+        },
+        {
+          "slug": "transport-tempo",
+          "name": "Transport / Tempo / Mini Truck",
+          "name_hi": "ट्रांसपोर्ट",
+          "icon": "🚚"
+        },
+        {
+          "slug": "csc-aadhaar",
+          "name": "CSC / Aadhaar / PAN Centre",
+          "name_hi": "CSC / आधार केंद्र",
+          "icon": "🪪"
+        },
+        {
+          "slug": "travel-agent",
+          "name": "Tour & Travel / Bus-Train Booking",
+          "name_hi": "टूर ट्रैवल",
+          "icon": "✈️"
+        },
+        {
+          "slug": "astrologer-pandit",
+          "name": "Astrologer / Pandit ji",
+          "name_hi": "ज्योतिषी / पंडित जी",
+          "icon": "🔮"
+        },
+        {
+          "slug": "marriage-bureau",
+          "name": "Marriage Bureau / Matchmaker",
+          "name_hi": "विवाह ब्यूरो",
+          "icon": "💑"
+        },
+        {
+          "slug": "visa-passport",
+          "name": "Visa / Passport / Immigration",
+          "name_hi": "वीजा / पासपोर्ट",
+          "icon": "🛂"
+        },
+        {
+          "slug": "drone-prewedding-photo",
+          "name": "Drone / Pre-Wedding Photography",
+          "name_hi": "ड्रोन / प्री-वेडिंग",
+          "icon": "🚁"
+        }
+      ]
+    },
+    {
+      "slug": "agri-business",
+      "name": "Agri Business / Farming",
+      "name_hi": "कृषि व्यवसाय / खेती",
+      "icon": "🌾",
+      "color": "#16A34A",
+      "subs": [
+        {
+          "slug": "aarhti-commission",
+          "name": "Aarhti / Commission Agent (Galla Mandi)",
+          "name_hi": "आढ़ती / कमीशन एजेंट (गल्ला मंडी)",
+          "icon": "🌾"
+        },
+        {
+          "slug": "pesticide-shop",
+          "name": "Pesticide / Insecticide Shop",
+          "name_hi": "कीटनाशक / दवा शॉप",
+          "icon": "🧴"
+        },
+        {
+          "slug": "fertilizer-shop",
+          "name": "Fertilizer / Khaad Shop",
+          "name_hi": "खाद / उर्वरक शॉप",
+          "icon": "🪴"
+        },
+        {
+          "slug": "seeds-shop",
+          "name": "Seeds / Beej Shop",
+          "name_hi": "बीज / सीड्स शॉप",
+          "icon": "🌱"
+        },
+        {
+          "slug": "agri-equipment-shop",
+          "name": "Agri Equipment / Implements Shop",
+          "name_hi": "कृषि उपकरण / यंत्र शॉप",
+          "icon": "🚜"
+        },
+        {
+          "slug": "tractor-dealer",
+          "name": "Tractor / Combine Harvester Dealer",
+          "name_hi": "ट्रैक्टर / हार्वेस्टर डीलर",
+          "icon": "🚜"
+        },
+        {
+          "slug": "cattle-feed-shop",
+          "name": "Cattle Feed / Pashu Aahar Shop",
+          "name_hi": "पशु आहार / दाना शॉप",
+          "icon": "🌽"
+        },
+        {
+          "slug": "dairy-farm",
+          "name": "Dairy Farm / Milk Producer",
+          "name_hi": "डेयरी फार्म / दूध उत्पादक",
+          "icon": "🐄"
+        },
+        {
+          "slug": "poultry-farm",
+          "name": "Poultry / Murgi Palan Farm",
+          "name_hi": "मुर्गी पालन / पोल्ट्री फार्म",
+          "icon": "🐔"
+        },
+        {
+          "slug": "bee-keeping",
+          "name": "Bee Keeping / Honey Producer",
+          "name_hi": "मधुमक्खी पालन / शहद",
+          "icon": "🍯"
+        },
+        {
+          "slug": "plant-nursery",
+          "name": "Plant Nursery / Saplings",
+          "name_hi": "पौधा नर्सरी / पौधे",
+          "icon": "🌿"
+        },
+        {
+          "slug": "agri-vet-doctor",
+          "name": "Veterinary / Animal Doctor",
+          "name_hi": "पशु चिकित्सक",
+          "icon": "🐾"
+        },
+        {
+          "slug": "drip-irrigation",
+          "name": "Drip Irrigation / Sprinkler Dealer",
+          "name_hi": "ड्रिप / स्प्रिंकलर डीलर",
+          "icon": "💧"
+        },
+        {
+          "slug": "cold-storage",
+          "name": "Cold Storage / Warehouse",
+          "name_hi": "कोल्ड स्टोरेज / गोदाम",
+          "icon": "❄️"
+        },
+        {
+          "slug": "agri-export",
+          "name": "Agri Trader / Exporter",
+          "name_hi": "कृषि व्यापारी / निर्यातक",
+          "icon": "📦"
+        },
+        {
+          "slug": "agri-loan-agent",
+          "name": "Agri Loan / KCC Agent",
+          "name_hi": "कृषि लोन / KCC एजेंट",
+          "icon": "💰"
+        },
+        {
+          "slug": "flour-mill",
+          "name": "Flour Mill / Atta Chakki",
+          "name_hi": "आटा चक्की / फ्लोर मिल",
+          "icon": "🌾"
+        },
+        {
+          "slug": "rice-mill",
+          "name": "Rice Mill / Chawal Mill",
+          "name_hi": "राइस मिल / चावल मिल",
+          "icon": "🍚"
+        },
+        {
+          "slug": "oil-mill",
+          "name": "Oil Mill / Tel Mill",
+          "name_hi": "तेल मिल / कोल्हू",
+          "icon": "🛢️"
+        },
+        {
+          "slug": "cotton-ginning",
+          "name": "Cotton Ginning / Kapas Factory",
+          "name_hi": "कपास जिनिंग / कॉटन फैक्ट्री",
+          "icon": "🧶"
+        },
+        {
+          "slug": "animal-husbandry",
+          "name": "Animal Husbandry / Goat / Sheep",
+          "name_hi": "पशुपालन / बकरी / भेड़",
+          "icon": "🐐"
+        },
+        {
+          "slug": "fishery",
+          "name": "Fishery / Fish Farm",
+          "name_hi": "मछली पालन / फिशरी",
+          "icon": "🐟"
+        }
+      ]
+    },
+    {
+      "slug": "energy-solar",
+      "name": "Energy, Solar & Renewable",
+      "name_hi": "ऊर्जा, सोलर एवं नवीकरणीय",
+      "icon": "☀️",
+      "color": "#F59E0B",
+      "subs": [
+        {
+          "slug": "solar-panel-installation",
+          "name": "Solar Panel Installation",
+          "name_hi": "सोलर पैनल इंस्टॉलेशन",
+          "icon": "🔆"
+        },
+        {
+          "slug": "solar-water-heater",
+          "name": "Solar Water Heater",
+          "name_hi": "सोलर वाटर हीटर",
+          "icon": "♨️"
+        },
+        {
+          "slug": "solar-inverter-battery",
+          "name": "Solar Inverter / Battery",
+          "name_hi": "सोलर इन्वर्टर / बैटरी",
+          "icon": "🔋"
+        },
+        {
+          "slug": "rooftop-solar",
+          "name": "Rooftop Solar (Residential)",
+          "name_hi": "रूफटॉप सोलर (घरेलू)",
+          "icon": "🏠"
+        },
+        {
+          "slug": "commercial-solar-epc",
+          "name": "Commercial Solar / EPC",
+          "name_hi": "कमर्शियल सोलर / EPC",
+          "icon": "🏢"
+        },
+        {
+          "slug": "solar-pump-agri",
+          "name": "Solar Pump (Agri / KUSUM)",
+          "name_hi": "सोलर पंप (कृषि / KUSUM)",
+          "icon": "💧"
+        },
+        {
+          "slug": "solar-street-light",
+          "name": "Solar Street Light / Lamp",
+          "name_hi": "सोलर स्ट्रीट लाइट",
+          "icon": "💡"
+        },
+        {
+          "slug": "solar-amc-cleaning",
+          "name": "Solar AMC & Cleaning",
+          "name_hi": "सोलर AMC एवं सफाई",
+          "icon": "🧹"
+        },
+        {
+          "slug": "renewable-energy-consultant",
+          "name": "Renewable Energy Consultant",
+          "name_hi": "नवीकरणीय ऊर्जा सलाहकार",
+          "icon": "🌱"
+        },
+        {
+          "slug": "energy-audit",
+          "name": "Energy Audit / Saving",
+          "name_hi": "एनर्जी ऑडिट / बचत",
+          "icon": "📋"
+        },
+        {
+          "slug": "wind-energy",
+          "name": "Wind Energy Solutions",
+          "name_hi": "पवन ऊर्जा समाधान",
+          "icon": "🌬️"
+        },
+        {
+          "slug": "biogas-biomass",
+          "name": "Biogas / Biomass",
+          "name_hi": "बायोगैस / बायोमास",
+          "icon": "♻️"
+        },
+        {
+          "slug": "ev-charging-station",
+          "name": "EV Charging Station",
+          "name_hi": "EV चार्जिंग स्टेशन",
+          "icon": "🔌"
+        },
+        {
+          "slug": "ups-inverter-battery",
+          "name": "UPS / Inverter / Battery Shop",
+          "name_hi": "UPS / इन्वर्टर / बैटरी शॉप",
+          "icon": "🔋"
+        },
+        {
+          "slug": "solar-subsidy-mnre",
+          "name": "Solar Subsidy / MNRE Consultant",
+          "name_hi": "सोलर सब्सिडी / MNRE सलाहकार",
+          "icon": "📜"
+        }
+      ]
+    },
+    {
+      "slug": "community-social",
+      "name": "Community & Social",
+      "name_hi": "सामुदायिक एवं सामाजिक",
+      "icon": "🤝",
+      "subs": [
+        {
+          "slug": "gau-shala",
+          "name": "Gau Shala / Animal Welfare",
+          "name_hi": "गौ शाला / पशु कल्याण",
+          "icon": "🐄"
+        },
+        {
+          "slug": "temple-trust",
+          "name": "Temple / Religious Trust",
+          "name_hi": "मंदिर / धार्मिक ट्रस्ट",
+          "icon": "🛕"
+        },
+        {
+          "slug": "gurudwara",
+          "name": "Gurudwara",
+          "name_hi": "गुरुद्वारा",
+          "icon": "🕌"
+        },
+        {
+          "slug": "ngo-charitable",
+          "name": "NGO / Charitable Trust",
+          "name_hi": "एनजीओ / धर्मार्थ ट्रस्ट",
+          "icon": "❤️"
+        },
+        {
+          "slug": "social-club",
+          "name": "Social Club (Rotary, Lions)",
+          "name_hi": "सामाजिक क्लब",
+          "icon": "🎗️"
+        },
+        {
+          "slug": "cultural-sanstha",
+          "name": "Cultural Sanstha / Mahila Mandal",
+          "name_hi": "सांस्कृतिक संस्था / महिला मंडल",
+          "icon": "🌸"
+        },
+        {
+          "slug": "yuvak-mandal",
+          "name": "Yuvak Mandal / Youth Club",
+          "name_hi": "युवक मंडल",
+          "icon": "🤸"
+        },
+        {
+          "slug": "sports-club",
+          "name": "Sports Club / Akhada",
+          "name_hi": "खेल क्लब / अखाड़ा",
+          "icon": "🏃"
+        },
+        {
+          "slug": "panchayat-office",
+          "name": "Panchayat / Community Office",
+          "name_hi": "पंचायत / सामुदायिक कार्यालय",
+          "icon": "🏛️"
+        },
+        {
+          "slug": "blood-donation-camp",
+          "name": "Blood Donation / Welfare Camp",
+          "name_hi": "रक्तदान / कल्याण शिविर",
+          "icon": "🩸"
+        },
+        {
+          "slug": "temple-mandir",
+          "name": "Temple / Mandir",
+          "name_hi": "मंदिर",
+          "icon": "🛕"
+        },
+        {
+          "slug": "masjid",
+          "name": "Masjid",
+          "name_hi": "मस्जिद",
+          "icon": "🕌"
+        },
+        {
+          "slug": "community-hall",
+          "name": "Marriage Hall / Community Hall",
+          "name_hi": "मैरिज हॉल",
+          "icon": "🏛️"
+        },
+        {
+          "slug": "hostel-pg",
+          "name": "Hostel / PG / Paying Guest",
+          "name_hi": "हॉस्टल / PG",
+          "icon": "🏘️"
+        }
+      ]
+    }
+  ]
+}

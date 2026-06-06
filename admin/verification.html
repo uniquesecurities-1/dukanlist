@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Verification Queue — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%93</text></svg>">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .nav{display:flex;gap:6px;align-items:center}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600;transition:all .15s}
+  .nav a:hover{background:rgba(255,255,255,0.1);color:white}
+  .nav a.active{background:#1E3A8A;color:white}
+
+  .main{max-width:1200px;margin:24px auto;padding:0 20px}
+  .page-title{font-size:24px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+  .page-sub{font-size:14px;color:#64748b;margin-bottom:20px;line-height:1.6}
+
+  .info-card{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1px solid #93C5FD;border-left:4px solid #1E3A8A;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:13.5px;color:#1E3A8A;line-height:1.55}
+  .info-card b{color:#0F172A}
+
+  .city-group{margin-bottom:24px}
+  .city-header{display:flex;align-items:center;justify-content:space-between;background:#0F172A;color:#fff;padding:10px 16px;border-radius:10px 10px 0 0;font-size:14px;font-weight:800;letter-spacing:.02em}
+  .city-header .count{background:#FF6B1A;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700}
+  .city-shops{background:#fff;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+
+  .shop-row{padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border-bottom:1px solid #f1f5f9}
+  .shop-row:last-child{border-bottom:none}
+  .shop-row:hover{background:#fafbfc}
+  .shop-info{min-width:0}
+  .shop-name{font-weight:800;color:#0F172A;font-size:14.5px;margin-bottom:3px}
+  .shop-meta{font-size:12.5px;color:#64748b;line-height:1.6}
+  .shop-meta b{color:#0F172A;font-weight:700}
+  .shop-meta .age-fresh{color:#65A30D;font-weight:700}
+  .shop-meta .age-warn{color:#92400E;font-weight:700}
+  .shop-meta .age-old{color:#991B1B;font-weight:700}
+
+  .shop-actions{display:flex;flex-direction:column;gap:6px;min-width:170px}
+  .btn{padding:8px 12px;border-radius:7px;border:0;font-weight:700;cursor:pointer;font-size:12.5px;font-family:inherit;text-align:center;text-decoration:none;display:block;transition:.15s}
+  .btn-verify{background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 2px 6px rgba(16,185,129,.3)}
+  .btn-verify:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 10px rgba(16,185,129,.4)}
+  .btn-wa{background:#25D366;color:#fff}
+  .btn-secondary{background:#fff;color:#475569;border:1.5px solid #e2e8f0}
+  .btn-secondary:hover{background:#f1f5f9}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .empty{text-align:center;padding:60px 20px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;color:#64748b}
+  .empty-emoji{font-size:48px;margin-bottom:10px}
+  .empty-title{font-size:16px;font-weight:800;color:#0F172A;margin-bottom:6px}
+
+  .loader{text-align:center;padding:40px;color:#64748b;font-size:14px}
+  .err{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;padding:14px 18px;border-radius:10px;font-size:14px}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:10px;font-weight:700;font-size:14px;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:none}
+  .toast.success{background:#10B981;color:white}
+  .toast.error{background:#EF4444;color:white}
+</style>
+
+<!-- Premium banking-class polish — shared CSS file applied site-wide. Load LAST so it overrides earlier inline styles. -->
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">⚖ DukanList <span class="badge">ADMIN</span></div>
+  <nav class="nav">
+    <a href="/admin/dashboard.html">Dashboard</a>
+    <a href="/admin/moderation.html">Moderation</a>
+    <a href="/admin/verification.html" class="active">Verify ✓</a>
+    <a href="/admin/shop.html">Shop</a>
+    <a href="/admin/settings.html">Settings</a>
+    <a href="#" onclick="C.auth.signOut();location='/admin/login.html';return false">Logout</a>
+  </nav>
+</header>
+
+<div class="main">
+  <h1 class="page-title">
+    ✓ Verification Queue
+  </h1>
+  <p class="page-sub">
+    Shopkeepers who requested a physical verification visit. Plan visits city-wise — saari requests Mandi Dabwali, Sirsa, Bathinda, Mansa, Muktsar area-wise grouped hain.
+    Visit ke baad <b>Mark Verified</b> click karein.
+  </p>
+
+  <div class="info-card">
+    💡 <b>Approval ≠ Verification.</b> Approve karne se shop public ho jaati hai (paperwork OK).
+    Verification matlab humne physically visit kiya — Blue Tick ki guarantee. Customer trust ke liye separate process zaroori hai.
+  </div>
+
+  <div id="loading" class="loader">⏳ Loading verification queue…</div>
+  <div id="content" style="display:none"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/admin-common.js"></script>
+<script>
+// Use ShopDB.client (the actual export from supabase-init.js).
+// Old code referenced window.C / AdminDB which never existed - caused
+// "Supabase client missing" error. We accept any of the 3 forms now.
+const C = (window.ShopDB && ShopDB.client) || window.C || (window.AdminDB && AdminDB.client) || null;
+
+function showToast(msg, kind){
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + (kind === 'error' ? 'error' : 'success');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function ageBadge(days){
+  if (days <= 2) return '<span class="age-fresh">' + days + 'd waiting · fresh</span>';
+  if (days <= 7) return '<span class="age-warn">' + days + 'd waiting</span>';
+  return '<span class="age-old">' + days + 'd waiting · urgent</span>';
+}
+
+function renderShopRow(b){
+  const name = escapeHtml(b.business_name);
+  const owner = escapeHtml(b.owner_name || '');
+  const cat = escapeHtml(b.primary_cat || '');
+  const mobile = (b.mobile || '').replace(/\D/g,'').slice(-10);
+  const wa = (b.whatsapp || '').replace(/\D/g,'').slice(-10) || mobile;
+  const pincode = escapeHtml(b.pincode || '');
+  const address = escapeHtml(b.address_line1 || '');
+  const days = b.days_waiting || 0;
+
+  const waMsg = encodeURIComponent(
+    'Namaste ' + (owner || '') + ', DukanList admin team se baat hai. '
+    + 'Aapne verification visit ke liye request bheji thi "' + (b.business_name || '') + '" ke liye. '
+    + 'Hum kal/parso aapki shop par visit karenge — please confirm aap available rahenge?'
+  );
+  const waUrl = wa ? ('https://wa.me/91' + wa + '?text=' + waMsg) : '';
+
+  return '<div class="shop-row" id="row-' + b.business_id + '">'
+    + '<div class="shop-info">'
+    +   '<div class="shop-name">' + name + (cat ? ' <span style="color:#94a3b8;font-weight:500;font-size:11.5px">· ' + cat + '</span>' : '') + '</div>'
+    +   '<div class="shop-meta">'
+    +     (owner ? '👤 <b>' + owner + '</b> · ' : '')
+    +     (mobile ? '📞 +91 ' + mobile + ' · ' : '')
+    +     ageBadge(days)
+    +   '</div>'
+    +   '<div class="shop-meta" style="margin-top:3px">'
+    +     '📍 ' + (address || '<i>no street</i>') + (pincode ? ' · pincode <b>' + pincode + '</b>' : '')
+    +   '</div>'
+    + '</div>'
+    + '<div class="shop-actions">'
+    +   '<button class="btn btn-verify" onclick="markVerified(\'' + b.business_id + '\', \'' + name.replace(/'/g,"\\\'") + '\')">✓ Mark Verified</button>'
+    +   (waUrl ? '<a class="btn btn-wa" href="' + waUrl + '" target="_blank">💬 WhatsApp owner</a>' : '')
+    +   '<a class="btn btn-secondary" href="/admin/shop.html?id=' + b.business_id + '" target="_blank">📋 Full details</a>'
+    + '</div>'
+    + '</div>';
+}
+
+async function loadQueue(){
+  const host = document.getElementById('content');
+  const ldn = document.getElementById('loading');
+  try {
+    const r = await C.rpc('get_verification_queue', { p_limit: 200 });
+    if (r.error) throw r.error;
+    const rows = r.data || [];
+    ldn.style.display = 'none';
+    host.style.display = '';
+
+    if (!rows.length){
+      host.innerHTML = '<div class="empty">'
+        + '<div class="empty-emoji">🎉</div>'
+        + '<div class="empty-title">All clear!</div>'
+        + '<div>No pending verification requests. Shopkeepers will appear here when they tap "Request Verification" in their dashboard.</div>'
+        + '</div>';
+      return;
+    }
+
+    // Group by city
+    const groups = {};
+    rows.forEach(r => {
+      const city = r.city_name || 'Unknown city';
+      if (!groups[city]) groups[city] = [];
+      groups[city].push(r);
+    });
+
+    const cities = Object.keys(groups).sort();
+    host.innerHTML = cities.map(city => {
+      const shops = groups[city];
+      return '<div class="city-group">'
+        + '<div class="city-header">'
+        +   '<span>📍 ' + escapeHtml(city) + '</span>'
+        +   '<span class="count">' + shops.length + ' request' + (shops.length === 1 ? '' : 's') + '</span>'
+        + '</div>'
+        + '<div class="city-shops">'
+        + shops.map(renderShopRow).join('')
+        + '</div>'
+        + '</div>';
+    }).join('');
+  } catch(e){
+    ldn.innerHTML = '<div class="err">Failed to load: ' + escapeHtml(e.message || 'Unknown') + '<br><small>Make sure db/84-decouple-approval-from-verification.sql is deployed.</small></div>';
+  }
+}
+
+async function markVerified(bizId, name){
+  if (!confirm('Mark "' + name + '" as verified?\n\nThis adds the Blue Tick badge. Use only if you have physically visited or have a trusted reference.')) return;
+  const note = prompt('Optional verification note (e.g., "Visited 1-Jun-2026", "Founder reference", etc.):', '');
+  try {
+    const r = await C.rpc('admin_set_verified', {
+      p_business_id: bizId,
+      p_verified: true,
+      p_note: note || null
+    });
+    if (r.error) throw r.error;
+    showToast('✓ Verified — Blue Tick activated', 'success');
+    const row = document.getElementById('row-' + bizId);
+    if (row) row.style.opacity = '0.3';
+    setTimeout(loadQueue, 800);
+  } catch(e){
+    showToast('Failed: ' + (e.message || 'Unknown'), 'error');
+  }
+}
+
+window.markVerified = markVerified;
+
+// Initial load
+(async () => {
+  if (typeof requireAdmin === 'function'){
+    await requireAdmin();
+  }
+  if (!C){
+    document.getElementById('loading').innerHTML = '<div class="err">Supabase client missing — please re-login.</div>';
+    return;
+  }
+  loadQueue();
+})();
+</script>
+</body>
+</html>

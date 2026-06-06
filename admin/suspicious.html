@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Suspicious Activity — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚨</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif;background:#f1f5f9;color:#0F172A;font-size:14px;line-height:1.5}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .badge{font-size:10px;font-weight:700;background:#FFC93D;color:#0F172A;padding:2px 7px;border-radius:5px}
+  .topbar a{color:#cbd5e1;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;transition:.15s}
+  .topbar a:hover{background:rgba(255,255,255,.1);color:#fff}
+  .topbar a.active{background:rgba(239,68,68,.18);color:#FCA5A5}
+  .main{max-width:1280px;margin:24px auto;padding:0 18px}
+  h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;color:#0F172A}
+  h1 .ico{font-size:1.6rem;margin-right:6px}
+  .sub{font-size:13px;color:#64748b;margin-bottom:20px}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+  .stat-card{background:#fff;border-radius:12px;padding:18px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+  .stat-card.high{border-left:4px solid #EF4444}
+  .stat-card.med{border-left:4px solid #F59E0B}
+  .stat-card.low{border-left:4px solid #94A3B8}
+  .stat-card.total{border-left:4px solid #1E3A8A}
+  .stat-card .v{font-size:2rem;font-weight:900;line-height:1;margin-bottom:4px;letter-spacing:-.02em}
+  .stat-card.high .v{color:#EF4444}
+  .stat-card.med .v{color:#F59E0B}
+  .stat-card.low .v{color:#64748b}
+  .stat-card.total .v{color:#1E3A8A}
+  .stat-card .l{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em}
+
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .chip{background:#F1F5F9;color:#475569;border:none;padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.12s}
+  .chip:hover{background:#E2E8F0}
+  .chip.active{background:#1E3A8A;color:#fff}
+  .chip.high.active{background:#EF4444}
+  .chip.med.active{background:#F59E0B}
+
+  .info-banner{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#3730A3;display:flex;gap:10px;line-height:1.5}
+  .info-banner b{color:#1E3A8A}
+
+  .table-wrap{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:12px 12px;background:#F8FAFC;border-bottom:1px solid #e2e8f0;font-weight:700;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  td{padding:12px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover{background:#FAFBFF}
+
+  .biz-link{font-weight:700;color:#1E3A8A;text-decoration:none;font-size:13.5px}
+  .biz-link:hover{color:#FF6B1A;text-decoration:underline}
+  .owner{font-size:11.5px;color:#64748b;margin-top:2px}
+  .meta{font-size:11px;color:#94a3b8;margin-top:3px}
+
+  .risk-badge{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:14px;font-weight:900;font-size:1.05rem;line-height:1}
+  .risk-high{background:#FEE2E2;color:#991B1B}
+  .risk-med{background:#FEF3C7;color:#92400E}
+  .risk-low{background:#F1F5F9;color:#64748b}
+
+  .reasons{display:flex;flex-wrap:wrap;gap:4px;max-width:340px}
+  .reason-tag{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:6px;letter-spacing:.02em;text-transform:uppercase}
+  .r-duplicate_mobile{background:#FEE2E2;color:#991B1B}
+  .r-spam_keyword{background:#FCE7F3;color:#9F1239}
+  .r-fake_owner_name{background:#FEF3C7;color:#92400E}
+  .r-low_completeness{background:#F1F5F9;color:#475569}
+  .r-bulk_registration{background:#FFE4E6;color:#9F1239}
+  .r-multiple_flags{background:#FEE2E2;color:#991B1B}
+  .r-inactive_verified{background:#E0E7FF;color:#3730A3}
+  .r-mismatched_data{background:#FEF3C7;color:#92400E}
+
+  .status-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10.5px;font-weight:700;text-transform:uppercase}
+  .s-active{background:#D1FAE5;color:#065F46}
+  .s-pending,.s-pending_review{background:#FEF3C7;color:#92400E}
+  .s-flagged{background:#FEE2E2;color:#991B1B}
+  .s-banned{background:#374151;color:#fff}
+  .s-self_hidden{background:#E5E7EB;color:#374151}
+
+  .actions{display:flex;gap:5px;flex-wrap:nowrap}
+  .btn{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:3px;border:none}
+  .btn-view{background:#1E3A8A;color:#fff}
+  .btn-view:hover{background:#1E40AF}
+  .btn-wa{background:#25D366;color:#fff}
+  .btn-safe{background:#10B981;color:#fff}
+  .btn-hide{background:#EF4444;color:#fff}
+
+  .empty-state{padding:80px 20px;text-align:center;color:#94a3b8}
+  .empty-state .ico{font-size:64px;opacity:.5;margin-bottom:14px;display:block}
+  .empty-state .et{font-size:18px;font-weight:800;color:#10B981;margin-bottom:6px}
+  .empty-state .es{font-size:13px;max-width:420px;margin:0 auto;color:#64748b}
+
+  .loader{text-align:center;padding:80px 20px;color:#64748b}
+  .err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:16px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:16px}
+
+  @media (max-width: 760px){
+    table{font-size:12px;min-width:900px}
+    .reasons{max-width:220px}
+  }
+</style>
+
+<!-- Premium banking-class polish — shared CSS file applied site-wide. Load LAST so it overrides earlier inline styles. -->
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="/admin/dashboard" style="display:flex;align-items:center;gap:10px;color:#fff;padding:0">🛡️ <strong>Admin</strong> <span class="badge">Suspicious</span></a>
+  </div>
+  <nav style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/pucho-moderation.html">💬 Pucho Bhai</a>
+    <a href="/admin/bulk-upload">📥 Bulk Add</a>
+    <a href="/admin/announcements">📣 Announcements</a>
+    <a href="/admin/featured.html">⭐ Featured</a>
+    <a href="/admin/deals.html">🎁 Deals</a>
+    <a href="/admin/activity.html">📋 Activity</a>
+    <a href="/admin/suspicious.html" class="active">🚨 Suspicious</a>
+    <a href="/" target="_blank">🌐 Site</a>
+  </nav>
+</header>
+
+<main class="main">
+  <h1><span class="ico">🚨</span>Suspicious Activity Detector</h1>
+  <p class="sub">Auto-flagged shops based on 8 risk patterns. Higher score = needs urgent review. Sorted by risk.</p>
+
+  <div class="info-banner">
+    <span style="font-size:1.2rem">💡</span>
+    <div>
+      <b>Read-only detection.</b> This page only HIGHLIGHTS shops with suspicious patterns — it never auto-hides, auto-bans, or modifies anything. You review and act manually via the View button.
+      <br>Detection rules: duplicate mobile · spam keywords · fake-looking owner name · low completeness · bulk registration · multiple flags · inactive verified · mismatched data.
+    </div>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat-card high"><div class="v" id="cntHigh">—</div><div class="l">🔴 High Risk (60+)</div></div>
+    <div class="stat-card med"><div class="v" id="cntMed">—</div><div class="l">🟡 Medium Risk (30-59)</div></div>
+    <div class="stat-card low"><div class="v" id="cntLow">—</div><div class="l">⚪ Low Risk (10-29)</div></div>
+    <div class="stat-card total"><div class="v" id="cntTotal">—</div><div class="l">📊 Total Flagged</div></div>
+  </div>
+
+  <div class="toolbar">
+    <span style="color:#94a3b8;font-size:11px;font-weight:700">FILTER:</span>
+    <button class="chip active" data-f="all" onclick="setFilter('all', this)">All</button>
+    <button class="chip high" data-f="high" onclick="setFilter('high', this)">🔴 High Risk</button>
+    <button class="chip med" data-f="med" onclick="setFilter('med', this)">🟡 Medium</button>
+    <button class="chip" data-f="low" onclick="setFilter('low', this)">⚪ Low</button>
+    <button class="chip" data-f="all" onclick="reloadAll(this)" style="margin-left:auto;background:#0F172A;color:#fff">🔄 Refresh</button>
+  </div>
+
+  <div id="resultsBox">
+    <div class="loader">⏳ Scanning all shops for suspicious patterns…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+let ALL_ROWS = [];
+let CURRENT_FILTER = 'all';
+
+async function load(){
+  const box = document.getElementById('resultsBox');
+  box.innerHTML = '<div class="loader">⏳ Scanning all shops for suspicious patterns…</div>';
+
+  if (typeof ShopDB === 'undefined' || !ShopDB){
+    box.innerHTML = '<div class="err">ShopDB not loaded. Reload page.</div>'; return;
+  }
+  const c = ShopDB.client;
+
+  // Auth gate
+  try {
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user){ window.location.href = '/admin/login.html'; return; }
+    const ia = await c.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); window.location.href = '/admin/login.html'; return; }
+  } catch(e){ box.innerHTML = '<div class="err">Auth failed: ' + (e.message || e) + '</div>'; return; }
+
+  // Fetch suspicious shops
+  try {
+    const { data, error } = await c.rpc('admin_get_suspicious_shops');
+    if (error){
+      box.innerHTML = '<div class="err"><b>Failed to fetch suspicious shops.</b><br>'
+        + escapeHtml(error.message)
+        + '<br><br>If the function does not exist, please run <code>db/50-suspicious-activity-detector.sql</code> in Supabase SQL Editor.</div>';
+      document.getElementById('cntHigh').textContent = 'N/A';
+      document.getElementById('cntMed').textContent = 'N/A';
+      document.getElementById('cntLow').textContent = 'N/A';
+      document.getElementById('cntTotal').textContent = 'N/A';
+      return;
+    }
+    ALL_ROWS = data || [];
+    updateStats();
+    renderTable();
+  } catch(e){
+    box.innerHTML = '<div class="err">Unexpected error: ' + (e.message || e) + '</div>';
+  }
+}
+
+function updateStats(){
+  let high = 0, med = 0, low = 0;
+  ALL_ROWS.forEach(r => {
+    const s = r.risk_score || 0;
+    if (s >= 60) high++; else if (s >= 30) med++; else low++;
+  });
+  document.getElementById('cntHigh').textContent = high;
+  document.getElementById('cntMed').textContent = med;
+  document.getElementById('cntLow').textContent = low;
+  document.getElementById('cntTotal').textContent = ALL_ROWS.length;
+}
+
+function setFilter(f, btn){
+  CURRENT_FILTER = f;
+  document.querySelectorAll('.chip[data-f]').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTable();
+}
+
+function reloadAll(btn){
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⏳ Re-scanning…';
+  btn.disabled = true;
+  load().finally(() => { btn.innerHTML = orig; btn.disabled = false; });
+}
+
+function renderTable(){
+  let rows = ALL_ROWS.slice();
+  if (CURRENT_FILTER === 'high') rows = rows.filter(r => r.risk_score >= 60);
+  else if (CURRENT_FILTER === 'med') rows = rows.filter(r => r.risk_score >= 30 && r.risk_score < 60);
+  else if (CURRENT_FILTER === 'low') rows = rows.filter(r => r.risk_score < 30);
+
+  const box = document.getElementById('resultsBox');
+  if (rows.length === 0){
+    if (ALL_ROWS.length === 0){
+      box.innerHTML = '<div class="empty-state"><span class="ico">✅</span>'
+        + '<div class="et">No suspicious activity detected</div>'
+        + '<div class="es">All shops look clean. Your database is healthy! Re-scan periodically as new shops register.</div></div>';
+    } else {
+      box.innerHTML = '<div class="empty-state"><span class="ico">🔍</span>'
+        + '<div class="et" style="color:#64748b">No shops in this filter</div>'
+        + '<div class="es">Try a different risk level — or click All.</div></div>';
+    }
+    return;
+  }
+
+  const riskBadge = (s) => {
+    if (s >= 60) return `<div class="risk-badge risk-high" title="High risk">${s}</div>`;
+    if (s >= 30) return `<div class="risk-badge risk-med" title="Medium risk">${s}</div>`;
+    return `<div class="risk-badge risk-low" title="Low risk">${s}</div>`;
+  };
+
+  const reasonLabel = (r) => ({
+    'duplicate_mobile':   '🔁 Duplicate Mobile',
+    'spam_keyword':       '🚫 Spam Keyword',
+    'fake_owner_name':    '👤 Fake Name',
+    'low_completeness':   '📉 Empty Profile',
+    'bulk_registration':  '🌊 Bulk Wave',
+    'multiple_flags':     '⚠ User Flags',
+    'inactive_verified':  '💤 Inactive Verified',
+    'mismatched_data':    '❓ Mismatched Data'
+  }[r] || r);
+
+  const html = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:62px">Risk</th>
+            <th>Business / Owner</th>
+            <th>Reasons</th>
+            <th>Status</th>
+            <th>Contact</th>
+            <th>Location</th>
+            <th>Created</th>
+            <th style="width:200px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => {
+            const mobile = (r.mobile || '').replace(/^91/, '');
+            const wa = (r.whatsapp || '').replace(/^91/, '');
+            const waLink = (wa || mobile)
+              ? `https://wa.me/91${wa || mobile}?text=${encodeURIComponent('Namaste! DukanList admin here re: your shop ' + (r.name || '') + '.')}`
+              : null;
+            return `
+              <tr>
+                <td>${riskBadge(r.risk_score || 0)}</td>
+                <td>
+                  <a class="biz-link" href="/admin/shop?id=${r.business_id}">${escapeHtml(r.name || '—')}</a>
+                  <div class="owner">${escapeHtml(r.owner_name || '—')}</div>
+                  <div class="meta">${escapeHtml(r.primary_cat || '')}</div>
+                </td>
+                <td>
+                  <div class="reasons">
+                    ${(r.reasons || []).map(re => `<span class="reason-tag r-${re}">${reasonLabel(re)}</span>`).join('')}
+                  </div>
+                </td>
+                <td><span class="status-pill s-${r.status}">${r.status}</span>${r.flagged_count > 0 ? `<div class="meta" style="color:#EF4444">⚠ ${r.flagged_count} flag(s)</div>` : ''}</td>
+                <td style="font-size:12px">
+                  <div title="Mobile">📞 ${escapeHtml(mobile || '—')}</div>
+                  ${wa && wa !== mobile ? `<div style="color:#16A34A;margin-top:2px" title="WhatsApp">💬 ${escapeHtml(wa)}</div>` : ''}
+                </td>
+                <td style="font-size:12px;color:#64748b">${escapeHtml(r.city_name || '—')}${r.pincode ? `<div class="meta">PIN ${escapeHtml(r.pincode)}</div>` : ''}</td>
+                <td style="font-size:11px;color:#64748b">${fmtDate(r.created_at)}</td>
+                <td>
+                  <div class="actions">
+                    <a class="btn btn-view" href="/admin/shop?id=${r.business_id}">🛡 View</a>
+                    ${waLink ? `<a class="btn btn-wa" href="${waLink}" target="_blank" rel="noopener">💬</a>` : ''}
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;font-size:11px;color:#94a3b8;text-align:center">
+      Showing <b>${rows.length}</b> of <b>${ALL_ROWS.length}</b> flagged shops
+    </div>
+  `;
+  box.innerHTML = html;
+}
+
+function fmtDate(iso){
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+else load();
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>

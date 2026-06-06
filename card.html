@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#0B1E3F">
+<title>Digital Business Card — DukanList</title>
+<meta name="description" content="Save this contact to your phone in one tap. Powered by DukanList.">
+<meta property="og:title" content="Digital Business Card">
+<meta property="og:description" content="Tap to save this contact to your phone.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 100%);
+    color:#0F172A; min-height:100vh; padding:24px 16px 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{ max-width:480px; margin:0 auto }
+
+  /* Top tag */
+  .top-tag{ text-align:center; margin-bottom:16px; font-size:12px; color:#64748b; letter-spacing:.1em; text-transform:uppercase; font-weight:700 }
+  .top-tag em{ color:#0F172A; font-style:normal }
+
+  /* ========== GLOSSY CARD (Apple Wallet style) ========== */
+  .card{
+    position:relative;
+    border-radius:22px;
+    padding:28px 24px 24px;
+    color:#fff;
+    box-shadow:
+      0 24px 48px -12px rgba(15,23,42,.45),
+      0 8px 18px -4px rgba(15,23,42,.20),
+      inset 0 1px 0 rgba(255,255,255,.12);
+    overflow:hidden;
+    isolation:isolate;
+    min-height:280px;
+  }
+  /* Default theme: Imperial Navy + Gold */
+  .card.theme-navy{
+    background-color:#0B1E3F;
+    background:
+      radial-gradient(120% 80% at -10% -20%, rgba(245,158,11,.18) 0%, transparent 55%),
+      radial-gradient(140% 100% at 110% 120%, rgba(30,58,138,.55) 0%, transparent 60%),
+      linear-gradient(135deg, #0B1E3F 0%, #1E3A8A 50%, #0F172A 100%);
+  }
+  .card.theme-medical{
+    background:
+      radial-gradient(120% 80% at -10% -20%, rgba(16,185,129,.25) 0%, transparent 55%),
+      linear-gradient(135deg, #ECFEFF 0%, #BAE6FD 50%, #F0F9FF 100%);
+    color:#0F172A;
+  }
+  .card.theme-medical .c-name, .card.theme-medical .c-title-line{ color:#0F172A }
+  .card.theme-medical .c-business{ color:#0369A1 }
+  .card.theme-medical .c-meta-label{ color:#64748b }
+  .card.theme-medical .c-meta-val{ color:#0F172A }
+  .card.theme-medical .c-divider{ background:rgba(15,23,42,.12) }
+  .card.theme-medical .c-brand-strip{ background:rgba(255,255,255,.6); color:#0F172A }
+
+  .card.theme-legal{
+    background-color:#18181B;
+    background:
+      radial-gradient(120% 80% at -10% -20%, rgba(217,119,6,.22) 0%, transparent 55%),
+      linear-gradient(135deg, #18181B 0%, #27272A 50%, #000 100%);
+  }
+  .card.theme-legal .c-name{ font-family:'Cinzel','Plus Jakarta Sans',serif }
+
+  .card.theme-finance{
+    background-color:#1E3A8A;
+    background:
+      radial-gradient(120% 80% at -10% -20%, rgba(255,255,255,.10) 0%, transparent 55%),
+      linear-gradient(135deg, #1E40AF 0%, #1E3A8A 50%, #312E81 100%);
+  }
+
+  .card.theme-vibrant{
+    background-color:#C2410C;
+    background:
+      radial-gradient(120% 80% at -10% -20%, rgba(251,191,36,.22) 0%, transparent 55%),
+      linear-gradient(135deg, #C2410C 0%, #FF6B1A 50%, #B91C1C 100%);
+  }
+
+  /* Subtle holographic shimmer */
+  .card::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(125deg, transparent 0%, transparent 40%, rgba(255,255,255,.08) 50%, transparent 60%, transparent 100%);
+    z-index:0;
+  }
+  .card > *{ position:relative; z-index:1 }
+
+  /* Top row: photo + verified badge */
+  .c-top{ display:flex; align-items:center; gap:14px; margin-bottom:14px }
+  .c-photo{
+    width:64px; height:64px; border-radius:50%; overflow:hidden;
+    border:2.5px solid rgba(255,255,255,.4); flex-shrink:0;
+    background:rgba(255,255,255,.1); display:grid; place-items:center;
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:24px; color:rgba(255,255,255,.85);
+    box-shadow:0 4px 12px rgba(0,0,0,.2);
+  }
+  .c-photo img{ width:100%; height:100%; object-fit:cover; display:block }
+  .c-title-block{ flex:1; min-width:0 }
+  .c-name{ font-family:'Plus Jakarta Sans',sans-serif; font-size:1.45rem; font-weight:800; letter-spacing:-.01em; line-height:1.15; word-break:break-word; color:#fff }
+  .c-title-line{ font-size:.85rem; font-weight:600; color:rgba(255,255,255,.85); margin-top:3px; line-height:1.3 }
+  .c-verified{
+    background:linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+    color:#78350F; padding:4px 9px; border-radius:5px;
+    font-size:.62rem; font-weight:900; letter-spacing:.08em;
+    box-shadow:0 2px 6px rgba(245,158,11,.4);
+    flex-shrink:0; align-self:flex-start;
+  }
+
+  /* Business line */
+  .c-business{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:1.05rem; font-weight:700;
+    color:rgba(255,255,255,.95); margin-bottom:6px;
+    letter-spacing:.01em; line-height:1.2;
+  }
+  .c-business-meta{
+    font-size:.75rem; font-weight:600; color:rgba(255,255,255,.65);
+    letter-spacing:.01em; margin-bottom:18px;
+  }
+  .c-business-meta span{ display:inline }
+  .c-business-meta span + span::before{ content:' · '; opacity:.5 }
+
+  .c-divider{
+    height:1px; background:rgba(255,255,255,.15); margin:14px 0 12px;
+  }
+
+  /* Meta rows */
+  .c-meta{ display:grid; gap:6px; font-size:.85rem; line-height:1.4 }
+  .c-meta-row{ display:flex; gap:8px; align-items:flex-start }
+  .c-meta-ico{ font-size:.92rem; opacity:.85; flex-shrink:0; width:18px; text-align:center }
+  .c-meta-val{ color:rgba(255,255,255,.92); font-weight:600; word-break:break-word; flex:1 }
+
+  /* Dynamic stat chips */
+  .c-stat-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 12px }
+  .c-stat{ display:inline-flex; align-items:center; gap:4px; padding:4px 9px; border-radius:99px; font-size:.72rem; font-weight:800; background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.18) }
+  .c-stat.rating{ background:rgba(245,158,11,.22); color:#FBBF24; border-color:rgba(245,158,11,.4) }
+  .c-stat.open  { background:rgba(16,185,129,.22); color:#6EE7B7; border-color:rgba(16,185,129,.4) }
+  .c-stat.closed{ background:rgba(239,68,68,.22); color:#FCA5A5; border-color:rgba(239,68,68,.4) }
+  .c-stat.tier-gold  { background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F; border-color:#F59E0B }
+  .c-stat.tier-silver{ background:linear-gradient(135deg,#E5E7EB,#9CA3AF); color:#1F2937; border-color:#9CA3AF }
+  .c-stat.tier-bronze{ background:linear-gradient(135deg,#FCD34D,#B45309); color:#FFFBEB; border-color:#B45309 }
+
+  /* USP tagline */
+  .c-usp{ margin:10px 0 12px; padding:8px 12px; background:rgba(255,255,255,.08); border-left:3px solid rgba(255,255,255,.4); border-radius:6px; font-size:.82rem; font-style:italic; line-height:1.5; color:rgba(255,255,255,.92) }
+
+  /* Multi-cat chips */
+  .c-cat-chips{ display:flex; flex-wrap:wrap; gap:5px; margin:8px 0 12px }
+  .c-cat-chip{ background:rgba(255,255,255,.10); color:rgba(255,255,255,.88); padding:3px 9px; border-radius:99px; font-size:.7rem; font-weight:700; border:1px solid rgba(255,255,255,.14) }
+  .c-cat-chip.primary{ background:rgba(255,255,255,.20); color:#fff; border-color:rgba(255,255,255,.35) }
+
+  /* Payment + Features */
+  .c-pay-row{ display:flex; flex-wrap:wrap; gap:5px; margin-top:10px }
+  .c-pay-chip{ background:rgba(255,255,255,.10); color:rgba(255,255,255,.85); padding:3px 8px; border-radius:6px; font-size:.7rem; font-weight:700; border:1px solid rgba(255,255,255,.14) }
+  .c-features{ margin-top:10px; display:grid; gap:3px; font-size:.78rem; line-height:1.4 }
+  .c-feature-row{ display:flex; gap:6px; color:rgba(255,255,255,.92); font-weight:600 }
+  .c-feature-ico{ color:#34D399; font-weight:900; flex-shrink:0 }
+
+  /* Social icons */
+  .c-social{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; justify-content:center }
+  .c-social a{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:#fff; text-decoration:none; transition:transform .15s; box-shadow:0 2px 6px rgba(0,0,0,.18) }
+  .c-social a:hover{ transform:translateY(-2px) }
+  .c-social a.s-fb{ background:#1877F2 } .c-social a.s-ig{ background:linear-gradient(135deg,#F58529,#DD2A7B,#8134AF,#515BD4) }
+  .c-social a.s-yt{ background:#FF0000 } .c-social a.s-x{ background:#0F0F0F }
+  .c-social a.s-li{ background:#0A66C2 } .c-social a.s-web{ background:#475569 }
+  .c-social svg{ width:18px; height:18px; fill:#fff }
+
+  /* Light theme overrides */
+  .card.theme-medical .c-stat{ background:rgba(15,23,42,.08); color:#0F172A; border-color:rgba(15,23,42,.12) }
+  .card.theme-medical .c-usp{ background:rgba(15,23,42,.06); color:#0F172A; border-left-color:#0369A1 }
+  .card.theme-medical .c-cat-chip{ background:rgba(15,23,42,.08); color:#0F172A; border-color:rgba(15,23,42,.14) }
+  .card.theme-medical .c-cat-chip.primary{ background:rgba(3,105,161,.18); color:#075985 }
+  .card.theme-medical .c-pay-chip{ background:rgba(15,23,42,.08); color:#0F172A; border-color:rgba(15,23,42,.14) }
+  .card.theme-medical .c-feature-row{ color:#0F172A } .card.theme-medical .c-feature-ico{ color:#059669 }
+
+  /* Bottom DukanList strip */
+  .c-brand-strip{
+    margin-top:16px; padding:8px 12px;
+    background:rgba(255,255,255,.08);
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; font-size:.7rem; font-weight:700; color:rgba(255,255,255,.78);
+    letter-spacing:.04em;
+  }
+  .c-brand-strip b{ color:#fff }
+  .c-brand-strip-right{ font-size:.65rem; opacity:.7 }
+
+  /* ========== ACTIONS BELOW CARD ========== */
+  .save-cta{
+    display:block; width:100%;
+    background:linear-gradient(135deg, #FF6B1A 0%, #EA580C 100%);
+    color:#fff; border:none; padding:18px 20px;
+    border-radius:14px; font-family:inherit; font-weight:800;
+    font-size:1.05rem; cursor:pointer; margin-top:22px;
+    box-shadow:0 12px 26px -8px rgba(255,107,26,.55), 0 4px 10px rgba(255,107,26,.25);
+    transition:transform .12s, box-shadow .12s;
+    letter-spacing:.01em;
+  }
+  .save-cta:hover{ transform:translateY(-2px); box-shadow:0 16px 30px -8px rgba(255,107,26,.65) }
+  .save-cta:active{ transform:translateY(0) }
+  .save-cta.success{ background:linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow:0 12px 26px -8px rgba(16,185,129,.45) }
+
+  /* Quick action chips */
+  .quick-actions{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:12px;
+  }
+  .qa{
+    background:#fff; color:#0F172A; border:1.5px solid #E2E8F0;
+    padding:13px 8px; border-radius:12px; text-decoration:none;
+    text-align:center; font-weight:700; font-size:.82rem;
+    transition:.15s; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;
+    box-shadow:0 1px 2px rgba(15,23,42,.04);
+  }
+  .qa:hover{ background:#F8FAFC; border-color:#CBD5E1; transform:translateY(-1px); box-shadow:0 4px 8px rgba(15,23,42,.06) }
+  .qa-ico{ font-size:1.3rem; line-height:1 }
+  .qa-wa{ background:#25D366; color:#fff; border-color:#25D366 }
+  .qa-wa:hover{ background:#1DA851; border-color:#1DA851 }
+
+  /* Footer */
+  .footer{
+    margin-top:30px; text-align:center; font-size:.74rem; color:#64748b;
+    line-height:1.6;
+  }
+  .footer a{ color:#1E3A8A; font-weight:700; text-decoration:none }
+  .footer .powered{ font-size:.7rem; color:#94a3b8; margin-top:6px }
+  .footer .powered b{ color:#0F172A; font-weight:800 }
+
+  /* Loading + Error */
+  .state{ text-align:center; padding:80px 20px; color:#64748b }
+  .state .ico{ font-size:2.5rem; margin-bottom:10px; opacity:.5 }
+
+  /* Toast */
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:#0F172A; color:#fff; padding:11px 18px; border-radius:10px;
+    font-size:14px; font-weight:600; z-index:1000;
+    box-shadow:0 8px 24px rgba(0,0,0,.25); opacity:0;
+    transition:opacity .2s, transform .2s;
+    pointer-events:none; max-width:90%;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px) }
+
+  @media (max-width:380px){
+    .card{ padding:24px 20px 20px; min-height:260px }
+    .c-name{ font-size:1.3rem }
+    .c-photo{ width:56px; height:56px; font-size:22px }
+    .quick-actions{ gap:8px }
+    .qa{ padding:11px 6px; font-size:.78rem }
+  }
+</style>
+
+<!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="top-tag" id="topTag">
+    <em>📇 Digital Business Card</em>
+  </div>
+
+  <div id="content">
+    <div class="state">
+      <div class="ico">⏳</div>
+      <div>Loading card…</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="powered">
+      Powered by <b>DukanList</b> · Bharat's local directory · <a href="https://dukanlist.com" target="_blank">dukanlist.com</a>
+    </div>
+    <div style="margin-top:4px;font-size:.68rem;color:#94a3b8">List your business <a href="https://dukanlist.com/register.html" target="_blank">free →</a></div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+
+// Smart name prefix based on owner_role
+function applyRolePrefix(name, role){
+  if (!name) return '';
+  var r = (role || '').toLowerCase();
+  if (r.indexOf('doctor') >= 0) return 'Dr. ' + name;
+  if (r.indexOf('chartered accountant') >= 0 || r === 'ca') return 'CA ' + name;
+  if (r.indexOf('advocate') >= 0 || r.indexOf('lawyer') >= 0) return 'Adv. ' + name;
+  if (r.indexOf('architect') >= 0) return 'Ar. ' + name;
+  if (r.indexOf('engineer') >= 0 && r.indexOf('architect') < 0) return 'Er. ' + name;
+  if (r.indexOf('pandit') >= 0 || r.indexOf('acharya') >= 0) return 'Pt. ' + name;
+  return name;
+}
+
+// Trust tier from verified_score
+function trustTier(score){
+  var s = Number(score) || 0;
+  if (s >= 5) return { label: 'GOLD' };
+  if (s >= 3) return { label: 'SILVER' };
+  if (s >= 1) return { label: 'BRONZE' };
+  return null;
+}
+
+// Open/Closed Now from hours_json
+function openStatus(hours){
+  if (!hours || typeof hours !== 'object') return null;
+  var dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+  var now = new Date();
+  var today = hours[dayKeys[now.getDay()]];
+  if (!today) return null;
+  if (today.closed) return { open: false, text: 'Closed today' };
+  var o = today.open || '', cl = today.close || '';
+  if (!o || !cl) return null;
+  function toMin(t){ var p = String(t).split(':'); return (parseInt(p[0],10)||0)*60 + (parseInt(p[1],10)||0); }
+  var nowMin = now.getHours()*60 + now.getMinutes();
+  var oMin = toMin(o), cMin = toMin(cl);
+  var isOpen = (cMin > oMin) ? (nowMin >= oMin && nowMin < cMin) : (nowMin >= oMin || nowMin < cMin);
+  function fmt(t){ var p = String(t).split(':'); var h = parseInt(p[0],10)||0, m = parseInt(p[1],10)||0; var ampm = h>=12?'PM':'AM'; var h12 = h%12||12; return h12 + (m?':'+(m<10?'0':'')+m:'') + ' ' + ampm; }
+  return { open: isOpen, text: isOpen ? ('Open · closes ' + fmt(cl)) : ('Closed · opens ' + fmt(o)) };
+}
+
+// Pick theme based on category/role
+function pickTheme(role, catName, urlTheme){
+  if (urlTheme && ['navy','medical','legal','finance','vibrant'].indexOf(urlTheme) >= 0) return urlTheme;
+  var r = (role || '').toLowerCase() + ' ' + (catName || '').toLowerCase();
+  if (/doctor|hospital|clinic|dentist|medical|pharma/.test(r)) return 'medical';
+  if (/advocate|lawyer|legal/.test(r)) return 'legal';
+  if (/chartered|tax|broker|mutual|insurance|financial|bank/.test(r)) return 'finance';
+  return 'navy';
+}
+
+// Build vCard 3.0 string
+function buildVCard(d){
+  function esc(v){ return String(v == null ? '' : v).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n'); }
+  var lines = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    'FN:' + esc(d.displayName || d.owner_name || d.business_name),
+    'N:' + esc(d.last_name || '') + ';' + esc(d.first_name || d.owner_name || '') + ';;;',
+    'ORG:' + esc(d.business_name || ''),
+    'TITLE:' + esc(d.role || ''),
+  ];
+  if (d.mobile){
+    lines.push('TEL;TYPE=CELL,VOICE:+91' + esc(d.mobile));
+  }
+  if (d.whatsapp && d.whatsapp !== d.mobile){
+    lines.push('TEL;TYPE=WORK,VOICE:+91' + esc(d.whatsapp));
+  }
+  if (d.email){
+    lines.push('EMAIL;TYPE=WORK,INTERNET:' + esc(d.email));
+  }
+  if (d.address_line1 || d.city){
+    lines.push('ADR;TYPE=WORK:;;' + esc(d.address_line1 || '') + (d.address_line2 ? ', ' + esc(d.address_line2) : '') + ';' + esc(d.city || '') + ';' + esc(d.state || '') + ';' + esc(d.pincode || '') + ';India');
+  }
+  if (d.website){
+    lines.push('URL:' + esc(d.website));
+  }
+  if (d.photo_data){
+    // photo_data is "JPEG:base64..." or "PNG:base64..."
+    var pp = d.photo_data.split(':');
+    if (pp.length === 2){
+      lines.push('PHOTO;TYPE=' + pp[0] + ';ENCODING=BASE64:' + pp[1]);
+    }
+  }
+  lines.push('NOTE:Listed on DukanList — Bharat\'s local directory · dukanlist.com');
+  lines.push('END:VCARD');
+  return lines.join('\r\n');
+}
+
+// Fetch photo URL → base64
+async function photoToBase64(url){
+  try {
+    var r = await fetch(url, { mode: 'cors' });
+    if (!r.ok) return null;
+    var blob = await r.blob();
+    if (blob.size > 500000) return null; // skip if >500KB
+    return await new Promise(function(res){
+      var rd = new FileReader();
+      rd.onload = function(){
+        var s = rd.result;
+        var comma = s.indexOf(',');
+        var type = s.indexOf('jpeg') >= 0 ? 'JPEG' : (s.indexOf('png') >= 0 ? 'PNG' : 'JPEG');
+        res(type + ':' + s.slice(comma + 1));
+      };
+      rd.onerror = function(){ res(null); };
+      rd.readAsDataURL(blob);
+    });
+  } catch(e){ return null; }
+}
+
+function downloadVCard(vcfText, filename){
+  var blob = new Blob([vcfText], { type: 'text/vcard;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = (filename || 'contact') + '.vcf';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+window.CARD_DATA = null;
+
+function render(d){
+  window.CARD_DATA = d;
+  var theme = pickTheme(d.role, d.category_name, new URLSearchParams(location.search).get('theme'));
+
+  var photoHtml = d.photo_url
+    ? '<img src="' + escapeHtml(d.photo_url) + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + (d.displayName || 'X').charAt(0).toUpperCase() + '\'">'
+    : escapeHtml((d.displayName || d.business_name || 'X').charAt(0).toUpperCase());
+
+  var metaRows = [];
+  if (d.mobile)    metaRows.push({ ico:'📞', val: '+91 ' + d.mobile });
+  if (d.whatsapp && d.whatsapp !== d.mobile) metaRows.push({ ico:'💬', val: '+91 ' + d.whatsapp + ' (WhatsApp)' });
+  if (d.email)     metaRows.push({ ico:'✉️', val: d.email });
+  if (d.website)   metaRows.push({ ico:'🌐', val: d.website.replace(/^https?:\/\//, '') });
+  var addr = [d.address_line1, d.address_line2, d.city, d.pincode].filter(Boolean).join(', ');
+  if (addr) metaRows.push({ ico:'📍', val: addr });
+
+  var bizMeta = [d.city].filter(Boolean);
+
+  // Stat chips
+  var statChips = [];
+  if (d.rating_count > 0 && d.rating_avg > 0) statChips.push('<span class="c-stat rating">★ ' + d.rating_avg.toFixed(1) + ' (' + d.rating_count + ')</span>');
+  var os = openStatus(d.hours_json);
+  if (os) statChips.push('<span class="c-stat ' + (os.open ? 'open' : 'closed') + '">' + (os.open ? '🟢' : '🔴') + ' ' + escapeHtml(os.text) + '</span>');
+  var tier = trustTier(d.verified_score);
+  if (tier) statChips.push('<span class="c-stat tier-' + tier.label.toLowerCase() + '">🏆 ' + tier.label + '</span>');
+  if (d.established_year){
+    var yrs = (new Date()).getFullYear() - Number(d.established_year);
+    if (yrs >= 0 && yrs < 200) statChips.push('<span class="c-stat">📅 Since ' + d.established_year + (yrs >= 1 ? ' · ' + yrs + ' yr' + (yrs > 1 ? 's' : '') : '') + '</span>');
+  }
+  var statRow = statChips.length ? '<div class="c-stat-row">' + statChips.join('') + '</div>' : '';
+
+  var uspHtml = d.usp_text ? '<div class="c-usp">' + escapeHtml(d.usp_text.length > 180 ? d.usp_text.slice(0,177) + '…' : d.usp_text) + '</div>' : '';
+
+  var catChips = '';
+  if (Array.isArray(d.all_categories) && d.all_categories.length){
+    catChips = '<div class="c-cat-chips">' + d.all_categories.slice(0,6).map(function(cn,i){ return '<span class="c-cat-chip' + (i===0?' primary':'') + '">' + escapeHtml(cn) + '</span>'; }).join('') + '</div>';
+  }
+
+  var payLabels = { cash:'💵 Cash', upi:'📱 UPI', cards:'💳 Cards', credit:'📒 Credit', cheque:'📝 Cheque', online:'💻 Online' };
+  var payHtml = '';
+  if (Array.isArray(d.payment_methods) && d.payment_methods.length){
+    payHtml = '<div class="c-pay-row">' + d.payment_methods.map(function(p){ return '<span class="c-pay-chip">' + (payLabels[p] || escapeHtml(p)) + '</span>'; }).join('') + '</div>';
+  }
+
+  var featHtml = '';
+  if (Array.isArray(d.special_features) && d.special_features.length){
+    featHtml = '<div class="c-features">' + d.special_features.slice(0,6).map(function(f){ return '<div class="c-feature-row"><span class="c-feature-ico">✓</span><span>' + escapeHtml(f) + '</span></div>'; }).join('') + '</div>';
+  }
+
+  var s = d.socials || {};
+  var SVG = {
+    fb:'<svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>',
+    ig:'<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.3-1.46.72-2.13 1.38C1.35 2.68.94 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.67 1.34 1.08 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.3 1.46-.71 2.13-1.38.67-.67 1.08-1.34 1.38-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.3-.79-.71-1.46-1.38-2.13-.67-.67-1.34-1.08-2.13-1.38-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 100 12.32 6.16 6.16 0 000-12.32zm0 10.16a4 4 0 110-8 4 4 0 010 8zm6.41-10.4a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z"/></svg>',
+    yt:'<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 00.5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>',
+    x:'<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.16 17.52h1.833L7.084 4.126H5.117L17.084 19.77z"/></svg>',
+    li:'<svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.23 0z"/></svg>',
+    web:'<svg viewBox="0 0 24 24"><path d="M12 0a12 12 0 100 24 12 12 0 000-24zm-1 22a10 10 0 01-7.16-3.7C5.4 17.07 7.83 17 9 17v5h-1zm-9-9c0-1.5.34-2.93.96-4.22C3.7 9.4 5 9.6 5 11v2c0 1.1.9 2 2 2v2c0 1.1.9 2 2 2v.95C4.96 19.07 2 15.79 2 13zm15.84 6.3A10 10 0 0113 22v-3a2 2 0 002-2v-2h-2a2 2 0 010-4h4a3 3 0 003-3v-.4A9.99 9.99 0 0117.84 19.3z"/></svg>'
+  };
+  var socIcons = [];
+  if (s.facebook)  socIcons.push('<a class="s-fb"  href="' + escapeHtml(s.facebook)  + '" target="_blank" rel="noopener" title="Facebook">'  + SVG.fb  + '</a>');
+  if (s.instagram) socIcons.push('<a class="s-ig"  href="' + escapeHtml(s.instagram) + '" target="_blank" rel="noopener" title="Instagram">' + SVG.ig  + '</a>');
+  if (s.youtube)   socIcons.push('<a class="s-yt"  href="' + escapeHtml(s.youtube)   + '" target="_blank" rel="noopener" title="YouTube">'   + SVG.yt  + '</a>');
+  if (s.x_twitter) socIcons.push('<a class="s-x"   href="' + escapeHtml(s.x_twitter) + '" target="_blank" rel="noopener" title="X">'         + SVG.x   + '</a>');
+  if (s.linkedin)  socIcons.push('<a class="s-li"  href="' + escapeHtml(s.linkedin)  + '" target="_blank" rel="noopener" title="LinkedIn">'  + SVG.li  + '</a>');
+  if (s.website)   socIcons.push('<a class="s-web" href="' + escapeHtml(s.website)   + '" target="_blank" rel="noopener" title="Website">'   + SVG.web + '</a>');
+  var socialHtml = socIcons.length ? '<div class="c-social">' + socIcons.join('') + '</div>' : '';
+
+  var addrFull = [d.address_line1, d.address_line2, d.city, d.pincode].filter(Boolean).join(', ');
+  var mapsUrl = addrFull ? ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((d.business_name || '') + ', ' + addrFull)) : '';
+
+  var html = ''
+    + '<div class="card theme-' + theme + '" id="bcard">'
+    +   '<div class="c-top">'
+    +     '<div class="c-photo">' + photoHtml + '</div>'
+    +     '<div class="c-title-block">'
+    +       '<div class="c-name">' + escapeHtml(d.displayName || d.business_name) + '</div>'
+    +       (d.role ? '<div class="c-title-line">' + escapeHtml(d.role) + '</div>' : '')
+    +     '</div>'
+    +     (d.verified ? '<span class="c-verified">✓ VERIFIED</span>' : '')
+    +   '</div>'
+    +   '<div class="c-business">' + escapeHtml(d.business_name) + '</div>'
+    +   (bizMeta.length ? '<div class="c-business-meta">' + bizMeta.map(function(x){ return '<span>' + escapeHtml(x) + '</span>'; }).join('') + '</div>' : '')
+    +   statRow
+    +   uspHtml
+    +   catChips
+    +   '<div class="c-divider"></div>'
+    +   '<div class="c-meta">'
+    +     metaRows.map(function(r){ return '<div class="c-meta-row"><span class="c-meta-ico">' + r.ico + '</span><span class="c-meta-val">' + escapeHtml(r.val) + '</span></div>'; }).join('')
+    +   '</div>'
+    +   payHtml
+    +   featHtml
+    +   socialHtml
+    +   '<div class="c-brand-strip">'
+    +     '<span><b>DukanList</b> Verified Local Establishment</span>'
+    +     '<span class="c-brand-strip-right">dukanlist.com</span>'
+    +   '</div>'
+    + '</div>'
+    + '<button class="save-cta" id="saveBtn" onclick="saveContact()">'
+    +   '📥 Save ' + escapeHtml((d.displayName || d.business_name).split(/\s+/).slice(0,2).join(' ')) + ' to my Contacts'
+    + '</button>'
+    + '<div class="quick-actions" style="grid-template-columns:repeat(' + (mapsUrl ? 4 : 3) + ', 1fr)">'
+    + (d.mobile ? '<a class="qa" href="tel:+91' + escapeHtml(d.mobile) + '"><span class="qa-ico">📞</span>Call</a>' : '<span></span>')
+    + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + escapeHtml(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
+    + (mapsUrl ? '<a class="qa" href="' + escapeHtml(mapsUrl) + '" target="_blank"><span class="qa-ico">📍</span>Directions</a>' : '')
+    + '<a class="qa" href="' + escapeHtml('/business.html?slug=' + encodeURIComponent(d.slug || '')) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
+    + '</div>';
+
+  document.getElementById('content').innerHTML = html;
+}
+
+async function saveContact(){
+  var d = window.CARD_DATA;
+  if (!d){ toast('Card not loaded yet'); return; }
+  var btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ Preparing contact…';
+  // Try to embed photo (best-effort, doesn't block)
+  if (d.photo_url && !d.photo_data){
+    try { d.photo_data = await photoToBase64(d.photo_url); } catch(_){}
+  }
+  var vcf = buildVCard(d);
+  var safeName = (d.displayName || d.business_name || 'contact').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,40);
+  downloadVCard(vcf, safeName);
+  btn.className = 'save-cta success';
+  btn.textContent = '✓ Saved! Check your contacts';
+  toast('Contact downloaded — phone will prompt to save');
+  setTimeout(function(){
+    btn.className = 'save-cta';
+    btn.textContent = '📥 Save again';
+  }, 4000);
+}
+
+async function loadCard(){
+  var qs = new URLSearchParams(location.search);
+  var slug = qs.get('slug') || qs.get('s');
+  var id   = qs.get('id');
+  if (!slug && !id){
+    document.getElementById('content').innerHTML = '<div class="state"><div class="ico">❌</div><div>No card specified.<br><small>Open via your DukanList listing link.</small></div></div>';
+    return;
+  }
+  var c = ShopDB.client;
+  // Use minimal query (no FK joins) to avoid 400 errors from
+  // ambiguous category FK on businesses table. Fetch category
+  // separately if needed (faster + safer pattern, same as dashboard).
+  // Pull all card data in one query. No FK joins (avoids 400 ambiguity).
+  var query = c.from('businesses')
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, geo_cities(name)');
+  if (slug) query = query.eq('slug', slug);
+  else      query = query.eq('id', id);
+
+  var r = await query.maybeSingle();
+  if (r.error || !r.data){
+    document.getElementById('content').innerHTML = '<div class="state"><div class="ico">⚠️</div><div>Could not load this card.<br><small>The listing may have been removed.</small></div></div>';
+    return;
+  }
+  var b = r.data;
+  if (b.status !== 'active'){
+    document.getElementById('content').innerHTML = '<div class="state"><div class="ico">⏳</div><div>This card is not active yet.<br><small>The business is pending verification.</small></div></div>';
+    return;
+  }
+
+  // Fetch primary category name (avoids FK ambiguity)
+  var catName = '';
+  var primaryCatId = b.sub_category_id || b.category_id;
+  if (primaryCatId){
+    try {
+      var catRes = await c.from('categories').select('name').eq('id', primaryCatId).maybeSingle();
+      if (catRes && catRes.data) catName = catRes.data.name;
+    } catch(_){}
+  }
+
+  // Fetch ALL categories for multi-cat chips (best-effort)
+  var allCats = catName ? [catName] : [];
+  try {
+    var mcRes = await c.rpc('get_business_categories', { p_business_id: b.id });
+    if (mcRes && mcRes.data && mcRes.data.length){
+      mcRes.data.sort(function(x, y){ return (y.is_primary ? 1 : 0) - (x.is_primary ? 1 : 0); });
+      allCats = mcRes.data.map(function(x){ return x.name; }).filter(Boolean);
+    }
+  } catch(_){}
+
+  // Build display data
+  var firstPhoto = Array.isArray(b.photos) && b.photos.length ? b.photos[0] : null;
+  var displayName = applyRolePrefix(b.owner_name, b.owner_role);
+  var nameParts = (b.owner_name || '').trim().split(/\s+/);
+  var firstName = nameParts[0] || '';
+  var lastName  = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+  var data = {
+    slug:          b.slug,
+    business_id:   b.id,
+    displayName:   displayName || b.name,
+    owner_name:    b.owner_name,
+    first_name:    firstName,
+    last_name:     lastName,
+    role:          b.owner_role || '',
+    business_name: b.name,
+    category_name: catName,
+    mobile:        b.mobile,
+    whatsapp:      b.whatsapp,
+    email:         b.email,
+    address_line1: b.address_line1,
+    address_line2: b.address_line2,
+    city:          b.geo_cities ? b.geo_cities.name : '',
+    pincode:       b.pincode,
+    photo_url:     firstPhoto,
+    website:       'https://dukanlist.com/' + b.slug,
+    verified:      (b.verified_score || 0) >= 3,
+    verified_score: b.verified_score || 0,
+    rating_avg:    Number(b.rating_avg) || 0,
+    rating_count:  Number(b.rating_count) || 0,
+    hours_json:    b.hours_json || null,
+    established_year: b.established_year || null,
+    usp_text:      (b.usp_text || '').toString().trim(),
+    all_categories: allCats,
+    payment_methods: Array.isArray(b.payment_methods) ? b.payment_methods : [],
+    special_features: Array.isArray(b.special_features) ? b.special_features : [],
+    socials: {
+      facebook:  b.facebook_url   || '',
+      instagram: b.instagram_url  || '',
+      youtube:   b.youtube_url    || '',
+      x_twitter: b.x_twitter_url  || '',
+      linkedin:  b.linkedin_url   || '',
+      website:   b.website_url    || ''
+    }
+  };
+
+  // Page title + meta
+  document.title = (data.displayName || data.business_name) + ' · Digital Business Card';
+  var topTag = document.getElementById('topTag');
+  if (topTag) topTag.innerHTML = '<em>📇 ' + escapeHtml(data.business_name) + '</em> · Digital Card';
+
+  render(data);
+}
+
+loadCard();
+</script>
+
+<

@@ -1,0 +1,332 @@
+/* ============================================================
+   public-premium.css
+   Premium "JustDial+MMT-class" polish layer for ALL public pages.
+   Loaded AFTER main.css so its rules win where they overlap.
+   Pure visual overlay — does NOT change layout, IDs, classes,
+   or JS behaviour. Safe to delete this file to roll back globally.
+   ============================================================
+   Brand vocabulary (inherits from main.css):
+     --saffron : #FF6B1A   (primary accent, CTAs)
+     --indigo  : #1E3A8A   (deep brand, trust)
+     --emerald : #059669   (success, verified)
+     --ink     : #0B1220   (body)
+
+   Design intent: warm-premium. Not banking-cold like admin.
+   Trust + speed + "real local business" feel.
+   ============================================================ */
+
+:root{
+  --pp-bg-soft:        #FAFBFD;
+  --pp-line:           #E6E9EE;
+  --pp-line-strong:    #D7DCE4;
+  --pp-ink-strong:     #0F1729;
+  --pp-ink-mute:       #6B7385;
+  --pp-saffron-deep:   #C24A0A;
+  --pp-gold:           #B07A2A;
+  --pp-shadow-sm:      0 1px 2px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.04);
+  --pp-shadow-md:      0 6px 18px rgba(15,23,42,.06), 0 3px 6px rgba(15,23,42,.04);
+  --pp-shadow-lg:      0 18px 44px rgba(15,23,42,.10), 0 6px 14px rgba(15,23,42,.05);
+  --pp-shadow-warm:    0 8px 24px rgba(255,107,26,.18);
+}
+
+/* Premium tabular numerics across data-heavy elements */
+body{
+  font-feature-settings: "kern" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.shop-card .rating, .shop-card .stars,
+.kpi .value, .stats .num, .counter,
+[data-numeric]{
+  font-feature-settings: "tnum" 1, "kern" 1 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* ===== Generic card refinements =====
+   NOTE: .card removed from selectors — too generic, was overriding
+   the Digital Business Card's dark gradient theme (card.html uses .card).
+   Use .shop-card, .biz-card etc which are specific to listing cards. */
+.shop-card,
+.biz-card,
+.feature-card,
+.deal-card,
+.review-card{
+  border-radius: 14px !important;
+  border: 1px solid var(--pp-line) !important;
+  background: #FFFFFF !important;
+  box-shadow: var(--pp-shadow-sm) !important;
+  transition: transform .18s cubic-bezier(.22,.61,.36,1),
+              box-shadow .22s cubic-bezier(.22,.61,.36,1),
+              border-color .15s ease !important;
+}
+.shop-card:hover,
+.biz-card:hover,
+.feature-card:hover,
+.deal-card:hover{
+  transform: translateY(-2px) !important;
+  box-shadow: var(--pp-shadow-md) !important;
+  border-color: var(--pp-line-strong) !important;
+}
+
+/* ===== Primary CTA buttons — premium saffron with depth ===== */
+.btn-primary,
+button.primary,
+.cta-primary,
+a.btn-primary{
+  background: linear-gradient(180deg, #FF7B2E 0%, #FF6B1A 60%, #E55100 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(0,0,0,.06) !important;
+  box-shadow: var(--pp-shadow-warm),
+              inset 0 1px 0 rgba(255,255,255,.25) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.005em !important;
+  transition: transform .12s ease, box-shadow .18s ease, filter .15s ease !important;
+}
+.btn-primary:hover,
+button.primary:hover,
+.cta-primary:hover,
+a.btn-primary:hover{
+  transform: translateY(-1px) !important;
+  box-shadow: 0 12px 28px rgba(255,107,26,.28),
+              inset 0 1px 0 rgba(255,255,255,.28) !important;
+  filter: brightness(1.02);
+}
+.btn-primary:active,
+button.primary:active,
+.cta-primary:active{
+  transform: translateY(0) !important;
+  filter: brightness(.97);
+}
+
+/* Secondary button refinement */
+.btn-secondary,
+button.secondary{
+  background: #FFFFFF !important;
+  color: var(--indigo, #1E3A8A) !important;
+  border: 1.5px solid var(--pp-line-strong) !important;
+  font-weight: 600 !important;
+  box-shadow: var(--pp-shadow-sm) !important;
+  transition: all .15s ease !important;
+}
+.btn-secondary:hover,
+button.secondary:hover{
+  border-color: var(--indigo, #1E3A8A) !important;
+  color: var(--indigo, #1E3A8A) !important;
+  background: #F4F6FB !important;
+}
+
+/* ===== WhatsApp button — keep distinctive green ===== */
+.wa-btn, .whatsapp-btn, a[href*="wa.me"].btn{
+  background: linear-gradient(180deg, #25D366 0%, #128C7E 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  box-shadow: 0 6px 16px rgba(37,211,102,.28),
+              inset 0 1px 0 rgba(255,255,255,.2) !important;
+}
+
+/* ===== Verified / Featured badges — premium gloss ===== */
+.badge-verified, .verified-badge, [class*="verified"].badge{
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  box-shadow: 0 2px 8px rgba(5,150,105,.22),
+              inset 0 0 0 1px rgba(255,255,255,.15) !important;
+}
+.badge-featured, .featured-badge, .ribbon-featured{
+  background: linear-gradient(135deg, #B07A2A 0%, #C2A05A 50%, #8C6A1F 100%) !important;
+  color: #FFF8E6 !important;
+  font-weight: 800 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 2px 8px rgba(176,122,42,.30),
+              inset 0 0 0 1px rgba(255,255,255,.18) !important;
+}
+
+/* ===== Headings — tighter letter-spacing for premium feel =====
+   NOTE: NO color override here — pages have their own headings on
+   varying backgrounds (light AND dark sections like .cta-strip).
+   Forcing dark navy via !important made white-on-dark headings
+   invisible. Only letter-spacing is safe to apply universally.
+*/
+h1, h2, h3,
+.page-title, .section-title, .hero-title{
+  letter-spacing: -.022em !important;
+}
+h1, .hero-title{ letter-spacing: -.028em !important; }
+/* Explicit dark colour only for class-scoped page titles where it's safe */
+.page-title, .section-title{ color: var(--pp-ink-strong) !important; }
+
+/* ===== Stars and rating — crisper amber ===== */
+.stars, .rating-stars{
+  color: #F59E0B !important;
+  letter-spacing: 1px !important;
+}
+
+/* ===== Search box / input refinement ===== */
+.search-box, .hero-search, input.search,
+input[type="search"], input[type="text"].search-input{
+  border-radius: 12px !important;
+  border: 1.5px solid var(--pp-line) !important;
+  background: #FFFFFF !important;
+  box-shadow: var(--pp-shadow-sm) !important;
+  transition: all .18s ease !important;
+}
+.search-box:focus-within, .hero-search:focus-within,
+input.search:focus, input[type="search"]:focus,
+input[type="text"].search-input:focus{
+  border-color: var(--saffron, #FF6B1A) !important;
+  box-shadow: 0 0 0 4px rgba(255,107,26,.12), var(--pp-shadow-md) !important;
+  outline: none !important;
+}
+
+/* ===== Photo gallery / image polish ===== */
+.shop-photo, .biz-photo, .gallery img,
+.shop-card img, .biz-card img{
+  border-radius: 10px !important;
+  background: var(--pp-bg-soft);
+}
+
+/* ===== Trust strip / Open Since / Year badges ===== */
+.trust-strip, .since-badge, .year-badge{
+  border-radius: 10px !important;
+  border: 1px solid var(--pp-line) !important;
+  background: linear-gradient(135deg, #FBF5E2 0%, #F5EBD5 100%) !important;
+  color: #5A4216 !important;
+  font-weight: 600 !important;
+  box-shadow: var(--pp-shadow-sm) !important;
+}
+
+/* ===== Filter chips — refined pill ===== */
+.chip, .filter-chip, .cat-chip{
+  border-radius: 99px !important;
+  border: 1.2px solid var(--pp-line-strong) !important;
+  background: #FFFFFF !important;
+  color: var(--pp-ink-strong) !important;
+  font-weight: 600 !important;
+  transition: all .15s ease !important;
+}
+.chip:hover, .filter-chip:hover, .cat-chip:hover{
+  border-color: var(--saffron, #FF6B1A) !important;
+  background: #FFF7F0 !important;
+  color: var(--pp-saffron-deep) !important;
+}
+.chip.active, .filter-chip.active, .cat-chip.active,
+.chip[data-active="true"]{
+  background: linear-gradient(180deg, var(--saffron, #FF6B1A) 0%, var(--pp-saffron-deep) 100%) !important;
+  border-color: var(--pp-saffron-deep) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 3px 10px rgba(255,107,26,.25) !important;
+}
+
+/* ===== Header / nav refinement ===== */
+.topbar, header.site-header, .navbar{
+  box-shadow: var(--pp-shadow-sm) !important;
+  border-bottom: 1px solid var(--pp-line) !important;
+  backdrop-filter: saturate(1.05) blur(6px);
+  -webkit-backdrop-filter: saturate(1.05) blur(6px);
+}
+
+/* ===== Footer =====
+   NOTE: Removed background + border-top override. Pages like
+   index.html ship a dark <footer> with white text via main.css
+   (background:var(--ink)). A light override here made the text
+   invisible. Footers now keep their own page-defined styling.
+*/
+
+/* ===== Toast / snackbar / alerts ===== */
+.toast, .snackbar, .alert{
+  border-radius: 12px !important;
+  box-shadow: var(--pp-shadow-lg) !important;
+  border: 1px solid var(--pp-line) !important;
+}
+
+/* ===== Modals — softer, more premium ===== */
+.modal-card, .modal-content, [role="dialog"] > div{
+  border-radius: 16px !important;
+  border: 1px solid var(--pp-line) !important;
+  box-shadow: var(--pp-shadow-lg) !important;
+}
+.modal-backdrop, .overlay{
+  background: rgba(15,23,41,.55) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* ===== Scrollbar — site-wide thin elegant ===== */
+::-webkit-scrollbar{ width: 10px; height: 10px; }
+::-webkit-scrollbar-track{ background: var(--pp-bg-soft); }
+::-webkit-scrollbar-thumb{
+  background: #C5CCD9;
+  border-radius: 99px;
+  border: 2px solid var(--pp-bg-soft);
+}
+::-webkit-scrollbar-thumb:hover{ background: #A1AAB8; }
+
+/* ===== Selection color — brand-tinted ===== */
+::selection{
+  background: rgba(255,107,26,.22);
+  color: var(--pp-ink-strong);
+}
+
+/* ===== Loading skeleton refinement ===== */
+.skeleton, .loading-shimmer{
+  background: linear-gradient(90deg, #F1F4F9 0%, #F8FAFD 50%, #F1F4F9 100%) !important;
+  background-size: 200% 100% !important;
+  border-radius: 8px !important;
+}
+
+/* ===== Mobile-specific polish (don't go heavy) ===== */
+@media (max-width: 640px){
+  .card, .shop-card, .biz-card{
+    border-radius: 12px !important;
+  }
+  .btn-primary, button.primary, .cta-primary{
+    box-shadow: 0 4px 12px rgba(255,107,26,.20) !important;
+  }
+}
+
+/* ===== Accessibility — better focus rings ===== */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline: 3px solid rgba(255,107,26,.40) !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================================
+   MOBILE PWA — Lock horizontal pan / float
+   ----------------------------------------------------------------
+   USER REPORT (2026-06-05):
+     "Apni app PWA mobile screen par touch karne par float kar
+      rahi hai" — touching/swiping the page would let it drag
+     horizontally exposing background.
+
+   ROOT CAUSE:
+     html/body in main.css have no overflow-x lock. Any element
+     even 1px wider than viewport (long URL, sticky strip, embed,
+     shadow with negative margin) makes the WHOLE page horizontally
+     pannable. PWA standalone mode amplifies this — no browser
+     chrome to "snap back".
+
+   FIX (no layout impact — purely behaviour):
+     - overflow-x:hidden + max-width:100% on html/body
+     - overscroll-behavior-x:none → no rubber-band swipe gestures
+     - touch-action:pan-y → allow vertical scroll, block horizontal
+       drag at the touch-event level (PWA-aware)
+   ============================================================ */
+html, body{
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+/* Defensive: any top-level wrapper wider than viewport gets clipped */
+body > *{
+  max-width: 100vw;
+}
+
+/* ============================================================
+   END public-premium.css
+   ============================================================ */

@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#7C3AED">
+<title>Pucho Bhai — Ask Your City | dukanlist.com</title>
+<meta name="description" content="Pucho Bhai — your city's community Q&A board. Ask about local listings, services, recommendations — get answers from locals. Mandi Dabwali, Sirsa, Bathinda, Mansa, Muktsar &amp; sub-towns.">
+<link rel="canonical" href="https://dukanlist.com/pucho-bhai.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dukanlist.com/pucho-bhai.html">
+<meta property="og:title" content="Pucho Bhai — Community Q&A on dukanlist.com">
+<meta property="og:description" content="Ask anything about your city and get answers from real locals — best shops, services and recommendations.">
+<meta property="og:image" content="https://dukanlist.com/assets/icons/icon-512.png">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260531">
+<style>
+body { font-family:'Plus Jakarta Sans','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#F8FAFC; color:#0F172A; margin:0 }
+html[data-lang="hi"] body { font-family:'Noto Sans Devanagari','Plus Jakarta Sans',sans-serif }
+
+/* ===== Pucho Bhai theme palette (purple-pink gradient) ===== */
+:root {
+  --pb-primary: #7C3AED;       /* violet-600 */
+  --pb-primary-d: #6D28D9;
+  --pb-accent: #EC4899;        /* pink-500 */
+  --pb-tint: #F5F3FF;          /* violet-50 */
+  --pb-tint-d: #EDE9FE;
+  --pb-ink: #0F172A;
+  --pb-ink-2: #475569;
+  --pb-muted: #94A3B8;
+  --pb-border: #E2E8F0;
+}
+
+/* ===== Hero ===== */
+.pb-hero {
+  background:linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  color:#fff;
+  padding:36px 20px 70px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.pb-hero::before {
+  content:""; position:absolute; inset:0;
+  background-image:radial-gradient(circle at 20% 30%, rgba(255,255,255,.12), transparent 40%),
+                   radial-gradient(circle at 80% 70%, rgba(255,255,255,.08), transparent 45%);
+  pointer-events:none;
+}
+.pb-hero-inner { max-width:760px; margin:0 auto; position:relative; z-index:1 }
+.pb-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.18); backdrop-filter:blur(8px);
+  padding:6px 14px; border-radius:99px;
+  font-size:.74rem; font-weight:700; letter-spacing:.04em;
+  border:1px solid rgba(255,255,255,.25);
+  margin-bottom:14px;
+}
+.pb-hero h1 {
+  font-family:'Manrope',sans-serif;
+  font-size:clamp(1.85rem, 5vw, 2.6rem);
+  font-weight:800; line-height:1.1; letter-spacing:-.02em;
+  margin:0 0 10px;
+}
+html[data-lang="hi"] .pb-hero h1 { font-family:'Noto Sans Devanagari',sans-serif }
+.pb-hero p {
+  font-size:1rem; opacity:.95; max-width:540px; margin:0 auto 22px; line-height:1.5;
+}
+.pb-hero-cta {
+  display:inline-flex; align-items:center; gap:8px;
+  background:#fff; color:var(--pb-primary-d);
+  padding:13px 26px; border-radius:99px;
+  font-weight:800; font-size:1rem;
+  text-decoration:none;
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  transition:transform .15s, box-shadow .15s;
+  border:none; cursor:pointer;
+}
+.pb-hero-cta:hover { transform:translateY(-2px); box-shadow:0 16px 36px rgba(0,0,0,.22) }
+.pb-hero-stats {
+  display:flex; gap:22px; justify-content:center; margin-top:22px;
+  font-size:.82rem; opacity:.92; flex-wrap:wrap;
+}
+.pb-hero-stats b { display:block; font-size:1.4rem; font-weight:800; letter-spacing:-.02em; line-height:1 }
+
+/* ===== Main container ===== */
+.pb-wrap { max-width:980px; margin:-40px auto 60px; padding:0 16px; position:relative; z-index:2 }
+
+/* ===== City tabs ===== */
+.pb-city-card {
+  background:#fff; border-radius:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.04);
+  padding:14px 16px;
+  margin-bottom:18px;
+}
+.pb-city-label {
+  font-size:.74rem; font-weight:800; color:var(--pb-muted);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin-bottom:8px; display:flex; align-items:center; gap:6px;
+}
+.pb-city-tabs {
+  display:flex; gap:7px; overflow-x:auto; padding:2px 0; margin:0 -4px;
+  scrollbar-width:none;
+}
+.pb-city-tabs::-webkit-scrollbar { display:none }
+.pb-city-tab {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 14px; background:#F1F5F9; border:1.5px solid transparent;
+  border-radius:99px; font-size:.83rem; font-weight:700;
+  color:var(--pb-ink-2); cursor:pointer; transition:all .15s;
+  white-space:nowrap; flex-shrink:0; font-family:inherit;
+}
+.pb-city-tab:hover { background:var(--pb-tint); color:var(--pb-primary-d) }
+.pb-city-tab.active {
+  background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
+  color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.30);
+}
+.pb-city-tab .count { font-size:.7rem; opacity:.8; font-weight:600 }
+.pb-city-tab mark { background:#FEF3C7; color:#92400E; padding:0 2px; border-radius:3px; font-weight:800 }
+.pb-city-tab.active { animation: pillPulse .4s ease-out }
+
+/* ===== Animations ===== */
+@keyframes pillPulse {
+  0%   { transform:scale(1);     box-shadow:0 0 0 0 rgba(124,58,237,.45) }
+  50%  { transform:scale(1.06);  box-shadow:0 0 0 8px rgba(124,58,237,0) }
+  100% { transform:scale(1);     box-shadow:0 4px 12px rgba(124,58,237,.30) }
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px) }
+  to   { opacity:1; transform:translateY(0) }
+}
+
+@keyframes fadeIn {
+  from { opacity:0 } to { opacity:1 }
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(40px) scale(.96) }
+  to   { opacity:1; transform:translateY(0) scale(1) }
+}
+
+@keyframes heroShine {
+  0%, 100% { background-position: 0% 50% }
+  50%      { background-position: 100% 50% }
+}
+
+@keyframes ctaWiggle {
+  0%, 100% { transform: translateY(0) }
+  50%      { transform: translateY(-3px) }
+}
+
+/* Hero entrance stagger */
+.pb-hero { background-size:200% 200%; animation: heroShine 14s ease-in-out infinite }
+.pb-badge      { animation: fadeUp .55s ease-out .05s both }
+.pb-hero h1    { animation: fadeUp .65s ease-out .15s both }
+.pb-hero p     { animation: fadeUp .65s ease-out .25s both }
+.pb-hero-cta   { animation: fadeUp .65s ease-out .35s both, ctaWiggle 2.4s ease-in-out 1.5s infinite }
+.pb-hero-stats { animation: fadeUp .65s ease-out .45s both }
+
+/* Question cards fade-in stagger */
+.pb-q-card { animation: fadeUp .4s ease-out both }
+.pb-q-card:nth-child(1) { animation-delay:.02s }
+.pb-q-card:nth-child(2) { animation-delay:.06s }
+.pb-q-card:nth-child(3) { animation-delay:.10s }
+.pb-q-card:nth-child(4) { animation-delay:.14s }
+.pb-q-card:nth-child(5) { animation-delay:.18s }
+.pb-q-card:nth-child(6) { animation-delay:.22s }
+.pb-q-card:nth-child(n+7) { animation-delay:.26s }
+
+/* Modal slide-up */
+.pb-modal.active .pb-modal-card { animation: slideUp .35s cubic-bezier(.22,.61,.36,1) both }
+
+/* Submit success pulse — applied via JS */
+.pb-ok.shown { animation: fadeUp .35s ease-out both }
+
+/* Counter target — used by JS animateCount() */
+.hero-stat-anim { display:inline-block }
+
+/* ===== City search + dropdown row ===== */
+.pb-city-search-row {
+  display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;
+}
+.pb-search-wrap { position:relative; flex:1; min-width:180px }
+.pb-search-icon {
+  position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  pointer-events:none; font-size:.95rem; opacity:.7;
+}
+.pb-search-wrap input {
+  width:100%; padding:10px 36px 10px 34px;
+  border:1.5px solid var(--pb-border); border-radius:11px;
+  font-size:.92rem; font-family:inherit; background:#fff; color:var(--pb-ink);
+  transition:border .15s, box-shadow .15s; box-sizing:border-box;
+}
+.pb-search-wrap input::placeholder { color:#94A3B8 }
+.pb-search-wrap input:focus {
+  outline:none; border-color:var(--pb-primary);
+  box-shadow:0 0 0 3px rgba(124,58,237,.12);
+}
+.pb-clear-btn {
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  background:#F1F5F9; border:none; width:22px; height:22px;
+  border-radius:50%; cursor:pointer; font-size:1rem; line-height:1;
+  color:#64748b; display:grid; place-items:center; padding:0;
+}
+.pb-clear-btn:hover { background:#E2E8F0; color:var(--pb-ink) }
+#cityDropdown {
+  padding:10px 12px; border:1.5px solid var(--pb-border);
+  border-radius:11px; background:#fff; font-size:.92rem;
+  font-family:inherit; cursor:pointer; min-width:170px; color:var(--pb-ink);
+  transition:border .15s;
+}
+#cityDropdown:focus { outline:none; border-color:var(--pb-primary); box-shadow:0 0 0 3px rgba(124,58,237,.12) }
+#cityNoMatch {
+  display:none; padding:8px 12px; margin-top:6px;
+  background:#FEF3C7; color:#92400E; border-radius:9px;
+  font-size:.82rem; font-weight:600; text-align:center;
+}
+@media (max-width:480px){
+  .pb-city-search-row { gap:6px }
+  #cityDropdown { width:100%; min-width:0 }
+  .pb-search-wrap { min-width:100% }
+}
+
+/* ===== Question list ===== */
+.pb-list {
+  display:flex; flex-direction:column; gap:12px;
+}
+.pb-q-card {
+  background:#fff; border-radius:16px;
+  box-shadow:0 1px 3px rgba(15,23,42,.04), 0 0 0 1px rgba(15,23,42,.04);
+  padding:16px 18px;
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.pb-q-card:hover {
+  transform:translateY(-1px);
+  box-shadow:0 12px 28px rgba(15,23,42,.08), 0 0 0 1px var(--pb-primary);
+}
+.pb-q-meta {
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  font-size:.7rem; color:var(--pb-muted); font-weight:600;
+  margin-bottom:7px;
+}
+.pb-q-meta .pb-pill {
+  padding:2px 8px; border-radius:99px;
+  background:var(--pb-tint); color:var(--pb-primary-d); font-weight:700;
+  font-size:.68rem; letter-spacing:.02em;
+}
+.pb-q-meta .pb-pill.cat { background:#FFF7ED; color:#C2410C }
+.pb-q-text {
+  font-size:1rem; font-weight:700; color:var(--pb-ink);
+  line-height:1.4; letter-spacing:-.005em;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.pb-q-foot {
+  display:flex; align-items:center; gap:14px; margin-top:10px;
+  font-size:.78rem; color:var(--pb-ink-2); font-weight:600;
+}
+.pb-q-foot span { display:inline-flex; align-items:center; gap:5px }
+.pb-q-foot .ans-yes {
+  background:#DCFCE7; color:#15803D;
+  padding:3px 9px; border-radius:99px; font-weight:700; font-size:.72rem;
+}
+.pb-q-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  padding:2px 8px; border-radius:99px;
+  font-size:.65rem; font-weight:800; letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.pb-q-badge.pin     { background:#FEF3C7; color:#92400E }
+.pb-q-badge.solved  { background:#D1FAE5; color:#065F46 }
+.pb-q-badge.best    { background:linear-gradient(135deg,#FDE68A,#F59E0B); color:#78350F; box-shadow:0 4px 10px rgba(245,158,11,.25) }
+.pb-reply.best-reply {
+  background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+  border:1.5px solid #F59E0B;
+  position:relative;
+}
+.pb-reply.best-reply::before {
+  content:'🏆 BEST ANSWER';
+  position:absolute; top:-10px; left:12px;
+  background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff;
+  padding:3px 10px; border-radius:99px;
+  font-size:.62rem; font-weight:800; letter-spacing:.06em;
+  box-shadow:0 4px 10px rgba(245,158,11,.35);
+}
+.pb-q-card.pinned {
+  border-left:3px solid #F59E0B;
+  background:linear-gradient(135deg,#FFFBEB 0%,#fff 30%);
+}
+.pb-q-foot .ans-no {
+  color:var(--pb-accent); font-weight:700;
+}
+
+/* ===== Empty state ===== */
+.pb-empty {
+  background:#fff; border-radius:16px;
+  padding:42px 24px; text-align:center;
+  box-shadow:0 1px 3px rgba(15,23,42,.04);
+}
+.pb-empty .e-icon { font-size:3rem; margin-bottom:10px }
+.pb-empty h3 { font-size:1.2rem; font-weight:800; margin:0 0 6px; color:var(--pb-ink) }
+.pb-empty p { font-size:.92rem; color:var(--pb-ink-2); margin:0 0 18px }
+
+/* ===== Leaderboard ===== */
+.pb-side {
+  background:#fff; border-radius:18px;
+  padding:16px 18px;
+  box-shadow:0 1px 3px rgba(15,23,42,.04);
+  margin-bottom:18px;
+}
+.pb-side h3 {
+  font-size:.92rem; font-weight:800; margin:0 0 10px;
+  display:flex; align-items:center; gap:7px; color:var(--pb-ink);
+}
+.pb-lb-row {
+  display:flex; align-items:center; gap:10px;
+  padding:7px 0; border-bottom:1px solid #F1F5F9;
+  font-size:.86rem;
+}
+.pb-lb-row:last-child { border-bottom:none }
+.pb-lb-rank {
+  width:24px; height:24px; flex-shrink:0;
+  background:#F1F5F9; color:var(--pb-ink-2);
+  border-radius:50%; display:grid; place-items:center;
+  font-size:.74rem; font-weight:800;
+}
+.pb-lb-row.top1 .pb-lb-rank { background:#FEF3C7; color:#92400E }
+.pb-lb-row.top2 .pb-lb-rank { background:#E0E7FF; color:#3730A3 }
+.pb-lb-row.top3 .pb-lb-rank { background:#FCE7F3; color:#9D174D }
+.pb-lb-name { flex:1; font-weight:700; color:var(--pb-ink) }
+.pb-lb-count { font-weight:700; color:var(--pb-primary-d); font-size:.78rem }
+.pb-lb-recent { font-size:.66rem; color:var(--pb-accent); font-weight:700; margin-left:4px }
+
+/* ===== Grid for desktop ===== */
+@media (min-width:880px) {
+  .pb-grid { display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:start }
+}
+
+/* ===== Modal ===== */
+.pb-modal {
+  position:fixed; inset:0; background:rgba(15,23,42,.65);
+  backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center;
+  z-index:200; padding:16px;
+}
+.pb-modal.active { display:flex }
+.pb-modal-card {
+  background:#fff; border-radius:20px;
+  max-width:560px; width:100%;
+  max-height:92vh; overflow-y:auto;
+  padding:22px;
+  box-shadow:0 32px 70px rgba(0,0,0,.30);
+  position:relative;
+}
+.pb-modal-close {
+  position:absolute; top:12px; right:14px;
+  width:34px; height:34px; border-radius:50%;
+  background:#F1F5F9; border:none; cursor:pointer;
+  font-size:1.2rem; color:var(--pb-ink-2);
+  display:grid; place-items:center;
+}
+.pb-modal-card h2 {
+  font-family:'Manrope',sans-serif;
+  font-size:1.3rem; font-weight:800; margin:0 0 6px;
+  letter-spacing:-.01em;
+  background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.pb-modal-card .sub { font-size:.86rem; color:var(--pb-ink-2); margin:0 0 16px }
+.pb-field { margin-bottom:12px }
+.pb-field label {
+  display:block; font-size:.78rem; font-weight:700;
+  color:var(--pb-ink-2); margin-bottom:5px;
+}
+.pb-field input, .pb-field select, .pb-field textarea {
+  width:100%; padding:11px 13px; border:1.5px solid var(--pb-border);
+  border-radius:11px; font-size:.95rem; font-family:inherit;
+  background:#fff; color:var(--pb-ink); transition:border .15s;
+  box-sizing:border-box;
+}
+.pb-field input:focus, .pb-field select:focus, .pb-field textarea:focus {
+  outline:none; border-color:var(--pb-primary);
+  box-shadow:0 0 0 3px rgba(124,58,237,.12);
+}
+.pb-field textarea { min-height:90px; resize:vertical; line-height:1.45 }
+.pb-counter { font-size:.7rem; color:var(--pb-muted); text-align:right; margin-top:3px }
+
+/* ===== Pro category picker ===== */
+.pb-cat-picker { position:relative }
+.pb-cat-clear {
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  background:#F1F5F9; border:none; width:24px; height:24px;
+  border-radius:50%; cursor:pointer; font-size:1.1rem; line-height:1;
+  color:#64748b; display:grid; place-items:center; padding:0; font-family:inherit;
+}
+.pb-cat-clear:hover { background:#FECACA; color:#B91C1C }
+.pb-cat-results {
+  margin-top:6px; max-height:240px; overflow-y:auto;
+  border:1.5px solid var(--pb-primary); border-radius:11px;
+  background:#fff; box-shadow:0 8px 20px rgba(124,58,237,.12);
+  display:none;
+}
+.pb-cat-results.active { display:block }
+.pb-cat-row {
+  padding:10px 14px; cursor:pointer; font-size:.92rem;
+  font-weight:600; color:var(--pb-ink);
+  border-bottom:1px solid #F8FAFC;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  transition:background .12s;
+}
+.pb-cat-row:last-child { border-bottom:none }
+.pb-cat-row:hover, .pb-cat-row.kbd-active {
+  background:var(--pb-tint); color:var(--pb-primary-d);
+}
+.pb-cat-row mark {
+  background:#FEF3C7; color:#92400E;
+  padding:0 2px; border-radius:3px; font-weight:800;
+}
+.pb-cat-row .hi-name { color:var(--pb-muted); font-size:.78rem; font-weight:500; margin-left:4px }
+.pb-cat-popular {
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;
+}
+.pb-cat-popular .pb-cat-chip {
+  padding:6px 12px; background:#F5F3FF;
+  border:1.5px solid #E0E7FF; border-radius:99px;
+  font-size:.78rem; font-weight:700; color:var(--pb-primary-d);
+  cursor:pointer; font-family:inherit; transition:.12s; white-space:nowrap;
+}
+.pb-cat-popular .pb-cat-chip:hover {
+  background:var(--pb-primary); color:#fff; border-color:var(--pb-primary);
+  transform:translateY(-1px);
+}
+.pb-cat-popular-label {
+  width:100%; font-size:.7rem; font-weight:800; color:var(--pb-muted);
+  letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px;
+}
+.pb-cat-hint {
+  font-size:.78rem; color:var(--pb-primary-d);
+  margin-top:6px; font-weight:700; min-height:14px;
+}
+.pb-cat-hint.err { color:#B91C1C }
+@media (max-width:480px){
+  .pb-cat-results { max-height:200px }
+  .pb-cat-row { padding:11px 12px; font-size:.9rem }
+}
+.pb-modal-btn {
+  width:100%; padding:13px;
+  background:linear-gradient(135deg, var(--pb-primary), var(--pb-accent));
+  color:#fff; border:none; border-radius:12px;
+  font-weight:800; font-size:.98rem; cursor:pointer;
+  box-shadow:0 8px 22px rgba(124,58,237,.30);
+  transition:transform .15s;
+  font-family:inherit;
+}
+.pb-modal-btn:hover { transform:translateY(-1px) }
+.pb-modal-btn:disabled { opacity:.5; cursor:not-allowed; transform:none }
+.pb-err { background:#FEF2F2; color:#B91C1C; padding:9px 12px; border-radius:9px; font-size:.84rem; font-weight:600; margin-bottom:10px; display:none }
+.pb-ok { background:#F0FDF4; color:#15803D; padding:9px 12px; border-radius:9px; font-size:.84rem; font-weight:600; margin-bottom:10px; display:none }
+
+/* ===== Detail view ===== */
+.pb-detail-q {
+  background:linear-gradient(135deg, var(--pb-tint), #FFF1F2);
+  padding:18px; border-radius:14px;
+  font-size:1.04rem; font-weight:700; color:var(--pb-ink); line-height:1.45;
+  margin:0 0 14px;
+  border-left:4px solid var(--pb-primary);
+}
+.pb-detail-meta { font-size:.78rem; color:var(--pb-ink-2); margin-bottom:14px; font-weight:600 }
+.pb-replies { display:flex; flex-direction:column; gap:10px; margin-bottom:18px }
+.pb-reply {
+  background:#F8FAFC; padding:13px 15px; border-radius:12px;
+  border:1px solid var(--pb-border);
+}
+.pb-reply-text { font-size:.94rem; color:var(--pb-ink); line-height:1.5; margin:0 0 7px; white-space:pre-wrap; word-break:break-word }
+.pb-reply-meta { font-size:.74rem; color:var(--pb-muted); font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.pb-reply-meta .biz-link { color:var(--pb-primary-d); font-weight:700; text-decoration:none; background:var(--pb-tint); padding:2px 8px; border-radius:99px; font-size:.7rem }
+.pb-reply-meta .biz-link:hover { text-decoration:underline }
+
+/* ===== Report buttons ===== */
+.pb-report-btn {
+  background:transparent; border:1px solid #FECACA; color:#B91C1C;
+  padding:4px 12px; border-radius:99px; font-size:.72rem; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:.12s;
+}
+.pb-report-btn:hover { background:#FEF2F2; color:#991B1B }
+.pb-report-btn-inline {
+  background:transparent; border:none; cursor:pointer;
+  font-size:.78rem; padding:1px 4px; margin-left:auto;
+  opacity:.5; transition:opacity .15s;
+  font-family:inherit;
+}
+.pb-report-btn-inline:hover { opacity:1 }
+
+/* ===== Vote buttons (thumbs up/down) ===== */
+.pb-vote-row { display:inline-flex; gap:6px; align-items:center; margin-right:auto }
+.pb-vote-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:4px 11px; border-radius:99px;
+  background:#F1F5F9; border:1.5px solid transparent;
+  font-size:.76rem; font-weight:700;
+  color:#475569; cursor:pointer; font-family:inherit;
+  transition:all .15s;
+}
+.pb-vote-btn:hover { background:#E2E8F0; transform:scale(1.04) }
+.pb-vote-btn .vc { font-size:.78rem; font-weight:800; min-width:14px; text-align:center }
+.pb-vote-btn.helpful.voted   { background:#D1FAE5; color:#065F46; border-color:#10B981; box-shadow:0 2px 6px rgba(16,185,129,.20) }
+.pb-vote-btn.unhelpful.voted { background:#FEE2E2; color:#991B1B; border-color:#EF4444; box-shadow:0 2px 6px rgba(239,68,68,.20) }
+.pb-vote-btn:active { transform:scale(0.96) }
+
+.pb-report-reasons {
+  display:flex; flex-direction:column; gap:6px; margin-bottom:12px;
+}
+.pb-report-reason {
+  background:#F8FAFC; border:1.5px solid var(--pb-border);
+  padding:9px 12px; border-radius:9px;
+  font-size:.86rem; font-weight:600; color:var(--pb-ink-2);
+  cursor:pointer; font-family:inherit; text-align:left;
+  transition:.12s;
+}
+.pb-report-reason:hover { background:var(--pb-tint); border-color:var(--pb-primary); color:var(--pb-primary-d) }
+.pb-report-reason.selected { background:var(--pb-tint); border-color:var(--pb-primary); color:var(--pb-primary-d) }
+.pb-reply-add-btn {
+  background:#fff; color:var(--pb-primary-d);
+  border:1.5px solid var(--pb-primary); padding:11px;
+  border-radius:11px; font-weight:700; cursor:pointer;
+  width:100%; font-family:inherit; transition:all .15s;
+}
+.pb-reply-add-btn:hover { background:var(--pb-tint) }
+
+/* ===== Topbar ===== */
+.pb-topbar {
+  background:#fff; border-bottom:1px solid var(--pb-border);
+  padding:10px 16px;
+  display:flex; align-items:center; gap:14px;
+}
+.pb-topbar a.logo { font-weight:800; color:var(--pb-ink); text-decoration:none; font-size:1.05rem; display:flex; align-items:center; gap:7px }
+.pb-topbar .right { margin-left:auto; display:flex; gap:8px; align-items:center }
+.pb-topbar .right a {
+  padding:7px 14px; border-radius:99px; background:#F1F5F9;
+  color:var(--pb-ink); text-decoration:none; font-weight:700; font-size:.82rem;
+}
+.pb-topbar .right a:hover { background:var(--pb-tint); color:var(--pb-primary-d) }
+
+@media (max-width:680px) {
+  .pb-hero { padding:28px 16px 60px }
+  .pb-hero h1 { font-size:1.7rem }
+  .pb-hero p { font-size:.92rem }
+  .pb-q-card { padding:14px 15px }
+  .pb-q-text { font-size:.95rem }
+  .pb-modal-card { padding:18px }
+}
+
+/* Bottom nav spacer for mobile */
+@media (max-width:768px) { .pb-wrap { padding-bottom:80px } }
+.pb-loading { text-align:center; padding:40px 20px; color:var(--pb-muted); font-weight:600 }
+.pb-loading .spinner { display:inline-block; width:28px; height:28px; border:3px solid #EDE9FE; border-top-color:var(--pb-primary); border-radius:50%; animation:spin .8s linear infinite }
+@keyframes spin { to { transform:rotate(360deg) } }
+</style>
+
+<!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+</head>
+<body>
+
+<header class="pb-topbar">
+  <a href="/" class="logo">
+    <img src="/assets/icons/logo.svg" alt="" style="width:28px;height:28px"/>
+    <span>dukanlist</span>
+  </a>
+  <span style="font-size:.78rem;color:var(--pb-muted);font-weight:600;border-left:1px solid var(--pb-border);padding-left:12px">Pucho Bhai</span>
+  <div class="right">
+    <a href="/browse.html">Browse</a>
+    <a href="/" id="langTog" onclick="event.preventDefault();toggleLang()">हिं</a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="pb-hero">
+  <div class="pb-hero-inner">
+    <div class="pb-badge">
+      <span>✦</span>
+      <span data-i18n-en>NEW · COMMUNITY Q&amp;A BOARD</span>
+      <span data-i18n-hi>नया · कम्युनिटी Q&amp;A बोर्ड</span>
+    </div>
+    <h1>
+      <span data-i18n-en>Pucho Bhai 🙏</span>
+      <span data-i18n-hi>पूछो भाई 🙏</span>
+    </h1>
+    <p>
+      <span data-i18n-en>Ask anything about your city — locals reply with real answers. Best shops, services and recommendations, all in one place.</span>
+      <span data-i18n-hi>अपने शहर में पूछो, लोकल लोगों से जवाब पाओ। सबसे अच्छी दुकानें, सेवाएँ, सलाह — सब यहीं।</span>
+    </p>
+    <button class="pb-hero-cta" onclick="openAskModal()">
+      <span style="font-size:1.2rem">💬</span>
+      <span data-i18n-en>Ask Your Question</span>
+      <span data-i18n-hi>अपना सवाल पूछें</span>
+    </button>
+    <div class="pb-hero-stats">
+      <div><b id="hs-q">—</b><span data-i18n-en>Questions</span><span data-i18n-hi>सवाल</span></div>
+      <div><b id="hs-r">—</b><span data-i18n-en>Answers</span><span data-i18n-hi>जवाब</span></div>
+      <div><b id="hs-c">—</b><span data-i18n-en>Active Cities</span><span data-i18n-hi>शहर</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN ===== -->
+<div class="pb-wrap">
+
+  <!-- City selector card -->
+  <div class="pb-city-card">
+    <div class="pb-city-label">
+      <span>📍</span>
+      <span data-i18n-en>Select your city</span>
+      <span data-i18n-hi>अपना शहर चुनें</span>
+    </div>
+
+    <!-- Search input -->
+    <div class="pb-city-search-row">
+      <div class="pb-search-wrap">
+        <span class="pb-search-icon">🔍</span>
+        <input type="text" id="citySearchInput" autocomplete="off"
+               data-ph-en="Search city e.g. Dabwali, Sirsa, Bathinda, Mansa, Muktsar — even type in Hindi" data-ph-hi="शहर खोजें… जैसे डबवाली, सिरसा, बठिंडा, मानसा, मुक्तसर" placeholder="Search city e.g. Dabwali, Sirsa, Bathinda, Mansa, Muktsar — even type in Hindi"
+               onkeydown="cityPickerKeydown(event)">
+        <button type="button" class="pb-clear-btn" id="cityClearBtn" onclick="clearCitySearch()" style="display:none" aria-label="Clear">×</button>
+      </div>
+    </div>
+
+    <div class="pb-city-tabs" id="cityTabs">
+      <div class="pb-city-tab active" data-city-id="" data-city-name=""><span data-i18n-en>All Cities</span><span data-i18n-hi>सभी शहर</span></div>
+    </div>
+    <div id="cityNoMatch">
+      <span data-i18n-en>No city matches that search. Try a shorter name.</span>
+      <span data-i18n-hi style="display:none">कोई शहर नहीं मिला। छोटा नाम try करें।</span>
+    </div>
+  </div>
+
+  <div class="pb-grid">
+    <div>
+      <!-- Question list -->
+      <div id="qList" class="pb-list"></div>
+    </div>
+
+    <aside>
+      <!-- Leaderboard -->
+      <div class="pb-side" id="lbCard">
+        <h3>🏆 <span data-i18n-en>Active Cities</span><span data-i18n-hi>सक्रिय शहर</span></h3>
+        <div id="lbList" style="font-size:.84rem;color:var(--pb-muted)">Loading…</div>
+      </div>
+      <!-- About box -->
+      <div class="pb-side">
+        <h3>💡 <span data-i18n-en>How it works</span><span data-i18n-hi style="display:none">कैसे काम करता है</span></h3>
+        <div style="font-size:.86rem;line-height:1.5;color:var(--pb-ink-2)">
+          <div style="display:flex;gap:9px;margin-bottom:10px;align-items:flex-start">
+            <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#EDE9FE;color:#6D28D9;font-weight:800;font-size:.72rem;display:grid;place-items:center">1</span>
+            <span><span data-i18n-en>Ask any local question — no login needed.</span><span data-i18n-hi style="display:none">कोई भी लोकल सवाल पूछें — बिना लॉगिन।</span></span>
+          </div>
+          <div style="display:flex;gap:9px;margin-bottom:10px;align-items:flex-start">
+            <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#EDE9FE;color:#6D28D9;font-weight:800;font-size:.72rem;display:grid;place-items:center">2</span>
+            <span><span data-i18n-en>Locals answer based on real experience.</span><span data-i18n-hi style="display:none">लोकल लोग असली अनुभव से जवाब देते हैं।</span></span>
+          </div>
+          <div style="display:flex;gap:9px;margin-bottom:10px;align-items:flex-start">
+            <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#EDE9FE;color:#6D28D9;font-weight:800;font-size:.72rem;display:grid;place-items:center">3</span>
+            <span><span data-i18n-en>Find best shops &amp; services in your area.</span><span data-i18n-hi style="display:none">अपने इलाके की बेहतरीन लिस्टिंग खोजें।</span></span>
+          </div>
+          <div style="display:flex;gap:9px;align-items:flex-start">
+            <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#EDE9FE;color:#6D28D9;font-weight:800;font-size:.72rem;display:grid;place-items:center">4</span>
+            <span><span data-i18n-en>Shopkeepers reply &amp; can quote their shop.</span><span data-i18n-hi style="display:none">मालिक जवाब देकर अपनी दुकान बता सकते हैं।</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ===== ASK MODAL ===== -->
+<div class="pb-modal" id="askModal">
+  <div class="pb-modal-card">
+    <button class="pb-modal-close" onclick="closeAsk()">×</button>
+    <h2><span data-i18n-en>Ask a Question</span><span data-i18n-hi>सवाल पूछें</span></h2>
+    <p class="sub"><span data-i18n-en>Locals usually reply within a few hours. Be specific!</span><span data-i18n-hi>आमतौर पर कुछ घंटों में जवाब मिलता है। साफ़ लिखें!</span></p>
+    <div class="pb-err" id="askErr"></div>
+    <div class="pb-ok" id="askOk"></div>
+    <div class="pb-field">
+      <label data-i18n-en>City</label><label data-i18n-hi style="display:none">शहर</label>
+      <select id="askCity"></select>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Category (optional)</label><label data-i18n-hi style="display:none">श्रेणी (वैकल्पिक)</label>
+      <div class="pb-cat-picker">
+        <input id="askCatInput" autocomplete="off"
+               data-ph-en="🔍 Search e.g. Karyana, Mobile, Doctor…"
+               data-ph-hi="🔍 खोजें: किराना, मोबाइल, डॉक्टर…"
+               placeholder="🔍 Search e.g. Karyana, Mobile, Doctor…"
+               oninput="filterCategoryResults()"
+               onfocus="filterCategoryResults()"
+               onkeydown="catPickerKeydown(event)">
+        <button type="button" class="pb-cat-clear" id="askCatClear" onclick="clearAskCat()" style="display:none" aria-label="Clear">×</button>
+      </div>
+      <div id="askCatResults" class="pb-cat-results"></div>
+      <div id="askCatPopular" class="pb-cat-popular"></div>
+      <input type="hidden" id="askCat" value="">
+      <div id="askCatHint" class="pb-cat-hint"></div>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Question *</label><label data-i18n-hi style="display:none">आपका सवाल *</label>
+      <textarea id="askText" maxlength="500" data-ph-en="e.g. Best mobile repair shop in Mandi Dabwali?" data-ph-hi="उदाहरण: मंडी डबवाली में सबसे अच्छी मोबाइल रिपेयर शॉप कौन सी है?" placeholder="e.g. Best mobile repair shop in Mandi Dabwali?"></textarea>
+      <div class="pb-counter"><span id="askLen">0</span> / 500</div>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Name (optional)</label><label data-i18n-hi style="display:none">आपका नाम (वैकल्पिक)</label>
+      <input id="askName" maxlength="50" data-ph-en="Rajesh" data-ph-hi="राजेश" placeholder="Rajesh">
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
+      <input id="askPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
+      <div class="pb-counter"><span data-i18n-en>Only used to prevent spam — never shown publicly</span><span data-i18n-hi>केवल स्पैम रोकने के लिए — कभी सार्वजनिक नहीं</span></div>
+    </div>
+    <button class="pb-modal-btn" id="askSubmit" onclick="submitAsk()">
+      <span data-i18n-en>Post Question</span><span data-i18n-hi>सवाल भेजें</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="pb-modal" id="detailModal">
+  <div class="pb-modal-card">
+    <button class="pb-modal-close" onclick="closeDetail()">×</button>
+    <div id="detailBody"><div class="pb-loading"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ===== REPORT MODAL ===== -->
+<div class="pb-modal" id="reportModal">
+  <div class="pb-modal-card" style="max-width:440px">
+    <button class="pb-modal-close" onclick="closeReportModal()">×</button>
+    <h2 style="background:linear-gradient(135deg,#EF4444,#F97316);-webkit-background-clip:text;background-clip:text;color:transparent">
+      <span data-i18n-en>🚩 Report Content</span><span data-i18n-hi>🚩 Report करें</span>
+    </h2>
+    <p class="sub"><span data-i18n-en>Help keep the community clean. Tell us what's wrong:</span><span data-i18n-hi>कम्युनिटी साफ़ रखें। बताइए क्या गलत है:</span></p>
+    <div class="pb-err" id="repErr"></div>
+    <div class="pb-ok" id="repOk"></div>
+
+    <div class="pb-report-reasons" id="repReasons">
+      <button type="button" class="pb-report-reason" data-reason="Spam or advertising">🚫 Spam / advertising</button>
+      <button type="button" class="pb-report-reason" data-reason="Abusive language or harassment">😡 Abusive / offensive</button>
+      <button type="button" class="pb-report-reason" data-reason="Misleading or false info">❌ Misleading / false</button>
+      <button type="button" class="pb-report-reason" data-reason="Adult or inappropriate content">🔞 Adult content</button>
+      <button type="button" class="pb-report-reason" data-reason="Scam / fraud attempt">💸 Scam / fraud</button>
+      <button type="button" class="pb-report-reason" data-reason="Off-topic / irrelevant">🤷 Off-topic</button>
+    </div>
+
+    <div class="pb-field">
+      <label data-i18n-en>Your Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
+      <input id="repPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
+      <div class="pb-counter"><span data-i18n-en>Used only to prevent fake reports — never shown</span><span data-i18n-hi>केवल फेक रिपोर्ट रोकने के लिए</span></div>
+    </div>
+
+    <button class="pb-modal-btn" id="repSubmit" onclick="submitReport()" disabled style="background:linear-gradient(135deg,#EF4444,#F97316)">
+      <span data-i18n-en>Submit Report</span><span data-i18n-hi>रिपोर्ट भेजें</span>
+    </button>
+    <div style="font-size:.72rem;color:var(--pb-muted);margin-top:10px;text-align:center;line-height:1.4">
+      <span data-i18n-en>After 3 unique reports, content auto-hides for admin review.</span>
+      <span data-i18n-hi>3 अलग-अलग रिपोर्ट के बाद कंटेंट अपने आप छुप जाएगा।</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPLY MODAL ===== -->
+<div class="pb-modal" id="replyModal">
+  <div class="pb-modal-card">
+    <button class="pb-modal-close" onclick="closeReply()">×</button>
+    <h2><span data-i18n-en>Post Your Reply</span><span data-i18n-hi>अपना जवाब दें</span></h2>
+    <p class="sub" id="replyQuestionPreview" style="background:#F8FAFC;padding:10px 12px;border-radius:9px;font-style:italic;color:var(--pb-ink-2);font-weight:600"></p>
+    <div class="pb-err" id="rErr"></div>
+    <div class="pb-ok" id="rOk"></div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Reply *</label><label data-i18n-hi style="display:none">आपका जवाब *</label>
+      <textarea id="rText" maxlength="1000" data-ph-en="I have used them — really good service…" data-ph-hi="मैंने इनसे सेवा ली है, बहुत अच्छी service देते हैं…" placeholder="I have used them — really good service…"></textarea>
+      <div class="pb-counter"><span id="rLen">0</span> / 1000</div>
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Your Name (optional)</label><label data-i18n-hi style="display:none">आपका नाम (वैकल्पिक)</label>
+      <input id="rName" maxlength="50" data-ph-en="Mukesh" data-ph-hi="मुकेश" placeholder="Mukesh">
+    </div>
+    <div class="pb-field">
+      <label data-i18n-en>Mobile Number *</label><label data-i18n-hi style="display:none">मोबाइल नंबर *</label>
+      <input id="rPhone" inputmode="numeric" pattern="[0-9]*" maxlength="13" data-ph-en="10-digit mobile" data-ph-hi="10-अंकों का मोबाइल" placeholder="10-digit mobile">
+    </div>
+    <div class="pb-field" style="position:relative">
+      <label>
+        <span data-i18n-en>Recommending a shop, practice or organization? (optional)</span>
+        <span data-i18n-hi style="display:none">कोई दुकान, प्रैक्टिस या संस्था सुझा रहे हैं? (वैकल्पिक)</span>
+      </label>
+      <input id="rBizSearch" type="text" autocomplete="off" data-ph-en="Type shop / doctor / organization name to search…" data-ph-hi="दुकान / डॉक्टर / संस्था का नाम लिखें…" placeholder="Type shop / doctor / organization name to search…" style="width:100%;padding:9px 11px;border:1px solid #E5E7EB;border-radius:8px;font-size:.88rem">
+      <input type="hidden" id="rBiz" value="">
+      <div id="rBizResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:#fff;border:1px solid #E5E7EB;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:240px;overflow-y:auto;margin-top:3px"></div>
+      <div id="rBizPicked" style="display:none;margin-top:6px;padding:7px 10px;background:#ECFDF5;border:1px solid #10B981;border-radius:7px;font-size:.78rem;font-weight:600;color:#065F46">
+        <span id="rBizPickedLabel"></span>
+        <span style="cursor:pointer;float:right;color:#DC2626" onclick="clearBizPick()">✕ remove</span>
+      </div>
+      <div class="pb-counter">
+        <span data-i18n-en>Search any DukanList shop and tag it. Helpful for the asker!</span>
+        <span data-i18n-hi style="display:none">DukanList पर कोई भी दुकान खोज कर tag करें। पूछने वाले को मदद मिलेगी!</span>
+      </div>
+    </div>
+    <div style="background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:8px 11px;border-radius:9px;font-size:.74rem;font-weight:600;margin-bottom:10px;line-height:1.45">
+      <span data-i18n-en>⚠️ You cannot reply to your own question. Self-promotion via fake replies will get your number blocked.</span>
+      <span data-i18n-hi style="display:none">⚠️ अपने ही सवाल का जवाब आप नहीं दे सकते। फेक रिप्लाई से self-promotion पर नंबर block हो जाएगा।</span>
+    </div>
+    <button class="pb-modal-btn" id="rSubmit" onclick="submitReply()">
+      <span data-i18n-en>Post Reply</span><span data-i18n-hi>जवाब भेजें</span>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/city-persist.js"></script>
+<script>
+'use strict';
+
+const SB = ShopDB.client;
+let CURRENT_CITY = null;     // {id, name, slug?}
+let CITIES = [];
+let CATEGORIES = [];
+let ACTIVE_QUESTION_ID = null;
+let MY_BIZ_LIST = [];        // populated if logged in
+
+// ====== Lang toggle ======
+function toggleLang(){
+  const cur = document.documentElement.getAttribute('data-lang') || 'en';
+  const next = cur === 'en' ? 'hi' : 'en';
+  document.documentElement.setAttribute('data-lang', next);
+  document.querySelectorAll('[data-i18n-en]').forEach(el=>{ el.style.display = next==='en' ? '' : 'none' });
+  document.querySelectorAll('[data-i18n-hi]').forEach(el=>{ el.style.display = next==='hi' ? '' : 'none' });
+  // Swap data-ph-* placeholders on inputs/textareas
+  document.querySelectorAll('[data-ph-en]').forEach(el => {
+    const key = 'data-ph-' + next;
+    if (el.hasAttribute(key)) el.placeholder = el.getAttribute(key);
+  });
+  try { localStorage.setItem('dl_lang', next) } catch(_){}
+  document.getElementById('langTog').textContent = next==='en' ? 'हिं' : 'EN';
+}
+try {
+  const saved = localStorage.getItem('dl_lang');
+  if (saved === 'hi') toggleLang();
+} catch(_){}
+
+// ====== Load city tabs ======
+async function loadCities(){
+  const { data, error } = await SB
+    .from('geo_cities')
+    .select('id, name, name_hi, active')
+    .eq('active', true)
+    .order('name');
+  if (error) { console.error(error); return; }
+  CITIES = data || [];
+
+  const tabs = document.getElementById('cityTabs');
+  // populate counts asynchronously
+  const counts = {};
+  try {
+    const { data: lbData } = await SB.rpc('get_community_city_leaderboard');
+    (lbData || []).forEach(r => { counts[r.city_id] = r.question_count; });
+  } catch(_){}
+
+  // Default city from city-persist (slug-based) — map slug to id
+  let savedSlug = ''; try { savedSlug = DukanCity.get(); } catch(_){}
+  let defaultCityId = null;
+  if (savedSlug) {
+    const match = CITIES.find(c => c.name.toLowerCase().replace(/\s+/g,'-') === savedSlug);
+    if (match) defaultCityId = match.id;
+  }
+
+  CITIES.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'pb-city-tab';
+    el.dataset.cityId = c.id;
+    el.dataset.cityName = c.name.toLowerCase();
+    el.dataset.cityNameHi = (c.name_hi || '').toLowerCase();
+    el.dataset.cityCount = counts[c.id] || 0;
+    const cnt = counts[c.id] || 0;
+    el.innerHTML = `<span class="city-name">${escapeHtml(c.name)}</span>` + (cnt>0?`<span class="count">${cnt}</span>`:'');
+    el.onclick = ()=>selectCity(c.id, c.name);
+    tabs.appendChild(el);
+  });
+
+  // Populate ask modal city dropdown
+  const askCity = document.getElementById('askCity');
+  CITIES.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id; o.textContent = c.name;
+    askCity.appendChild(o);
+  });
+
+  // Wire up live search-input filter
+  const searchIn = document.getElementById('citySearchInput');
+  if (searchIn && !searchIn.__wired){
+    searchIn.__wired = true;
+    searchIn.addEventListener('input', filterCityPills);
+    // Enter key → if exactly one pill matches, select it
+    searchIn.addEventListener('keydown', e => {
+      if (e.key === 'Enter'){
+        const visible = Array.from(document.querySelectorAll('.pb-city-tab'))
+          .filter(t => t.style.display !== 'none' && t.dataset.cityId);
+        if (visible.length === 1){
+          const t = visible[0];
+          const c = CITIES.find(c => String(c.id) === t.dataset.cityId);
+          if (c){ selectCity(c.id, c.name); searchIn.value=''; filterCityPills(); }
+        }
+      }
+    });
+  }
+
+  // Set default
+  if (defaultCityId) {
+    selectCity(defaultCityId, CITIES.find(c=>c.id===defaultCityId).name);
+    askCity.value = defaultCityId;
+  } else {
+    selectCity(null, null);  // "All"
+  }
+}
+
+// ====== City pill filter by typed keyword ======
+function filterCityPills(){
+  const q = (document.getElementById('citySearchInput').value || '').toLowerCase().trim();
+  const clearBtn = document.getElementById('cityClearBtn');
+  if (clearBtn) clearBtn.style.display = q ? '' : 'none';
+
+  let visibleCount = 0;
+  document.querySelectorAll('.pb-city-tab').forEach(tab => {
+    const id = tab.dataset.cityId || '';
+    if (!id){
+      // "All Cities" tab — hide when searching, show otherwise
+      tab.style.display = q ? 'none' : '';
+      return;
+    }
+    const enName = tab.dataset.cityName || '';
+    const hiName = tab.dataset.cityNameHi || '';
+    const cnt = parseInt(tab.dataset.cityCount || '0', 10);
+    const matches = !q || enName.includes(q) || hiName.includes(q);
+    tab.style.display = matches ? '' : 'none';
+    // Render highlighted name on EN side, plain otherwise
+    const nameEl = tab.querySelector('.city-name');
+    if (nameEl){
+      const origName = tab.dataset.cityNameOrig || nameEl.textContent;
+      if (!tab.dataset.cityNameOrig) tab.dataset.cityNameOrig = origName;
+      if (q && enName.includes(q)){
+        const i = enName.indexOf(q);
+        nameEl.innerHTML = escapeHtml(origName.slice(0,i))
+          + '<mark>' + escapeHtml(origName.slice(i, i+q.length)) + '</mark>'
+          + escapeHtml(origName.slice(i+q.length));
+      } else {
+        nameEl.textContent = origName;
+      }
+    }
+    if (matches) visibleCount++;
+  });
+  const noMatch = document.getElementById('cityNoMatch');
+  if (noMatch) noMatch.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+}
+
+function clearCitySearch(){
+  const inp = document.getElementById('citySearchInput');
+  if (inp){ inp.value=''; inp.focus(); }
+  filterCityPills();
+}
+
+// city-picker keyboard: Enter picks single match
+function cityPickerKeydown(e){
+  if (e.key === 'Enter'){
+    const visible = Array.from(document.querySelectorAll('.pb-city-tab'))
+      .filter(t => t.style.display !== 'none' && t.dataset.cityId);
+    if (visible.length === 1){
+      e.preventDefault();
+      const t = visible[0];
+      const c = CITIES.find(c => String(c.id) === t.dataset.cityId);
+      if (c){ selectCity(c.id, c.name); clearCitySearch(); }
+    }
+  } else if (e.key === 'Escape'){
+    clearCitySearch();
+  }
+}
+
+function selectCity(id, name){
+  CURRENT_CITY = id ? {id, name} : null;
+  document.querySelectorAll('.pb-city-tab').forEach(t=>{
+    t.classList.toggle('active', String(t.dataset.cityId||'') === String(id||''));
+  });
+  // Save to persist if a real city
+  if (id && name) {
+    try { DukanCity.set(name.toLowerCase().replace(/\s+/g,'-')); } catch(_){}
+  }
+  loadQuestions();
+}
+
+// ====== Load categories (for ask modal) ======
+async function loadCategories(){
+  try {
+    // attempt with parent_id ordering, but graceful fallback
+    const { data, error } = await SB
+      .from('categories')
+      .select('id, name, name_hi, parent_id, keywords, description')
+      .order('name')
+      .limit(500);
+    if (error) { console.warn(error); return; }
+    CATEGORIES = data || [];
+    renderPopularCats();
+  } catch(e){ console.warn(e); }
+}
+
+// ====== Pro category picker ======
+// Popular category seed names — looked up against CATEGORIES at render
+const POPULAR_CAT_HINTS = [
+  'Karyana', 'Grocery', 'Mobile', 'Doctor', 'Salon', 'Beauty',
+  'Restaurant', 'Cafe', 'Mechanic', 'Tailor', 'Sweets', 'Bakery',
+  'Pharmacy', 'Hospital', 'Electrician', 'Plumber', 'Hardware', 'Garments'
+];
+let CAT_KBD_INDEX = -1;     // keyboard nav highlight index
+let CAT_LAST_RESULTS = [];  // last filtered list
+
+function renderPopularCats(){
+  const box = document.getElementById('askCatPopular');
+  if (!box || !CATEGORIES.length) return;
+  // Find first matching CATEGORY for each hint (case-insensitive substring)
+  const seen = new Set();
+  const popular = [];
+  for (const hint of POPULAR_CAT_HINTS){
+    const lc = hint.toLowerCase();
+    const found = CATEGORIES.find(c => !seen.has(c.id) && (c.name||'').toLowerCase().includes(lc));
+    if (found){ popular.push(found); seen.add(found.id); }
+    if (popular.length >= 8) break;
+  }
+  if (!popular.length){ box.style.display='none'; return; }
+  box.innerHTML = '<div class="pb-cat-popular-label">'
+    + '<span data-i18n-en>Popular categories</span>'
+    + '<span data-i18n-hi style="display:none">लोकप्रिय श्रेणियाँ</span>'
+    + '</div>'
+    + popular.map(c =>
+        `<button type="button" class="pb-cat-chip" onclick="pickCategory(${c.id})">${escapeHtml(c.name)}</button>`
+      ).join('');
+  // Apply current i18n state to the newly-inserted spans
+  const cur = document.documentElement.getAttribute('data-lang') || 'en';
+  box.querySelectorAll('[data-i18n-en]').forEach(el => el.style.display = cur==='en' ? '' : 'none');
+  box.querySelectorAll('[data-i18n-hi]').forEach(el => el.style.display = cur==='hi' ? '' : 'none');
+}
+
+function pickCategory(id){
+  // Lookup the category from global CATEGORIES (avoids HTML-quoting bugs in onclick)
+  const c = CATEGORIES.find(x => Number(x.id) === Number(id));
+  if (!c){ console.warn('pickCategory: id not found', id); return; }
+  const name = c.name;
+  const inp = document.getElementById('askCatInput');
+  inp.value = name;
+  document.getElementById('askCat').value = id;
+  const hint = document.getElementById('askCatHint');
+  hint.innerHTML = '✓ <b>' + escapeHtml(name) + '</b>';
+  hint.classList.remove('err');
+  document.getElementById('askCatClear').style.display = '';
+  document.getElementById('askCatResults').classList.remove('active');
+  document.getElementById('askCatResults').innerHTML = '';
+  document.getElementById('askCatPopular').style.display = 'none';
+  CAT_KBD_INDEX = -1;
+}
+
+function clearAskCat(){
+  document.getElementById('askCatInput').value = '';
+  document.getElementById('askCat').value = '';
+  const hint = document.getElementById('askCatHint');
+  hint.textContent = '';
+  hint.classList.remove('err');
+  document.getElementById('askCatClear').style.display = 'none';
+  document.getElementById('askCatResults').classList.remove('active');
+  document.getElementById('askCatResults').innerHTML = '';
+  document.getElementById('askCatPopular').style.display = '';
+  CAT_KBD_INDEX = -1;
+  document.getElementById('askCatInput').focus();
+}
+
+function filterCategoryResults(){
+  const inp = document.getElementById('askCatInput');
+  const hiddenInp = document.getElementById('askCat');
+  const q = (inp.value || '').trim().toLowerCase();
+  const results = document.getElementById('askCatResults');
+  const popular = document.getElementById('askCatPopular');
+  const clearBtn = document.getElementById('askCatClear');
+  const hint = document.getElementById('askCatHint');
+
+  // If previously selected, check if input still matches that category exactly.
+  // If user typed something different, clear the hidden id (stale otherwise).
+  if (hiddenInp.value){
+    const sel = CATEGORIES.find(c => Number(c.id) === Number(hiddenInp.value));
+    if (sel && inp.value !== sel.name){
+      hiddenInp.value = '';
+      hint.textContent = '';
+      hint.classList.remove('err');
+    }
+  }
+
+  // When empty: show popular, hide results
+  if (!q){
+    results.classList.remove('active');
+    results.innerHTML = '';
+    popular.style.display = '';
+    clearBtn.style.display = 'none';
+    document.getElementById('askCat').value = '';
+    hint.textContent = '';
+    hint.classList.remove('err');
+    CAT_KBD_INDEX = -1;
+    return;
+  }
+
+  popular.style.display = 'none';
+  clearBtn.style.display = '';
+
+  // Score matches: exact > prefix > word-start > substring (across name + name_hi + keywords + description)
+  const matches = [];
+  for (const c of CATEGORIES){
+    const en = (c.name || '').toLowerCase();
+    const hi = (c.name_hi || '').toLowerCase();
+    const kw = (c.keywords || '').toLowerCase();
+    const desc = (c.description || '').toLowerCase();
+    let score = 0;
+    if (en === q || hi === q) score = 100;
+    else if (en.startsWith(q) || hi.startsWith(q)) score = 80;
+    else if (en.includes(' '+q) || hi.includes(' '+q)) score = 60;
+    else if (en.includes(q) || hi.includes(q)) score = 50;
+    // Keyword/synonym match — lower priority than name match but still findable
+    else if (kw.includes(q)) score = 45;
+    else if (desc.includes(q)) score = 30;
+    if (score > 0) matches.push({ c, score });
+  }
+  matches.sort((a,b) => b.score - a.score || a.c.name.length - b.c.name.length);
+  const top = matches.slice(0, 12);
+  CAT_LAST_RESULTS = top;
+  CAT_KBD_INDEX = -1;
+
+  if (!top.length){
+    results.innerHTML = '<div class="pb-cat-row" style="color:#94a3b8;cursor:default;font-style:italic;justify-content:flex-start">No category matches &quot;'
+      + escapeHtml(q) + '&quot; — try simpler keywords (e.g. mobile, grocery, doctor)</div>';
+    hint.textContent = '';
+  } else {
+    results.innerHTML = top.map((m, idx) => {
+      const c = m.c;
+      const en = c.name || '';
+      const lcEn = en.toLowerCase();
+      const i = lcEn.indexOf(q);
+      const highlighted = i >= 0
+        ? escapeHtml(en.slice(0,i)) + '<mark>' + escapeHtml(en.slice(i, i+q.length)) + '</mark>' + escapeHtml(en.slice(i+q.length))
+        : escapeHtml(en);
+      const hiPart = c.name_hi ? '<span class="hi-name">· ' + escapeHtml(c.name_hi) + '</span>' : '';
+      return `<div class="pb-cat-row" data-idx="${idx}" onclick="pickCategory(${c.id})"><span>${highlighted}${hiPart}</span><span style="color:var(--pb-primary);font-size:1rem">→</span></div>`;
+    }).join('');
+  }
+  results.classList.add('active');
+}
+
+function catPickerKeydown(e){
+  const results = document.getElementById('askCatResults');
+  if (!results.classList.contains('active') || !CAT_LAST_RESULTS.length) return;
+  const rows = results.querySelectorAll('.pb-cat-row[data-idx]');
+  if (e.key === 'ArrowDown'){
+    e.preventDefault();
+    CAT_KBD_INDEX = Math.min(CAT_KBD_INDEX + 1, rows.length - 1);
+    rows.forEach((r,i) => r.classList.toggle('kbd-active', i === CAT_KBD_INDEX));
+    if (rows[CAT_KBD_INDEX]) rows[CAT_KBD_INDEX].scrollIntoView({ block:'nearest' });
+  } else if (e.key === 'ArrowUp'){
+    e.preventDefault();
+    CAT_KBD_INDEX = Math.max(CAT_KBD_INDEX - 1, 0);
+    rows.forEach((r,i) => r.classList.toggle('kbd-active', i === CAT_KBD_INDEX));
+    if (rows[CAT_KBD_INDEX]) rows[CAT_KBD_INDEX].scrollIntoView({ block:'nearest' });
+  } else if (e.key === 'Enter'){
+    const target = CAT_KBD_INDEX >= 0 ? CAT_LAST_RESULTS[CAT_KBD_INDEX] : CAT_LAST_RESULTS[0];
+    if (target){
+      e.preventDefault();
+      pickCategory(target.c.id);
+    }
+  } else if (e.key === 'Escape'){
+    results.classList.remove('active');
+  }
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.pb-cat-picker');
+  const results = document.getElementById('askCatResults');
+  if (!wrap || !results) return;
+  if (!wrap.contains(e.target) && !results.contains(e.target)){
+    results.classList.remove('active');
+  }
+});
+
+// ====== Load questions ======
+async function loadQuestions(){
+  const wrap = document.getElementById('qList');
+  wrap.innerHTML = '<div class="pb-loading"><div class="spinner"></div></div>';
+  try {
+    const { data, error } = await SB.rpc('get_community_questions', {
+      p_city_id: CURRENT_CITY ? CURRENT_CITY.id : null,
+      p_limit: 30, p_offset: 0
+    });
+    if (error) throw error;
+    renderQuestions(data || []);
+  } catch(e){
+    console.error(e);
+    wrap.innerHTML = `<div class="pb-empty"><div class="e-icon">⚠️</div><h3>Could not load</h3><p>${escapeHtml(e.message||'Network error')}</p></div>`;
+  }
+}
+
+function renderQuestions(rows){
+  const wrap = document.getElementById('qList');
+  if (!rows.length) {
+    const cityLabel = CURRENT_CITY ? CURRENT_CITY.name : 'any city';
+    wrap.innerHTML = `
+      <div class="pb-empty">
+        <div class="e-icon">💬</div>
+        <h3>Be the first to ask!</h3>
+        <p>No questions yet in <b>${escapeHtml(cityLabel)}</b>. Ask anything — locals are watching.</p>
+        <button class="pb-hero-cta" style="background:linear-gradient(135deg,var(--pb-primary),var(--pb-accent));color:#fff" onclick="openAskModal()">
+          💬 Ask First Question
+        </button>
+      </div>`;
+    return;
+  }
+  wrap.innerHTML = rows.map(q => {
+    const ago = timeAgo(q.created_at);
+    const hasAns = (q.reply_count || 0) > 0;
+    const ansBadge = hasAns
+      ? `<span class="ans-yes">✓ ${q.reply_count} ${q.reply_count===1?'reply':'replies'}</span>`
+      : `<span class="ans-no">⏳ Awaiting reply</span>`;
+    const pinBadge = q.is_pinned ? '<span class="pb-q-badge pin">📌 Pinned</span>' : '';
+    const solvedBadge = q.is_resolved ? '<span class="pb-q-badge solved">✅ Solved</span>' : '';
+    const cardClass = q.is_pinned ? 'pb-q-card pinned' : 'pb-q-card';
+    return `
+      <div class="${cardClass}" onclick="openDetail('${q.id}')">
+        <div class="pb-q-meta">
+          ${pinBadge}${solvedBadge}
+          ${q.city_name ? `<span class="pb-pill">📍 ${escapeHtml(q.city_name)}</span>` : ''}
+          ${q.category_name ? `<span class="pb-pill cat">${escapeHtml(q.category_name)}</span>` : ''}
+          ${q.asker_name ? `<span>· asked by <b style="color:var(--pb-ink-2)">${escapeHtml(q.asker_name)}</b></span>` : '<span>· anonymous</span>'}
+          <span>· ${ago}</span>
+        </div>
+        <div class="pb-q-text">${escapeHtml(q.question_text)}</div>
+        <div class="pb-q-foot">
+          ${ansBadge}
+          <span>👁 ${q.view_count || 0}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ====== Stats + Leaderboard ======
+async function loadLeaderboard(){
+  const lb = document.getElementById('lbList');
+  try {
+    const { data, error } = await SB.rpc('get_community_city_leaderboard');
+    if (error) throw error;
+    if (!data || !data.length) {
+      lb.innerHTML = '<div style="font-size:.84rem;color:var(--pb-muted);text-align:center;padding:14px 0">No activity yet. Be the first!</div>';
+      return;
+    }
+    lb.innerHTML = data.map((r, i) => `
+      <div class="pb-lb-row ${i===0?'top1':i===1?'top2':i===2?'top3':''}" onclick="selectCity(${r.city_id}, '${escapeAttr(r.city_name)}');window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">
+        <div class="pb-lb-rank">${i+1}</div>
+        <div class="pb-lb-name">${escapeHtml(r.city_name)}</div>
+        <div class="pb-lb-count">${r.question_count}Q${r.recent_count>0?`<span class="pb-lb-recent">+${r.recent_count}</span>`:''}</div>
+      </div>
+    `).join('');
+    // Update hero stats with count-up animation
+    const totalQ = data.reduce((s,r)=>s+Number(r.question_count||0),0);
+    const totalR = data.reduce((s,r)=>s+Number(r.reply_count||0),0);
+    animateCount('hs-q', totalQ);
+    animateCount('hs-r', totalR);
+    animateCount('hs-c', data.length);
+  } catch(e){
+    console.error(e);
+    lb.innerHTML = '<div style="font-size:.78rem;color:#B91C1C">Leaderboard offline</div>';
+  }
+}
+
+// ====== Ask modal ======
+function openAskModal(){
+  document.getElementById('askModal').classList.add('active');
+  document.getElementById('askErr').style.display='none';
+  document.getElementById('askOk').style.display='none';
+  // Default ask-city to current city
+  if (CURRENT_CITY) document.getElementById('askCity').value = CURRENT_CITY.id;
+  // Reset category picker (full reset to show popular chips again)
+  clearAskCat();
+  // Restore phone from localStorage
+  try { document.getElementById('askPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+  try { document.getElementById('askName').value = localStorage.getItem('dl_pb_name') || ''; } catch(_){}
+}
+function closeAsk(){ document.getElementById('askModal').classList.remove('active') }
+
+document.getElementById('askText').addEventListener('input', e=>{
+  document.getElementById('askLen').textContent = e.target.value.length;
+});
+
+async function submitAsk(){
+  const btn = document.getElementById('askSubmit');
+  const err = document.getElementById('askErr');
+  const ok = document.getElementById('askOk');
+  err.style.display='none'; ok.style.display='none';
+
+  try {
+    const cityIdRaw = document.getElementById('askCity').value;
+    const cityId = parseInt(cityIdRaw, 10);
+    const catRaw = document.getElementById('askCat').value;
+    const catId = (catRaw && /^\d+$/.test(String(catRaw).trim())) ? parseInt(catRaw, 10) : null;
+    const text = document.getElementById('askText').value.trim();
+    const name = document.getElementById('askName').value.trim();
+    const phone = document.getElementById('askPhone').value.trim();
+
+    if (!cityId) { err.textContent='Please select a city first'; err.style.display='block'; return; }
+    if (text.length < 10) { err.textContent='Question must be at least 10 characters'; err.style.display='block'; return; }
+    if (phone.replace(/[^0-9]/g,'').length < 10) { err.textContent='Valid 10-digit mobile required'; err.style.display='block'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Posting…';
+
+    const { data, error } = await SB.rpc('post_community_question', {
+      p_city_id: cityId,
+      p_category_id: catId,
+      p_question_text: text,
+      p_asker_name: name || null,
+      p_asker_phone: phone
+    });
+    if (error) throw error;
+    ok.textContent = '✓ Question posted! Locals will reply soon.';
+    ok.style.display='block';
+    try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
+    document.getElementById('askText').value=''; document.getElementById('askLen').textContent='0';
+    clearAskCat();
+    setTimeout(()=>{ closeAsk(); loadQuestions(); loadLeaderboard(); }, 1100);
+  } catch(e){
+    console.error('[submitAsk] failure:', e);
+    err.textContent = (e && e.message ? e.message : 'Could not post — please try again.').replace(/^.*?:\s*/,'');
+    err.style.display='block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Post Question</span><span data-i18n-hi style="display:none">सवाल भेजें</span>';
+  }
+}
+
+// ====== submitReply — post reply to community question ======
+async function submitReply(){
+  const btn = document.getElementById('rSubmit');
+  const err = document.getElementById('rErr');
+  const ok  = document.getElementById('rOk');
+  if (err) err.style.display='none';
+  if (ok)  ok.style.display='none';
+
+  try {
+    if (!ACTIVE_QUESTION_ID){ throw new Error('No question selected'); }
+    const text  = (document.getElementById('rText') || {}).value || '';
+    const name  = ((document.getElementById('rName') || {}).value || '').trim();
+    const phone = ((document.getElementById('rPhone') || {}).value || '').trim();
+    const bizId = ((document.getElementById('rBiz') || {}).value || '').trim() || null;
+
+    if (text.trim().length < 4){
+      if (err){ err.textContent = 'Reply must be at least 4 characters'; err.style.display='block'; }
+      return;
+    }
+    if (phone.replace(/[^0-9]/g,'').length < 10){
+      if (err){ err.textContent = 'Valid 10-digit mobile required'; err.style.display='block'; }
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Posting…';
+
+    const { data, error } = await SB.rpc('post_community_reply', {
+      p_question_id   : ACTIVE_QUESTION_ID,
+      p_reply_text    : text.trim(),
+      p_replier_name  : name || null,
+      p_replier_phone : phone,
+      p_business_id   : bizId
+    });
+    if (error) throw error;
+
+    if (ok){
+      ok.textContent = '✓ Reply posted! Thank you for helping.';
+      ok.style.display='block';
+    }
+    try { localStorage.setItem('dl_pb_phone', phone); if (name) localStorage.setItem('dl_pb_name', name); } catch(_){}
+    document.getElementById('rText').value=''; 
+    const rLen = document.getElementById('rLen'); if (rLen) rLen.textContent='0';
+    clearBizPick();
+
+    // Refresh detail view to show new reply
+    setTimeout(()=>{
+      closeReply();
+      try { openDetail(ACTIVE_QUESTION_ID); } catch(_){}
+      try { loadLeaderboard(); } catch(_){}
+    }, 1100);
+  } catch(e){
+    console.error('[submitReply] failure:', e);
+    if (err){
+      err.textContent = (e && e.message ? e.message : 'Could not post — please try again.').replace(/^.*?:\s*/,'');
+      err.style.display='block';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Post Reply</span><span data-i18n-hi>जवाब भेजें</span>';
+  }
+}
+
+// ====== Detail view ======
+async function openDetail(qid){
+  ACTIVE_QUESTION_ID = qid;
+  const m = document.getElementById('detailModal');
+  m.classList.add('active');
+  const body = document.getElementById('detailBody');
+  body.innerHTML = '<div class="pb-loading"><div class="spinner"></div></div>';
+  try {
+    const { data, error } = await SB.rpc('get_community_question_detail', { p_id: qid });
+    if (error) throw error;
+    const q = data.question;
+    const replies = data.replies || [];
+    body.innerHTML = `
+      <div class="pb-detail-meta">
+        ${q.is_pinned ? '<span class="pb-q-badge pin">📌 Pinned</span> ' : ''}
+        ${q.is_resolved ? '<span class="pb-q-badge solved">✅ Solved</span> ' : ''}
+        ${q.city_name ? `<span class="pb-pill" style="background:var(--pb-tint);color:var(--pb-primary-d);padding:2px 8px;border-radius:99px;font-weight:700;font-size:.7rem">📍 ${escapeHtml(q.city_name)}</span> · ` : ''}
+        ${q.asker_name ? `Asked by <b>${escapeHtml(q.asker_name)}</b>` : 'Asked anonymously'}
+        · ${timeAgo(q.created_at)} · 👁 ${q.view_count}
+      </div>
+      <div class="pb-detail-q">${escapeHtml(q.question_text)}</div>
+      <div style="display:flex;justify-content:flex-end;margin:-8px 0 14px">
+        <button class="pb-report-btn" onclick="openReportModal('question','${q.id}')" title="Report this question">🚩 Report</button>
+      </div>
+      <div style="font-size:.84rem;font-weight:800;color:var(--pb-ink-2);margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em">
+        ${replies.length} ${replies.length===1?'Reply':'Replies'}
+      </div>
+      <div class="pb-replies">
+        ${replies.length===0
+          ? `<div style="background:#FFFBEB;border:1px dashed #F59E0B;padding:14px;border-radius:11px;text-align:center;color:#92400E;font-weight:600;font-size:.88rem">⏳ No replies yet — be the first to help!</div>`
+          : replies.map(r => {
+              const myVote = getMyVoteState(r.id);
+              return `
+              <div class="pb-reply ${r.is_best ? 'best-reply' : ''}" data-reply-id="${r.id}" style="${r.is_best ? 'margin-top:18px' : ''}">
+                <p class="pb-reply-text">${escapeHtml(r.reply_text)}</p>
+                <div class="pb-reply-meta">
+                  <div class="pb-vote-row">
+                    <button class="pb-vote-btn helpful ${myVote==='helpful'?'voted':''}"
+                            onclick="votePuchoReply('${r.id}','helpful')"
+                            title="Helpful — this answer is useful">
+                      👍 <span class="vc">${r.helpful_count || 0}</span>
+                    </button>
+                    <button class="pb-vote-btn unhelpful ${myVote==='unhelpful'?'voted':''}"
+                            onclick="votePuchoReply('${r.id}','unhelpful')"
+                            title="Not helpful — this answer doesn't solve">
+                      👎 <span class="vc">${r.unhelpful_count || 0}</span>
+                    </button>
+                  </div>
+                  ${r.replier_name ? `<b>${escapeHtml(r.replier_name)}</b>` : 'Anonymous'}
+                  ${r.business_name ? `<a class="biz-link" href="/business.html?slug=${encodeURIComponent(r.business_slug||'')}" target="_blank">🏪 ${escapeHtml(r.business_name)}</a>` : ''}
+                  <span>· ${timeAgo(r.created_at)}</span>
+                  <button class="pb-report-btn-inline" onclick="openReportModal('reply','${r.id}')" title="Report this reply">🚩</button>
+                </div>
+              </div>
+            `; }).join('')
+        }
+      </div>
+      <button class="pb-reply-add-btn" onclick="openReplyModal('${escapeAttr(q.question_text)}')">
+        💬 Post Your Reply
+      </button>
+    `;
+  } catch(e){
+    body.innerHTML = `<div class="pb-empty"><div class="e-icon">⚠️</div><h3>Could not load</h3><p>${escapeHtml(e.message||'')}</p></div>`;
+  }
+}
+function closeDetail(){ document.getElementById('detailModal').classList.remove('active'); ACTIVE_QUESTION_ID=null; }
+
+// ====== Reply voting (thumbs up/down) ======
+const PB_VOTE_STORAGE_KEY = 'dl_pb_my_votes';
+
+function getAllMyVotes(){
+  try { return JSON.parse(localStorage.getItem(PB_VOTE_STORAGE_KEY) || '{}'); } catch(_){ return {}; }
+}
+function getMyVoteState(replyId){
+  const all = getAllMyVotes();
+  return all[replyId] || null;
+}
+function setMyVoteState(replyId, voteType){
+  const all = getAllMyVotes();
+  if (voteType) all[replyId] = voteType;
+  else delete all[replyId];
+  try { localStorage.setItem(PB_VOTE_STORAGE_KEY, JSON.stringify(all)); } catch(_){}
+}
+
+async function votePuchoReply(replyId, voteType){
+  let phone = '';
+  try { phone = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+  if (!phone || phone.replace(/[^0-9]/g,'').length < 10){
+    phone = prompt('Enter your 10-digit mobile to vote:\n(only used to prevent fake votes — never shown publicly)') || '';
+    if (!phone) return;
+    if (phone.replace(/[^0-9]/g,'').length < 10){
+      alert('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    try { localStorage.setItem('dl_pb_phone', phone); } catch(_){}
+  }
+
+  // Optimistic UI tweak — disable both buttons momentarily
+  const wrap = document.querySelector('[data-reply-id="' + replyId + '"]');
+  if (wrap){
+    wrap.querySelectorAll('.pb-vote-btn').forEach(b => b.disabled = true);
+  }
+
+  try {
+    const { data, error } = await SB.rpc('vote_pucho_reply', {
+      p_reply_id: replyId,
+      p_vote_type: voteType,
+      p_voter_phone: phone
+    });
+    if (error) throw error;
+
+    // Save my vote state
+    setMyVoteState(replyId, data.my_vote);
+
+    // Update UI
+    if (wrap){
+      const h = wrap.querySelector('.pb-vote-btn.helpful');
+      const u = wrap.querySelector('.pb-vote-btn.unhelpful');
+      if (h){
+        h.querySelector('.vc').textContent = data.helpful_count || 0;
+        h.classList.toggle('voted', data.my_vote === 'helpful');
+      }
+      if (u){
+        u.querySelector('.vc').textContent = data.unhelpful_count || 0;
+        u.classList.toggle('voted', data.my_vote === 'unhelpful');
+      }
+    }
+  } catch(e){
+    console.error('[votePuchoReply]', e);
+    const msg = (e && e.message ? e.message : 'Could not vote').replace(/^.*?:\s*/,'');
+    alert('Vote failed: ' + msg);
+  } finally {
+    if (wrap){
+      wrap.querySelectorAll('.pb-vote-btn').forEach(b => b.disabled = false);
+    }
+  }
+}
+
+// ====== Report modal ======
+let REPORT_TARGET = null;     // { type, id }
+let REPORT_REASON = null;
+
+function openReportModal(type, id){
+  REPORT_TARGET = { type, id };
+  REPORT_REASON = null;
+  document.getElementById('reportModal').classList.add('active');
+  document.getElementById('repErr').style.display='none';
+  document.getElementById('repOk').style.display='none';
+  document.getElementById('repSubmit').disabled = true;
+  document.querySelectorAll('.pb-report-reason').forEach(b => {
+    b.classList.remove('selected');
+    b.onclick = () => {
+      document.querySelectorAll('.pb-report-reason').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      REPORT_REASON = b.dataset.reason;
+      document.getElementById('repSubmit').disabled = false;
+    };
+  });
+  try { document.getElementById('repPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+}
+function closeReportModal(){
+  document.getElementById('reportModal').classList.remove('active');
+  REPORT_TARGET = null; REPORT_REASON = null;
+}
+
+async function submitReport(){
+  if (!REPORT_TARGET || !REPORT_REASON) return;
+  const btn = document.getElementById('repSubmit');
+  const err = document.getElementById('repErr');
+  const ok = document.getElementById('repOk');
+  err.style.display='none'; ok.style.display='none';
+  const phone = document.getElementById('repPhone').value.trim();
+  if (phone.replace(/[^0-9]/g,'').length < 10){
+    err.textContent='Valid 10-digit mobile required';
+    err.style.display='block';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const { error } = await SB.rpc('report_community_item', {
+      p_type: REPORT_TARGET.type,
+      p_id: REPORT_TARGET.id,
+      p_reason: REPORT_REASON,
+      p_reporter_phone: phone
+    });
+    if (error) throw error;
+    ok.textContent = '✓ Thanks! Report submitted. Admin will review shortly.';
+    ok.style.display='block';
+    try { localStorage.setItem('dl_pb_phone', phone); } catch(_){}
+    setTimeout(closeReportModal, 1400);
+  } catch(e){
+    err.textContent = (e.message || 'Could not submit').replace(/^.*?:\s*/,'');
+    err.style.display='block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span data-i18n-en>Submit Report</span><span data-i18n-hi style="display:none">रिपोर्ट भेजें</span>';
+  }
+}
+
+// ====== Reply modal ======
+async function openReplyModal(qpreview){
+  if (!ACTIVE_QUESTION_ID) return;
+  document.getElementById('replyModal').classList.add('active');
+  document.getElementById('replyQuestionPreview').textContent = '"' + qpreview + '"';
+  document.getElementById('rErr').style.display='none';
+  document.getElementById('rOk').style.display='none';
+  try { document.getElementById('rPhone').value = localStorage.getItem('dl_pb_phone') || ''; } catch(_){}
+  try { document.getElementById('rName').value = localStorage.getItem('dl_pb_name') || ''; } catch(_){}
+  // populate biz dropdown if logged in
+  await populateMyBizDropdown();
+}
+function closeReply(){ document.getElementById('replyModal').classList.remove('active') }
+
+document.getElementById('rText').addEventListener('input', e=>{
+  document.getElementById('rLen').textContent = e.target.value.length;
+});
+
+// Reset the biz search field (called when opening modal)
+async function populateMyBizDropdown(){
+  document.getElementById('rBiz').value = '';
+  document.getElementById('rBizSearch').value = '';
+  document.getElementById('rBizResults').style.display = 'none';
+  document.getElementById('rBizPicked').style.display = 'none';
+  // If logged in, prefetch user's own shops as default suggestions
+  try {
+    const user = await ShopDB.getUser();
+    if (user) {
+      // Get owned business IDs via business_owners join
+      const { data: ownerRows } = await SB
+        .from('business_owners')
+        .select('business_id')
+        .eq('auth_user_id', user.id);
+      const ids = (ownerRows || []).map(r => r.business_id);
+      if (ids.length === 0) {
+        window._myShops = [];
+      } else {
+        const { data } = await SB
+          .from('businesses')
+          .select('id, name, geo_cities(name)')
+          .in('id', ids)
+          .eq('status', 'active')
+          .limit(10);
+        // Flatten city name for display compatibility
+        window._myShops = (data || []).map(b => ({
+          id: b.id,
+          name: b.name,
+          city: (b.geo_cities && b.geo_cities.name) || ''
+        }));
+      }
+    } else {
+      window._myShops = [];
+    }
+  } catch(_){ window._myShops = []; }
+}
+
+// Clear picked business
+function clearBizPick(){
+  document.getElementById('rBiz').value = '';
+  document.getElementById('rBizPicked').style.display = 'none';
+  document.getElementById('rBizSearch').value = '';
+  document.getElementById('rBizSearch').focus();
+}
+
+// Pick a business from search results
+function pickBiz(id, name, city){
+  document.getElementById('rBiz').value = id;
+  document.getElementById('rBizSearch').value = '';
+  document.getElementById('rBizResults').style.display = 'none';
+  const lbl = document.getElementById('rBizPickedLabel');
+  lbl.textContent = '✓ Tagged: ' + name + (city ? ' (' + city + ')' : '');
+  document.getElementById('rBizPicked').style.display = 'block';
+}
+
+// Live search businesses as user types
+let _bizSearchTimer = null;
+function setupBizSearch(){
+  const inp = document.getElementById('rBizSearch');
+  if (!inp || inp._wired) return;
+  inp._wired = true;
+
+  inp.addEventListener('input', e => {
+    const q = (e.target.value || '').trim();
+    clearTimeout(_bizSearchTimer);
+    const box = document.getElementById('rBizResults');
+
+    // Helper to render rows with data attributes (event delegation safe)
+    const renderRow = (b, label) => {
+      const safeName = escapeHtml(b.name || '');
+      const safeCity = escapeHtml(b.city || '');
+      return `<div class="biz-row" data-id="${escapeHtml(b.id)}" data-name="${safeName}" data-city="${safeCity}" style="padding:8px 11px;cursor:pointer;border-bottom:1px solid #F3F4F6;font-size:.83rem">🏪 ${safeName}${safeCity ? ' <span style="color:#9CA3AF;font-size:.72rem">— '+safeCity+'</span>' : ''}</div>`;
+    };
+
+    // Show own shops when empty + logged in
+    if (!q) {
+      const own = window._myShops || [];
+      if (own.length === 0) { box.style.display = 'none'; return; }
+      box.innerHTML = '<div style="padding:6px 11px;font-size:.7rem;font-weight:700;color:#6B7280;background:#F9FAFB;border-bottom:1px solid #E5E7EB">YOUR SHOPS</div>' +
+        own.map(b => renderRow(b)).join('');
+      box.style.display = 'block';
+      return;
+    }
+
+    if (q.length < 2) { box.style.display = 'none'; return; }
+
+    _bizSearchTimer = setTimeout(async () => {
+      box.innerHTML = '<div style="padding:10px 11px;color:#6B7280;font-size:.8rem">🔍 Searching…</div>';
+      box.style.display = 'block';
+      try {
+        // FIX (2026-06-02): column was wrong — businesses has no plain
+        // "verified" / "city" columns. Use verified_score (generated)
+        // for ranking, and embed geo_cities for city name display.
+        const { data: rawData, error } = await SB
+          .from('businesses')
+          .select('id, name, city_id, geo_cities(name)')
+          .ilike('name', '%' + q.replace(/[%_]/g,'') + '%')
+          .eq('status','active')
+          .order('verified_score', { ascending: false, nullsFirst: false })
+          .limit(12);
+        if (error) throw error;
+        // Flatten city name from FK join for the renderer
+        const data = (rawData || []).map(b => ({
+          id: b.id,
+          name: b.name,
+          city: b.geo_cities && b.geo_cities.name ? b.geo_cities.name : ''
+        }));
+        if (!data || data.length === 0) {
+          box.innerHTML = '<div style="padding:10px 11px;color:#9CA3AF;font-size:.8rem">No shop found matching "' + escapeHtml(q) + '"</div>';
+          return;
+        }
+        box.innerHTML = data.map(b => renderRow(b)).join('');
+      } catch(err){
+        console.error('[bizSearch]', err);
+        box.innerHTML = '<div style="padding:10px 11px;color:#DC2626;font-size:.78rem">Search failed — try again</div>';
+      }
+    }, 250);
+  });
+
+  // Event delegation for picking rows (safe against quotes in names)
+  const box = document.getElementById('rBizResults');
+  box.addEventListener('click', e => {
+    const row = e.target.closest('.biz-row');
+    if (!row) return;
+    pickBiz(row.dataset.id, row.dataset.name, row.dataset.city || '');
+  });
+  box.addEventListener('mouseover', e => {
+    const row = e.target.closest('.biz-row');
+    if (row) row.style.background = '#FFF7ED';
+  });
+  box.addEventListener('mouseover', e => {
+    const row = e.target.closest('.biz-row');
+    if (row) row.style.background = '#FFF7ED';
+  });
+  box.addEventListener('mouseout', e => {
+    const row = e.target.closest('.biz-row');
+    if (row) row.style.background = '';
+  });
+}
+setupBizSearch();
+
+// ====== Helpers (utility functions used throughout the page) ======
+function escapeHtml(s){
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
+
+function timeAgo(iso){
+  if (!iso) return '';
+  const t = new Date(iso).getTime();
+  const s = Math.floor((Date.now() - t)/1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60)+'m ago';
+  if (s < 86400) return Math.floor(s/3600)+'h ago';
+  if (s < 86400*7) return Math.floor(s/86400)+'d ago';
+  return new Date(iso).toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+}
+
+function animateCount(elId, target){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  target = Number(target) || 0;
+  if (target === 0){ el.textContent = '0'; return; }
+  const start = performance.now();
+  const dur = Math.min(900, 200 + target * 18);
+  const initial = Number(el.textContent) || 0;
+  function tick(now){
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const val = Math.round(initial + (target - initial) * eased);
+    el.textContent = val.toLocaleString('en-IN');
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// Bootstrap — load each independently so one failure doesn't block others
+console.info('[pucho-bhai] bootstrap starting');
+(function bootstrap(){
+  try { loadCities().catch(function(e){ console.error('[loadCities]', e); }); }
+  catch(e){ console.error('[loadCities sync]', e); }
+
+  try { loadCategories().catch(function(e){ console.error('[loadCategories]', e); }); }
+  catch(e){ console.error('[loadCategories sync]', e); }
+
+  try { loadLeaderboard().catch(function(e){ console.error('[loadLeaderboard]', e); }); }
+  catch(e){ console.error('[loadLeaderboard sync]', e); }
+
+  setTimeout(function(){
+    var qList = document.getElementById('qList');
+    if (qList && (qList.innerHTML.indexOf('spinner') >= 0 || qList.innerHTML.trim() === '')) {
+      console.warn('[pucho-bhai] qList still empty after 3s, forcing loadQuestions');
+      try { loadQuestions(); } catch(e){ console.error('[forced loadQuestions]', e); }
+    }
+  }, 3000);
+
+  setTimeout(function(){
+    var lb = document.getElementById('lbList');
+    if (lb && lb.textContent.trim() === 'Loading\u2026') {
+      console.warn('[pucho-bhai] leaderboard still Loading after 3s, forcing');
+      try { loadLeaderboard(); } catch(e){ console.error('[forced loadLeaderboard]', e); }
+    }
+  }, 3000);
+})();
+</script>
+
+<!-- Mobile bottom nav -->
+<script>
+  if (window.innerWidth <= 768) {
+    var nav = document.createElement('nav');
+    nav.id = 'mobileBottomNav';
+    nav.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E2E8F0;display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:90;box-shadow:0 -2px 8px rgba(15,23,42,.04)';
+    nav.innerHTML =
+      '<a href="/" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🏠<div>Home</div></a>' +
+      '<a href="/browse.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">📂<div>Browse</div></a>' +
+      '<a href="/pucho-bhai.html" style="text-align:center;text-decoration:none;color:var(--pb-primary-d);font-size:.66rem;font-weight:800">💬<div>Pucho Bhai</div></a>' +
+      '<a href="/search.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">🔍<div>Search</div></a>' +
+      '<a href="/panel/dashboard.html" style="text-align:center;text-decoration:none;color:#64748B;font-size:.66rem;font-weight:700">👤<div>Account</div></a>';
+    document.body.appendChild(nav);
+  }
+</script>
+
+<script src="/assets/js/error-reporter.js" defer></script>
+</body>
+</html>

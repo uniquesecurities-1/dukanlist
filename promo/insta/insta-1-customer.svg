@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+    <radialGradient id="spotlight" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="rgba(251,191,36,0.18)"/>
+      <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- BG -->
+  <rect width="1080" height="1080" fill="url(#bg1)"/>
+  <rect width="1080" height="1080" fill="url(#spotlight)"/>
+
+  <!-- Decorative dots pattern (subtle) -->
+  <g opacity="0.08" fill="#FBBF24">
+    <circle cx="120" cy="180" r="3"/>
+    <circle cx="950" cy="220" r="4"/>
+    <circle cx="80" cy="900" r="3"/>
+    <circle cx="980" cy="950" r="3"/>
+    <circle cx="540" cy="80" r="2"/>
+    <circle cx="200" cy="1000" r="2"/>
+    <circle cx="900" cy="800" r="3"/>
+  </g>
+
+  <!-- Decorative shapes -->
+  <circle cx="940" cy="180" r="160" fill="rgba(251,191,36,0.06)"/>
+  <circle cx="140" cy="900" r="220" fill="rgba(249,115,22,0.04)"/>
+
+  <!-- Top label -->
+  <g transform="translate(540, 130)">
+    <text text-anchor="middle" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="22" letter-spacing="4">📍 MANDI DABWALI · SIRSA · BATHINDA</text>
+  </g>
+
+  <!-- Logo / brand -->
+  <g transform="translate(540, 230)">
+    <rect x="-180" y="-50" width="360" height="80" rx="40" fill="url(#goldGrad)" filter="url(#glow)"/>
+    <text text-anchor="middle" fill="#0F172A" font-family="'Manrope', sans-serif" font-weight="900" font-size="42" y="6">📍 DukanList</text>
+  </g>
+
+  <!-- Headline -->
+  <g transform="translate(540, 400)">
+    <text text-anchor="middle" fill="#FFFFFF" font-family="'Manrope', sans-serif" font-weight="900" font-size="92" letter-spacing="-3">Apna Local</text>
+    <text text-anchor="middle" fill="url(#goldGrad)" font-family="'Manrope', sans-serif" font-weight="900" font-size="92" letter-spacing="-3" y="100">Directory.</text>
+  </g>
+
+  <!-- Sub headline -->
+  <g transform="translate(540, 620)">
+    <text text-anchor="middle" fill="#cbd5e1" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="34" letter-spacing="-0.5">Doctor · Dukaan · Halwai · Tailor</text>
+    <text text-anchor="middle" fill="#cbd5e1" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="34" letter-spacing="-0.5" y="44">Mechanic · Mistri · Salon · CA</text>
+  </g>
+
+  <!-- Stats row -->
+  <g transform="translate(540, 760)">
+    <g transform="translate(-300, 0)">
+      <text text-anchor="middle" fill="#FBBF24" font-family="'Manrope', sans-serif" font-weight="900" font-size="64">195+</text>
+      <text text-anchor="middle" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="18" letter-spacing="2" y="32">CATEGORIES</text>
+    </g>
+    <g transform="translate(0, 0)">
+      <text text-anchor="middle" fill="#FBBF24" font-family="'Manrope', sans-serif" font-weight="900" font-size="64">100%</text>
+      <text text-anchor="middle" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="18" letter-spacing="2" y="32">VERIFIED</text>
+    </g>
+    <g transform="translate(300, 0)">
+      <text text-anchor="middle" fill="#FBBF24" font-family="'Manrope', sans-serif" font-weight="900" font-size="64">FREE</text>
+      <text text-anchor="middle" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="18" letter-spacing="2" y="32">FOREVER</text>
+    </g>
+  </g>
+
+  <!-- CTA box -->
+  <g transform="translate(540, 900)">
+    <rect x="-280" y="-40" width="560" height="80" rx="40" fill="url(#goldGrad)" filter="url(#glow)"/>
+    <text text-anchor="middle" fill="#0F172A" font-family="'Manrope', sans-serif" font-weight="900" font-size="36" y="14">🔍 dukanlist.com</text>
+  </g>
+
+  <!-- Bottom tagline -->
+  <g transform="translate(540, 1010)">
+    <text text-anchor="middle" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="20" letter-spacing="2">SIRSA–BATHINDA · LOCAL TRUST · NO PAID RANKING</text>
+  </g>
+</svg>

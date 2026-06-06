@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Contact Us — dukanlist.com</title>
+<meta name="description" content="Get in touch with DukanList team — Mandi Dabwali office, WhatsApp, email. Shopkeeper support, partnership, legal inquiries.">
+<link rel="canonical" href="https://dukanlist.com/contact.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dukanlist.com/contact.html">
+<meta property="og:title" content="Contact DukanList — Mandi Dabwali office, WhatsApp, email">
+<meta property="og:description" content="Reach out for shopkeeper support, partnerships, or legal inquiries. We respond fast.">
+<meta property="og:image" content="https://dukanlist.com/assets/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260528">
+<style>
+.contact-hero{ text-align:center; padding:40px 20px 30px; background:linear-gradient(180deg,#FFF7ED 0%,#fff 100%); border-bottom:1px solid var(--line) }
+.contact-hero h1{ font-family:'Manrope',sans-serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:900; letter-spacing:-.02em; margin-bottom:8px }
+.contact-hero .lead{ color:var(--ink-2); font-size:1rem; max-width:580px; margin:0 auto }
+.contact-grid{ max-width:980px; margin:30px auto; padding:0 20px; display:grid; grid-template-columns:1fr; gap:20px }
+@media (min-width:760px){ .contact-grid{ grid-template-columns:1.1fr 1fr } }
+.contact-card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px; box-shadow:var(--shadow-sm) }
+.contact-card h2{ font-family:'Manrope',sans-serif; font-size:1.2rem; font-weight:800; margin-bottom:14px; color:var(--ink) }
+html[data-lang="hi"] .contact-card h2{ font-family:'Noto Sans Devanagari',sans-serif }
+.contact-method{ display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px dashed var(--line) }
+.contact-method:last-child{ border:none }
+.contact-method .ico{ width:42px; height:42px; border-radius:10px; display:grid; place-items:center; font-size:1.4rem; flex-shrink:0; background:linear-gradient(135deg,#FFF7ED,#FED7AA); border:1px solid #FED7AA }
+.contact-method .info{ flex:1 }
+.contact-method .label{ font-size:.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px }
+.contact-method .val{ font-size:.96rem; font-weight:600; color:var(--ink) }
+.contact-method .val a{ color:var(--saffron-deep); text-decoration:none }
+.contact-method .val a:hover{ text-decoration:underline }
+.contact-method .sub{ font-size:.82rem; color:var(--muted); margin-top:2px; line-height:1.5 }
+
+.cta-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap }
+.cta-btn{ display:inline-flex; align-items:center; gap:6px; padding:11px 18px; border-radius:9px; font-weight:800; font-size:.92rem; text-decoration:none; transition:.15s; border:none; cursor:pointer; font-family:inherit }
+.cta-wa{ background:#25D366; color:#fff; box-shadow:0 4px 12px rgba(37,211,102,.35) }
+.cta-wa:hover{ background:#1EBE5B; text-decoration:none; transform:translateY(-1px); color:#fff }
+.cta-mail{ background:var(--indigo); color:#fff }
+.cta-mail:hover{ background:var(--indigo-deep); text-decoration:none; color:#fff }
+.cta-call{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff }
+.cta-call:hover{ text-decoration:none; transform:translateY(-1px); color:#fff }
+
+.office-box{ background:linear-gradient(135deg,#FFFBEB,#FFF7ED); border:1px solid #FED7AA; border-radius:12px; padding:18px; margin-top:14px }
+.office-box h3{ font-size:1rem; font-weight:800; margin-bottom:6px; color:var(--saffron-deep) }
+.office-box p{ font-size:.92rem; line-height:1.6; color:var(--ink-2) }
+.office-box a{ color:var(--saffron-deep); font-weight:700 }
+
+.hours-table{ width:100%; border-collapse:collapse; font-size:.88rem; margin-top:8px }
+.hours-table td{ padding:5px 0; border-bottom:1px dashed var(--line) }
+.hours-table td:last-child{ text-align:right; color:var(--muted) }
+.hours-table tr:last-child td{ border:none }
+
+.inquiry-types{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px }
+@media (max-width:480px){ .inquiry-types{ grid-template-columns:1fr } }
+.inquiry-type{ background:#F8FAFC; border:1px solid var(--line); border-radius:10px; padding:12px; text-decoration:none; color:var(--ink); transition:.15s }
+.inquiry-type:hover{ background:#fff; border-color:var(--saffron); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.06); text-decoration:none }
+.inquiry-type .it-icon{ font-size:1.4rem; margin-bottom:4px }
+.inquiry-type .it-title{ font-weight:800; font-size:.88rem; margin-bottom:2px }
+.inquiry-type .it-email{ font-size:.76rem; color:var(--muted); font-family:'Inter',monospace }
+</style>
+
+<!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/browse.html"><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></a>
+      <a href="/about.html"><span data-i18n-en>About</span><span data-i18n-hi>हमारे बारे</span></a>
+      <a href="/register.html" class="nav-cta"><span data-i18n-en>+ Register</span><span data-i18n-hi>+ रजिस्टर</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="contact-hero">
+  <h1>
+    <span data-i18n-en>📞 <span class="grad">Get in Touch</span></span>
+    <span data-i18n-hi>📞 <span class="grad">संपर्क करें</span></span>
+  </h1>
+  <p class="lead">
+    <span data-i18n-en>From Mandi Dabwali to all of Bharat — we're here to help. WhatsApp us for fastest response.</span>
+    <span data-i18n-hi>मंडी डबवाली से पूरे भारत तक — हम आपकी मदद के लिए हैं। WhatsApp सबसे तेज़।</span>
+  </p>
+</section>
+
+<div class="contact-grid">
+
+  <!-- Left: Contact methods -->
+  <div class="contact-card">
+    <h2>
+      <span data-i18n-en>Reach Us Directly</span>
+      <span data-i18n-hi>हमसे बात करें</span>
+    </h2>
+
+    <div class="contact-method">
+      <div class="ico">💬</div>
+      <div class="info">
+        <div class="label">WhatsApp</div>
+        <div class="val"><a href="https://wa.me/919541223377?text=Hi%20DukanList%20team%2C%20I%20have%20a%20query%20about" target="_blank">+91 95412 23377</a></div>
+        <div class="sub">
+          <span data-i18n-en>Fastest response · 9 AM – 9 PM IST</span>
+          <span data-i18n-hi>सबसे तेज़ जवाब · सुबह 9 - रात 9 बजे</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-method">
+      <div class="ico">📞</div>
+      <div class="info">
+        <div class="label"><span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span></div>
+        <div class="val"><a href="tel:+919541223377">+91 95412 23377</a></div>
+        <div class="sub">
+          <span data-i18n-en>10 AM – 7 PM IST · Mon to Sat</span>
+          <span data-i18n-hi>सुबह 10 - शाम 7 · सोम-शनि</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-method">
+      <div class="ico">✉️</div>
+      <div class="info">
+        <div class="label">Email (General)</div>
+        <div class="val"><a href="mailto:hello@dukanlist.com">hello@dukanlist.com</a></div>
+        <div class="sub">
+          <span data-i18n-en>Response within 24 hours</span>
+          <span data-i18n-hi>24 घंटे में जवाब</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="cta-btn cta-wa" href="https://wa.me/919541223377?text=Hi%20DukanList%20team" target="_blank">
+        💬 <span data-i18n-en>Chat on WhatsApp</span><span data-i18n-hi>WhatsApp चैट</span>
+      </a>
+      <a class="cta-btn cta-call" href="tel:+919541223377">
+        📞 <span data-i18n-en>Call Now</span><span data-i18n-hi>कॉल करें</span>
+      </a>
+    </div>
+
+    <h2 style="margin-top:24px">
+      <span data-i18n-en>📧 By Inquiry Type</span>
+      <span data-i18n-hi>📧 विषय के अनुसार</span>
+    </h2>
+    <div class="inquiry-types">
+      <a class="inquiry-type" href="mailto:support@dukanlist.com">
+        <div class="it-icon">🛟</div>
+        <div class="it-title">
+          <span data-i18n-en>Owner Support</span>
+          <span data-i18n-hi>मालिक सपोर्ट</span>
+        </div>
+        <div class="it-email">support@dukanlist.com</div>
+      </a>
+      <a class="inquiry-type" href="mailto:privacy@dukanlist.com">
+        <div class="it-icon">🔒</div>
+        <div class="it-title">
+          <span data-i18n-en>Privacy / Data</span>
+          <span data-i18n-hi>गोपनीयता / डेटा</span>
+        </div>
+        <div class="it-email">privacy@dukanlist.com</div>
+      </a>
+      <a class="inquiry-type" href="mailto:legal@dukanlist.com">
+        <div class="it-icon">⚖️</div>
+        <div class="it-title">
+          <span data-i18n-en>Legal / Disputes</span>
+          <span data-i18n-hi>कानूनी / विवाद</span>
+        </div>
+        <div class="it-email">legal@dukanlist.com</div>
+      </a>
+      <a class="inquiry-type" href="mailto:partner@dukanlist.com">
+        <div class="it-icon">🤝</div>
+        <div class="it-title">
+          <span data-i18n-en>Partnerships</span>
+          <span data-i18n-hi>साझेदारी</span>
+        </div>
+        <div class="it-email">partner@dukanlist.com</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Right: Office address -->
+  <div class="contact-card">
+    <h2>
+      <span data-i18n-en>🏢 Our Office</span>
+      <span data-i18n-hi>🏢 हमारा कार्यालय</span>
+    </h2>
+    <div class="office-box">
+      <h3>DigiMutual Goals Pvt. Ltd.</h3>
+      <p>
+        <span data-i18n-en class="block">SCO-01, Near IndusInd Bank,</span>
+        <span data-i18n-en class="block">Aastha Hospital Street, Chotala Road,</span>
+        <span data-i18n-en class="block">Mandi Dabwali — 125104</span>
+        <span data-i18n-en class="block">District Sirsa, Haryana, India</span>
+        <span data-i18n-hi class="block">SCO-01, इंडसइंड बैंक के पास,</span>
+        <span data-i18n-hi class="block">आस्था अस्पताल स्ट्रीट, चोटाला रोड,</span>
+        <span data-i18n-hi class="block">मंडी डबवाली — 125104</span>
+        <span data-i18n-hi class="block">जिला सिरसा, हरियाणा, भारत</span>
+      </p>
+      <a href="https://www.google.com/maps/search/?api=1&query=Unique+Securities+SCO-01+Chotala+Road+Mandi+Dabwali" target="_blank" style="display:inline-block;margin-top:8px">
+        🗺 <span data-i18n-en>Open in Google Maps →</span><span data-i18n-hi>Google Maps में देखें →</span>
+      </a>
+    </div>
+
+    <h2 style="margin-top:24px">
+      <span data-i18n-en>🕒 Office Hours</span>
+      <span data-i18n-hi>🕒 ऑफिस का समय</span>
+    </h2>
+    <table class="hours-table">
+      <tr><td><span data-i18n-en>Monday – Friday</span><span data-i18n-hi>सोम - शुक्र</span></td><td class="keep-en">10:00 AM – 7:00 PM</td></tr>
+      <tr><td><span data-i18n-en>Saturday</span><span data-i18n-hi>शनिवार</span></td><td class="keep-en">10:00 AM – 5:00 PM</td></tr>
+      <tr><td><span data-i18n-en>Sunday</span><span data-i18n-hi>रविवार</span></td><td><span data-i18n-en>Closed</span><span data-i18n-hi>बंद</span></td></tr>
+      <tr><td><strong>WhatsApp</strong></td><td class="keep-en">9:00 AM – 9:00 PM</td></tr>
+    </table>
+
+    <h2 style="margin-top:24px">
+      <span data-i18n-en>📜 Company</span>
+      <span data-i18n-hi>📜 कंपनी</span>
+    </h2>
+    <p style="font-size:.88rem;color:var(--ink-2);line-height:1.6">
+      <span class="block"><strong>DigiMutual Goals Pvt. Ltd.</strong></span>
+      <span class="block"><span data-i18n-en>Registered under the Companies Act, 2013</span><span data-i18n-hi>कंपनी अधिनियम, 2013 के तहत पंजीकृत</span></span>
+    </p>
+  </div>
+
+</div>
+
+<!-- Quick action strip for shopkeepers -->
+<div style="background:linear-gradient(135deg,var(--indigo-deep),var(--indigo));color:#fff;padding:40px 20px;margin-top:30px;text-align:center">
+  <h2 style="font-family:'Manrope',sans-serif;font-size:1.5rem;font-weight:900;margin-bottom:8px;color:#FFFFFF;letter-spacing:-.01em">
+    <span data-i18n-en>Need help registering your business?</span>
+    <span data-i18n-hi>दुकान रजिस्टर करने में मदद चाहिए?</span>
+  </h2>
+  <p style="opacity:.85;margin-bottom:14px;font-size:.95rem">
+    <span data-i18n-en>WhatsApp us — we'll walk you through it in 5 minutes.</span>
+    <span data-i18n-hi>WhatsApp करें — 5 मिनट में पूरा कर देंगे।</span>
+  </p>
+  <a class="cta-btn cta-wa" href="https://wa.me/919541223377?text=Hi%2C%20I%20need%20help%20registering%20my%20shop%20on%20DukanList" target="_blank" style="font-size:1rem">
+    💬 <span data-i18n-en>Get Free Help on WhatsApp →</span><span data-i18n-hi>WhatsApp पर मदद लें →</span>
+  </a>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com ·
+  <a href="/about.html">About</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a>
+</footer>
+
+<script src="/assets/js/nav.js" defer></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+}
+window.addEventListener('DOMContentLoaded', () => setLang(localStorage.getItem('shop_lang') || 'en'));
+</script>
+
+<script src="/assets/js/error-reporter.js" defer></script>
+</body>
+</html>

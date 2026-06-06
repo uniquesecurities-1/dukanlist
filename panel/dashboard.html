@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>My Listing Dashboard — dukanlist.com</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260531">
+<style>
+.dash-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:18px 0 24px }
+.kpi{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px }
+.kpi .lab{ font-size:.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px }
+.kpi .val{ font-family:'Manrope',sans-serif; font-size:1.7rem; font-weight:900; color:var(--ink); letter-spacing:-.02em }
+.kpi .delta{ font-size:.78rem; color:var(--emerald); font-weight:700; margin-top:2px }
+.verif-badges{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px }
+.vbadge{ font-size:.7rem; font-weight:800; padding:4px 9px; border-radius:99px }
+.vbadge.on{ background:#DCFCE7; color:#065F46 }
+.vbadge.off{ background:#FEE2E2; color:#991B1B }
+.status-pill{ display:inline-block; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase }
+.status-pill.pending{ background:#FEF3C7; color:#92400E }
+.status-pill.active{ background:#DCFCE7; color:#065F46 }
+.status-pill.flagged{ background:#FEE2E2; color:#991B1B }
+.quick-actions{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-top:14px }
+.qa{ background:#fff; border:1.5px solid var(--line); border-radius:11px; padding:14px; text-decoration:none; color:inherit; transition:.15s; display:flex; align-items:center; gap:11px }
+.qa:hover{ border-color:var(--saffron); transform:translateY(-1px); text-decoration:none; box-shadow:0 4px 12px rgba(255,107,26,.15) }
+.qa .ico{ font-size:1.7rem }
+.qa .name{ font-weight:800; font-size:.92rem; color:var(--ink) }
+.qa .desc{ font-size:.75rem; color:var(--muted); margin-top:1px }
+
+/* Phase 9 (2026-06-05): Daily Buzz Stories */
+.db-card{ background:#fff; border:1px solid #E5E7EB; border-radius:18px; padding:18px 20px; margin-top:16px; box-shadow:0 8px 24px rgba(15,23,42,.06) }
+.db-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap }
+.db-icon{ font-size:1.3rem }
+.db-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#0F172A; letter-spacing:-.015em; flex:1 }
+.db-sub{ font-size:.72rem; color:#94A3B8; font-weight:700 }
+.db-input{ width:100%; min-height:80px; resize:vertical; padding:12px 14px; border:1px solid #E2E8F0; border-radius:12px; font-family:inherit; font-size:.95rem; color:#0F172A; outline:none; font-weight:500 }
+.db-input:focus{ border-color:#FBBF24 }
+.db-input::placeholder{ color:#94A3B8 }
+.db-meta{ display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap }
+.db-count{ font-size:.74rem; color:#64748B; font-weight:700 }
+.db-bg-picker{ display:flex; gap:5px; flex:1 }
+.db-bg-dot{ width:24px; height:24px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:.15s }
+.db-bg-dot:hover{ transform:scale(1.15) }
+.db-bg-dot.active{ border-color:#0F172A; box-shadow:0 0 0 2px #FBBF24 }
+.db-post-btn{ background:linear-gradient(135deg,#FBBF24,#F97316); color:#0F172A; border:none; padding:9px 18px; border-radius:10px; font-weight:900; font-size:.86rem; cursor:pointer; font-family:inherit; box-shadow:0 6px 16px rgba(251,191,36,.32); transition:.15s }
+.db-post-btn:hover:not(:disabled){ transform:translateY(-1px) }
+.db-post-btn:disabled{ opacity:.6; cursor:wait }
+.db-preview-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap }
+.db-active-story{ flex:1; min-width:140px; border-radius:12px; padding:12px 14px; color:#fff; position:relative; overflow:hidden }
+.db-active-text{ font-size:.86rem; line-height:1.35; font-weight:600; margin-bottom:6px; max-height:3.5em; overflow:hidden }
+.db-active-meta{ display:flex; justify-content:space-between; align-items:center; font-size:.7rem; opacity:.85 }
+.db-del-btn{ background:rgba(0,0,0,.3); color:#fff; border:none; width:20px; height:20px; border-radius:50%; cursor:pointer; font-size:.8rem; line-height:1 }
+.db-empty{ color:#94A3B8; font-size:.86rem; padding:12px; text-align:center; font-weight:600 }
+</style>
+
+<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+</head>
+<body>
+<!-- Impersonation banner -->
+<script src="/assets/js/impersonation-banner.js"></script>
+<!-- Email verification reminder banner — shows if email not yet confirmed -->
+<script src="/assets/js/email-verify-banner.js"></script>
+<!-- Welcome Onboarding Wizard (first-time login only) -->
+<!-- Replaced Hinglish tips modal with a clean, action-focused wizard
+     that deep-links each step to the specific page that completes it. -->
+<div id="welcomeModalDL" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.78);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:#fff;border-radius:22px;max-width:520px;width:100%;padding:34px 30px 30px;box-shadow:0 24px 64px rgba(15,23,42,0.35);position:relative;animation:welcomeIn 0.4s ease-out;font-family:'Manrope',Inter,-apple-system,sans-serif">
+    <button onclick="closeWelcomeModal()" style="position:absolute;top:16px;right:16px;background:#F1F5F9;border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;color:#64748B;line-height:1" aria-label="Close">×</button>
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-size:3.4rem;line-height:1;margin-bottom:6px">🎉</div>
+      <h2 style="font-size:1.7rem;font-weight:900;letter-spacing:-0.02em;color:#0F172A;margin-bottom:6px">
+        Welcome to DukanList!
+      </h2>
+      <p style="color:#64748B;font-size:.95rem;line-height:1.5;max-width:380px;margin:0 auto">
+        Your shop is now visible to customers across <b style="color:#0F172A">Sirsa, Bathinda, Mansa &amp; Muktsar</b>.
+      </p>
+    </div>
+
+    <!-- Sub-heading -->
+    <div style="margin:22px 0 14px;padding:11px 14px;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-radius:11px;border-left:4px solid #F59E0B">
+      <div style="font-size:.7rem;font-weight:800;color:#92400E;letter-spacing:.08em;text-transform:uppercase">Get your first lead in 3 quick steps</div>
+      <div style="font-size:.78rem;color:#78350F;margin-top:2px">Completing all three takes about 4 minutes.</div>
+    </div>
+
+    <!-- Step 1: Photos -->
+    <a href="/panel/photos.html" style="display:flex;gap:14px;align-items:center;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#F97316'" onmouseout="this.style.transform='';this.style.borderColor='#FED7AA'">
+      <div style="background:#fff;border:2px solid #F97316;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#C2410C;flex-shrink:0">1</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">📸 Add 3+ shop photos</div>
+        <div style="font-size:.8rem;color:#78350F;margin-top:3px">Shops with photos get 3× more calls. Real photos beat stock images every time.</div>
+      </div>
+      <div style="background:#F97316;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Add →</div>
+    </a>
+
+    <!-- Step 2: USP -->
+    <a href="/panel/profile.html#usp" style="display:flex;gap:14px;align-items:center;background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#2563EB'" onmouseout="this.style.transform='';this.style.borderColor='#93C5FD'">
+      <div style="background:#fff;border:2px solid #2563EB;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#1E40AF;flex-shrink:0">2</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">✨ Write a one-line USP</div>
+        <div style="font-size:.8rem;color:#1E3A8A;margin-top:3px">Tell customers why to pick you — "Free home delivery", "20+ years experience", "Lowest price guarantee".</div>
+      </div>
+      <div style="background:#2563EB;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Write →</div>
+    </a>
+
+    <!-- Step 3: Share -->
+    <a href="/panel/poster-studio.html" style="display:flex;gap:14px;align-items:center;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:18px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#15803D'" onmouseout="this.style.transform='';this.style.borderColor='#86EFAC'">
+      <div style="background:#fff;border:2px solid #15803D;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#15803D;flex-shrink:0">3</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">📱 Share with your customers</div>
+        <div style="font-size:.8rem;color:#14532D;margin-top:3px">Generate a free WhatsApp Status poster with QR code. Send it to 50 customers — leads start flowing.</div>
+      </div>
+      <div style="background:#15803D;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Create →</div>
+    </a>
+
+    <!-- Email verify reminder -->
+    <div id="welcomeEmailVerify" style="display:none;background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.82rem;color:#78350F;line-height:1.4">
+      <b>⚠️ Verify your email</b> — Look for the confirmation link in your inbox. Once verified, your listing goes live publicly.
+    </div>
+
+    <!-- Bottom action -->
+    <button onclick="closeWelcomeModal()" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:12px;font-size:.98rem;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.01em">
+      Start exploring DukanList →
+    </button>
+
+    <div style="text-align:center;margin-top:12px;font-size:.74rem;color:#94a3b8">
+      You can revisit this guide anytime from <b>Dashboard</b>.
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes welcomeIn { from{opacity:0;transform:scale(0.9) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes confettiFall { 0%{transform:translateY(-100vh) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+.streak-badge {
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#FBBF24,#F59E0B);
+  color:#78350F;padding:5px 12px;border-radius:99px;
+  font-size:.78rem;font-weight:800;letter-spacing:0.5px;
+  box-shadow:0 2px 8px rgba(245,158,11,0.3);
+  animation:streakPulse 2s ease-in-out infinite;
+}
+@keyframes streakPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+.tip-of-day-card {
+  background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);
+  border:2px solid #F59E0B;
+  border-radius:16px;
+  padding:18px 22px;
+  margin:18px 0;
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  position:relative;
+  overflow:hidden;
+}
+.tip-of-day-card::before {
+  content:'';
+  position:absolute;top:0;right:0;
+  width:120px;height:120px;
+  background:radial-gradient(circle, rgba(245,158,11,0.15), transparent 70%);
+  pointer-events:none;
+}
+.tip-of-day-card .tip-icon { font-size:2rem;flex-shrink:0;line-height:1 }
+.tip-of-day-card .tip-content { flex:1;position:relative;z-index:1 }
+.tip-of-day-card .tip-label {
+  font-size:.7rem;color:#92400E;text-transform:uppercase;
+  letter-spacing:2px;font-weight:800;margin-bottom:4px;
+}
+.tip-of-day-card .tip-text {
+  font-family:'Manrope',sans-serif;font-size:1rem;font-weight:700;
+  color:#0F172A;line-height:1.4;
+}
+.tip-of-day-card .tip-sub {
+  font-size:.82rem;color:#78350F;margin-top:4px;
+}
+
+
+/* ===== Dashboard Desktop 2-Column Layout ===== */
+.dash-layout-v2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+@media (min-width: 1100px) {
+  .dash-layout-v2 {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 28px;
+  }
+}
+.dash-main-v2 { min-width: 0 }
+.dash-side-v2 { display: flex; flex-direction: column; gap: 18px }
+@media (min-width: 1100px) {
+  .dash-side-v2 { position: sticky; top: 20px; align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; padding-right: 4px }
+  .dash-side-v2::-webkit-scrollbar { width: 6px }
+  .dash-side-v2::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px }
+}
+
+/* Enhanced KPI cards - gradient backgrounds */
+.dash-grid .kpi {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF7ED 100%);
+  border: 1px solid #FED7AA;
+  border-radius: 16px;
+  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.dash-grid .kpi::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(255,107,26,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-grid .kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255,107,26,0.15);
+}
+.dash-grid .kpi:nth-child(2) { background: linear-gradient(135deg, #FFFFFF 0%, #DCFCE7 100%); border-color: #86EFAC }
+.dash-grid .kpi:nth-child(2)::before { background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%) }
+.dash-grid .kpi:nth-child(3) { background: linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%); border-color: #FCD34D }
+.dash-grid .kpi:nth-child(3)::before { background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%) }
+.dash-grid .kpi:nth-child(4) { background: linear-gradient(135deg, #FFFFFF 0%, #EDE9FE 100%); border-color: #C4B5FD }
+.dash-grid .kpi:nth-child(4)::before { background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%) }
+
+.dash-grid .kpi .lab { font-size: .78rem; color: #64748B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px }
+.dash-grid .kpi .val { font-family: 'Manrope', sans-serif; font-size: 2.2rem; font-weight: 900; color: #0F172A; line-height: 1; letter-spacing: -0.02em }
+
+/* Sidebar widgets */
+.side-widget {
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+}
+.side-widget-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: .82rem;
+  font-weight: 800;
+  color: #0F172A;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Quick Action grid in sidebar */
+.qa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.qa-tile {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-decoration: none;
+  text-align: center;
+  transition: all .15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.qa-tile:hover {
+  background: #FFF7ED;
+  border-color: #FB923C;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251,146,60,0.15);
+}
+.qa-tile-ico { font-size: 1.4rem; line-height: 1 }
+.qa-tile-lbl { font-size: .72rem; font-weight: 700; color: #0F172A }
+
+/* Recent Activity feed */
+.activity-feed-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #E2E8F0;
+  font-size: .82rem;
+}
+.activity-feed-item:last-child { border-bottom: none }
+.activity-feed-icon { font-size: 1rem; flex-shrink: 0; width: 22px; text-align: center }
+.activity-feed-text { flex: 1; color: #334155 }
+.activity-feed-time { font-size: .68rem; color: #94A3B8; margin-top: 2px }
+
+/* Mini Live Pulse in sidebar */
+.mini-pulse {
+  background: linear-gradient(160deg, #0F1B36 0%, #1A2848 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.mini-pulse-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.mini-pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #10B981;
+  animation: pulse-ring-mini 1.8s ease-out infinite;
+}
+@keyframes pulse-ring-mini {
+  0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.6) }
+  70% { box-shadow: 0 0 0 8px rgba(16,185,129,0) }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0) }
+}
+.mini-pulse-title { font-size: .72rem; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 2px }
+.mini-pulse-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px }
+.mini-pulse-stat { text-align: center; padding: 8px 4px; background: rgba(255,255,255,0.04); border-radius: 8px }
+.mini-pulse-num { font-family: 'Manrope', sans-serif; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg,#FFD56A,#FF9D2E); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1 }
+.mini-pulse-lbl { font-size: .62rem; color: #9DB1D4; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 700 }
+
+/* ============================================================
+   STRATEGIC (2026-06-05): Aaj ka Score + Aaj ka Poster
+   ============================================================ */
+.aaj-score-hero{
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #312E81 100%);
+  color:#fff; border-radius:20px; padding:22px 22px 18px;
+  margin-top:18px; box-shadow:0 14px 40px rgba(15,23,42,.18);
+  position:relative; overflow:hidden;
+}
+.aaj-score-hero::before{
+  content:""; position:absolute; top:-40px; right:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle, rgba(251,191,36,.18), transparent 70%);
+  pointer-events:none;
+}
+.aaj-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; position:relative; z-index:1 }
+.live-pulse{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(16,185,129,.18); color:#10B981;
+  padding:5px 11px; border-radius:99px; font-size:.7rem;
+  font-weight:900; letter-spacing:.08em;
+}
+.live-pulse .dot{
+  width:8px; height:8px; border-radius:50%; background:#10B981;
+  animation:livePulse 1.6s ease-in-out infinite;
+}
+@keyframes livePulse{
+  0%,100%{ transform:scale(1); opacity:1 }
+  50%{ transform:scale(1.4); opacity:.65 }
+}
+.aaj-date{ font-size:.78rem; color:rgba(255,255,255,.55); font-weight:600 }
+.aaj-big{ display:flex; align-items:baseline; gap:14px; margin-bottom:4px; position:relative; z-index:1 }
+.big-num{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:3.4rem; line-height:1; letter-spacing:-.04em;
+  background:linear-gradient(135deg,#FBBF24,#F97316);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.trend-arrow{
+  font-size:.85rem; font-weight:800; padding:4px 10px; border-radius:8px;
+  background:rgba(16,185,129,.18); color:#34D399;
+}
+.trend-arrow.down{ background:rgba(239,68,68,.18); color:#FCA5A5 }
+.trend-arrow.flat{ background:rgba(148,163,184,.18); color:#CBD5E1 }
+.aaj-sub{ color:rgba(255,255,255,.78); font-size:.92rem; font-weight:600; margin-bottom:18px; position:relative; z-index:1 }
+.aaj-chips{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; position:relative; z-index:1 }
+.aaj-chip{
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; padding:12px 8px; text-align:center;
+}
+.aaj-chip .ico{ font-size:1.2rem; display:block; margin-bottom:4px }
+.aaj-chip .num{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:1.3rem; color:#fff; display:block; line-height:1;
+}
+.aaj-chip .lab{
+  font-size:.65rem; color:rgba(255,255,255,.55);
+  text-transform:uppercase; letter-spacing:.1em;
+  font-weight:700; margin-top:5px; display:block;
+}
+
+/* ===== Compact Poster Studio highlight (Phase 8.7) ===== */
+.poster-highlight{
+  display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+  color:#fff; border-radius:18px; padding:18px 22px;
+  margin-top:16px; text-decoration:none;
+  box-shadow:0 14px 36px rgba(15,23,42,.20);
+  transition:.18s; position:relative; overflow:hidden;
+}
+.poster-highlight::before{
+  content:""; position:absolute; top:-50px; right:-50px;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle,rgba(251,191,36,.20),transparent 70%);
+  pointer-events:none;
+}
+.poster-highlight:hover{ transform:translateY(-2px); box-shadow:0 20px 44px rgba(15,23,42,.28); text-decoration:none; color:#fff }
+.ph-icon{
+  width:48px; height:48px; border-radius:12px;
+  background:linear-gradient(135deg,#FBBF24,#F97316);
+  display:grid; place-items:center; font-size:1.4rem;
+  box-shadow:0 8px 20px rgba(251,191,36,.4);
+  flex-shrink:0; z-index:1;
+}
+.ph-body{ flex:1; z-index:1; min-width:0 }
+.ph-label{
+  font-size:.66rem; color:rgba(251,191,36,.9); font-weight:800;
+  letter-spacing:.12em; margin-bottom:4px;
+}
+.ph-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:-.015em; line-height:1.2 }
+.ph-sub{ font-size:.78rem; color:rgba(255,255,255,.6); font-weight:600; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.ph-arrow{ font-size:1.4rem; color:rgba(251,191,36,.9); font-weight:900; z-index:1 }
+
+/* ============================================================
+   PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements
+   Professional palette, no Hinglish.
+   ============================================================ */
+
+/* ===== Town Rank Card ===== */
+.tr-card{
+  background:#fff; border:1px solid #E5E7EB; border-radius:18px;
+  padding:18px 20px; margin-top:16px;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+.tr-card.leader{ background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%); border-color:#D97706 }
+.tr-card.top3{ background:linear-gradient(135deg,#DBEAFE 0%,#BFDBFE 100%); border-color:#3B82F6 }
+.tr-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px }
+.tr-emoji{ font-size:1.3rem }
+.tr-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#0F172A; letter-spacing:-.015em }
+.tr-rank-row{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap }
+.tr-rank-big{
+  font-family:'Manrope',sans-serif; font-weight:900;
+  font-size:3rem; line-height:1; color:#1E3A8A; letter-spacing:-.04em;
+}
+.tr-card.leader .tr-rank-big{ color:#92400E }
+.tr-rank-of{ font-size:1.1rem; font-weight:700; color:#64748B }
+.tr-segment{ font-size:.82rem; color:#64748B; margin-left:8px; font-weight:600 }
+.tr-sub{ color:#475569; font-size:.92rem; font-weight:600; margin-top:10px }
+.tr-leader{
+  margin-top:14px; padding-top:14px; border-top:1px dashed #E5E7EB;
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+}
+.tr-leader-label{ font-size:.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.06em; font-weight:700 }
+.tr-leader-name{ font-weight:800; color:#0F172A; font-size:.95rem }
+.tr-card.empty{ text-align:center; padding:24px 18px }
+.tr-empty-icon{ font-size:2rem; margin-bottom:8px; opacity:.6 }
+.tr-empty-msg{ color:#64748B; font-size:.92rem; font-weight:600 }
+
+/* ===== Smart Tips Card ===== */
+.st-card{
+  background:#fff; border:1px solid #E5E7EB; border-radius:18px;
+  padding:18px 20px; margin-top:16px;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+.st-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px }
+.st-emoji{ font-size:1.3rem }
+.st-title{
+  font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem;
+  color:#0F172A; letter-spacing:-.015em; flex:1;
+}
+.st-count{
+  background:#1E3A8A; color:#fff; font-size:.7rem; font-weight:800;
+  padding:3px 10px; border-radius:99px; letter-spacing:.05em;
+}
+.st-list{ display:flex; flex-direction:column; gap:10px }
+.st-row{
+  display:grid; grid-template-columns:36px 1fr auto; gap:12px;
+  padding:12px 14px; background:#F8FAFC; border:1px solid #E2E8F0;
+  border-radius:12px; text-decoration:none; color:#0F172A;
+  transition:.15s; align-items:center;
+}
+.st-row:hover{ background:#F1F5F9; border-color:#CBD5E1; transform:translateX(2px); text-decoration:none }
+.st-row.prio-high{ border-left:3px solid #EF4444 }
+.st-row.prio-medium{ border-left:3px solid #F59E0B }
+.st-row.prio-low{ border-left:3px solid #94A3B8 }
+.st-row-icon{
+  width:36px; height:36px; display:grid; place-items:center;
+  background:#fff; border:1px solid #E5E7EB; border-radius:9px;
+  font-size:1.1rem;
+}
+.st-row-title{ font-weight:800; font-size:.92rem; line-height:1.3; color:#0F172A; margin-bottom:3px }
+.st-row-detail{ font-size:.78rem; color:#64748B; font-weight:500; line-height:1.4 }
+.st-row-cta{ font-weight:700; font-size:.82rem; color:#1E3A8A; white-space:nowrap }
+.st-card.empty{ text-align:center; padding:24px 18px }
+.st-empty-icon{ font-size:2rem; margin-bottom:6px }
+.st-empty-msg{ color:#64748B; font-size:.92rem; font-weight:600 }
+
+/* ===== Badge Wall ===== */
+.badge-wall-card{
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+  color:#fff; border-radius:18px; padding:20px;
+  margin-top:16px; box-shadow:0 14px 40px rgba(15,23,42,.16);
+}
+.bw-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px }
+.bw-title{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem;
+  letter-spacing:-.015em;
+}
+.bw-emoji{ font-size:1.3rem }
+.bw-count{ font-size:.78rem; color:rgba(255,255,255,.65); font-weight:700 }
+.bw-bar{
+  background:rgba(255,255,255,.08); border-radius:99px; height:6px;
+  overflow:hidden; margin-bottom:16px;
+}
+.bw-bar-fill{
+  background:linear-gradient(90deg,#FBBF24,#F97316);
+  height:100%; transition:width .8s ease-out;
+}
+.bw-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr));
+  gap:10px;
+}
+.bw-chip{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  padding:10px 4px; border-radius:12px; cursor:default;
+}
+.bw-chip.unlocked{ background:rgba(255,255,255,.06) }
+.bw-chip.locked{ opacity:.4 }
+.bw-chip-icon{
+  width:38px; height:38px; display:grid; place-items:center;
+  background:rgba(255,255,255,.12); border-radius:10px;
+  font-size:1.3rem;
+}
+.bw-chip-label{
+  font-size:.66rem; font-weight:700; text-align:center;
+  line-height:1.2; color:rgba(255,255,255,.88);
+}
+.bw-share-btn{
+  margin-top:14px; width:100%; background:rgba(255,255,255,.08);
+  color:#fff; border:1px solid rgba(255,255,255,.16);
+  padding:10px; border-radius:10px; font-weight:700; font-size:.85rem;
+  cursor:pointer; font-family:inherit; transition:.15s;
+}
+.bw-share-btn:hover{ background:rgba(255,255,255,.14) }
+
+/* ===== Streak pill (inline in hero) ===== */
+.streak-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(251,191,36,.18); color:#FBBF24;
+  padding:5px 12px; border-radius:99px; font-size:.78rem;
+  font-weight:800; letter-spacing:.02em; margin-left:8px;
+}
+.streak-pill .streak-num{ font-family:'Manrope',sans-serif; font-size:.95rem; font-weight:900 }
+.streak-pill .streak-lbl{ opacity:.85; font-size:.72rem }
+.streak-pill .streak-emoji{ font-size:.95rem }
+/* ===== Phase 4 (2026-06-05): Loyalty Tracker Card ===== */
+.loyalty-card{
+  background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 50%,#FCD34D 100%);
+  border-radius:18px; padding:20px;
+  margin-top:16px; box-shadow:0 14px 40px rgba(251,191,36,.15);
+  position:relative; overflow:hidden;
+}
+.loyalty-card::before{
+  content:""; position:absolute; top:-30px; right:-30px;
+  width:140px; height:140px; border-radius:50%;
+  background:radial-gradient(circle, rgba(220,38,38,.15), transparent 70%);
+  pointer-events:none;
+}
+.lc-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px; position:relative; z-index:1 }
+.lc-emoji{ font-size:1.3rem }
+.lc-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#451A03; letter-spacing:-.015em; flex:1 }
+.lc-tier{
+  display:inline-flex; align-items:center; gap:4px;
+  background:#fff; color:#92400E; font-size:.7rem; font-weight:900;
+  padding:4px 10px; border-radius:99px; letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.lc-tier.gold   { background:linear-gradient(135deg,#FBBF24,#D97706); color:#fff }
+.lc-tier.silver { background:linear-gradient(135deg,#94A3B8,#475569); color:#fff }
+.lc-tier.bronze { background:linear-gradient(135deg,#D97706,#92400E); color:#fff }
+.lc-main{ display:flex; align-items:baseline; gap:12px; margin-bottom:6px; position:relative; z-index:1 }
+.lc-num{ font-family:'Manrope',sans-serif; font-weight:900; font-size:2.8rem; line-height:1; color:#92400E; letter-spacing:-.04em }
+.lc-label{ color:#78350F; font-weight:700; font-size:.95rem }
+.lc-growth{
+  font-size:.78rem; font-weight:800; padding:3px 9px; border-radius:8px;
+  background:rgba(16,185,129,.18); color:#047857;
+}
+.lc-growth.down{ background:rgba(239,68,68,.15); color:#991B1B }
+.lc-growth.flat{ background:rgba(148,163,184,.18); color:#475569 }
+.lc-sub{ color:#78350F; font-size:.85rem; font-weight:600; margin-top:8px; position:relative; z-index:1 }
+.lc-progress{
+  margin-top:12px; height:8px; background:rgba(146,64,14,.12);
+  border-radius:99px; overflow:hidden; position:relative; z-index:1;
+}
+.lc-progress-fill{
+  height:100%; background:linear-gradient(90deg,#FBBF24,#F97316);
+  border-radius:99px; transition:width .8s ease-out;
+}
+
+
+
+</style>
+
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
+      <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
+      <a href="/panel/digital-card.html"><span data-i18n-en>📇 Digital Card</span><span data-i18n-hi>📇 डिजिटल कार्ड</span></a>
+      <a href="/panel/reviews.html"><span data-i18n-en>⭐ Reviews</span><span data-i18n-hi>⭐ रिव्यू</span></a>
+      <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
+      <a href="/panel/deals.html"><span data-i18n-en>🎁 Deals</span><span data-i18n-hi>🎁 डील्स</span></a>
+      <a href="/panel/analytics.html"><span data-i18n-en>📊 Analytics</span><span data-i18n-hi>📊 आँकड़े</span></a>
+      <a href="/panel/services.html"><span data-i18n-en>🛠️ Services</span><span data-i18n-hi>🛠️ सेवाएँ</span></a>
+      <a href="/panel/poster-studio.html"><span data-i18n-en>✨ Poster Studio</span><span data-i18n-hi>📲 WA पोस्टर</span></a>
+      <a href="/pucho-bhai.html"><span data-i18n-en>💬 Pucho Bhai</span><span data-i18n-hi>💬 पूछो भाई</span></a>
+      <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support" target="_blank" rel="noopener"><span data-i18n-en>🆘 Get Help</span><span data-i18n-hi>🆘 सहायता</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+
+  <div id="loading" style="text-align:center;padding:40px 0;color:var(--muted)">⏳ Loading your business...</div>
+
+  <div id="dashboardContent" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:8px">
+      <div>
+        <h1 class="title" id="bizNameDisp">—</h1>
+        <p class="subtitle" id="bizSubDisp">—</p>
+      </div>
+      <span class="status-pill" id="statusPill">—</span> <span id="streakBadge" style="display:none" class="streak-badge"></span>
+    </div>
+
+    <div class="verif-badges" id="verifBadges"></div>
+
+    <div class="dash-layout-v2">
+  <div class="dash-main-v2">
+
+    <!-- ===== AAJ KA SCORE — Live dopamine hero ===== -->
+    <div class="aaj-score-hero" id="aajScoreHero" style="display:none">
+      <div class="aaj-top">
+        <span class="live-pulse"><span class="dot"></span>LIVE</span>
+        <span class="aaj-date" id="aajDate">Aaj</span>
+      </div>
+      <div class="aaj-big">
+        <span class="big-num" id="aajViewsBig">0</span>
+        <span class="trend-arrow flat" id="aajTrend">— 0%</span>
+      </div>
+      <div class="aaj-sub">
+        <span data-i18n-en>people viewed your shop today</span>
+        <span data-i18n-hi>लोगों ने आज आपकी listing देखी</span>
+      </div>
+      <div class="aaj-chips">
+        <div class="aaj-chip">
+          <span class="ico">📞</span>
+          <span class="num" id="aajCalls">0</span>
+          <span class="lab">Calls</span>
+        </div>
+        <div class="aaj-chip">
+          <span class="ico">❤️</span>
+          <span class="num" id="aajSaves">0</span>
+          <span class="lab">Saves</span>
+        </div>
+        <div class="aaj-chip">
+          <span class="ico">⭐</span>
+          <span class="num" id="aajRating">—</span>
+          <span class="lab">Rating</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Phase 8.7: Compact Poster Studio highlight card ===== -->
+    <a href="/panel/poster-studio.html" id="aajPosterCard" class="poster-highlight" style="display:flex">
+      <div class="ph-icon">✨</div>
+      <div class="ph-body">
+        <div class="ph-label">POSTER STUDIO</div>
+        <div class="ph-title" id="phTitle">Today's poster is ready</div>
+        <div class="ph-sub" id="phSub">30+ templates · QR · Photo background · Festival ready</div>
+      </div>
+      <div class="ph-arrow">→</div>
+    </a>
+
+    <!-- ===== PHASE 2 (2026-06-05): Town Rank + Smart Tips + Achievements ===== -->
+    <div id="townRankCard" style="display:none"></div>
+    <div id="smartTipsCard" style="display:none"></div>
+    
+    <!-- ===== Phase 9: Daily Buzz post widget ===== -->
+    <div id="dailyBuzzWidget"></div>
+    <div id="loyaltyCard" style="display:none"></div>
+    <div id="badgeWallCard"></div>
+
+  <!-- Profile completeness widget -->
+    <div id="completenessWidget" style="margin-top:18px"></div>
+
+    <!-- Push notifications opt-in -->
+    <div style="margin-top:18px;display:flex;justify-content:flex-end">
+      <button id="enableNotifBtn" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#0F172A;border:1.5px solid #cbd5e1;padding:8px 14px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔔 Enable notifications</button>
+    </div>
+
+    <!-- Notifications bell + dropdown -->
+    <div id="notifWidget" style="margin-top:18px"></div>
+
+    <!-- Pending photo upload alert -->
+    <div class="alert warning" id="pendingPhotoAlert" style="display:none;margin-top:18px">
+      <span class="a-icon">📸</span>
+      <div>
+        <b><span data-i18n-en>Upload at least 1 photo to activate your listing.</span><span data-i18n-hi>लिस्टिंग चालू करने के लिए कम से कम 1 फोटो अपलोड करें।</span></b><br>
+        <a href="/panel/photos.html" style="font-weight:700">
+          <span data-i18n-en>Upload Now →</span><span data-i18n-hi>अभी अपलोड करें →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Verification CTA card (decoupled from approval - rendered by renderVerificationCta) -->
+    <div id="verificationCta" style="margin-top:18px"></div>
+
+    <!-- KPI -->
+    <div class="dash-grid">
+      <div class="kpi">
+        <div class="lab"><span data-i18n-en>Profile Views</span><span data-i18n-hi>प्रोफाइल विज़िट</span></div>
+        <div class="val" id="kpiViews">0</div>
+      </div>
+      <div class="kpi">
+        <div class="lab"><span data-i18n-en>Calls + WhatsApp</span><span data-i18n-hi>कॉल + WhatsApp</span></div>
+        <div class="val" id="kpiLeads">0</div>
+      </div>
+      <div class="kpi">
+        <div class="lab"><span data-i18n-en>Rating</span><span data-i18n-hi>रेटिंग</span></div>
+        <div class="val" id="kpiRating">—</div>
+        <div class="delta" id="kpiRatingCount"></div>
+      </div>
+      <div class="kpi">
+        <div class="lab"><span data-i18n-en>Trust Score</span><span data-i18n-hi>ट्रस्ट स्कोर</span></div>
+        <div class="val" id="kpiTrust">0<span style="font-size:.6em;color:var(--muted)">/5</span></div>
+      </div>
+    </div>
+
+    <!-- Daily Tip of the Day card -->
+    <div class="tip-of-day-card" id="tipOfDayCard">
+      <div class="tip-icon" id="tipIcon">💡</div>
+      <div class="tip-content">
+        <div class="tip-label">
+          <span data-i18n-en>Tip of the Day</span>
+          <span data-i18n-hi>Aaj Ka Tip</span>
+        </div>
+        <div class="tip-text" id="tipText">Loading...</div>
+        <div class="tip-sub" id="tipSub"></div>
+      </div>
+    </div>
+
+    <!-- Shareable Stats Card -->
+    <div id="shareStatsRow" style="margin:14px 0 18px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap">
+      <button onclick="openShareStatsModal()" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(5,150,105,.28);transition:.15s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 20px rgba(5,150,105,.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(5,150,105,.28)'">
+        📤 <span data-i18n-en>Share my stats</span><span data-i18n-hi>आँकड़े साझा करें</span>
+      </button>
+    </div>
+
+    <!-- Smart Actions (Owner Insights v2) -->
+    <div class="card smart-actions-card" id="smartActionsCard" style="margin-bottom:18px;display:none;background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border-color:#93C5FD">
+      <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#1E40AF">
+        <span>💡</span>
+        <span data-i18n-en>Suggested Next Actions</span><span data-i18n-hi>अगले सुझाव</span>
+      </div>
+      <div id="smartActionsList" style="display:grid;gap:8px;margin-top:10px"></div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-title">
+        <span data-i18n-en>Quick Actions</span><span data-i18n-hi>तुरंत करें</span>
+      </div>
+      <div class="quick-actions">
+        <a href="/panel/analytics.html" class="qa" style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#F59E0B">
+          <span class="ico">📊</span>
+          <div>
+            <div class="name" style="color:#92400E"><span data-i18n-en>Analytics</span><span data-i18n-hi>आपका डेटा</span></div>
+            <div class="desc" style="color:#92400E;opacity:.8"><span data-i18n-en>Views, calls, leads, trends</span><span data-i18n-hi>व्यूज, कॉल, लीड, ट्रेंड्स</span></div>
+          </div>
+        </a>
+        <a href="/panel/deals.html" class="qa" style="background:linear-gradient(135deg,#FEF2F2,#FFE4E6);border-color:#F87171">
+          <span class="ico">🎁</span>
+          <div>
+            <div class="name" style="color:#991B1B"><span data-i18n-en>Deals &amp; Offers</span><span data-i18n-hi>ऑफर्स</span></div>
+            <div class="desc" style="color:#991B1B;opacity:.8"><span data-i18n-en>Post discounts to attract customers</span><span data-i18n-hi>ग्राहकों के लिए डिस्काउंट डालें</span></div>
+          </div>
+        </a>
+        <a href="/panel/reviews.html" class="qa" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#60A5FA">
+          <span class="ico">⭐</span>
+          <div>
+            <div class="name" style="color:#1E40AF"><span data-i18n-en>Reviews &amp; Replies</span><span data-i18n-hi>रिव्यू &amp; जवाब</span></div>
+            <div class="desc" style="color:#1E40AF;opacity:.8"><span data-i18n-en>Read customer reviews + reply publicly</span><span data-i18n-hi>ग्राहक रिव्यू देखें + जवाब दें</span></div>
+          </div>
+        </a>
+        <a href="/panel/profile.html" class="qa">
+          <span class="ico">✏️</span>
+          <div>
+            <div class="name"><span data-i18n-en>Edit Profile</span><span data-i18n-hi>प्रोफाइल बदलें</span></div>
+            <div class="desc"><span data-i18n-en>Name, address, hours</span><span data-i18n-hi>नाम, पता, समय</span></div>
+          </div>
+        </a>
+        <a href="/panel/photos.html" class="qa">
+          <span class="ico">📸</span>
+          <div>
+            <div class="name"><span data-i18n-en>Manage Photos</span><span data-i18n-hi>फोटो मैनेज करें</span></div>
+            <div class="desc"><span data-i18n-en>Add/remove profile photos</span><span data-i18n-hi>दुकान फोटो जोड़ें/हटाएं</span></div>
+          </div>
+        </a>
+        <a href="/panel/services.html" class="qa">
+          <span class="ico">🛠</span>
+          <div>
+            <div class="name"><span data-i18n-en>Services + Pricing</span><span data-i18n-hi>सेवाएं और रेट</span></div>
+            <div class="desc"><span data-i18n-en>What you offer</span><span data-i18n-hi>आप क्या देते हैं</span></div>
+          </div>
+        </a>
+        <a href="#" onclick="shareProfile(event)" class="qa">
+          <span class="ico">🔗</span>
+          <div>
+            <div class="name"><span data-i18n-en>Share Profile</span><span data-i18n-hi>प्रोफाइल शेयर करें</span></div>
+            <div class="desc"><span data-i18n-en>WhatsApp / Copy link</span><span data-i18n-hi>WhatsApp / लिंक कॉपी</span></div>
+          </div>
+        </a>
+        <a href="/panel/qr-code.html" class="qa" style="background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border-color:#7DD3FC">
+          <span class="ico">📱</span>
+          <div>
+            <div class="name" style="color:#0C4A6E"><span data-i18n-en>Shop QR Code</span><span data-i18n-hi>शॉप QR कोड</span></div>
+            <div class="desc" style="color:#0C4A6E;opacity:.8"><span data-i18n-en>Print & display at counter</span><span data-i18n-hi>प्रिंट करके लगाएं</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- USP Display -->
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">
+        <span data-i18n-en>✨ Your USP</span><span data-i18n-hi>✨ आपकी USP</span>
+      </div>
+      <p id="uspDisp" style="color:var(--ink-2);font-size:.95rem;line-height:1.6">—</p>
+    </div>
+
+  </div><!-- /.dash-main-v2 -->
+
+  <aside class="dash-side-v2">
+    <!-- Quick Actions sticky widget -->
+    <div class="side-widget">
+      <div class="side-widget-title">⚡ <span data-i18n-en>Quick Actions</span><span data-i18n-hi>तेज़ कार्य</span></div>
+      <!-- Manage -->
+      <div class="qa-section-title">Manage</div>
+      <div class="qa-grid">
+        <a href="/panel/profile.html" class="qa-tile">
+          <div class="qa-tile-ico">✏️</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></div>
+        </a>
+        <a href="/panel/photos.html" class="qa-tile">
+          <div class="qa-tile-ico">📸</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></div>
+        </a>
+        <a href="/panel/profile.html#hours" class="qa-tile">
+          <div class="qa-tile-ico">⏰</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Hours</span><span data-i18n-hi>घंटे</span></div>
+        </a>
+        <a href="/panel/services.html" class="qa-tile">
+          <div class="qa-tile-ico">🛠️</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Services</span><span data-i18n-hi>सेवाएँ</span></div>
+        </a>
+      </div>
+
+      <!-- Engage -->
+      <div class="qa-section-title">Engage</div>
+      <div class="qa-grid">
+        <a href="/panel/reviews.html" class="qa-tile">
+          <div class="qa-tile-ico">⭐</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Reviews</span><span data-i18n-hi>रिव्यू</span></div>
+        </a>
+        <a href="/panel/deals.html" class="qa-tile">
+          <div class="qa-tile-ico">🎁</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Deals</span><span data-i18n-hi>डील्स</span></div>
+        </a>
+        <a href="/panel/digital-card.html" class="qa-tile">
+          <div class="qa-tile-ico">💳</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Digital Card</span><span data-i18n-hi>डिजिटल कार्ड</span></div>
+        </a>
+        <a href="/pucho-bhai.html" class="qa-tile">
+          <div class="qa-tile-ico">💬</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span></div>
+        </a>
+      </div>
+
+      <!-- Grow -->
+      <div class="qa-section-title">Grow</div>
+      <div class="qa-grid">
+        <a href="/panel/analytics.html" class="qa-tile">
+          <div class="qa-tile-ico">📊</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Analytics</span><span data-i18n-hi>आँकड़े</span></div>
+        </a>
+        <a href="/panel/poster-studio.html" class="qa-tile">
+          <div class="qa-tile-ico">📲</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Poster Studio</span><span data-i18n-hi>WA पोस्टर</span></div>
+        </a>
+        <a href="/panel/qr-code.html" class="qa-tile">
+          <div class="qa-tile-ico">📱</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>QR Card</span><span data-i18n-hi>QR कार्ड</span></div>
+        </a>
+        <a href="#" id="qaViewListing" class="qa-tile">
+          <div class="qa-tile-ico">👁️</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>My Listing</span><span data-i18n-hi>मेरी listing</span></div>
+        </a>
+      </div>
+
+      <!-- More -->
+      <div class="qa-section-title">More</div>
+      <div class="qa-grid">
+        <a href="/panel/favorites.html" class="qa-tile">
+          <div class="qa-tile-ico">♥</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Saved</span><span data-i18n-hi>पसंदीदा</span></div>
+        </a>
+        <a href="/compare.html" class="qa-tile">
+          <div class="qa-tile-ico">⚖️</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Compare</span><span data-i18n-hi>तुलना</span></div>
+        </a>
+        <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support%2C%20I%20need%20help%20with%20my%20business%20listing." target="_blank" rel="noopener" class="qa-tile">
+          <div class="qa-tile-ico">🆘</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Get Help</span><span data-i18n-hi>सहायता</span></div>
+        </a>
+        <a href="#" id="qaLogout" class="qa-tile">
+          <div class="qa-tile-ico">🚪</div>
+          <div class="qa-tile-lbl"><span data-i18n-en>Logout</span><span data-i18n-hi>लॉग आउट</span></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Profile Completeness widget -->
+    <!-- WhatsApp Status Poster widget -->
+    <div class="side-widget" style="background:linear-gradient(135deg,#F0FDF4,#BBF7D0);border-color:#16A34A">
+      <div class="side-widget-title" style="color:#166534">📱 <span data-i18n-en>WhatsApp Status Poster</span><span data-i18n-hi>WhatsApp Status Poster</span></div>
+      <div style="font-size:.82rem;color:#166534;margin-bottom:10px;line-height:1.45"><span data-i18n-en>Auto-generated 1080×1080 poster with QR code. Share on WhatsApp Status for free marketing.</span><span data-i18n-hi>1080×1080 poster with QR code. WhatsApp Status पर डालें — फ्री marketing।</span></div>
+      <a href="/panel/poster-studio.html" style="display:block;background:#25D366;color:#fff;padding:10px;border-radius:8px;font-weight:800;text-decoration:none;text-align:center;font-size:.86rem">
+        📸 <span data-i18n-en>Create Poster</span><span data-i18n-hi>Poster बनाएं</span>
+      </a>
+    </div>
+
+    <!-- Sidebar Profile Completeness widget removed (2026-06-02).
+         Replaced by the prominent main-area widget at top of dashboard
+         (#completenessWidget) which is bigger, gamified, and more
+         actionable. Single source of truth = renderProfileCompleteness(). -->
+
+
+    <!-- Ranking Battle widget -->
+    <div class="side-widget" id="rankWidget" style="background:linear-gradient(135deg,#FAF5FF,#E9D5FF);border-color:#9333EA;display:none">
+      <div class="side-widget-title" style="color:#6B21A8">🏆 <span data-i18n-en>Your Ranking</span><span data-i18n-hi>आपकी रैंकिंग</span></div>
+      <div id="rankBody" style="font-size:.84rem;color:#581C87;line-height:1.5">
+        <div style="opacity:.6;text-align:center;padding:8px"><span data-i18n-en>Loading ranking…</span><span data-i18n-hi>लोड हो रहा है…</span></div>
+      </div>
+    </div>
+
+    <!-- Referral Program widget -->
+    <div class="side-widget referral-widget" style="background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C">
+      <div class="side-widget-title" style="color:#9A3412">🎁 <span data-i18n-en>Refer & Earn</span><span data-i18n-hi>Refer & Earn</span></div>
+      <div style="font-size:.84rem;color:#7C2D12;margin-bottom:10px;line-height:1.45">
+        <span data-i18n-en>Refer <b>5 owners</b> &mdash; you BOTH get <b>6-month Featured listing FREE</b></span>
+        <span data-i18n-hi>5 मालिकों को refer करें &mdash; दोनों को <b>6-month Featured FREE</b></span>
+      </div>
+      <div style="background:#fff;padding:8px 10px;border-radius:8px;border:1px dashed #FB923C;font-size:.78rem;color:#0F172A;word-break:break-all;margin-bottom:8px" id="referralLinkBox">
+        Loading link...
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button onclick="shareReferralWhatsApp()" style="background:#25D366;color:#fff;border:none;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px">💬 WhatsApp</button>
+        <button onclick="copyReferralLink()" id="copyRefBtn" style="background:#0F172A;color:#fff;border:none;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit">📋 Copy</button>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #FB923C;font-size:.74rem;color:#9A3412;text-align:center">
+        <span data-i18n-en>Your referrals: </span><span data-i18n-hi>आपके referrals: </span>
+        <b id="refCounter">0</b>
+        <span style="margin-left:4px;opacity:.7">/ 5</span>
+      </div>
+    </div>
+
+    <!-- Recent Activity widget -->
+    <div class="side-widget">
+      <div class="side-widget-title">📋 <span data-i18n-en>Your Activity (24h)</span><span data-i18n-hi>आपकी एक्टिविटी (24h)</span></div>
+      <div id="dashActivityFeed">
+        <div class="activity-feed-item">
+          <div class="activity-feed-icon">⏳</div>
+          <div class="activity-feed-text">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini Live Platform Pulse -->
+    <div class="mini-pulse">
+      <div class="mini-pulse-header">
+        <span class="mini-pulse-dot"></span>
+        <span class="mini-pulse-title">Platform Pulse</span>
+      </div>
+      <div style="font-size:.78rem;color:#9DB1D4">
+        <span data-i18n-en>Sirsa · Bathinda · Mansa · Muktsar Live</span>
+        <span data-i18n-hi>Sirsa · Bathinda · Mansa · Muktsar Live</span>
+      </div>
+      <div class="mini-pulse-stats">
+        <div class="mini-pulse-stat">
+          <div class="mini-pulse-num" id="dashPsShops">—</div>
+          <div class="mini-pulse-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>शॉप्स</span></div>
+        </div>
+        <div class="mini-pulse-stat">
+          <div class="mini-pulse-num" id="dashPsCities">—</div>
+          <div class="mini-pulse-lbl"><span data-i18n-en>Cities</span><span data-i18n-hi>शहर</span></div>
+        </div>
+        <div class="mini-pulse-stat">
+          <div class="mini-pulse-num" id="dashPsCats">—</div>
+          <div class="mini-pulse-lbl"><span data-i18n-en>Cats</span><span data-i18n-hi>श्रेणी</span></div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- /.dash-layout-v2 -->
+
+  </div>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/og-card-generator.js"></script>
+<script src="/assets/js/completeness.js"></script>
+<script src="/assets/js/push.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanPush) DukanPush.attachButton('enableNotifBtn', { audience: 'shopkeeper' }); });</script>
+<script>
+// Lead notifications widget (loads independently — doesn't block dashboard if RPC missing)
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadNotifications, 1500);
+});
+async function loadNotifications(){
+  try {
+    const c = window.ShopDB && ShopDB.client;
+    if (!c) return;
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user) return;
+    const r = await c.rpc('my_notifications', { p_limit: 10 });
+    if (r.error) return; // RPC may not exist yet — silent
+    const items = r.data || [];
+    if (items.length === 0) return;
+    const unread = items.filter(n => !n.read_at).length;
+    const slot = document.getElementById('notifWidget');
+    if (!slot) return;
+    slot.innerHTML = '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      + '<div style="font-size:14px;font-weight:800;color:#0F172A;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:8px">'
+      + '🔔 <span>Recent Activity</span>'
+      + (unread > 0 ? ' <span style="background:#EF4444;color:#fff;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:800">' + unread + ' new</span>' : '')
+      + '</div>'
+      + (unread > 0 ? '<button onclick="markAllNotifRead()" style="background:transparent;border:0;color:#6366F1;font-size:12px;font-weight:700;cursor:pointer">Mark all read</button>' : '')
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:8px">'
+      + items.slice(0, 5).map(n => {
+          const isUnread = !n.read_at;
+          const when = timeAgo(n.created_at);
+          return '<div style="display:flex;gap:10px;padding:10px 12px;background:' + (isUnread ? '#FFFBF5' : '#F8FAFC') + ';border:1px solid ' + (isUnread ? '#FED7AA' : '#E2E8F0') + ';border-radius:10px">'
+            + '<div style="flex:1">'
+            + '<div style="font-weight:700;font-size:13px;color:#0F172A">' + escNotif(n.title) + (isUnread ? ' <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#EF4444;vertical-align:middle"></span>' : '') + '</div>'
+            + (n.body ? '<div style="font-size:12px;color:#64748b;margin-top:2px;line-height:1.4">' + escNotif(n.body) + '</div>' : '')
+            + '<div style="font-size:11px;color:#94a3b8;margin-top:4px;font-weight:600">' + when + '</div>'
+            + '</div></div>';
+        }).join('')
+      + '</div></div>';
+  } catch(_) {}
+}
+async function markAllNotifRead(){
+  const c = window.ShopDB && ShopDB.client;
+  if (!c) return;
+  await c.rpc('mark_notifications_read', { p_ids: null });
+  loadNotifications();
+}
+function escNotif(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function timeAgo(iso){
+  if (!iso) return '';
+  const d = new Date(iso), diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+</script>
+<script src="/assets/js/nav.js" defer></script>
+<script>
+function setLang(lang){
+  if (lang !== 'en' && lang !== 'hi') lang = 'en';
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  localStorage.setItem('shop_lang', lang);
+  document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('langBtnHi').classList.toggle('active', lang === 'hi');
+}
+
+let MY_BUSINESS = null;
+
+async function loadDashboard(){
+  const user = await ShopDB.requireAuth();
+  if (!user) return;
+
+  // 📧 Email verification gate banner — for users with pre-existing sessions
+  // who haven't verified their email yet. New logins are blocked at login.html,
+  // but a session created before the verification fix could still reach here.
+  if (user && !user.email_confirmed_at && !user.confirmed_at){
+    const host = document.getElementById('loading');
+    if (host){
+      host.innerHTML =
+        '<div style="max-width:520px;margin:30px auto;background:#FEF2F2;border:1px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:14px;padding:22px 22px 18px;text-align:center">'
+        + '<div style="font-size:2.4rem;margin-bottom:6px">📧</div>'
+        + '<div style="font-size:1.15rem;font-weight:800;color:#7F1D1D;margin-bottom:6px">Email verify pending</div>'
+        + '<div style="color:#7C2D12;font-size:.95rem;line-height:1.55;margin-bottom:14px">Aapki listing tab tak admin ke paas approval ke liye nahi jaayegi jab tak aap apna email verify nahi karenge. <br><b>Inbox + Spam folder</b> me <b>noreply@dukanlist.com</b> se aayi confirmation email check karein.</div>'
+        + '<button id="resendVerifyBtn" style="background:#1E3A8A;color:#fff;border:0;padding:11px 22px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">📧 Resend verification email</button>'
+        + '<div id="resendVerifyMsg" style="font-size:12px;color:#7C2D12;margin-top:10px;min-height:18px"></div>'
+        + '<div style="font-size:12px;color:#9A3412;margin-top:10px;line-height:1.55">Already verified? <a href="/panel/login.html" style="color:#1E3A8A;font-weight:700">Logout</a> aur dobara login karein — sab thik ho jaayega.</div>'
+        + '</div>';
+      const btn = document.getElementById('resendVerifyBtn');
+      const msg = document.getElementById('resendVerifyMsg');
+      if (btn) btn.addEventListener('click', async () => {
+        btn.disabled = true; btn.textContent = '⏳ Sending...';
+        try {
+          const c2 = ShopDB.client;
+          const { error } = await c2.auth.resend({ type: 'signup', email: user.email });
+          if (error) throw error;
+          msg.innerHTML = '✓ Verification email re-sent to <b>' + (user.email || '') + '</b>. Inbox + Spam check karein (1-2 min lag sakte hain).';
+          btn.textContent = '✓ Sent';
+        } catch(e){
+          msg.textContent = '⚠ Could not send: ' + (e.message || 'Try again in a minute.');
+          btn.disabled = false; btn.textContent = '📧 Resend verification email';
+        }
+      });
+    }
+    return;
+  }
+
+  const c = ShopDB.client;
+  // 🚨 SECURITY FIX 2 (2026-05-28): Use get_my_business_safe() RPC.
+  // The old query `.eq('auth_user_id', user.id).limit(1)` was returning
+  // a NON-DETERMINISTIC row when same auth_user_id had multiple
+  // business_owners links (legacy bad data from before db/71). This
+  // caused users to see WRONG shops randomly across page loads.
+  // The new RPC ranks matches by email/phone match against the auth
+  // user's identity and picks the BEST + EARLIEST claim deterministically.
+  let owners = null;
+  let multiShopWarning = '';
+  try {
+    const safeRes = await c.rpc('get_my_business_safe');
+    if (safeRes.error){
+      console.warn('[dashboard] get_my_business_safe RPC missing — fallback:', safeRes.error.message);
+      const fb = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+      owners = fb.data;
+    } else if (safeRes.data && safeRes.data.length){
+      owners = safeRes.data.map(r => ({ business_id: r.business_id }));
+      if (safeRes.data[0].warning) multiShopWarning = safeRes.data[0].warning;
+    } else {
+      owners = [];
+    }
+  } catch(e){
+    console.error('[dashboard] business lookup failed:', e);
+    const fb = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+    owners = fb.data;
+  }
+
+  if (!owners || !owners.length){
+    const metaMobile = (user.user_metadata && user.user_metadata.mobile)
+      ? String(user.user_metadata.mobile).replace(/\D/g,'').slice(-10) : '';
+    const userEmail = user.email || '';
+    const waMsg = encodeURIComponent('Hello DukanList team, I registered with email ' + userEmail + ' but my account shows "No business linked". Kindly help me link my shop.');
+    const waUrl = 'https://wa.me/919541223377?text=' + waMsg;
+
+    function escapeHtmlSafe(s){
+      return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    document.getElementById('loading').innerHTML =
+      '<div style="max-width:560px;margin:24px auto;padding:0 16px;font-family:Manrope,Inter,-apple-system,sans-serif">'
+      // -------- Header card (info, not warning) --------
+      + '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:18px;padding:24px 24px 22px;box-shadow:0 6px 22px rgba(15,23,42,0.06);margin-bottom:16px">'
+      +   '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">'
+      +     '<div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#DBEAFE,#BFDBFE);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0">&#128279;</div>'
+      +     '<div style="flex:1;min-width:0">'
+      +       '<div style="font-size:1.2rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:4px">Link your shop to this account</div>'
+      +       '<div style="font-size:.88rem;color:#475569;line-height:1.5">Your email is verified. Now connect your existing shop listing or register a new one.</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:11px 14px;font-size:.84rem;color:#334155;line-height:1.5">'
+      +     '<span style="color:#64748B;font-weight:600">Signed in as</span> <b style="color:#0F172A;word-break:break-all">' + escapeHtmlSafe(userEmail) + '</b>'
+      +   '</div>'
+      + '</div>'
+      // -------- Option 1: Link by mobile --------
+      + '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:18px 20px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,23,42,0.04)">'
+      +   '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+      +     '<span style="background:#FF6B1A;color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.82rem">1</span>'
+      +     '<div style="flex:1">'
+      +       '<div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">Link an existing shop</div>'
+      +       '<div style="font-size:.78rem;color:#64748B;margin-top:2px">Enter the 10-digit mobile number used at registration</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+      +     '<input id="linkMobile" type="tel" inputmode="numeric" maxlength="10" value="' + escapeHtmlSafe(metaMobile) + '" placeholder="10-digit mobile" style="flex:1;min-width:160px;padding:12px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:15px;font-family:inherit;font-weight:600;letter-spacing:.05em">'
+      +     '<button onclick="tryLinkByMobile()" id="linkBtn" style="background:linear-gradient(135deg,#FF6B1A,#F97316);color:#fff;border:0;padding:12px 22px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,26,0.3);font-family:inherit;white-space:nowrap">&#128279; Link my shop</button>'
+      +   '</div>'
+      +   '<div id="linkErr" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#FEE2E2;color:#991B1B;font-size:.85rem;line-height:1.5;border:1px solid #FCA5A5"></div>'
+      +   '<div id="linkOk" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#D1FAE5;color:#065F46;font-size:.85rem;line-height:1.5;border:1px solid #6EE7B7"></div>'
+      + '</div>'
+      // -------- Option 2: Register new shop --------
+      + '<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 20px;margin-bottom:12px">'
+      +   '<div style="display:flex;align-items:center;gap:10px">'
+      +     '<span style="background:#1E3A8A;color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.82rem">2</span>'
+      +     '<div style="flex:1">'
+      +       '<div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">Register a new shop</div>'
+      +       '<div style="font-size:.78rem;color:#64748B;margin-top:2px">If you have not registered yet</div>'
+      +     '</div>'
+      +     '<a href="/register.html" style="background:#1E3A8A;color:#fff;padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;white-space:nowrap">Register &rarr;</a>'
+      +   '</div>'
+      + '</div>'
+      // -------- WhatsApp help --------
+      + '<div style="background:linear-gradient(135deg,#25D366,#128C7E);border-radius:14px;padding:14px 18px;color:#fff;display:flex;align-items:center;gap:12px">'
+      +   '<span style="font-size:1.6rem">&#128172;</span>'
+      +   '<div style="flex:1">'
+      +     '<b style="font-size:.95rem">Need help? We respond personally</b>'
+      +     '<div style="font-size:.78rem;opacity:.9;margin-top:2px">Average reply on WhatsApp: 5 minutes</div>'
+      +   '</div>'
+      +   '<a href="' + waUrl + '" target="_blank" style="background:#fff;color:#128C7E;padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:800;font-size:.84rem;white-space:nowrap">WhatsApp us</a>'
+      + '</div>'
+      + '<div style="text-align:center;margin-top:16px"><a href="#" onclick="ShopDB.signOut();return false;" style="font-size:.84rem;color:#64748B;text-decoration:none">Logout and sign in with a different email &rarr;</a></div>'
+      + '</div>';
+
+    window.tryLinkByMobile = async function(){
+      const el = document.getElementById('linkMobile');
+      const er = document.getElementById('linkErr');
+      const ok = document.getElementById('linkOk');
+      const btn = document.getElementById('linkBtn');
+      er.style.display = 'none';
+      ok.style.display = 'none';
+
+      const m = (el.value || '').replace(/\D/g,'').slice(-10);
+      if (m.length !== 10){
+        er.innerHTML = '<b>&#9888; Invalid mobile</b><br>Please enter a valid 10-digit Indian mobile number (without +91).';
+        er.style.display = 'block'; return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Searching...';
+
+      try {
+        const preview = await c.rpc('preview_claim_by_phone', { p_mobile: m });
+        if (preview.error) throw preview.error;
+        const matches = preview.data || [];
+
+        if (matches.length === 0){
+          er.innerHTML =
+            '<b>&#10060; No shop found for this mobile</b><br>' +
+            'Possible reasons:<br>' +
+            '&bull; You may already be linked (try logging out and back in)<br>' +
+            '&bull; Mobile may be in a different format from the one used at registration<br>' +
+            '&bull; The shop has not been registered yet<br>' +
+            '<br><b>Need help?</b> <a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp us with your email and mobile</a> &mdash; we will link it manually.';
+          er.style.display = 'block';
+          btn.disabled = false; btn.textContent = '🔗 Link my shop';
+          return;
+        }
+
+        if (matches.length > 1){
+          er.innerHTML =
+            '<b>&#9888; Multiple shops found on this mobile</b><br>' +
+            'For safety, admin will link the correct one manually. Shops found:<br>' +
+            '<small>' + matches.map(x => '&bull; ' + x.name).join('<br>') + '</small><br><br>' +
+            '<a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp admin to confirm your shop</a>';
+          er.style.display = 'block';
+          btn.disabled = false; btn.textContent = '🔗 Link my shop';
+          return;
+        }
+
+        const shopName = matches[0].name || 'this shop';
+        if (!confirm('Link this account to "' + shopName + '"?\n\nThis will become your shop dashboard. Confirm ONLY if this is YOUR shop.')){
+          btn.disabled = false; btn.textContent = '🔗 Link my shop';
+          return;
+        }
+      } catch(e){
+        console.warn('preview_claim_by_phone unavailable:', e && e.message || e);
+      }
+
+      const rr = await c.rpc('claim_business_by_phone', { p_mobile: m });
+      if (rr.error){
+        er.innerHTML = '<b>&#10060; Could not link</b><br>' + escapeHtmlSafe(rr.error.message || 'Unknown error') + '<br><br><a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp us for manual help</a>';
+        er.style.display = 'block';
+        btn.disabled = false; btn.textContent = '🔗 Link my shop';
+        return;
+      }
+
+      ok.innerHTML = '<b>&#10003; Shop linked successfully!</b><br>Refreshing your dashboard...';
+      ok.style.display = 'block';
+      setTimeout(function(){ location.reload(); }, 1200);
+    };
+    return;
+  }
+
+  const { data: biz, error: bizErr } = await c
+    .from('businesses')
+    .select('*, geo_cities(name, name_hi)')
+    .eq('id', owners[0].business_id)
+    .maybeSingle();
+
+  if (bizErr || !biz){
+    console.error('Business load error:', bizErr);
+    document.getElementById('loading').innerHTML = '⚠ Could not load your business.';
+    return;
+  }
+
+  // 🚨 STRICT ADMIN GATE: block dashboard if business is not yet approved.
+  // Login.html already blocks this path, but a pre-existing session could still reach here.
+  if (biz.status !== 'active' && biz.status !== 'pending_review'){
+    let icon = '⏳', title = '', body = '', tone = '#FEF3C7', border = '#F59E0B';
+    if (biz.status === 'pending'){
+      title = 'Listing admin approval ke liye pending hai';
+      body = 'Aapki listing "<b>' + (biz.name || '') + '</b>" abhi review me hai. Admin approve karte hi sab features unlock ho jaayenge.<br><br>' +
+             '<b>Yahan tak hum verify karte hain:</b><br>' +
+             '• Genuine local business hai ya nahi<br>• Address + contact sahi hai ya nahi<br>• Category sahi assign ki hai ya nahi<br><br>' +
+             'Usually 24 ghante me approve ho jaata hai. Tezi ke liye:<br>' +
+             '<a href="https://wa.me/919541223377?text=' + encodeURIComponent('Hi, meri listing "' + (biz.name || '') + '" admin approval ke liye pending hai. Kindly verify karein.') + '" target="_blank" style="display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none">📱 WhatsApp +91 95412 23377</a>';
+    } else if (biz.status === 'disabled'){
+      tone = '#FEE2E2'; border = '#DC2626'; icon = '⛔';
+      title = 'Listing temporarily disabled hai';
+      body = 'Admin ne "<b>' + (biz.name || '') + '</b>" temporarily disable ki hai. Reactivate karwane ke liye contact karein.';
+    } else if (biz.status === 'banned'){
+      tone = '#FEE2E2'; border = '#7F1D1D'; icon = '🚫';
+      title = 'Listing rejected';
+      body = 'Aapki listing approve nahi ki gayi. Reason aur next steps ke liye contact karein.';
+    } else {
+      title = 'Listing review me hai';
+      body = 'Status: ' + biz.status + '. Admin review ke baad notify karenge.';
+    }
+
+    document.getElementById('loading').innerHTML =
+      '<div style="max-width:560px;margin:30px auto;padding:0 16px"><div style="background:' + tone + ';border:1.5px solid ' + border + ';border-left:5px solid ' + border + ';border-radius:14px;padding:24px 22px;text-align:center;line-height:1.6">' +
+      '<div style="font-size:3rem;margin-bottom:8px">' + icon + '</div>' +
+      '<div style="font-size:1.25rem;font-weight:900;color:#0F172A;margin-bottom:10px">' + title + '</div>' +
+      '<div style="font-size:.95rem;color:#475569;text-align:left">' + body + '</div>' +
+      '<div style="margin-top:18px;padding-top:14px;border-top:1px dashed ' + border + '"><button onclick="ShopDB.signOut()" style="background:#0F172A;color:#fff;border:0;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit">Logout</button></div>' +
+      '</div></div>';
+    return;
+  }
+
+  // Fetch primary category separately (avoids dual-FK ambiguity)
+  const primaryCatId = biz.sub_category_id || biz.category_id;
+  if (primaryCatId){
+    const { data: cat } = await c.from('categories')
+      .select('slug, name, name_hi, icon')
+      .eq('id', primaryCatId)
+      .maybeSingle();
+    biz.categories = cat || { slug:'', name:'—', icon:'🏪' };
+  } else {
+    biz.categories = { slug:'', name:'—', icon:'🏪' };
+  }
+
+  MY_BUSINESS = biz;
+  window.MY_BUSINESS = biz;
+  // First-login: apply pending_owner_role from registration
+  try {
+    const pendingRole = localStorage.getItem('pending_owner_role');
+    if (pendingRole && !biz.owner_role){
+      c.rpc('update_my_role', { p_role: pendingRole }).then(r => {
+        if (!r.error){ biz.owner_role = pendingRole; localStorage.removeItem('pending_owner_role'); }
+      }).catch(()=>{});
+    }
+  } catch(_){}
+  // expose for cross-script widgets
+  renderDashboard(biz);
+  // Power widgets (panel sidebar)
+  try { renderProfileCompleteness(biz); } catch(e){ console.warn('PC widget:', e); }
+  try { loadRankingBattle(biz); }       catch(e){ console.warn('Rank widget:', e); }
+
+  // Load multi-cat badges
+  loadCategoryBadges(biz.id);
+
+  // ===== Verification CTA (only show if approved + not yet verified) =====
+  try { renderVerificationCta(biz, c); } catch(e){ console.warn('Verification CTA:', e); }
+
+  // ===== STRATEGIC (2026-06-05) — Aaj ka Score + Aaj ka Poster =====
+  try { initAajKaScore(biz, c); } catch(e){ console.warn('Aaj Score:', e); }
+  try { initAajKaPoster(biz); }   catch(e){ console.warn('Aaj Poster:', e); }
+  try { if (window.DailyBuzz) DailyBuzz.renderOwnerWidget('dailyBuzzWidget', c, biz); else setTimeout(() => window.DailyBuzz && DailyBuzz.renderOwnerWidget('dailyBuzzWidget', c, biz), 800); } catch(e){ console.warn('DailyBuzz:', e); }
+
+  // ===== STRATEGIC PHASE 2 (2026-06-05) — Town Rank + Smart Tips + Badges + Streak =====
+  try { initPhase2Cards(biz, c); } catch(e){ console.warn('Phase 2:', e); }
+
+  // ===== OG SHARE CARD auto-generation (DISABLED 2026-06-01) =====
+  // Disabled on dashboard load to keep console clean. The auto-hook was
+  // calling Supabase Storage upload + RPC on every dashboard load, which
+  // logged 400 errors when the business-og bucket RLS policies were not
+  // fully synced. OG cards still get generated when the owner saves their
+  // profile (panel/profile.html). api/share.js falls back to first photo
+  // or default image if og_image_url is missing — no UX impact.
+  //
+  // To re-enable: verify db/73-og-share-card-storage.sql is fully deployed
+  // in Supabase (column + bucket + 4 RLS policies + 2 RPCs) and uncomment.
+}
+
+async function loadCategoryBadges(bizId){
+  const c = ShopDB.client;
+  try{
+    const { data } = await c.rpc('get_business_categories', { p_business_id: bizId });
+    if (!data || data.length <= 1) return;
+    // Sort: primary first
+    data.sort((a,b) => (b.is_primary?1:0) - (a.is_primary?1:0));
+    const sub = document.getElementById('bizSubDisp');
+    if (!sub) return;
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 600px)').matches;
+    const uniqId = 'catB_' + Date.now();
+
+    // Mobile: show primary only, with +N more toggle
+    if (isMobile) {
+      const primary = data[0];
+      const extras  = data.slice(1);
+      const star = primary.is_primary ? '⭐ ' : '';
+      const priChip = `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:.75rem;border:1px solid #F59E0B;background:#FFFBEB;color:#92400E;font-weight:800">${star}${primary.icon||''} ${escapeHTML(primary.name)}</span>`;
+      let moreChip = '';
+      if (extras.length > 0) {
+        moreChip = `<button type="button" id="${uniqId}_more" style="border:1px solid #cbd5e1;background:#fff;color:#475569;font-weight:700;font-size:.72rem;padding:4px 10px;border-radius:99px;cursor:pointer">+${extras.length} more</button>`;
+      }
+      sub.insertAdjacentHTML('afterend',
+        `<div id="${uniqId}" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center">${priChip}${moreChip}</div>`
+      );
+      if (extras.length > 0) {
+        document.getElementById(`${uniqId}_more`).addEventListener('click', () => {
+          const host = document.getElementById(uniqId);
+          host.innerHTML = priChip + extras.map(cat =>
+            `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:.72rem;border:1px solid #e2e8f0;background:#f1f5f9;color:#475569;font-weight:600">${cat.icon||''} ${escapeHTML(cat.name)}</span>`
+          ).join('');
+        });
+      }
+      return;
+    }
+
+    // Desktop: show all
+    const html = data.map(cat => {
+      const isPri = cat.is_primary;
+      const star = isPri ? '⭐ ' : '';
+      const style = isPri
+        ? 'background:#FFFBEB;border-color:#F59E0B;color:#92400E;font-weight:800'
+        : 'background:#f1f5f9;border-color:#e2e8f0;color:#475569;font-weight:600';
+      return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:.75rem;border:1px solid;${style}">${star}${cat.icon||''} ${escapeHTML(cat.name)}</span>`;
+    }).join('');
+    sub.insertAdjacentHTML('afterend', `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${html}</div>`);
+  }catch(e){ console.warn('Category badges failed', e); }
+}
+
+function escapeHTML(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+// ============================================================
+// renderVerificationCta(biz, c)
+// Decoupling approval from verification - db/84
+// States:
+//   1. verified_visit === true                 -> success card
+//   2. verification_requested_at within 7 days -> pending card
+//   3. status === 'active' + not verified      -> CTA card
+//   4. status !== 'active'                     -> hidden
+// ============================================================
+function renderVerificationCta(biz, c){
+  const host = document.getElementById('verificationCta');
+  if (!host) return;
+  if (!biz || biz.status !== 'active'){ host.innerHTML = ''; return; }
+
+  // STATE 1 - already verified
+  if (biz.verified_visit === true){
+    host.innerHTML = '<div style="background:linear-gradient(135deg,#ECFDF5 0%,#D1FAE5 100%);border:1.5px solid #10B981;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px">'
+      + '<div style="width:44px;height:44px;border-radius:50%;background:#10B981;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0">✓</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-weight:800;color:#065F46;font-size:.98rem;margin-bottom:2px">Verified Shop — Blue Tick Earned</div>'
+      + '<div style="color:#047857;font-size:.83rem;line-height:1.45">DukanList admin team has physically visited &amp; confirmed this business. Aapki listing par blue badge live hai.</div>'
+      + '</div></div>';
+    return;
+  }
+
+  // STATE 2 - recent request pending
+  const reqAt = biz.verification_requested_at ? new Date(biz.verification_requested_at) : null;
+  const sevenDaysAgo = new Date(Date.now() - 7*24*60*60*1000);
+  if (reqAt && reqAt > sevenDaysAgo){
+    const days = Math.max(0, Math.floor((Date.now() - reqAt.getTime())/(24*60*60*1000)));
+    const dayLabel = days === 0 ? 'today' : (days === 1 ? '1 day ago' : days + ' days ago');
+    host.innerHTML = '<div style="background:#FFFBEB;border:1.5px solid #F59E0B;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px">'
+      + '<div style="width:44px;height:44px;border-radius:50%;background:#F59E0B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⏳</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-weight:800;color:#92400E;font-size:.98rem;margin-bottom:2px">Verification Request Received</div>'
+      + '<div style="color:#78350F;font-size:.83rem;line-height:1.45">Requested ' + dayLabel + '. DukanList admin team will contact you within 3-7 business days for a physical visit. Make sure your shop is reachable on the mobile number you provided.</div>'
+      + '</div></div>';
+    return;
+  }
+
+  // STATE 3 - eligible, not yet requested
+  host.innerHTML = '<div style="background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border:1.5px solid #3B82F6;border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
+    + '<div style="width:52px;height:52px;border-radius:50%;background:#3B82F6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">✓</div>'
+    + '<div style="flex:1;min-width:200px">'
+    + '<div style="font-weight:800;color:#1E3A8A;font-size:1rem;margin-bottom:3px">Get the Blue Verified Badge</div>'
+    + '<div style="color:#1E40AF;font-size:.83rem;line-height:1.45">DukanList team aapke shop par physical visit karke verification kar sakti hai. Verified shops ko search me higher rank, customer trust aur leads jyada milte hai. <b>Bilkul Free.</b></div>'
+    + '</div>'
+    + '<button id="btnRequestVerify" style="background:#1D4ED8;color:#fff;border:none;padding:11px 22px;border-radius:99px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(29,78,216,.25);flex-shrink:0">Request Verification Visit</button>'
+    + '</div>';
+
+  const btn = document.getElementById('btnRequestVerify');
+  if (btn){
+    btn.addEventListener('click', async function(){
+      btn.disabled = true;
+      btn.textContent = 'Sending request...';
+      try{
+        const { data, error } = await c.rpc('shopkeeper_request_verification');
+        if (error){
+          alert('Error: ' + (error.message || 'Could not submit request. Please try again.'));
+          btn.disabled = false; btn.textContent = 'Request Verification Visit'; return;
+        }
+        if (data && data.success === false){
+          alert(data.message || 'Could not submit request.');
+          btn.disabled = false; btn.textContent = 'Request Verification Visit'; return;
+        }
+        biz.verification_requested_at = new Date().toISOString();
+        renderVerificationCta(biz, c);
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#065F46;color:#fff;padding:12px 22px;border-radius:99px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:.9rem';
+        toast.textContent = '✓ Verification request sent. Admin team will contact you soon.';
+        document.body.appendChild(toast);
+        setTimeout(function(){ toast.remove(); }, 4000);
+      }catch(e){
+        alert('Network error. Please check your connection and try again.');
+        btn.disabled = false; btn.textContent = 'Request Verification Visit';
+      }
+    });
+  }
+}
+
+function renderDashboard(b){
+  document.getElementById('bizNameDisp').textContent = b.name;
+  document.getElementById('bizSubDisp').textContent =
+    (b.categories?.icon || '') + ' ' + (b.categories?.name || '') +
+    ' · ' + (b.geo_cities?.name || '') + ' · ' + (b.pincode || '');
+  // Status pill
+  const pill = document.getElementById('statusPill');
+  pill.textContent = b.status.toUpperCase();
+  pill.className = 'status-pill ' + b.status;
+
+  // Verification badges
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  const badges = [
+    { label: lang==='hi'?'मोबाइल':'Mobile',   on: b.verified_mobile },
+    { label: lang==='hi'?'पता':'Address',     on: b.verified_address },
+    { label: lang==='hi'?'फोटो':'Photo',      on: b.verified_photo },
+    { label: lang==='hi'?'विज़िट':'Visited',  on: b.verified_visit }
+  ];
+  document.getElementById('verifBadges').innerHTML = badges.map(x =>
+    `<span class="vbadge ${x.on?'on':'off'}">${x.on?'✓':'○'} ${x.label}</span>`
+  ).join('');
+
+  // KPIs
+  document.getElementById('kpiViews').textContent  = (b.view_count || 0).toLocaleString();
+  document.getElementById('kpiLeads').textContent  = (b.lead_count || 0).toLocaleString();
+  document.getElementById('kpiRating').textContent = b.rating_avg > 0 ? Number(b.rating_avg).toFixed(1) + ' ⭐' : '—';
+  document.getElementById('kpiRatingCount').textContent = b.rating_count > 0 ? '(' + b.rating_count + ' review' + (Number(b.rating_count)===1?'':'s') + ')' : '';
+  document.getElementById('kpiTrust').innerHTML    = b.verified_score + '<span style="font-size:.6em;color:var(--muted)">/5</span>';
+
+  // Photo upload alert
+  if (!b.verified_photo){
+    document.getElementById('pendingPhotoAlert').style.display = '';
+  }
+
+  // USP
+  document.getElementById('uspDisp').textContent = b.usp_text || '— (no USP yet — add via Edit Profile)';
+
+  // Trust Tier roadmap (Power Features Pack)
+  if (typeof DukanTier !== 'undefined'){
+    renderTierRoadmap(b);
+  }
+
+  // Smart Actions card (Owner Insights v2)
+  renderSmartActions(b);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('dashboardContent').style.display = '';
+}
+
+function renderTierRoadmap(b){
+  const result = DukanTier.compute(b);
+  let host = document.getElementById('tierRoadmapHost');
+  if (!host){
+    host = document.createElement('div');
+    host.id = 'tierRoadmapHost';
+    const usp = document.getElementById('uspDisp');
+    const anchor = usp ? usp.closest('.card, .panel, .section') || usp.parentNode : document.getElementById('dashboardContent');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(host, anchor.nextSibling);
+  }
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  const L = (en, hi) => lang === 'hi' ? hi : en;
+  const tierLabelsEn = { gold:'\u{1F3C5} Gold Trusted', silver:'\u{1F948} Silver Verified', bronze:'✓ Verified' };
+  const tierLabelsHi = { gold:'\u{1F3C5} गोल्ड ट्रस्टेड', silver:'\u{1F948} सिल्वर वेरिफाइड', bronze:'✓ वेरिफाइड' };
+  const currentLabel = result.tier
+    ? (lang === 'hi' ? tierLabelsHi[result.tier] : tierLabelsEn[result.tier])
+    : L('Not yet verified', 'अभी वेरिफाइड नहीं');
+  if (!result.nextTier){
+    host.innerHTML = '<div class="tier-roadmap tier-complete">'
+      + '<h3>\u{1F3C6} ' + L('Top Tier Reached!', 'सर्वोच्च टीयर हासिल!') + '</h3>'
+      + '<div class="tr-current">' + L('Your shop is at', 'आपकी दुकान') + ' ' + currentLabel + '. '
+      + L('Keep delighting customers — high ratings retain this status automatically.', 'ग्राहकों को खुश रखते रहें — अच्छी रेटिंग से यह स्तर बना रहेगा।') + '</div>'
+      + '</div>';
+    return;
+  }
+  const nextLabel = result.nextTier.tier === 'gold'
+      ? L('Gold Trusted \u{1F3C5}', 'गोल्ड ट्रस्टेड \u{1F3C5}')
+      : result.nextTier.tier === 'silver'
+      ? L('Silver Verified \u{1F948}', 'सिल्वर वेरिफाइड \u{1F948}')
+      : L('Verified', 'वेरिफाइड');
+  const items = result.nextTier.missing.map(m => '<li>' + escapeHTML(m) + '</li>').join('');
+  host.innerHTML = '<div class="tier-roadmap">'
+    + '<h3>\u{1F680} ' + L('Level up your trust tier', 'अपना ट्रस्ट टीयर बढ़ाएँ') + '</h3>'
+    + '<div class="tr-current">' + L('Current tier', 'वर्तमान टीयर') + ': <b>' + currentLabel + '</b></div>'
+    + '<div class="tr-next">' + L('To reach', 'पहुँचने के लिए') + ' <b>' + nextLabel + '</b>:</div>'
+    + '<ul>' + (items || '<li>' + L('You meet all requirements — refresh in a few minutes.', 'आप सभी शर्तें पूरी कर रहे हैं — कुछ मिनट में रिफ्रेश करें।') + '</li>') + '</ul>'
+    + '</div>';
+}
+
+function shareProfile(e){
+  e.preventDefault();
+  if (!MY_BUSINESS) return;
+  const url = location.origin + '/business.html?slug=' + encodeURIComponent(MY_BUSINESS.slug);
+  const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us on DukanList: ${url}`;
+  if (navigator.share) {
+    navigator.share({ title: MY_BUSINESS.name, text: msg, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('Profile link copied!\n' + url);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadDashboard();
+});
+
+function renderSmartActions(b){
+  const list = document.getElementById('smartActionsList');
+  const card = document.getElementById('smartActionsCard');
+  if (!list || !card || !b) return;
+
+  const actions = [];
+  const photoCount = Array.isArray(b.photos) ? b.photos.length : 0;
+  const rating = Number(b.rating_avg) || 0;
+  const reviewCount = Number(b.rating_count) || 0;
+  const verified = Number(b.verified_score) || 0;
+  const hasUSP = !!(b.usp_text && b.usp_text.length > 10);
+  const hasAbout = !!(b.about_text && b.about_text.length > 50);
+  const hasHours = b.hours_json && Object.keys(b.hours_json).length > 0;
+  const hasYear = !!b.established_year;
+
+  // Generate smart action suggestions (top 3 most impactful)
+  if (photoCount < 3){
+    actions.push({
+      icon: '\u{1F4F8}',
+      title: photoCount === 0 ? 'Add your first photo' : 'Add ' + (3 - photoCount) + ' more photo' + (photoCount === 2 ? '' : 's'),
+      sub: 'Shops with 3+ photos get 2x more views',
+      href: '/panel/photos.html',
+      cta: 'Upload now'
+    });
+  }
+  if (!hasUSP){
+    actions.push({
+      icon: '\u{2728}',
+      title: 'Write your shop\'s USP',
+      sub: 'A one-line pitch that makes you stand out',
+      href: '/panel/profile.html#usp',
+      cta: 'Add USP'
+    });
+  }
+  if (!hasAbout){
+    actions.push({
+      icon: '\u{1F4D6}',
+      title: 'Write About section',
+      sub: 'Tell customers your story (50+ characters)',
+      href: '/panel/profile.html#about',
+      cta: 'Add now'
+    });
+  }
+  if (!hasHours){
+    actions.push({
+      icon: '\u{1F552}',
+      title: 'Set business hours',
+      sub: 'Customers see Open/Closed status',
+      href: '/panel/profile.html#hours',
+      cta: 'Set hours'
+    });
+  }
+  if (!hasYear){
+    actions.push({
+      icon: '\u{1F3DB}',
+      title: 'Add established year',
+      sub: 'Unlocks Gold Trusted tier eligibility',
+      href: '/panel/profile.html',
+      cta: 'Update'
+    });
+  }
+  if (reviewCount < 5 && photoCount >= 1){
+    actions.push({
+      icon: '\u{2B50}',
+      title: 'Ask customers for reviews',
+      sub: 'Print your QR code and place it at the counter',
+      href: '/panel/qr-code.html',
+      cta: 'Print QR'
+    });
+  }
+  if (rating >= 4 && reviewCount >= 5){
+    actions.push({
+      icon: '\u{1F4AC}',
+      title: 'Reply to recent reviews',
+      sub: 'Owner replies build trust with future customers',
+      href: '/panel/reviews.html',
+      cta: 'Open reviews'
+    });
+  }
+  if (verified < 3){
+    actions.push({
+      icon: '\u{1F6E1}',
+      title: 'Get DukanList verified',
+      sub: 'Verified shops appear higher in search',
+      href: 'https://wa.me/919541223377?text=' + encodeURIComponent('Please verify my shop: ' + (b.name || '')),
+      cta: 'Request verify',
+      external: true
+    });
+  }
+
+  // Always-on suggestions (low priority, only if nothing else)
+  if (actions.length < 3){
+    actions.push({
+      icon: '\u{1F381}',
+      title: 'Post a deal/offer',
+      sub: 'Attract weekend customers with a discount',
+      href: '/panel/deals.html',
+      cta: 'Post deal'
+    });
+  }
+
+  // Show top 3 only
+  const top = actions.slice(0, 3);
+  if (!top.length){
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+  list.innerHTML = top.map(a => '<a href="' + a.href + '"' + (a.external ? ' target="_blank" rel="noopener"' : '') + ' style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #BFDBFE;border-radius:10px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#3B82F6\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#BFDBFE\';this.style.transform=\'translateX(0)\'">'
+    + '<span style="font-size:1.5rem;flex-shrink:0">' + a.icon + '</span>'
+    + '<div style="flex:1;min-width:0">'
+    +   '<div style="font-weight:800;font-size:.9rem;color:#0F172A;letter-spacing:-.01em">' + escapeHTML(a.title) + '</div>'
+    +   '<div style="font-size:.78rem;color:#64748B;margin-top:2px">' + escapeHTML(a.sub) + '</div>'
+    + '</div>'
+    + '<span style="background:#1E40AF;color:#fff;padding:6px 12px;border-radius:8px;font-size:.74rem;font-weight:800;flex-shrink:0">' + a.cta + ' →</span>'
+    + '</a>').join('');
+}
+</script>
+
+<!-- Share Stats Modal -->
+<div id="shareStatsOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:10001;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)">
+  <div style="background:#fff;border-radius:18px;max-width:520px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(15,23,42,.32);position:relative;font-family:'Plus Jakarta Sans',sans-serif">
+    <button onclick="closeShareStatsModal()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:transparent;border:none;font-size:24px;color:#94a3b8;cursor:pointer;line-height:1;padding:4px 8px">×</button>
+    <div style="font-family:'Manrope',sans-serif;font-size:1.2rem;font-weight:800;color:#0F172A;margin-bottom:6px;letter-spacing:-.01em">📤 Share Your Stats</div>
+    <div style="font-size:.88rem;color:#64748b;margin-bottom:14px;line-height:1.45">Show your network how DukanList is helping. Download or share directly on WhatsApp.</div>
+    <div id="shareStatsCanvas" style="display:flex;justify-content:center;margin-bottom:14px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button id="ssWaBtn" onclick="shareStatsToWhatsApp()" style="background:#25D366;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px">📱 Share on WhatsApp</button>
+      <button id="ssDownloadBtn" onclick="downloadStatsImage()" style="background:#0F172A;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px">⬇ Download PNG</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SHARE STATS — Generate SVG card with shop's weekly performance
+// ============================================================
+let SHARE_STATS_SVG = '';
+
+function openShareStatsModal(){
+  if (!MY_BUSINESS){ alert('Your business data is still loading. Please wait a moment.'); return; }
+  const b = MY_BUSINESS;
+  const views   = Number(b.view_count) || 0;
+  const leads   = Number(b.lead_count) || 0;
+  const rating  = Number(b.rating_avg) || 0;
+  const reviews = Number(b.rating_count) || 0;
+  const shopName = b.name || 'My Shop';
+  // Truncate long names
+  const displayName = shopName.length > 26 ? shopName.slice(0, 23) + '...' : shopName;
+
+  // Build SVG card (1200x630 — perfect for WhatsApp/OG)
+  // Saffron gradient background + white card overlay + stats
+  SHARE_STATS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FF6B1A"/>
+        <stop offset="100%" stop-color="#E55100"/>
+      </linearGradient>
+      <linearGradient id="card" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.98"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0.94"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <text x="60" y="80" font-family="Manrope, sans-serif" font-size="28" font-weight="700" fill="#fff" opacity="0.85">DukanList · Weekly Stats</text>
+    <text x="60" y="160" font-family="Manrope, sans-serif" font-size="72" font-weight="900" fill="#fff" letter-spacing="-2">${escSvg(displayName)}</text>
+    <rect x="60" y="220" width="1080" height="320" fill="url(#card)" rx="22"/>
+    <g transform="translate(120, 280)">
+      <text x="0" y="0" font-family="Manrope, sans-serif" font-size="22" font-weight="800" fill="#64748b" letter-spacing="2">VIEWS</text>
+      <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#0F172A" letter-spacing="-3">${views.toLocaleString('en-IN')}</text>
+    </g>
+    <g transform="translate(500, 280)">
+      <text x="0" y="0" font-family="Manrope, sans-serif" font-size="22" font-weight="800" fill="#64748b" letter-spacing="2">CALLS + WHATSAPP</text>
+      <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#FF6B1A" letter-spacing="-3">${leads.toLocaleString('en-IN')}</text>
+    </g>
+    <g transform="translate(880, 280)">
+      <text x="0" y="0" font-family="Manrope, sans-serif" font-size="22" font-weight="800" fill="#64748b" letter-spacing="2">RATING</text>
+      <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#F59E0B" letter-spacing="-3">${rating > 0 ? '⭐' + rating.toFixed(1) : '—'}</text>
+      <text x="0" y="135" font-family="Inter, sans-serif" font-size="20" fill="#64748b">${reviews} review${reviews === 1 ? '' : 's'}</text>
+    </g>
+    <text x="60" y="595" font-family="Manrope, sans-serif" font-size="26" font-weight="700" fill="#fff" opacity="0.9">🇮🇳 List your shop free → dukanlist.com</text>
+  </svg>`;
+
+  // Display in modal
+  const host = document.getElementById('shareStatsCanvas');
+  host.innerHTML = '<div style="max-width:100%;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.18)">' + SHARE_STATS_SVG.replace('width="1200"', 'width="100%"').replace('height="630"', 'height="auto"') + '</div>';
+
+  document.getElementById('shareStatsOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function escSvg(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function closeShareStatsModal(){
+  document.getElementById('shareStatsOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function shareStatsToWhatsApp(){
+  if (!MY_BUSINESS) return;
+  const shopName = MY_BUSINESS.name || 'My shop';
+  const views = Number(MY_BUSINESS.view_count) || 0;
+  const leads = Number(MY_BUSINESS.lead_count) || 0;
+  const msg = '🎉 ' + shopName + ' is on DukanList!\n\n👀 ' + views + ' views\n📞 ' + leads + ' calls + WhatsApp\n\nDukanList par apni dukan free list karwao:\nhttps://dukanlist.com/register';
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank', 'noopener');
+}
+
+async function downloadStatsImage(){
+  if (!SHARE_STATS_SVG){ alert('Stats not ready yet'); return; }
+  // Convert SVG to PNG using canvas
+  const btn = document.getElementById('ssDownloadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  try {
+    const blob = new Blob([SHARE_STATS_SVG], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#FF6B1A';
+    ctx.fillRect(0, 0, 1200, 630);
+    ctx.drawImage(img, 0, 0, 1200, 630);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((pngBlob) => {
+      if (!pngBlob){
+        // Fallback — direct SVG download
+        const a = document.createElement('a');
+        a.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SHARE_STATS_SVG);
+        a.download = 'dukanlist-stats-' + (MY_BUSINESS?.slug || 'shop') + '.svg';
+        a.click();
+      } else {
+        const dl = document.createElement('a');
+        dl.href = URL.createObjectURL(pngBlob);
+        dl.download = 'dukanlist-stats-' + (MY_BUSINESS?.slug || 'shop') + '.png';
+        dl.click();
+        setTimeout(() => URL.revokeObjectURL(dl.href), 1000);
+      }
+      btn.disabled = false;
+      btn.textContent = '⬇ Download PNG';
+    }, 'image/png');
+  } catch(e){
+    console.warn('PNG conversion failed, falling back to SVG download', e);
+    const a = document.createElement('a');
+    a.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SHARE_STATS_SVG);
+    a.download = 'dukanlist-stats-' + (MY_BUSINESS?.slug || 'shop') + '.svg';
+    a.click();
+    btn.disabled = false;
+    btn.textContent = '⬇ Download PNG';
+  }
+}
+
+// Close modal on outside click
+document.addEventListener('click', (e) => {
+  const overlay = document.getElementById('shareStatsOverlay');
+  if (e.target === overlay) closeShareStatsModal();
+});
+</script>
+
+<script src="/assets/js/trust-tier.js"></script>
+
+<script>
+// ============= Welcome Onboarding Wizard (first-time only) =============
+// Bumped to v2 so users who saw the older Hinglish modal also see the
+// new action-focused English wizard once. After they close v2, it
+// won't appear again.
+function openWelcomeModalIfFirstTime(){
+  try {
+    if (localStorage.getItem('dl_welcome_seen_v2')) return;
+    const modal = document.getElementById('welcomeModalDL');
+    if (!modal) return;
+    modal.style.display = 'flex';
+
+    // If the user hasn't verified email yet, show the warning row inside
+    // the wizard so they know to check their inbox.
+    try {
+      var c = window.ShopDB && window.ShopDB.client;
+      if (c) {
+        c.auth.getUser().then(function(res){
+          var u = res && res.data && res.data.user;
+          if (u && !u.email_confirmed_at) {
+            var warn = document.getElementById('welcomeEmailVerify');
+            if (warn) warn.style.display = 'block';
+          }
+        }).catch(function(){});
+      }
+    } catch(_){}
+  } catch(_){}
+}
+function closeWelcomeModal(){
+  try {
+    localStorage.setItem('dl_welcome_seen_v2', '1');
+    const modal = document.getElementById('welcomeModalDL');
+    if (modal) modal.style.display = 'none';
+    // Trigger confetti for first close
+    fireConfetti();
+  } catch(_){}
+}
+
+// ============= Daily Login Streak =============
+function updateLoginStreak(){
+  try {
+    const today = new Date().toDateString();
+    const lastDate = localStorage.getItem('dl_streak_last_date_v1');
+    let streak = parseInt(localStorage.getItem('dl_streak_v1') || '0', 10);
+    if (lastDate === today) {
+      // Already counted today, just show badge
+    } else {
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = yesterday.toDateString();
+      streak = (lastDate === yStr) ? (streak + 1) : 1;
+      localStorage.setItem('dl_streak_v1', String(streak));
+      localStorage.setItem('dl_streak_last_date_v1', today);
+      // Confetti on milestones
+      if ([3, 7, 14, 30, 60, 100].indexOf(streak) !== -1) {
+        setTimeout(fireConfetti, 800);
+      }
+    }
+    const badge = document.getElementById('streakBadge');
+    if (badge && streak > 0) {
+      const emoji = streak >= 30 ? '🏆' : streak >= 7 ? '🔥' : '✨';
+      const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+      badge.innerHTML = emoji + ' ' + streak + ' ' + (lang === 'hi' ? 'din' : 'day') + ' ' + (lang === 'hi' ? 'streak' : 'streak');
+      badge.style.display = 'inline-flex';
+    }
+  } catch(_){}
+}
+
+// ============= Daily Tip Rotation =============
+const DAILY_TIPS = [
+  { icon: '📸', en: 'Shops with 5+ photos get <b>3x more calls</b>', hi: '5+ photos wali dukane <b>3x zyada calls</b> paati hain', sub: 'Photos tab me jaake upload karein' },
+  { icon: '⭐', en: '<b>Reply karne wale owners</b> ko 2x repeat customers milte hain', hi: '<b>Reply karne wale owners</b> ko 2x repeat customers milte hain', sub: 'Reviews me reply karna mat bhulein' },
+  { icon: '🎁', en: 'Weekly <b>deals/offers</b> launch karne wale shops me 40% zyada calls aate hain', hi: 'Weekly <b>deals/offers</b> launch karne wale shops me 40% zyada calls aate hain', sub: 'Deals tab pe ek offer banayein abhi' },
+  { icon: '⏰', en: 'Shop hours <b>accurate update</b> rakhein — customer galat time pe call na kare', hi: 'Shop hours <b>accurate</b> rakhein — galat time pe call na ho', sub: 'Profile tab me hours check karein' },
+  { icon: '📍', en: 'Address + landmark <b>clearly likhein</b> — customer easily pohunche', hi: 'Address + landmark <b>clearly likhein</b> — customer easily pohunche', sub: 'Profile tab me address update karein' },
+  { icon: '✅', en: 'Verified Bronze tier paane ke liye <b>3 photos + WhatsApp</b> add karein', hi: 'Verified Bronze tier ke liye <b>3 photos + WhatsApp</b> chahiye', sub: 'Trust badhega — customer zyada call karenge' },
+  { icon: '🔔', en: '<b>Push notifications enable</b> karein — instant lead alerts', hi: '<b>Push notifications enable</b> karein — instant lead alerts', sub: 'Customer ke click karte hi notification milegi' },
+  { icon: '💬', en: 'WhatsApp number bhi add karein — <b>50% customers WhatsApp</b> prefer karte hain', hi: 'WhatsApp number add karein — <b>50% customers WhatsApp</b> prefer karte hain', sub: 'Direct chat = direct sales' },
+  { icon: '🏷️', en: 'Apne shop ki <b>USP / 1-liner</b> add karein — customer ko clearly samjhe', hi: 'Apne shop ki <b>USP / 1-liner</b> add karein', sub: 'Profile tab me About section me likhein' },
+  { icon: '🎯', en: '<b>Multi-category</b> shops 2x discover hote hain search me', hi: '<b>Multi-category</b> shops 2x discover hote hain', sub: 'Apni shop ki sab services add karein' },
+  { icon: '📞', en: '<b>Call answer karne ki speed</b> matters — 1 min me reply karne wale 3x convert karte hain', hi: 'Calls turant attend karein — 3x conversion', sub: 'Phone hamesha audible rakhein dukaan par' },
+  { icon: '🌟', en: 'Happy customers ko <b>review dena yaad dilayein</b> — verbal request kaafi hai', hi: 'Happy customers se review dene ko bolein', sub: '"DukanList par review de dena bhai" — itna kaafi' },
+  { icon: '📲', en: 'WhatsApp Status pe <b>shop link share karein</b> — daily reach badhayein', hi: 'WhatsApp Status pe <b>shop link share</b> karein roz', sub: 'Direct customers aapke profile par aayenge' },
+  { icon: '🛍️', en: '<b>Festival ke around deals</b> launch karne wale shops me sales 3x hoti hai', hi: 'Festival ke time <b>special deals</b> chalayein', sub: 'Diwali, Holi, Eid, Lohri — har tyohaar pe' },
+  { icon: '🤝', en: 'Padosi owners ko bhi DukanList suggest karein — <b>community grow karega</b>', hi: 'Padosi owners ko bhi join karayein', sub: 'Aapke area ka apna directory ban jayega' },
+  { icon: '📈', en: '<b>Analytics roz check karein</b> — pata chalega kab peak hours hain', hi: '<b>Analytics roz check karein</b> peak hours pata chalega', sub: 'Analytics tab → daily trends dekhein' },
+  { icon: '🏪', en: 'Apne shop ka <b>QR code print karke counter pe lagayein</b>', hi: 'Shop ka <b>QR code print karke counter pe lagayein</b>', sub: 'Panel → QR Code tab se download karein' },
+  { icon: '💎', en: '<b>Silver tier</b> paane ke liye 5+ photos + 3 reviews + ek deal active', hi: '<b>Silver tier</b> = 5+ photos + 3 reviews + 1 deal', sub: 'Trust ka next level' },
+  { icon: '🏆', en: '<b>Gold tier</b> shops top search results me dikhte hain', hi: '<b>Gold tier</b> shops top search me dikhte hain', sub: 'Goal: 4.5+ rating + 10+ reviews + 8+ photos' },
+  { icon: '📝', en: 'Shop me <b>3-5 services / products list karein</b> — Google bhi pick karega', hi: 'Shop me <b>3-5 services list</b> karein', sub: 'Profile tab → Services section' },
+  { icon: '🕐', en: 'Sunday closed hai? <b>Clearly mark karein</b> — galat call avoid hogi', hi: 'Sunday closed? <b>Clearly mark</b> karein', sub: 'Profile → Hours → Sunday: Closed' },
+  { icon: '💌', en: '<b>Negative review aaye to professionally respond karein</b> — image badhega', hi: 'Negative review me <b>professional reply</b> dein', sub: 'Defend mat karein, solution offer karein' },
+  { icon: '🎊', en: 'Pehle 5 customers ko WhatsApp pe <b>"DukanList par hu"</b> bata dijiye', hi: 'Pehle 5 customers ko WhatsApp pe shop link bhejein', sub: 'Word-of-mouth se viral growth' },
+  { icon: '🌈', en: '<b>Shop ka exterior + interior + product</b> teen alag photos zaroor hone chahiye', hi: 'Shop ke <b>exterior + interior + product</b> photos add karein', sub: 'Customer ko complete picture mile' },
+  { icon: '🚀', en: 'Pehle hafte 10 leads chahiye? <b>Family + neighbors</b> ko link bhejein', hi: 'Pehle 10 leads ke liye <b>family + padosi</b> ko link bhejein', sub: 'Initial traction se algorithm boost karega' },
+  { icon: '⚡', en: '<b>Lightning fast loading</b> — DukanList 2 second me khulta hai pure India me', hi: '<b>DukanList 2 second me</b> khulta hai sab phones me', sub: 'Customer wait nahi karna padta' },
+  { icon: '🔒', en: 'Aapka <b>data 100% secure</b> hai — daily backup, encrypted', hi: 'Aapka <b>data secure</b> hai — daily encrypted backup', sub: 'Chinta-mukt rahein, focus shop pe' },
+  { icon: '📱', err: '', en: '<b>PWA install</b> karein phone pe — app jaisi speed milegi', hi: '<b>PWA install</b> karein — app jaisi feel', sub: 'Browser me "Add to Home Screen" option' },
+  { icon: '🎓', en: '<b>Naya customer aaye to ye 3 cheez puchhein</b> — naam, kya chahiye, kab', hi: 'Naye customer se 3 cheez puchein — naam, jarurat, time', sub: 'Personal touch = loyalty' },
+  { icon: '🌟', en: 'DukanList pe <b>active rehna</b> hi success ka key hai — daily 2 min', hi: 'DukanList pe <b>daily 2 min active</b> rahein — yahi key hai', sub: 'Streak badge dekhein — aap kar rahe ho!' }
+];
+function loadTipOfDay(){
+  try {
+    const tipEl = document.getElementById('tipText');
+    const subEl = document.getElementById('tipSub');
+    const iconEl = document.getElementById('tipIcon');
+    if (!tipEl) return;
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    const tip = DAILY_TIPS[dayOfYear % DAILY_TIPS.length];
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    tipEl.innerHTML = lang === 'hi' ? tip.hi : tip.en;
+    if (subEl) subEl.textContent = tip.sub || '';
+    if (iconEl) iconEl.textContent = tip.icon;
+  } catch(_){}
+}
+
+// ============= Confetti =============
+function fireConfetti(){
+  try {
+    const colors = ['#FF6B1A','#FFB200','#10B981','#3B82F6','#EC4899','#FBBF24'];
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;overflow:hidden';
+    for (let i = 0; i < 60; i++){
+      const p = document.createElement('div');
+      const sz = 6 + Math.random() * 8;
+      const left = Math.random() * 100;
+      const delay = Math.random() * 0.3;
+      const dur = 2 + Math.random() * 1.5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      p.style.cssText = 'position:absolute;left:' + left + '%;top:-20px;width:' + sz + 'px;height:' + sz + 'px;background:' + color + ';border-radius:' + (Math.random() > 0.5 ? '50%' : '2px') + ';animation:confettiFall ' + dur + 's ' + delay + 's ease-out forwards';
+      wrap.appendChild(p);
+    }
+    document.body.appendChild(wrap);
+    setTimeout(() => wrap.remove(), 4500);
+  } catch(_){}
+}
+
+// ============= Init all engagement features =============
+function initEngagementFeatures(){
+  // Wait for dashboardContent to be visible
+  const tryInit = () => {
+    const dash = document.getElementById('dashboardContent');
+    if (!dash || dash.style.display === 'none') {
+      setTimeout(tryInit, 500);
+      return;
+    }
+    updateLoginStreak();
+    loadTipOfDay();
+    setTimeout(openWelcomeModalIfFirstTime, 600);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryInit);
+  else tryInit();
+}
+initEngagementFeatures();
+</script>
+
+<script>
+// ============= Sidebar Mini Live Pulse =============
+async function loadDashSidebarPulse(){
+  try {
+    if (typeof ShopDB === 'undefined' || !ShopDB.client) return;
+    const { data, error } = await ShopDB.client.rpc('get_public_stats');
+    if (error || !data || !data.length) return;
+    const s = data[0];
+    const animate = (id, target) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const dur = 1000;
+      const start = performance.now();
+      function step(now){
+        const t = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const val = Math.floor(eased * target);
+        el.textContent = (target >= 100 ? val + (t < 1 ? '' : '+') : val);
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = (target >= 100 ? target + '+' : target);
+      }
+      requestAnimationFrame(step);
+    };
+    animate('dashPsShops', s.total_shops || 0);
+    animate('dashPsCities', s.total_cities || 0);
+    animate('dashPsCats', s.total_categories || 0);
+  } catch(_){}
+}
+
+// ============= Dashboard Activity Feed =============
+// Derives "what happened in last 24h" from existing data on page + localStorage
+function renderDashActivity(){
+  const feed = document.getElementById('dashActivityFeed');
+  if (!feed) return;
+  const items = [];
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+
+  // 1. Login streak
+  const streak = parseInt(localStorage.getItem('dl_streak_v1') || '0', 10);
+  if (streak > 0) {
+    const txt = lang === 'hi' ? `Aap ${streak} din se active hain 🔥` : `${streak}-day active streak 🔥`;
+    items.push({ icon: '🔥', text: txt, time: lang === 'hi' ? 'Aaj' : 'Today' });
+  }
+
+  // 2. KPI snapshot — derive activity from current values on page
+  const views = document.getElementById('kpiViews');
+  const leads = document.getElementById('kpiLeads');
+  const rating = document.getElementById('kpiRating');
+  if (views && parseInt(views.textContent || '0', 10) > 0) {
+    items.push({ icon: '👀', text: lang === 'hi' ? `${views.textContent} profile views aaye` : `${views.textContent} profile views received`, time: lang === 'hi' ? 'Recent' : 'Recent' });
+  }
+  if (leads && parseInt(leads.textContent || '0', 10) > 0) {
+    items.push({ icon: '📞', text: lang === 'hi' ? `${leads.textContent} customers contact kiya` : `${leads.textContent} customers contacted`, time: lang === 'hi' ? 'Recent' : 'Recent' });
+  }
+  if (rating && rating.textContent && rating.textContent !== '—') {
+    items.push({ icon: '⭐', text: lang === 'hi' ? `Current rating: ${rating.textContent}` : `Current rating: ${rating.textContent}`, time: lang === 'hi' ? 'Updated' : 'Updated' });
+  }
+
+  // 3. Welcome flag
+  if (!localStorage.getItem('dl_welcome_seen_v1')) {
+    items.push({ icon: '🎉', text: lang === 'hi' ? 'Aap pehli baar login hue!' : 'First time login — welcome!', time: lang === 'hi' ? 'Just now' : 'Just now' });
+  }
+
+  // 4. Reminders / suggested actions based on completion
+  const completeness = document.getElementById('completenessWidget');
+  if (completeness && completeness.textContent && completeness.textContent.indexOf('100') === -1) {
+    items.push({ icon: '💡', text: lang === 'hi' ? 'Profile complete karne par 2x leads' : 'Complete profile for 2x leads', time: lang === 'hi' ? 'Suggestion' : 'Suggestion' });
+  }
+
+  // Fallback if no items
+  if (!items.length) {
+    items.push({ icon: '🌅', text: lang === 'hi' ? 'Naya din shuru hua — apni dukaan ko grow karein!' : 'New day — grow your shop today!', time: lang === 'hi' ? 'Aaj' : 'Today' });
+  }
+
+  feed.innerHTML = items.slice(0, 6).map(i => 
+    '<div class="activity-feed-item"><div class="activity-feed-icon">' + i.icon + '</div><div class="activity-feed-text">' + i.text + '<div class="activity-feed-time">' + i.time + '</div></div></div>'
+  ).join('');
+}
+
+// Initialize sidebar widgets
+(function(){
+  function initSidebarWidgets(){
+    loadDashSidebarPulse();
+    // Activity feed waits a bit so KPIs are populated
+    setTimeout(renderDashActivity, 1500);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSidebarWidgets);
+  else initSidebarWidgets();
+})();
+
+// ============================================================
+// STRATEGIC (2026-06-05) — Aaj ka Score + Aaj ka Poster
+// ============================================================
+
+// ─── Aaj ka Score: Live engagement hero card ─────────────────
+async function initAajKaScore(biz, c){
+  if (!biz || !biz.id) return;
+  const heroEl = document.getElementById('aajScoreHero');
+  if (!heroEl) return;
+
+  // Date label (local)
+  try {
+    const d = new Date();
+    const lang = (document.documentElement.getAttribute('data-lang') || 'en') === 'hi' ? 'hi-IN' : 'en-IN';
+    const dateLabel = d.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'short' });
+    const dEl = document.getElementById('aajDate');
+    if (dEl) dEl.textContent = (lang === 'hi-IN' ? '' : 'Today — ') + dateLabel;
+  } catch(_) {}
+
+  heroEl.style.display = 'block';
+
+  // Fetch RPC
+  try {
+    const { data, error } = await c.rpc('get_owner_today_pulse', { p_business_id: biz.id });
+    if (error || !data) {
+      console.warn('aaj-score rpc:', error);
+      // Show zeros, still display card
+      return;
+    }
+    animateAajScore(data);
+  } catch(e) {
+    console.warn('aaj-score fail:', e);
+  }
+}
+
+function animateAajScore(d){
+  const setNum = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const target = parseInt(val, 10) || 0;
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target / 18));
+    const t = setInterval(() => {
+      cur += step;
+      if (cur >= target) { cur = target; clearInterval(t); }
+      el.textContent = cur.toLocaleString('en-IN');
+    }, 35);
+    if (target === 0) el.textContent = '0';
+  };
+
+  setNum('aajViewsBig', d.today_views || 0);
+  setNum('aajCalls',    d.today_calls || 0);
+  setNum('aajSaves',    d.today_saves || 0);
+
+  // Rating
+  const rEl = document.getElementById('aajRating');
+  if (rEl) {
+    const r = parseFloat(d.rating);
+    rEl.textContent = (r > 0) ? r.toFixed(1) : '—';
+  }
+
+  // Trend arrow
+  const tEl = document.getElementById('aajTrend');
+  if (tEl) {
+    const delta = parseInt(d.delta_pct, 10) || 0;
+    const trend = d.trend || 'flat';
+    tEl.className = 'trend-arrow ' + trend;
+    if (trend === 'up')    tEl.textContent = '↑ ' + delta + '%';
+    else if (trend === 'down') tEl.textContent = '↓ ' + Math.abs(delta) + '%';
+    else tEl.textContent = '— 0%';
+  }
+}
+
+// ─── Aaj ka Poster: Daily auto-rotating WhatsApp share ───────
+function initAajKaPoster(biz){
+  // Phase 8.7: Studio moved to dedicated page (/panel/poster-studio.html)
+  // Dashboard now shows compact highlight card with date-aware sub text.
+  const el = document.getElementById('aajPosterCard');
+  if (!el) return;
+  el.style.display = 'flex';
+  // Update sub text with festival info if active
+  try {
+    if (window.FestivalEngine && FestivalEngine.getActiveFestival) {
+      const f = FestivalEngine.getActiveFestival();
+      if (f) {
+        const subEl = document.getElementById('phSub');
+        const titleEl = document.getElementById('phTitle');
+        if (titleEl) titleEl.textContent = f.nameEn + ' poster is ready';
+        if (subEl) {
+          const d = f.daysAway;
+          const dayLbl = d <= 0 ? 'Today' : d === 1 ? 'Tomorrow' : d + ' days away';
+          subEl.textContent = dayLbl + ' · 30+ designs · Open Studio →';
+        }
+      }
+    }
+  } catch(_){}
+}
+
+// ─── Phase 4: Loyalty Tracker render ───────────────────────────
+async function renderLoyaltyCard(businessId, supaClient){
+  const el = document.getElementById('loyaltyCard');
+  if (!el || !supaClient || !businessId) return;
+  try {
+    const { data, error } = await supaClient.rpc('get_shop_loyalty_stats', { p_business_id: businessId });
+    if (error || !data) { console.warn('loyalty rpc:', error); return; }
+
+    const total = parseInt(data.total_followers, 10) || 0;
+    const thisWeek = parseInt(data.this_week, 10) || 0;
+    const growth = parseInt(data.growth_pct, 10) || 0;
+    const tier = String(data.tier || 'none').toLowerCase();
+    const tierLabel = data.tier_label || 'Build your loyalty';
+    const nextAt = parseInt(data.next_tier_at, 10) || 10;
+    const gap = parseInt(data.gap_to_next_tier, 10) || 0;
+
+    const trendClass = growth > 0 ? '' : growth < 0 ? 'down' : 'flat';
+    const trendArrow = growth > 0 ? '↑' : growth < 0 ? '↓' : '—';
+
+    const tierClass = (tier === 'none') ? '' : tier;
+    const progressPct = Math.min(100, Math.round((total / nextAt) * 100));
+
+    const subText = (total === 0)
+      ? 'When customers save your business, they become your loyal followers.'
+      : (gap > 0)
+        ? gap + ' more to reach ' + (tier === 'none' ? 'Bronze' : tier === 'bronze' ? 'Silver' : tier === 'silver' ? 'Gold' : 'next tier')
+        : 'You have reached the top tier. Congratulations!';
+
+    el.innerHTML =
+      '<div class="loyalty-card">' +
+      '  <div class="lc-head">' +
+      '    <span class="lc-emoji">❤️</span>' +
+      '    <span class="lc-title">Your Loyalty Hub</span>' +
+      '    <span class="lc-tier ' + tierClass + '">' + tierLabel + '</span>' +
+      '  </div>' +
+      '  <div class="lc-main">' +
+      '    <span class="lc-num">' + total + '</span>' +
+      '    <span class="lc-label">customers saved your business</span>' +
+      '    ' + (thisWeek > 0 ? '<span class="lc-growth ' + trendClass + '">' + trendArrow + ' ' + thisWeek + ' this week</span>' : '') +
+      '  </div>' +
+      '  <div class="lc-sub">' + subText + '</div>' +
+      '  <div class="lc-progress"><div class="lc-progress-fill" style="width:' + progressPct + '%"></div></div>' +
+      '</div>';
+    el.style.display = 'block';
+  } catch(e) { console.warn('Loyalty render fail:', e); }
+}
+</script>
+
+<script>
+// ============= Profile Completeness Wizard =============
+// =====================================================
+// Profile Completeness Meter — prominent top-of-dashboard card
+// -----------------------------------------------------
+// Scores ONLY fields the shopkeeper actually controls from the panel.
+// Identity fields (name, mobile, email, whatsapp, address) are locked
+// at registration and NOT scored — every shop would get those points
+// for free, which dilutes the meter's motivational value.
+//
+// Tiers: 0–39 Beginner, 40–59 Basic, 60–79 Good, 80–94 Excellent,
+//        95–100 Platinum (gold border + trophy).
+// =====================================================
+function renderProfileCompleteness(b){
+  if (!b) return;
+  const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+
+  const checks = [
+    { en:'Upload 3+ shop photos',    hi:'3+ फोटो अपलोड करें',     pts:20, href:'/panel/photos.html#upload',
+      ok: (Array.isArray(b.photos) ? b.photos.length : 0) >= 3,
+      partial: (Array.isArray(b.photos) ? b.photos.length : 0) >= 1 ? 10 : 0 },
+    { en:'Write your USP / tagline (English)', hi:'USP / टैगलाइन (English)', pts:12, href:'/panel/profile.html#usp',
+      ok: !!(b.usp_text && b.usp_text.trim().length > 10) },
+    { en:'Write your USP in Hindi',  hi:'USP हिंदी में',           pts:6,  href:'/panel/profile.html#usp',
+      ok: !!(b.usp_hi && b.usp_hi.trim().length > 5) },
+    { en:'Add About Us (50+ chars)', hi:'हमारे बारे में (50+ अक्षर)', pts:12, href:'/panel/profile.html#about',
+      ok: !!(b.about_text && b.about_text.trim().length > 50) },
+    { en:'Set business hours',       hi:'खुलने का समय सेट करें',    pts:8,  href:'/panel/profile.html#hours',
+      ok: !!(b.hours_json && Object.keys(b.hours_json || {}).length > 0) },
+    { en:'Select payment methods',   hi:'पेमेंट तरीके चुनें',         pts:7,  href:'/panel/profile.html#trust',
+      ok: Array.isArray(b.payment_methods) && b.payment_methods.length > 0 },
+    { en:'Add special features',     hi:'खासियत जोड़ें',             pts:6,  href:'/panel/profile.html#trust',
+      ok: Array.isArray(b.special_features) && b.special_features.length > 0 },
+    { en:'Add established year',     hi:'स्थापना वर्ष जोड़ें',        pts:5,  href:'/panel/profile.html#trust',
+      ok: !!(b.established_year && b.established_year > 1900) },
+    { en:'Add 3+ FAQs',              hi:'3+ FAQs जोड़ें',          pts:10, href:'/panel/profile.html#faqs',
+      ok: Array.isArray(b.faqs_json) && b.faqs_json.length >= 3 },
+    { en:'Set your role / designation', hi:'अपनी भूमिका सेट करें', pts:5,  href:'/panel/profile.html#owner',
+      ok: !!(b.owner_role && b.owner_role.trim()) },
+    { en:'Add 1 social media link',  hi:'सोशल मीडिया लिंक जोड़ें',  pts:5,  href:'/panel/profile.html#social',
+      ok: !!(b.facebook_url || b.instagram_url || b.youtube_url || b.x_twitter_url || b.linkedin_url || b.website_url) },
+    { en:'Add services with prices', hi:'सेवाएँ + दाम जोड़ें',       pts:4,  href:'/panel/services.html',
+      ok: Array.isArray(b.services_json) ? b.services_json.length > 0 : (b.services_json && Object.keys(b.services_json).length > 0) }
+  ];
+
+  // Compute totals
+  const totalPts = checks.reduce((s, c) => s + c.pts, 0);
+  const earned = checks.reduce((s, c) => s + (c.ok ? c.pts : (c.partial || 0)), 0);
+  const score = Math.round((earned / totalPts) * 100);
+
+  // Tier
+  let tier;
+  if      (score >= 95) tier = { name:(lang==='hi'?'Platinum 🏆':'Platinum 🏆'), bg:'linear-gradient(135deg,#FBBF24,#D97706)', txt:'#78350F', accent:'#D97706', tag:(lang==='hi'?'सर्वोच्च प्रोफ़ाइल — top रैंकिंग':'Top-tier profile — best ranking') };
+  else if (score >= 80) tier = { name:(lang==='hi'?'Excellent ✨':'Excellent ✨'), bg:'linear-gradient(135deg,#D1FAE5,#A7F3D0)', txt:'#065F46', accent:'#10B981', tag:(lang==='hi'?'ग्राहक-रेडी, बढ़िया!':'Customer-ready, great!') };
+  else if (score >= 60) tier = { name:(lang==='hi'?'Good 👍':'Good 👍'),       bg:'linear-gradient(135deg,#DBEAFE,#BFDBFE)', txt:'#1E40AF', accent:'#3B82F6', tag:(lang==='hi'?'और भी details जोड़ें':'Add more details to stand out') };
+  else if (score >= 40) tier = { name:(lang==='hi'?'Basic 📝':'Basic 📝'),     bg:'linear-gradient(135deg,#FEF3C7,#FDE68A)', txt:'#92400E', accent:'#F59E0B', tag:(lang==='hi'?'काम चल रहा है — और जोड़ें':'Profile needs more work') };
+  else                  tier = { name:(lang==='hi'?'Incomplete ⚠️':'Incomplete ⚠️'), bg:'linear-gradient(135deg,#FEE2E2,#FECACA)', txt:'#991B1B', accent:'#EF4444', tag:(lang==='hi'?'ग्राहक आपकी listing skip कर सकते हैं':'Customers may skip your listing') };
+
+  const missing = checks.filter(c => !c.ok).sort((a, b) => b.pts - a.pts);
+
+  const container = document.getElementById('completenessWidget');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div style="background:${tier.bg};border-radius:16px;padding:18px 20px;box-shadow:0 4px 18px rgba(0,0,0,.06);margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:.7rem;font-weight:800;color:${tier.txt};letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:4px">
+            ${lang==='hi' ? 'प्रोफ़ाइल पूर्णता' : 'Profile Completeness'}
+          </div>
+          <div style="font-size:1.6rem;font-weight:900;color:${tier.txt};line-height:1.1;letter-spacing:-.01em">
+            ${tier.name}
+          </div>
+          <div style="font-size:.85rem;color:${tier.txt};opacity:.85;font-weight:600;margin-top:4px">
+            ${tier.tag}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:3rem;font-weight:900;color:${tier.txt};line-height:1;letter-spacing:-.02em">${score}<span style="font-size:1.4rem">%</span></div>
+          <div style="font-size:.72rem;color:${tier.txt};opacity:.7;font-weight:700;margin-top:2px">${earned} / ${totalPts} pts</div>
+        </div>
+      </div>
+      <div style="height:10px;background:rgba(255,255,255,.55);border-radius:99px;overflow:hidden;margin:14px 0 4px">
+        <div style="height:100%;width:${score}%;background:${tier.accent};border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px ${tier.accent}aa"></div>
+      </div>
+    </div>
+
+    ${missing.length === 0 ? `
+      <div style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1.5px solid #6EE7B7;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:1.8rem">🎉</div>
+        <div>
+          <div style="font-weight:800;color:#065F46;font-size:1rem">${lang==='hi' ? 'सब कुछ पूरा! बहुत बढ़िया!' : 'All done — perfect profile!'}</div>
+          <div style="font-size:.82rem;color:#047857;margin-top:2px;font-weight:600">${lang==='hi' ? 'आपकी listing top रैंक पर है।' : 'Your listing now has the top-tier badge.'}</div>
+        </div>
+      </div>
+    ` : `
+      <div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+        <div style="font-size:.78rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">
+          ${lang==='hi' ? '🚀 स्कोर बढ़ाने के लिए ये जोड़ें' : '🚀 Add these to boost your score'}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${missing.slice(0, 5).map(c => `
+            <a href="${c.href}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 13px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;text-decoration:none;color:#0F172A;font-size:.9rem;font-weight:600;transition:all .15s">
+              <span style="display:flex;align-items:center;gap:8px">
+                <span style="color:#94a3b8">○</span>
+                <span>${lang==='hi' ? c.hi : c.en}</span>
+              </span>
+              <span style="display:flex;align-items:center;gap:8px">
+                <span style="background:${tier.accent};color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:99px">+${c.pts}%</span>
+                <span style="color:${tier.accent};font-weight:900">→</span>
+              </span>
+            </a>
+          `).join('')}
+          ${missing.length > 5 ? `
+            <div style="text-align:center;font-size:.78rem;color:#94a3b8;font-weight:600;margin-top:4px">
+              +${missing.length - 5} ${lang==='hi' ? 'और भी' : 'more items'}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `}
+  `;
+}
+
+// ============= Ranking Battle Widget =============
+async function loadRankingBattle(b){
+  if (!b || !b.id) return;
+  const c = ShopDB.client;
+  if (!c) return;
+
+  // Get this shop's primary category + city
+  const catId = b.sub_category_id || b.category_id;
+  const cityId = b.city_id;
+  if (!catId || !cityId) return;
+
+  try {
+    const { data: peers, error } = await c.from('businesses')
+      .select('id, name, slug, verified_score, rating_count, rating_avg, photos')
+      .eq('city_id', cityId)
+      .eq('status', 'active')
+      .or(`sub_category_id.eq.${catId},category_id.eq.${catId}`)
+      .limit(200);
+    if (error) throw error;
+    if (!peers || peers.length < 2){
+      const widget = document.getElementById('rankWidget');
+      widget.style.display = '';
+      document.getElementById('rankBody').innerHTML = '<div style="text-align:center;padding:8px;color:#6B21A8;font-weight:600">' +
+        '<div style="font-size:1.4rem;margin-bottom:4px">🌟</div>' +
+        '<div data-i18n-en>You\'re the first in your category here!</div>' +
+        '<div data-i18n-hi>आप यहाँ अपनी category में पहले हैं!</div>' +
+        '<div style="font-size:.74rem;opacity:.7;margin-top:6px" data-i18n-en>Be the local leader. Keep your listing fresh.</div>' +
+        '<div style="font-size:.74rem;opacity:.7;margin-top:6px" data-i18n-hi>स्थानीय leader बनें। profile fresh रखें।</div></div>';
+      return;
+    }
+
+    // Score formula: (rating_count * rating_avg) + (verified_score * 10) + (photos.length * 2)
+    const scored = peers.map(p => ({
+      ...p,
+      _score: (Number(p.rating_count) || 0) * (Number(p.rating_avg) || 0) +
+              (Number(p.verified_score) || 0) * 10 +
+              ((Array.isArray(p.photos) ? p.photos.length : 0)) * 2
+    }));
+    scored.sort((a, x) => x._score - a._score);
+
+    const myIdx = scored.findIndex(p => p.id === b.id);
+    const myRank = myIdx + 1;
+    const total = scored.length;
+    const myScore = scored[myIdx] ? scored[myIdx]._score : 0;
+    const aboveMe = myIdx > 0 ? scored[myIdx - 1] : null;
+    const gap = aboveMe ? Math.ceil(aboveMe._score - myScore) : 0;
+
+    const isTop = myRank === 1;
+    const isPodium = myRank <= 3;
+    const widget = document.getElementById('rankWidget');
+    widget.style.display = '';
+
+    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    let html = '';
+    if (isTop) {
+      html = '<div style="text-align:center;padding:4px"><div style="font-size:2rem;margin-bottom:4px">🥇</div>' +
+        '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">' + (lang === 'hi' ? '#1 — आप टॉप पर हैं!' : '#1 — You\'re the top!') + '</div>' +
+        '<div style="font-size:.78rem;color:#6B21A8;opacity:.8;margin-top:4px">' + (lang === 'hi' ? 'आपकी category में ' + total + ' shops में सबसे आगे' : 'Leading ' + total + ' listings in your category') + '</div></div>';
+    } else {
+      const medal = myRank === 2 ? '🥈' : (myRank === 3 ? '🥉' : '🏅');
+      html = '<div style="text-align:center;padding:4px">' +
+        '<div style="font-size:1.8rem;margin-bottom:4px">' + medal + '</div>' +
+        '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">#' + myRank + ' ' + (lang === 'hi' ? 'में से' : 'of') + ' ' + total + '</div>' +
+        '<div style="font-size:.78rem;color:#6B21A8;opacity:.85;margin-top:6px">' +
+        (lang === 'hi' ? 'अगला rank तक: <b>' + gap + '</b> points' : 'To next rank: <b>' + gap + '</b> points') +
+        '</div>' +
+        '<div style="font-size:.72rem;color:#6B21A8;opacity:.65;margin-top:8px;line-height:1.4">' +
+        (lang === 'hi' ? '💡 Score = reviews × rating + verification × 10 + photos × 2' : '💡 Score = reviews × rating + verification × 10 + photos × 2') +
+        '</div></div>';
+    }
+    document.getElementById('rankBody').innerHTML = html;
+  } catch(e){
+    console.warn('Rank widget error:', e);
+  }
+}
+
+// ============= Referral Program =============
+let __refRetries = 0;
+async function setupReferralWidget(){
+  try {
+    // Path A — pick up MY_BUSINESS exposed on window (set by main script)
+    let biz = (typeof window !== 'undefined' && window.MY_BUSINESS) ? window.MY_BUSINESS : null;
+    if (!biz){
+      try { if (typeof MY_BUSINESS !== 'undefined' && MY_BUSINESS) biz = MY_BUSINESS; } catch(_){}
+    }
+    if (biz && biz.slug){ fillReferral(biz.slug); return; }
+
+    __refRetries++;
+    if (__refRetries < 12){ setTimeout(setupReferralWidget, 800); return; }
+
+    // Path B — fallback: query Supabase directly. Guarantees the link
+    // appears even if main script's MY_BUSINESS load is slow or fails.
+    try {
+      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : null;
+      if (!c) throw new Error('No DB client');
+      const sess = await c.auth.getUser();
+      const uid = sess && sess.data && sess.data.user && sess.data.user.id;
+      if (!uid) throw new Error('Not logged in');
+      // SECURITY: use safe RPC to avoid non-deterministic .limit(1) cross-user leak
+      let own = null;
+      try {
+        const safeRes = await c.rpc('get_my_business_safe');
+        if (!safeRes.error && safeRes.data && safeRes.data.length){
+          own = { business_id: safeRes.data[0].business_id };
+        }
+      } catch(_){ /* fallback below */ }
+      if (!own){
+        const fb = await c.from('business_owners')
+          .select('business_id').eq('auth_user_id', uid).limit(1).maybeSingle();
+        own = fb.data;
+      }
+      if (!own || !own.business_id) throw new Error('No shop linked');
+      const { data: b } = await c.from('businesses')
+        .select('slug').eq('id', own.business_id).maybeSingle();
+      if (!b || !b.slug) throw new Error('No slug');
+      fillReferral(b.slug);
+    } catch(fbErr){
+      const box = document.getElementById('referralLinkBox');
+      if (box) box.innerHTML = '<span style="color:#9A3412">Shop not loaded. <a href="javascript:location.reload()" style="color:#1E3A8A;text-decoration:underline">Refresh page</a></span>';
+      console.warn('Referral fallback:', fbErr && fbErr.message || fbErr);
+    }
+  } catch(e){ console.warn('Referral setup:', e); }
+}
+
+function fillReferral(slug){
+  const refLink = window.location.origin + '/register.html?ref=' + encodeURIComponent(slug);
+  const box = document.getElementById('referralLinkBox');
+  if (box) box.textContent = refLink;
+  window._referralLink = refLink;
+  const clicks = parseInt(localStorage.getItem('dl_ref_clicks_' + slug) || '0', 10);
+  const ctr = document.getElementById('refCounter');
+  if (ctr) ctr.textContent = clicks;
+}
+
+function copyReferralLink(){
+  const link = window._referralLink;
+  if (!link) return;
+  try {
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById('copyRefBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Copied!';
+      btn.style.background = '#16A34A';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#0F172A'; }, 2000);
+    });
+  } catch(_){
+    prompt('Copy this link:', link);
+  }
+}
+
+function shareReferralWhatsApp(){
+  const link = window._referralLink;
+  if (!link) return;
+  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+  const message = lang === 'hi'
+    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Aaj hi karein: ' + link
+    : 'Namaste! List your shop on DukanList — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Register today: ' + link;
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+}
+
+(function(){
+  function init(){
+    setupReferralWidget();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+<!-- Daily Poster Engine (2026-06-05) — 7-day theme rotation for Aaj ka Poster card -->
+<script src="/assets/js/daily-poster-engine.js" defer></script>
+<!-- Festival Engine (2026-06-05): Auto-override poster theme on festival days -->
+<script src="/assets/js/festival-engine.js" defer></script>
+<!-- Template Mega Pack (2026-06-05): 30+ designs -->
+<script src="/assets/js/template-mega-pack.js" defer></script>
+<!-- Daily Buzz Stories (Phase 9) -->
+<script src="/assets/js/daily-buzz.js" defer></script>
+<!-- Engagement Engine (2026-06-05) -->
+<script src="/assets/js/engagement-engine.js" defer></script>
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
+
+<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
+<script src="/assets/js/error-reporter.js" defer></script>
+</body>
+</html>

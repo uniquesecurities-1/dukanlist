@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Moderation — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .nav{display:flex;gap:6px;align-items:center}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600;transition:all .15s}
+  .nav a:hover{background:rgba(255,255,255,0.1);color:white}
+  .nav a.active{background:#1E3A8A;color:white}
+  .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
+  .logout:hover{background:rgba(255,255,255,0.1);color:white}
+
+  .main{max-width:1200px;margin:24px auto;padding:0 20px}
+  .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
+  .page-sub{font-size:14px;color:#64748b;margin-bottom:20px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:4px;border-bottom:2px solid #e2e8f0;margin-bottom:20px;overflow-x:auto}
+  .tab{
+    padding:10px 16px;font-weight:600;color:#64748b;cursor:pointer;
+    border:none;background:transparent;font-size:14px;border-bottom:2px solid transparent;
+    margin-bottom:-2px;white-space:nowrap;font-family:inherit;
+  }
+  .tab.active{color:#1E3A8A;border-bottom-color:#1E3A8A}
+  .tab .count{
+    display:inline-block;margin-left:6px;padding:1px 7px;border-radius:10px;
+    font-size:11px;background:#e2e8f0;color:#475569;font-weight:700;
+  }
+  .tab.active .count{background:#1E3A8A;color:white}
+
+  .panel{display:none}
+  .panel.active{display:block}
+
+  /* Business card */
+  .biz-card{
+    background:white;border:1px solid #e2e8f0;border-radius:12px;
+    padding:16px;margin-bottom:12px;
+  }
+  .biz-header{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .biz-name{font-size:16px;font-weight:700}
+  .biz-meta{font-size:12px;color:#64748b;margin-top:2px}
+  .biz-status{
+    font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;
+    text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;
+  }
+  .status-pending{background:#FEF3C7;color:#92400E}
+  .status-flagged{background:#FEE2E2;color:#991B1B}
+  .status-active{background:#D1FAE5;color:#065F46}
+  .status-banned{background:#E5E7EB;color:#374151}
+
+  .biz-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;font-size:13px;margin:10px 0}
+  .biz-field{padding:8px;background:#f8fafc;border-radius:6px}
+  .biz-field .lbl{font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600}
+  .biz-field .val{color:#0F172A;font-weight:500;margin-top:2px;word-break:break-word}
+
+  .biz-usp{
+    background:#fffbeb;border-left:3px solid #f59e0b;
+    padding:10px 12px;border-radius:6px;margin:10px 0;font-size:13px;font-style:italic;
+  }
+
+  .biz-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9}
+  .btn{
+    padding:8px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer;
+    font-size:13px;transition:all .15s;display:inline-flex;align-items:center;gap:6px;
+    font-family:inherit;
+  }
+  .btn-approve{background:#10B981;color:white}
+  .btn-approve:hover:not(:disabled){background:#059669}
+  .btn-reject{background:#EF4444;color:white}
+  .btn-reject:hover:not(:disabled){background:#DC2626}
+  .btn-danger-hard{
+    background:#7F1D1D; color:white;
+    border:1px solid #450A0A;
+  }
+  .btn-danger-hard:hover:not(:disabled){background:#450A0A;box-shadow:0 4px 14px rgba(127,29,29,.4)}
+
+  /* Confirm modal */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center;
+    z-index:2000; padding:16px;
+  }
+  .modal-backdrop.show{display:flex}
+  .modal-box{
+    background:white; border-radius:14px;
+    max-width:480px; width:100%;
+    padding:24px;
+    box-shadow:0 24px 60px rgba(0,0,0,.3);
+  }
+  .modal-box h2{
+    font-size:18px; font-weight:800; color:#7F1D1D;
+    margin-bottom:6px;
+  }
+  .modal-box .modal-warn{
+    background:#FEF2F2; border-left:3px solid #DC2626;
+    padding:12px 14px; border-radius:8px;
+    color:#7F1D1D; font-size:13px; line-height:1.55;
+    margin:12px 0;
+  }
+  .modal-box .modal-stats{
+    background:#F8FAFC; border-radius:8px;
+    padding:12px; font-size:12px; color:#475569;
+    margin:12px 0; line-height:1.6;
+  }
+  .modal-box .modal-stats b{ color:#0F172A }
+  .modal-box label{
+    font-size:12px; font-weight:700; color:#475569;
+    display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em;
+  }
+  .modal-box input[type=text]{
+    width:100%; padding:10px 12px;
+    border:2px solid #E2E8F0; border-radius:8px;
+    font-size:14px; font-family:inherit;
+  }
+  .modal-box input[type=text]:focus{
+    outline:none; border-color:#DC2626;
+  }
+  .modal-box .modal-actions{
+    display:flex; gap:10px; margin-top:18px; justify-content:flex-end;
+  }
+  .btn-secondary{background:white;color:#475569;border:1.5px solid #e2e8f0}
+  .btn-secondary:hover:not(:disabled){background:#f8fafc}
+  .btn:disabled{opacity:0.6;cursor:not-allowed}
+
+  /* Flag item */
+  .flag-item{background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:10px}
+  .flag-reason{display:inline-block;background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .flag-text{color:#475569;font-size:13px;margin:6px 0;font-style:italic}
+
+  /* Empty state */
+  .empty{text-align:center;padding:60px 20px;color:#64748b}
+  .empty-emoji{font-size:48px;margin-bottom:8px}
+  .empty-title{font-size:16px;font-weight:700;color:#0F172A;margin-bottom:4px}
+  .empty-sub{font-size:13px}
+
+  /* Toast */
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:none}
+  .toast.success{background:#10B981;color:white}
+  .toast.error{background:#EF4444;color:white}
+
+  .loader{text-align:center;padding:40px;color:#64748b;font-size:14px}
+  .err{color:#dc2626;text-align:center;padding:14px;background:#fef2f2;border-radius:8px;font-size:14px}
+
+/* === Pending Re-Review diff cards === */
+.edit-diff{margin-top:12px;padding:12px;background:#F8FAFC;border-radius:8px;border:1px solid #e2e8f0}
+.edit-row{padding:8px 0;border-bottom:1px dashed #e2e8f0}
+.edit-row:last-child{border-bottom:0}
+.edit-field{font-size:12px;font-weight:800;color:#0F172A;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.edit-old,.edit-new{font-size:13px;line-height:1.5;padding:6px 10px;border-radius:6px;margin-bottom:4px;word-break:break-word}
+.edit-old{background:#FEF2F2;color:#7F1D1D;border:1px solid #FECACA;text-decoration:line-through;text-decoration-color:rgba(127,29,29,.4)}
+.edit-new{background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0}
+.edit-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:middle;letter-spacing:.05em}
+.edit-tag.old{background:#991B1B;color:#fff}
+.edit-tag.new{background:#065F46;color:#fff}
+
+/* === Bulk action UI === */
+.bulk-checkbox{display:flex;align-items:center;padding:6px 4px;cursor:pointer;flex-shrink:0;margin-right:4px}
+.bulk-checkbox input{width:18px;height:18px;cursor:pointer;accent-color:#1E3A8A}
+.biz-card.bulk-selected{border-color:#1E3A8A;background:#F5F7FF;box-shadow:0 0 0 1.5px #1E3A8A inset}
+.list-toolbar{display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:12px;background:#F8FAFC;border-radius:8px;border:1px dashed #cbd5e1}
+.bulk-all-label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#475569;cursor:pointer}
+.bulk-all-label input{width:18px;height:18px;cursor:pointer;accent-color:#1E3A8A}
+.bulk-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);transition:transform .25s cubic-bezier(.4,1.4,.6,1);z-index:200;width:auto;max-width:calc(100vw - 32px);pointer-events:none}
+.bulk-bar.show{pointer-events:auto}
+.bulk-bar.show{transform:translateX(-50%) translateY(0)}
+.bulk-bar-inner{background:#0F172A;color:#fff;border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:16px;box-shadow:0 18px 50px rgba(15,23,42,.4);flex-wrap:wrap}
+.bulk-bar-info{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600}
+.bulk-bar-info strong{font-size:18px;font-weight:800}
+.bulk-bar-clear{background:transparent;border:1px solid #475569;color:#cbd5e1;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit}
+.bulk-bar-clear:hover{background:#1E293B;color:#fff}
+.bulk-bar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.bulk-bar-actions .btn{font-size:13px;padding:8px 14px}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>body,h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important}</style>
+
+<!-- Premium banking-class polish — shared CSS file applied site-wide. Load LAST so it overrides earlier inline styles. -->
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span>🛡️</span>
+    <span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav class="nav">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation" class="active">⚖️ Moderation</a>
+    <a href="/admin/pucho-moderation.html">💬 Pucho Bhai</a>
+    <a href="/admin/bulk-upload">📥 Bulk Add</a>
+    <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
+    <a href="/admin/test-cleanup" id="navCleanup" style="display:none">🧹 Cleanup</a>
+    <a href="/" target="_blank">🌐 Public Site</a>
+    <span class="logout" onclick="logout()">⎋ Logout</span>
+  </nav>
+</header>
+
+<main class="main">
+
+  <h1 class="page-title">⚖️ Moderation Queue</h1>
+  <p class="page-sub">Review pending businesses and community-flagged content</p>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="pending" onclick="switchTab('pending')">
+      ⏳ Pending Approvals <span class="count" id="cnt-pending">—</span>
+    </button>
+    <button class="tab" data-tab="flagged" onclick="switchTab('flagged')">
+      🚩 Flagged Businesses <span class="count" id="cnt-flagged">—</span>
+    </button>
+    <button class="tab" data-tab="flags" onclick="switchTab('flags')">
+      📋 Community Flag Reports <span class="count" id="cnt-flags">—</span>
+    </button>
+    <button class="tab" data-tab="edits" onclick="switchTab('edits')">
+      🔄 Pending Re-Review <span class="count" id="cnt-edits">—</span>
+    </button>
+  </div>
+
+  <!-- Panel: Pending Approvals -->
+  <div class="panel active" id="panel-pending">
+    <div class="list-toolbar">
+      <label class="bulk-all-label"><input type="checkbox" id="selAll-pending" onchange="toggleAllSelected('pending', this.checked)"> Select all on this page</label>
+    </div>
+    <div id="list-pending"><div class="loader">Loading pending businesses...</div></div>
+  </div>
+
+  <!-- Panel: Flagged Businesses -->
+  <div class="panel" id="panel-flagged">
+    <div class="list-toolbar">
+      <label class="bulk-all-label"><input type="checkbox" id="selAll-flagged" onchange="toggleAllSelected('flagged', this.checked)"> Select all on this page</label>
+    </div>
+    <div id="list-flagged"><div class="loader">Loading flagged businesses...</div></div>
+  </div>
+
+  <!-- Panel: Community Flag Reports -->
+  <div class="panel" id="panel-flags">
+    <div id="list-flags"><div class="loader">Loading flag reports...</div></div>
+  </div>
+
+  <!-- Panel: Pending Re-Review (post-approval edits) -->
+  <div class="panel" id="panel-edits">
+    <div id="list-edits"><div class="loader">Loading pending edits...</div></div>
+  </div>
+
+<!-- ===== Floating Bulk Action Bar ===== -->
+<div class="bulk-bar" id="bulkBar">
+  <div class="bulk-bar-inner">
+    <div class="bulk-bar-info">
+      <strong id="bulkCount">0</strong> selected
+      <button class="bulk-bar-clear" onclick="clearBulkSelection()">Clear</button>
+    </div>
+    <div class="bulk-bar-actions">
+      <button class="btn btn-approve" onclick="performBulkAction('approve')">✓ Approve Selected</button>
+      <button class="btn btn-reject" onclick="performBulkAction('ban')">✕ Ban Selected</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== DELETE CONFIRMATION MODAL ===== -->
+<div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal-box">
+    <h2>🗑 Delete Shop Permanently</h2>
+    <div style="font-size:13px;color:#475569;line-height:1.55">
+      You are about to permanently delete <b id="deleteBizName" style="color:#0F172A"></b>.
+    </div>
+
+    <div class="modal-warn">
+      <b>⚠ This action cannot be undone.</b><br>
+      Everything below will be permanently erased from the database:
+      <ul style="margin:6px 0 0 18px;padding:0">
+        <li>Shop profile + all categories</li>
+        <li>All reviews from customers</li>
+        <li>All lead clicks (calls, WhatsApp, directions)</li>
+        <li>All photos in Storage</li>
+        <li>Any flags or moderation history</li>
+      </ul>
+    </div>
+
+    <div class="modal-stats" id="deleteStats" style="display:none"></div>
+
+    <label>Type the shop name to confirm:</label>
+    <input type="text" id="deleteConfirmInput" placeholder="" oninput="onDeleteConfirmInput(event)" autocomplete="off">
+    <div style="font-size:11px;color:#94A3B8;margin-top:4px">
+      Expected: <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px"><span id="deleteBizNameHint"></span></code>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger-hard" id="deleteConfirmBtn" onclick="confirmDeleteBusiness()" disabled>
+        🗑 Delete Permanently
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+let C = null;
+// Watchdog — if page doesn't finish loading in 15s, show warning
+const INIT_WATCHDOG = setTimeout(function(){
+  if (!document.getElementById('list-pending').children.length){
+    console.warn('[admin/moderation] init still running after 15s — possible RPC stall');
+  }
+}, 15000);
+// Cleared when first panel renders (best-effort)
+window.addEventListener('load', function(){ setTimeout(function(){ clearTimeout(INIT_WATCHDOG); }, 5000); });
+
+// Top-level error visibility
+window.addEventListener('error', function(e){
+  console.error('[admin/moderation] uncaught error:', e.error || e.message, 'at', e.filename + ':' + e.lineno);
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('[admin/moderation] unhandled promise rejection:', e.reason);
+});
+
+(async function init(){
+  try {
+  C = ShopDB.client;
+  if (!C){ document.body.innerHTML = '<div class="err" style="margin:40px">Backend not configured.</div>'; return; }
+
+  // Verify admin
+  const { data: user } = await C.auth.getUser();
+  if (!user || !user.user){ window.location.href = '/admin/login'; return; }
+  const { data: isAdmin } = await C.rpc('is_admin');
+  if (!isAdmin){
+    alert('Not authorized — admin access required');
+    await C.auth.signOut();
+    window.location.href = '/admin/login';
+    return;
+  }
+
+  // Show Admins link if super_admin
+  try {
+    const scopeRes = await C.rpc('get_admin_scope');
+    if (scopeRes && scopeRes.data && scopeRes.data.is_super){
+      const nav = document.getElementById('navAdmins');
+      if (nav) nav.style.display = '';
+      const cln = document.getElementById('navCleanup');
+      if (cln) cln.style.display = '';
+    }
+  } catch(e){ /* non-blocking */ }
+
+  // Honor URL tab param
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get('tab');
+  if (tab && ['pending','flagged','flags','edits'].includes(tab)) switchTab(tab);
+
+  // Load all four panels — individually catch so one failure doesn't block others
+  const results = await Promise.allSettled([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
+  results.forEach(function(r, i){
+    if (r.status === 'rejected') console.error('[admin/moderation] panel ' + i + ' failed:', r.reason);
+  });
+  } catch (err) {
+    console.error('[admin/moderation] init() failed:', err);
+    alert('Page initialization failed:\n\n' + (err.message || err) + '\n\nOpen DevTools (F12) → Console for details.');
+  }
+})();
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+}
+
+// ===== PENDING APPROVALS =====
+async function loadPending(){
+  const { data, error } = await C.rpc('admin_list_businesses', {
+    p_status: 'pending', p_limit: 50, p_offset: 0, p_sort: 'newest'
+  });
+  if (error){
+    document.getElementById('list-pending').innerHTML = '<div class="err">Failed: ' + escapeHtml(error.message) + '</div>';
+    return;
+  }
+  document.getElementById('cnt-pending').textContent = data.length;
+
+  // Email-gate info: show how many NEW registrations are still awaiting email verify
+  // (admin can't action these, they appear here only when owner clicks the verify link)
+  try {
+    const waitRes = await C.rpc('admin_pending_awaiting_email_count');
+    const waiting = (waitRes && !waitRes.error && typeof waitRes.data === 'number') ? waitRes.data : 0;
+    const hostEl = document.getElementById('list-pending');
+    let banner = '';
+    if (waiting > 0){
+      banner = '<div id="emailWaitBanner" style="background:#FEF3C7;border:1px solid #FCD34D;border-left:4px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#78350F;">'
+        + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+        + '<span style="font-size:18px">📧</span>'
+        + '<div style="flex:1"><b>' + waiting + '</b> new registration' + (waiting === 1 ? '' : 's') + ' awaiting email verification. Email verify hote hi yahan dikhne lagengi.</div>'
+        + '<button onclick="toggleEmailWaitList()" id="emailWaitToggleBtn" style="background:#F59E0B;color:#fff;border:0;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">👁 Show list</button>'
+        + '</div>'
+        + '<div id="emailWaitList" style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #FCD34D"></div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px;margin-top:8px;border-top:1px dashed #FCD34D">'
+        + '<span style="font-size:12px;color:#78350F">Email completely failing for someone? Manual override:</span>'
+        + '<button onclick="adminForceVerifyEmail()" style="background:#1E3A8A;color:#fff;border:0;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔓 Force-verify by email</button>'
+        + '</div>'
+        + '</div>';
+    }
+    if (!data.length){
+      hostEl.innerHTML = banner + emptyState('🎉', 'All clear!', 'No pending businesses. Nice work.');
+      return;
+    }
+    hostEl.innerHTML = banner + data.map(b => bizCard(b, 'pending')).join('');
+  } catch(e){
+    if (!data.length){
+      document.getElementById('list-pending').innerHTML = emptyState('🎉', 'All clear!', 'No pending businesses. Nice work.');
+      return;
+    }
+    document.getElementById('list-pending').innerHTML = data.map(b => bizCard(b, 'pending')).join('');
+  }
+}
+
+// ===== EMAIL-WAIT LIST (expandable in pending tab) =====
+let _emailWaitLoaded = false;
+
+async function toggleEmailWaitList(){
+  const box = document.getElementById('emailWaitList');
+  const btn = document.getElementById('emailWaitToggleBtn');
+  if (!box || !btn) return;
+
+  if (box.style.display === 'none'){
+    box.style.display = 'block';
+    btn.textContent = '🔼 Hide list';
+    if (!_emailWaitLoaded){
+      box.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E">⏳ Loading…</div>';
+      try {
+        const r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+        if (r.error) throw r.error;
+        const rows = r.data || [];
+        if (!rows.length){
+          box.innerHTML = '<div style="padding:10px;color:#78350F;text-align:center">No pending-email registrations to show.</div>';
+        } else {
+          box.innerHTML = rows.map(renderEmailWaitRow).join('');
+        }
+        _emailWaitLoaded = true;
+      } catch(e){
+        box.innerHTML = '<div style="padding:10px;color:#991B1B;background:#FEE2E2;border-radius:6px">Failed to load list: ' + escapeHtml(e.message || 'Unknown') + '<br><small>Make sure db/82-pending-email-verify-list.sql is deployed.</small></div>';
+      }
+    }
+  } else {
+    box.style.display = 'none';
+    btn.textContent = '👁 Show list';
+  }
+}
+
+function renderEmailWaitRow(b){
+  const name = escapeHtml(b.business_name || 'Unknown shop');
+  const owner = escapeHtml(b.owner_name || '');
+  const city = escapeHtml(b.city_name || '');
+  const cat = escapeHtml(b.primary_cat || '');
+  const mobile = (b.mobile || '').replace(/\D/g, '').slice(-10);
+  const wa = (b.whatsapp || '').replace(/\D/g, '').slice(-10) || mobile;
+  const bizEmail = escapeHtml(b.business_email || '');
+  const loginEmail = escapeHtml(b.login_email || '');
+  const days = b.days_since_signup || 0;
+  const ageBadge = days === 0 ? 'today'
+                  : days === 1 ? '1 day ago'
+                  : days < 7   ? days + ' days ago'
+                  : days < 30  ? Math.floor(days/7) + ' weeks ago'
+                  :              Math.floor(days/30) + ' months ago';
+
+  const waMsg = encodeURIComponent(
+    'Hello' + (owner ? ' ' + b.owner_name : '') + ', DukanList se Deepak Singla bol raha hoon.\n\n' +
+    'Aapne "' + (b.business_name || '') + '" register kiya ' + ageBadge + ', lekin abhi tak email verify nahi ki hai. ' +
+    'Verification email check karein:\n' +
+    '• Login email: ' + (b.login_email || '') + '\n' +
+    '• Inbox + Spam folder dono dekhein\n' +
+    '• Sender: noreply@dukanlist.com\n\n' +
+    'Email nahi mili? Yahan se resend karein: https://dukanlist.com/panel/resend-verification.html?email=' + encodeURIComponent(b.login_email || '') + '\n\n' +
+    'Email verify hote hi mai aapki listing approve kar dunga. Dhanyawaad.'
+  );
+  const waUrl = wa ? ('https://wa.me/91' + wa + '?text=' + waMsg) : '';
+
+  const ageColor = days >= 7 ? '#991B1B' : days >= 3 ? '#92400E' : '#65A30D';
+
+  return '<div style="background:#FFFDF7;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">'
+    + '<div style="flex:1;min-width:220px">'
+    +   '<div style="font-weight:800;color:#0F172A;font-size:14px">' + name + (cat ? ' <span style="color:#94a3b8;font-weight:500;font-size:11px">· ' + cat + '</span>' : '') + '</div>'
+    +   '<div style="color:#64748B;font-size:12px;margin-top:2px">'
+    +     (owner ? '👤 ' + owner + ' · ' : '')
+    +     (city ? '📍 ' + city : '')
+    +   '</div>'
+    +   '<div style="color:#0F172A;font-size:12px;margin-top:4px;line-height:1.5">'
+    +     (mobile ? '📞 +91 ' + mobile + ' · ' : '')
+    +     (loginEmail ? '📧 ' + loginEmail : '')
+    +   '</div>'
+    +   (bizEmail && bizEmail.toLowerCase() !== loginEmail.toLowerCase() ? '<div style="color:#92400E;font-size:11px;margin-top:2px">⚠ Business email different: ' + bizEmail + '</div>' : '')
+    +   '<div style="color:' + ageColor + ';font-size:11px;font-weight:700;margin-top:4px">⏳ Registered ' + ageBadge + '</div>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:170px">'
+    +   (waUrl ? '<a href="' + waUrl + '" target="_blank" style="background:#25D366;color:#fff;text-align:center;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;display:block">📱 WhatsApp Reminder</a>' : '<span style="color:#9CA3AF;font-size:11px;text-align:center;padding:4px">no WhatsApp #</span>')
+    +   '<button onclick="adminForceVerifyEmailFor(\'' + (loginEmail || '').replace(/\'/g, "\\\'") + '\')" style="background:#1E3A8A;color:#fff;border:0;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔓 Force-verify</button>'
+    + '</div>'
+    + '</div>';
+}
+
+async function adminForceVerifyEmailFor(email){
+  if (!email) { alert('No email'); return; }
+  if (!confirm('Force-verify "' + email + '"?\n\nYe action bypass karega email confirmation. Sirf un cases me use karein jab user ke paas verification email kaafi try ke baad bhi na pahunche.')) return;
+  try {
+    const sess = await C.auth.getSession();
+    const jwt = sess?.data?.session?.access_token;
+    if (!jwt){ alert('⚠ Session expired'); return; }
+    const res = await fetch('/api/admin-force-verify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    const j = await res.json();
+    if (!res.ok){ alert('❌ Failed: ' + (j.error || ('HTTP ' + res.status))); return; }
+    alert(j.already_verified ? 'ℹ Already verified.' : '✓ Email verified manually. Business ab pending queue me appear hogi.');
+    _emailWaitLoaded = false;
+    await loadPending();
+  } catch(e){
+    alert('❌ ' + (e.message || e));
+  }
+}
+
+// ===== ADMIN FORCE-VERIFY EMAIL (last-resort override) =====
+async function adminForceVerifyEmail(){
+  const email = prompt('Owner ka email daalein jiska verification manually karwana hai (email delivery fail ho gaya ho to hi use karein):');
+  if (!email) return;
+  const trimmed = email.trim().toLowerCase();
+  if (!trimmed || trimmed.indexOf('@') === -1){ alert('⚠ Invalid email'); return; }
+
+  if (!confirm('Force-verify "' + trimmed + '"?\n\nYe action bypass karega email confirmation. Sirf un cases me use karein jab user ke paas verification email kaafi try ke baad bhi na pahunche.')){
+    return;
+  }
+
+  try {
+    const sess = await C.auth.getSession();
+    const jwt = sess && sess.data && sess.data.session && sess.data.session.access_token;
+    if (!jwt){ alert('⚠ Session expired. Re-login karein.'); return; }
+
+    const res = await fetch('/api/admin-force-verify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: trimmed })
+    });
+    const j = await res.json();
+    if (!res.ok){
+      alert('❌ Failed: ' + (j.error || ('HTTP ' + res.status)));
+      return;
+    }
+    if (j.already_verified){
+      alert('ℹ️ Ye email already verified hai. Kuch karne ki zaroorat nahi.');
+    } else {
+      alert('✓ Email manually verified: ' + j.email + '\n\nUser ab login kar sakta hai. Unki business automatically pending queue me dikhne lagegi.');
+      await loadPending();
+    }
+  } catch(e){
+    alert('❌ Network error: ' + (e.message || e));
+  }
+}
+
+// ===== PENDING RE-REVIEW (post-approval edits) =====
+async function loadPendingEdits(){
+  const { data, error } = await C.rpc('admin_pending_edits', { p_limit: 50, p_offset: 0 });
+  if (error){
+    document.getElementById('list-edits').innerHTML = '<div class="err">Failed: ' + escapeHtml(error.message) + '<br><small>Run db/38-moderation-hardening.sql first.</small></div>';
+    return;
+  }
+  const rows = data || [];
+  document.getElementById('cnt-edits').textContent = rows.length;
+  if (!rows.length){
+    document.getElementById('list-edits').innerHTML = emptyState('✅', 'No pending edits', 'Approved shops with sensitive changes will appear here.');
+    return;
+  }
+  document.getElementById('list-edits').innerHTML = rows.map(renderPendingEditCard).join('');
+}
+
+function renderPendingEditCard(b){
+  const pending = b.pending_edits || {};
+  const live    = b.live_snapshot || {};
+  const keys = Object.keys(pending);
+
+  const diffHtml = keys.length
+    ? '<div class="edit-diff">' + keys.map(k => {
+        let oldVal = live[k];
+        let newVal = pending[k];
+        if (k === 'photos'){
+          const oldArr = Array.isArray(oldVal) ? oldVal : [];
+          const newArr = Array.isArray(newVal) ? newVal : [];
+          const photoStrip = (arr) => arr.length
+            ? '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+              + arr.slice(0,6).map(u => '<img src="' + escapeHtml(u) + '" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1">').join('')
+              + (arr.length > 6 ? '<span style="align-self:center;color:#64748b;font-size:12px">+' + (arr.length - 6) + ' more</span>' : '')
+              + '</div>'
+            : '<span style="color:#94a3b8;font-size:12px">No photos</span>';
+          return '<div class="edit-row">'
+            + '<div class="edit-field">photos</div>'
+            + '<div class="edit-old"><span class="edit-tag old">OLD (live)</span>' + photoStrip(oldArr) + '</div>'
+            + '<div class="edit-new"><span class="edit-tag new">NEW (proposed)</span>' + photoStrip(newArr) + '</div>'
+            + '</div>';
+        }
+        const oldV = escapeHtml(String(oldVal == null ? '—' : oldVal).substring(0, 300));
+        const newV = escapeHtml(String(newVal == null ? '—' : newVal).substring(0, 300));
+        return '<div class="edit-row">'
+          + '<div class="edit-field">' + escapeHtml(k) + '</div>'
+          + '<div class="edit-old"><span class="edit-tag old">OLD (live)</span>' + oldV + '</div>'
+          + '<div class="edit-new"><span class="edit-tag new">NEW (proposed)</span>' + newV + '</div>'
+          + '</div>';
+      }).join('') + '</div>'
+    : '<div style="color:#94a3b8;font-size:13px;padding:8px 0">No pending changes.</div>';
+
+  const when = b.pending_edits_at ? new Date(b.pending_edits_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+
+  return `<div class="biz-card" style="border-left:3px solid #1E3A8A">
+    <div class="biz-head">
+      <div style="flex:1;min-width:0">
+        <div class="biz-name">${escapeHtml(b.name)} <span class="pill" style="background:#EEF2FF;color:#4338CA;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:6px">🔄 ${keys.length} PENDING CHANGE${keys.length === 1 ? '' : 'S'}</span></div>
+        <div class="biz-sub">📍 ${escapeHtml(b.city_name || '—')} · Proposed ${when}</div>
+      </div>
+    </div>
+    ${diffHtml}
+    <div class="biz-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="approvePendingEdits('${b.business_id}', this)">✓ Approve & Apply Changes</button>
+      <button class="btn" style="background:#EF4444;color:#fff" onclick="rejectPendingEdits('${b.business_id}', this)">✗ Reject Changes</button>
+      <a class="btn btn-secondary" href="/business.html?slug=${b.slug}" target="_blank">🌐 Public View (live)</a>
+      <a class="btn btn-secondary" href="/admin/shop.html?id=${b.business_id}">⚖ Full Admin View</a>
+    </div>
+  </div>`;
+}
+
+async function approvePendingEdits(bizId, btn){
+  if (!confirm('Approve all pending changes? They will go live immediately.')) return;
+  btn.disabled = true; btn.textContent = '⏳ Applying…';
+  const r = await C.rpc('admin_approve_pending_edits', { p_business_id: bizId });
+  if (r.error){ alert('Approve failed: ' + r.error.message); btn.disabled = false; btn.textContent = '✓ Approve & Apply Changes'; return; }
+  toast('✓ Changes applied & live');
+  await loadPendingEdits();
+}
+
+async function rejectPendingEdits(bizId, btn){
+  const reason = prompt('Rejection reason (optional, for audit):') || null;
+  if (reason === null && !confirm('Reject changes without a reason?')) return;
+  btn.disabled = true; btn.textContent = '⏳ Rejecting…';
+  const r = await C.rpc('admin_reject_pending_edits', { p_business_id: bizId, p_reason: reason });
+  if (r.error){ alert('Reject failed: ' + r.error.message); btn.disabled = false; btn.textContent = '✗ Reject Changes'; return; }
+  toast('Pending changes discarded');
+  await loadPendingEdits();
+}
+
+// ===== FLAGGED BUSINESSES =====
+async function loadFlaggedBiz(){
+  const { data, error } = await C.rpc('admin_list_businesses', {
+    p_status: 'flagged', p_limit: 50, p_offset: 0, p_sort: 'flags'
+  });
+  if (error){
+    document.getElementById('list-flagged').innerHTML = '<div class="err">Failed: ' + escapeHtml(error.message) + '</div>';
+    return;
+  }
+  document.getElementById('cnt-flagged').textContent = data.length;
+  if (!data.length){
+    document.getElementById('list-flagged').innerHTML = emptyState('✅', 'No flagged businesses', 'Community trust is intact.');
+    return;
+  }
+  document.getElementById('list-flagged').innerHTML = data.map(b => bizCard(b, 'flagged')).join('');
+}
+
+// ===== COMMUNITY FLAG REPORTS =====
+async function loadFlags(){
+  const { data, error } = await C.rpc('admin_get_flags', { p_limit: 50 });
+  if (error){
+    document.getElementById('list-flags').innerHTML = '<div class="err">Failed: ' + escapeHtml(error.message) + '</div>';
+    return;
+  }
+  document.getElementById('cnt-flags').textContent = data.length;
+  if (!data.length){
+    document.getElementById('list-flags').innerHTML = emptyState('🕊️', 'No flag reports', 'No community complaints in the queue.');
+    return;
+  }
+  document.getElementById('list-flags').innerHTML = data.map(f => flagItem(f)).join('');
+}
+
+function buildVerifyWaLink(b){
+  // Strip non-digits + ensure 91 prefix
+  let num = String(b.mobile || '').replace(/[^\d]/g, '');
+  if (num.length === 10) num = '91' + num;
+  const ownerName = b.owner_name || 'Shop Owner';
+  const shopName = b.name || 'your shop';
+  const msg =
+    'Namaste ' + ownerName + ' ji!\n\n' +
+    'Main DukanList se baat kar raha hu. Aapne *' + shopName + '* ' +
+    'apni dukaan register ki hai. Hum aapki listing verify karna chahte hain.\n\n' +
+    '1) Kya yeh aap hi ne register kiya hai?\n' +
+    '2) Kya dukaan ka actual address yahi hai?\n\n' +
+    'Confirm karne ke baad hum profile activate kar denge.\n\n' +
+    'Thanks!\nDukanList Team';
+  return 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+}
+
+function bizCard(b, kind){
+  const statusCls = 'status-' + (b.status || 'pending');
+  return `
+    <div class="biz-card" id="biz-${b.id}" data-biz-id="${b.id}">
+      <div class="biz-header">
+        <label class="bulk-checkbox" title="Select for bulk action">
+          <input type="checkbox" class="bulk-cb" data-id="${b.id}" data-name="${escapeHtml(b.name)}" data-kind="${kind}" onchange="onBulkToggle(this)">
+        </label>
+        <div style="flex:1;min-width:0">
+          <div class="biz-name">${escapeHtml(b.name)} ${b.name_hi ? '<span style="color:#94a3b8;font-size:14px">· ' + escapeHtml(b.name_hi) + '</span>' : ''}</div>
+          <div class="biz-meta">👤 ${escapeHtml(b.owner_name || '—')} · 📞 ${escapeHtml(b.mobile || '—')} ${b.whatsapp && b.whatsapp !== b.mobile ? '· WA ' + escapeHtml(b.whatsapp) : ''}</div>
+        </div>
+        <div class="biz-status ${statusCls}">${escapeHtml(b.status)}</div>
+      </div>
+
+      <div class="biz-body">
+        <div class="biz-field"><div class="lbl">Primary Category</div><div class="val">${escapeHtml(b.primary_cat || '—')}</div></div>
+        <div class="biz-field"><div class="lbl">Location</div><div class="val">${escapeHtml(b.city_name || '—')}, ${escapeHtml(b.state_code || '')} · ${escapeHtml(b.pincode || '')}</div></div>
+        <div class="biz-field"><div class="lbl">Photos</div><div class="val">${b.photos_count} uploaded</div></div>
+        <div class="biz-field"><div class="lbl">Verified Score</div><div class="val">${b.verified_score}/5</div></div>
+        <div class="biz-field"><div class="lbl">Rating</div><div class="val">${b.rating_avg || '—'} ⭐ (${b.rating_count || 0})</div></div>
+        <div class="biz-field"><div class="lbl">Created</div><div class="val">${formatDate(b.created_at)}</div></div>
+      </div>
+
+      ${kind === 'flagged' ? `<div class="biz-field" style="background:#fef2f2"><div class="lbl" style="color:#991b1b">Flag Count</div><div class="val" style="color:#991b1b;font-weight:700">${b.flagged_count} community flags</div></div>` : ''}
+
+      <div class="biz-actions">
+        <button class="btn btn-approve" onclick="approveBusiness('${b.id}','${escapeJs(b.name)}')">✓ Approve &amp; Activate</button>
+        <a class="btn" style="background:#25D366;color:white" href="${buildVerifyWaLink(b)}" target="_blank" rel="noopener" title="WhatsApp shopkeeper for verification">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24z"/></svg>
+          WhatsApp Verify
+        </a>
+        <a class="btn btn-secondary" href="tel:+${(b.mobile||'').replace(/[^\\d]/g,'')}" title="Call shopkeeper">📞 Call</a>
+        <button class="btn btn-reject" onclick="rejectBusiness('${b.id}','${escapeJs(b.name)}')">✕ Reject / Ban</button>
+        <button class="btn btn-danger-hard" onclick="deleteBusiness('${b.id}','${escapeJs(b.name)}')" title="Permanently delete shop + all data">🗑️ Delete Permanently</button>
+        <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(b.slug)}" target="_blank">👁️ View Public Profile</a>
+        <a class="btn" style="background:#1E3A8A;color:#fff" href="/admin/shop?id=${b.id}" title="Comprehensive admin view + edit + verification toggles">🛡️ Admin View</a>
+        <a class="btn btn-secondary" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/editor?table=businesses&filter=id::eq::${b.id}" target="_blank">🗄️ Edit in DB</a>
+      </div>
+    </div>
+  `;
+}
+
+function flagItem(f){
+  return `
+    <div class="flag-item">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:700;font-size:15px">${escapeHtml(f.business_name)}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px">Business status: <b>${escapeHtml(f.business_status)}</b> · Flagged ${formatDate(f.created_at)}</div>
+        </div>
+        <span class="flag-reason">${escapeHtml(f.reason)}</span>
+      </div>
+      ${f.text ? `<div class="flag-text">"${escapeHtml(f.text)}"</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-approve" onclick="resolveFlag('${f.id}','resolved')">✓ Mark Resolved</button>
+        <button class="btn btn-secondary" onclick="resolveFlag('${f.id}','dismissed')">🚫 Dismiss</button>
+        <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(f.business_slug)}" target="_blank">👁️ View Business</a>
+      </div>
+    </div>
+  `;
+}
+
+function emptyState(emoji, title, sub){
+  return `<div class="empty"><div class="empty-emoji">${emoji}</div><div class="empty-title">${escapeHtml(title)}</div><div class="empty-sub">${escapeHtml(sub)}</div></div>`;
+}
+
+async function approveBusiness(id, name, evt){
+  if (!confirm(`Approve "${name}"?\n\nThis will make the listing live on dukanlist.com.`)) return;
+  // Disable all approve/reject buttons in this row to prevent double-click race
+  const row = document.getElementById('biz-' + id);
+  const btns = row ? Array.from(row.querySelectorAll('button')) : [];
+  btns.forEach(b => { b.disabled = true; b.style.opacity = '.55'; });
+  try {
+    const { error } = await C.rpc('admin_approve_business', { p_business_id: id });
+    if (error){
+      toast('Failed: ' + error.message, 'error');
+      btns.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+      return;
+    }
+    toast('✓ Approved — listing is now live', 'success');
+    row?.remove();
+    await loadPending();
+    await loadFlaggedBiz();
+  } catch(e){
+    toast('Failed: ' + (e.message || e), 'error');
+    btns.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+  }
+}
+
+async function rejectBusiness(id, name, evt){
+  const reason = prompt(`Reject "${name}"?\n\nEnter reason (will be saved as internal note):`);
+  if (!reason) return;
+  // Disable buttons to prevent double-click
+  const row = document.getElementById('biz-' + id);
+  const btns = row ? Array.from(row.querySelectorAll('button')) : [];
+  btns.forEach(b => { b.disabled = true; b.style.opacity = '.55'; });
+  try {
+    const { error } = await C.rpc('admin_reject_business', { p_business_id: id, p_reason: reason });
+    if (error){
+      toast('Failed: ' + error.message, 'error');
+      btns.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+      return;
+    }
+    toast('✕ Rejected — status set to "banned"', 'success');
+    row?.remove();
+    await loadPending();
+    await loadFlaggedBiz();
+  } catch(e){
+    toast('Failed: ' + (e.message || e), 'error');
+    btns.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+  }
+}
+
+async function deleteBusiness(id, name){
+  // Show custom confirmation modal — type-to-confirm pattern
+  const modal = document.getElementById('deleteModal');
+  document.getElementById('deleteBizName').textContent = name;
+  document.getElementById('deleteBizNameHint').textContent = name;
+  document.getElementById('deleteConfirmInput').value = '';
+  document.getElementById('deleteConfirmBtn').disabled = true;
+
+  modal.dataset.bizId = id;
+  modal.dataset.bizName = name;
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById('deleteConfirmInput').focus(), 100);
+}
+
+function onDeleteConfirmInput(e){
+  const expected = document.getElementById('deleteModal').dataset.bizName || '';
+  const typed = e.target.value;
+  document.getElementById('deleteConfirmBtn').disabled = (typed !== expected);
+}
+
+function closeDeleteModal(){
+  document.getElementById('deleteModal').classList.remove('show');
+}
+
+async function confirmDeleteBusiness(){
+  const modal = document.getElementById('deleteModal');
+  const id = modal.dataset.bizId;
+  const name = modal.dataset.bizName;
+  const btn = document.getElementById('deleteConfirmBtn');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Deleting...';
+
+  // Step 1: Call RPC to hard-delete + get photo URLs back
+  const { data, error } = await C.rpc('admin_delete_business', { p_business_id: id });
+  if (error){
+    btn.disabled = false;
+    btn.textContent = '🗑 Delete Permanently';
+    toast('Delete failed: ' + error.message, 'error');
+    return;
+  }
+
+  // Step 2: Clean up photos from Supabase Storage (if any)
+  let photoNote = '';
+  if (data && Array.isArray(data.photos_to_cleanup) && data.photos_to_cleanup.length){
+    const paths = data.photos_to_cleanup
+      .map(url => extractStoragePath(url))
+      .filter(Boolean);
+    if (paths.length){
+      try {
+        const { error: storErr } = await C.storage.from('shop-photos').remove(paths);
+        if (storErr){
+          console.warn('Storage cleanup partial:', storErr);
+          photoNote = ' (storage cleanup needs manual review)';
+        } else {
+          photoNote = ' · ' + paths.length + ' photo(s) cleaned';
+        }
+      } catch (e){
+        console.warn('Storage cleanup exception:', e);
+        photoNote = ' (storage cleanup failed)';
+      }
+    }
+  }
+
+  closeDeleteModal();
+
+  // Step 3: Toast + refresh
+  toast('🗑 "' + name + '" deleted permanently' + photoNote, 'success');
+  document.getElementById('biz-' + id)?.remove();
+  await loadPending();
+  await loadFlaggedBiz();
+  await loadFlags();
+}
+
+// Extract storage object path from public URL
+// e.g. https://xxx.supabase.co/storage/v1/object/public/shop-photos/<biz-id>/photo1.jpg
+// returns: <biz-id>/photo1.jpg
+function extractStoragePath(url){
+  if (!url) return null;
+  const marker = '/shop-photos/';
+  const idx = String(url).indexOf(marker);
+  if (idx < 0) return null;
+  return String(url).slice(idx + marker.length);
+}
+
+async function resolveFlag(id, action){
+  const { error } = await C.rpc('admin_resolve_flag', { p_flag_id: id, p_action: action });
+  if (error){ toast('Failed: ' + error.message, 'error'); return; }
+  toast(action === 'resolved' ? '✓ Flag resolved' : '🚫 Flag dismissed', 'success');
+  await loadFlags();
+}
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+function formatDate(iso){
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return Math.floor(diff) + 's ago';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+// ===== Bulk action selection =====
+let _selectedBulk = new Map(); // id → { name, kind }
+
+function onBulkToggle(cb){
+  const id = cb.dataset.id;
+  const name = cb.dataset.name;
+  const kind = cb.dataset.kind;
+  const card = document.getElementById('biz-' + id);
+  if (cb.checked){
+    _selectedBulk.set(id, { name, kind });
+    if (card) card.classList.add('bulk-selected');
+  } else {
+    _selectedBulk.delete(id);
+    if (card) card.classList.remove('bulk-selected');
+  }
+  updateBulkBar();
+}
+
+function updateBulkBar(){
+  const bar = document.getElementById('bulkBar');
+  const cnt = document.getElementById('bulkCount');
+  if (!bar) return;
+  cnt.textContent = _selectedBulk.size;
+  bar.classList.toggle('show', _selectedBulk.size > 0);
+}
+
+function clearBulkSelection(){
+  _selectedBulk.clear();
+  document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.biz-card.bulk-selected').forEach(c => c.classList.remove('bulk-selected'));
+  document.querySelectorAll('input[id^="selAll-"]').forEach(c => c.checked = false);
+  updateBulkBar();
+}
+
+function toggleAllSelected(panelKind, checked){
+  // Iterate checkboxes inside the matching panel only
+  const panel = document.getElementById('panel-' + panelKind);
+  if (!panel) return;
+  panel.querySelectorAll('.bulk-cb').forEach(cb => {
+    if (cb.checked !== checked){
+      cb.checked = checked;
+      onBulkToggle(cb);
+    }
+  });
+}
+
+async function performBulkAction(action){
+  if (_selectedBulk.size === 0) return;
+  const ids = Array.from(_selectedBulk.keys());
+  const names = Array.from(_selectedBulk.values()).map(v => v.name).slice(0, 5);
+  const previewList = names.join(', ') + (_selectedBulk.size > 5 ? ' + ' + (_selectedBulk.size - 5) + ' more' : '');
+  const verb = action === 'approve' ? 'approve & activate' : 'ban';
+  if (!confirm(verb.toUpperCase() + ' ' + _selectedBulk.size + ' shop' + (_selectedBulk.size === 1 ? '' : 's') + '?\n\n' + previewList)) return;
+
+  const rpcName = action === 'approve' ? 'admin_bulk_approve' : 'admin_bulk_ban';
+  const params = action === 'approve' ? { p_ids: ids } : { p_ids: ids, p_reason: null };
+  const r = await C.rpc(rpcName, params);
+  if (r.error){
+    alert('Bulk action failed: ' + r.error.message);
+    return;
+  }
+  const changed = r.data?.changed_count ?? 0;
+  showToast('✓ ' + changed + ' shop' + (changed === 1 ? '' : 's') + ' updated', 'success');
+  clearBulkSelection();
+  // Reload all panels so the moved shops disappear from their old tabs
+  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
+}
+
+function showToast(msg, kind){
+  // Use existing toast() if available, else fallback
+  if (typeof toast === 'function'){ toast(msg, kind); return; }
+  alert(msg);
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+function escapeJs(s){
+  return String(s == null ? '' : s).replace(/[\\'"]/g, ch => '\\' + ch);
+}
+
+async function logout(){
+  if (!confirm('Logout from admin panel?')) return;
+  await C.auth.signOut();
+  window.location.href = '/admin/login';
+}
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>

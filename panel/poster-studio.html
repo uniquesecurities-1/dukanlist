@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FAFAFA">
+<title>Poster Studio — DukanList</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260605">
+
+<style>
+  *{ box-sizing:border-box }
+  body{
+    font-family:'Inter','Manrope',-apple-system,sans-serif;
+    background:#FAFAFA;
+    color:#0A0A0A;
+    margin:0; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.005em;
+  }
+
+  /* ===== Modern header ===== */
+  .studio-bar{
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(20px) saturate(180%);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-bottom:1px solid rgba(0,0,0,.05);
+    padding:14px 20px;
+    position:sticky; top:0; z-index:50;
+  }
+  .studio-bar-inner{
+    max-width:1280px; margin:0 auto;
+    display:flex; align-items:center; gap:14px;
+  }
+  .studio-back{
+    display:inline-flex; align-items:center; gap:6px;
+    color:#525252; text-decoration:none; font-weight:600;
+    font-size:.88rem; padding:6px 10px; border-radius:8px;
+    transition:.15s;
+  }
+  .studio-back:hover{ background:#F4F4F5; color:#0A0A0A; text-decoration:none }
+  .studio-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:-.02em; flex:1 }
+  .studio-streak{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#FAFAFA; border:1px solid #E5E5E5;
+    padding:6px 12px; border-radius:99px; font-size:.78rem;
+    font-weight:700; color:#404040;
+  }
+  .studio-streak .dot{ color:#F97316 }
+  .studio-shares{
+    display:inline-flex; align-items:center; gap:5px;
+    color:#737373; font-size:.78rem; font-weight:600;
+  }
+
+  /* ===== Layout ===== */
+  .studio-wrap{
+    max-width:1280px; margin:0 auto;
+    padding:24px 20px 60px;
+    display:grid; grid-template-columns:1fr; gap:24px;
+  }
+  @media (min-width:980px){
+    .studio-wrap{ grid-template-columns:minmax(0, 480px) 1fr; align-items:start }
+  }
+
+  /* ===== Preview column (left on desktop) ===== */
+  .preview-col{ position:relative }
+  @media (min-width:980px){
+    .preview-col{ position:sticky; top:80px }
+  }
+  .preview-card{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.06);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,.04);
+  }
+  .format-tabs{
+    display:inline-flex; background:#F4F4F5;
+    padding:3px; border-radius:10px; margin-bottom:16px;
+    gap:0;
+  }
+  .format-btn{
+    background:transparent; border:none; color:#737373;
+    padding:6px 14px; border-radius:8px;
+    font-weight:600; font-size:.82rem; cursor:pointer;
+    font-family:inherit; transition:.15s;
+  }
+  .format-btn.active{ background:#fff; color:#0A0A0A; box-shadow:0 1px 3px rgba(0,0,0,.08) }
+
+  .preview-wrap{
+    background:linear-gradient(135deg,#FAFAFA,#F4F4F5);
+    border-radius:14px; padding:24px;
+    display:grid; place-items:center;
+    min-height:300px;
+    position:relative;
+  }
+  .preview-wrap canvas{
+    width:100%; max-width:320px; aspect-ratio:1/1;
+    border-radius:10px; background:#fff;
+    box-shadow:0 12px 40px rgba(0,0,0,.15);
+    display:block; transition:max-width .25s ease;
+  }
+  .preview-wrap.fmt-story canvas{ max-width:200px; aspect-ratio:9/16 }
+  .preview-wrap.fmt-card canvas{ max-width:360px; aspect-ratio:16/9 }
+  .fs-btn{
+    position:absolute; top:14px; right:14px;
+    width:34px; height:34px; border-radius:8px;
+    background:rgba(0,0,0,.7); color:#fff; border:none;
+    cursor:pointer; font-size:1rem; transition:.15s;
+  }
+  .fs-btn:hover{ background:#0A0A0A }
+
+  /* Share buttons */
+  .share-row{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+    margin-top:16px;
+  }
+  .share-btn{
+    border:none; padding:12px 4px; border-radius:11px;
+    font-weight:700; font-size:.82rem; cursor:pointer;
+    font-family:inherit; color:#fff;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    transition:.15s;
+  }
+  .share-btn .ico{ font-size:1.05rem }
+  .share-btn .lbl{ font-size:.7rem; opacity:.95 }
+  .share-btn:disabled{ opacity:.6; cursor:wait }
+  .share-btn:hover:not(:disabled){ transform:translateY(-1px) }
+  .share-wa{ background:#25D366 }
+  .share-ig{ background:linear-gradient(135deg,#F58529 0%,#DD2A7B 50%,#8134AF 100%) }
+  .share-fb{ background:#1877F2 }
+  .share-dl{ background:#171717 }
+
+  /* Festival banner */
+  .fest-banner{
+    background:linear-gradient(135deg,#FFF7ED,#FED7AA);
+    border:1px solid rgba(249,115,22,.2);
+    border-radius:12px; padding:12px 14px;
+    margin-bottom:14px; display:none;
+    align-items:center; gap:10px;
+  }
+  .fest-banner.show{ display:flex }
+  .fest-icon{ font-size:1.4rem }
+  .fest-text{ font-weight:700; font-size:.86rem; color:#7C2D12 }
+  .fest-days{ font-size:.72rem; color:#9A3412; font-weight:600; margin-top:2px }
+
+  /* ===== Controls column (right) ===== */
+  .controls-col{ display:flex; flex-direction:column; gap:16px }
+  .control-card{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.06);
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.03);
+  }
+  .control-title{
+    font-family:'Manrope',sans-serif; font-weight:800;
+    font-size:.78rem; color:#737373; text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:12px;
+  }
+
+  /* Search + filter */
+  .search-input{
+    width:100%; background:#FAFAFA;
+    border:1px solid #E5E5E5; color:#0A0A0A;
+    padding:10px 14px; border-radius:10px; font-size:.92rem;
+    font-family:inherit; outline:none; transition:.15s;
+  }
+  .search-input:focus{ border-color:#171717; background:#fff }
+  .search-input::placeholder{ color:#A3A3A3 }
+  .filter-tabs{
+    display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;
+  }
+  .filter-tab{
+    background:#FAFAFA; border:1px solid #E5E5E5; color:#525252;
+    padding:6px 12px; border-radius:99px; font-weight:600;
+    font-size:.74rem; cursor:pointer; font-family:inherit;
+    transition:.15s;
+  }
+  .filter-tab:hover{ background:#F4F4F5; color:#0A0A0A }
+  .filter-tab.active{ background:#171717; color:#fff; border-color:#171717 }
+
+  /* Gallery grid */
+  .gallery{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    max-height:420px; overflow-y:auto;
+    padding:3px;
+    scrollbar-width:thin;
+  }
+  @media (min-width:680px){ .gallery{ grid-template-columns:repeat(4,1fr) } }
+  .tmpl{
+    aspect-ratio:1/1; border-radius:12px; overflow:hidden;
+    cursor:pointer; border:2px solid transparent;
+    position:relative; background:#FAFAFA;
+    transition:.15s;
+  }
+  .tmpl:hover{ transform:scale(1.04); box-shadow:0 8px 20px rgba(0,0,0,.08) }
+  .tmpl.active{ border-color:#171717; box-shadow:0 0 0 3px rgba(23,23,23,.1) }
+  .tmpl canvas{ width:100%; height:100%; display:block }
+  .tmpl-name{
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(to top,rgba(0,0,0,.78),transparent);
+    color:#fff; padding:16px 6px 6px; font-size:.62rem;
+    font-weight:700; text-align:center; letter-spacing:.02em;
+    line-height:1.15;
+  }
+  .tmpl-fav{
+    position:absolute; top:5px; right:5px;
+    width:24px; height:24px; border-radius:50%;
+    background:rgba(0,0,0,.55); display:grid; place-items:center;
+    cursor:pointer; font-size:11px; color:rgba(255,255,255,.7);
+    z-index:2;
+  }
+  .tmpl-fav.faved{ background:#FACC15; color:#0A0A0A }
+
+  /* Toggle chips */
+  .toggle-row{ display:flex; flex-wrap:wrap; gap:6px }
+  .toggle-chip{
+    background:#FAFAFA; border:1px solid #E5E5E5;
+    color:#525252; padding:7px 12px; border-radius:99px;
+    font-weight:600; font-size:.76rem; cursor:pointer;
+    font-family:inherit; transition:.15s;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .toggle-chip:hover{ background:#F4F4F5 }
+  .toggle-chip.on{ background:#0A0A0A; color:#fff; border-color:#0A0A0A }
+
+  /* Edit panel */
+  .edit-row{ margin-bottom:10px }
+  .edit-row:last-child{ margin-bottom:0 }
+  .edit-label{
+    display:block; font-size:.7rem; color:#737373;
+    font-weight:700; margin-bottom:4px;
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .edit-input{
+    width:100%; background:#FAFAFA;
+    border:1px solid #E5E5E5; color:#0A0A0A;
+    padding:8px 12px; border-radius:9px; font-size:.88rem;
+    font-family:inherit; outline:none; transition:.15s;
+  }
+  .edit-input:focus{ border-color:#171717; background:#fff }
+
+  /* Sticker buttons */
+  .stickers{ display:flex; gap:6px; flex-wrap:wrap }
+  .sticker-btn{
+    background:#FAFAFA; border:1px solid #E5E5E5; color:#525252;
+    padding:6px 11px; border-radius:99px; font-weight:800;
+    font-size:.7rem; cursor:pointer; font-family:inherit;
+    letter-spacing:.04em; transition:.15s;
+  }
+  .sticker-btn:hover{ background:#F4F4F5; color:#0A0A0A }
+  .sticker-btn[data-sticker="NEW"].on   { background:#10B981; color:#fff; border-color:transparent }
+  .sticker-btn[data-sticker="SALE"].on  { background:#DC2626; color:#fff; border-color:transparent }
+  .sticker-btn[data-sticker="OFFER"].on { background:#F97316; color:#fff; border-color:transparent }
+  .sticker-btn[data-sticker="FREE"].on  { background:#A855F7; color:#fff; border-color:transparent }
+  .sticker-btn[data-sticker="HOT"].on   { background:#EF4444; color:#fff; border-color:transparent }
+  .sticker-btn[data-sticker="TOP"].on   { background:#FACC15; color:#0A0A0A; border-color:transparent }
+
+  /* Color swatches */
+  .swatches{ display:flex; gap:6px; flex-wrap:wrap }
+  .swatch{
+    width:28px; height:28px; border-radius:50%; cursor:pointer;
+    border:2px solid transparent; transition:.15s;
+  }
+  .swatch:hover{ transform:scale(1.12) }
+  .swatch.active{ box-shadow:0 0 0 2px #fff, 0 0 0 4px #0A0A0A }
+
+  /* Language toggle */
+  .lang-toggle{
+    display:inline-flex; background:#F4F4F5; padding:3px;
+    border-radius:99px;
+  }
+  .lang-btn{
+    background:transparent; border:none; color:#737373;
+    padding:5px 12px; font-size:.74rem; font-weight:700;
+    cursor:pointer; border-radius:99px; font-family:inherit;
+    transition:.15s; letter-spacing:.03em;
+  }
+  .lang-btn.active{ background:#fff; color:#0A0A0A; box-shadow:0 1px 3px rgba(0,0,0,.08) }
+
+  /* Fullscreen modal */
+  .fs-modal{
+    position:fixed; inset:0; background:rgba(10,10,10,.94);
+    z-index:99999; display:none; align-items:center; justify-content:center;
+    padding:24px; backdrop-filter:blur(8px);
+  }
+  .fs-modal.open{ display:flex }
+  .fs-modal canvas{ max-width:95%; max-height:90vh; border-radius:16px; box-shadow:0 40px 100px rgba(0,0,0,.8) }
+  .fs-close{
+    position:absolute; top:24px; right:24px;
+    width:42px; height:42px; border-radius:50%;
+    background:#fff; color:#0A0A0A; border:none; font-size:1.2rem;
+    cursor:pointer; font-weight:800;
+  }
+
+  /* Card section title */
+  .section-flex{ display:flex; align-items:center; gap:10px; margin-bottom:12px }
+  .section-flex .control-title{ margin-bottom:0; flex:1 }
+
+  /* Empty state */
+  .empty{
+    grid-column:1 / -1; padding:30px;
+    text-align:center; color:#A3A3A3; font-size:.86rem; font-weight:600;
+  }
+
+  /* Wonderful Pack v1 (2026-06-06) */
+  .wpack-section{ margin-top:14px; padding-top:14px; border-top:1px dashed #E5E5E5 }
+  .wpack-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px }
+  .wpack-row:last-child{ margin-bottom:0 }
+  .wpack-btn{
+    background:#FAFAFA; border:1px solid #E5E5E5; color:#525252;
+    padding:8px 14px; border-radius:10px; font-weight:700;
+    font-size:.82rem; cursor:pointer; font-family:inherit;
+    display:inline-flex; align-items:center; gap:6px; transition:.15s;
+  }
+  .wpack-btn:hover{ background:#F4F4F5; color:#0A0A0A }
+  .wpack-btn.primary{ background:#0A0A0A; color:#fff; border-color:#0A0A0A }
+  .wpack-btn.on{ background:#10B981; color:#fff; border-color:#10B981 }
+  .wpack-btn:disabled{ opacity:.5; cursor:wait }
+  .wpack-preview-thumb{
+    width:40px; height:40px; border-radius:8px;
+    background:#FAFAFA; border:1px solid #E5E5E5;
+    background-size:cover; background-position:center;
+  }
+  .wpack-info{
+    background:#FFFBEB; border:1px solid #FDE68A;
+    padding:8px 12px; border-radius:9px; font-size:.78rem; color:#92400E;
+    font-weight:600; line-height:1.4;
+  }
+  .wpack-clear{
+    background:transparent; border:none; color:#DC2626;
+    cursor:pointer; font-weight:700; font-size:.78rem; padding:4px 8px;
+  }
+  .wpack-suggest-chips{
+    display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;
+  }
+  .wpack-suggest-chip{
+    background:#EFF6FF; border:1px solid #BFDBFE; color:#1E3A8A;
+    padding:6px 10px; border-radius:99px; font-size:.78rem;
+    font-weight:600; cursor:pointer; font-family:inherit;
+    transition:.15s;
+  }
+  .wpack-suggest-chip:hover{ background:#DBEAFE }
+
+  /* Premium template badge */
+  .tmpl.premium-tier{ border-color:#D4AF37 }
+  .tmpl.premium-tier .tmpl-name{
+    background:linear-gradient(to top, rgba(212,175,55,.95), transparent);
+    color:#000; font-weight:900;
+  }
+  .tmpl.premium-tier::before{
+    content:"PREMIUM"; position:absolute; top:6px; left:6px;
+    background:linear-gradient(135deg,#D4AF37,#996515);
+    color:#fff; font-size:.55rem; font-weight:900;
+    padding:3px 7px; border-radius:99px; letter-spacing:.05em;
+    z-index:3; box-shadow:0 2px 6px rgba(0,0,0,.3);
+  }
+  /* HERO photo upload card */
+  .hero-upload{
+    background:linear-gradient(135deg,#FDFBF6 0%,#F5F1E8 100%);
+    border:2px dashed #D4AF37;
+    border-radius:16px; padding:20px;
+    text-align:center; cursor:pointer;
+    transition:.15s;
+  }
+  .hero-upload:hover{ background:linear-gradient(135deg,#FAF6EC 0%,#EFE9D9 100%); transform:translateY(-1px) }
+  .hero-upload.has-photo{
+    background:none; border-style:solid; border-color:#D4AF37;
+    padding:14px;
+  }
+  .hero-upload-icon{ font-size:2.2rem; margin-bottom:6px }
+  .hero-upload-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:.95rem; color:#5D4920; margin-bottom:2px }
+  .hero-upload-sub{ font-size:.78rem; color:#8B6F47; font-weight:600 }
+  .hero-photo-preview{
+    width:100%; aspect-ratio:16/9;
+    border-radius:10px; background-size:cover; background-position:center;
+    margin-bottom:10px;
+  }
+
+  /* Quick Pick Hero Templates */
+  .quickpick{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+    margin-bottom:14px;
+  }
+  @media (min-width:600px){ .quickpick{ grid-template-columns:repeat(4,1fr) } }
+  .qp-tile{
+    aspect-ratio:9/12; border-radius:14px; overflow:hidden;
+    cursor:pointer; border:2px solid transparent; position:relative;
+    background:#FAFAFA; transition:.2s;
+    box-shadow:0 4px 14px rgba(0,0,0,.06);
+  }
+  .qp-tile:hover{ transform:translateY(-2px); box-shadow:0 12px 24px rgba(0,0,0,.10) }
+  .qp-tile.active{ border-color:#D4AF37; box-shadow:0 0 0 3px rgba(212,175,55,.25) }
+  .qp-tile canvas{ width:100%; height:100%; display:block }
+  .qp-tile-label{
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
+    color:#fff; padding:18px 8px 8px; font-size:.7rem;
+    font-weight:800; text-align:center; letter-spacing:.03em;
+  }
+  .qp-tile-badge{
+    position:absolute; top:6px; right:6px;
+    background:linear-gradient(135deg,#D4AF37,#B8860B);
+    color:#000; font-size:.55rem; font-weight:900;
+    padding:3px 7px; border-radius:99px; letter-spacing:.05em;
+  }
+
+  .show-all-btn{
+    background:#FAFAFA; border:1px solid #E5E5E5;
+    color:#525252; padding:9px 14px; border-radius:10px;
+    font-weight:700; font-size:.84rem; cursor:pointer;
+    font-family:inherit; width:100%; transition:.15s;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .show-all-btn:hover{ background:#F4F4F5; color:#0A0A0A }
+  .more-styles-section{ display:none }
+  .more-styles-section.open{ display:block }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="studio-bar">
+  <div class="studio-bar-inner">
+    <a href="/panel/dashboard.html" class="studio-back">← Dashboard</a>
+    <div class="studio-title">Poster Studio</div>
+    <span class="studio-shares" id="topShareCount">0 shared</span>
+    <span class="studio-streak"><span class="dot">●</span> <span id="topStreak">0 days</span></span>
+  </div>
+</header>
+
+<div class="studio-wrap">
+
+  <!-- ========== LEFT: Preview Column ========== -->
+  <div class="preview-col">
+    <div class="preview-card">
+
+      <div class="fest-banner" id="festBanner">
+        <span class="fest-icon" id="festIcon">🎉</span>
+        <div>
+          <div class="fest-text" id="festText"></div>
+          <div class="fest-days" id="festDays"></div>
+        </div>
+      </div>
+
+      <div class="format-tabs">
+        <button type="button" class="format-btn active" data-fmt="square">Square</button>
+        <button type="button" class="format-btn" data-fmt="story">Story</button>
+        <button type="button" class="format-btn" data-fmt="card">Card</button>
+      </div>
+
+      <div class="preview-wrap" id="previewWrap">
+        <button type="button" class="fs-btn" id="fsBtn" title="Fullscreen">⛶</button>
+        <canvas id="mainCanvas" width="1080" height="1080"></canvas>
+      </div>
+
+      <div class="share-row">
+        <button type="button" class="share-btn share-wa" id="shareWa">
+          <span class="ico">💬</span><span class="lbl">WhatsApp</span>
+        </button>
+        <button type="button" class="share-btn share-ig" id="shareIg">
+          <span class="ico">📷</span><span class="lbl">Instagram</span>
+        </button>
+        <button type="button" class="share-btn share-fb" id="shareFb">
+          <span class="ico">f</span><span class="lbl">Facebook</span>
+        </button>
+        <button type="button" class="share-btn share-dl" id="shareDl">
+          <span class="ico">↓</span><span class="lbl">Download</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== RIGHT: Controls Column ========== -->
+  <div class="controls-col">
+
+    <!-- HERO PHOTO UPLOAD - Premium Default -->
+    <div class="control-card" style="border:1px solid #D4AF37">
+      <div class="control-title" style="color:#5D4920">📸 Hero Photo</div>
+      <div class="hero-upload" id="heroUploadZone">
+        <div class="hero-upload-icon">📤</div>
+        <div class="hero-upload-title">Upload your shop photo</div>
+        <div class="hero-upload-sub">JPG / PNG · Max 8 MB · Tap to choose</div>
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:8px;line-height:1.4">
+        Premium templates highlight your photo at top. Choose a clean, well-lit shot of your shop, products, or workplace.
+      </div>
+    </div>
+
+    <!-- Custom Address (override) -->
+    <div class="control-card">
+      <div class="control-title">📍 Address (saved permanently)</div>
+      <div class="edit-row">
+        <label class="edit-label">Full address as you want it shown</label>
+        <input type="text" class="edit-input" id="customAddress" placeholder="e.g. SCO-01, Near Indusind Bank, Aastha Hospital Street, Chotala Road, Mandi Dabwali-125104" maxlength="180">
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:4px">Saves on your device. Auto-wraps to 2 lines.</div>
+    </div>
+
+    <!-- QR Code toggle -->
+    <div class="control-card">
+      <div class="control-title">🔗 QR Code on Poster</div>
+      <div class="wpack-row">
+        <button type="button" class="wpack-btn on" id="qrToggle" data-on="1">🔗 Show QR code (bottom right)</button>
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:6px">Scanners reach your shop page directly.</div>
+    </div>
+
+    <!-- Quick Pick Premium Templates -->
+    <div class="control-card">
+      <div class="section-flex">
+        <div class="control-title">⭐ Quick Pick — Premium Templates</div>
+        <div class="lang-toggle" id="langToggle">
+          <button type="button" class="lang-btn active" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="hi">हिं</button>
+        </div>
+      </div>
+      <div style="font-size:.78rem;color:#737373;margin-bottom:12px">Pick a style below — all need just a photo upload.</div>
+      <div class="quickpick" id="quickpickTiles"></div>
+      <button type="button" class="show-all-btn" id="showAllBtn">▾ Show all styles (<span id="tmplCount">30</span>)</button>
+      <div class="more-styles-section" id="moreStyles">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search templates..." style="margin-top:12px">
+        <div class="filter-tabs">
+          <button type="button" class="filter-tab active" data-filter="all">All</button>
+          <button type="button" class="filter-tab" data-filter="favorites">★ Saved</button>
+          <button type="button" class="filter-tab" data-filter="festival">Festival</button>
+          <button type="button" class="filter-tab" data-filter="minimal">Minimal</button>
+          <button type="button" class="filter-tab" data-filter="bold">Bold</button>
+          <button type="button" class="filter-tab" data-filter="photo">Photo</button>
+        </div>
+        <div class="gallery" id="gallery" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <!-- What to show -->
+    <div class="control-card">
+      <div class="control-title">Show on poster</div>
+      <div class="toggle-row">
+        <button type="button" class="toggle-chip on" data-toggle="photo">Photo</button>
+        <button type="button" class="toggle-chip on" data-toggle="rating">Rating</button>
+        <button type="button" class="toggle-chip on" data-toggle="phone">Phone</button>
+        <button type="button" class="toggle-chip" data-toggle="address">Address</button>
+        <button type="button" class="toggle-chip" data-toggle="photoBg">Photo as background</button>
+      </div>
+    </div>
+
+    <!-- Custom text -->
+    <div class="control-card">
+      <div class="control-title">Custom text (optional)</div>
+      <div class="edit-row">
+        <label class="edit-label">Headline</label>
+        <input type="text" class="edit-input" id="customHeadline" placeholder="e.g. Special offer this week" maxlength="60">
+      </div>
+      <div class="edit-row">
+        <label class="edit-label">Subline</label>
+        <input type="text" class="edit-input" id="customSubline" placeholder="e.g. Up to 30% off" maxlength="80">
+      </div>
+    </div>
+
+    <!-- Smart Suggestions -->
+    <div class="control-card">
+      <div class="control-title">💡 Smart suggestions</div>
+      <div style="font-size:.74rem;color:#737373;margin-bottom:8px">Tap to use as headline. Refreshes every minute.</div>
+      <div class="wpack-suggest-chips" id="suggestChips"></div>
+    </div>
+
+    <!-- ✨ Your Brand Assets -->
+    <div class="control-card">
+      <div class="control-title">✨ Your brand assets</div>
+      <div class="wpack-row">
+        <div class="wpack-preview-thumb" id="photoThumb"></div>
+        <button type="button" class="wpack-btn" id="uploadPhotoBtn">📤 Upload photo</button>
+        <button type="button" class="wpack-clear" id="clearPhotoBtn" style="display:none">Clear</button>
+        <input type="file" id="photoInput" accept="image/*" style="display:none">
+      </div>
+      <div class="wpack-row">
+        <div class="wpack-preview-thumb" id="logoThumb"></div>
+        <button type="button" class="wpack-btn" id="uploadLogoBtn">🏷️ Upload logo</button>
+        <button type="button" class="wpack-clear" id="clearLogoBtn" style="display:none">Clear</button>
+        <input type="file" id="logoInput" accept="image/*" style="display:none">
+      </div>
+      <div style="font-size:.74rem;color:#737373;margin-top:4px">Logo saves permanently. Use shop photo for personal branding.</div>
+    </div>
+
+    <!-- 🎁 Auto-pull from your shop -->
+    <div class="control-card">
+      <div class="control-title">🎁 Auto-pull from your shop</div>
+      <div class="wpack-row">
+        <button type="button" class="wpack-btn" id="dealToggle">🎁 Add today\'s deal</button>
+        <button type="button" class="wpack-btn" id="reviewPullBtn">⭐ Use customer review</button>
+      </div>
+      <div id="dealInfo" class="wpack-info" style="display:none;margin-top:8px"></div>
+      <div id="reviewInfo" class="wpack-info" style="display:none;margin-top:8px"></div>
+      <div id="noAssistInfo" style="font-size:.74rem;color:#A3A3A3;margin-top:6px">Loading...</div>
+    </div>
+
+    <!-- Stickers -->
+    <div class="control-card">
+      <div class="control-title">Add badges (max 4)</div>
+      <div class="stickers" id="stickers">
+        <button type="button" class="sticker-btn" data-sticker="NEW">NEW</button>
+        <button type="button" class="sticker-btn" data-sticker="SALE">SALE</button>
+        <button type="button" class="sticker-btn" data-sticker="OFFER">OFFER</button>
+        <button type="button" class="sticker-btn" data-sticker="FREE">FREE</button>
+        <button type="button" class="sticker-btn" data-sticker="HOT">HOT</button>
+        <button type="button" class="sticker-btn" data-sticker="TOP">TOP</button>
+      </div>
+    </div>
+
+    <!-- Color -->
+    <div class="control-card">
+      <div class="control-title">Accent color</div>
+      <div class="swatches" id="swatches">
+        <span class="swatch active" data-color="" style="background:linear-gradient(135deg,#fff 50%,#171717 50%);border:1px solid #E5E5E5" title="Template default"></span>
+        <span class="swatch" data-color="#F97316" style="background:#F97316"></span>
+        <span class="swatch" data-color="#DC2626" style="background:#DC2626"></span>
+        <span class="swatch" data-color="#10B981" style="background:#10B981"></span>
+        <span class="swatch" data-color="#1E3A8A" style="background:#1E3A8A"></span>
+        <span class="swatch" data-color="#7C3AED" style="background:#7C3AED"></span>
+        <span class="swatch" data-color="#0EA5E9" style="background:#0EA5E9"></span>
+        <span class="swatch" data-color="#FACC15" style="background:#FACC15"></span>
+        <span class="swatch" data-color="#171717" style="background:#171717"></span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Fullscreen modal -->
+<div class="fs-modal" id="fsModal">
+  <button type="button" class="fs-close" id="fsClose">✕</button>
+  <canvas id="fsCanvas" width="1080" height="1080"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js?v=722370"></script>
+<script src="/assets/js/daily-poster-engine.js?v=fix1780725556"></script>
+<script src="/assets/js/festival-engine.js?v=723034"></script>
+<script src="/assets/js/template-mega-pack.js?v=fix1780725556"></script>
+
+<script>
+(async function init(){
+  if (!window.TemplateMegaPack || !window.ShopDB || !ShopDB.client) {
+    setTimeout(init, 400);
+    return;
+  }
+  const c = ShopDB.client;
+  let biz;
+  try {
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user) { location.href = '/panel/login.html'; return; }
+    const own = await c.from('business_owners').select('business_id').eq('auth_user_id', u.data.user.id).limit(1).maybeSingle();
+    if (!own || !own.data) { console.error('No business owner row found for user'); alert('No business linked to your account.\nGoing back to dashboard.'); location.href = '/panel/dashboard.html'; return; }
+    const b = await c.from('businesses').select('id, name, slug, mobile, whatsapp, photos, rating_avg, established_year, pincode, city_id, category_id, website_url').eq('id', own.data.business_id).maybeSingle();
+    if (!b || !b.data) { console.error('Business fetch returned no data:', b); alert('Business data could not be loaded'); return; }
+    biz = b.data;
+    // Get city name
+    if (biz.city_id) {
+      const cn = await c.from('geo_cities').select('name').eq('id', biz.city_id).maybeSingle();
+      biz.city_name = cn?.data?.name || '';
+    }
+    // Get category slug
+    if (biz.category_id) {
+      const cat = await c.from('categories').select('slug').eq('id', biz.category_id).maybeSingle();
+      biz.category_slug = cat?.data?.slug || '';
+    }
+  } catch(e){
+    console.error('Studio init error:', e); alert('Could not load your business: ' + (e && e.message || 'Unknown error')); return;
+  }
+
+  const shopData = {
+    name: biz.name || 'Your Business',
+    slug: biz.slug || '',
+    mobile: biz.mobile || '',
+    city: biz.city_name || '',
+    category: biz.category_slug || '',
+    established_year: biz.established_year || null,
+    rating: biz.rating_avg || 0,
+    address: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
+    _autoAddress: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
+    photo: (Array.isArray(biz.photos) && biz.photos[0]) || '',
+    website: biz.website_url || ''
+  };
+
+  const state = {
+    format: 'square',
+    tmpl: null,
+    lang: 'en',
+    showPhoto: true,
+    showRating: true,
+    showPhone: true,
+    showAddress: false,
+    usePhotoBg: false,
+    filter: 'all',
+    search: '',
+    customHeadline: '',
+    customSubline: '',
+    customAccent: '',
+    stickers: []
+  };
+
+  function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_tmpl_favs')||'[]'); } catch(_){return []} }
+  function setFavs(a){ try { localStorage.setItem('dl_tmpl_favs', JSON.stringify(a)); } catch(_){} }
+  function isFav(id){ return getFavs().indexOf(id) > -1 }
+  function toggleFav(id){ const f=getFavs(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); setFavs(f); return f.indexOf(id)>-1 }
+
+  function shares(){ try{return parseInt(localStorage.getItem('dl_tmpl_shares')||'0',10)||0}catch(_){return 0} }
+  function bumpShares(){ try{ const n=shares()+1; localStorage.setItem('dl_tmpl_shares',String(n)); document.getElementById('topShareCount').textContent=n+' shared'; }catch(_){} }
+  document.getElementById('topShareCount').textContent = shares() + ' shared';
+
+  function streak(){
+    try {
+      const s = JSON.parse(localStorage.getItem('dl_poster_streak')||'{}');
+      return parseInt(s.streak,10) || 0;
+    } catch(_){ return 0 }
+  }
+  function bumpStreak(){
+    try {
+      const today = new Date().toISOString().slice(0,10);
+      let s = JSON.parse(localStorage.getItem('dl_poster_streak')||'{}');
+      const last = s.last_date;
+      let st = parseInt(s.streak,10) || 0;
+      if (last === today) return;
+      if (last) {
+        const diff = Math.round((new Date(today)-new Date(last))/86400000);
+        st = (diff === 1) ? st+1 : 1;
+      } else st = 1;
+      localStorage.setItem('dl_poster_streak', JSON.stringify({ last_date:today, streak:st }));
+      document.getElementById('topStreak').textContent = st + ' days';
+    } catch(_){}
+  }
+  document.getElementById('topStreak').textContent = streak() + ' days';
+
+  // Festival
+  let festival = null;
+  if (window.FestivalEngine && FestivalEngine.getActiveFestival) festival = FestivalEngine.getActiveFestival();
+  if (festival) {
+    document.getElementById('festIcon').textContent = festival.emoji || '🎉';
+    document.getElementById('festText').textContent = festival.nameEn + ' theme available';
+    const days = festival.daysAway;
+    document.getElementById('festDays').textContent = (days <= 0 ? 'Today' : days===1 ? 'Tomorrow' : days + ' days away');
+    document.getElementById('festBanner').classList.add('show');
+  }
+
+  // Templates
+  const allTemplates = TemplateMegaPack.getRelevantTemplates(shopData.category);
+  document.getElementById('tmplCount').textContent = '(' + allTemplates.length + ')';
+  state.tmpl = allTemplates[0];
+
+  function styleMatches(t, f){
+    if (f === 'all') return true;
+    if (f === 'favorites') return isFav(t.id);
+    if (f === 'festival') return t.style === 'festival' || t.id.indexOf('fest-') === 0;
+    if (f === 'minimal') return t.style === 'minimal';
+    if (f === 'bold') return t.style === 'bold-name' || t.style === 'cta';
+    if (f === 'photo') return t.needsPhoto || t.style === 'photo-hero';
+    return true;
+  }
+  function filtered(){
+    const q = (state.search || '').toLowerCase().trim();
+    return allTemplates.filter(t => {
+      if (!styleMatches(t, state.filter)) return false;
+      if (q) return (t.name + ' ' + (t.nameHi||'') + ' ' + (t.category||'')).toLowerCase().indexOf(q) > -1;
+      return true;
+    });
+  }
+
+  const gal = document.getElementById('gallery');
+  async function buildGallery(){
+    const tmpls = filtered();
+    if (tmpls.length === 0) {
+      gal.innerHTML = '<div class="empty">No templates match your filter</div>';
+      return;
+    }
+    gal.innerHTML = tmpls.map(t =>
+      '<div class="tmpl ' + (t.premium ? 'premium-tier ' : '') + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
+      '  <div class="tmpl-fav ' + (isFav(t.id) ? 'faved' : '') + '" data-fav="' + t.id + '">★</div>' +
+      '  <canvas data-thumb-for="' + t.id + '"></canvas>' +
+      '  <div class="tmpl-name">' + t.name + '</div>' +
+      '</div>'
+    ).join('');
+    for (const t of tmpls) {
+      const thumb = gal.querySelector('[data-thumb-for="' + t.id + '"]');
+      if (thumb) {
+        try { await TemplateMegaPack.renderTemplate(thumb, shopData, t, { size: 200, lang: state.lang }); } catch(_){}
+      }
+    }
+    gal.querySelectorAll('.tmpl').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.classList.contains('tmpl-fav')) return;
+        gal.querySelectorAll('.tmpl').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        state.tmpl = allTemplates.find(t => t.id === el.dataset.tid);
+        renderMain();
+      });
+    });
+    gal.querySelectorAll('.tmpl-fav').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const now = toggleFav(el.dataset.fav);
+        el.classList.toggle('faved', now);
+      });
+    });
+  }
+
+  // Format tabs
+  document.querySelectorAll('.format-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.format-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      state.format = b.dataset.fmt;
+      const w = document.getElementById('previewWrap');
+      w.classList.remove('fmt-square','fmt-story','fmt-card');
+      w.classList.add('fmt-' + state.format);
+      renderMain();
+    });
+  });
+
+  // Filter tabs
+  document.querySelectorAll('.filter-tab').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      state.filter = b.dataset.filter;
+      buildGallery();
+    });
+  });
+
+  // ─── Quick Pick: Premium hero tiles (MODULE SCOPE) ───────────
+  async function renderQuickpick(){
+    const premiumOnes = allTemplates.filter(t => t.premium);
+    const el = document.getElementById('quickpickTiles');
+    if (!el || premiumOnes.length === 0) return;
+    el.innerHTML = premiumOnes.map((t) =>
+      '<div class="qp-tile ' + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
+      '  <div class="qp-tile-badge">PREMIUM</div>' +
+      '  <canvas data-qp-for="' + t.id + '"></canvas>' +
+      '  <div class="qp-tile-label">' + t.name + '</div>' +
+      '</div>'
+    ).join('');
+    // Render thumbs
+    for (const t of premiumOnes) {
+      const cv = el.querySelector('[data-qp-for="' + t.id + '"]');
+      if (cv) {
+        try { await TemplateMegaPack.renderTemplate(cv, shopData, t, { size: 300, lang: state.lang }); } catch(_){}
+      }
+    }
+    // Wire clicks
+    el.querySelectorAll('.qp-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        el.querySelectorAll('.qp-tile').forEach(x => x.classList.remove('active'));
+        tile.classList.add('active');
+        state.tmpl = allTemplates.find(t => t.id === tile.dataset.tid);
+        document.querySelectorAll('.gallery .tmpl').forEach(x => x.classList.remove('active'));
+        const g = document.querySelector('.gallery [data-tid="' + state.tmpl.id + '"]');
+        if (g) g.classList.add('active');
+        renderMain();
+      });
+    });
+  }
+
+  // Default to first premium template on first load
+  const firstPremium = allTemplates.find(t => t.premium);
+  if (firstPremium && (!state.tmpl || !state.tmpl.premium)) {
+    state.tmpl = firstPremium;
+  }
+
+  // Show All toggle
+  const showAllBtn = document.getElementById('showAllBtn');
+  const moreSection = document.getElementById('moreStyles');
+  if (showAllBtn && moreSection) {
+    showAllBtn.addEventListener('click', () => {
+      const isOpen = moreSection.classList.toggle('open');
+      showAllBtn.innerHTML = (isOpen ? '▴ Hide other styles' : '▾ Show all styles (<span id="tmplCount">' + allTemplates.length + '</span>)');
+    });
+  }
+
+  // Initial Quick Pick render (will run after shopData populated)
+  setTimeout(() => { renderQuickpick(); }, 250);
+
+  // Search
+  let sT;
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    clearTimeout(sT);
+    sT = setTimeout(() => { state.search = e.target.value; buildGallery(); }, 250);
+  });
+
+  // Lang
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.lang-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      state.lang = b.dataset.lang;
+      renderMain(); buildGallery();
+    });
+  });
+
+  // Toggles
+  document.querySelectorAll('.toggle-chip').forEach(t => {
+    t.addEventListener('click', () => {
+      t.classList.toggle('on');
+      const k = t.dataset.toggle;
+      if (k === 'photoBg') state.usePhotoBg = t.classList.contains('on');
+      else state['show'+k.charAt(0).toUpperCase()+k.slice(1)] = t.classList.contains('on');
+      renderMain();
+    });
+  });
+
+  // Text inputs
+  let h1, h2;
+  document.getElementById('customHeadline').addEventListener('input', (e) => {
+    clearTimeout(h1); h1 = setTimeout(() => { state.customHeadline = e.target.value; renderMain(); }, 300);
+  });
+  document.getElementById('customSubline').addEventListener('input', (e) => {
+    clearTimeout(h2); h2 = setTimeout(() => { state.customSubline = e.target.value; renderMain(); }, 300);
+  });
+
+  // Stickers
+  document.querySelectorAll('.sticker-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      const s = b.dataset.sticker;
+      const i = state.stickers.indexOf(s);
+      if (i > -1) { state.stickers.splice(i,1); b.classList.remove('on'); }
+      else if (state.stickers.length < 4) { state.stickers.push(s); b.classList.add('on'); }
+      renderMain();
+    });
+  });
+
+  // Swatches
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.addEventListener('click', () => {
+      document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+      state.customAccent = s.dataset.color || '';
+      renderMain();
+    });
+  });
+
+  // Fullscreen
+  document.getElementById('fsBtn').addEventListener('click', async () => {
+    document.getElementById('fsModal').classList.add('open');
+    try { await TemplateMegaPack.renderTemplate(document.getElementById('fsCanvas'), effective(), state.tmpl, opts()); } catch(_){}
+  });
+  document.getElementById('fsClose').addEventListener('click', () => document.getElementById('fsModal').classList.remove('open'));
+  document.getElementById('fsModal').addEventListener('click', (e) => { if (e.target.id === 'fsModal') e.target.classList.remove('open'); });
+
+  function effective(){
+    return {
+      name: shopData.name, slug: shopData.slug,
+      mobile: state.showPhone ? shopData.mobile : '',
+      city: shopData.city, category: shopData.category,
+      established_year: shopData.established_year,
+      rating: state.showRating ? shopData.rating : 0,
+      address: state.showAddress === false ? '' : (state.customAddress || shopData.address),
+      photo: state.customPhoto || shopData.photo,
+      website: shopData.website || ''
+    };
+  }
+  function opts(){
+    return {
+      size: 1080, lang: state.lang,
+      usePhotoBg: state.usePhotoBg,
+      customHeadline: state.customHeadline || null,
+      customSubline: state.customSubline || null,
+      customAccent: state.customAccent || null,
+      stickers: state.stickers,
+      showQr: state.showQr !== false,
+      logoUrl: state.customLogo || null,
+      dealText: state.useDeal ? state.dealText : null,
+      dealAccent: '#F97316',
+      photoOverride: state.customPhoto || null
+    };
+  }
+  async function renderMain(){
+    try { await TemplateMegaPack.renderTemplate(document.getElementById('mainCanvas'), effective(), state.tmpl, opts()); } catch(_){}
+  }
+
+  async function share(plat, id){
+    const b = document.getElementById(id);
+    b.disabled = true;
+    try {
+      await TemplateMegaPack.shareToPlatform(plat, effective(), state.tmpl, opts());
+      bumpShares(); bumpStreak();
+    } catch(_){}
+    finally { b.disabled = false; }
+  }
+  document.getElementById('shareWa').addEventListener('click', () => share('whatsapp','shareWa'));
+  document.getElementById('shareIg').addEventListener('click', () => share('instagram','shareIg'));
+  document.getElementById('shareFb').addEventListener('click', () => share('facebook','shareFb'));
+  document.getElementById('shareDl').addEventListener('click', async () => {
+    const b = document.getElementById('shareDl');
+    b.disabled = true;
+    try { await TemplateMegaPack.downloadPoster(effective(), state.tmpl, opts()); bumpShares(); bumpStreak(); }
+    catch(_){}
+    finally { b.disabled = false; }
+  });
+
+  // ─── Wonderful Pack v1 ─────────────────────────────────
+  state.customPhoto = '';
+  state.customLogo = localStorage.getItem('dl_studio_logo') || '';
+  state.useDeal = false;
+  state.dealText = '';
+  state.assistDeal = null;
+  state.assistReview = null;
+
+  // Photo upload (custom background)
+  function fileToDataURL(file){
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+  function compressImage(dataUrl, maxSize){
+    return new Promise((res) => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const w = img.width * ratio, h = img.height * ratio;
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        res(cv.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => res(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
+  document.getElementById('uploadPhotoBtn').addEventListener('click', () => document.getElementById('photoInput').click());
+  document.getElementById('photoInput').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (f.size > 8 * 1024 * 1024) { alert('Photo too large (max 8 MB)'); return; }
+    const url = await fileToDataURL(f);
+    state.customPhoto = await compressImage(url, 1400);
+    document.getElementById('photoThumb').style.backgroundImage = 'url(' + state.customPhoto + ')';
+    document.getElementById('clearPhotoBtn').style.display = 'inline-block';
+    // Auto-enable Photo Bg toggle
+    const pbg = document.querySelector('[data-toggle="photoBg"]');
+    if (pbg && !pbg.classList.contains('on')) { pbg.classList.add('on'); state.usePhotoBg = true; }
+    renderMain();
+  });
+  document.getElementById('clearPhotoBtn').addEventListener('click', () => {
+    state.customPhoto = '';
+    document.getElementById('photoThumb').style.backgroundImage = '';
+    document.getElementById('clearPhotoBtn').style.display = 'none';
+    renderMain();
+  });
+
+  // Logo upload (persists)
+  function refreshLogoThumb(){
+    if (state.customLogo) {
+      document.getElementById('logoThumb').style.backgroundImage = 'url(' + state.customLogo + ')';
+      document.getElementById('clearLogoBtn').style.display = 'inline-block';
+    } else {
+      document.getElementById('logoThumb').style.backgroundImage = '';
+      document.getElementById('clearLogoBtn').style.display = 'none';
+    }
+  }
+  refreshLogoThumb();
+  document.getElementById('uploadLogoBtn').addEventListener('click', () => document.getElementById('logoInput').click());
+  document.getElementById('logoInput').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (f.size > 2 * 1024 * 1024) { alert('Logo too large (max 2 MB)'); return; }
+    const url = await fileToDataURL(f);
+    const small = await compressImage(url, 400);
+    state.customLogo = small;
+    try { localStorage.setItem('dl_studio_logo', small); } catch(_){}
+    refreshLogoThumb();
+    renderMain();
+  });
+  document.getElementById('clearLogoBtn').addEventListener('click', () => {
+    state.customLogo = '';
+    try { localStorage.removeItem('dl_studio_logo'); } catch(_){}
+    refreshLogoThumb();
+    renderMain();
+  });
+
+  // Fetch assist data (deal + review)
+  async function loadAssist(){
+    try {
+      const { data, error } = await c.rpc('get_studio_assist_data', { p_business_id: biz.id });
+      if (error || !data) { document.getElementById('noAssistInfo').textContent = 'Studio assist not available yet (db/113 may not be installed).'; return; }
+      state.assistDeal = data.deal;
+      state.assistReview = data.review;
+      const infoEl = document.getElementById('noAssistInfo');
+      if (data.deal) {
+        document.getElementById('dealInfo').textContent = '🎁 Active: ' + (data.deal.title || '');
+        document.getElementById('dealInfo').style.display = 'block';
+      }
+      if (data.review) {
+        const txt = String(data.review.text || '').slice(0, 80);
+        document.getElementById('reviewInfo').textContent = '⭐ ' + data.review.rating + '/5: ' + txt + (txt.length >= 80 ? '...' : '');
+        document.getElementById('reviewInfo').style.display = 'block';
+      }
+      if (!data.deal && !data.review) {
+        infoEl.textContent = 'Post deals or get reviews to unlock smart pulls.';
+      } else {
+        infoEl.style.display = 'none';
+      }
+    } catch(e) {
+      document.getElementById('noAssistInfo').textContent = 'Could not load assist data.';
+    }
+  }
+  loadAssist();
+
+  // Deal toggle
+  document.getElementById('dealToggle').addEventListener('click', () => {
+    const btn = document.getElementById('dealToggle');
+    if (!state.assistDeal) { alert('No active deal found. Create one from /panel/deals.html first.'); return; }
+    state.useDeal = !state.useDeal;
+    btn.classList.toggle('on', state.useDeal);
+    btn.textContent = state.useDeal ? '🎁 Deal added ✓' : '🎁 Add today\'s deal';
+    state.dealText = state.useDeal ? (state.assistDeal.title || '') : '';
+    renderMain();
+  });
+
+  // Review pull → fills custom headline + subline
+  document.getElementById('reviewPullBtn').addEventListener('click', () => {
+    if (!state.assistReview) { alert('No customer reviews found yet.'); return; }
+    const r = state.assistReview;
+    const hd = document.getElementById('customHeadline');
+    const sl = document.getElementById('customSubline');
+    hd.value = (r.text || '').slice(0, 60);
+    sl.value = '— ' + (r.customer_name || 'A customer') + ' · ' + r.rating + '/5';
+    state.customHeadline = hd.value;
+    state.customSubline = sl.value;
+    renderMain();
+  });
+
+  // Smart copy suggestions (client-side, smart logic)
+  function buildSuggestions(){
+    const today = new Date();
+    const day = today.getDay();
+    const hour = today.getHours();
+    const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const cat = shopData.category || '';
+
+    const all = [
+      'Trusted by 100+ happy customers',
+      'Open today — visit us now',
+      dayNames[day] + ' Special',
+      'Best in ' + (shopData.city || 'town'),
+      'Verified by DukanList',
+      'Call now: ' + (shopData.mobile || 'visit shop'),
+      'Quality + Trust + Service',
+      'Fresh stock available'
+    ];
+    if (hour < 12) all.push('Good morning — visit us today');
+    if (hour >= 17) all.push('Open till late — come over');
+    if (day === 0) all.push('Sunday family time');
+    if (day === 5 || day === 6) all.push('Weekend offers inside');
+    if (cat.includes('kirana')) all.push('Fresh produce daily');
+    if (cat.includes('medical')) all.push('All medicines in stock');
+    if (cat.includes('restaurant')) all.push('Today\'s special menu');
+    if (cat.includes('salon')) all.push('Walk in for a fresh look');
+    if (cat.includes('mobile')) all.push('Original phones + warranty');
+
+    // Festival hook
+    if (window.FestivalEngine && FestivalEngine.getActiveFestival) {
+      const f = FestivalEngine.getActiveFestival();
+      if (f) all.unshift('Happy ' + f.nameEn);
+    }
+
+    // Pick 5 random
+    const chosen = [];
+    const used = new Set();
+    while (chosen.length < 5 && chosen.length < all.length) {
+      const i = Math.floor(Math.random() * all.length);
+      if (!used.has(i)) { used.add(i); chosen.push(all[i]); }
+    }
+    return chosen;
+  }
+  function renderSuggestions(){
+    const el = document.getElementById('suggestChips');
+    if (!el) return;
+    el.innerHTML = buildSuggestions().map(s =>
+      '<button type="button" class="wpack-suggest-chip" data-suggest="' + s.replace(/"/g,'&quot;') + '">' + s + '</button>'
+    ).join('');
+    el.querySelectorAll('.wpack-suggest-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('customHeadline').value = chip.dataset.suggest;
+        state.customHeadline = chip.dataset.suggest;
+        renderMain();
+      });
+    });
+  }
+  renderSuggestions();  // Hero upload zone — proxy to file input
+  const heroZone = document.getElementById('heroUploadZone');
+  if (heroZone) {
+    heroZone.addEventListener('click', () => document.getElementById('photoInput').click());
+    // Update hero zone when photo loads
+    const origPhotoInput = document.getElementById('photoInput');
+    if (origPhotoInput) {
+      origPhotoInput.addEventListener('change', () => {
+        setTimeout(() => {
+          if (state.customPhoto) {
+            heroZone.classList.add('has-photo');
+            heroZone.innerHTML = '<div class="hero-photo-preview" style="background-image:url(' + state.customPhoto + ')"></div>' +
+              '<button type="button" class="wpack-btn" style="width:100%">📸 Change photo</button>';
+          }
+        }, 600);
+      });
+    }
+  }
+
+  setInterval(renderSuggestions, 60000);  // refresh every minute
+
+  // Custom address — localStorage persistent
+  state.customAddress = localStorage.getItem('dl_studio_address') || '';
+  state.showQr = (localStorage.getItem('dl_studio_qr') !== '0');
+  const addrInput = document.getElementById('customAddress');
+  if (addrInput) {
+    addrInput.value = state.customAddress;
+    let aT;
+    addrInput.addEventListener('input', () => {
+      clearTimeout(aT);
+      aT = setTimeout(() => {
+        state.customAddress = addrInput.value.trim();
+        try { localStorage.setItem('dl_studio_address', state.customAddress); } catch(_){}
+        renderMain();
+      }, 300);
+    });
+  }
+  const qrBtn = document.getElementById('qrToggle');
+  if (qrBtn) {
+    qrBtn.classList.toggle('on', state.showQr);
+    qrBtn.textContent = state.showQr ? '\ud83d\udd17 QR Code: ON' : '\ud83d\udd17 Show QR code';
+    qrBtn.addEventListener('click', () => {
+      state.showQr = !state.showQr;
+      qrBtn.classList.toggle('on', state.showQr);
+      qrBtn.textContent = state.showQr ? '\ud83d\udd17 QR Code: ON' : '\ud83d\udd17 Show QR code';
+      try { localStorage.setItem('dl_studio_qr', state.showQr ? '1' : '0'); } catch(_){}
+      renderMain();
+    });
+  }
+
+  buildGallery();
+  setTimeout(renderMain, 250);
+})();
+</script>
+</body>
+</html>

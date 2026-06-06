@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Shop View — DukanList</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;background:#f1f5f9;color:#0F172A;font-size:14px;line-height:1.5}
+  /* Top bar */
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:#fff;padding:2px 7px;border-radius:5px}
+  .topbar a{color:#cbd5e1;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;transition:.15s}
+  .topbar a:hover{background:rgba(255,255,255,.1);color:#fff}
+  .logout{color:#FCA5A5;cursor:pointer}
+
+  /* Layout */
+  .main{max-width:1240px;margin:20px auto;padding:0 18px;display:grid;grid-template-columns:1fr 320px;gap:18px}
+  @media(max-width:900px){.main{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:#0F172A}
+  .card h2 .subtle{font-size:11px;color:#64748b;font-weight:600}
+  hr{border:0;border-top:1px solid #e2e8f0;margin:14px 0}
+
+  /* Status pill */
+  .pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .pill.active{background:#D1FAE5;color:#065F46}
+  .pill.pending{background:#FEF3C7;color:#92400E}
+  .pill.banned{background:#FEE2E2;color:#991B1B}
+  .pill.flagged{background:#FED7AA;color:#9A3412}
+  .pill.self_hidden{background:#E5E7EB;color:#4B5563}
+  .pill.featured{background:linear-gradient(135deg,#FFC93D,#FF8C00);color:#1A1A1A}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #cbd5e1;color:#0F172A;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:.12s}
+  .btn:hover{background:#f8fafc;border-color:#94a3b8}
+  .btn.pri{background:#1E3A8A;color:#fff;border-color:#1E3A8A}
+  .btn.pri:hover{background:#1E1B4B}
+  .btn.good{background:#10B981;color:#fff;border-color:#10B981}
+  .btn.good:hover{background:#059669}
+  .btn.warn{background:#F59E0B;color:#fff;border-color:#F59E0B}
+  .btn.danger{background:#EF4444;color:#fff;border-color:#EF4444}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  .actions-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+
+  /* Form */
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+  .field label{font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em}
+  .field input[type=text], .field input[type=tel], .field input[type=number], .field textarea, .field select{
+    width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;font-family:inherit;color:#0F172A;background:#fff;
+  }
+  .field textarea{min-height:80px;resize:vertical;line-height:1.45}
+  .field input:focus, .field textarea:focus, .field select:focus{outline:0;border-color:#1E3A8A;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.grid-2{grid-template-columns:1fr}}
+
+  /* Verification grid */
+  .verify-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .verify-tile{border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#fff;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.12s;user-select:none}
+  .verify-tile:hover{border-color:#94a3b8;background:#f8fafc}
+  .verify-tile.on{border-color:#10B981;background:#ECFDF5}
+  .verify-tile input{margin:0;cursor:pointer}
+  .verify-tile .vt-label{font-weight:700;font-size:13px;color:#0F172A}
+  .verify-tile .vt-desc{font-size:11px;color:#64748b}
+  .verify-score{margin-top:12px;padding:10px 14px;background:#F8FAFC;border-radius:10px;border:1px solid #e2e8f0;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+
+  /* Side panel */
+  .meta-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #e2e8f0;gap:10px}
+  .meta-row:last-child{border-bottom:0}
+  .meta-row .k{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:90px}
+  .meta-row .v{font-size:13px;color:#0F172A;text-align:right;word-break:break-word;font-weight:600}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+  .stat-tile{background:#F8FAFC;border:1px solid #e2e8f0;border-radius:8px;padding:8px;text-align:center}
+  .stat-tile .n{font-size:18px;font-weight:800;color:#0F172A}
+  .stat-tile .l{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:.04em;margin-top:2px}
+
+  .loader{text-align:center;padding:60px 20px;color:#64748b;font-size:14px}
+  .err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:14px;border-radius:10px;font-size:13px;font-weight:600}
+  .ok-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 12px 28px rgba(15,23,42,.25);opacity:0;transition:opacity .18s}
+  .ok-toast.show{opacity:1}
+  .ok-toast.err{background:#DC2626}
+
+  .photos-strip{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
+  .photos-strip img{height:80px;border-radius:8px;border:1px solid #e2e8f0}
+
+  .nav-back{font-size:13px;color:#64748b;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px}
+
+  /* Edit history timeline */
+  .eh-row{padding:9px 0;border-bottom:1px dashed #e2e8f0;font-size:13px}
+  .eh-row:last-child{border-bottom:0}
+  .eh-head{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-weight:700}
+  .eh-field{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;background:#F1F5F9;color:#475569;padding:2px 7px;border-radius:5px}
+  .eh-field.sensitive{background:#FEF3C7;color:#92400E}
+  .eh-time{font-size:11px;color:#94a3b8;margin-left:auto;font-weight:500}
+  .eh-vals{font-size:12px;color:#475569;line-height:1.4;padding-left:0}
+  .eh-vals .o{color:#7F1D1D;text-decoration:line-through;text-decoration-color:rgba(127,29,29,.3);margin-right:8px}
+  .eh-vals .n{color:#065F46;font-weight:600}
+  .eh-empty{color:#94a3b8;font-size:13px;padding:8px 0;text-align:center}
+  .nav-back:hover{color:#0F172A}
+
+  /* Featured Modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000;backdrop-filter:blur(4px)}
+  .modal-box{background:#fff;border-radius:14px;max-width:520px;width:100%;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+  .modal-box h3{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .modal-box .sub{font-size:13px;color:#64748b;margin-bottom:14px}
+  .alert{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:1px solid #FCD34D;color:#92400E;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:700;margin-bottom:14px}
+  .fm-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:480px){.fm-row{grid-template-columns:1fr}}
+  .fm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0}
+  .fm-history{margin-top:14px;padding-top:14px;border-top:1px dashed #e2e8f0}
+  .fm-history-h{font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .fm-history-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;color:#475569}
+  .duration-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+  .dur-chip{padding:6px 8px;text-align:center;border:1.5px solid #cbd5e1;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;transition:.12s}
+  .dur-chip:hover{border-color:#1E3A8A}
+  .dur-chip.active{background:#1E3A8A;color:#fff;border-color:#1E3A8A}
+
+  /* Admin payment chips */
+  .adm-pm{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:99px;border:1.5px solid #cbd5e1;background:#fff;font-size:12px;font-weight:700;color:#0F172A;cursor:pointer;user-select:none}
+  .adm-pm:has(input:checked){background:#ECFDF5;border-color:#10B981;color:#065F46}
+  .adm-pm input{accent-color:#10B981;cursor:pointer;margin:0}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>body,h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important}</style>
+
+<!-- Premium banking-class polish — shared CSS file applied site-wide. Load LAST so it overrides earlier inline styles. -->
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span>🛡️</span>
+    <span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav>
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/verification.html">🔵 Verification</a>
+    <a href="/admin/pucho-moderation.html">💬 Pucho Bhai</a>
+    <a href="#" onclick="logout()" class="logout">⎋ Logout</a>
+  </nav>
+</header>
+
+<div class="main" id="root">
+  <div class="loader" style="grid-column:1/-1">⏳ Loading shop…</div>
+</div>
+
+<div id="toast" class="ok-toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/admin-common.js"></script>
+<script>
+function logout(){ if (window.ShopDB && ShopDB.signOut) ShopDB.signOut(); else location.href = '/admin/login.html'; }
+
+var SHOP = null;
+var BIZ_ID = new URLSearchParams(location.search).get('id');
+var ROOT = document.getElementById('root');
+
+function toast(msg, isErr){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+async function init(){
+  if (!BIZ_ID){
+    ROOT.innerHTML = '<div class="err">Missing ?id=&lt;shop-uuid&gt; in URL.</div>';
+    return;
+  }
+  if (typeof ShopDB === 'undefined' || !ShopDB.client){
+    ROOT.innerHTML = '<div class="err">Backend not configured.</div>';
+    return;
+  }
+  var c = ShopDB.client;
+
+  // Auth + admin check
+  var u = await c.auth.getUser();
+  if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
+
+  var a = await c.rpc('is_admin');
+  if (a.error || !a.data){
+    alert('Admin access required.');
+    await c.auth.signOut();
+    location.href = '/admin/login.html';
+    return;
+  }
+
+  // Fetch full shop
+  var r = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (r.error || !r.data){
+    ROOT.innerHTML = '<div class="err">Failed to load shop: ' + esc(r.error?.message || 'unknown') + '</div>';
+    return;
+  }
+  SHOP = r.data;
+  render();
+  loadEditHistory();
+  setTimeout(loadCategoryEditor, 100);
+  setTimeout(loadReviewsForAdmin, 100);
+}
+
+function render(){
+  var s = SHOP;
+  var statusPill = '<span class="pill ' + esc(s.status) + '">' + esc(s.status) + '</span>';
+  var featuredPill = '';
+  if (s.featured){
+    if (s.featured_until){
+      var daysLeft = Math.max(0, Math.ceil((new Date(s.featured_until) - new Date()) / 86400000));
+      featuredPill = ' <span class="pill featured" title="Expires ' + new Date(s.featured_until).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) + '">★ Featured · ' + daysLeft + 'd left</span>';
+    } else {
+      featuredPill = ' <span class="pill featured">★ Featured · No expiry</span>';
+    }
+  }
+
+  ROOT.innerHTML =
+    '<div>'
+      // === Header card ===
+      + '<a class="nav-back" href="/admin/moderation">← Back to Moderation</a>'
+      + '<div class="card">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">'
+          + '<div>'
+            + '<div style="font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.02em">' + esc(s.name) + '</div>'
+            + '<div style="font-size:12px;color:#64748b;margin-top:4px">' + esc(s.category?.icon || '🏪') + ' ' + esc(s.category?.name || '—') + ' · ' + esc(s.city?.name || '—') + (s.locality ? ' · ' + esc(s.locality.name) : '') + '</div>'
+            + '<div style="margin-top:8px">' + statusPill + featuredPill + '</div>'
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'
+            + '<a class="btn sm" target="_blank" href="/business.html?slug=' + esc(s.slug) + '">🌐 View Public Page →</a>'
+            + (s.mobile ? '<a class="btn sm" href="tel:' + esc(s.mobile) + '">📞 Call ' + esc(s.mobile) + '</a>' : '')
+            + (s.whatsapp || s.mobile ? '<a class="btn sm" target="_blank" href="https://wa.me/91' + esc(s.whatsapp || s.mobile) + '">💬 WhatsApp Owner</a>' : '')
+          + '</div>'
+        + '</div>'
+        + '<hr>'
+        + '<div class="actions-row">'
+          + (s.status !== 'active'   ? '<button class="btn good"   onclick="doStatus(\'active\')">✓ Approve / Activate</button>'  : '')
+          + (s.status !== 'pending'  ? '<button class="btn warn"   onclick="doStatus(\'pending\')">⏳ Move to Pending</button>'   : '')
+          + (s.status !== 'banned'   ? '<button class="btn danger" onclick="doStatus(\'banned\')">⛔ Ban Shop</button>'           : '')
+          + '<button class="btn pri" onclick="openFeaturedModal()">★ ' + (s.featured ? 'Manage Featured' : 'Make Featured') + '</button>'
+          + '<button class="btn danger" onclick="doDelete()" style="margin-left:auto">🗑 Delete Permanently</button>'
+        + '</div>'
+      + '</div>'
+
+      // === Verification card ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🛡 Verification Badges <span class="subtle">click to toggle</span></h2>'
+        + '<div class="verify-grid">'
+          + verifyTile('verified_mobile',  '📞', 'Phone Verified',   'Owner phone number confirmed',     s.verified_mobile)
+          + verifyTile('verified_address', '📍', 'Address Verified', 'Pincode + locality cross-checked', s.verified_address)
+          + verifyTile('verified_photo',   '📸', 'Photos Verified',  'At least one real shop photo',     s.verified_photo)
+          + verifyTile('verified_visit',   '👤', 'Visit Verified',   'Personally visited by team (×2)',  s.verified_visit)
+        + '</div>'
+        + '<div class="verify-score">'
+          + '<span>Verified Score</span>'
+          + '<span id="vScore" style="font-weight:800;font-size:15px;color:#0F172A">' + (s.verified_score || 0) + ' / 5</span>'
+        + '</div>'
+      + '</div>'
+
+      // === Recent Changes card ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📝 Recent Changes <span class="subtle">last 10 edits</span></h2>'
+        + '<div id="editHistory"><div style="color:#94a3b8;font-size:13px;padding:6px 0">Loading…</div></div>'
+      + '</div>'
+
+      // === Edit card ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>✏️ Edit Shop Details <span class="subtle">save below</span></h2>'
+        + '<form id="editForm" onsubmit="saveShop(event)">'
+          + '<div class="grid-2">'
+            + field('text', 'name', 'Shop Name', s.name)
+            + field('tel',  'mobile', 'Mobile (10 digit)', s.mobile)
+          + '</div>'
+          + '<div class="grid-2">'
+            + field('text', 'owner_name', 'Owner Name', s.owner_name)
+            + field('tel',  'whatsapp', 'WhatsApp (10 digit)', s.whatsapp)
+          + '</div>'
+          + '<div class="grid-2">'
+            // Single source of truth: auth.users.email. The public "shop
+            // email" is just a mirror of the login email — they are kept
+            // in sync by api/admin-update-shop-email.js cascade and the
+            // one-time db/92 backfill. Editing here is disabled to
+            // prevent the two values from diverging again.
+            + '<div class="field"><label>Shop Email (public contact)</label>'
+              + '<input type="email" disabled value="' + esc(s.owner_email || s.shop_email || s.email || '— not set —') + '" style="background:#F8FAFC;color:#475569;cursor:not-allowed">'
+              + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">Mirrors the login email — change it via "Change Login Email" in Owner Account panel →</small>'
+            + '</div>'
+            + '<div class="field"><label style="color:#94a3b8;font-size:12px">Login Email (read-only)</label>'
+              + '<input type="email" disabled value="' + esc(s.owner_email || '— not set —') + '" style="background:#F8FAFC;color:#64748b;cursor:not-allowed">'
+              + '<small style="display:block;margin-top:4px;color:#94a3b8;font-size:11px">To change login email, use "Change Login Email" button in Owner Account panel →</small>'
+            + '</div>'
+          + '</div>'
+          + field('textarea', 'usp_text',   'USP / Tagline (English)', s.usp_text)
+          + field('textarea', 'usp_hi',     'USP / Tagline (Hindi)',   s.usp_hi)
+          + field('textarea', 'about_text', 'About / Description',     s.about_text)
+          + '<div class="grid-2">'
+            + field('text', 'address_line1', 'Address Line 1', s.address_line1)
+            + field('text', 'address_line2', 'Address Line 2', s.address_line2)
+          + '</div>'
+          + field('text', 'pincode', 'Pincode', s.pincode)
+          + '<hr style="border:0;border-top:1px dashed #e2e8f0;margin:16px 0">'
+          + '<div style="font-size:13px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">✨ Shop Trust Signals</div>'
+          + '<div style="background:#F0F9FF;border-left:3px solid #0EA5E9;padding:9px 12px;border-radius:6px;font-size:12px;color:#075985;line-height:1.5;margin-bottom:12px">ℹ️ These three fields power the Shop Highlights card on the public listing page. Filling them increases the verified_score and gives the listing a "Trust badge" boost in search.</div>'
+          + '<div class="grid-2">'
+            + field('number', 'established_year', 'Established Year (e.g. 2009 — appears as "Open since 2009 — 17 years on DukanList")', s.established_year)
+            + '<div class="field"><label title="Tick what the shop accepts. These show up as small chips on the public listing — UPI is biggest trust signal for digital-savvy buyers.">Payment Methods <span style="color:#94a3b8;font-weight:500;font-size:11px">(ticked methods show as chips on listing)</span></label>'
+              + '<div id="adminPaymentBox" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">'
+                + ['cash','upi','cards','credit','cheque','online'].map(function(k){
+                    var checked = Array.isArray(s.payment_methods) && s.payment_methods.indexOf(k) !== -1 ? 'checked' : '';
+                    var labels = {cash:'💵 Cash',upi:'📱 UPI',cards:'💳 Cards',credit:'📒 Credit',cheque:'📝 Cheque',online:'💻 Online'};
+                    return '<label class="adm-pm"><input type="checkbox" value="'+k+'" data-adm-payment '+checked+'>'+labels[k]+'</label>';
+                  }).join('')
+              + '</div>'
+            + '</div>'
+          + '</div>'
+          + '<div class="field"><label title="Each comma-separated phrase becomes a green tick on the public listing — concrete, scannable, builds trust at a glance.">Special Features <span style="color:#94a3b8;font-weight:500;font-size:11px">(max 6, comma-separated — shown as ✓ chips on listing)</span></label>'
+            + '<input type="text" name="special_features_raw" id="adminFeaturesRaw" value="'
+            + esc(Array.isArray(s.special_features) ? s.special_features.join(', ') : '')
+            + '" placeholder="Free home delivery, Bulk discount, EMI available">'
+          + '</div>'
+          + '<div style="display:flex;justify-content:flex-end;margin-top:8px">'
+            + '<button type="submit" class="btn pri">💾 Save Changes</button>'
+          + '</div>'
+        + '</form>'
+      + '</div>'
+
+      // === Category editor (multi-select with primary) ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🏷️ Categories <span class="subtle">tap ⭐ to set primary · ✕ to remove · up to 5</span></h2>'
+        + '<div id="catChipsBox" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:36px;padding:8px;background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:10px">'
+          + '<div style="font-size:13px;color:#94a3b8">Loading current categories…</div>'
+        + '</div>'
+        + '<div style="position:relative">'
+          + '<input type="text" id="catAddInput" autocomplete="off"'
+          + ' placeholder="🔍 Search to add — e.g. mobile, doctor, kirana, organic, bank"'
+          + ' style="width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .15s">'
+          + '<div id="catSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #1E3A8A;border-radius:10px;max-height:320px;overflow-y:auto;z-index:200;box-shadow:0 12px 28px rgba(15,23,42,.18)"></div>'
+        + '</div>'
+        + '<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:14px">'
+          + '<span id="catStatus" style="font-size:12px;color:#64748b"></span>'
+          + '<button type="button" class="btn pri" onclick="saveShopCategories()">💾 Save Categories</button>'
+        + '</div>'
+      + '</div>'
+
+      // === Photos preview ===
+      + (Array.isArray(s.photos) && s.photos.length ?
+        ('<div class="card" style="margin-top:14px">'
+          + '<h2>📸 Photos <span class="subtle">' + s.photos.length + ' total</span></h2>'
+          + '<div class="photos-strip">'
+            + s.photos.map(function(p){ return '<a href="' + esc(p) + '" target="_blank"><img src="' + esc(p) + '" alt=""></a>'; }).join('')
+          + '</div>'
+        + '</div>') : '')
+
+      // === Reviews CRUD (admin) ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>⭐ Customer Reviews <span class="subtle">add offline feedback · edit typos · remove spam</span></h2>'
+        + '<div id="reviewsList" style="margin-top:8px"><div style="color:#94a3b8;font-size:13px;font-style:italic;padding:8px 0">Loading reviews…</div></div>'
+        + '<div style="margin-top:14px;padding-top:14px;border-top:1px dashed #E2E8F0">'
+          + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+            + '<b style="font-size:13px;color:#1E3A8A">➕ Add Review (offline feedback)</b>'
+            + '<span style="font-size:11px;color:#94a3b8">— for paper / WhatsApp feedback you want recorded</span>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 110px;gap:8px;margin-bottom:8px">'
+            + '<input type="text" id="adminRevName" placeholder="Customer name (optional)" maxlength="60" style="padding:9px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px">'
+            + '<select id="adminRevRating" style="padding:9px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px">'
+              + '<option value="5">⭐⭐⭐⭐⭐ 5</option>'
+              + '<option value="4">⭐⭐⭐⭐ 4</option>'
+              + '<option value="3">⭐⭐⭐ 3</option>'
+              + '<option value="2">⭐⭐ 2</option>'
+              + '<option value="1">⭐ 1</option>'
+            + '</select>'
+          + '</div>'
+          + '<textarea id="adminRevText" placeholder="Review text — what the customer said" maxlength="600" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px"></textarea>'
+          + '<div style="display:flex;justify-content:flex-end">'
+            + '<button class="btn pri" onclick="addReviewByAdmin()">➕ Add Review</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+
+      // === Admin notes ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📝 Internal Admin Notes <span class="subtle">private — only admins see</span></h2>'
+        + '<textarea id="notesField" placeholder="e.g. Visited on 21-May-26, confirmed location & owner identity. Owner asked for festive banner update next month.">' + esc(s.admin_notes || '') + '</textarea>'
+        + '<div style="display:flex;justify-content:flex-end;margin-top:8px">'
+          + '<button class="btn pri" onclick="saveNotes()">💾 Save Note</button>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
+
+    // === SIDE PANEL ===
+    + '<aside>'
+      + '<div class="card">'
+        + '<h2>👤 Owner Account</h2>'
+        + metaRow('Owner Name', s.owner_name || '—')
+        + '<div class="meta-row"><span class="ml">🔑 Login Email <span style="font-weight:500;color:#94a3b8;font-size:10px">(auth.users — used for sign-in)</span></span>'
+          + '<span class="mv" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">'
+          + '<b style="color:' + (s.owner_email ? '#065F46' : '#DC2626') + '">' + esc(s.owner_email || '— not set —') + '</b>'
+          + (s.owner_user_id ? '<button type="button" onclick="openEmailEdit()" title="Change LOGIN email — instantly auto-confirmed" style="background:#1E3A8A;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Change Login Email</button> <button type="button" onclick="unlinkOwner()" title="Unlink this auth user from the shop. Also clears owner_phone so the row cannot be auto-claimed again." style="background:#DC2626;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔗 Unlink Owner</button>' : '<span style="color:#DC2626;font-size:11px;font-weight:600">⚠ No auth account linked</span>')
+          + '</span></div>'
+        + '<div class="meta-row"><span class="ml">📧 Shop Email <span style="font-weight:500;color:#94a3b8;font-size:10px">(public contact · edit below ↓)</span></span><span class="mv">' + esc(s.shop_email || s.email || '—') + '</span></div>'
+        + ((s.owner_email && (s.shop_email || s.email) && s.owner_email !== (s.shop_email || s.email)) ? '<div class="meta-row" style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:6px 10px;margin-top:4px;border-radius:6px;font-size:11.5px;color:#7C2D12;line-height:1.4">⚠️ <b>Login email ≠ Shop email.</b> Shopkeeper uses the <b>Login Email</b> to sign in. If they think the Shop Email is correct, click <b>Change Login Email</b> above.</div>' : '')
+        + metaRow('Mobile', s.mobile || '—')
+        + metaRow('Auth User ID', s.owner_user_id ? (s.owner_user_id.slice(0, 8) + '…') : '—')
+      + '</div>'
+
+      + renderOwnerDiagnostics(s)
+
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📊 Engagement</h2>'
+        + '<div class="stat-grid">'
+          + statTile(s.view_count, 'Views')
+          + statTile(s.leads_30d, 'Leads 30d')
+          + statTile(s.rating_count, 'Reviews')
+        + '</div>'
+        + '<div class="stat-grid" style="margin-top:8px">'
+          + statTile(s.leads_7d, 'Leads 7d')
+          + statTile((s.rating_avg||0).toFixed(1), '⭐ Avg')
+          + statTile(s.flags_pending || 0, 'Flags')
+        + '</div>'
+      + '</div>'
+
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🕒 Timeline</h2>'
+        + metaRow('Created', new Date(s.created_at).toLocaleString('en-IN'))
+        + metaRow('Last Updated', s.updated_at ? new Date(s.updated_at).toLocaleString('en-IN') : '—')
+        + metaRow('Slug', s.slug)
+        + metaRow('Shop ID', s.id.slice(0, 8) + '…')
+      + '</div>'
+
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🔗 Share Preview</h2>'
+        + '<div style="font-size:12px;color:#64748b;margin-bottom:8px">Public share URL with rich preview:</div>'
+        + '<a class="btn sm" target="_blank" style="word-break:break-all;text-align:left" href="https://dukanlist.com/share?slug=' + esc(s.slug) + '">/share?slug=' + esc(s.slug) + ' →</a>'
+      + '</div>'
+    + '</aside>';
+}
+
+function field(type, name, label, val){
+  if (type === 'textarea'){
+    return '<div class="field"><label>' + esc(label) + '</label><textarea name="' + esc(name) + '">' + esc(val || '') + '</textarea></div>';
+  }
+  return '<div class="field"><label>' + esc(label) + '</label><input type="' + esc(type) + '" name="' + esc(name) + '" value="' + esc(val || '') + '"></div>';
+}
+
+function verifyTile(key, icon, label, desc, isOn){
+  return '<label class="verify-tile' + (isOn ? ' on' : '') + '" onclick="toggleVerify(\'' + key + '\')">'
+    + '<span style="font-size:22px">' + icon + '</span>'
+    + '<div style="flex:1">'
+      + '<div class="vt-label">' + esc(label) + '</div>'
+      + '<div class="vt-desc">' + esc(desc) + '</div>'
+    + '</div>'
+    + '<input type="checkbox" ' + (isOn ? 'checked' : '') + ' style="pointer-events:none">'
+  + '</label>';
+}
+
+function metaRow(k, v){ return '<div class="meta-row"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + '</div></div>'; }
+function statTile(n, l){ return '<div class="stat-tile"><div class="n">' + esc(n) + '</div><div class="l">' + esc(l) + '</div></div>'; }
+
+// === ACTIONS ===
+async function applyPatch(patch, successMsg){
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_update_shop', { p_business_id: BIZ_ID, p_patch: patch });
+  if (r.error){
+    toast('Save failed: ' + r.error.message, true);
+    return false;
+  }
+  // Refresh SHOP from server to get recomputed score
+  var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (!fresh.error && fresh.data) SHOP = fresh.data;
+  render();
+  toast(successMsg || 'Saved');
+  return true;
+}
+
+async function toggleVerify(field){
+  var current = !!SHOP[field];
+  await applyPatch({ [field]: !current }, '✓ Verification updated');
+}
+
+function openFeaturedModal(){
+  var m = document.getElementById('featuredModal');
+  // Pre-fill current state
+  var current = '';
+  if (SHOP.featured && SHOP.featured_until){
+    var d = new Date(SHOP.featured_until);
+    var daysLeft = Math.max(0, Math.ceil((d - new Date()) / 86400000));
+    current = '<div class="alert">★ Currently featured · expires ' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) + ' (' + daysLeft + ' days left)</div>';
+  } else if (SHOP.featured){
+    current = '<div class="alert">★ Currently featured · No expiry</div>';
+  }
+  document.getElementById('fmCurrent').innerHTML = current;
+  document.getElementById('fmDays').value = 30;
+  document.getElementById('fmAmount').value = '';
+  document.getElementById('fmMethod').value = 'cash';
+  document.getElementById('fmNotes').value = '';
+  // Show revoke button only if currently featured
+  document.getElementById('fmRevokeBtn').style.display = SHOP.featured ? 'inline-flex' : 'none';
+  // Recent payment history
+  var pays = SHOP.featured_payments || [];
+  var historyHtml = '';
+  if (pays.length){
+    historyHtml = '<div class="fm-history"><div class="fm-history-h">Recent payments</div>'
+      + pays.slice(0,3).map(function(p){
+        var status = p.revoked_at ? '<span style="color:#EF4444">Revoked</span>'
+          : (new Date(p.expires_at) > new Date() ? '<span style="color:#10B981">Active</span>' : '<span style="color:#94a3b8">Expired</span>');
+        return '<div class="fm-history-row">'
+          + '<span>' + p.days + ' days · ₹' + Number(p.amount_inr || 0).toLocaleString('en-IN') + ' · ' + (p.payment_method || '—') + '</span>'
+          + status
+          + '</div>';
+      }).join('')
+      + '</div>';
+  }
+  document.getElementById('fmHistory').innerHTML = historyHtml;
+  m.style.display = 'flex';
+}
+
+function closeFeaturedModal(){
+  document.getElementById('featuredModal').style.display = 'none';
+}
+
+async function submitFeatured(e){
+  e.preventDefault();
+  var days   = parseInt(document.getElementById('fmDays').value, 10) || 0;
+  var amount = parseFloat(document.getElementById('fmAmount').value) || 0;
+  var method = document.getElementById('fmMethod').value;
+  var notes  = document.getElementById('fmNotes').value.trim() || null;
+  if (days <= 0 || days > 730){ toast('Days must be 1\u2013730', true); return; }
+  if (amount < 0){ toast('Amount cannot be negative', true); return; }
+  var btn = document.getElementById('fmSaveBtn');
+  btn.disabled = true; btn.textContent = '\u23f3 Saving...';
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_set_featured', {
+    p_business_id: BIZ_ID,
+    p_days: days,
+    p_amount: amount,
+    p_payment_method: method,
+    p_notes: notes
+  });
+  btn.disabled = false; btn.textContent = '\u2605 Save & Mark Featured';
+  if (r.error){ toast('Failed: ' + r.error.message, true); return; }
+  toast('\u2605 Featured for ' + days + ' days (\u20b9' + amount + ')');
+  closeFeaturedModal();
+  // Reload
+  var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (!fresh.error && fresh.data) SHOP = fresh.data;
+  render();
+}
+
+async function revokeFeatured(){
+  if (!confirm('Revoke featured status now? Shop will no longer appear at top of listings.')) return;
+  var reason = prompt('Reason (optional, for audit):') || null;
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_unset_featured', { p_business_id: BIZ_ID, p_reason: reason });
+  if (r.error){ toast('Failed: ' + r.error.message, true); return; }
+  toast('Featured revoked');
+  closeFeaturedModal();
+  var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+  if (!fresh.error && fresh.data) SHOP = fresh.data;
+  render();
+}
+
+async function doStatus(newStatus){
+  if (newStatus === 'banned' && !confirm('Ban this shop? It will be hidden from the public site immediately.')) return;
+  if (newStatus === 'active' && SHOP.status === 'pending'){
+    // Use proper approve RPC so verified_visit + score also update
+    var r = await ShopDB.client.rpc('admin_approve_business', { p_business_id: BIZ_ID });
+    if (r.error){ toast('Approve failed: ' + r.error.message, true); return; }
+    toast('✓ Approved & live');
+    var fresh = await ShopDB.client.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+    if (!fresh.error && fresh.data) SHOP = fresh.data;
+    render();
+    return;
+  }
+  await applyPatch({ status: newStatus }, 'Status → ' + newStatus);
+}
+
+async function doDelete(){
+  // Use AdminCommon's strong confirm modal with required-text + reason audit
+  if (!window.AdminCommon || !AdminCommon.dangerConfirm){
+    // Fallback to old prompt if helper isn't loaded
+    var typed = prompt('Type DELETE to permanently remove this shop:');
+    if (typed !== 'DELETE') return;
+  } else {
+    var shopName = (SHOP && SHOP.name) ? SHOP.name : 'this shop';
+    var res = await AdminCommon.dangerConfirm({
+      title: 'Permanently delete "' + shopName + '"?',
+      body: '⚠️ <b>This action cannot be undone.</b><br><br>This will delete the business listing, all its reviews, leads, photos, deals, and audit history. The owner account stays but won\'t be linked to any shop.<br><br>Please provide a reason below (logged for audit trail).',
+      requiredText: 'DELETE ' + (shopName.split(/\s+/)[0] || 'SHOP').toUpperCase(),
+      reasonRequired: true,
+      confirmLabel: '🗑 Permanently Delete'
+    });
+    if (!res || !res.confirmed) return;
+    var reason = res.reason || '';
+    // Log delete reason in admin_notes BEFORE delete (so it survives in audit log)
+    try {
+      await ShopDB.client.rpc('admin_update_shop', {
+        p_business_id: BIZ_ID,
+        p_patch: { admin_notes: (SHOP.admin_notes || '') + '\n[DELETE-REASON ' + new Date().toISOString() + '] ' + reason }
+      });
+    } catch(_){}
+  }
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_delete_business', { p_business_id: BIZ_ID });
+  if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
+  toast('Shop deleted');
+  setTimeout(function(){ location.href = '/admin/moderation'; }, 1500);
+}
+
+async function saveShop(e){
+  e.preventDefault();
+  var f = document.getElementById('editForm');
+  var patch = {};
+  ['name','mobile','whatsapp','owner_name','usp_text','usp_hi','about_text','address_line1','address_line2','pincode'].forEach(function(k){
+    var v = f.querySelector('[name="' + k + '"]')?.value;
+    if (v !== undefined && v !== SHOP[k]) patch[k] = v;
+  });
+  // Shop email is deliberately NOT included in this patch. It is now
+  // a read-only mirror of auth.users.email. To change it, admin uses
+  // the "Change Login Email" button which cascades to businesses.email
+  // (see api/admin-update-shop-email.js). Including it here would
+  // re-introduce the historical bug of the two email columns drifting
+  // apart from each other.
+  // Trust signals
+  var yEl = f.querySelector('[name="established_year"]');
+  if (yEl){
+    var y = parseInt(yEl.value, 10);
+    if (!isNaN(y) && y >= 1800 && y <= 2100 && y !== SHOP.established_year) patch.established_year = y;
+    else if (yEl.value === '' && SHOP.established_year != null) patch.established_year = null;
+  }
+  var pmChecks = Array.from(document.querySelectorAll('input[data-adm-payment]:checked')).map(function(cb){ return cb.value; });
+  var pmOld = Array.isArray(SHOP.payment_methods) ? SHOP.payment_methods : [];
+  if (pmChecks.sort().join(',') !== pmOld.slice().sort().join(',')) patch.payment_methods = pmChecks;
+  var sfRaw = (document.getElementById('adminFeaturesRaw') || {}).value || '';
+  var sfArr = sfRaw.split(',').map(function(s){return s.trim();}).filter(function(s){return s.length > 0 && s.length < 60;}).slice(0, 6);
+  var sfOld = Array.isArray(SHOP.special_features) ? SHOP.special_features : [];
+  if (sfArr.sort().join('|') !== sfOld.slice().sort().join('|')) patch.special_features = sfArr;
+  if (Object.keys(patch).length === 0){ toast('Nothing changed'); return; }
+  await applyPatch(patch, '✓ Saved ' + Object.keys(patch).length + ' field(s)');
+}
+
+async function saveNotes(){
+  var v = document.getElementById('notesField').value;
+  await applyPatch({ admin_notes: v }, '✓ Note saved');
+}
+
+async function loadEditHistory(){
+  var el = document.getElementById('editHistory');
+  if (!el) return;
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_get_edit_history', { p_business_id: BIZ_ID, p_limit: 10 });
+  if (r.error){
+    el.innerHTML = '<div class="eh-empty">Could not load edit history</div>';
+    return;
+  }
+  var rows = r.data || [];
+  if (!rows.length){
+    el.innerHTML = '<div class="eh-empty">No changes recorded yet</div>';
+    return;
+  }
+  el.innerHTML = rows.map(function(e){
+    var when = e.created_at ? new Date(e.created_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    var fieldCls = e.is_sensitive ? 'eh-field sensitive' : 'eh-field';
+    var role = e.edited_role === 'admin' ? '🛡 admin' : (e.edited_role === 'owner' ? '👤 owner' : 'system');
+    var reviewTag = e.triggered_review ? ' <span style="background:#EEF2FF;color:#4338CA;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:800">→ REVIEW</span>' : '';
+    return '<div class="eh-row">'
+      + '<div class="eh-head"><span class="' + fieldCls + '">' + esc(e.field_name) + '</span>'
+      + '<span style="font-size:11px;color:#64748b;font-weight:600">' + role + '</span>'
+      + reviewTag
+      + '<span class="eh-time">' + when + '</span></div>'
+      + '<div class="eh-vals"><span class="o">' + esc(e.old_value || '—') + '</span><span class="n">' + esc(e.new_value || '—') + '</span></div>'
+      + '</div>';
+  }).join('');
+}
+
+// ====== Category Editor (admin) ======
+var CAT_LIST = [];                    // master list { id, slug, name, name_hi, parent_name, keywords, description }
+var CURRENT_CATS = [];                // [{ id, name, is_primary }]
+
+async function loadCategoryEditor(){
+  var c = ShopDB.client;
+  var box = document.getElementById('catChipsBox');
+  if (!box) return;
+
+  // Fetch master list
+  try {
+    var rr = await c.from('categories')
+      .select('id, slug, name, name_hi, parent_id, keywords, description')
+      .eq('active', true)
+      .order('sort_order');
+    if (rr.error) throw rr.error;
+    var byId = {};
+    (rr.data || []).forEach(function(r){ byId[r.id] = r; });
+    (rr.data || []).forEach(function(r){
+      if (r.parent_id && byId[r.parent_id]) r.parent_name = byId[r.parent_id].name;
+    });
+    CAT_LIST = rr.data || [];
+  } catch(e){
+    box.innerHTML = '<div style="font-size:12px;color:#dc2626">Could not load categories list: ' + esc(e.message || '') + '</div>';
+    return;
+  }
+
+  // Fetch current shop categories
+  try {
+    var bc = await c.from('business_categories')
+      .select('category_id, is_primary')
+      .eq('business_id', BIZ_ID);
+    if (bc.error) throw bc.error;
+    CURRENT_CATS = (bc.data || []).map(function(b){
+      var cat = CAT_LIST.find(function(x){ return x.id === b.category_id; });
+      return cat ? { id: cat.id, name: cat.name, parent_name: cat.parent_name || '', is_primary: !!b.is_primary } : null;
+    }).filter(Boolean);
+    // Sort: primary first, then by name
+    CURRENT_CATS.sort(function(a,b){
+      if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+  } catch(e){
+    box.innerHTML = '<div style="font-size:12px;color:#dc2626">Could not load shop categories: ' + esc(e.message || '') + '</div>';
+    return;
+  }
+
+  renderCatChips();
+
+  // Wire search input
+  var inp = document.getElementById('catAddInput');
+  if (inp){
+    inp.addEventListener('input', filterCatSearch);
+    inp.addEventListener('focus', filterCatSearch);
+    inp.addEventListener('click', filterCatSearch);  // also on click
+    // Border colour change on focus/blur
+    inp.addEventListener('focus', function(){ inp.style.borderColor = '#1E3A8A'; });
+    inp.addEventListener('blur',  function(){ inp.style.borderColor = '#E2E8F0'; });
+    // Close on outside click
+    document.addEventListener('click', function(ev){
+      if (!ev.target.closest('#catAddInput') && !ev.target.closest('#catSearchResults')){
+        var r = document.getElementById('catSearchResults');
+        if (r) r.style.display = 'none';
+      }
+    });
+    // Inject row-hover CSS once
+    if (!document.getElementById('catPickRowCss')){
+      var st = document.createElement('style');
+      st.id = 'catPickRowCss';
+      st.textContent = '.cat-pick-row:hover{background:#F5F3FF !important}';
+      document.head.appendChild(st);
+    }
+  }
+  console.info('[catEditor] loaded:', CAT_LIST.length, 'master categories,', CURRENT_CATS.length, 'currently assigned');
+}
+
+function renderCatChips(){
+  var box = document.getElementById('catChipsBox');
+  if (!box) return;
+  if (!CURRENT_CATS.length){
+    box.innerHTML = '<div style="font-size:13px;color:#94a3b8;font-style:italic">No categories assigned. Search below to add (up to 5).</div>';
+    return;
+  }
+  box.innerHTML = CURRENT_CATS.map(function(c){
+    var bg = c.is_primary ? 'linear-gradient(135deg,#FEF3C7,#FDE68A)' : '#F1F5F9';
+    var border = c.is_primary ? '#F59E0B' : '#CBD5E1';
+    var star = c.is_primary ? '⭐' : '☆';
+    var starTitle = c.is_primary ? 'Primary category' : 'Tap to make primary';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:' + bg + ';border:1.5px solid ' + border + ';border-radius:99px;font-size:13px;font-weight:700;color:#0F172A">'
+      + '<button type="button" title="' + starTitle + '" onclick="setPrimaryCat(' + c.id + ')" style="background:transparent;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1">' + star + '</button>'
+      + '<span>' + esc(c.name) + (c.parent_name ? '<span style="color:#94a3b8;font-weight:500;font-size:11px"> · ' + esc(c.parent_name) + '</span>' : '') + '</span>'
+      + '<button type="button" title="Remove" onclick="removeCat(' + c.id + ')" style="background:transparent;border:none;cursor:pointer;color:#64748b;font-size:14px;padding:0 0 0 2px;line-height:1">✕</button>'
+      + '</span>';
+  }).join('');
+  // Status
+  var st = document.getElementById('catStatus');
+  if (st) st.textContent = CURRENT_CATS.length + ' selected · ' + CURRENT_CATS.filter(function(c){return c.is_primary;}).length + ' primary';
+}
+
+function filterCatSearch(){
+  var inp = document.getElementById('catAddInput');
+  var results = document.getElementById('catSearchResults');
+  if (!inp || !results) return;
+
+  // If categories not loaded yet, show loader
+  if (!CAT_LIST || !CAT_LIST.length){
+    results.innerHTML = '<div style="padding:14px;color:#dc2626;font-size:13px;font-weight:600">⚠️ Categories list not loaded yet. Reload the page if this persists.</div>';
+    results.style.display = 'block';
+    return;
+  }
+
+  var q = (inp.value || '').toLowerCase().trim();
+  var selected = new Set(CURRENT_CATS.map(function(c){ return c.id; }));
+  var pool;
+
+  if (!q){
+    // Browse mode — show first 20 unselected categories alphabetically
+    pool = CAT_LIST
+      .filter(function(c){ return !selected.has(c.id); })
+      .sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); })
+      .slice(0, 20);
+  } else {
+    pool = CAT_LIST.filter(function(c){
+      if (selected.has(c.id)) return false;
+      var hay = ((c.name||'') + ' ' + (c.name_hi||'') + ' ' + (c.slug||'') + ' ' + (c.parent_name||'') + ' ' + (c.keywords||'') + ' ' + (c.description||'')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    }).slice(0, 20);
+  }
+
+  if (!pool.length){
+    results.innerHTML = '<div style="padding:14px;color:#94a3b8;font-size:13px;font-style:italic">'
+      + (q ? 'No match for "' + esc(q) + '". Try different keyword.' : 'All categories already selected.')
+      + '</div>';
+    results.style.display = 'block';
+    return;
+  }
+
+  var headerHtml = !q
+    ? '<div style="padding:8px 14px;background:#F8FAFC;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #E2E8F0">Browse all (' + CAT_LIST.length + ') · type to filter</div>'
+    : '<div style="padding:8px 14px;background:#F8FAFC;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #E2E8F0">' + pool.length + ' match' + (pool.length===1?'':'es') + '</div>';
+
+  results.innerHTML = headerHtml + pool.map(function(c){
+    return '<div class="cat-pick-row" onclick="addCat(' + c.id + ')" style="padding:10px 14px;cursor:pointer;font-size:13.5px;border-bottom:1px solid #f1f5f9;transition:background .12s">'
+      + '<b>' + esc(c.name) + '</b>'
+      + (c.parent_name ? '<span style="color:#94a3b8;font-weight:500;font-size:11.5px"> · ' + esc(c.parent_name) + '</span>' : '')
+      + (c.name_hi ? '<span style="color:#94a3b8;font-weight:500;font-size:11px"> · ' + esc(c.name_hi) + '</span>' : '')
+      + '</div>';
+  }).join('');
+  results.style.display = 'block';
+}
+
+function addCat(catId){
+  if (CURRENT_CATS.length >= 5){
+    alert('Maximum 5 categories. Remove one before adding more.');
+    return;
+  }
+  var cat = CAT_LIST.find(function(x){ return x.id === catId; });
+  if (!cat) return;
+  // If no primary, make this primary
+  var hasPrimary = CURRENT_CATS.some(function(c){ return c.is_primary; });
+  CURRENT_CATS.push({ id: cat.id, name: cat.name, parent_name: cat.parent_name || '', is_primary: !hasPrimary });
+  renderCatChips();
+  // Reset search
+  var inp = document.getElementById('catAddInput');
+  if (inp){ inp.value=''; inp.focus(); }
+  document.getElementById('catSearchResults').style.display = 'none';
+}
+
+function removeCat(catId){
+  var wasPrimary = false;
+  CURRENT_CATS = CURRENT_CATS.filter(function(c){
+    if (c.id === catId){ wasPrimary = c.is_primary; return false; }
+    return true;
+  });
+  // If primary removed, mark first as new primary
+  if (wasPrimary && CURRENT_CATS.length) CURRENT_CATS[0].is_primary = true;
+  renderCatChips();
+}
+
+function setPrimaryCat(catId){
+  CURRENT_CATS.forEach(function(c){ c.is_primary = (c.id === catId); });
+  // Re-sort with primary first
+  CURRENT_CATS.sort(function(a,b){
+    if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  renderCatChips();
+}
+
+async function saveShopCategories(){
+  if (!CURRENT_CATS.length){
+    alert('At least 1 category required.');
+    return;
+  }
+  var primary = CURRENT_CATS.find(function(c){ return c.is_primary; });
+  if (!primary){ primary = CURRENT_CATS[0]; primary.is_primary = true; }
+  var ids = CURRENT_CATS.map(function(c){ return c.id; });
+  var st = document.getElementById('catStatus');
+  if (st) st.textContent = 'Saving...';
+  try {
+    var r = await ShopDB.client.rpc('admin_set_business_categories', {
+      p_business_id: BIZ_ID,
+      p_category_ids: ids,
+      p_primary_category_id: primary.id
+    });
+    if (r.error) throw r.error;
+    toast('✓ Categories saved');
+    if (st) st.textContent = '✓ Saved · ' + ids.length + ' total';
+  } catch(e){
+    console.error('[saveShopCategories]', e);
+    var msg = e.message || 'save failed';
+    toast('✗ ' + msg, true);
+    alert('Could not save categories:\n\n' + msg);
+    if (st) st.textContent = '';
+  }
+}
+
+
+// ====== Reviews CRUD (admin) ======
+async function loadReviewsForAdmin(){
+  var box = document.getElementById('reviewsList');
+  if (!box) return;
+  try {
+    var r = await ShopDB.client.rpc('admin_list_business_reviews', { p_business_id: BIZ_ID });
+    if (r.error) throw r.error;
+    var rows = r.data || [];
+    if (!rows.length){
+      box.innerHTML = '<div style="color:#94a3b8;font-size:13px;font-style:italic;padding:8px 0">No reviews yet — add one below if needed.</div>';
+      return;
+    }
+    box.innerHTML = rows.map(function(rv){
+      var stars = '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating);
+      var when = rv.created_at ? new Date(rv.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+      var statusBadge = rv.status === 'flagged' ? ' <span style="background:#FEE2E2;color:#991B1B;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:800">FLAGGED</span>' : '';
+      var ridSafe = String(rv.id).replace(/[^a-zA-Z0-9-]/g, '');
+      return '<div style="padding:10px 12px;background:#FAFAFA;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:8px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:5px">'
+          + '<div><span style="color:#F59E0B;font-size:13px;font-weight:700">' + stars + '</span>'
+          + ' <b style="font-size:13px;color:#0F172A">' + esc(rv.customer_name || 'Customer') + '</b>' + statusBadge + '</div>'
+          + '<div style="display:flex;gap:6px">'
+            + '<button class="btn" style="padding:4px 9px;font-size:11px" onclick="startEditReview(\'' + ridSafe + '\')">✏️ Edit</button>'
+            + '<button class="btn" style="padding:4px 9px;font-size:11px;background:#FEE2E2;color:#991B1B;border-color:#FECACA" onclick="deleteReviewByAdmin(\'' + ridSafe + '\')">🗑 Delete</button>'
+          + '</div>'
+        + '</div>'
+        + '<div id="rv-view-' + ridSafe + '">'
+          + '<div style="font-size:13px;color:#334155;line-height:1.5;margin-top:4px">' + esc(rv.text || '') + '</div>'
+          + '<div style="font-size:11px;color:#94a3b8;margin-top:5px">' + when + (rv.owner_reply ? ' · 💬 owner replied' : '') + '</div>'
+        + '</div>'
+        + '<div id="rv-edit-' + ridSafe + '" style="display:none;margin-top:6px">'
+          + '<div style="display:grid;grid-template-columns:1fr 110px;gap:6px;margin-bottom:6px">'
+            + '<input type="text" id="ev-name-' + ridSafe + '" value="' + esc(rv.customer_name || '') + '" placeholder="Name" style="padding:7px 9px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px">'
+            + '<select id="ev-rating-' + ridSafe + '" style="padding:7px 9px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px">'
+              + [5,4,3,2,1].map(function(n){ return '<option value="' + n + '"' + (rv.rating === n ? ' selected':'') + '>' + '⭐'.repeat(n) + ' ' + n + '</option>'; }).join('')
+            + '</select>'
+          + '</div>'
+          + '<textarea id="ev-text-' + ridSafe + '" maxlength="600" style="width:100%;min-height:55px;padding:7px 9px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical">' + esc(rv.text || '') + '</textarea>'
+          + '<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px">'
+            + '<button class="btn" style="padding:5px 11px;font-size:11px" onclick="cancelEditReview(\'' + ridSafe + '\')">Cancel</button>'
+            + '<button class="btn pri" style="padding:5px 11px;font-size:11px" onclick="saveEditReview(\'' + ridSafe + '\')">💾 Save</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  } catch(e){
+    console.error('[loadReviewsForAdmin]', e);
+    box.innerHTML = '<div style="color:#dc2626;font-size:12px;padding:8px 0">Failed to load reviews: ' + esc(e.message || '') + '<br><span style="color:#94a3b8;font-size:11px">Run db/66 in Supabase if you see "function not found".</span></div>';
+  }
+}
+function startEditReview(id){
+  document.getElementById('rv-view-' + id).style.display = 'none';
+  document.getElementById('rv-edit-' + id).style.display = 'block';
+}
+function cancelEditReview(id){
+  document.getElementById('rv-view-' + id).style.display = 'block';
+  document.getElementById('rv-edit-' + id).style.display = 'none';
+}
+async function saveEditReview(id){
+  var name = document.getElementById('ev-name-' + id).value.trim();
+  var rating = parseInt(document.getElementById('ev-rating-' + id).value, 10);
+  var text = document.getElementById('ev-text-' + id).value.trim();
+  if (text.length < 3){ alert('Review text needed (3+ chars)'); return; }
+  try {
+    var r = await ShopDB.client.rpc('admin_edit_review', { p_review_id: id, p_rating: rating, p_text: text, p_reviewer_name: name });
+    if (r.error) throw r.error;
+    toast('✓ Review updated'); loadReviewsForAdmin();
+  } catch(e){ alert('Edit failed: ' + (e.message || '')); }
+}
+async function deleteReviewByAdmin(id){
+  if (!confirm('Delete this review permanently? Cannot be undone.')) return;
+  try {
+    var r = await ShopDB.client.rpc('admin_delete_review', { p_review_id: id });
+    if (r.error) throw r.error;
+    toast('✓ Review deleted'); loadReviewsForAdmin();
+  } catch(e){ alert('Delete failed: ' + (e.message || '')); }
+}
+async function addReviewByAdmin(){
+  var name = document.getElementById('adminRevName').value.trim();
+  var rating = parseInt(document.getElementById('adminRevRating').value, 10);
+  var text = document.getElementById('adminRevText').value.trim();
+  if (text.length < 3){ alert('Review text needed (3+ chars)'); return; }
+  try {
+    var r = await ShopDB.client.rpc('admin_add_review', { p_business_id: BIZ_ID, p_rating: rating, p_text: text, p_reviewer_name: name });
+    if (r.error) throw r.error;
+    toast('✓ Review added');
+    document.getElementById('adminRevName').value = '';
+    document.getElementById('adminRevText').value = '';
+    document.getElementById('adminRevRating').value = '5';
+    loadReviewsForAdmin();
+  } catch(e){
+    alert('Add failed: ' + (e.message || '') + (e.message && e.message.indexOf('function') >= 0 ? '\n\nRun db/66-admin-review-crud.sql in Supabase.' : ''));
+  }
+}
+
+// ====== Change Owner Email ======
+async function openEmailEdit(){
+  if (!SHOP || !SHOP.owner_user_id){
+    alert('This shop has no linked owner account yet.');
+    return;
+  }
+  var newEmail = prompt(
+    'Change owner email for ' + SHOP.name + '\n\n' +
+    'Current: ' + (SHOP.owner_email || '(none)') + '\n\n' +
+    'Enter NEW email address:\n' +
+    '(auto-confirms — no verification needed)',
+    SHOP.owner_email || ''
+  );
+  if (!newEmail) return;
+  newEmail = newEmail.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)){
+    alert('Invalid email format');
+    return;
+  }
+  if (newEmail === SHOP.owner_email){
+    alert('Same email — no change made');
+    return;
+  }
+  if (!confirm('Update owner email to:\n\n' + newEmail + '\n\nShopkeeper will need to use this new email to log in.\n\nProceed?')) return;
+
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+
+    toast('⏳ Updating email...');
+    var r = await fetch('/api/admin-update-shop-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ business_id: BIZ_ID, new_email: newEmail })
+    });
+    var data = await r.json();
+    if (!r.ok){
+      var msg = data.error || ('HTTP ' + r.status);
+      if (data.hint) msg += '\n\n' + data.hint;
+      if (data.details) msg += '\n\nDetails: ' + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details));
+      alert('Email update failed:\n\n' + msg);
+      return;
+    }
+    // Email change is staged: confirmation link sent to new address.
+    // Old email continues to work for login until the new one is confirmed.
+    // The displayed shop email and business email both cascade immediately.
+    alert(
+      'Email change initiated for ' + newEmail + '.\n\n' +
+      'A confirmation link has been sent to that address. ' +
+      'The shopkeeper must click that link to activate the new login email.\n\n' +
+      'Until they confirm, login still works with the OLD email.\n\n' +
+      'Shop email displayed on the public page has been updated immediately.\n\n' +
+      'If the email does not arrive, use the "Force Verify Email" button below to override.'
+    );
+    // Reload the entire shop view so all email fields reflect the new value
+    // (owner_email, shop_email and any other cached copies).
+    try {
+      var fresh = await ShopDB.client.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+      if (fresh && fresh.data) { SHOP = fresh.data; render(); }
+      else render();
+    } catch(_) { render(); }
+  } catch(e){
+    alert('Network error: ' + (e.message || e));
+  }
+}
+
+// ====== Owner Diagnostics card renderer (smart state-aware) ======
+function renderOwnerDiagnostics(s){
+  var hasAuth = !!s.owner_email;
+  var emailVerified = !!s.owner_email_confirmed;
+  var emailEsc = (s.owner_email || '').replace(/['"\\]/g, "");
+
+  // CASE A: no auth account linked yet
+  if (!hasAuth){
+    var hasShopEmail = !!(s.shop_email || s.email);
+    var createBtn = hasShopEmail
+      ? '<button type="button" onclick="adminCreateOwnerAccount(\'' + s.id + '\')" '
+        + 'style="display:block;width:100%;background:#059669;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;margin-top:10px">'
+        + '🆕 Create Login Account for Owner</button>'
+      : '<div style="font-size:11px;color:#94a3b8;margin-top:10px;font-style:italic">Add a Shop Email (in Edit Shop Details below) to enable account creation.</div>';
+    return '<div class="card" style="margin-top:14px;border:2px dashed #CBD5E1;background:#F8FAFC">'
+      + '<h2 style="color:#475569">' + '🔧' + ' Owner Account Diagnostics</h2>'
+      + '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:10px 12px;border-radius:6px;font-size:12px;color:#78350F;line-height:1.5">'
+      + '<b>' + '⚠' + ' No login account exists for this shop.</b><br>'
+      + 'Shopkeeper has not registered yet, or admin manually created the listing. '
+      + 'You can either (a) create an account on their behalf now, or (b) ask them to self-register.'
+      + '</div>'
+      + createBtn
+      + '<div style="font-size:11px;color:#64748b;margin-top:10px;line-height:1.45">'
+      + '<b>Or self-register:</b> Ask owner to register at /register.html using mobile '
+      + '<b>' + esc(s.mobile || '—') + '</b>. Their account will auto-claim this listing.'
+      + '</div>'
+      + '</div>';
+  }
+
+  // CASE B: auth account exists
+  var html = '<div class="card" style="margin-top:14px;border:2px solid #FECACA;background:linear-gradient(180deg,#FFF7F7 0%,#FFF 100%)">'
+    + '<h2 style="color:#7F1D1D">' + '🔧' + ' Owner Account Diagnostics</h2>'
+    + '<div style="font-size:11.5px;color:#64748b;margin-bottom:10px;line-height:1.45">Use these to help shopkeepers who are stuck. Every action is logged.</div>';
+
+  // Force Verify Email - only if NOT already verified
+  if (emailVerified){
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#ECFDF5;border:1px solid #10B981;border-radius:8px;margin-bottom:8px;font-size:12px;color:#065F46;font-weight:700">'
+      + '✓ Email already verified'
+      + (s.owner_email_confirmed_at ? '<span style="font-weight:500;color:#047857;font-size:11px">· ' + new Date(s.owner_email_confirmed_at).toLocaleDateString("en-IN") + '</span>' : '')
+      + '</div>';
+  } else {
+    html += '<button type="button" onclick="adminForceVerifyEmail(\'' + emailEsc + '\')" '
+      + 'style="display:block;width:100%;background:#1D4ED8;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:8px">'
+      + '📧 Force Verify Email <span style="font-weight:500;font-size:10.5px;opacity:.85">(email unverified)</span></button>';
+  }
+
+  // Reset Password - always available when auth exists
+  html += '<button type="button" onclick="adminResetPassword(\'' + emailEsc + '\')" '
+    + 'style="display:block;width:100%;background:#B45309;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:8px">'
+    + '🔑 Reset Password (Set Temporary)</button>';
+
+  // Impersonate - always available when auth exists
+  html += '<button type="button" onclick="adminImpersonate(\'' + emailEsc + '\')" '
+    + 'style="display:block;width:100%;background:#7C3AED;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit">'
+    + '🎭 Login as Owner (Impersonate)</button>'
+    + '<div style="font-size:10.5px;color:#94a3b8;margin-top:8px;line-height:1.4">Open impersonation link in <b>incognito/private window</b> so admin session is not lost.</div>'
+    + '</div>';
+
+  return html;
+}
+
+// ====== Create Login Account for owner (no auth yet) ======
+async function adminCreateOwnerAccount(bizId){
+  if (!bizId) return;
+  var shopEmail = SHOP.shop_email || SHOP.email || '';
+  if (!shopEmail){
+    alert('No shop email found. Add it in Edit Shop Details first.');
+    return;
+  }
+  var useEmail = prompt(
+    'Create login account for ' + SHOP.name + '\n\n' +
+    'This will create an auth user, mark email VERIFIED, and link to this shop.\n\n' +
+    'Login email (default = Shop Email; you can edit):',
+    shopEmail
+  );
+  if (useEmail === null) return;
+  useEmail = String(useEmail).trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(useEmail)){
+    alert('Invalid email format'); return;
+  }
+  var suggested = 'Dukan@' + (1000 + Math.floor(Math.random() * 9000));
+  var usePwd = prompt(
+    'Temporary password for ' + useEmail + '\n\n' +
+    'Owner will change this after first login. Min 8 chars.\n\n' +
+    'Suggestion (you can edit):',
+    suggested
+  );
+  if (usePwd === null) return;
+  usePwd = String(usePwd).trim();
+  if (usePwd.length < 8){ alert('Password too short (min 8 chars)'); return; }
+  if (!confirm('Create account?\n\nEmail:    ' + useEmail + '\nPassword: ' + usePwd + '\nLink to:  ' + SHOP.name + '\n\nShare these credentials with the owner after creation. Proceed?')) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt){ alert('Login expired. Refresh and try again.'); return; }
+    toast('⏳ Creating account...');
+    var r = await fetch('/api/admin-create-owner-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ business_id: bizId, email: useEmail, password: usePwd })
+    });
+    var data = await r.json();
+
+    // Special case: 409 with existing_user_id - offer to RELINK
+    if (r.status === 409 && data.existing_user_id){
+      var relinkMsg = 'An auth account already exists for ' + useEmail + '\n\n'
+        + 'User ID: ' + data.existing_user_id + '\n\n'
+        + 'Most likely this owner registered before, then admin clicked Unlink Owner.\n'
+        + 'The auth account was kept but the link to this shop was broken.\n\n'
+        + 'OPTIONS:\n'
+        + '  OK     - Re-link this existing user to ' + SHOP.name + '\n'
+        + '           (owner keeps their ORIGINAL password; use Reset Password if forgotten)\n\n'
+        + '  Cancel - Do nothing. You can try a different email manually.\n\n'
+        + 'Re-link the existing account?';
+      if (!confirm(relinkMsg)) return;
+
+      toast('⏳ Re-linking existing account...');
+      var r2 = await fetch('/api/admin-create-owner-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+        body: JSON.stringify({
+          business_id: bizId,
+          link_existing_user_id: data.existing_user_id
+        })
+      });
+      var data2 = await r2.json();
+      if (!r2.ok){
+        alert('Re-link failed:\n\n' + (data2.error || ('HTTP ' + r2.status)));
+        return;
+      }
+      alert(
+        '✓ EXISTING ACCOUNT RE-LINKED\n\n' +
+        'Email: ' + data2.email + '\n' +
+        'User ID: ' + data2.user_id + '\n\n' +
+        'The owner can login with their ORIGINAL password.\n' +
+        'If they forgot it, click "Reset Password" on this shop next.'
+      );
+      toast('✓ Account re-linked');
+      setTimeout(function(){ location.reload(); }, 800);
+      return;
+    }
+
+    if (!r.ok){
+      var msg = data.error || ('HTTP ' + r.status);
+      if (data.hint) msg += '\n\n' + data.hint;
+      if (data.existing_user_id) msg += '\n\nExisting user id: ' + data.existing_user_id;
+      alert('Create account failed:\n\n' + msg);
+      return;
+    }
+    showCredentialsModal({
+      title: '✓ LOGIN ACCOUNT CREATED',
+      email: data.email,
+      password: data.password,
+      mobile: SHOP.mobile || SHOP.whatsapp || '',
+      shopName: SHOP.name || '',
+      onClose: function(){ location.reload(); }
+    });
+    toast('✓ Account created');
+  } catch(e){
+    alert('Network error: ' + (e.message || e));
+  }
+}
+
+// ====== Credentials modal — shows email + password with WhatsApp share button ======
+// Stays open until admin explicitly closes. Big WhatsApp button auto-prefills
+// owner mobile + message. Solves: 'admin bhul gaya note karne ka' problem.
+//
+// IMPORTANT: Copy buttons + close button use addEventListener (not inline onclick)
+// because inline onclick="...JSON.stringify(value)..." breaks HTML parsing —
+// double quotes inside the value terminate the attribute early.
+function showCredentialsModal(opts){
+  opts = opts || {};
+  var email = String(opts.email || '');
+  var password = String(opts.password || '');
+  var mobile = String(opts.mobile || '').replace(/\D/g, '').slice(-10);
+  var shopName = String(opts.shopName || '');
+  var title = String(opts.title || 'Account credentials');
+  var subtitle = String(opts.subtitle || 'Share these with the owner via WhatsApp or phone. They should change the password after first login.');
+  var onClose = opts.onClose || function(){};
+
+  function esc(v){
+    return String(v||'').replace(/[&<>"']/g, function(c){
+      return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c];
+    });
+  }
+
+  // Pre-filled WhatsApp / SMS / clipboard message - professional English.
+  var waMsg = (
+    'Hello!\n\n'
+    + 'This is the DukanList admin team. Your login account' + (shopName ? ' for "' + shopName + '"' : '') + ' is now ready.\n\n'
+    + 'Login URL: https://dukanlist.com/panel/login.html\n'
+    + 'Email: ' + email + '\n'
+    + (password ? 'Password: ' + password + '\n\n' : '\n')
+    + 'Please change your password after your first login (Settings > Reset Password).\n\n'
+    + 'For any help, please message us on this number.\n\n'
+    + '- Team DukanList'
+  );
+  var waUrl = mobile ? ('https://wa.me/91' + mobile + '?text=' + encodeURIComponent(waMsg)) : '';
+
+  // Remove any pre-existing modal
+  var existing = document.getElementById('credentialsModal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'credentialsModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;font-family:inherit';
+
+  // Build inner HTML — values escaped, NO inline onclick handlers
+  var hasPwd = !!password;
+  var hasMobile = !!mobile && !!password; // only show WA button if both exist
+  var noMobileWarn = !mobile && hasPwd
+    ? '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:10px;border-radius:6px;font-size:12px;color:#78350F;margin-bottom:8px">⚠ No mobile number set for this shop. Copy credentials above and share manually.</div>'
+    : '';
+
+  overlay.innerHTML =
+      '<div style="background:#fff;border-radius:16px;padding:24px;max-width:520px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.4);max-height:92vh;overflow-y:auto">'
+    +   '<div style="text-align:center;margin-bottom:16px">'
+    +     '<div style="display:inline-block;width:60px;height:60px;border-radius:50%;background:#10B981;color:#fff;font-size:30px;line-height:60px;text-align:center;margin-bottom:10px">✓</div>'
+    +     '<h2 style="margin:0;font-size:18px;color:#065F46;font-weight:800">' + esc(title) + '</h2>'
+    +   '</div>'
+    +   '<p style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:14px;text-align:center">' + esc(subtitle) + '</p>'
+
+    +   '<div style="background:#F8FAFC;border:2px solid #E2E8F0;border-radius:10px;padding:14px;margin-bottom:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace">'
+    +     '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">'
+    +       '<div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+    +         '<div style="font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Email</div>'
+    +         '<div style="font-size:14px;color:#0F172A;font-weight:700">' + esc(email) + '</div>'
+    +       '</div>'
+    +       '<button type="button" data-copy="email" style="background:#1D4ED8;color:#fff;border:none;width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;font-family:inherit" title="Copy email">⧉</button>'
+    +     '</div>'
+    +     '<div style="border-top:1px dashed #CBD5E1;padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px">'
+    +       '<div style="flex:1;min-width:0">'
+    +         '<div style="font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Password</div>'
+    +         '<div style="font-size:18px;color:#0F172A;font-weight:800;letter-spacing:.05em">' + (hasPwd ? esc(password) : '<span style="font-weight:500;color:#64748b;font-style:italic">(unchanged — owner uses existing password)</span>') + '</div>'
+    +       '</div>'
+    +       (hasPwd ? '<button type="button" data-copy="password" style="background:#1D4ED8;color:#fff;border:none;width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;font-family:inherit" title="Copy password">⧉</button>' : '')
+    +     '</div>'
+    +   '</div>'
+
+    +   (hasMobile
+        ? '<a href="' + esc(waUrl) + '" target="_blank" rel="noopener" '
+          + 'style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;padding:14px;border-radius:10px;font-weight:800;font-size:15px;margin-bottom:8px;box-shadow:0 4px 12px rgba(37,211,102,.35)">'
+          + '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.6 6.32A7.8 7.8 0 0 0 12 4a7.85 7.85 0 0 0-6.66 11.94L4 20l4.18-1.32A7.86 7.86 0 0 0 19.85 12 7.8 7.8 0 0 0 17.6 6.32zm-5.55 12.06a6.5 6.5 0 0 1-3.32-.91l-.24-.14-2.47.78.78-2.4-.16-.25a6.55 6.55 0 1 1 12.13-3.5 6.56 6.56 0 0 1-6.72 6.42z"/><path d="M15.62 13.5c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.5.65-.62.78-.11.13-.23.15-.43.05-.2-.1-.83-.3-1.59-.98-.59-.52-.98-1.17-1.1-1.37-.11-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.07-.13.03-.25-.02-.35-.05-.1-.45-1.08-.61-1.48-.16-.39-.33-.34-.45-.34l-.39-.01c-.13 0-.34.05-.52.25-.18.2-.69.67-.69 1.64s.7 1.91.8 2.04c.1.13 1.4 2.14 3.4 3 .47.2.85.32 1.14.41.48.15.92.13 1.26.08.39-.06 1.18-.48 1.35-.95.17-.47.17-.87.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>'
+          + 'Send via WhatsApp to ' + esc(mobile)
+          + '</a>'
+        : noMobileWarn)
+
+    +   '<button type="button" data-copy="fullmsg" style="width:100%;background:#1E3A8A;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">'
+    +     '<span style="font-size:16px">⎘</span> Copy full message (paste anywhere)'
+    +   '</button>'
+    +   '<button type="button" data-modal-close="1" style="width:100%;background:#475569;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+
+    +   '<div style="font-size:10.5px;color:#94a3b8;margin-top:10px;text-align:center;line-height:1.45">'
+    +     'Password is shown only here — it is NOT logged. If you close without saving, you can use Reset Password again to generate a new one.'
+    +   '</div>'
+    + '</div>';
+
+  document.body.appendChild(overlay);
+
+  // Wire up event handlers AFTER mount — avoids inline-onclick quote-escaping hell
+  function copyTo(btn, value){
+    var orig = btn.textContent;
+    function flash(ok){
+      btn.textContent = ok ? '✓' : '✗';
+      btn.style.background = ok ? '#10B981' : '#DC2626';
+      setTimeout(function(){
+        btn.textContent = orig;
+        btn.style.background = '#1D4ED8';
+      }, 1400);
+    }
+    try {
+      navigator.clipboard.writeText(value).then(function(){ flash(true); }, function(){ flash(false); });
+    } catch(_){
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = value; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        flash(true);
+      } catch(__){ flash(false); }
+    }
+  }
+
+  overlay.querySelectorAll('button[data-copy]').forEach(function(btn){
+    var which = btn.getAttribute('data-copy');
+    btn.addEventListener('click', function(){
+      var val;
+      if (which === 'password')      val = password;
+      else if (which === 'fullmsg')  val = waMsg;
+      else                           val = email;
+      copyTo(btn, val);
+    });
+  });
+
+  var closeBtn = overlay.querySelector('button[data-modal-close]');
+  if (closeBtn){
+    closeBtn.addEventListener('click', function(){
+      overlay.remove();
+      try { onClose(); } catch(_){}
+    });
+  }
+}
+
+// ====== Force Verify Email (admin override) ======
+async function adminForceVerifyEmail(email){
+  if (!email) return;
+  if (!confirm('Mark email "' + email + '" as VERIFIED?\n\nUse this only when the user did not receive the verification mail.\n\nThis is logged in the admin audit trail.')) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    toast('⏳ Verifying email...');
+    var r = await fetch('/api/admin-force-verify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await r.json();
+    if (!r.ok){ alert('Verify failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    toast(data.already_verified ? '✓ Already verified' : '✓ Email marked verified');
+  } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// ====== Reset Password (admin sets temp password) ======
+async function adminResetPassword(email){
+  if (!email) return;
+  var suggested = 'Dukan@' + (1000 + Math.floor(Math.random() * 9000));
+  var newPwd = prompt(
+    'Set TEMPORARY password for ' + email + '\n\n' +
+    'Use a password the user can remember briefly. They must change it after login.\n\n' +
+    'Minimum 8 chars. Suggestion (you can edit):',
+    suggested
+  );
+  if (newPwd === null) return;
+  newPwd = String(newPwd).trim();
+  if (newPwd.length < 8){ alert('Password must be at least 8 characters.'); return; }
+  if (!confirm('Set password for ' + email + ' to:\n\n' + newPwd + '\n\nShare this with the user via WhatsApp/phone. They will need to change it after login.\n\nProceed?')) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    toast('⏳ Resetting password...');
+    var r = await fetch('/api/admin-reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email, new_password: newPwd })
+    });
+    var data = await r.json();
+    if (!r.ok){ alert('Reset failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    showCredentialsModal({
+      title: '✓ PASSWORD RESET',
+      subtitle: 'Share the new temp password with the owner. Advise them to change it once logged in.',
+      email: email,
+      password: newPwd,
+      mobile: SHOP.mobile || SHOP.whatsapp || '',
+      shopName: SHOP.name || '',
+      onClose: function(){ /* no reload needed */ }
+    });
+    toast('✓ Password reset');
+  } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// ====== Impersonate Login (open as the user) ======
+async function adminImpersonate(email){
+  if (!email) return;
+  var msg = '🎭 LOGIN AS ' + email + '\n\n' +
+    'You will be signed in as this user in a NEW INCOGNITO/PRIVATE window.\n' +
+    'Use a private window so your admin session is preserved here.\n\n' +
+    'WHAT TO DO:\n' +
+    '  1. Click OK below\n' +
+    '  2. A link will be shown — copy it\n' +
+    '  3. Open INCOGNITO window (Ctrl+Shift+N) and paste\n' +
+    '  4. You will land on the shopkeeper dashboard with a red banner on top\n\n' +
+    'Every action you take is logged. Proceed?';
+  if (!confirm(msg)) return;
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    toast('⏳ Generating impersonation link...');
+    var r = await fetch('/api/admin-impersonate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await r.json();
+    if (!r.ok){ alert('Impersonation failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    var link = data.url;
+    var copied = false;
+    try { await navigator.clipboard.writeText(link); copied = true; } catch(_){}
+    prompt(
+      '✓ IMPERSONATION LINK READY' + (copied ? ' (copied to clipboard)' : '') + '\n\n' +
+      'Paste in an INCOGNITO window — link expires in 60 min.\n\n' +
+      'Target: ' + email + '\n\n' +
+      'LINK:',
+      link
+    );
+    toast('🎭 Link ready');
+  } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// ====== Unlink Owner (security fix — break auto-claim chain) ======
+async function unlinkOwner(){
+  if (!SHOP || !SHOP.owner_user_id){
+    alert('No owner linked to this shop.');
+    return;
+  }
+  var msg = 'Unlink owner from "' + SHOP.name + '"?\n\n'
+          + 'Login email:   ' + (SHOP.owner_email || '(none)') + '\n'
+          + 'Owner mobile:  ' + (SHOP.mobile || '(none)') + '\n\n'
+          + 'This will:\n'
+          + '  1. Remove the auth user → shop link\n'
+          + '  2. Clear owner_phone so the row CANNOT be silently re-claimed\n\n'
+          + 'Use this when the wrong account is linked, or to fix the '
+          + '"same email → wrong shop after delete" bug.\n\nProceed?';
+  if (!confirm(msg)) return;
+
+  try {
+    var r = await ShopDB.client.rpc('admin_unlink_owner', {
+      p_business_id: BIZ_ID,
+      p_clear_phone: true
+    });
+    if (r.error) throw r.error;
+    toast('✓ Owner unlinked. Affected rows: ' + (r.data && r.data.rows_affected || 0));
+    SHOP.owner_user_id = null;
+    SHOP.owner_email = null;
+    render();
+  } catch(e){
+    alert('Unlink failed: ' + (e.message || e) + '\n\nIf this RPC is missing, run db/71-safer-claim-by-phone.sql in Supabase.');
+  }
+}
+
+init();
+</script>
+
+<!-- Featured Listing Modal -->
+<div class="modal-bg" id="featuredModal" onclick="if(event.target===this)closeFeaturedModal()">
+  <div class="modal-box">
+    <h3>★ Featured Listing</h3>
+    <div class="sub">Mark this shop as featured to boost its visibility across browse, search, and homepage.</div>
+    <div id="fmCurrent"></div>
+
+    <form onsubmit="submitFeatured(event)">
+      <div class="field">
+        <label>Duration — quick pick</label>
+        <div class="duration-grid">
+          <div class="dur-chip" onclick="setDays(7,this)">7 days</div>
+          <div class="dur-chip active" onclick="setDays(30,this)">30 days</div>
+          <div class="dur-chip" onclick="setDays(90,this)">90 days</div>
+          <div class="dur-chip" onclick="setDays(180,this)">180 days</div>
+        </div>
+      </div>
+
+      <div class="fm-row">
+        <div class="field">
+          <label>Days *</label>
+          <input id="fmDays" type="number" min="1" max="730" value="30" required>
+        </div>
+        <div class="field">
+          <label>Amount (₹) *</label>
+          <input id="fmAmount" type="number" min="0" step="0.01" placeholder="e.g. 999" required>
+        </div>
+      </div>
+
+      <div class="fm-row">
+        <div class="field">
+          <label>Payment method</label>
+          <select id="fmMethod">
+            <option value="cash">Cash</option>
+            <option value="upi">UPI</option>
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="cheque">Cheque</option>
+            <option value="complimentary">Complimentary (₹0)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Notes (optional)</label>
+          <input id="fmNotes" type="text" placeholder="e.g. Diwali campaign">
+        </div>
+      </div>
+
+      <div id="fmHistory"></div>
+
+      <div class="fm-actions">
+        <button type="button" class="btn" onclick="closeFeaturedModal()">Cancel</button>
+        <button type="button" class="btn danger" id="fmRevokeBtn" onclick="revokeFeatured()" style="display:none">Revoke Now</button>
+        <button type="submit" class="btn pri" id="fmSaveBtn">★ Save & Mark Featured</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function setDays(d, el){
+  document.getElementById('fmDays').value = d;
+  document.querySelectorAll('.dur-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>

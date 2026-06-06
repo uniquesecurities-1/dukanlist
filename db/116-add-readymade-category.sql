@@ -25,4 +25,27 @@ SELECT
   '#A855F7',
   COALESCE(
     (SELECT MAX(sort_order) FROM categories
-      WHERE parent_id = (SELECT id FROM categor
+      WHERE parent_id = (SELECT id FROM categories WHERE slug = 'retail-shopping' LIMIT 1)),
+    100) + 5,
+  TRUE,
+  'Ready-to-wear clothing — kids, men, women apparel, jeans, t-shirts, dresses'
+WHERE NOT EXISTS (
+  SELECT 1 FROM categories WHERE slug = 'readymade-garments'
+);
+
+NOTIFY pgrst, 'reload schema';
+
+COMMIT;
+
+DO $$
+DECLARE
+  v_count INT;
+BEGIN
+  SELECT COUNT(*) INTO v_count FROM categories WHERE slug = 'readymade-garments';
+  IF v_count = 1 THEN
+    RAISE NOTICE 'db/116 installed.';
+    RAISE NOTICE '  + Readymade Garments under Retail & Shopping';
+  ELSE
+    RAISE NOTICE 'db/116: Readymade Garments already existed — nothing changed.';
+  END IF;
+END $$;
