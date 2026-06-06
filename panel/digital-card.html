@@ -352,4 +352,27 @@ async function init(){
   // Fetch category name (for theme auto-pick)
   var primaryCatId = BIZ.sub_category_id || BIZ.category_id;
   if (primaryCatId){
-    var cat 
+    var cat = await c.from('categories').select('name').eq('id', primaryCatId).maybeSingle();
+    if (cat.data) BIZ.cat_name = cat.data.name;
+  }
+
+  // Auto-pick theme
+  CURRENT_THEME = pickAutoTheme(BIZ.owner_role, BIZ.cat_name);
+  document.querySelectorAll('.theme-chip').forEach(function(c){
+    c.classList.toggle('active', c.dataset.theme === CURRENT_THEME);
+  });
+
+  refreshPreview();
+}
+
+init();
+</script>
+
+<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
+<script src="/assets/js/owner-notifications.js" defer></script>
+
+<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
+<script src="/assets/js/error-reporter.js" defer></script>
+<script src="/_vercel/insights/script.js" defer></script>
+</body>
+</html>
