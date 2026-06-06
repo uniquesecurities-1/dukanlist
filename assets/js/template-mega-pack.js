@@ -1137,7 +1137,7 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
   const bandBg = isDark ? '#0F0F0F' : '#FFFFFF';
 
   // ===== TOP 50% : HERO PHOTO (FULL BLEED, no padding) =====
-  const photoH = sz * 0.50;
+  const photoH = sz * 0.78;  // 78% photo hero
 
   // Photo placeholder backdrop
   ctx.fillStyle = isDark ? '#1A1A1A' : '#F0EBE0';
@@ -1170,37 +1170,29 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
     drawPhotoPlaceholder(ctx, sz, photoH, mutedInk);
   }
 
-  // ===== BOTTOM 50% : SOLID BAND with content =====
+  // ===== BOTTOM 22% : COMPACT CONTENT BAND =====
   ctx.fillStyle = bandBg;
   ctx.fillRect(0, photoH, sz, sz - photoH);
 
-  // Top of band: shop name
-  ctx.textAlign = 'center';
-  ctx.fillStyle = t.ink;
-  const nameTxt = (s.name || 'Your Business').trim();
-  const nameFont = nameTxt.length > 22 ? 0.044 : 0.054;
-  ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
-  ctx.fillText(nameTxt, sz / 2, photoH + sz * 0.075);
-
-  // ===== METRIC LINE — "17+ YEARS OF TRUST" style =====
-  // Compute years if available
+  // ===== Top of band: Shop name + years metric inline =====
+  const bandY = photoH;
   const yrs = s.established_year && s.established_year > 1900
     ? (new Date().getFullYear() - s.established_year) : null;
 
+  // Shop name
+  ctx.textAlign = 'center';
+  ctx.fillStyle = t.ink;
+  const nameTxt = (s.name || 'Your Business').trim();
+  const nameFont = nameTxt.length > 22 ? 0.034 : 0.040;
+  ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
+  ctx.fillText(nameTxt, sz / 2, bandY + sz * 0.030);
+
+  // Years + Tagline (compact, inline)
+  ctx.fillStyle = t.accent;
   if (yrs && yrs > 0) {
-    // Big number
-    ctx.fillStyle = t.accent;
-    ctx.font = '900 ' + Math.floor(sz * 0.090) + 'px Manrope, Arial';
-    ctx.fillText(yrs + '+', sz / 2, photoH + sz * 0.175);
-    // Small caption tight below
-    ctx.fillStyle = mutedInk;
-    ctx.font = '800 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
-    const caption = txt(lang, 'YEARS OF TRUST', 'सालों का भरोसा');
-    ctx.fillText(caption.split('').join(' '), sz / 2, photoH + sz * 0.215);
+    ctx.font = '900 ' + Math.floor(sz * 0.026) + 'px Manrope, Arial';
+    ctx.fillText(yrs + '+ YEARS  ·  TRUSTED ESTABLISHMENT', sz / 2, bandY + sz * 0.060);
   } else {
-    // Fallback: tagline by category
-    ctx.fillStyle = t.accent;
-    ctx.font = '800 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
     let tag = txt(lang, 'TRUSTED LOCAL BUSINESS', 'भरोसेमंद लोकल बिज़नेस');
     if (s.category) {
       const cl = s.category.toLowerCase();
@@ -1212,71 +1204,45 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
       else if (cl.includes('kirana') || cl.includes('grocery')) tag = 'FAMILY GROCERY STORE';
       else if (cl.includes('mobile')) tag = 'AUTHORISED MOBILE DEALER';
     }
-    ctx.fillText(tag.split('').join(' '), sz / 2, photoH + sz * 0.140);
+    ctx.font = '900 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
+    ctx.fillText(tag, sz / 2, bandY + sz * 0.060);
   }
 
-  // Divider line
-  const divY = photoH + sz * 0.260;
+  // Divider
   ctx.fillStyle = dividerColor;
-  ctx.fillRect(sz * 0.30, divY, sz * 0.40, sz * 0.0025);
+  ctx.fillRect(sz * 0.38, bandY + sz * 0.080, sz * 0.24, sz * 0.0020);
 
-  // ===== CONTACT BLOCK (left-aligned, proper pattern) =====
-  const contactStartY = photoH + sz * 0.305;
-  const lineH = sz * 0.045;
-  let lineY = contactStartY;
-  const leftX = sz * 0.10;
-  const iconX = sz * 0.10;
-  const textX = sz * 0.165;
-
-  ctx.textAlign = 'left';
+  // ===== Contact lines (compact, centered, with icons) =====
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  let contactY = bandY + sz * 0.110;
+  const lineGap = sz * 0.030;
 
-  // Phone
   if (s.mobile) {
     const phone = String(s.mobile).replace(/\D/g, '').slice(-10);
     ctx.fillStyle = t.ink;
-    ctx.font = '700 ' + Math.floor(sz * 0.028) + 'px Inter, Arial';
-    drawIcon(ctx, '📞', iconX, lineY, sz * 0.032);
-    ctx.fillText('+91 ' + phone.slice(0,5) + ' ' + phone.slice(5), textX, lineY);
-    lineY += lineH;
+    ctx.font = '700 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
+    ctx.fillText('📞  +91 ' + phone.slice(0,5) + ' ' + phone.slice(5), sz / 2, contactY);
+    contactY += lineGap;
   }
 
-  // Address (full)
   if (s.address) {
     ctx.fillStyle = mutedInk;
-    ctx.font = '500 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
-    drawIcon(ctx, '📍', iconX, lineY, sz * 0.032);
+    ctx.font = '500 ' + Math.floor(sz * 0.020) + 'px Inter, Arial';
     let addr = String(s.address).trim();
-    // Wrap to 2 lines if long
-    const maxW = sz * 0.78;
-    const words = addr.split(' ');
-    let line = '';
-    let lines = [];
-    for (let i = 0; i < words.length; i++) {
-      const test = line + words[i] + ' ';
-      if (ctx.measureText(test).width > maxW && line.length > 0) {
-        lines.push(line.trim());
-        line = words[i] + ' ';
-      } else { line = test; }
-    }
-    lines.push(line.trim());
-    lines = lines.slice(0, 2);
-    for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], textX, lineY + i * (sz * 0.034));
-    }
-    lineY += lineH + (lines.length - 1) * (sz * 0.034);
+    if (addr.length > 70) addr = addr.slice(0, 67) + '...';
+    ctx.fillText('📍  ' + addr, sz / 2, contactY);
+    contactY += lineGap;
   }
 
-  // Website
   let websiteText = '';
   if (s.website) websiteText = String(s.website).replace(/^https?:\/\//, '').replace(/\/$/, '');
   else if (s.slug) websiteText = 'dukanlist.com/' + s.slug;
   if (websiteText) {
+    if (websiteText.length > 48) websiteText = websiteText.slice(0, 45) + '...';
     ctx.fillStyle = t.accent;
-    ctx.font = '700 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
-    drawIcon(ctx, '🌐', iconX, lineY, sz * 0.032);
-    if (websiteText.length > 42) websiteText = websiteText.slice(0, 39) + '...';
-    ctx.fillText(websiteText, textX, lineY);
+    ctx.font = '700 ' + Math.floor(sz * 0.020) + 'px Inter, Arial';
+    ctx.fillText('🌐  ' + websiteText, sz / 2, contactY);
   }
 
   ctx.textBaseline = 'alphabetic';
