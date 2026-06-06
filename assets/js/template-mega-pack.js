@@ -535,8 +535,10 @@ async function renderTemplate(canvas, shop, tmpl, opts){
   canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext('2d');
 
-  // 1. Background — gradient or photo
-  if (usePhotoBg) {
+  // 1. Background — gradient or photo (premium-card handles its own)
+  if (tmpl.style === 'premium-card') {
+    // skip — drawPremiumCard handles background
+  } else if (usePhotoBg) {
     const img = await loadPhotoImg(shop.photo);
     if (img) {
       // cover-fit
@@ -554,8 +556,8 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     drawBackground(ctx, tmpl, size);
   }
 
-  // 2. Decorative orbs (light)
-  if (tmpl.style !== 'minimal' && tmpl.style !== 'medical') {
+  // 2. Decorative orbs (light) — also skip for premium-card
+  if (tmpl.style !== 'minimal' && tmpl.style !== 'medical' && tmpl.style !== 'premium-card') {
     ctx.save();
     ctx.globalAlpha = 0.12;
     ctx.fillStyle = tmpl.accent || '#FFF';
@@ -564,8 +566,10 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     ctx.restore();
   }
 
-  // 3. Brand strip
-  drawBrandStrip(ctx, tmpl, size);
+  // 3. Brand strip (skip for premium-card clean style)
+  if (tmpl.style !== 'premium-card') {
+    drawBrandStrip(ctx, tmpl, size);
+  }
 
   // 4. Style-specific rendering
   switch (tmpl.style) {
@@ -588,8 +592,8 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     default:                drawBoldName(ctx, shop, tmpl, size, lang);
   }
 
-  // 5. QR code corner (always, except qr-hero which has its own)
-  if (tmpl.style !== 'qr-hero') {
+  // 5. QR code corner (skip for premium-card which has clean layout)
+  if (tmpl.style !== 'qr-hero' && tmpl.style !== 'premium-card') {
     await drawQrCorner(ctx, shop, size);
   }
 
@@ -603,8 +607,10 @@ async function renderTemplate(canvas, shop, tmpl, opts){
     try { drawDealBanner(ctx, opts.dealText, opts.dealAccent || tmpl.accent, tmpl, size); } catch(_){}
   }
 
-  // 7. Watermark
-  drawWatermark(ctx, tmpl, size);
+  // 7. Watermark (skip for premium-card)
+  if (tmpl.style !== 'premium-card') {
+    drawWatermark(ctx, tmpl, size);
+  }
 
   // 7. Sticker layer (NEW / SALE / OFFER / FREE)
   if (stickers.length > 0) {
@@ -1129,18 +1135,17 @@ function isColorDark(hex){
 
 
 
-// ─── Layout: Premium Business Card (MNC-class) ────────────
+// ─── Layout: Premium Business Card (Clean Reference Style) ─
 async function drawPremiumCard(ctx, s, t, sz, lang){
-  const isDark = t.id === 'premium-charcoal' || (t.ink && t.ink === '#FFFFFF');
-  const dividerColor = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)';
-  const mutedInk = isDark ? 'rgba(255,255,255,0.72)' : 'rgba(0,0,0,0.62)';
-  const bandBg = isDark ? '#0F0F0F' : '#FFFFFF';
+  // ===== PURE WHITE BACKGROUND =====
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, sz, sz);
 
-  // ===== TOP 50% : HERO PHOTO (FULL BLEED, no padding) =====
-  const photoH = sz * 0.78;  // 78% photo hero
+  // ===== PHOTO 75% TOP, FULL BLEED =====
+  const photoH = sz * 0.75;
 
-  // Photo placeholder backdrop
-  ctx.fillStyle = isDark ? '#1A1A1A' : '#F0EBE0';
+  // Light gray placeholder backdrop
+  ctx.fillStyle = '#F5F5F5';
   ctx.fillRect(0, 0, sz, photoH);
 
   if (s.photo) {
@@ -1155,107 +1160,104 @@ async function drawPremiumCard(ctx, s, t, sz, lang){
         const w = img.width * ratio;
         const h = img.height * ratio;
         ctx.drawImage(img, (sz - w) / 2, (photoH - h) / 2, w, h);
-        // Subtle darkening overlay at bottom for legibility
-        const grad = ctx.createLinearGradient(0, photoH * 0.7, 0, photoH);
-        grad.addColorStop(0, 'rgba(0,0,0,0)');
-        grad.addColorStop(1, 'rgba(0,0,0,0.18)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, photoH * 0.7, sz, photoH * 0.3);
         ctx.restore();
+
+        // Soft white fade at very bottom of photo (smooth transition)
+        const fadeH = sz * 0.04;
+        const grad = ctx.createLinearGradient(0, photoH - fadeH, 0, photoH);
+        grad.addColorStop(0, 'rgba(255,255,255,0)');
+        grad.addColorStop(1, 'rgba(255,255,255,1)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, photoH - fadeH, sz, fadeH);
       } else {
-        drawPhotoPlaceholder(ctx, sz, photoH, mutedInk);
+        drawPhotoPlaceholder(ctx, sz, photoH, 'rgba(0,0,0,0.30)');
       }
-    } catch(_) { drawPhotoPlaceholder(ctx, sz, photoH, mutedInk); }
+    } catch(_) { drawPhotoPlaceholder(ctx, sz, photoH, 'rgba(0,0,0,0.30)'); }
   } else {
-    drawPhotoPlaceholder(ctx, sz, photoH, mutedInk);
+    drawPhotoPlaceholder(ctx, sz, photoH, 'rgba(0,0,0,0.30)');
   }
 
-  // ===== BOTTOM 22% : COMPACT CONTENT BAND =====
-  ctx.fillStyle = bandBg;
-  ctx.fillRect(0, photoH, sz, sz - photoH);
+  // ===== BOTTOM 25% — CONTENT ON WHITE =====
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
 
-  // ===== Top of band: Shop name + years metric inline =====
-  const bandY = photoH;
+  const black = '#000000';
+
+  // Shop name — BIG BOLD CENTERED
+  ctx.fillStyle = black;
+  const nameTxt = (s.name || 'Your Business').trim();
+  const nameFont = nameTxt.length > 22 ? 0.042 : 0.052;
+  ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
+  ctx.fillText(nameTxt, sz / 2, sz * 0.817);
+
+  // Tagline (years if available, else category)
   const yrs = s.established_year && s.established_year > 1900
     ? (new Date().getFullYear() - s.established_year) : null;
 
-  // Shop name
-  ctx.textAlign = 'center';
-  ctx.fillStyle = t.ink;
-  const nameTxt = (s.name || 'Your Business').trim();
-  const nameFont = nameTxt.length > 22 ? 0.034 : 0.040;
-  ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
-  ctx.fillText(nameTxt, sz / 2, bandY + sz * 0.030);
-
-  // Years + Tagline (compact, inline)
-  ctx.fillStyle = t.accent;
+  ctx.fillStyle = black;
+  ctx.font = '700 ' + Math.floor(sz * 0.026) + 'px Inter, Arial';
+  let taglineTxt = '';
   if (yrs && yrs > 0) {
-    ctx.font = '900 ' + Math.floor(sz * 0.026) + 'px Manrope, Arial';
-    ctx.fillText(yrs + '+ YEARS  ·  TRUSTED ESTABLISHMENT', sz / 2, bandY + sz * 0.060);
-  } else {
-    let tag = txt(lang, 'TRUSTED LOCAL BUSINESS', 'भरोसेमंद लोकल बिज़नेस');
-    if (s.category) {
-      const cl = s.category.toLowerCase();
-      if (cl.includes('mutual') || cl.includes('finance') || cl.includes('securit')) tag = 'CERTIFIED FINANCIAL ADVISOR';
-      else if (cl.includes('medical') || cl.includes('pharmacy')) tag = 'TRUSTED PHARMACY';
-      else if (cl.includes('jewel')) tag = 'HALLMARK GOLD JEWELLERY';
-      else if (cl.includes('restaurant')) tag = 'AUTHENTIC INDIAN CUISINE';
-      else if (cl.includes('salon') || cl.includes('beauty')) tag = 'PREMIUM BEAUTY EXPERTS';
-      else if (cl.includes('kirana') || cl.includes('grocery')) tag = 'FAMILY GROCERY STORE';
-      else if (cl.includes('mobile')) tag = 'AUTHORISED MOBILE DEALER';
-    }
-    ctx.font = '900 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
-    ctx.fillText(tag, sz / 2, bandY + sz * 0.060);
+    taglineTxt = yrs + '+ Years of Trust.';
+  } else if (s.category) {
+    const cl = s.category.toLowerCase();
+    if (cl.includes('mutual') || cl.includes('finance') || cl.includes('securit')) taglineTxt = 'Certified Financial Advisor.';
+    else if (cl.includes('medical') || cl.includes('pharmacy')) taglineTxt = 'Trusted Pharmacy.';
+    else if (cl.includes('jewel')) taglineTxt = 'Hallmark Gold Jewellery.';
+    else if (cl.includes('restaurant')) taglineTxt = 'Authentic Indian Cuisine.';
+    else if (cl.includes('salon') || cl.includes('beauty')) taglineTxt = 'Premium Beauty Experts.';
+    else if (cl.includes('kirana') || cl.includes('grocery')) taglineTxt = 'Family Grocery Store.';
+    else taglineTxt = 'Trusted Local Business.';
   }
+  if (taglineTxt) ctx.fillText(taglineTxt, sz / 2, sz * 0.853);
 
-  // Divider
-  ctx.fillStyle = dividerColor;
-  ctx.fillRect(sz * 0.38, bandY + sz * 0.080, sz * 0.24, sz * 0.0020);
-
-  // ===== Contact lines (compact, centered, with icons) =====
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  let contactY = bandY + sz * 0.110;
-  const lineGap = sz * 0.030;
-
+  // Phone — "M: <number>" simple text
   if (s.mobile) {
     const phone = String(s.mobile).replace(/\D/g, '').slice(-10);
-    ctx.fillStyle = t.ink;
-    ctx.font = '700 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
-    ctx.fillText('📞  +91 ' + phone.slice(0,5) + ' ' + phone.slice(5), sz / 2, contactY);
-    contactY += lineGap;
+    ctx.fillStyle = black;
+    ctx.font = '600 ' + Math.floor(sz * 0.024) + 'px Inter, Arial';
+    ctx.fillText('M: ' + phone, sz / 2, sz * 0.886);
   }
 
+  // Hairline divider (60% width, centered)
+  ctx.fillStyle = black;
+  ctx.fillRect(sz * 0.20, sz * 0.908, sz * 0.60, sz * 0.0020);
+
+  // Address — 2 lines centered
   if (s.address) {
-    ctx.fillStyle = mutedInk;
-    ctx.font = '500 ' + Math.floor(sz * 0.020) + 'px Inter, Arial';
+    ctx.fillStyle = black;
+    ctx.font = '500 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
     let addr = String(s.address).trim();
-    if (addr.length > 70) addr = addr.slice(0, 67) + '...';
-    ctx.fillText('📍  ' + addr, sz / 2, contactY);
-    contactY += lineGap;
-  }
+    const maxW = sz * 0.84;
+    const words = addr.split(' ');
+    let line = '';
+    let lines = [];
+    for (let i = 0; i < words.length; i++) {
+      const test = line + words[i] + ' ';
+      if (ctx.measureText(test).width > maxW && line.length > 0) {
+        lines.push(line.trim());
+        line = words[i] + ' ';
+      } else { line = test; }
+    }
+    lines.push(line.trim());
+    lines = lines.slice(0, 2);
 
-  let websiteText = '';
-  if (s.website) websiteText = String(s.website).replace(/^https?:\/\//, '').replace(/\/$/, '');
-  else if (s.slug) websiteText = 'dukanlist.com/' + s.slug;
-  if (websiteText) {
-    if (websiteText.length > 48) websiteText = websiteText.slice(0, 45) + '...';
-    ctx.fillStyle = t.accent;
-    ctx.font = '700 ' + Math.floor(sz * 0.020) + 'px Inter, Arial';
-    ctx.fillText('🌐  ' + websiteText, sz / 2, contactY);
+    const startY = sz * 0.940;
+    const gap = sz * 0.030;
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], sz / 2, startY + i * gap);
+    }
   }
-
-  ctx.textBaseline = 'alphabetic';
 }
 
 function drawPhotoPlaceholder(ctx, sz, h, ink){
   ctx.fillStyle = ink;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = Math.floor(sz * 0.08) + 'px serif';
-  ctx.fillText('📷', sz / 2, h / 2 - sz * 0.02);
-  ctx.font = '600 ' + Math.floor(sz * 0.020) + 'px Inter, Arial';
-  ctx.fillText('Upload your photo', sz / 2, h / 2 + sz * 0.06);
+  ctx.font = Math.floor(sz * 0.10) + 'px serif';
+  ctx.fillText('📷', sz / 2, h / 2);
+  ctx.font = '600 ' + Math.floor(sz * 0.022) + 'px Inter, Arial';
+  ctx.fillText('Upload your shop photo', sz / 2, h / 2 + sz * 0.08);
   ctx.textBaseline = 'alphabetic';
 }
 
