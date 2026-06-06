@@ -1139,6 +1139,8 @@ function isColorDark(hex){
 async function drawPremiumCard(ctx, s, t, sz, lang, opts){
   opts = opts || {};
   const showQr = opts.showQr !== false;  // default true
+  const customHeadline = (s._customHeadline || '').trim();
+  const customSubline  = (s._customSubline  || '').trim();
 
   // ===== PURE WHITE BACKGROUND =====
   ctx.fillStyle = '#FFFFFF';
@@ -1177,6 +1179,24 @@ async function drawPremiumCard(ctx, s, t, sz, lang, opts){
     drawPhotoPlaceholder(ctx, sz, photoH, 'rgba(0,0,0,0.30)');
   }
 
+  // ===== CUSTOM HEADLINE RIBBON (over photo) =====
+  if (customHeadline) {
+    const ribH = sz * 0.075;
+    const ribY = sz * 0.030;
+    ctx.fillStyle = '#0A0A0A';
+    ctx.fillRect(0, ribY, sz, ribH);
+    // Gold accent line on left
+    ctx.fillStyle = '#D4AF37';
+    ctx.fillRect(0, ribY, sz * 0.018, ribH);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const hlTxt = customHeadline.toUpperCase();
+    const hlFont = hlTxt.length > 28 ? 0.028 : 0.034;
+    ctx.font = '900 ' + Math.floor(sz * hlFont) + 'px Manrope, Arial';
+    ctx.fillText(hlTxt, sz / 2, ribY + ribH / 2);
+  }
+
   // ===== BOTTOM 28% — CONTENT ON WHITE =====
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
@@ -1190,11 +1210,13 @@ async function drawPremiumCard(ctx, s, t, sz, lang, opts){
   ctx.font = '900 ' + Math.floor(sz * nameFont) + 'px Manrope, Arial';
   ctx.fillText(nameTxt, sz / 2, sz * 0.785);
 
-  // Tagline
+  // Tagline — custom subline wins if user typed one
   const yrs = s.established_year && s.established_year > 1900
     ? (new Date().getFullYear() - s.established_year) : null;
   let taglineTxt = '';
-  if (yrs && yrs > 0) {
+  if (customSubline) {
+    taglineTxt = customSubline;
+  } else if (yrs && yrs > 0) {
     taglineTxt = yrs + '+ Years of Trust.';
   } else if (s.category) {
     const cl = s.category.toLowerCase();
@@ -1329,25 +1351,4 @@ async function shareToPlatform(platform, shop, tmpl, opts){
     catch(_){}
   }
   await downloadPoster(shop, tmpl, opts);
-  if (platform === 'whatsapp')   window.open('https://wa.me/?text=' + encodeURIComponent(caption), '_blank');
-  if (platform === 'facebook')   window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank');
-  return { method: 'download' };
-}
-
-// ─── Filter templates by shop category ────────────────────
-function getRelevantTemplates(shopCategory){
-  const c = (shopCategory || '').toLowerCase();
-  return TEMPLATES.filter(t => t.category === 'all' || c.includes(t.category));
-}
-
-// ─── Public API ───────────────────────────────────────────
-global.TemplateMegaPack = {
-  TEMPLATES,
-  renderTemplate,
-  renderToBlob,
-  downloadPoster,
-  shareToPlatform,
-  getRelevantTemplates
-};
-
-})(window);
+  if (platf

@@ -640,9 +640,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js?v=722370"></script>
-<script src="/assets/js/daily-poster-engine.js?v=723586"></script>
+<script src="/assets/js/daily-poster-engine.js?v=724053"></script>
 <script src="/assets/js/festival-engine.js?v=723034"></script>
-<script src="/assets/js/template-mega-pack.js?v=723586"></script>
+<script src="/assets/js/template-mega-pack.js?v=724053"></script>
 
 <script>
 (async function init(){
@@ -828,12 +828,16 @@
       document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
       state.filter = b.dataset.filter;
-        // ─── Quick Pick: Premium hero tiles ────────────────────
-  function renderQuickpick(){
+      buildGallery();
+    });
+  });
+
+  // ─── Quick Pick: Premium hero tiles (MODULE SCOPE) ───────────
+  async function renderQuickpick(){
     const premiumOnes = allTemplates.filter(t => t.premium);
     const el = document.getElementById('quickpickTiles');
     if (!el || premiumOnes.length === 0) return;
-    el.innerHTML = premiumOnes.map((t, i) =>
+    el.innerHTML = premiumOnes.map((t) =>
       '<div class="qp-tile ' + (state.tmpl && state.tmpl.id === t.id ? 'active' : '') + '" data-tid="' + t.id + '">' +
       '  <div class="qp-tile-badge">PREMIUM</div>' +
       '  <canvas data-qp-for="' + t.id + '"></canvas>' +
@@ -841,35 +845,30 @@
       '</div>'
     ).join('');
     // Render thumbs
-    setTimeout(async () => {
-      for (const t of premiumOnes) {
-        const cv = el.querySelector('[data-qp-for="' + t.id + '"]');
-        if (cv) {
-          try { await TemplateMegaPack.renderTemplate(cv, shopData, t, { size: 300, lang: state.lang }); } catch(_){}
-        }
+    for (const t of premiumOnes) {
+      const cv = el.querySelector('[data-qp-for="' + t.id + '"]');
+      if (cv) {
+        try { await TemplateMegaPack.renderTemplate(cv, shopData, t, { size: 300, lang: state.lang }); } catch(_){}
       }
-    }, 100);
+    }
     // Wire clicks
     el.querySelectorAll('.qp-tile').forEach(tile => {
       tile.addEventListener('click', () => {
         el.querySelectorAll('.qp-tile').forEach(x => x.classList.remove('active'));
         tile.classList.add('active');
         state.tmpl = allTemplates.find(t => t.id === tile.dataset.tid);
-        // Also sync active state in hidden gallery
         document.querySelectorAll('.gallery .tmpl').forEach(x => x.classList.remove('active'));
-        const g = document.querySelector('[data-tid="' + state.tmpl.id + '"]');
-        if (g && g.classList.contains('tmpl')) g.classList.add('active');
+        const g = document.querySelector('.gallery [data-tid="' + state.tmpl.id + '"]');
+        if (g) g.classList.add('active');
         renderMain();
       });
     });
   }
-  renderQuickpick();
 
   // Default to first premium template on first load
   const firstPremium = allTemplates.find(t => t.premium);
   if (firstPremium && (!state.tmpl || !state.tmpl.premium)) {
     state.tmpl = firstPremium;
-    setTimeout(renderMain, 300);
   }
 
   // Show All toggle
@@ -882,9 +881,8 @@
     });
   }
 
-  buildGallery();
-    });
-  });
+  // Initial Quick Pick render (will run after shopData populated)
+  setTimeout(() => { renderQuickpick(); }, 250);
 
   // Search
   let sT;
@@ -1219,37 +1217,4 @@
 
   // Custom address — localStorage persistent
   state.customAddress = localStorage.getItem('dl_studio_address') || '';
-  state.showQr = (localStorage.getItem('dl_studio_qr') !== '0');  // default true
-  const addrInput = document.getElementById('customAddress');
-  if (addrInput) {
-    addrInput.value = state.customAddress;
-    let aT;
-    addrInput.addEventListener('input', () => {
-      clearTimeout(aT);
-      aT = setTimeout(() => {
-        state.customAddress = addrInput.value.trim();
-        try { localStorage.setItem('dl_studio_address', state.customAddress); } catch(_){}
-        renderMain();
-      }, 300);
-    });
-  }
-  const qrBtn = document.getElementById('qrToggle');
-  if (qrBtn) {
-    qrBtn.classList.toggle('on', state.showQr);
-    qrBtn.textContent = state.showQr ? '🔗 QR Code: ON' : '🔗 Show QR code';
-    qrBtn.addEventListener('click', () => {
-      state.showQr = !state.showQr;
-      qrBtn.classList.toggle('on', state.showQr);
-      qrBtn.textContent = state.showQr ? '🔗 QR Code: ON' : '🔗 Show QR code';
-      try { localStorage.setItem('dl_studio_qr', state.showQr ? '1' : '0'); } catch(_){}
-      renderMain();
-    });
-  }
-
-  buildGallery();
-  setTimeout(renderMain, 250);
-})();
-</script>
-
-</body>
-</html>
+  state.showQr = (localStorage.getItem

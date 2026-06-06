@@ -1409,6 +1409,36 @@ async function loadCategoryBadges(bizId){
     if (!data || data.length <= 1) return;
     // Sort: primary first
     data.sort((a,b) => (b.is_primary?1:0) - (a.is_primary?1:0));
+    const sub = document.getElementById('bizSubDisp');
+    if (!sub) return;
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 600px)').matches;
+    const uniqId = 'catB_' + Date.now();
+
+    // Mobile: show primary only, with +N more toggle
+    if (isMobile) {
+      const primary = data[0];
+      const extras  = data.slice(1);
+      const star = primary.is_primary ? '⭐ ' : '';
+      const priChip = `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:.75rem;border:1px solid #F59E0B;background:#FFFBEB;color:#92400E;font-weight:800">${star}${primary.icon||''} ${escapeHTML(primary.name)}</span>`;
+      let moreChip = '';
+      if (extras.length > 0) {
+        moreChip = `<button type="button" id="${uniqId}_more" style="border:1px solid #cbd5e1;background:#fff;color:#475569;font-weight:700;font-size:.72rem;padding:4px 10px;border-radius:99px;cursor:pointer">+${extras.length} more</button>`;
+      }
+      sub.insertAdjacentHTML('afterend',
+        `<div id="${uniqId}" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center">${priChip}${moreChip}</div>`
+      );
+      if (extras.length > 0) {
+        document.getElementById(`${uniqId}_more`).addEventListener('click', () => {
+          const host = document.getElementById(uniqId);
+          host.innerHTML = priChip + extras.map(cat =>
+            `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:.72rem;border:1px solid #e2e8f0;background:#f1f5f9;color:#475569;font-weight:600">${cat.icon||''} ${escapeHTML(cat.name)}</span>`
+          ).join('');
+        });
+      }
+      return;
+    }
+
+    // Desktop: show all
     const html = data.map(cat => {
       const isPri = cat.is_primary;
       const star = isPri ? '⭐ ' : '';
@@ -1417,7 +1447,6 @@ async function loadCategoryBadges(bizId){
         : 'background:#f1f5f9;border-color:#e2e8f0;color:#475569;font-weight:600';
       return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:.75rem;border:1px solid;${style}">${star}${cat.icon||''} ${escapeHTML(cat.name)}</span>`;
     }).join('');
-    const sub = document.getElementById('bizSubDisp');
     sub.insertAdjacentHTML('afterend', `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${html}</div>`);
   }catch(e){ console.warn('Category badges failed', e); }
 }
@@ -2582,54 +2611,4 @@ function shareReferralWhatsApp(){
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
-</body>
-</html>
-t on first paint) -->
-<script src="/assets/js/error-reporter.js" defer></script>
-<script src="/_vercel/insights/script.js" defer></script>
-<script>
-// Sidebar: View My Listing + Logout handlers
-(function(){
-  function attach(){
-    var view = document.getElementById('qaViewListing');
-    if (view && !view._wired){
-      view._wired = true;
-      view.addEventListener('click', function(e){
-        e.preventDefault();
-        var biz = (window.MY_BUSINESS || window.biz);
-        if (biz && biz.slug){
-          window.open('/business.html?slug=' + encodeURIComponent(biz.slug), '_blank');
-        } else {
-          alert('Your listing link is not ready yet. Please refresh.');
-        }
-      });
-    }
-    var lo = document.getElementById('qaLogout');
-    if (lo && !lo._wired){
-      lo._wired = true;
-      lo.addEventListener('click', async function(e){
-        e.preventDefault();
-        if (!confirm('Logout from your dashboard?')) return;
-        try {
-          if (window.ShopDB && ShopDB.client) await ShopDB.client.auth.signOut();
-        } catch(_){}
-        try { localStorage.removeItem('dukanlist.session'); } catch(_){}
-        location.href = '/panel/login.html';
-      });
-    }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach);
-  else attach();
-  // Re-attach after delayed renders
-  setTimeout(attach, 1500);
-})();
-</script>
-
-<!-- Fullscreen preview modal -->
-<div class="ps-fs-modal" id="psFsModal">
-  <button type="button" class="ps-fs-close" id="psFsClose">✕</button>
-  <canvas id="psFsCanvas" width="1080" height="1080"></canvas>
-</div>
-</body>
-</html>
+<script src="/_vercel/insig
