@@ -813,6 +813,14 @@ function _renderResultsInner(){
   rows = applySort(rows);
 
   countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>shop${rows.length===1?'':'s'} found</span><span data-i18n-hi>लिस्टिंग मिली</span>`;
+  // db/117 — log every search (esp. zero-result) for admin "Lost Searches"
+  try {
+    const q = (document.getElementById('q')?.value || '').trim() || (new URLSearchParams(location.search).get('q') || '').trim();
+    const citySlug = (new URLSearchParams(location.search).get('city') || '').trim() || null;
+    if (q && q.length >= 2 && ShopDB && ShopDB.client) {
+      ShopDB.client.rpc('log_search', { p_query: q, p_city_slug: citySlug, p_result_count: rows.length }).catch(()=>{});
+    }
+  } catch(_){}
   if (OPEN_NOW && filteredOutByOpen > 0){
     hint.textContent = '(' + filteredOutByOpen + ' hidden — closed)';
   } else {
