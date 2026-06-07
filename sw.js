@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.7.3';  // bumped — Email-verify celebration banner + pending list email-match fallback
+const VERSION    = 'dukan-v1.7.4';  // bumped — Apple-style pending card + Fancy Lights & Home Decor categories
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

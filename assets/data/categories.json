@@ -242,6 +242,20 @@
           "icon": "💡"
         },
         {
+          "slug": "fancy-lights",
+          "name": "Fancy Lights",
+          "name_hi": "फैंसी लाइट्स",
+          "icon": "✨",
+          "keywords": ["chandelier","decorative lights","fairy lights","ceiling lights","wall lights","jhumar","pendant light","designer light","party lights","string lights","झूमर","फैंसी लाइट"]
+        },
+        {
+          "slug": "home-decor",
+          "name": "Home Decor",
+          "name_hi": "होम डेकोर",
+          "icon": "🖼️",
+          "keywords": ["wall art","showpiece","vase","wallpaper","curtains","cushion","rugs","carpets","artificial plants","decoration items","interior items","wall hanging","photo frame","gift items","होम डेकोर","सजावट"]
+        },
+        {
           "slug": "solar-inverter",
           "name": "Solar / Inverter / Battery",
           "name_hi": "सोलर / इन्वर्टर",
