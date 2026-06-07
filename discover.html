@@ -239,6 +239,74 @@
     100%{ opacity:0; transform:translateX(-50%) translateY(-55px) scale(1) }
   }
 
+  /* ===== FULL-SCREEN LOVE CELEBRATION ===== */
+  .love-celebration{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:9999;
+    overflow:hidden;
+  }
+  .love-celebration .center-emoji{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    font-size:140px;
+    animation:centerPop 1s cubic-bezier(.2,.85,.3,1.3) forwards;
+    filter:drop-shadow(0 8px 30px rgba(239,68,68,.8));
+  }
+  @keyframes centerPop{
+    0%   { opacity:0; transform:translate(-50%,-50%) scale(0)    rotate(-180deg) }
+    35%  { opacity:1; transform:translate(-50%,-50%) scale(1.5)  rotate(20deg) }
+    55%  { opacity:1; transform:translate(-50%,-50%) scale(.9)   rotate(-8deg) }
+    80%  { opacity:1; transform:translate(-50%,-50%) scale(1.15) rotate(0) }
+    100% { opacity:0; transform:translate(-50%,-110%) scale(.6)   rotate(0) }
+  }
+
+  .love-celebration .big-text{
+    position:absolute;
+    left:50%; top:65%;
+    transform:translate(-50%, 0);
+    font-size:46px;
+    font-weight:900;
+    color:#FBBF24;
+    text-shadow:0 4px 16px rgba(0,0,0,.8), 0 0 30px rgba(239,68,68,.6);
+    letter-spacing:.05em;
+    font-family:'Manrope',sans-serif;
+    animation:bigTextFloat 1.3s ease-out forwards;
+    white-space:nowrap;
+  }
+  @keyframes bigTextFloat{
+    0%   { opacity:0; transform:translate(-50%, 30px) scale(.5) }
+    20%  { opacity:1; transform:translate(-50%, 0)    scale(1.2) }
+    45%  { opacity:1; transform:translate(-50%, -5px) scale(1)   }
+    100% { opacity:0; transform:translate(-50%, -60px) scale(.95) }
+  }
+
+  /* Confetti shower */
+  .love-celebration .confetti{
+    position:absolute;
+    width:12px; height:12px;
+    animation:confettiFly 1.6s cubic-bezier(.1,.7,.4,1) forwards;
+    box-shadow:0 0 6px currentColor;
+  }
+  @keyframes confettiFly{
+    0%   { opacity:1; transform:translate(0,0) rotate(0) scale(1) }
+    100% { opacity:0; transform:translate(var(--cx),var(--cy)) rotate(720deg) scale(.4) }
+  }
+
+  /* Background flash */
+  .love-celebration::before{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(circle at center, rgba(239,68,68,.25) 0%, transparent 60%);
+    animation:bgFlash .8s ease-out forwards;
+  }
+  @keyframes bgFlash{
+    0%   { opacity:0 }
+    20%  { opacity:1 }
+    100% { opacity:0 }
+  }
+
   /* Main CTA buttons */
   .cta-row{
     position:absolute; bottom:24px; left:18px; right:78px;
@@ -511,6 +579,44 @@ function getLoveSessionId(){
 // Track which shops user already loved this device (UX feedback)
 function getLovedSet(){ try { return new Set(JSON.parse(localStorage.getItem('dl_loved')||'[]')); } catch(_){ return new Set(); } }
 function markLoved(id){ try { var s = getLovedSet(); s.add(id); localStorage.setItem('dl_loved', JSON.stringify(Array.from(s))); } catch(_){} }
+function unmarkLoved(id){ try { var s = getLovedSet(); s.delete(id); localStorage.setItem('dl_loved', JSON.stringify(Array.from(s))); } catch(_){} }
+
+// FULL-SCREEN celebration when user likes a shop — big 🔥 + LOVED + confetti
+function showFullScreenLove(){
+  var overlay = document.createElement('div');
+  overlay.className = 'love-celebration';
+  // Center 🔥
+  var center = document.createElement('div');
+  center.className = 'center-emoji';
+  center.textContent = '🔥';
+  overlay.appendChild(center);
+  // Big floating text
+  var text = document.createElement('div');
+  text.className = 'big-text';
+  text.textContent = 'LOVED!';
+  overlay.appendChild(text);
+  // Confetti shower
+  var colors = ['#FBBF24','#F59E0B','#FB923C','#F472B6','#EF4444','#FDE68A','#FB7185','#A855F7','#10B981','#3B82F6'];
+  for (var i = 0; i < 36; i++){
+    var c = document.createElement('div');
+    c.className = 'confetti';
+    var startX = 35 + Math.random() * 30; // start near center
+    var startY = 35 + Math.random() * 30;
+    c.style.left = startX + '%';
+    c.style.top  = startY + '%';
+    c.style.background = colors[i % colors.length];
+    c.style.color = colors[i % colors.length];
+    c.style.borderRadius = (Math.random() < .5 ? '50%' : '2px');
+    var ang = Math.random() * Math.PI * 2;
+    var dist = 250 + Math.random() * 350;
+    c.style.setProperty('--cx', Math.cos(ang) * dist + 'px');
+    c.style.setProperty('--cy', Math.sin(ang) * dist + 'px');
+    c.style.animationDelay = (Math.random() * 0.15) + 's';
+    overlay.appendChild(c);
+  }
+  document.body.appendChild(overlay);
+  setTimeout(function(){ overlay.remove(); }, 1800);
+}
 
 function spawnLoveSparkles(btn){
   var burst = document.createElement('div');
@@ -543,39 +649,62 @@ function spawnPlus1(btn){
 async function bumpLove(btn){
   var bizId = btn.getAttribute('data-id');
   if (!bizId) return;
-  if (getLovedSet().has(bizId)){
-    showToast('Already loved 🔥 — share to grow this shop!');
-    // Mini pulse just to confirm tap landed
-    btn.classList.remove('loved'); void btn.offsetWidth; btn.classList.add('loved');
-    return;
-  }
-  // Haptic feedback (phone vibration if supported)
-  try { if (navigator.vibrate) navigator.vibrate([30, 20, 50]); } catch(_){}
-  // Optimistic UI — restart animation reliably
-  btn.classList.remove('loved'); void btn.offsetWidth; btn.classList.add('loved');
-  spawnLoveSparkles(btn);
-  spawnPlus1(btn);
+  var wasLoved = getLovedSet().has(bizId);
   var countEl = btn.querySelector('.love-count');
   var current = parseInt(btn.getAttribute('data-count') || '0', 10);
-  var optimistic = current + 1;
-  btn.setAttribute('data-count', optimistic);
-  if (countEl){
-    countEl.textContent = optimistic;
-    // Restart count bump animation
-    countEl.style.animation = 'none'; void countEl.offsetWidth; countEl.style.animation = '';
+
+  // Haptic — light tap on unlike, strong on like
+  try {
+    if (navigator.vibrate) navigator.vibrate(wasLoved ? [25] : [30, 20, 80]);
+  } catch(_){}
+
+  if (wasLoved) {
+    // === UNLIKE ===
+    btn.classList.remove('loved');
+    unmarkLoved(bizId);
+    var down = Math.max(current - 1, 0);
+    btn.setAttribute('data-count', down);
+    if (countEl){
+      countEl.textContent = down;
+      countEl.style.animation = 'none'; void countEl.offsetWidth; countEl.style.animation = '';
+    }
+    showToast('💔 Like removed');
+  } else {
+    // === LIKE — full celebration ===
+    btn.classList.remove('loved'); void btn.offsetWidth; btn.classList.add('loved');
+    spawnLoveSparkles(btn);
+    spawnPlus1(btn);
+    showFullScreenLove();   // <— big screen celebration!
+    var up = current + 1;
+    btn.setAttribute('data-count', up);
+    if (countEl){
+      countEl.textContent = up;
+      countEl.style.animation = 'none'; void countEl.offsetWidth; countEl.style.animation = '';
+    }
+    markLoved(bizId);
+    showToast('🔥 Loved! Share to grow this shop');
   }
-  markLoved(bizId);
-  // Server call
+
+  // Server: toggle
   try {
     var sid = getLoveSessionId();
-    var r = await ShopDB.client.rpc('bump_shop_like', { p_business_id: bizId, p_session_id: sid });
-    if (!r.error && typeof r.data === 'number'){
-      btn.setAttribute('data-count', r.data);
-      if (countEl) countEl.textContent = r.data;
+    var r = await ShopDB.client.rpc('toggle_shop_like', { p_business_id: bizId, p_session_id: sid });
+    if (!r.error && r.data && typeof r.data === 'object'){
+      // Authoritative state from server
+      var serverCount = parseInt(r.data.count, 10);
+      var serverLiked = !!r.data.liked;
+      btn.setAttribute('data-count', serverCount);
+      if (countEl) countEl.textContent = serverCount;
+      if (serverLiked){
+        btn.classList.add('loved');
+        markLoved(bizId);
+      } else {
+        btn.classList.remove('loved');
+        unmarkLoved(bizId);
+      }
     }
-    showToast('🔥 Loved! Share with friends to grow this shop');
   } catch(e){
-    console.warn('bump_shop_like failed:', e);
+    console.warn('toggle_shop_like failed:', e);
   }
 }
 
