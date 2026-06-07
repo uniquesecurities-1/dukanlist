@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spotlight + Lost Searches — DukanList Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260605">
+<style>
+  body{ font-family:'Manrope',sans-serif; background:#F8FAFC; color:#0F172A; margin:0 }
+  .nav{ background:linear-gradient(135deg,#0F172A,#1E3A8A); color:#fff; padding:12px 24px; display:flex; align-items:center; gap:18px }
+  .nav a{ color:#FCD34D; text-decoration:none; font-weight:700; font-size:14px }
+  .nav .brand{ font-weight:900; font-size:16px; color:#fff }
+  .wrap{ max-width:1200px; margin:24px auto; padding:0 20px }
+  h1{ font-size:22px; font-weight:900; margin:0 0 4px }
+  .sub{ font-size:13px; color:#64748b; margin-bottom:22px }
+
+  .tabs{ display:flex; gap:8px; margin-bottom:18px; border-bottom:2px solid #E2E8F0 }
+  .tab{ background:none; border:0; padding:10px 16px; font:inherit; font-weight:800; color:#64748b; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; font-size:14px }
+  .tab.active{ color:#0F172A; border-bottom-color:#1E3A8A }
+
+  .card{ background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:20px; margin-bottom:14px }
+  .card h2{ font-size:15px; font-weight:800; margin:0 0 14px; display:flex; align-items:center; gap:8px }
+
+  .spotlight-current{ background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%); border:1.5px solid #F59E0B; border-radius:14px; padding:18px; margin-bottom:16px; display:flex; gap:14px; align-items:center }
+  .spotlight-current .sc-photo{ width:64px; height:64px; border-radius:50%; background:#fff; overflow:hidden; flex-shrink:0; border:3px solid #F59E0B }
+  .spotlight-current .sc-photo img{ width:100%;height:100%;object-fit:cover }
+  .spotlight-current .sc-info{ flex:1 }
+  .spotlight-current h3{ margin:0; font-size:18px; font-weight:900; color:#78350F }
+  .spotlight-current .sc-meta{ font-size:12px; color:#92400E; font-weight:600; margin-top:2px }
+  .spotlight-current .sc-reason{ font-size:13px; color:#451A03; margin-top:6px; font-style:italic }
+
+  .search-box{ display:flex; gap:8px; margin-bottom:12px }
+  .search-box input{ flex:1; padding:11px 14px; border:1.5px solid #CBD5E1; border-radius:8px; font:inherit; font-size:14px }
+  .search-box input:focus{ outline:0; border-color:#1E3A8A }
+  .btn{ background:#1E3A8A; color:#fff; border:0; padding:11px 18px; border-radius:8px; font:inherit; font-weight:800; cursor:pointer; font-size:14px }
+  .btn:hover{ background:#1E40AF }
+  .btn.wa{ background:#25D366 }
+  .btn.wa:hover{ background:#1da851 }
+  .btn:disabled{ opacity:.5; cursor:wait }
+
+  .results{ background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; max-height:300px; overflow-y:auto; margin-bottom:12px }
+  .results.hidden{ display:none }
+  .res-row{ display:flex; gap:10px; padding:9px 12px; border-bottom:1px solid #E2E8F0; cursor:pointer; align-items:center }
+  .res-row:hover{ background:#EEF2FF }
+  .res-photo{ width:36px; height:36px; border-radius:6px; background:#fff; overflow:hidden; flex-shrink:0; border:1px solid #E2E8F0; display:grid; place-items:center; font-size:18px; color:#94a3b8 }
+  .res-photo img{ width:100%;height:100%;object-fit:cover }
+  .res-info{ flex:1; min-width:0 }
+  .res-name{ font-weight:800; font-size:13px; color:#0F172A; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .res-meta{ font-size:11px; color:#64748b }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px }
+  th{ background:#F1F5F9; padding:8px 10px; text-align:left; font-weight:800; color:#475569; font-size:11px; letter-spacing:.04em; text-transform:uppercase; position:sticky; top:0 }
+  td{ padding:10px 10px; border-bottom:1px solid #E2E8F0; vertical-align:top }
+  tr:hover td{ background:#FAFBFC }
+  .pill{ display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:800 }
+  .pill.hi{ background:#FEE2E2; color:#991B1B }
+  .pill.med{ background:#FEF3C7; color:#92400E }
+  .pill.lo{ background:#DBEAFE; color:#1E3A8A }
+
+  .empty{ padding:30px; text-align:center; color:#94a3b8; font-size:14px }
+  .err{ background:#FEE2E2; color:#991B1B; padding:12px 14px; border-radius:8px; font-size:14px; margin-bottom:12px; display:none }
+  .ok{ background:#D1FAE5; color:#065F46; padding:12px 14px; border-radius:8px; font-size:14px; margin-bottom:12px; display:none }
+
+  textarea{ width:100%; padding:11px 14px; border:1.5px solid #CBD5E1; border-radius:8px; font:inherit; font-size:14px; resize:vertical; min-height:60px; box-sizing:border-box }
+  textarea:focus{ outline:0; border-color:#1E3A8A }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/admin/dashboard.html" class="brand">🛡 DukanList Admin</a>
+  <a href="/admin/dashboard.html">← Dashboard</a>
+  <a href="/admin/moderation.html">Moderation</a>
+  <a href="/admin/spotlight.html" style="text-decoration:underline">⭐ Spotlight</a>
+  <a href="/admin/broadcast.html">📢 Broadcast</a>
+</nav>
+
+<div class="wrap">
+  <h1>⭐ Spotlight + 🎯 Lost Searches</h1>
+  <p class="sub">Weekly star pick + zero-result search opportunities — both growth levers in one place.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="spotlight">⭐ Spotlight of the Week</button>
+    <button class="tab" data-tab="lost">🎯 Lost Searches (7d)</button>
+  </div>
+
+  <div id="errBox" class="err"></div>
+  <div id="okBox" class="ok"></div>
+
+  <!-- ===== SPOTLIGHT TAB ===== -->
+  <section id="tabSpotlight">
+    <div class="card">
+      <h2>👑 Current Week's Spotlight</h2>
+      <div id="currentSpot">
+        <div class="empty">Loading…</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>✨ Pick This Week's Spotlight</h2>
+      <div class="search-box">
+        <input type="search" id="shopSearch" placeholder="Search shop by name, mobile, slug...">
+      </div>
+      <div id="searchResults" class="results hidden"></div>
+      <div id="selectedShop" style="display:none;background:#EEF2FF;border:1.5px solid #4338CA;border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-size:11px;color:#4338CA;font-weight:800;text-transform:uppercase;letter-spacing:.04em">Selected</div>
+        <div id="selShopName" style="font-size:15px;font-weight:800;color:#1E3A8A;margin-top:2px"></div>
+        <div id="selShopMeta" style="font-size:12px;color:#475569;margin-top:2px"></div>
+      </div>
+      <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.04em">Why this shop? (optional, shown to customers)</label>
+      <textarea id="pickReason" placeholder="e.g., Quick service • 5.0 rating • Verified by admin team"></textarea>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn" id="setSpotBtn">⭐ Set as This Week's Spotlight</button>
+        <button class="btn wa" id="broadcastBtn" style="display:none">💬 Broadcast to All Shopkeepers</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOST SEARCHES TAB ===== -->
+  <section id="tabLost" style="display:none">
+    <div class="card">
+      <h2>🎯 Customer Demand Gaps · Last 7 Days <span id="lostCount" style="color:#94a3b8;font-weight:500;font-size:13px;margin-left:6px"></span></h2>
+      <p class="sub" style="margin-bottom:14px">These are searches that returned <b>zero results</b>. Each one is a real customer's unmet need — and a shop you could onboard. Click WhatsApp to find a shop offering this service in your network.</p>
+      <div style="max-height:520px;overflow-y:auto;border:1px solid #E2E8F0;border-radius:10px">
+        <table>
+          <thead>
+            <tr>
+              <th>Search Query</th>
+              <th style="width:80px">City</th>
+              <th style="width:60px">Hits</th>
+              <th style="width:110px">Last seen</th>
+              <th style="width:130px">Action</th>
+            </tr>
+          </thead>
+          <tbody id="lostBody">
+            <tr><td colspan="5" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+var SELECTED_BIZ = null;
+
+function showErr(msg){ var e=document.getElementById('errBox'); e.textContent=msg; e.style.display='block'; document.getElementById('okBox').style.display='none'; }
+function showOk(msg){ var o=document.getElementById('okBox'); o.textContent=msg; o.style.display='block'; document.getElementById('errBox').style.display='none'; setTimeout(function(){ o.style.display='none'; }, 5000); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];}); }
+function timeAgo(d){ var diff=(Date.now()-new Date(d).getTime())/1000; if(diff<60) return Math.floor(diff)+'s'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return Math.floor(diff/86400)+'d'; }
+
+// Tab switch
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active');
+    var which = t.dataset.tab;
+    document.getElementById('tabSpotlight').style.display = which==='spotlight'?'block':'none';
+    document.getElementById('tabLost').style.display = which==='lost'?'block':'none';
+    if (which==='lost') loadLostSearches();
+  });
+});
+
+async function init(){
+  var user = await ShopDB.requireAuth();
+  if (!user) return;
+  var c = ShopDB.client;
+  var ia = await c.rpc('is_admin');
+  if (!ia.data){ document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#991B1B"><h2>Admin access required</h2></div>'; return; }
+  loadCurrentSpotlight();
+  setupShopSearch();
+}
+init();
+
+async function loadCurrentSpotlight(){
+  try {
+    var c = ShopDB.client;
+    var r = await c.rpc('get_current_spotlight');
+    var host = document.getElementById('currentSpot');
+    if (r.error || !r.data || r.data.length === 0){
+      host.innerHTML = '<div class="empty">No spotlight set yet for this week. Pick one below 👇</div>';
+      return;
+    }
+    var s = r.data[0];
+    host.innerHTML =
+      '<div class="spotlight-current">' +
+      '  <div class="sc-photo">' + (s.photo ? '<img src="'+esc(s.photo)+'" alt="">' : '🏪') + '</div>' +
+      '  <div class="sc-info">' +
+      '    <h3>' + esc(s.name) + '</h3>' +
+      '    <div class="sc-meta">📍 ' + esc(s.city_name||'') + ' · ' + esc(s.cat_name||'') + ' · ⭐ ' + (s.rating_avg||0).toFixed(1) + ' (' + (s.rating_count||0) + ')</div>' +
+      (s.pick_reason ? '    <div class="sc-reason">"' + esc(s.pick_reason) + '"</div>' : '') +
+      '    <div style="font-size:11px;color:#92400E;font-weight:600;margin-top:6px">Week of ' + new Date(s.week_start).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ' · Free Featured for 30 days</div>' +
+      '  </div>' +
+      '</div>';
+    // Show broadcast button
+    document.getElementById('broadcastBtn').style.display = '';
+    document.getElementById('broadcastBtn').dataset.shop = s.name;
+    document.getElementById('broadcastBtn').dataset.slug = s.slug;
+  } catch(e){ showErr('Failed to load current spotlight: ' + e.message); }
+}
+
+function setupShopSearch(){
+  var input = document.getElementById('shopSearch');
+  var results = document.getElementById('searchResults');
+  var t;
+  input.addEventListener('input', function(){
+    clearTimeout(t);
+    var q = input.value.trim();
+    if (q.length < 2){ results.classList.add('hidden'); return; }
+    t = setTimeout(function(){ runSearch(q); }, 250);
+  });
+}
+
+async function runSearch(q){
+  try {
+    var c = ShopDB.client;
+    var r = await c.rpc('admin_global_search', { p_query: q, p_limit: 8 });
+    var results = document.getElementById('searchResults');
+    if (r.error || !r.data || r.data.length === 0){
+      results.innerHTML = '<div class="empty">No shops found</div>';
+      results.classList.remove('hidden');
+      return;
+    }
+    results.innerHTML = r.data.map(function(b){
+      var photo = (b.photos && b.photos[0]) || '';
+      return '<div class="res-row" data-id="'+b.id+'" data-name="'+esc(b.name||'')+'" data-meta="'+esc((b.city_name||'')+' · '+(b.cat_name||''))+'">'+
+        '<div class="res-photo">'+(photo?'<img src="'+esc(photo)+'">':'🏪')+'</div>'+
+        '<div class="res-info"><div class="res-name">'+esc(b.name||'')+'</div><div class="res-meta">'+esc(b.city_name||'')+' · '+esc(b.cat_name||'')+' · ⭐ '+(b.rating_avg||0).toFixed(1)+'</div></div>'+
+      '</div>';
+    }).join('');
+    results.classList.remove('hidden');
+    results.querySelectorAll('.res-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        SELECTED_BIZ = { id: row.dataset.id, name: row.dataset.name };
+        document.getElementById('selShopName').textContent = row.dataset.name;
+        document.getElementById('selShopMeta').textContent = row.dataset.meta;
+        document.getElementById('selectedShop').style.display = 'block';
+        results.classList.add('hidden');
+        document.getElementById('shopSearch').value = row.dataset.name;
+      });
+    });
+  } catch(e){ showErr('Search failed: ' + e.message); }
+}
+
+document.getElementById('setSpotBtn').addEventListener('click', async function(){
+  if (!SELECTED_BIZ){ showErr('Pehle ek shop search karke select kariye.'); return; }
+  if (!confirm('Set "' + SELECTED_BIZ.name + '" as this week\'s Spotlight?\n\n+ Homepage banner will show this shop\n+ 30 days free Featured boost will be applied\n+ You can broadcast to all shopkeepers from here')) return;
+  var btn = this;
+  btn.disabled = true; btn.textContent = '⏳ Setting…';
+  try {
+    var c = ShopDB.client;
+    var reason = document.getElementById('pickReason').value.trim() || null;
+    var r = await c.rpc('admin_set_spotlight', { p_business_id: SELECTED_BIZ.id, p_reason: reason });
+    if (r.error) throw r.error;
+    showOk('✅ Spotlight set! Homepage banner is now live + Featured boost applied for 30 days.');
+    SELECTED_BIZ = null;
+    document.getElementById('selectedShop').style.display = 'none';
+    document.getElementById('shopSearch').value = '';
+    document.getElementById('pickReason').value = '';
+    loadCurrentSpotlight();
+  } catch(e){ showErr('Failed: ' + (e.message||e)); }
+  finally{ btn.disabled = false; btn.textContent = '⭐ Set as This Week\'s Spotlight'; }
+});
+
+document.getElementById('broadcastBtn').addEventListener('click', function(){
+  var shop = this.dataset.shop;
+  var slug = this.dataset.slug;
+  var msg = '⭐ *Star Shop of the Week*\n\n*' + shop + '* — DukanList ne is week ki star shop chuni hai 🎉\n\n👉 https://dukanlist.com/business?slug=' + slug + '\n\nApne customers ko bhi refer karein! Aap bhi star shop banna chahte hain? Profile complete rakhein + customers ko reviews maange. Aapki shop bhi feature ho sakti hai!\n\n— Team DukanList';
+  // Open Broadcast tool with pre-filled message
+  var url = '/admin/broadcast.html?msg=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+});
+
+async function loadLostSearches(){
+  var body = document.getElementById('lostBody');
+  if (body.dataset.loaded) return;
+  body.innerHTML = '<tr><td colspan="5" class="empty">Loading…</td></tr>';
+  try {
+    var c = ShopDB.client;
+    var r = await c.rpc('admin_lost_searches', { p_days: 7 });
+    if (r.error) throw r.error;
+    var rows = r.data || [];
+    document.getElementById('lostCount').textContent = '(' + rows.length + ' unique queries · ' + rows.reduce(function(a,b){return a + Number(b.hit_count);},0) + ' total hits)';
+    if (rows.length === 0){
+      body.innerHTML = '<tr><td colspan="5" class="empty">No lost searches in last 7 days. Once site gets traffic, zero-result queries will show here.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map(function(r){
+      var cls = r.hit_count >= 5 ? 'hi' : (r.hit_count >= 2 ? 'med' : 'lo');
+      var waText = encodeURIComponent('Namaste! Mai DukanList se hu — Mandi Dabwali / Sirsa ki local directory app. Customers ne aapke service "' + r.query + '" ke liye ' + r.hit_count + ' baar search kiya hai but koi listing nahi hai. Aap ya aap jaise kisi business ko refer karein — free registration. Detail: dukanlist.com');
+      return '<tr>' +
+        '<td><b style="font-size:14px;color:#0F172A">' + esc(r.query) + '</b></td>' +
+        '<td style="color:#64748b">' + esc(r.city_slug || '—') + '</td>' +
+        '<td><span class="pill ' + cls + '">' + r.hit_count + 'x</span></td>' +
+        '<td style="color:#64748b">' + timeAgo(r.last_seen) + ' ago</td>' +
+        '<td><a href="https://wa.me/?text=' + waText + '" target="_blank" class="btn wa" style="padding:6px 10px;font-size:12px;text-decoration:none;display:inline-block">💬 Share</a></td>' +
+      '</tr>';
+    }).join('');
+    body.dataset.loaded = '1';
+  } catch(e){ body.innerHTML = '<tr><td colspan="5" class="empty" style="color:#991B1B">Error: ' + esc(e.message||e) + '. Make sure db/117 has been run.</td></tr>'; }
+}
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>

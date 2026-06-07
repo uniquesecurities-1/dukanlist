@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0F172A">
+<title>Discover Shops — DukanList</title>
+<meta name="description" content="Swipe through local shops, restaurants, and services in your city. TikTok-style discovery for Bharat.">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{ height:100%; overflow:hidden; font-family:'Manrope',sans-serif; background:#0F172A; color:#fff; overscroll-behavior:none }
+  .feed{
+    height:100vh; height:100dvh;
+    overflow-y:scroll; scroll-snap-type:y mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .feed::-webkit-scrollbar{ display:none }
+
+  .card{
+    height:100vh; height:100dvh;
+    scroll-snap-align:start; scroll-snap-stop:always;
+    position:relative; overflow:hidden;
+    background:#0F172A;
+  }
+  .card .bg{
+    position:absolute; inset:0;
+    background-size:cover; background-position:center;
+    filter:brightness(.6);
+    transition:transform .6s ease;
+  }
+  .card.no-photo .bg{ background:linear-gradient(135deg,#1E3A8A,#7C3AED) }
+
+  .card .gradient{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(15,23,42,.95) 0%, rgba(15,23,42,.5) 35%, rgba(15,23,42,0) 70%);
+    pointer-events:none;
+  }
+
+  .card .top{
+    position:absolute; top:env(safe-area-inset-top, 12px); left:14px; right:14px;
+    display:flex; align-items:center; justify-content:space-between; z-index:2;
+  }
+  .card .top .logo{
+    background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
+    border-radius:99px; padding:5px 11px;
+    font-size:12px; font-weight:800;
+    color:#fff;
+  }
+  .card .top .logo em{ color:#FBBF24; font-style:normal }
+  .card .top a{
+    color:#fff; text-decoration:none; font-size:11px; font-weight:700;
+    background:rgba(255,255,255,.12); padding:5px 11px; border-radius:99px; backdrop-filter:blur(10px);
+  }
+
+  .card .body{
+    position:absolute; bottom:0; left:0; right:0;
+    padding:0 18px 92px;
+    z-index:2;
+  }
+  .card .badges{
+    display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;
+  }
+  .badge{
+    background:rgba(255,255,255,.15); backdrop-filter:blur(10px);
+    padding:3px 9px; border-radius:99px; font-size:11px; font-weight:700;
+    color:#fff;
+  }
+  .badge.verified{ background:rgba(245,158,11,.25); color:#FBBF24; border:1px solid rgba(245,158,11,.4) }
+  .badge.open{ background:rgba(16,185,129,.25); color:#6EE7B7; border:1px solid rgba(16,185,129,.4) }
+  .badge.walkins{ background:rgba(236,72,153,.25); color:#FBCFE8; border:1px solid rgba(236,72,153,.4) }
+
+  .card h2{
+    font-family:'Manrope',sans-serif;
+    font-size:28px; font-weight:900; line-height:1.05;
+    letter-spacing:-.02em; margin-bottom:6px;
+    text-shadow:0 2px 8px rgba(0,0,0,.4);
+  }
+  .card .meta{
+    font-size:14px; font-weight:700; color:rgba(255,255,255,.85); margin-bottom:8px;
+  }
+  .card .usp{
+    font-size:14px; line-height:1.45;
+    color:rgba(255,255,255,.94); margin-bottom:6px;
+    background:rgba(255,255,255,.08); border-left:3px solid rgba(251,191,36,.7);
+    padding:8px 10px; border-radius:6px;
+    backdrop-filter:blur(6px);
+    max-width:84%;
+    font-style:italic;
+  }
+  .card .addr{
+    font-size:12px; color:rgba(255,255,255,.7); margin-bottom:14px;
+    display:flex; align-items:center; gap:5px;
+  }
+
+  /* Right rail action buttons */
+  .actions{
+    position:absolute; right:12px; bottom:110px;
+    display:flex; flex-direction:column; gap:14px; z-index:3;
+  }
+  .act{
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.18);
+    display:grid; place-items:center;
+    font-size:22px; color:#fff;
+    cursor:pointer; transition:.15s;
+    text-decoration:none;
+  }
+  .act:active{ transform:scale(.9) }
+  .act:hover{ background:rgba(255,255,255,.22) }
+  .act.call{ background:linear-gradient(135deg,#10B981,#059669); border-color:transparent }
+  .act.wa{ background:linear-gradient(135deg,#25D366,#1da851); border-color:transparent }
+  .act .lbl{
+    position:absolute; bottom:-16px; font-size:9px; color:#fff; font-weight:800;
+    white-space:nowrap; text-shadow:0 1px 3px rgba(0,0,0,.6); letter-spacing:.04em;
+  }
+  .act .heart-fill{ display:none }
+  .act.faved .heart-fill{ display:inline }
+  .act.faved .heart-out{ display:none }
+  .act.faved{ background:linear-gradient(135deg,#EF4444,#DC2626); border-color:transparent }
+
+  /* Main CTA buttons */
+  .cta-row{
+    position:absolute; bottom:24px; left:18px; right:78px;
+    display:flex; gap:10px; z-index:3;
+  }
+  .cta{
+    flex:1; padding:13px; border-radius:14px;
+    background:#fff; color:#0F172A;
+    font-weight:800; font-size:14px;
+    text-decoration:none; text-align:center;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    box-shadow:0 6px 18px rgba(0,0,0,.3);
+  }
+  .cta.primary{
+    background:linear-gradient(135deg,#FBBF24,#F59E0B);
+    color:#78350F;
+  }
+
+  /* Loading + empty states */
+  .center{
+    height:100vh; display:grid; place-items:center;
+    color:#94a3b8; font-size:14px;
+  }
+  .spinner{
+    width:36px; height:36px; border:3px solid rgba(255,255,255,.18);
+    border-top-color:#FBBF24; border-radius:50%;
+    animation:spin .9s linear infinite;
+    margin:0 auto 12px;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg) } }
+
+  /* Swipe hint (only first card, fades out) */
+  .swipe-hint{
+    position:absolute; bottom:160px; left:50%; transform:translateX(-50%);
+    color:rgba(255,255,255,.85); font-size:12px; font-weight:700;
+    background:rgba(0,0,0,.4); padding:8px 14px; border-radius:99px;
+    backdrop-filter:blur(8px);
+    animation:bounce 1.6s infinite;
+    pointer-events:none; z-index:4;
+  }
+  @keyframes bounce{
+    0%,100%{ transform:translateX(-50%) translateY(0) }
+    50%{ transform:translateX(-50%) translateY(-8px) }
+  }
+  .swipe-hint.hide{ opacity:0; transition:opacity .4s }
+
+  html[data-lang="hi"] body, html[data-lang="hi"] .card h2, html[data-lang="hi"] .card .meta{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen" class="center">
+  <div>
+    <div class="spinner"></div>
+    <div style="color:#cbd5e1;font-weight:700">Loading shops near you…</div>
+  </div>
+</div>
+
+<div id="feed" class="feed" style="display:none"></div>
+
+<div id="emptyScreen" class="center" style="display:none">
+  <div style="text-align:center;padding:0 24px">
+    <div style="font-size:48px;margin-bottom:14px">🏪</div>
+    <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops yet in this view</h2>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try searching for what you need or browse by category.</p>
+    <a href="/" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none">← Back to Home</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];}); }
+function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_favs')||'[]'); } catch(_){return []} }
+function setFavs(a){ try { localStorage.setItem('dl_favs', JSON.stringify(a)); } catch(_){} }
+function isFav(id){ return getFavs().indexOf(id) > -1 }
+function toggleFav(id){ var f=getFavs(); var i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); setFavs(f); return f.indexOf(id)>-1 }
+
+async function init(){
+  try {
+    var c = ShopDB.client;
+    // Pull a randomised mix of recent active shops
+    var r = await c.from('businesses')
+      .select('id, slug, name, photos, mobile, whatsapp, usp_text, address_line1, pincode, rating_avg, rating_count, verified_score, walk_ins_today, sub_category_id, category_id, city_id, hours_json')
+      .eq('status', 'active')
+      .order('updated_at', { ascending: false })
+      .limit(40);
+    if (r.error) throw r.error;
+    var rows = r.data || [];
+    if (rows.length === 0){
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('emptyScreen').style.display = '';
+      return;
+    }
+    // Shuffle for fun
+    rows = rows.sort(function(){ return Math.random() - 0.5; });
+
+    // Look up city + cat names in batch
+    var cityIds = [...new Set(rows.map(function(r){return r.city_id}).filter(Boolean))];
+    var catIds  = [...new Set(rows.map(function(r){return r.sub_category_id || r.category_id}).filter(Boolean))];
+    var cityMap = {}, catMap = {};
+    if (cityIds.length){
+      var cr = await c.from('geo_cities').select('id,name').in('id', cityIds);
+      (cr.data||[]).forEach(function(x){ cityMap[x.id] = x.name; });
+    }
+    if (catIds.length){
+      var kr = await c.from('categories').select('id,name,icon').in('id', catIds);
+      (kr.data||[]).forEach(function(x){ catMap[x.id] = x; });
+    }
+
+    // Render cards
+    var html = rows.map(function(b, idx){
+      var photo = (b.photos && b.photos[0]) || '';
+      var cat = catMap[b.sub_category_id || b.category_id] || {};
+      var city = cityMap[b.city_id] || '';
+      var verified = b.verified_score >= 1;
+      var rating = (b.rating_avg||0).toFixed(1);
+      var rc = b.rating_count || 0;
+      var fav = isFav(b.id);
+      var walks = b.walk_ins_today || 0;
+      var addrShort = (b.address_line1 || '').split(',')[0] || city;
+      return ''+
+      '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'">'+
+        '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
+        '<div class="gradient"></div>'+
+        '<div class="top">'+
+          '<div class="logo">Dukan<em>List</em></div>'+
+          '<a href="/">← Home</a>'+
+        '</div>'+
+        '<div class="body">'+
+          '<div class="badges">'+
+            (cat.icon ? '<span class="badge">'+cat.icon+' '+esc(cat.name||'')+'</span>' : '')+
+            (verified ? '<span class="badge verified">✓ Verified</span>' : '')+
+            (rc > 0 ? '<span class="badge">⭐ '+rating+' ('+rc+')</span>' : '')+
+            (walks > 0 ? '<span class="badge walkins">🚶 '+walks+' today</span>' : '')+
+          '</div>'+
+          '<h2>'+esc(b.name||'')+'</h2>'+
+          (city ? '<div class="meta">📍 '+esc(city)+'</div>' : '')+
+          (b.usp_text ? '<div class="usp">"'+esc(b.usp_text.slice(0,140))+(b.usp_text.length>140?'…':'')+'"</div>' : '')+
+          (addrShort && addrShort!==city ? '<div class="addr">📌 '+esc(addrShort)+'</div>' : '')+
+        '</div>'+
+        '<div class="actions">'+
+          '<div class="act fav '+(fav?'faved':'')+'" data-id="'+b.id+'">'+
+            '<span class="heart-out">🤍</span><span class="heart-fill">❤️</span>'+
+            '<span class="lbl">Save</span>'+
+          '</div>'+
+          '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'">📤<span class="lbl">Share</span></div>'+
+          (b.mobile ? '<a class="act call" href="tel:'+esc(b.mobile)+'">📞<span class="lbl">Call</span></a>' : '')+
+          (b.whatsapp || b.mobile ? '<a class="act wa" href="https://wa.me/91'+esc((b.whatsapp||b.mobile).replace(/\\D/g,\"\"))+'" target="_blank">💬<span class="lbl">Chat</span></a>' : '')+
+        '</div>'+
+        '<div class="cta-row">'+
+          '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Shop →</a>'+
+        '</div>'+
+        (idx===0 ? '<div class="swipe-hint" id="swipeHint">⬆️ Swipe up for next</div>' : '')+
+      '</div>';
+    }).join('');
+
+    var feed = document.getElementById('feed');
+    feed.innerHTML = html;
+    document.getElementById('loadingScreen').style.display = 'none';
+    feed.style.display = '';
+
+    // Wire favorites
+    feed.querySelectorAll('.act.fav').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        var on = toggleFav(btn.dataset.id);
+        btn.classList.toggle('faved', on);
+      });
+    });
+    // Wire share
+    feed.querySelectorAll('.act.share').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        var name = btn.dataset.name;
+        var slug = btn.dataset.slug;
+        var url  = location.origin + '/business.html?slug=' + slug;
+        var msg  = name + '\\n' + url + '\\n\\nDukanList par mila — Bharat ki local directory.';
+        if (navigator.share){
+          navigator.share({ title:name, text:msg, url:url }).catch(function(){});
+        } else {
+          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+        }
+      });
+    });
+
+    // Hide swipe hint after first scroll
+    feed.addEventListener('scroll', function(){
+      var h = document.getElementById('swipeHint');
+      if (h) h.classList.add('hide');
+    }, { once:true });
+
+  } catch(e){
+    document.getElementById('loadingScreen').innerHTML = '<div style="color:#FCA5A5;text-align:center;padding:24px"><h2>Could not load shops</h2><p style="margin-top:8px;font-size:13px">'+(e.message||e)+'</p><a href="/" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:10px 16px;border-radius:8px;font-weight:800;text-decoration:none">← Back</a></div>';
+  }
+}
+init();
+</script>
+
+</body>
+</html>
