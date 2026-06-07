@@ -686,4 +686,106 @@ function renderFiltered(){
         void btn.offsetWidth;
         btn.classList.add('faved');
         spawnHeartBurst(btn);
-   
+      }
+      showToast(on ? '❤️ Saved' : '💔 Removed');
+    });
+  });
+  feed.querySelectorAll('.act').forEach(function(btn){
+    btn.addEventListener('pointerdown', function(){
+      btn.classList.remove('tapped');
+      void btn.offsetWidth;
+      btn.classList.add('tapped');
+    });
+  });
+
+  feed.querySelectorAll('.act.share').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var name = btn.getAttribute('data-name') || '';
+      var slug = btn.getAttribute('data-slug') || '';
+      var url  = location.origin + '/business.html?slug=' + slug;
+      var msg  = name + '\n' + url + '\n\nFound on DukanList — Bharat ki local directory.';
+      if (navigator.share){
+        navigator.share({ title:name, text:msg, url:url }).catch(function(){});
+      } else {
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+      }
+    });
+  });
+
+  feed.addEventListener('scroll', function(){
+    var h = document.getElementById('swipeHint');
+    if (h) h.classList.add('hide');
+  }, { once:true });
+
+  var cards = feed.querySelectorAll('.card');
+  for (var i = 1; i <= 3 && i < cards.length; i++){
+    var bg = cards[i].querySelector('.bg');
+    var style = bg && bg.getAttribute('style') || '';
+    var m = style.match(/url\(([^)]+)\)/);
+    if (m){ var img = new Image(); img.src = m[1]; }
+  }
+
+  // Track whether the user has interacted (touched the feed)
+  var _hasInteracted = false;
+  var _firstActivation = true;
+  var _lastActiveIdx = -1;
+  function unlockAudio(){
+    _hasInteracted = true;
+    try { var c = getAudioCtx(); if (c && c.state === 'suspended') c.resume(); } catch(_){}
+  }
+  feed.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
+  feed.addEventListener('wheel',      unlockAudio, { passive: true, once: true });
+  feed.addEventListener('scroll',     unlockAudio, { passive: true, once: true });
+
+  if ('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.intersectionRatio > 0.5){
+          en.target.classList.add('active');
+          var idx = parseInt(en.target.getAttribute('data-idx') || '0', 10);
+          if (!_firstActivation && _hasInteracted && idx !== _lastActiveIdx){
+            playSwipeSound();
+          }
+          _firstActivation = false;
+          _lastActiveIdx = idx;
+          var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
+          if (nxt){
+            var bg2 = nxt.querySelector('.bg');
+            var style2 = bg2 && bg2.getAttribute('style') || '';
+            var m2 = style2.match(/url\(([^)]+)\)/);
+            if (m2){ var im = new Image(); im.src = m2[1]; }
+          }
+        }
+      });
+    }, { root: feed, threshold: [0.5] });
+    cards.forEach(function(card){ obs.observe(card); });
+    if (cards[0]) cards[0].classList.add('active');
+  } else {
+    cards.forEach(function(card){ card.classList.add('active'); });
+  }
+}
+
+function spawnHeartBurst(btn){
+  var burst = document.createElement('div');
+  burst.className = 'heart-burst';
+  var colors = ['#fda4af','#fbbf24','#f472b6','#a78bfa','#fde68a','#86efac'];
+  for (var i = 0; i < 8; i++){
+    var s = document.createElement('span');
+    var angle = (i / 8) * Math.PI * 2;
+    var dist = 32 + Math.random() * 14;
+    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    s.style.background = colors[i % colors.length];
+    s.style.animationDelay = (Math.random() * 0.05) + 's';
+    burst.appendChild(s);
+  }
+  btn.appendChild(burst);
+  setTimeout(function(){ burst.remove(); }, 800);
+}
+
+init();
+</script>
+
+</body>
+</html>
