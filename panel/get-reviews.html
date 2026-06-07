@@ -496,18 +496,19 @@ async function loadBiz(){
   }
 
   const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, name_hi, rating, rating_count').eq('id', bizId).maybeSingle();
+    .select('id, slug, name, name_hi, rating_avg, rating_count').eq('id', bizId).maybeSingle();
   if (error || !biz){
-    document.getElementById('loading').innerHTML = '⚠ Could not load your shop.';
+    console.error('[get-reviews] biz fetch err', error);
+    document.getElementById('loading').innerHTML = '⚠ Could not load your shop. <a href="/panel/dashboard.html" style="color:#FF6B1A;font-weight:700;text-decoration:underline">Go to Dashboard</a>';
     return;
   }
 
   MY_BIZ = biz;
-  SHOP_URL_BASE = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug);
-  SHOP_URL = SHOP_URL_BASE + '&review=1';
+  SHOP_URL_BASE = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug || biz.id);
+  SHOP_URL = SHOP_URL_BASE + (SHOP_URL_BASE.indexOf('?') >= 0 ? '&' : '?') + 'review=1';
 
   // Stats
-  document.getElementById('statRating').textContent = biz.rating ? (Number(biz.rating).toFixed(1) + '★') : '—';
+  document.getElementById('statRating').textContent = biz.rating_avg ? (Number(biz.rating_avg).toFixed(1) + '★') : '—';
   document.getElementById('statCount').textContent  = biz.rating_count || 0;
 
   // This-month reviews

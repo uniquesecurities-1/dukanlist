@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.7.5';  // bumped — Get Reviews page (QR+WA+counter card) + QR library hotfix
+const VERSION    = 'dukan-v1.7.6';  // bumped — Get Reviews hotfix: column rating_avg (not rating)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
