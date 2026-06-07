@@ -198,7 +198,7 @@ async function renderHomepageCarousel(targetId, supaClient, citySlug){
       '<div class="db-home">' +
       '  <div class="db-home-label">' +
       '    <span class="db-home-emoji">⚡</span>' +
-      '    <span>Today\\'s Buzz</span>' +
+      '    <span>Today&#39;s Buzz</span>' +
       '    <span class="db-home-count">' + items.length + ' active</span>' +
       '  </div>' +
       '  <div class="db-home-scroll">' +
@@ -311,4 +311,4 @@ global.DailyBuzz = {
   GRADIENTS
 };
 
-})(window);
+})(window)
