@@ -83,17 +83,23 @@ function requestLocation(){
 
 // ─── Call RPC and render results ─────────────────────────────
 async function fetchNearby(coords, radiusKm){
-  if (!global.ShopDB || !ShopDB.client) return { items: [], count: 0 };
+  if (!global.ShopDB || !ShopDB.client) return { items: [], count: 0, error: 'init' };
   try {
-    const { data, error } = await ShopDB.client.rpc('get_open_shops_near', {
+    // Timeout the RPC at 12s to prevent indefinite stuck state
+    const rpcPromise = ShopDB.client.rpc('get_open_shops_near', {
       p_lat:       coords.lat,
       p_lng:       coords.lng,
       p_radius_km: radiusKm || 3,
       p_limit:     8
     });
-    if (error || !data) return { items: [], count: 0 };
+    const timeoutPromise = new Promise((resolve) =>
+      setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), 12000)
+    );
+    const { data, error } = await Promise.race([rpcPromise, timeoutPromise]);
+    if (error) return { items: [], count: 0, error: error.message || 'rpc_error' };
+    if (!data) return { items: [], count: 0 };
     return data;
-  } catch(_){ return { items: [], count: 0 }; }
+  } catch(e){ return { items: [], count: 0, error: (e && e.message) || 'exception' }; }
 }
 
 // ─── Render widget into container ────────────────────────────
@@ -128,117 +134,45 @@ async function renderWidget(containerId, opts){
     currentCoords = coords;
     btn.disabled = true;
     btn.textContent = 'Finding…';
-    results.innerHTML = '<div class="ony-empty" style="opacity:.6">Searching ' + radius + ' km radius…</div>';
+    // Build searching state with a Cancel/Reset option so user is NEVER fully stuck
+    results.innerHTML =
+      '<div class="ony-empty" style="opacity:.85">' +
+      '  <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:6px">' +
+      '    <span class="ony-spinner" style="display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.15);border-top-color:#2563eb;border-radius:50%;animation:onySpin 0.8s linear infinite"></span>' +
+      '    <span>Searching ' + radius + ' km radius…</span>' +
+      '  </div>' +
+      '  <button type="button" class="ony-stuck-fix" style="background:#f3f4f6;color:#374151;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600;border:0;cursor:pointer">Taking too long? Tap to retry</button>' +
+      '</div>' +
+      '<style>@keyframes onySpin{to{transform:rotate(360deg)}}</style>';
     results.style.display = 'block';
+    const stuckBtn = results.querySelector('.ony-stuck-fix');
+    if (stuckBtn) stuckBtn.addEventListener('click', () => load(currentCoords, currentRadius));
+
     const data = await fetchNearby(coords, radius);
     btn.disabled = false;
     btn.style.display = 'none';
+
+    if (data && data.error) {
+      // Error or timeout — show explicit retry option
+      results.innerHTML =
+        '<div class="ony-empty">' +
+        '  <div style="margin-bottom:10px">Could not load shops (' + (data.error === 'timeout' ? 'timeout — slow network' : 'connection issue') + ').</div>' +
+        '  <button type="button" class="ony-cta ony-retry">🔄 Try Again</button>' +
+        '</div>';
+      const r = results.querySelector('.ony-retry');
+      if (r) r.addEventListener('click', () => load(currentCoords, currentRadius));
+      return;
+    }
+
     if (!data || !data.count) {
       const nextRadius = radius < 5 ? 5 : (radius < 10 ? 10 : (radius < 25 ? 25 : 50));
       const showExpand = radius < 50;
       results.innerHTML =
         '<div class="ony-empty">' +
-        '  <div style="margin-bottom:10px">No open shops within ' + radius + ' km.</div>' +
+        '  <div style="margin-bottom:10px">No open shops within ' + radius + ' km right now.</div>' +
         '  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">' +
         (showExpand
           ? '    <button type="button" class="ony-cta ony-expand" data-r="' + nextRadius + '">🔍 Try ' + nextRadius + ' km</button>'
           : '') +
         '    <button type="button" class="ony-cta ony-refresh" style="background:#f3f4f6;color:#374151">🔄 Refresh</button>' +
-        '  </div>' +
-        '</div>';
-      results.style.display = 'block';
-      const exp = results.querySelector('.ony-expand');
-      const ref = results.querySelector('.ony-refresh');
-      if (exp) exp.addEventListener('click', () => load(currentCoords, Number(exp.getAttribute('data-r')) || nextRadius));
-      if (ref) ref.addEventListener('click', () => load(currentCoords, currentRadius));
-      return;
-    }
-    const headerHtml =
-      '<div class="ony-results-head" style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px 10px;font-size:12px;color:#6b7280">' +
-      '  <span>' + data.count + ' open within ' + radius + ' km</span>' +
-      '  <button type="button" class="ony-refresh" style="background:transparent;border:0;color:#2563eb;font-weight:600;cursor:pointer;font-size:12px">🔄 Refresh</button>' +
-      '</div>';
-    results.innerHTML = headerHtml + (data.items || []).map(renderShopRow).join('');
-    results.style.display = 'block';
-    const ref = results.querySelector('.ony-refresh');
-    if (ref) ref.addEventListener('click', () => load(currentCoords, currentRadius));
-  }
-
-  // Cached coords — skip prompt
-  const cached = getStoredCoords();
-  if (cached && !opts.forcePrompt) {
-    await load(cached);
-    return;
-  }
-
-  if (isDenied()) {
-    // Don't pester the user — hide widget
-    el.style.display = 'none';
-    return;
-  }
-
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    btn.textContent = 'Allow location…';
-    try {
-      const coords = await requestLocation();
-      await load(coords);
-    } catch(err) {
-      btn.disabled = false;
-      btn.textContent = 'Try again';
-      if (err && err.code === 1) {
-        results.innerHTML = '<div class="ony-empty">Location access blocked. Enable in your browser settings to use this.</div>';
-        results.style.display = 'block';
-      }
-    }
-  });
-}
-
-// Normalize Indian mobile to exactly 10 digits (no country code prefix).
-function normIN(raw){
-  var d = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
-  if (!d) return '';
-  if (d.length === 12 && d.charAt(0) === '9' && d.charAt(1) === '1') d = d.slice(2);
-  else if (d.length === 11 && d.charAt(0) === '0') d = d.slice(1);
-  return d.slice(-10);
-}
-
-function renderShopRow(b){
-  const dist = (b.dist_km != null) ? (Number(b.dist_km).toFixed(1) + ' km') : '';
-  const rating = (b.rating_count > 0) ? '⭐ ' + Number(b.rating_avg).toFixed(1) : '';
-  const photo = b.photo
-    ? '<img src="' + escAttr(b.photo) + '" alt="" loading="lazy">'
-    : '<span class="ony-row-emoji">🏪</span>';
-  const phone = normIN(b.mobile);
-  const wa    = normIN(b.whatsapp || b.mobile);
-  const phoneBtn = phone ? '<a class="ony-act call" href="tel:' + escAttr(phone) + '">📞 Call</a>' : '';
-  const waBtn   = wa    ? '<a class="ony-act wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '';
-  return '' +
-    '<a class="ony-row" href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '">' +
-    '  <div class="ony-row-photo">' + photo + '</div>' +
-    '  <div class="ony-row-body">' +
-    '    <div class="ony-row-name">' + escHtml(b.name || '') + '</div>' +
-    '    <div class="ony-row-meta">' +
-    '      <span class="ony-dist">' + escHtml(dist) + ' away</span>' +
-    (rating ? '<span class="ony-rating">' + escHtml(rating) + '</span>' : '') +
-    '    </div>' +
-    '    <div class="ony-row-actions">' + phoneBtn + waBtn + '</div>' +
-    '  </div>' +
-    '</a>';
-}
-
-// ─── helpers ────────────────────────────────────────────────
-function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escAttr(s){ return escHtml(s); }
-
-// ─── Public API ─────────────────────────────────────────────
-global.GeoNearby = {
-  getStoredCoords,
-  storeCoords,
-  requestLocation,
-  fetchNearby,
-  renderWidget,
-  isDenied
-};
-
-})(window);
+        '    <a href="/browse.html" style="background:#FBBF24;color:#78350F;padding:8px 14px;border-radius:99px;font-size:13px;font-weig

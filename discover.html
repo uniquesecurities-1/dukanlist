@@ -522,7 +522,18 @@ function renderFiltered(){
     var rc = b.rating_count || 0;
     var fav = isFav(b.id);
     var walks = b.walk_ins_today || 0;
-    var addrShort = (b.address_line1 || '').split(',')[0] || city;
+    // Build a readable address: prefer 2-3 segments of address_line1, fallback to city
+    var rawAddr = (b.address_line1 || '').trim();
+    var addrShort = '';
+    if (rawAddr){
+      var parts = rawAddr.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      // Skip pure shop/sco numbers as first part (Sco-01, Shop No 5 etc.) — use 2nd onward
+      var firstIsJustNumber = parts[0] && /^(sco|shop|no|h\.?no|plot)[\s\-\.]*\d+$/i.test(parts[0]);
+      var useParts = firstIsJustNumber && parts.length > 1 ? parts.slice(1, 4) : parts.slice(0, 3);
+      addrShort = useParts.join(', ');
+      if (addrShort.length > 70) addrShort = addrShort.slice(0, 68) + '…';
+    }
+    if (!addrShort) addrShort = city;
     var uspText = typeof b.usp_text === 'string' ? b.usp_text : '';
     var openStatus = isOpenNow(b.hours_json);
     var isFeatured = b.featured_until && new Date(b.featured_until) > nowDate;

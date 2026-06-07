@@ -506,9 +506,53 @@ function renderEmailWaitRow(b){
     + '</div>'
     + '<div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:170px">'
     +   (waUrl ? '<a href="' + waUrl + '" target="_blank" style="background:#25D366;color:#fff;text-align:center;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;display:block">📱 WhatsApp Reminder</a>' : '<span style="color:#9CA3AF;font-size:11px;text-align:center;padding:4px">no WhatsApp #</span>')
+    +   '<button onclick="adminResendVerificationEmail(\'' + (loginEmail || '').replace(/\'/g, "\\\'") + '\', this)" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📧 Resend Email</button>'
     +   '<button onclick="adminForceVerifyEmailFor(\'' + (loginEmail || '').replace(/\'/g, "\\\'") + '\')" style="background:#1E3A8A;color:#fff;border:0;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔓 Force-verify</button>'
     + '</div>'
     + '</div>';
+}
+
+// Light toast helper for inline feedback (CSS already in <style>)
+function showToast(msg, kind){
+  var t = document.getElementById('toast');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = kind === 'error' ? '#EF4444' : (kind === 'success' ? '#10B981' : '#0F172A');
+  t.style.color = '#fff';
+  t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, 3500);
+}
+
+// ============================================================
+// RESEND verification email — fresh email triggered via Supabase Admin
+// ============================================================
+async function adminResendVerificationEmail(email, btn){
+  if (!email) { alert('No email on file for this user'); return; }
+  if (!confirm('Resend verification email to:\n\n' + email + '\n\nUser ko fresh DukanList confirmation email milegi. Continue?')) return;
+  const orig = btn ? btn.innerHTML : '';
+  if (btn){ btn.disabled = true; btn.innerHTML = '⏳ Sending…'; }
+  try {
+    const sess = await C.auth.getSession();
+    const jwt = sess && sess.data && sess.data.session && sess.data.session.access_token;
+    if (!jwt) throw new Error('Session expired — please login again');
+    const res = await fetch('/api/admin-resend-verification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    const j = await res.json().catch(function(){ return {}; });
+    if (!res.ok || !j.ok) throw new Error(j.error || j.detail || ('HTTP ' + res.status));
+    showToast('✅ ' + (j.message || 'Verification email re-sent'), 'success');
+    if (btn){ btn.innerHTML = '✅ Sent'; setTimeout(function(){ if(btn){ btn.disabled=false; btn.innerHTML = orig; } }, 2500); }
+  } catch(e){
+    showToast('❌ ' + (e.message || 'Could not resend'), 'error');
+    if (btn){ btn.disabled = false; btn.innerHTML = orig; }
+  }
 }
 
 async function adminForceVerifyEmailFor(email){
@@ -962,67 +1006,4 @@ function updateBulkBar(){
 function clearBulkSelection(){
   _selectedBulk.clear();
   document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = false; });
-  document.querySelectorAll('.biz-card.bulk-selected').forEach(c => c.classList.remove('bulk-selected'));
-  document.querySelectorAll('input[id^="selAll-"]').forEach(c => c.checked = false);
-  updateBulkBar();
-}
-
-function toggleAllSelected(panelKind, checked){
-  // Iterate checkboxes inside the matching panel only
-  const panel = document.getElementById('panel-' + panelKind);
-  if (!panel) return;
-  panel.querySelectorAll('.bulk-cb').forEach(cb => {
-    if (cb.checked !== checked){
-      cb.checked = checked;
-      onBulkToggle(cb);
-    }
-  });
-}
-
-async function performBulkAction(action){
-  if (_selectedBulk.size === 0) return;
-  const ids = Array.from(_selectedBulk.keys());
-  const names = Array.from(_selectedBulk.values()).map(v => v.name).slice(0, 5);
-  const previewList = names.join(', ') + (_selectedBulk.size > 5 ? ' + ' + (_selectedBulk.size - 5) + ' more' : '');
-  const verb = action === 'approve' ? 'approve & activate' : 'ban';
-  if (!confirm(verb.toUpperCase() + ' ' + _selectedBulk.size + ' shop' + (_selectedBulk.size === 1 ? '' : 's') + '?\n\n' + previewList)) return;
-
-  const rpcName = action === 'approve' ? 'admin_bulk_approve' : 'admin_bulk_ban';
-  const params = action === 'approve' ? { p_ids: ids } : { p_ids: ids, p_reason: null };
-  const r = await C.rpc(rpcName, params);
-  if (r.error){
-    alert('Bulk action failed: ' + r.error.message);
-    return;
-  }
-  const changed = r.data?.changed_count ?? 0;
-  showToast('✓ ' + changed + ' shop' + (changed === 1 ? '' : 's') + ' updated', 'success');
-  clearBulkSelection();
-  // Reload all panels so the moved shops disappear from their old tabs
-  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
-}
-
-function showToast(msg, kind){
-  // Use existing toast() if available, else fallback
-  if (typeof toast === 'function'){ toast(msg, kind); return; }
-  alert(msg);
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-function escapeJs(s){
-  return String(s == null ? '' : s).replace(/[\\'"]/g, ch => '\\' + ch);
-}
-
-async function logout(){
-  if (!confirm('Logout from admin panel?')) return;
-  await C.auth.signOut();
-  window.location.href = '/admin/login';
-}
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+  docu
