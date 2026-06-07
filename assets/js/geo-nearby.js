@@ -175,4 +175,102 @@ async function renderWidget(containerId, opts){
           ? '    <button type="button" class="ony-cta ony-expand" data-r="' + nextRadius + '">🔍 Try ' + nextRadius + ' km</button>'
           : '') +
         '    <button type="button" class="ony-cta ony-refresh" style="background:#f3f4f6;color:#374151">🔄 Refresh</button>' +
-        '    <a href="/browse.html" style="background:#FBBF24;color:#78350F;padding:8px 14px;border-radius:99px;font-size:13px;font-weig
+        '    <a href="/browse.html" style="background:#FBBF24;color:#78350F;padding:8px 14px;border-radius:99px;font-size:13px;font-weight:700;text-decoration:none">📚 Browse All</a>' +
+        '  </div>' +
+        '</div>';
+      results.style.display = 'block';
+      const exp = results.querySelector('.ony-expand');
+      const ref = results.querySelector('.ony-refresh');
+      if (exp) exp.addEventListener('click', () => load(currentCoords, Number(exp.getAttribute('data-r')) || nextRadius));
+      if (ref) ref.addEventListener('click', () => load(currentCoords, currentRadius));
+      return;
+    }
+    const headerHtml =
+      '<div class="ony-results-head" style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px 10px;font-size:12px;color:#6b7280">' +
+      '  <span>' + data.count + ' open within ' + radius + ' km</span>' +
+      '  <button type="button" class="ony-refresh" style="background:transparent;border:0;color:#2563eb;font-weight:600;cursor:pointer;font-size:12px">🔄 Refresh</button>' +
+      '</div>';
+    results.innerHTML = headerHtml + (data.items || []).map(renderShopRow).join('');
+    results.style.display = 'block';
+    const ref = results.querySelector('.ony-refresh');
+    if (ref) ref.addEventListener('click', () => load(currentCoords, currentRadius));
+  }
+
+  // Cached coords — skip prompt
+  const cached = getStoredCoords();
+  if (cached && !opts.forcePrompt) {
+    await load(cached);
+    return;
+  }
+
+  if (isDenied()) {
+    // Don't pester the user — hide widget
+    el.style.display = 'none';
+    return;
+  }
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Allow location…';
+    try {
+      const coords = await requestLocation();
+      await load(coords);
+    } catch(err) {
+      btn.disabled = false;
+      btn.textContent = 'Try again';
+      if (err && err.code === 1) {
+        results.innerHTML = '<div class="ony-empty">Location access blocked. Enable in your browser settings to use this.</div>';
+        results.style.display = 'block';
+      }
+    }
+  });
+}
+
+// Normalize Indian mobile to exactly 10 digits (no country code prefix).
+function normIN(raw){
+  var d = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+  if (!d) return '';
+  if (d.length === 12 && d.charAt(0) === '9' && d.charAt(1) === '1') d = d.slice(2);
+  else if (d.length === 11 && d.charAt(0) === '0') d = d.slice(1);
+  return d.slice(-10);
+}
+
+function renderShopRow(b){
+  const dist = (b.dist_km != null) ? (Number(b.dist_km).toFixed(1) + ' km') : '';
+  const rating = (b.rating_count > 0) ? '⭐ ' + Number(b.rating_avg).toFixed(1) : '';
+  const photo = b.photo
+    ? '<img src="' + escAttr(b.photo) + '" alt="" loading="lazy">'
+    : '<span class="ony-row-emoji">🏪</span>';
+  const phone = normIN(b.mobile);
+  const wa    = normIN(b.whatsapp || b.mobile);
+  const phoneBtn = phone ? '<a class="ony-act call" href="tel:' + escAttr(phone) + '">📞 Call</a>' : '';
+  const waBtn   = wa    ? '<a class="ony-act wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '';
+  return '' +
+    '<a class="ony-row" href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '">' +
+    '  <div class="ony-row-photo">' + photo + '</div>' +
+    '  <div class="ony-row-body">' +
+    '    <div class="ony-row-name">' + escHtml(b.name || '') + '</div>' +
+    '    <div class="ony-row-meta">' +
+    '      <span class="ony-dist">' + escHtml(dist) + ' away</span>' +
+    (rating ? '<span class="ony-rating">' + escHtml(rating) + '</span>' : '') +
+    '    </div>' +
+    '    <div class="ony-row-actions">' + phoneBtn + waBtn + '</div>' +
+    '  </div>' +
+    '</a>';
+}
+
+// ─── helpers ────────────────────────────────────────────────
+function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return escHtml(s); }
+
+// ─── Public API ─────────────────────────────────────────────
+global.GeoNearby = {
+  getStoredCoords,
+  storeCoords,
+  requestLocation,
+  fetchNearby,
+  renderWidget,
+  isDenied
+};
+
+})(window);
