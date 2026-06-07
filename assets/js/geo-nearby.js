@@ -127,6 +127,7 @@ async function renderWidget(containerId, opts){
 
   let currentRadius = 3;
   let currentCoords = null;
+  let _errCount = 0;
 
   async function load(coords, radius){
     radius = radius || 3;
@@ -153,16 +154,26 @@ async function renderWidget(containerId, opts){
     btn.style.display = 'none';
 
     if (data && data.error) {
-      // Error or timeout — show explicit retry option
+      _errCount++;
+      // After 2 failures, gracefully hide the widget so user isn't stuck
+      if (_errCount >= 2){
+        el.style.display = 'none';
+        try { localStorage.setItem('dukanlist.geo.hidden_today', String(Date.now())); } catch(_){}
+        return;
+      }
       results.innerHTML =
         '<div class="ony-empty">' +
         '  <div style="margin-bottom:10px">Could not load shops (' + (data.error === 'timeout' ? 'timeout — slow network' : 'connection issue') + ').</div>' +
-        '  <button type="button" class="ony-cta ony-retry">🔄 Try Again</button>' +
+        '  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">' +
+        '    <button type="button" class="ony-cta ony-retry">🔄 Try Again</button>' +
+        '    <a href="/browse.html" style="background:#FBBF24;color:#78350F;padding:8px 14px;border-radius:99px;font-size:13px;font-weight:700;text-decoration:none">📚 Browse All Shops</a>' +
+        '  </div>' +
         '</div>';
       const r = results.querySelector('.ony-retry');
       if (r) r.addEventListener('click', () => load(currentCoords, currentRadius));
       return;
     }
+    _errCount = 0; // reset on success
 
     if (!data || !data.count) {
       const nextRadius = radius < 5 ? 5 : (radius < 10 ? 10 : (radius < 25 ? 25 : 50));
@@ -208,6 +219,14 @@ async function renderWidget(containerId, opts){
     el.style.display = 'none';
     return;
   }
+  // Was hidden today due to repeated RPC failures? Stay hidden until tomorrow.
+  try {
+    const t = parseInt(localStorage.getItem('dukanlist.geo.hidden_today') || '0', 10);
+    if (t && (Date.now() - t) < 12 * 60 * 60 * 1000){
+      el.style.display = 'none';
+      return;
+    }
+  } catch(_){}
 
   btn.addEventListener('click', async () => {
     btn.disabled = true;
