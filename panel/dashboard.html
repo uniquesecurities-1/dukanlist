@@ -194,10 +194,11 @@
 }
 .dash-main-v2 { min-width: 0 }
 .dash-side-v2 { display: flex; flex-direction: column; gap: 18px }
-@media (min-width: 1100px) {
+@media (min-width: 980px) {
   .dash-side-v2 { position: sticky; top: 20px; align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; padding-right: 4px }
   .dash-side-v2::-webkit-scrollbar { width: 6px }
   .dash-side-v2::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px }
+  .dash-side-v2::-webkit-scrollbar-track { background: transparent }
 }
 
 /* Enhanced KPI cards - gradient backgrounds */
@@ -921,6 +922,11 @@
         <a href="/compare.html" class="qa-tile">
           <div class="qa-tile-ico">⚖️</div>
           <div class="qa-tile-lbl"><span data-i18n-en>Compare</span><span data-i18n-hi>तुलना</span></div>
+        </a>
+        <a href="/discover.html" class="qa-tile" style="background:linear-gradient(135deg,#FAF5FF 0%,#FCE7F3 100%);border-color:#C084FC;position:relative" title="Swipe through shops TikTok-style">
+          <div class="qa-tile-ico">🎬</div>
+          <div class="qa-tile-lbl" style="color:#7C3AED;font-weight:800"><span data-i18n-en>Discover Feed</span><span data-i18n-hi>Discover Feed</span></div>
+          <span style="position:absolute;top:4px;right:5px;background:#EC4899;color:#fff;font-size:7.5px;font-weight:900;padding:1px 5px;border-radius:99px;letter-spacing:.03em">NEW</span>
         </a>
         <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support%2C%20I%20need%20help%20with%20my%20business%20listing." target="_blank" rel="noopener" class="qa-tile">
           <div class="qa-tile-ico">🆘</div>
@@ -2663,17 +2669,4 @@ function shareReferralWhatsApp(){
 <script src="/assets/js/daily-poster-engine.js" defer></script>
 <!-- Festival Engine (2026-06-05): Auto-override poster theme on festival days -->
 <script src="/assets/js/festival-engine.js" defer></script>
-<!-- Template Mega Pack (2026-06-05): 30+ designs -->
-<script src="/assets/js/template-mega-pack.js" defer></script>
-<!-- Daily Buzz Stories (Phase 9) -->
-<script src="/assets/js/daily-buzz.js" defer></script>
-<!-- Engagement Engine (2026-06-05) -->
-<script src="/assets/js/engagement-engine.js" defer></script>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
-<script src="/assets/js/error-reporter.js" defer></script>
-</body>
-</html>
+<!-- Tem

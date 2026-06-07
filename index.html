@@ -782,14 +782,21 @@ function dismissFestBanner(){
       </div>
     </form>
 
-    <!-- NEW: Discover (TikTok-style vertical feed) entry pill -->
-    <div style="text-align:center;margin:10px 0 16px">
-      <a href="/discover.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED 0%,#EC4899 50%,#F59E0B 100%);color:#fff;padding:10px 20px;border-radius:99px;font-weight:800;font-size:.94rem;text-decoration:none;box-shadow:0 8px 22px rgba(124,58,237,.32);font-family:'Manrope',sans-serif">
-        <span style="font-size:1.1rem">🎬</span>
-        <span data-i18n-en>Swipe Discover · Shop Reels</span><span data-i18n-hi>Swipe Discover · दुकानों के Reels</span>
-        <span style="background:rgba(255,255,255,.25);padding:2px 7px;border-radius:99px;font-size:.65rem;font-weight:900;letter-spacing:.04em">NEW</span>
+    <!-- NEW: Discover (TikTok-style vertical feed) entry pill — pulsing for attention -->
+    <div style="text-align:center;margin:12px 0 18px">
+      <a href="/discover.html" id="discoverPill" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#7C3AED 0%,#EC4899 50%,#F59E0B 100%);color:#fff;padding:12px 24px;border-radius:99px;font-weight:900;font-size:1rem;text-decoration:none;box-shadow:0 10px 26px rgba(124,58,237,.4);font-family:'Manrope',sans-serif;animation:pulseGlow 2.4s infinite;letter-spacing:.01em">
+        <span style="font-size:1.2rem">🎬</span>
+        <span data-i18n-en>Swipe Discover Shops · Try Now</span><span data-i18n-hi>दुकानों को Swipe करके खोजें · Try करें</span>
+        <span style="background:rgba(255,255,255,.28);padding:3px 9px;border-radius:99px;font-size:.7rem;font-weight:900;letter-spacing:.06em">NEW</span>
       </a>
     </div>
+    <style>
+      @keyframes pulseGlow{
+        0%,100%{ box-shadow:0 10px 26px rgba(124,58,237,.4) }
+        50%{ box-shadow:0 14px 36px rgba(236,72,153,.55), 0 0 0 10px rgba(236,72,153,.08) }
+      }
+      #discoverPill:hover{ transform:translateY(-2px); transition:transform .2s }
+    </style>
 
     <div class="hero-chips-wrap">
       <div class="hero-chips-label">
@@ -2323,45 +2330,4 @@ function dismissActTicker(){
     document.getElementById('pulseNewReviews').textContent = newRev;
     const catsEl = document.getElementById('pulseCats');
     if (catsEl && Array.isArray(data.top_categories)) {
-      catsEl.innerHTML = data.top_categories.slice(0, 3).map(function(c){
-        return '<a class="pulse-cat-pill" href="/search.html?cat='+encodeURIComponent(c.category_id||'')+'">#'+(c.category_name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</a>';
-      }).join('');
-    }
-    el.style.display = 'flex';
-  } catch(_){}
-})();
-</script>
-<script>
-// Phase 6: Init Open Near You widget on homepage
-(function(){
-  function init(){
-    if (window.GeoNearby) {
-      GeoNearby.renderWidget('openNearYou');
-    } else {
-      setTimeout(init, 400);
-    }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-<script>
-(function(){
-  function init(){
-    if (window.DailyBuzz && window.ShopDB && ShopDB.client) {
-      let citySlug = null;
-      try {
-        if (window.CityPersist && CityPersist.getCity) citySlug = (CityPersist.getCity() || {}).slug || null;
-        if (!citySlug) citySlug = localStorage.getItem('dukanlist.city') || null;
-      } catch(_){}
-      DailyBuzz.renderHomepageCarousel('homepageBuzz', ShopDB.client, citySlug);
-    } else {
-      setTimeout(init, 400);
-    }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-</body>
-</html>
+      catsEl.innerHTML = data.top_categories.slice(0, 3).
