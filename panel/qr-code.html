@@ -9,14 +9,12 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260528">
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
 <style>
 .qr-wrap{ display:flex; flex-direction:column; align-items:center; gap:14px }
 .qr-stage{
-  background:#fff;
-  padding:24px;
-  border-radius:18px;
-  border:1px solid var(--line);
-  box-shadow:var(--shadow-sm);
+  background:#fff; padding:24px; border-radius:18px;
+  border:1px solid var(--line); box-shadow:var(--shadow-sm);
   display:flex; flex-direction:column; align-items:center; gap:14px;
   max-width:380px; width:100%;
 }
@@ -25,35 +23,35 @@
 #qrBox{
   width:300px; height:300px; max-width:100%;
   display:grid; place-items:center;
-  background:#fff;
-  border-radius:12px;
-  position:relative;
+  background:#fff; border-radius:12px; position:relative;
 }
-#qrBox canvas, #qrBox svg, #qrBox table{ image-rendering:pixelated; max-width:100%; height:auto }
+#qrBox svg{ max-width:100%; height:auto; shape-rendering:crispEdges }
 .qr-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center }
 .qr-actions .btn{ min-width:150px }
 .qr-tip{ font-size:.82rem; color:var(--muted); text-align:center; max-width:420px; line-height:1.55 }
-.qr-tagline{
-  font-size:.85rem; color:var(--saffron-deep);
-  font-weight:700; text-align:center; letter-spacing:.01em;
-}
+.qr-tagline{ font-size:.85rem; color:var(--saffron-deep); font-weight:700; text-align:center }
 .print-only{ display:none }
-
+.upgrade-cta{
+  display:inline-flex; align-items:center; gap:10px;
+  background:linear-gradient(135deg,#FFFBEB,#FDE68A);
+  border:1.5px solid #F59E0B;
+  color:#92400E; padding:12px 20px; border-radius:12px;
+  font-weight:800; text-decoration:none; font-size:.95rem;
+  box-shadow:0 4px 12px -4px rgba(245,158,11,0.30);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.upgrade-cta:hover{ transform:translateY(-1px); box-shadow:0 8px 18px -6px rgba(245,158,11,0.45) }
 @media print{
   body{ background:#fff !important }
-  .topbar, footer.site, .qr-actions, .qr-tip, .no-print { display:none !important }
+  .topbar, footer.site, .qr-actions, .qr-tip, .no-print, .upgrade-cta{ display:none !important }
   .qr-stage{ box-shadow:none !important; border:none !important; padding:0 }
   .print-only{ display:block !important }
   .page{ padding:0 !important }
   body.has-sticky-cta{ padding-bottom:0 }
 }
 </style>
-
-<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
-<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
 </head>
 <body>
-<!-- Impersonation banner -->
 <script src="/assets/js/impersonation-banner.js"></script>
 <script src="/assets/js/email-verify-banner.js"></script>
 
@@ -94,8 +92,8 @@
     <span data-i18n-hi>आपका <span class="grad">शॉप QR</span> कोड</span>
   </h1>
   <p class="subtitle no-print">
-    <span data-i18n-en>Print this QR and display at your shop. Customers scan with their phone camera to view your profile and call you in one tap.</span>
-    <span data-i18n-hi>इस QR को प्रिंट करें और दुकान पर लगाएं। ग्राहक फोन कैमरा से स्कैन करके आपकी प्रोफाइल देख सकते हैं।</span>
+    <span data-i18n-en>Print this QR and display at your shop. Customers scan with their phone camera to view your profile.</span>
+    <span data-i18n-hi>इस QR को प्रिंट करें और दुकान पर लगाएं।</span>
   </p>
 
   <div id="loading" style="text-align:center;padding:40px 0;color:var(--muted)">⏳ Loading your business...</div>
@@ -105,7 +103,7 @@
     <div class="qr-stage" id="qrStage">
       <div class="qr-shopname" id="qrShopName">—</div>
       <div id="qrBox" aria-label="Shop QR code"></div>
-      <div class="qr-tagline print-only">📱 dukanlist.com — Every Shop, One App</div>
+      <div class="qr-tagline print-only">📱 dukanlist.com — Bharat's Local Directory</div>
       <div class="qr-url" id="qrUrl">—</div>
     </div>
 
@@ -116,16 +114,18 @@
       <button class="btn btn-sec" onclick="window.print()">
         🖨 <span data-i18n-en>Print</span><span data-i18n-hi>प्रिंट</span>
       </button>
-      <button class="btn btn-sec" onclick="openPoster()">
-        🎨 <span data-i18n-en>Printable Poster</span><span data-i18n-hi>पोस्टर बनाएं</span>
-      </button>
       <button class="btn btn-sec" onclick="copyUrl()">
         🔗 <span data-i18n-en>Copy Link</span><span data-i18n-hi>लिंक कॉपी</span>
       </button>
     </div>
 
+    <a href="/panel/get-reviews.html" class="upgrade-cta no-print">
+      🌟 <span data-i18n-en>Want a beautiful printable counter card + WhatsApp sender? Get Reviews →</span>
+      <span data-i18n-hi>सुंदर काउंटर कार्ड + व्हाट्सऐप के लिए: रिव्यू लाएँ →</span>
+    </a>
+
     <p class="qr-tip no-print">
-      <span data-i18n-en>💡 Tip: Print A5/A4, laminate, and display near your counter. Customers love finding you online.</span>
+      <span data-i18n-en>💡 Tip: Print A5/A4, laminate, and display near your counter.</span>
       <span data-i18n-hi>💡 टिप: A5/A4 प्रिंट करें, लैमिनेट करें और काउंटर पर रखें।</span>
     </p>
 
@@ -137,7 +137,6 @@
   © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
 </footer>
 
-<!-- QR library (lightweight, no deps) — NOTE: package only publishes qrcode.js, no .min.js -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
@@ -148,45 +147,44 @@ function setLang(lang){
   document.documentElement.setAttribute('data-lang',lang);
   document.documentElement.setAttribute('lang',lang);
   localStorage.setItem('shop_lang',lang);
-  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
-  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+  var en=document.getElementById('langBtnEn'); var hi=document.getElementById('langBtnHi');
+  if (en) en.classList.toggle('active',lang==='en');
+  if (hi) hi.classList.toggle('active',lang==='hi');
 }
 
-let MY_BIZ = null;
-let PROFILE_URL = '';
+var MY_BIZ = null;
+var PROFILE_URL = '';
 
 async function loadBiz(){
-  const user = await ShopDB.requireAuth();
+  var user = await ShopDB.requireAuth();
   if (!user) return;
-  const c = ShopDB.client;
-  // SECURITY: use safe RPC to avoid non-deterministic .limit(1) cross-user leak
-  let owners = null;
+  var c = ShopDB.client;
+
+  var bizId = null;
   try {
-    const safeRes = await c.rpc('get_my_business_safe');
-    if (!safeRes.error && safeRes.data && safeRes.data.length){
-      owners = safeRes.data.map(r => ({ business_id: r.business_id }));
+    var safe = await c.rpc('get_my_business_safe');
+    if (!safe.error && safe.data && safe.data.length){
+      bizId = safe.data[0].business_id;
     }
-  } catch(e){ /* fallback */ }
-  if (!owners){
-    const fb = await c.from('business_owners')
-      .select('business_id').eq('auth_user_id', user.id).limit(1);
-    owners = fb.data;
+  } catch(e){ /* fall through */ }
+  if (!bizId){
+    var fb = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+    if (fb.data && fb.data.length) bizId = fb.data[0].business_id;
   }
-  if (!owners || !owners.length){
+  if (!bizId){
     document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
     return;
   }
-  const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, name_hi, usp_text').eq('id', owners[0].business_id).maybeSingle();
-  if (error || !biz){
+
+  var res = await c.from('businesses').select('id, slug, name').eq('id', bizId).maybeSingle();
+  if (res.error || !res.data){
     document.getElementById('loading').innerHTML = '⚠ Could not load your shop.';
     return;
   }
-  MY_BIZ = biz;
-  // Always use canonical domain for QR (works even if shopkeeper is on a preview deploy)
-  PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug);
+  MY_BIZ = res.data;
+  PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
 
-  document.getElementById('qrShopName').textContent = biz.name || 'Your Shop';
+  document.getElementById('qrShopName').textContent = MY_BIZ.name || 'Your Shop';
   document.getElementById('qrUrl').textContent = PROFILE_URL;
   renderQR(PROFILE_URL);
 
@@ -196,48 +194,42 @@ async function loadBiz(){
 
 function renderQR(text){
   if (typeof qrcode !== 'function'){
-    document.getElementById('qrBox').textContent = 'QR library failed to load.';
+    document.getElementById('qrBox').textContent = '⚠ QR library failed to load.';
     return;
   }
-  // Type 0 = auto, ECC 'M' = medium (good for printed posters)
-  const qr = qrcode(0, 'M');
+  var qr = qrcode(0, 'M');
   qr.addData(text);
   qr.make();
-  // Render as svg-string at requested cell size (gives crisp on-screen view)
-  const cellSize = 8;
-  const margin   = 4;
-  const svg = qr.createSvgTag({ cellSize: cellSize, margin: margin, scalable: true });
-  const box = document.getElementById('qrBox');
-  box.innerHTML = svg;
-  // Force SVG to fit container
-  const svgEl = box.querySelector('svg');
-  if (svgEl){
-    svgEl.removeAttribute('width');
-    svgEl.removeAttribute('height');
-    svgEl.style.width = '100%';
-    svgEl.style.height = '100%';
-    svgEl.setAttribute('shape-rendering','crispEdges');
+  var box = document.getElementById('qrBox');
+  box.innerHTML = qr.createSvgTag({ cellSize: 8, margin: 4, scalable: true });
+  var svg = box.querySelector('svg');
+  if (svg){
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.setAttribute('shape-rendering','crispEdges');
   }
 }
 
 function copyUrl(){
   if (!PROFILE_URL) return;
-  try{
-    navigator.clipboard.writeText(PROFILE_URL).then(() => {
-      showToast('Link copied!');
-    }, () => fallbackCopy(PROFILE_URL));
-  }catch(_){ fallbackCopy(PROFILE_URL); }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(PROFILE_URL).then(function(){ showToast('Link copied!'); }, function(){ fallbackCopy(PROFILE_URL); });
+  } else {
+    fallbackCopy(PROFILE_URL);
+  }
 }
 function fallbackCopy(text){
-  const ta = document.createElement('textarea');
+  var ta = document.createElement('textarea');
   ta.value = text;
-  document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); showToast('Link copied!'); }
-  catch(_){ alert(text); }
-  finally{ ta.remove(); }
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('Link copied!'); } catch(_){ alert(text); }
+  finally { ta.remove(); }
 }
 function showToast(msg){
-  let t = document.getElementById('qrToast');
+  var t = document.getElementById('qrToast');
   if (!t){
     t = document.createElement('div');
     t.id = 'qrToast';
@@ -247,68 +239,61 @@ function showToast(msg){
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 1800);
 }
 
 function downloadQR(){
   if (!PROFILE_URL || typeof qrcode !== 'function') return;
-  // Render high-resolution canvas for download
-  const qr = qrcode(0, 'M');
+  var qr = qrcode(0, 'M');
   qr.addData(PROFILE_URL);
   qr.make();
-  const moduleCount = qr.getModuleCount();
-  const cellSize = 16;          // high-DPI for print
-  const margin   = 4 * cellSize;
-  const size     = moduleCount * cellSize + margin * 2;
-  const captionPad = 60;        // for shop name
-  const canvas = document.createElement('canvas');
+  var modules = qr.getModuleCount();
+  var cell = 16;
+  var marg = 4 * cell;
+  var captionPad = 60;
+  var size = modules * cell + marg * 2;
+  var canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size + captionPad;
-  const ctx = canvas.getContext('2d');
-  // White background
+  var ctx = canvas.getContext('2d');
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  // Draw modules
   ctx.fillStyle = '#0B1220';
-  for (let r = 0; r < moduleCount; r++){
-    for (let c = 0; c < moduleCount; c++){
+  for (var r = 0; r < modules; r++){
+    for (var c = 0; c < modules; c++){
       if (qr.isDark(r, c)){
-        ctx.fillRect(margin + c * cellSize, margin + r * cellSize, cellSize, cellSize);
+        ctx.fillRect(marg + c * cell, marg + r * cell, cell, cell);
       }
     }
   }
-  // Shop name caption
   ctx.fillStyle = '#0B1220';
   ctx.font = 'bold 28px Manrope, Inter, Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Shop';
-  // Truncate if too long
-  const maxW = canvas.width - 40;
-  let displayName = name;
-  if (ctx.measureText(displayName).width > maxW){
-    while (displayName.length > 6 && ctx.measureText(displayName + '…').width > maxW){
-      displayName = displayName.slice(0, -1);
+  var name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Shop';
+  var display = name;
+  var maxW = canvas.width - 40;
+  if (ctx.measureText(display).width > maxW){
+    while (display.length > 6 && ctx.measureText(display + '…').width > maxW){
+      display = display.slice(0, -1);
     }
-    displayName += '…';
+    display += '…';
   }
-  ctx.fillText(displayName, canvas.width / 2, size + captionPad / 2);
+  ctx.fillText(display, canvas.width / 2, size + captionPad / 2);
 
-  // Trigger download
-  canvas.toBlob((blob) => {
+  canvas.toBlob(function(blob){
+    var fname = ((MY_BIZ && MY_BIZ.slug) || 'dukan') + '-qr.png';
     if (!blob){
-      // Fallback: dataURL
-      const data = canvas.toDataURL('image/png');
-      triggerDownload(data, (MY_BIZ.slug || 'dukan') + '-qr.png');
+      triggerDownload(canvas.toDataURL('image/png'), fname);
       return;
     }
-    const url = URL.createObjectURL(blob);
-    triggerDownload(url, (MY_BIZ.slug || 'dukan') + '-qr.png');
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    var u = URL.createObjectURL(blob);
+    triggerDownload(u, fname);
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 5000);
   }, 'image/png');
 }
 function triggerDownload(href, filename){
-  const a = document.createElement('a');
+  var a = document.createElement('a');
   a.href = href;
   a.download = filename;
   document.body.appendChild(a);
@@ -316,88 +301,14 @@ function triggerDownload(href, filename){
   a.remove();
 }
 
-function openPoster(){
-  if (!MY_BIZ || !PROFILE_URL) return;
-  const html = buildPosterHtml(MY_BIZ.name || 'Your Shop', MY_BIZ.usp_text || '', PROFILE_URL);
-  const w = window.open('', '_blank');
-  if (!w){ alert('Allow popups to open the printable poster.'); return; }
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-}
-
-function buildPosterHtml(shopName, usp, url){
-  // Build SVG QR for embedding (no external script needed in poster window)
-  const qr = qrcode(0, 'M');
-  qr.addData(url);
-  qr.make();
-  const svg = qr.createSvgTag({ cellSize: 8, margin: 4, scalable: true });
-  const safeName = String(shopName).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
-  const safeUsp  = String(usp || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
-  const safeUrl  = String(url).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
-  return `<!DOCTYPE html>
-<html><head>
-<meta charset="utf-8">
-<title>${safeName} — QR Poster</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{font-family:Manrope,Inter,system-ui,sans-serif;background:#FFFBF5;color:#0B1220;display:flex;align-items:center;justify-content:center;padding:24px}
-  .poster{
-    background:#fff; width:600px; max-width:100%;
-    padding:36px 32px; border-radius:24px;
-    box-shadow:0 12px 40px rgba(15,23,42,.12);
-    text-align:center; border:6px solid #FF6B1A;
-    position:relative;
-  }
-  .brand{font-size:.9rem;font-weight:800;color:#E55100;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-  h1{font-size:2rem;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin:0 0 4px}
-  .usp{font-size:.95rem;color:#475569;margin:8px 0 22px;line-height:1.5}
-  .qr{width:320px;height:320px;margin:0 auto;background:#fff;padding:10px;border-radius:14px}
-  .qr svg{width:100%;height:100%;shape-rendering:crispEdges}
-  .cta{margin-top:20px;font-size:1.05rem;font-weight:800;color:#0B1220}
-  .cta .em{color:#E55100}
-  .url{margin-top:6px;font-size:.78rem;color:#6B7280;word-break:break-all}
-  .actions{margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-  .actions button{
-    background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:none;
-    padding:10px 18px;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.9rem;
-  }
-  .actions .sec{background:#F1F5F9;color:#0B1220}
-  .foot{margin-top:18px;font-size:.7rem;color:#94A3B8;letter-spacing:.05em;text-transform:uppercase}
-  @media print{
-    body{background:#fff;padding:0}
-    .poster{box-shadow:none;border-width:4px;width:100%}
-    .actions{display:none}
-  }
-</style>
-</head><body>
-<div class="poster">
-  <div class="brand">📱 Scan to find us online</div>
-  <h1>${safeName}</h1>
-  ${safeUsp ? '<div class="usp">' + safeUsp + '</div>' : ''}
-  <div class="qr">${svg}</div>
-  <div class="cta">Scan with your phone <span class="em">camera</span></div>
-  <div class="url">${safeUrl}</div>
-  <div class="actions">
-    <button onclick="window.print()">🖨 Print Poster</button>
-    <button class="sec" onclick="window.close()">Close</button>
-  </div>
-  <div class="foot">Powered by DukanList · dukanlist.com</div>
-</div>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<script src="/assets/js/error-reporter.js" defer></script>
-</body></html>`;
-}
-
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', function(){
   setLang(localStorage.getItem('shop_lang') || 'en');
   loadBiz();
 });
 </script>
+
+<script src="/assets/js/owner-notifications.js" defer></script>
+<script src="/assets/js/error-reporter.js" defer></script>
 
 </body>
 </html>
