@@ -1054,4 +1054,302 @@ function renderRecentTable(rows, totalCount){
           </tbody>
         </table>
       </div>
-      <div style="padding:8px 4px;font-size:11px;color:#94a3b8;d
+            <div style="padding:8px 4px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span>Showing <b>${rows.length}</b> of <b>${totalCount}</b> shops</span>
+        <span>Sort: <b>${st.sortKey}</b> ${st.sortDir === 'asc' ? '▲' : '▼'} · Click column headers to change.</span>
+      </div>
+    `}
+  `;
+  // Preserve focus + cursor position on the search input (re-render destroys it)
+  var _wasSearchFocused = (document.activeElement && document.activeElement.id === 'recentSearch');
+  var _searchSelStart = _wasSearchFocused ? document.activeElement.selectionStart : null;
+  var _searchSelEnd   = _wasSearchFocused ? document.activeElement.selectionEnd   : null;
+
+  document.getElementById('recentBiz').innerHTML = html;
+
+  if (_wasSearchFocused){
+    var inp = document.getElementById('recentSearch');
+    if (inp){
+      inp.focus();
+      try { inp.setSelectionRange(_searchSelStart, _searchSelEnd); } catch(_){}
+    }
+  }
+}
+
+// ===== Filter/Sort state setters =====
+function setStatusFilter(v){ window._filterState.statusFilter = v; renderRecentFiltered(); }
+function setQuickFilter(v){ window._filterState.quickFilter = v; renderRecentFiltered(); }
+// Debounced search so we don't re-render the whole table on every keystroke
+var _searchDebounceTimer = null;
+function setSearch(v){
+  window._filterState.search = v;
+  clearTimeout(_searchDebounceTimer);
+  _searchDebounceTimer = setTimeout(renderRecentFiltered, 180);
+}
+function setSort(k){
+  const st = window._filterState;
+  if (st.sortKey === k) st.sortDir = st.sortDir === 'asc' ? 'desc' : 'asc';
+  else { st.sortKey = k; st.sortDir = 'desc'; }
+  renderRecentFiltered();
+}
+function resetFilters(){
+  window._filterState.search = '';
+  window._filterState.statusFilter = 'all';
+  window._filterState.quickFilter = 'all';
+  renderRecentFiltered();
+}
+
+// ===== Bulk selection =====
+function toggleSelect(id){
+  const sel = window._filterState.selected;
+  if (sel.has(id)) sel.delete(id); else sel.add(id);
+  renderRecentFiltered();
+}
+function toggleSelectAll(checked){
+  const sel = window._filterState.selected;
+  // Apply to currently visible (filtered) rows only — read from DOM is fragile; recompute.
+  const all = window._recentRows || [];
+  const st = window._filterState;
+  // Get currently filtered ids by re-running the filter without sorting (simpler: read checkboxes).
+  if (checked){
+    document.querySelectorAll('#recentBiz tbody input[type=checkbox]').forEach((cb, i) => {
+      const tr = cb.closest('tr');
+      // Find id from the View link in same row
+      const link = tr && tr.querySelector('a[href*="/admin/shop?id="]');
+      if (link){
+        const m = link.href.match(/id=([0-9a-f-]+)/);
+        if (m) sel.add(m[1]);
+      }
+    });
+  } else { sel.clear(); }
+  renderRecentFiltered();
+}
+function clearBulkSelection(){ window._filterState.selected.clear(); renderRecentFiltered(); }
+
+async function bulkApproveSelected(){
+  const sel = window._filterState.selected;
+  if (sel.size === 0) return;
+  if (!confirm('Approve ' + sel.size + ' selected shop(s)? They will become active immediately.')) return;
+  const c = ShopDB.client;
+  let ok = 0, fail = 0;
+  const ids = Array.from(sel);
+  for (const id of ids){
+    try {
+      const { error } = await c.rpc('admin_approve_business', { p_business_id: id });
+      if (error) { fail++; console.warn('Approve fail', id, error); }
+      else {
+        ok++;
+        // Update local row
+        const row = (window._recentRows || []).find(r => r.id === id);
+        if (row){ row.status = 'active'; }
+      }
+    } catch(e){ fail++; }
+  }
+  alert('Bulk approve done: ' + ok + ' succeeded, ' + fail + ' failed.');
+  sel.clear();
+  renderRecentFiltered();
+}
+
+async function quickApprove(id, btn){
+  if (btn){ btn.disabled = true; btn.innerHTML = '⏳'; }
+  try {
+    const { error } = await ShopDB.client.rpc('admin_approve_business', { p_business_id: id });
+    if (error) throw error;
+    // Update local row
+    const row = (window._recentRows || []).find(r => r.id === id);
+    if (row){ row.status = 'active'; }
+    renderRecentFiltered();
+  } catch(e){
+    alert('Approve failed: ' + (e.message || e));
+    if (btn){ btn.disabled = false; btn.innerHTML = '✓'; }
+  }
+}
+
+// ===== Saved Views (localStorage) =====
+function saveCurrentView(){
+  const st = window._filterState;
+  const name = prompt('Save this filter combo as:', '');
+  if (!name || !name.trim()) return;
+  window._savedViews.push({
+    name: name.trim().slice(0, 24),
+    search: st.search,
+    statusFilter: st.statusFilter,
+    quickFilter: st.quickFilter,
+    sortKey: st.sortKey,
+    sortDir: st.sortDir
+  });
+  try { localStorage.setItem('dl_admin_views', JSON.stringify(window._savedViews)); } catch(_){}
+  renderRecentFiltered();
+}
+function loadView(i){
+  const v = window._savedViews[i];
+  if (!v) return;
+  const st = window._filterState;
+  st.search = v.search || '';
+  st.statusFilter = v.statusFilter || 'all';
+  st.quickFilter = v.quickFilter || 'all';
+  st.sortKey = v.sortKey || 'created_at';
+  st.sortDir = v.sortDir || 'desc';
+  renderRecentFiltered();
+}
+function deleteView(i){
+  if (!confirm('Delete saved view "' + (window._savedViews[i] && window._savedViews[i].name) + '"?')) return;
+  window._savedViews.splice(i, 1);
+  try { localStorage.setItem('dl_admin_views', JSON.stringify(window._savedViews)); } catch(_){}
+  renderRecentFiltered();
+}
+
+
+// Toggle Show All / Show Latest 10
+let __showingAll = false;
+async function toggleShowAll(){
+  const btn = document.getElementById('showAllBtn');
+  const label = document.getElementById('recentLabel');
+  const box = document.getElementById('recentBiz');
+  if (!__showingAll){
+    btn.disabled = true; btn.innerHTML = '⏳ Loading all...';
+    try {
+      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
+      const { data, error } = await c.rpc('admin_list_businesses', {
+        p_status: null, p_limit: 500, p_offset: 0, p_sort: 'newest'
+      });
+      if (error) throw error;
+      renderRecent(data || []);
+      __showingAll = true;
+      btn.innerHTML = '🔽 Show Latest 10';
+      btn.style.background = '#0F172A';
+      label.textContent = '(showing all ' + (data || []).length + ')';
+    } catch(e){
+      btn.innerHTML = '⚠ Retry';
+      box.insertAdjacentHTML('beforebegin', '<div class="err">Failed: ' + (e.message || e) + '</div>');
+    } finally { btn.disabled = false; }
+  } else {
+    // Switch back to latest 10
+    btn.disabled = true; btn.innerHTML = '⏳ Loading...';
+    try {
+      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
+      const { data, error } = await c.rpc('admin_list_businesses', {
+        p_status: null, p_limit: 10, p_offset: 0, p_sort: 'newest'
+      });
+      if (error) throw error;
+      renderRecent(data || []);
+      __showingAll = false;
+      btn.innerHTML = '👁 Show All';
+      btn.style.background = '#7C3AED';
+      label.textContent = '(latest 10)';
+    } catch(e){ btn.innerHTML = '⚠ Retry'; }
+    finally { btn.disabled = false; }
+  }
+}
+
+async function downloadCSV(fetchAll){
+  const btn = document.getElementById(fetchAll ? 'csvBtnAll' : 'csvBtn10');
+  const origLabel = btn ? btn.innerHTML : '';
+  if (btn){ btn.disabled = true; btn.innerHTML = '⏳ Preparing...'; }
+
+  try {
+    let rows;
+    if (fetchAll){
+      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
+      if (!c){ throw new Error('No DB client'); }
+      const { data, error } = await c.rpc('admin_list_businesses', {
+        p_status: null, p_limit: 500, p_offset: 0, p_sort: 'newest'
+      });
+      if (error) throw error;
+      rows = data || [];
+    } else {
+      rows = window._recentRows || [];
+    }
+
+    if (!rows.length){
+      alert('No shops to export.');
+      return;
+    }
+
+    const headers = [
+      'S.No', 'Business Name', 'Owner', 'Mobile', 'WhatsApp', 'Email',
+      'Category', 'City', 'State', 'Pincode',
+      'Status', 'Verified Score', 'Rating', 'Reviews', 'Photos',
+      'Flags', 'Slug', 'Shop ID', 'Created At'
+    ];
+
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return '';
+      const s = String(val);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1){
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    };
+
+    const csvRows = [headers.join(',')];
+    rows.forEach((r, idx) => {
+      const cleanMobile = (r.mobile || '').replace(/^91/, '');
+      const cleanWA = (r.whatsapp || '').replace(/^91/, '');
+      csvRows.push([
+        idx + 1,
+        escapeCSV(r.name),
+        escapeCSV(r.owner_name),
+        cleanMobile,
+        cleanWA,
+        escapeCSV(r.email),
+        escapeCSV(r.primary_cat),
+        escapeCSV(r.city_name),
+        escapeCSV(r.state_code),
+        escapeCSV(r.pincode),
+        escapeCSV(r.status),
+        r.verified_score || 0,
+        r.rating_avg ? Number(r.rating_avg).toFixed(2) : '',
+        r.rating_count || 0,
+        r.photos_count || 0,
+        r.flagged_count || 0,
+        escapeCSV(r.slug),
+        escapeCSV(r.id),
+        escapeCSV(r.created_at)
+      ].join(','));
+    });
+
+    const csv = '\ufeff' + csvRows.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const today = new Date().toISOString().slice(0, 10);
+    a.download = 'dukanlist-shops-' + today + (fetchAll ? '-all' : '-latest10') + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  } catch(e){
+    console.error('CSV download error:', e);
+    alert('Download failed: ' + (e.message || e));
+  } finally {
+    if (btn){ btn.disabled = false; btn.innerHTML = origLabel; }
+  }
+}
+
+function formatDate(iso){
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return Math.floor(diff) + 's ago';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>
