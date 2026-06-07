@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Get More Reviews — dukanlist.com</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260528">
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+<style>
+/* ============================================================
+   Get Reviews — Apple-class premium page
+   ============================================================ */
+.gr-wrap{ max-width:920px; margin:0 auto; padding:0 16px 60px }
+.gr-hero{
+  position:relative;
+  border-radius:28px;
+  overflow:hidden;
+  background:linear-gradient(135deg,#FF6B1A 0%,#F97316 50%,#EA580C 100%);
+  padding:42px 32px 38px;
+  color:#fff;
+  margin:18px 0 28px;
+  box-shadow:0 20px 50px -20px rgba(234,88,12,0.40),0 8px 22px -8px rgba(15,23,42,0.10);
+}
+.gr-hero::before{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(circle at 85% -10%,rgba(255,255,255,0.30),transparent 55%);
+  pointer-events:none;
+}
+.gr-hero::after{
+  content:""; position:absolute; bottom:-50px; left:-30px;
+  width:180px; height:180px;
+  background:rgba(255,255,255,0.10); border-radius:50%;
+  pointer-events:none;
+}
+.gr-hero h1{
+  font-size:2.05rem; font-weight:900; letter-spacing:-.03em;
+  line-height:1.1; margin:0 0 8px;
+  text-shadow:0 2px 10px rgba(0,0,0,0.12);
+}
+.gr-hero p{
+  font-size:1rem; opacity:.95; line-height:1.5;
+  font-weight:500; letter-spacing:-.01em; max-width:600px;
+}
+.gr-hero .stars{ font-size:1.4rem; letter-spacing:4px; margin-top:10px; text-shadow:0 2px 6px rgba(0,0,0,0.15) }
+
+.gr-card{
+  background:#fff;
+  border:1px solid #E2E8F0;
+  border-radius:22px;
+  padding:26px 26px 22px;
+  margin-bottom:18px;
+  box-shadow:0 4px 14px -4px rgba(15,23,42,0.06);
+  transition:transform .22s ease, box-shadow .22s ease;
+}
+.gr-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px -10px rgba(15,23,42,0.10);
+}
+.gr-card h2{
+  display:flex; align-items:center; gap:10px;
+  font-size:1.18rem; font-weight:800; letter-spacing:-.02em;
+  color:#0F172A; margin:0 0 6px;
+}
+.gr-card .h2-icon{
+  width:38px; height:38px; border-radius:11px;
+  display:grid; place-items:center;
+  font-size:1.2rem;
+}
+.gr-card .sub{
+  font-size:.88rem; color:#64748B; line-height:1.5;
+  margin:0 0 18px; font-weight:500;
+}
+
+.gr-row{ display:flex; gap:10px; flex-wrap:wrap }
+.gr-input, .gr-textarea, .gr-select{
+  flex:1; min-width:0;
+  padding:12px 14px;
+  border:1.5px solid #CBD5E1;
+  border-radius:11px;
+  font-size:15px; font-family:inherit;
+  background:#fff; color:#0F172A;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.gr-input:focus, .gr-textarea:focus, .gr-select:focus{
+  outline:0; border-color:#FF6B1A;
+  box-shadow:0 0 0 4px rgba(255,107,26,0.12);
+}
+.gr-textarea{ width:100%; min-height:90px; resize:vertical; line-height:1.5 }
+.gr-select{ max-width:120px; font-weight:700 }
+
+.gr-btn{
+  background:linear-gradient(135deg,#FF6B1A,#EA580C);
+  color:#fff; border:0;
+  padding:12px 22px; border-radius:11px;
+  font-weight:800; font-size:.94rem;
+  cursor:pointer; font-family:inherit;
+  letter-spacing:-.01em;
+  box-shadow:0 6px 16px -4px rgba(234,88,12,0.40);
+  transition:transform .12s ease, box-shadow .12s ease;
+  white-space:nowrap;
+  display:inline-flex; align-items:center; gap:8px;
+}
+.gr-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px -6px rgba(234,88,12,0.50) }
+.gr-btn:active{ transform:translateY(0) }
+.gr-btn.wa{ background:linear-gradient(135deg,#25D366,#128C7E); box-shadow:0 6px 16px -4px rgba(37,211,102,0.40) }
+.gr-btn.wa:hover{ box-shadow:0 10px 22px -6px rgba(37,211,102,0.55) }
+.gr-btn.ghost{
+  background:#F1F5F9; color:#0F172A;
+  box-shadow:none; border:1px solid #E2E8F0;
+}
+.gr-btn.ghost:hover{ background:#E2E8F0; box-shadow:none }
+
+.gr-tabs{
+  display:flex; gap:6px;
+  background:#F1F5F9; padding:4px;
+  border-radius:13px; margin:0 auto 22px;
+  max-width:480px;
+}
+.gr-tabs button{
+  flex:1; background:transparent; border:0;
+  padding:10px 14px; border-radius:9px;
+  font-weight:700; font-size:.88rem;
+  color:#64748B; cursor:pointer;
+  font-family:inherit; letter-spacing:-.01em;
+  transition:all .18s ease;
+}
+.gr-tabs button.active{
+  background:#fff; color:#0F172A;
+  box-shadow:0 2px 8px -2px rgba(15,23,42,0.10);
+}
+
+.tab-pane{ display:none }
+.tab-pane.active{ display:block }
+
+/* QR section */
+.qr-box{
+  width:280px; height:280px; max-width:100%;
+  margin:0 auto;
+  background:#fff;
+  border-radius:14px;
+  display:grid; place-items:center;
+  border:1px solid #E2E8F0;
+  padding:12px;
+}
+.qr-box svg{ width:100%; height:100%; shape-rendering:crispEdges }
+
+/* Bulk send section */
+.bulk-list{
+  margin-top:14px;
+  display:grid; gap:8px;
+  max-height:340px; overflow-y:auto;
+  padding-right:4px;
+}
+.bulk-list a{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px 14px;
+  background:#F8FAFC;
+  border:1px solid #E2E8F0;
+  border-radius:10px;
+  text-decoration:none; color:#0F172A;
+  font-size:.92rem; font-weight:600;
+  transition:all .15s ease;
+}
+.bulk-list a:hover{
+  background:#ECFDF5; border-color:#10B981;
+  transform:translateX(2px);
+}
+.bulk-list a .num{ font-weight:700; color:#475569 }
+.bulk-list a .wa-pill{
+  background:#25D366; color:#fff;
+  padding:5px 12px; border-radius:8px;
+  font-size:.75rem; font-weight:800;
+  letter-spacing:.04em;
+}
+
+/* Counter card preview */
+.cc-card{
+  background:linear-gradient(135deg,#FFF7ED 0%,#FED7AA 100%);
+  border:3px solid #FF6B1A;
+  border-radius:24px;
+  padding:28px 24px 22px;
+  text-align:center;
+  max-width:380px; margin:18px auto 0;
+  box-shadow:0 12px 32px -10px rgba(234,88,12,0.30);
+  position:relative; overflow:hidden;
+}
+.cc-card::before{
+  content:""; position:absolute; top:-30px; right:-30px;
+  width:120px; height:120px;
+  background:radial-gradient(circle, rgba(255,107,26,0.15), transparent 70%);
+  border-radius:50%;
+}
+.cc-card h3{
+  font-size:.78rem; font-weight:800; letter-spacing:.14em;
+  color:#C2410C; text-transform:uppercase;
+  margin:0 0 10px;
+}
+.cc-card .name{
+  font-size:1.45rem; font-weight:900; letter-spacing:-.025em;
+  color:#0F172A; line-height:1.1; margin-bottom:6px;
+}
+.cc-card .tag{
+  font-size:.9rem; color:#475569; font-weight:500;
+  line-height:1.45; margin:6px 0 16px;
+}
+.cc-card .stars-row{
+  font-size:1.6rem; letter-spacing:6px;
+  color:#FBBF24; margin:6px 0 14px;
+  text-shadow:0 2px 4px rgba(0,0,0,0.06);
+}
+.cc-card .cc-qr{
+  width:200px; height:200px;
+  margin:0 auto; background:#fff;
+  padding:8px; border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+.cc-card .cc-qr svg{ width:100%; height:100%; shape-rendering:crispEdges }
+.cc-card .cc-cta{
+  margin-top:14px; font-size:.95rem; font-weight:800;
+  color:#0F172A; letter-spacing:-.01em;
+}
+.cc-card .cc-cta em{ color:#EA580C; font-style:normal }
+.cc-card .cc-foot{
+  margin-top:10px; padding-top:10px;
+  border-top:1px dashed rgba(194,65,12,0.30);
+  font-size:.72rem; letter-spacing:.10em;
+  font-weight:700; color:#9A3412;
+  text-transform:uppercase;
+}
+
+/* Mini stats strip */
+.gr-stats{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:10px; margin-bottom:20px;
+}
+.gr-stat{
+  background:#fff; border:1px solid #E2E8F0;
+  border-radius:14px; padding:14px 12px;
+  text-align:center;
+}
+.gr-stat .v{ font-size:1.4rem; font-weight:900; color:#0F172A; letter-spacing:-.02em }
+.gr-stat .l{ font-size:.72rem; color:#64748B; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin-top:2px }
+@media (max-width:520px){
+  .gr-hero h1{ font-size:1.65rem }
+  .gr-hero p{ font-size:.92rem }
+  .gr-card{ padding:20px 18px 18px }
+  .gr-select{ max-width:100px }
+  .qr-box{ width:240px; height:240px }
+}
+
+.copy-flash{ animation:flashGreen .55s ease both }
+@keyframes flashGreen{ 0%{background:#10B981; color:#fff} 100%{background:#F1F5F9; color:#0F172A} }
+
+@media print{
+  body{ background:#fff !important }
+  .topbar, .gr-hero, .gr-card:not(.gr-card-print), .gr-tabs, footer.site, .no-print{ display:none !important }
+  .cc-card{ box-shadow:none; border-width:3px }
+  .page{ padding:0 !important }
+}
+</style>
+</head>
+<body>
+<script src="/assets/js/impersonation-banner.js"></script>
+<script src="/assets/js/email-verify-banner.js"></script>
+
+<header class="topbar no-print">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
+      <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
+      <a href="/panel/digital-card.html"><span data-i18n-en>📇 Digital Card</span><span data-i18n-hi>📇 डिजिटल कार्ड</span></a>
+      <a href="/panel/reviews.html"><span data-i18n-en>⭐ My Reviews</span><span data-i18n-hi>⭐ मेरे रिव्यू</span></a>
+      <a href="/panel/get-reviews.html" style="color:#FBBF24;font-weight:800"><span data-i18n-en>🌟 Get Reviews</span><span data-i18n-hi>🌟 रिव्यू लाएँ</span></a>
+      <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
+      <a href="/panel/deals.html"><span data-i18n-en>🎁 Deals</span><span data-i18n-hi>🎁 डील्स</span></a>
+      <a href="/panel/analytics.html"><span data-i18n-en>📊 Analytics</span><span data-i18n-hi>📊 आँकड़े</span></a>
+      <a href="/panel/poster-studio.html"><span data-i18n-en>✨ Poster Studio</span><span data-i18n-hi>📲 पोस्टर</span></a>
+      <a href="/pucho-bhai.html"><span data-i18n-en>💬 Pucho Bhai</span><span data-i18n-hi>💬 पूछो भाई</span></a>
+      <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support" target="_blank" rel="noopener"><span data-i18n-en>🆘 Get Help</span><span data-i18n-hi>🆘 सहायता</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+<div class="gr-wrap">
+
+  <a href="/panel/dashboard.html" class="btn btn-ghost no-print" style="margin-bottom:6px">
+    ← <span data-i18n-en>Back to Dashboard</span><span data-i18n-hi>डैशबोर्ड पर वापस</span>
+  </a>
+
+  <!-- ============ HERO ============ -->
+  <div class="gr-hero">
+    <h1>
+      <span data-i18n-en>Get More 5-Star Reviews</span>
+      <span data-i18n-hi>और रिव्यू लाएँ</span>
+    </h1>
+    <p>
+      <span data-i18n-en>The fastest way to grow your shop's trust. Ask happy customers in one tap — via WhatsApp, QR code, or a printable counter card.</span>
+      <span data-i18n-hi>अपनी दुकान का भरोसा बढ़ाने का सबसे तेज़ तरीका। एक टैप में खुश ग्राहकों से रिव्यू माँगें।</span>
+    </p>
+    <div class="stars">⭐ ⭐ ⭐ ⭐ ⭐</div>
+  </div>
+
+  <!-- Loading state -->
+  <div id="loading" style="text-align:center;padding:40px 0;color:var(--muted)">⏳ Loading your business...</div>
+
+  <!-- Mini stats -->
+  <div id="grStats" class="gr-stats" style="display:none">
+    <div class="gr-stat"><div class="v" id="statRating">—</div><div class="l" data-i18n-en>Average Rating</div><div class="l" data-i18n-hi>औसत रेटिंग</div></div>
+    <div class="gr-stat"><div class="v" id="statCount">—</div><div class="l" data-i18n-en>Total Reviews</div><div class="l" data-i18n-hi>कुल रिव्यू</div></div>
+    <div class="gr-stat"><div class="v" id="statThis">—</div><div class="l" data-i18n-en>This Month</div><div class="l" data-i18n-hi>इस माह</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div id="grContent" style="display:none">
+  <div class="gr-tabs">
+    <button class="active" data-tab="wa"><span data-i18n-en>📲 WhatsApp</span><span data-i18n-hi>📲 व्हाट्सऐप</span></button>
+    <button data-tab="qr"><span data-i18n-en>🔳 QR Code</span><span data-i18n-hi>🔳 QR कोड</span></button>
+    <button data-tab="card"><span data-i18n-en>🖨 Counter Card</span><span data-i18n-hi>🖨 काउंटर कार्ड</span></button>
+  </div>
+
+  <!-- ============ TAB 1: WHATSAPP ============ -->
+  <div id="tab-wa" class="tab-pane active">
+
+    <!-- Single customer -->
+    <div class="gr-card">
+      <h2><span class="h2-icon" style="background:#DCFCE7;color:#16A34A">📲</span>
+        <span data-i18n-en>Send to One Customer</span>
+        <span data-i18n-hi>एक ग्राहक को भेजें</span>
+      </h2>
+      <p class="sub">
+        <span data-i18n-en>Best for happy customers right after a sale. Personal touch = higher response.</span>
+        <span data-i18n-hi>खरीदारी के तुरंत बाद खुश ग्राहक को भेजें। बेहतर रिस्पॉन्स।</span>
+      </p>
+      <div class="gr-row" style="margin-bottom:10px">
+        <select id="singleCC" class="gr-select">
+          <option value="91">🇮🇳 +91</option>
+          <option value="971">🇦🇪 +971</option>
+          <option value="1">🇺🇸 +1</option>
+          <option value="44">🇬🇧 +44</option>
+          <option value="65">🇸🇬 +65</option>
+        </select>
+        <input id="singlePhone" type="tel" inputmode="numeric" maxlength="14" placeholder="Mobile number" class="gr-input">
+      </div>
+      <textarea id="singleMsg" class="gr-textarea" placeholder="Custom message..."></textarea>
+      <div class="gr-row" style="margin-top:12px;justify-content:flex-end">
+        <button class="gr-btn ghost" onclick="copySingleLink()">📋 <span data-i18n-en>Copy Link</span><span data-i18n-hi>लिंक कॉपी</span></button>
+        <button class="gr-btn wa" onclick="sendSingleWA()">📲 <span data-i18n-en>Send via WhatsApp</span><span data-i18n-hi>व्हाट्सऐप से भेजें</span></button>
+      </div>
+    </div>
+
+    <!-- Bulk paste -->
+    <div class="gr-card">
+      <h2><span class="h2-icon" style="background:#FEF3C7;color:#D97706">📨</span>
+        <span data-i18n-en>Bulk Send (One Time)</span>
+        <span data-i18n-hi>एक साथ कई ग्राहक</span>
+      </h2>
+      <p class="sub">
+        <span data-i18n-en>Paste multiple numbers (one per line). Each gets a personal WhatsApp link. Open and send one by one — WhatsApp does not allow real bulk-blast.</span>
+        <span data-i18n-hi>एक लाइन में एक नंबर लिखें। हर नंबर के लिए अलग व्हाट्सऐप लिंक मिलेगा।</span>
+      </p>
+      <textarea id="bulkNumbers" class="gr-textarea" placeholder="9876543210&#10;9123456789&#10;..." style="min-height:120px;font-family:'SF Mono','Roboto Mono',monospace;font-size:14px;letter-spacing:.04em"></textarea>
+      <div class="gr-row" style="margin-top:12px;justify-content:space-between;align-items:center">
+        <div style="font-size:.82rem;color:#64748B"><span data-i18n-en>Same default message will go to all.</span><span data-i18n-hi>सभी को वही मैसेज जाएगा।</span></div>
+        <button class="gr-btn" onclick="generateBulk()">⚡ <span data-i18n-en>Generate Links</span><span data-i18n-hi>लिंक बनाएँ</span></button>
+      </div>
+      <div id="bulkList" class="bulk-list"></div>
+    </div>
+
+  </div>
+
+  <!-- ============ TAB 2: QR CODE ============ -->
+  <div id="tab-qr" class="tab-pane">
+    <div class="gr-card" style="text-align:center">
+      <h2 style="justify-content:center"><span class="h2-icon" style="background:#DBEAFE;color:#2563EB">🔳</span>
+        <span data-i18n-en>Shop QR Code</span>
+        <span data-i18n-hi>शॉप QR कोड</span>
+      </h2>
+      <p class="sub">
+        <span data-i18n-en>Customers scan with their phone camera and land on your review page. Print, laminate, and stick at your counter.</span>
+        <span data-i18n-hi>ग्राहक कैमरे से स्कैन करते हैं और सीधे रिव्यू पेज पर पहुंच जाते हैं।</span>
+      </p>
+      <div class="qr-box"><div id="qrBox"></div></div>
+      <div id="qrUrl" style="font-size:.8rem;color:#64748B;margin-top:12px;word-break:break-all">—</div>
+      <div class="gr-row" style="justify-content:center;margin-top:14px">
+        <button class="gr-btn" onclick="downloadQR()">⬇ <span data-i18n-en>Download PNG</span><span data-i18n-hi>PNG डाउनलोड</span></button>
+        <button class="gr-btn ghost" onclick="copyShopUrl()">🔗 <span data-i18n-en>Copy Link</span><span data-i18n-hi>लिंक कॉपी</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TAB 3: COUNTER CARD ============ -->
+  <div id="tab-card" class="tab-pane">
+    <div class="gr-card gr-card-print">
+      <h2><span class="h2-icon" style="background:#FFEDD5;color:#EA580C">🖨</span>
+        <span data-i18n-en>Printable Counter Card</span>
+        <span data-i18n-hi>काउंटर कार्ड</span>
+      </h2>
+      <p class="sub no-print">
+        <span data-i18n-en>A beautiful 5×7 inch card with your QR. Print, laminate, and keep at your billing counter. Customers scan and review on the spot.</span>
+        <span data-i18n-hi>5×7 इंच कार्ड जिसमें आपका QR है। काउंटर पर रखें।</span>
+      </p>
+
+      <!-- Preview / Print target -->
+      <div class="cc-card" id="ccCard">
+        <h3 data-i18n-en>Rate Us On DukanList</h3>
+        <h3 data-i18n-hi>हमें रेट करें</h3>
+        <div class="name" id="ccName">—</div>
+        <div class="stars-row">⭐ ⭐ ⭐ ⭐ ⭐</div>
+        <div class="tag" id="ccTag" data-i18n-en>Loved your visit? Scan this QR and leave us 5 stars in 10 seconds. Your review helps our shop grow.</div>
+        <div class="tag" data-i18n-hi style="display:none">अच्छा अनुभव रहा? QR स्कैन करें और 10 सेकंड में 5 स्टार दें।</div>
+        <div class="cc-qr" id="ccQrBox"></div>
+        <div class="cc-cta">
+          <span data-i18n-en>Open phone <em>camera</em> & scan</span>
+          <span data-i18n-hi>फ़ोन <em>कैमरा</em> खोलकर स्कैन करें</span>
+        </div>
+        <div class="cc-foot">DukanList.com · Bharat's Local Directory</div>
+      </div>
+
+      <div class="gr-row no-print" style="justify-content:center;margin-top:18px">
+        <button class="gr-btn" onclick="window.print()">🖨 <span data-i18n-en>Print Card</span><span data-i18n-hi>प्रिंट</span></button>
+        <button class="gr-btn ghost" onclick="downloadCardPNG()">⬇ <span data-i18n-en>Download as PNG</span><span data-i18n-hi>PNG डाउनलोड</span></button>
+      </div>
+      <p class="sub no-print" style="text-align:center;margin-top:16px;font-size:.82rem">
+        💡 <span data-i18n-en>Tip: Print on A6 card stock, laminate it, and place near billing.</span>
+        <span data-i18n-hi>टिप: A6 कार्डबोर्ड पर प्रिंट करके लैमिनेट करें और बिलिंग के पास रखें।</span>
+      </p>
+    </div>
+  </div>
+
+  </div><!-- /grContent -->
+
+</div>
+</div>
+
+<footer class="site no-print">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/nav.js" defer></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+}
+
+let MY_BIZ = null;
+let SHOP_URL = '';     // review-prompt URL
+let SHOP_URL_BASE = ''; // base profile URL
+
+function defaultMsg(){
+  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our shop';
+  return 'Hi! Thank you for visiting ' + name + '. We would love your honest feedback on DukanList — it just takes 10 seconds. Please rate us here: ' + SHOP_URL;
+}
+
+async function loadBiz(){
+  const user = await ShopDB.requireAuth();
+  if (!user) return;
+  const c = ShopDB.client;
+
+  // Safe RPC first
+  let bizId = null;
+  try{
+    const safe = await c.rpc('get_my_business_safe');
+    if (!safe.error && safe.data && safe.data.length){
+      bizId = safe.data[0].business_id;
+    }
+  }catch(_){}
+  if (!bizId){
+    const fb = await c.from('business_owners')
+      .select('business_id').eq('auth_user_id', user.id).limit(1);
+    if (fb.data && fb.data.length) bizId = fb.data[0].business_id;
+  }
+  if (!bizId){
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+    return;
+  }
+
+  const { data: biz, error } = await c.from('businesses')
+    .select('id, slug, name, name_hi, rating, rating_count').eq('id', bizId).maybeSingle();
+  if (error || !biz){
+    document.getElementById('loading').innerHTML = '⚠ Could not load your shop.';
+    return;
+  }
+
+  MY_BIZ = biz;
+  SHOP_URL_BASE = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug);
+  SHOP_URL = SHOP_URL_BASE + '&review=1';
+
+  // Stats
+  document.getElementById('statRating').textContent = biz.rating ? (Number(biz.rating).toFixed(1) + '★') : '—';
+  document.getElementById('statCount').textContent  = biz.rating_count || 0;
+
+  // This-month reviews
+  try{
+    const monthStart = new Date();
+    monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+    const { count } = await c.from('reviews')
+      .select('id', { count:'exact', head:true })
+      .eq('business_id', bizId)
+      .gte('created_at', monthStart.toISOString());
+    document.getElementById('statThis').textContent = count || 0;
+  }catch(_){ document.getElementById('statThis').textContent = '—'; }
+
+  // Default message
+  document.getElementById('singleMsg').value = defaultMsg();
+
+  // QR code
+  renderQR('qrBox', SHOP_URL, 8, 4);
+  renderQR('ccQrBox', SHOP_URL, 6, 3);
+  document.getElementById('qrUrl').textContent = SHOP_URL;
+  document.getElementById('ccName').textContent = biz.name || 'Your Shop';
+
+  // Show content
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('grStats').style.display = '';
+  document.getElementById('grContent').style.display = '';
+}
+
+function renderQR(targetId, text, cellSize, margin){
+  const box = document.getElementById(targetId);
+  if (!box) return;
+  if (typeof qrcode !== 'function'){
+    box.textContent = '⚠ QR library failed to load. Refresh the page.';
+    return;
+  }
+  const qr = qrcode(0, 'M');
+  qr.addData(text);
+  qr.make();
+  box.innerHTML = qr.createSvgTag({ cellSize: cellSize || 8, margin: margin || 4, scalable: true });
+  const svg = box.querySelector('svg');
+  if (svg){
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.setAttribute('shape-rendering', 'crispEdges');
+  }
+}
+
+// ============ TABS ============
+document.addEventListener('click', function(e){
+  const t = e.target.closest('.gr-tabs button[data-tab]');
+  if (!t) return;
+  document.querySelectorAll('.gr-tabs button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  const tab = t.getAttribute('data-tab');
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById('tab-' + tab);
+  if (pane) pane.classList.add('active');
+});
+
+// ============ WHATSAPP SINGLE ============
+function singleWALink(){
+  const cc = (document.getElementById('singleCC').value || '91').replace(/\D/g,'');
+  const phone = (document.getElementById('singlePhone').value || '').replace(/\D/g,'');
+  if (!phone || phone.length < 7) return null;
+  const msg = (document.getElementById('singleMsg').value || defaultMsg()).trim();
+  return 'https://wa.me/' + cc + phone + '?text=' + encodeURIComponent(msg);
+}
+function sendSingleWA(){
+  const url = singleWALink();
+  if (!url){ toast('Enter a valid mobile number', true); return; }
+  window.open(url, '_blank');
+}
+function copySingleLink(){
+  const url = singleWALink();
+  if (!url){ toast('Enter a valid mobile number', true); return; }
+  copyToClipboard(url, 'WhatsApp link copied!');
+}
+
+// ============ WHATSAPP BULK ============
+function generateBulk(){
+  const raw = document.getElementById('bulkNumbers').value || '';
+  const cc = (document.getElementById('singleCC').value || '91').replace(/\D/g,'');
+  const msg = defaultMsg();
+  const list = raw.split(/[\n,]/).map(s => s.replace(/\D/g,'')).filter(n => n.length >= 7);
+  const target = document.getElementById('bulkList');
+  if (!list.length){
+    target.innerHTML = '<div style="text-align:center;padding:16px;color:#94A3B8;font-size:.88rem">No valid numbers found. Paste numbers above (one per line).</div>';
+    return;
+  }
+  target.innerHTML = list.map((n, i) => {
+    const display = n.length === 10 ? n.replace(/(\d{5})(\d{5})/, '$1 $2') : n;
+    const link = 'https://wa.me/' + cc + n + '?text=' + encodeURIComponent(msg);
+    return '<a href="' + link + '" target="_blank" rel="noopener"><span><span class="num">' + (i+1) + '.</span> +' + cc + ' ' + display + '</span><span class="wa-pill">SEND →</span></a>';
+  }).join('');
+}
+
+// ============ QR DOWNLOAD ============
+function downloadQR(){
+  if (!SHOP_URL || typeof qrcode !== 'function') return;
+  const qr = qrcode(0, 'M');
+  qr.addData(SHOP_URL); qr.make();
+  const modules = qr.getModuleCount();
+  const cell = 16, marg = 4 * cell, captionPad = 80;
+  const size = modules * cell + marg * 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size + captionPad;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0B1220';
+  for (let r=0;r<modules;r++){
+    for (let c=0;c<modules;c++){
+      if (qr.isDark(r,c)) ctx.fillRect(marg + c*cell, marg + r*cell, cell, cell);
+    }
+  }
+  ctx.fillStyle = '#0B1220';
+  ctx.font = 'bold 28px Manrope, Inter, Arial, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Shop';
+  let display = name; const maxW = canvas.width - 40;
+  if (ctx.measureText(display).width > maxW){
+    while (display.length > 6 && ctx.measureText(display + '…').width > maxW) display = display.slice(0,-1);
+    display += '…';
+  }
+  ctx.fillText(display, canvas.width/2, size + captionPad/2);
+  canvas.toBlob(b => {
+    if (!b){ triggerDownload(canvas.toDataURL('image/png'), (MY_BIZ.slug||'shop')+'-qr.png'); return; }
+    const u = URL.createObjectURL(b);
+    triggerDownload(u, (MY_BIZ.slug||'shop')+'-qr.png');
+    setTimeout(()=>URL.revokeObjectURL(u), 5000);
+  }, 'image/png');
+}
+function downloadCardPNG(){
+  // Re-use QR download with shop name caption is good enough for now
+  downloadQR();
+  toast('Saved QR with shop name. Use Print button for full card.');
+}
+function triggerDownload(href, filename){
+  const a = document.createElement('a');
+  a.href = href; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+function copyShopUrl(){ copyToClipboard(SHOP_URL, 'Shop link copied!'); }
+
+// ============ Utility ============
+function copyToClipboard(text, okMsg){
+  if (!text) return;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast(okMsg||'Copied!'), ()=>fbCopy(text, okMsg));
+  } else fbCopy(text, okMsg);
+}
+function fbCopy(text, okMsg){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast(okMsg||'Copied!'); }catch(_){ alert(text); }
+  finally{ ta.remove(); }
+}
+function toast(msg, err){
+  let t = document.getElementById('grToast');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'grToast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#0F172A;color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;font-size:.92rem;box-shadow:0 12px 30px -8px rgba(0,0,0,0.3);z-index:9999;opacity:0;transition:opacity .25s ease, transform .25s ease;font-family:Manrope,Inter,sans-serif;letter-spacing:-.01em';
+    document.body.appendChild(t);
+  }
+  t.style.background = err ? '#DC2626' : '#10B981';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2200);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadBiz();
+});
+</script>
+
+<script src="/assets/js/owner-notifications.js" defer></script>
+<script src="/assets/js/error-reporter.js" defer></script>
+
+</body>
+</html>

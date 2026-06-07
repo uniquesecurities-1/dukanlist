@@ -611,7 +611,8 @@
       <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
       <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
       <a href="/panel/digital-card.html"><span data-i18n-en>📇 Digital Card</span><span data-i18n-hi>📇 डिजिटल कार्ड</span></a>
-      <a href="/panel/reviews.html"><span data-i18n-en>⭐ Reviews</span><span data-i18n-hi>⭐ रिव्यू</span></a>
+      <a href="/panel/reviews.html"><span data-i18n-en>⭐ My Reviews</span><span data-i18n-hi>⭐ मेरे रिव्यू</span></a>
+      <a href="/panel/get-reviews.html" style="color:#FBBF24;font-weight:800"><span data-i18n-en>🌟 Get Reviews</span><span data-i18n-hi>🌟 रिव्यू लाएँ</span></a>
       <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
       <a href="/panel/deals.html"><span data-i18n-en>🎁 Deals</span><span data-i18n-hi>🎁 डील्स</span></a>
       <a href="/panel/analytics.html"><span data-i18n-en>📊 Analytics</span><span data-i18n-hi>📊 आँकड़े</span></a>
@@ -813,11 +814,23 @@
             <div class="desc" style="color:#991B1B;opacity:.8"><span data-i18n-en>Post discounts to attract customers</span><span data-i18n-hi>ग्राहकों के लिए डिस्काउंट डालें</span></div>
           </div>
         </a>
+        <!-- HERO CTA: Get Reviews (golden, eye-catching) -->
+        <a href="/panel/get-reviews.html" class="qa" style="background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 50%,#FDE68A 100%);border:1.5px solid #F59E0B;position:relative;overflow:hidden;box-shadow:0 6px 18px -6px rgba(245,158,11,0.35)">
+          <span class="ico" style="font-size:1.8rem;filter:drop-shadow(0 2px 4px rgba(245,158,11,0.4))">🌟</span>
+          <div style="position:relative">
+            <div class="name" style="color:#92400E;font-weight:900;letter-spacing:-.01em">
+              <span data-i18n-en>Get More Reviews</span><span data-i18n-hi>रिव्यू लाएँ</span>
+              <span style="display:inline-block;margin-left:6px;background:#DC2626;color:#fff;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.04em;vertical-align:middle;animation:pulseHot 1.4s ease-in-out infinite">NEW</span>
+            </div>
+            <div class="desc" style="color:#92400E;opacity:.88"><span data-i18n-en>WhatsApp, QR, printable counter card</span><span data-i18n-hi>व्हाट्सऐप, QR, काउंटर कार्ड</span></div>
+          </div>
+          <style>@keyframes pulseHot{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(220,38,38,.5)}50%{transform:scale(1.06);box-shadow:0 0 0 5px rgba(220,38,38,0)}}</style>
+        </a>
         <a href="/panel/reviews.html" class="qa" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#60A5FA">
           <span class="ico">⭐</span>
           <div>
-            <div class="name" style="color:#1E40AF"><span data-i18n-en>Reviews &amp; Replies</span><span data-i18n-hi>रिव्यू &amp; जवाब</span></div>
-            <div class="desc" style="color:#1E40AF;opacity:.8"><span data-i18n-en>Read customer reviews + reply publicly</span><span data-i18n-hi>ग्राहक रिव्यू देखें + जवाब दें</span></div>
+            <div class="name" style="color:#1E40AF"><span data-i18n-en>My Reviews</span><span data-i18n-hi>मेरे रिव्यू</span></div>
+            <div class="desc" style="color:#1E40AF;opacity:.8"><span data-i18n-en>Read &amp; reply to customer reviews</span><span data-i18n-hi>ग्राहक रिव्यू देखें + जवाब दें</span></div>
           </div>
         </a>
         <a href="/panel/profile.html" class="qa">
@@ -896,9 +909,13 @@
       <!-- Engage -->
       <div class="qa-section-title">Engage</div>
       <div class="qa-grid">
+        <a href="/panel/get-reviews.html" class="qa-tile" style="background:linear-gradient(135deg,#FFFBEB,#FDE68A);border:1.5px solid #F59E0B">
+          <div class="qa-tile-ico">🌟</div>
+          <div class="qa-tile-lbl" style="color:#92400E;font-weight:800"><span data-i18n-en>Get Reviews</span><span data-i18n-hi>रिव्यू लाएँ</span></div>
+        </a>
         <a href="/panel/reviews.html" class="qa-tile">
           <div class="qa-tile-ico">⭐</div>
-          <div class="qa-tile-lbl"><span data-i18n-en>Reviews</span><span data-i18n-hi>रिव्यू</span></div>
+          <div class="qa-tile-lbl"><span data-i18n-en>My Reviews</span><span data-i18n-hi>मेरे रिव्यू</span></div>
         </a>
         <a href="/panel/deals.html" class="qa-tile">
           <div class="qa-tile-ico">🎁</div>
@@ -1901,11 +1918,11 @@ function renderSmartActions(b){
   }
   if (reviewCount < 5 && photoCount >= 1){
     actions.push({
-      icon: '\u{2B50}',
+      icon: '\u{1F31F}',
       title: 'Ask customers for reviews',
-      sub: 'Print your QR code and place it at the counter',
-      href: '/panel/qr-code.html',
-      cta: 'Print QR'
+      sub: 'Send WhatsApp, share QR, or print a counter card',
+      href: '/panel/get-reviews.html',
+      cta: 'Get Reviews'
     });
   }
   if (rating >= 4 && reviewCount >= 5){
