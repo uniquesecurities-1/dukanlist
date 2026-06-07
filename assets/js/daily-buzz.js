@@ -311,4 +311,4 @@ global.DailyBuzz = {
   GRADIENTS
 };
 
-})(window);
+})(window)
