@@ -196,4 +196,49 @@ async function renderWidget(containerId, opts){
 
 // Normalize Indian mobile to exactly 10 digits (no country code prefix).
 function normIN(raw){
-  var d = String(raw == null ? '' : raw).replace(/
+  var d = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+  if (!d) return '';
+  if (d.length === 12 && d.charAt(0) === '9' && d.charAt(1) === '1') d = d.slice(2);
+  else if (d.length === 11 && d.charAt(0) === '0') d = d.slice(1);
+  return d.slice(-10);
+}
+
+function renderShopRow(b){
+  const dist = (b.dist_km != null) ? (Number(b.dist_km).toFixed(1) + ' km') : '';
+  const rating = (b.rating_count > 0) ? '⭐ ' + Number(b.rating_avg).toFixed(1) : '';
+  const photo = b.photo
+    ? '<img src="' + escAttr(b.photo) + '" alt="" loading="lazy">'
+    : '<span class="ony-row-emoji">🏪</span>';
+  const phone = normIN(b.mobile);
+  const wa    = normIN(b.whatsapp || b.mobile);
+  const phoneBtn = phone ? '<a class="ony-act call" href="tel:' + escAttr(phone) + '">📞 Call</a>' : '';
+  const waBtn   = wa    ? '<a class="ony-act wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '';
+  return '' +
+    '<a class="ony-row" href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '">' +
+    '  <div class="ony-row-photo">' + photo + '</div>' +
+    '  <div class="ony-row-body">' +
+    '    <div class="ony-row-name">' + escHtml(b.name || '') + '</div>' +
+    '    <div class="ony-row-meta">' +
+    '      <span class="ony-dist">' + escHtml(dist) + ' away</span>' +
+    (rating ? '<span class="ony-rating">' + escHtml(rating) + '</span>' : '') +
+    '    </div>' +
+    '    <div class="ony-row-actions">' + phoneBtn + waBtn + '</div>' +
+    '  </div>' +
+    '</a>';
+}
+
+// ─── helpers ────────────────────────────────────────────────
+function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return escHtml(s); }
+
+// ─── Public API ─────────────────────────────────────────────
+global.GeoNearby = {
+  getStoredCoords,
+  storeCoords,
+  requestLocation,
+  fetchNearby,
+  renderWidget,
+  isDenied
+};
+
+})(window);
