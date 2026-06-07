@@ -642,4 +642,19 @@ async function loadCard(){
       youtube:   b.youtube_url    || '',
       x_twitter: b.x_twitter_url  || '',
       linkedin:  b.linkedin_url   || '',
-      website:   b.website_url    |
+      website:   b.website_url    || ''
+    }
+  };
+
+  // Page title + meta
+  document.title = (data.displayName || data.business_name) + ' · Digital Business Card';
+  var topTag = document.getElementById('topTag');
+  if (topTag) topTag.innerHTML = '<em>📇 ' + escapeHtml(data.business_name) + '</em> · Digital Card';
+
+  render(data);
+}
+
+loadCard();
+</script>
+
+<
