@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.4.0';  // bumped — iPhone HEIC multi-strategy upload (native canvas + heic2any + camera capture)
+const VERSION    = 'dukan-v1.5.0';  // bumped — fix stale geo-nearby.js (refresh buttons) + discover.html + photos.html cache
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
@@ -145,4 +145,3 @@ self.addEventListener('notificationclick', function(event){
       if (clients.openWindow) return clients.openWindow(url);
     })
   );
-});

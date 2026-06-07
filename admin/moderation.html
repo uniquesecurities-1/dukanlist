@@ -403,8 +403,16 @@ async function loadPending(){
       banner = '<div id="emailWaitBanner" style="background:#FEF3C7;border:1px solid #FCD34D;border-left:4px solid #F59E0B;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:#78350F;">'
         + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
         + '<span style="font-size:22px">📧</span>'
-        + '<div style="flex:1"><b style="font-size:15px">' + waiting + '</b> new registration' + (waiting === 1 ? '' : 's') + ' <b>awaiting email verification</b>.<br><span style="font-size:11.5px;color:#92400E">Niche list me <span style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;padding:2px 7px;border-radius:4px;font-weight:700">📧 Resend Email</span> button se user ko fresh verification email bhejein.</span></div>'
+        + '<div style="flex:1"><b style="font-size:15px">' + waiting + '</b> new registration' + (waiting === 1 ? '' : 's') + ' <b>awaiting email verification</b>.</div>'
         + '<button onclick="toggleEmailWaitList()" id="emailWaitToggleBtn" style="background:#F59E0B;color:#fff;border:0;padding:8px 16px;border-radius:6px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">🔼 Hide list</button>'
+        + '</div>'
+        // === Manual email entry — ALWAYS visible, works even if list RPC returns empty ===
+        + '<div style="background:#fff;border:1px solid #FCD34D;border-radius:8px;padding:10px 12px;margin-bottom:10px">'
+        + '  <div style="font-size:12px;font-weight:700;color:#78350F;margin-bottom:6px">📧 Resend verification email to any user (type/paste email):</div>'
+        + '  <div style="display:flex;gap:6px;flex-wrap:wrap">'
+        + '    <input type="email" id="manualResendEmail" placeholder="user@example.com" style="flex:1;min-width:200px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-family:inherit">'
+        + '    <button type="button" onclick="adminResendVerificationManual()" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;padding:8px 16px;border-radius:6px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap">📧 Send Email</button>'
+        + '  </div>'
         + '</div>'
         + '<div id="emailWaitList" style="display:block;margin-top:10px;padding-top:10px;border-top:1px dashed #FCD34D"><div style="padding:14px;text-align:center;color:#92400E">⏳ Loading list…</div></div>'
         + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px;margin-top:8px;border-top:1px dashed #FCD34D">'
@@ -548,6 +556,22 @@ function showToast(msg, kind){
   t.style.color = '#fff';
   t.style.display = 'block';
   setTimeout(function(){ t.style.display = 'none'; }, 3500);
+}
+
+// ============================================================
+// MANUAL RESEND — admin types any email in the input field
+// Works even if the pending-list RPC returns empty rows.
+// ============================================================
+async function adminResendVerificationManual(){
+  var input = document.getElementById('manualResendEmail');
+  if (!input) return;
+  var email = (input.value || '').trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    alert('⚠ Valid email daalein (e.g. user@example.com)');
+    input.focus(); return;
+  }
+  await adminResendVerificationEmail(email, null);
+  input.value = '';
 }
 
 // ============================================================
@@ -939,156 +963,4 @@ async function confirmDeleteBusiness(){
       try {
         const { error: storErr } = await C.storage.from('shop-photos').remove(paths);
         if (storErr){
-          console.warn('Storage cleanup partial:', storErr);
-          photoNote = ' (storage cleanup needs manual review)';
-        } else {
-          photoNote = ' · ' + paths.length + ' photo(s) cleaned';
-        }
-      } catch (e){
-        console.warn('Storage cleanup exception:', e);
-        photoNote = ' (storage cleanup failed)';
-      }
-    }
-  }
-
-  closeDeleteModal();
-
-  // Step 3: Toast + refresh
-  toast('🗑 "' + name + '" deleted permanently' + photoNote, 'success');
-  document.getElementById('biz-' + id)?.remove();
-  await loadPending();
-  await loadFlaggedBiz();
-  await loadFlags();
-}
-
-// Extract storage object path from public URL
-// e.g. https://xxx.supabase.co/storage/v1/object/public/shop-photos/<biz-id>/photo1.jpg
-// returns: <biz-id>/photo1.jpg
-function extractStoragePath(url){
-  if (!url) return null;
-  const marker = '/shop-photos/';
-  const idx = String(url).indexOf(marker);
-  if (idx < 0) return null;
-  return String(url).slice(idx + marker.length);
-}
-
-async function resolveFlag(id, action){
-  const { error } = await C.rpc('admin_resolve_flag', { p_flag_id: id, p_action: action });
-  if (error){ toast('Failed: ' + error.message, 'error'); return; }
-  toast(action === 'resolved' ? '✓ Flag resolved' : '🚫 Flag dismissed', 'success');
-  await loadFlags();
-}
-
-function toast(msg, type){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type;
-  t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3000);
-}
-
-function formatDate(iso){
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = (now - d) / 1000;
-  if (diff < 60) return Math.floor(diff) + 's ago';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
-  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-}
-
-// ===== Bulk action selection =====
-let _selectedBulk = new Map(); // id → { name, kind }
-
-function onBulkToggle(cb){
-  const id = cb.dataset.id;
-  const name = cb.dataset.name;
-  const kind = cb.dataset.kind;
-  const card = document.getElementById('biz-' + id);
-  if (cb.checked){
-    _selectedBulk.set(id, { name, kind });
-    if (card) card.classList.add('bulk-selected');
-  } else {
-    _selectedBulk.delete(id);
-    if (card) card.classList.remove('bulk-selected');
-  }
-  updateBulkBar();
-}
-
-function updateBulkBar(){
-  const bar = document.getElementById('bulkBar');
-  const cnt = document.getElementById('bulkCount');
-  if (!bar) return;
-  cnt.textContent = _selectedBulk.size;
-  bar.classList.toggle('show', _selectedBulk.size > 0);
-}
-
-function clearBulkSelection(){
-  _selectedBulk.clear();
-  document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = false; });
-  document.querySelectorAll('.biz-card.bulk-selected').forEach(c => c.classList.remove('bulk-selected'));
-  document.querySelectorAll('input[id^="selAll-"]').forEach(c => c.checked = false);
-  updateBulkBar();
-}
-
-function toggleAllSelected(panelKind, checked){
-  // Iterate checkboxes inside the matching panel only
-  const panel = document.getElementById('panel-' + panelKind);
-  if (!panel) return;
-  panel.querySelectorAll('.bulk-cb').forEach(cb => {
-    if (cb.checked !== checked){
-      cb.checked = checked;
-      onBulkToggle(cb);
-    }
-  });
-}
-
-async function performBulkAction(action){
-  if (_selectedBulk.size === 0) return;
-  const ids = Array.from(_selectedBulk.keys());
-  const names = Array.from(_selectedBulk.values()).map(v => v.name).slice(0, 5);
-  const previewList = names.join(', ') + (_selectedBulk.size > 5 ? ' + ' + (_selectedBulk.size - 5) + ' more' : '');
-  const verb = action === 'approve' ? 'approve & activate' : 'ban';
-  if (!confirm(verb.toUpperCase() + ' ' + _selectedBulk.size + ' shop' + (_selectedBulk.size === 1 ? '' : 's') + '?\n\n' + previewList)) return;
-
-  const rpcName = action === 'approve' ? 'admin_bulk_approve' : 'admin_bulk_ban';
-  const params = action === 'approve' ? { p_ids: ids } : { p_ids: ids, p_reason: null };
-  const r = await C.rpc(rpcName, params);
-  if (r.error){
-    alert('Bulk action failed: ' + r.error.message);
-    return;
-  }
-  const changed = r.data?.changed_count ?? 0;
-  showToast('✓ ' + changed + ' shop' + (changed === 1 ? '' : 's') + ' updated', 'success');
-  clearBulkSelection();
-  // Reload all panels so the moved shops disappear from their old tabs
-  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
-}
-
-function showToast(msg, kind){
-  // Use existing toast() if available, else fallback
-  if (typeof toast === 'function'){ toast(msg, kind); return; }
-  alert(msg);
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-function escapeJs(s){
-  return String(s == null ? '' : s).replace(/[\\'"]/g, ch => '\\' + ch);
-}
-
-async function logout(){
-  if (!confirm('Logout from admin panel?')) return;
-  await C.auth.signOut();
-  window.location.href = '/admin/login';
-}
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+          console.warn('Storage
