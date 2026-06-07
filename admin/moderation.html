@@ -442,22 +442,71 @@ async function loadPending(){
 let _emailWaitLoaded = false;
 
 // Auto-load on banner render so admin sees the 📧 Resend Email buttons immediately
+// Tries the new v2 RPC first, falls back to v1 if not deployed.
 async function autoLoadEmailWaitList(){
   const box = document.getElementById('emailWaitList');
   if (!box || _emailWaitLoaded) return;
+  let rows = [];
+  let errMsg = '';
+  // Try NEW v2 RPC (db/118) — bulletproof
   try {
-    const r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
-    if (r.error) throw r.error;
-    const rows = r.data || [];
-    if (!rows.length){
-      box.innerHTML = '<div style="padding:10px;color:#78350F;text-align:center">No pending-email registrations to show.</div>';
-    } else {
-      box.innerHTML = rows.map(renderEmailWaitRow).join('');
-    }
-    _emailWaitLoaded = true;
-  } catch(e){
-    box.innerHTML = '<div style="padding:10px;color:#991B1B;background:#FEE2E2;border-radius:6px">Failed to load list: ' + escapeHtml(e.message || 'Unknown') + '<br><small>Make sure db/82-pending-email-verify-list.sql is deployed.</small></div>';
+    const r = await C.rpc('admin_pending_email_list_v2', { p_limit: 100, p_offset: 0 });
+    if (!r.error && Array.isArray(r.data)) rows = r.data;
+    else if (r.error) errMsg = 'v2: ' + (r.error.message || '');
+  } catch(e){ errMsg = 'v2: ' + (e.message || e); }
+  // Fallback to v1 RPC (db/82) if v2 returned nothing
+  if (rows.length === 0){
+    try {
+      const r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+      if (!r.error && Array.isArray(r.data)) rows = r.data;
+      else if (r.error) errMsg += ' | v1: ' + (r.error.message || '');
+    } catch(e){ errMsg += ' | v1: ' + (e.message || e); }
   }
+  if (!rows.length){
+    box.innerHTML =
+      '<div style="padding:14px;background:#FEE2E2;border-radius:8px;color:#991B1B;font-size:13px;line-height:1.55">' +
+      '<b>⚠ List load failed.</b> Pending count says there ARE registrations, but the RPC returned empty.<br>' +
+      '<b>Fix:</b> Run <code>db/118-pending-email-list-v2.sql</code> in Supabase SQL editor — fresh bulletproof RPC.<br>' +
+      (errMsg ? '<small style="color:#7F1D1D">Diagnostic: ' + escapeHtml(errMsg) + '</small><br>' : '') +
+      '<small>Meanwhile, use the email input box above to resend by typing the user\'s email.</small>' +
+      '</div>';
+    _emailWaitLoaded = true;
+    return;
+  }
+  // Render with checkboxes for selection + per-row Resend + bulk Resend button
+  let html = '';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">';
+  html += '  <label style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#78350F;cursor:pointer">';
+  html += '    <input type="checkbox" id="emailWaitSelectAll" onchange="toggleSelectAllEmailWait(this)"> Select all (' + rows.length + ')';
+  html += '  </label>';
+  html += '  <button type="button" onclick="adminResendVerificationBulk()" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;padding:8px 14px;border-radius:6px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit">📧 Resend to Selected</button>';
+  html += '</div>';
+  html += rows.map(renderEmailWaitRow).join('');
+  box.innerHTML = html;
+  _emailWaitLoaded = true;
+}
+
+function toggleSelectAllEmailWait(master){
+  const checks = document.querySelectorAll('.email-wait-check');
+  checks.forEach(c => { c.checked = master.checked; });
+}
+
+async function adminResendVerificationBulk(){
+  const checks = document.querySelectorAll('.email-wait-check:checked');
+  if (!checks.length){ alert('⚠ Pehle kuch users select karein (checkbox tick karein).'); return; }
+  const emails = Array.from(checks).map(c => c.getAttribute('data-email')).filter(Boolean);
+  if (!emails.length){ alert('⚠ Selected users ke paas email nahi hai.'); return; }
+  if (!confirm('Resend verification email to ' + emails.length + ' user' + (emails.length === 1 ? '' : 's') + '?\n\n' + emails.join('\n'))) return;
+  let ok = 0, fail = 0;
+  for (const email of emails){
+    try {
+      await adminResendVerificationEmail(email, null);
+      ok++;
+    } catch(_){ fail++; }
+    // small gap to avoid hammering
+    await new Promise(r => setTimeout(r, 350));
+  }
+  showToast('✅ Sent: ' + ok + (fail ? ' · Failed: ' + fail : ''), fail ? 'error' : 'success');
 }
 
 async function toggleEmailWaitList(){
@@ -521,6 +570,7 @@ function renderEmailWaitRow(b){
   const ageColor = days >= 7 ? '#991B1B' : days >= 3 ? '#92400E' : '#65A30D';
 
   return '<div style="background:#FFFDF7;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">'
+    + '<div style="flex:0 0 auto;padding-top:4px"><input type="checkbox" class="email-wait-check" data-email="' + loginEmail + '" style="width:18px;height:18px;cursor:pointer"></div>'
     + '<div style="flex:1;min-width:220px">'
     +   '<div style="font-weight:800;color:#0F172A;font-size:14px">' + name + (cat ? ' <span style="color:#94a3b8;font-weight:500;font-size:11px">· ' + cat + '</span>' : '') + '</div>'
     +   '<div style="color:#64748B;font-size:12px;margin-top:2px">'
