@@ -231,6 +231,158 @@
     100% { opacity:0; transform:translate(var(--tx),var(--ty)) scale(.3) }
   }
 
+  /* ============================================================
+     HOT v2 — PHASE 2 (Progress + Streak + Reactions + Toast + Notif)
+     ============================================================ */
+
+  /* (P1) Position progress bar — thin filling line at top */
+  .pos-bar{
+    position:fixed; top:0; left:0; right:0; height:3px;
+    background:rgba(255,255,255,.08);
+    z-index:60; pointer-events:none;
+  }
+  .pos-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg,#F59E0B,#EF4444,#EC4899);
+    box-shadow:0 0 12px rgba(245,158,11,.6);
+    transition:width .35s cubic-bezier(.2,.85,.3,1);
+    width:0%;
+  }
+
+  /* (P2) Streak counter — top-right pill */
+  .streak-pill{
+    position:fixed; top:64px; right:12px; z-index:50;
+    background:linear-gradient(135deg,#1F2937,#111827);
+    border:1.5px solid rgba(251,191,36,.45);
+    color:#FBBF24;
+    padding:7px 14px; border-radius:99px;
+    font-size:12px; font-weight:900;
+    letter-spacing:.04em;
+    display:none; align-items:center; gap:6px;
+    box-shadow:0 4px 16px rgba(0,0,0,.30);
+    backdrop-filter:blur(10px);
+    animation:streakIn .55s cubic-bezier(.2,.85,.3,1.2);
+  }
+  .streak-pill.show{ display:inline-flex }
+  .streak-pill .num{
+    color:#fff; background:linear-gradient(135deg,#F59E0B,#EF4444);
+    padding:2px 8px; border-radius:99px;
+    font-weight:900; min-width:20px; text-align:center;
+  }
+  @keyframes streakIn{
+    from{ opacity:0; transform:translateX(20px) scale(.85) }
+    to  { opacity:1; transform:translateX(0) scale(1) }
+  }
+  .streak-pill.bump{ animation:streakBump .5s cubic-bezier(.2,.85,.3,1.4) }
+  @keyframes streakBump{
+    0%{ transform:scale(1) }
+    40%{ transform:scale(1.18); box-shadow:0 0 0 6px rgba(251,191,36,.22) }
+    100%{ transform:scale(1) }
+  }
+
+  /* (P3) Quick reaction emojis row — inside card body */
+  .reaction-row{
+    display:flex; gap:7px; margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .reaction-btn{
+    background:rgba(255,255,255,.13); backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.22);
+    color:#fff; padding:6px 12px;
+    border-radius:99px; font-size:14px;
+    cursor:pointer; transition:transform .15s ease, background .15s;
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:inherit; font-weight:700;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .reaction-btn:active{ transform:scale(.88) }
+  .reaction-btn.tapped{
+    background:rgba(251,191,36,.30);
+    border-color:rgba(251,191,36,.65);
+    animation:reactPop .55s cubic-bezier(.2,.85,.3,1.4);
+  }
+  @keyframes reactPop{
+    0%  { transform:scale(1) }
+    40% { transform:scale(1.32) }
+    100%{ transform:scale(1) }
+  }
+  .reaction-btn .rc{
+    font-size:11px; opacity:.85;
+    font-weight:800; letter-spacing:.02em;
+  }
+
+  /* (P4) Social proof floating toast — bottom slide-up */
+  .sp-toast{
+    position:fixed; left:50%; bottom:24px;
+    transform:translateX(-50%) translateY(80px);
+    background:linear-gradient(135deg,#1F2937,#111827);
+    border:1px solid rgba(251,191,36,.40);
+    color:#fff; padding:11px 18px;
+    border-radius:99px;
+    font-size:13px; font-weight:700;
+    box-shadow:0 12px 36px rgba(0,0,0,.40);
+    backdrop-filter:blur(14px);
+    z-index:55; pointer-events:none;
+    opacity:0;
+    transition:opacity .35s ease, transform .45s cubic-bezier(.2,.85,.3,1.1);
+    max-width:90vw; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;
+  }
+  .sp-toast.show{
+    opacity:1; transform:translateX(-50%) translateY(0);
+  }
+  .sp-toast .em{
+    background:linear-gradient(135deg,#F59E0B,#EF4444);
+    color:#fff; padding:1px 8px; border-radius:99px;
+    margin-right:6px; font-weight:900;
+  }
+
+  /* (P5) Notification subscribe bottom sheet */
+  .notif-sheet{
+    position:fixed; left:0; right:0; bottom:0;
+    background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(0,0,0,.98));
+    backdrop-filter:blur(20px);
+    border-top:1px solid rgba(255,255,255,.18);
+    border-radius:24px 24px 0 0;
+    padding:22px 22px 26px;
+    color:#fff;
+    z-index:70;
+    transform:translateY(100%);
+    transition:transform .45s cubic-bezier(.2,.85,.3,1.1);
+    box-shadow:0 -16px 60px rgba(0,0,0,.40);
+  }
+  .notif-sheet.show{ transform:translateY(0) }
+  .notif-sheet .handle{
+    width:46px; height:4px; background:rgba(255,255,255,.30);
+    border-radius:99px; margin:0 auto 14px;
+  }
+  .notif-sheet h3{
+    font-size:1.2rem; font-weight:900; letter-spacing:-.02em;
+    margin-bottom:5px; display:flex; align-items:center; gap:8px;
+  }
+  .notif-sheet p{
+    font-size:.92rem; color:rgba(255,255,255,.78);
+    line-height:1.5; margin-bottom:16px;
+  }
+  .notif-sheet .actions{
+    display:flex; gap:10px; position:static;
+  }
+  .notif-sheet .btn-no{
+    flex:1; background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.22);
+    color:#fff; padding:13px; border-radius:13px;
+    font-weight:700; font-size:14px; cursor:pointer;
+    font-family:inherit;
+  }
+  .notif-sheet .btn-yes{
+    flex:1.4; background:linear-gradient(135deg,#F59E0B,#EF4444);
+    border:0; color:#fff; padding:13px; border-radius:13px;
+    font-weight:900; font-size:14px; cursor:pointer;
+    font-family:inherit; letter-spacing:.02em;
+    box-shadow:0 6px 16px rgba(239,68,68,.40);
+  }
+
   /* (5) Right rail visual polish — bigger + bouncier */
   .actions{
     position:absolute; right:10px; bottom:108px;
@@ -644,6 +796,22 @@
       <button onclick="closeCityPicker()" style="background:rgba(255,255,255,.1);color:#fff;border:0;width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer">×</button>
     </div>
     <div id="cityList" style="display:flex;flex-direction:column;gap:4px"></div>
+  </div>
+</div>
+
+<!-- HOT v2 Phase 2 — position bar + streak pill + bottom toast + notif sheet -->
+<div class="pos-bar" id="posBar"><div class="pos-bar-fill" id="posBarFill"></div></div>
+<div class="streak-pill" id="streakPill">
+  🎯 <span>Explored</span> <span class="num" id="streakNum">0</span>
+</div>
+<div class="sp-toast" id="spToast"></div>
+<div class="notif-sheet" id="notifSheet" role="dialog" aria-modal="true" aria-label="Get notifications">
+  <div class="handle"></div>
+  <h3>🔔 Get notified of new shops?</h3>
+  <p>Be the first to know when fresh shops join your area. One tap, that's it. Unsubscribe anytime.</p>
+  <div class="actions">
+    <button class="btn-no" type="button" onclick="dismissNotifSheet()">Not now</button>
+    <button class="btn-yes" type="button" onclick="acceptNotifSheet()">🔔 Yes, notify me</button>
   </div>
 </div>
 
@@ -1149,6 +1317,14 @@ function renderFiltered(){
       '<div class="cta-row">'+
         '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Shop →</a>'+
       '</div>'+
+      // HOT v2 Phase 2 — Quick reactions row
+      '<div class="reaction-row" data-bid="'+esc(b.id)+'">'+
+        '<button type="button" class="reaction-btn" data-r="love">😍 <span class="rc" data-c="love">0</span></button>'+
+        '<button type="button" class="reaction-btn" data-r="fire">🔥 <span class="rc" data-c="fire">0</span></button>'+
+        '<button type="button" class="reaction-btn" data-r="clap">👏 <span class="rc" data-c="clap">0</span></button>'+
+        '<button type="button" class="reaction-btn" data-r="best">💯 <span class="rc" data-c="best">0</span></button>'+
+        '<button type="button" class="reaction-btn" data-r="rais">🙌 <span class="rc" data-c="rais">0</span></button>'+
+      '</div>'+
       (idx===0 ? '<div class="swipe-hint" id="swipeHint">⬆️ Swipe up for next</div>' : '')+
     '</div>';
   }).join('');
@@ -1284,6 +1460,14 @@ function renderFiltered(){
           }
           _firstActivation = false;
           _lastActiveIdx = idx;
+          // HOT v2 Phase 2 — update progress bar + streak
+          updatePosBar(idx, cards.length);
+          bumpStreak();
+          // After 5 cards viewed → offer notif subscribe
+          if (idx >= 4) maybeShowNotifSheet();
+          // Show social proof toast on first activation of each new card
+          maybeShowSocialToast(en.target);
+          // Lazy load next card image
           var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
           if (nxt){
             var bg2 = nxt.querySelector('.bg');
@@ -1295,9 +1479,155 @@ function renderFiltered(){
       });
     }, { root: feed, threshold: [0.5] });
     cards.forEach(function(card){ obs.observe(card); });
-    if (cards[0]) cards[0].classList.add('active');
+    if (cards[0]){
+      cards[0].classList.add('active');
+      updatePosBar(0, cards.length);
+    }
   } else {
     cards.forEach(function(card){ card.classList.add('active'); });
+  }
+
+  // HOT v2 Phase 2 — Wire reaction buttons
+  feed.querySelectorAll('.reaction-row').forEach(function(row){
+    var bid = row.getAttribute('data-bid');
+    var saved = getReactions(bid);
+    // Apply persisted counts + tapped state
+    row.querySelectorAll('.reaction-btn').forEach(function(btn){
+      var k = btn.getAttribute('data-r');
+      var cnt = saved[k] || 0;
+      btn.querySelector('.rc').textContent = cnt;
+      if (cnt > 0) btn.classList.add('tapped');
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        var n = saved[k] || 0;
+        n = n + 1;
+        if (n > 99) n = 99;
+        saved[k] = n;
+        setReactions(bid, saved);
+        btn.querySelector('.rc').textContent = n;
+        btn.classList.remove('tapped'); void btn.offsetWidth; btn.classList.add('tapped');
+        if (navigator.vibrate) navigator.vibrate(15);
+      });
+    });
+  });
+}
+
+// ============================================================
+// HOT v2 Phase 2 — helpers
+// ============================================================
+function updatePosBar(idx, total){
+  var fill = document.getElementById('posBarFill');
+  if (!fill || !total) return;
+  var pct = Math.min(100, Math.max(0, ((idx + 1) / total) * 100));
+  fill.style.width = pct + '%';
+}
+
+var _streakCount = 0;
+var _streakSet = new Set();
+function bumpStreak(){
+  var pill = document.getElementById('streakPill');
+  var num  = document.getElementById('streakNum');
+  if (!pill || !num) return;
+  // Increment for unique active idx in this session only
+  var idx = _lastActiveIdx;
+  if (_streakSet.has(idx)) return;
+  _streakSet.add(idx);
+  _streakCount++;
+  num.textContent = _streakCount;
+  if (!pill.classList.contains('show')){
+    pill.classList.add('show');
+  } else {
+    pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump');
+  }
+  // Milestone toasts
+  if (_streakCount === 10){ showToast('🎉 10 shops explored! Keep going.'); }
+  else if (_streakCount === 25){ showToast('🔥 25 shops! You\'re on fire.'); }
+  else if (_streakCount === 50){ showToast('🏆 50 shops! Local explorer badge unlocked.'); }
+}
+
+function getReactions(bid){
+  try {
+    var all = JSON.parse(localStorage.getItem('dl_reactions') || '{}');
+    return all[bid] || {};
+  } catch(_){ return {}; }
+}
+function setReactions(bid, obj){
+  try {
+    var all = JSON.parse(localStorage.getItem('dl_reactions') || '{}');
+    all[bid] = obj;
+    localStorage.setItem('dl_reactions', JSON.stringify(all));
+  } catch(_){}
+}
+
+// Social proof toast — fake-but-fun "user from city loved this"
+var FAKE_NAMES = ['Rahul','Priya','Amit','Neha','Vikram','Pooja','Sahil','Riya','Aman','Simran','Karan','Anjali','Rohit','Tanu','Manjeet','Suman','Deepak','Geeta','Naveen','Ritu'];
+var FAKE_CITIES = ['Sirsa','Bathinda','Mansa','Mandi Dabwali','Muktsar','Tibi','Kalanwali','Rori','Maur','Gidderbaha'];
+var _toastTimer = null;
+var _toastShownIdx = new Set();
+function maybeShowSocialToast(cardEl){
+  var idx = parseInt(cardEl.getAttribute('data-idx') || '0', 10);
+  if (_toastShownIdx.has(idx)) return;
+  _toastShownIdx.add(idx);
+  // Show on every 3rd card after the first 2
+  if (idx < 2) return;
+  if (idx % 3 !== 0) return;
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){
+    var name = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
+    var city = FAKE_CITIES[Math.floor(Math.random() * FAKE_CITIES.length)];
+    var actions = ['🔥 loved', '😍 saved', '👏 shared', '💯 visited'];
+    var action = actions[Math.floor(Math.random() * actions.length)];
+    var t = document.getElementById('spToast');
+    if (!t) return;
+    t.innerHTML = '<span class="em">'+action.split(' ')[0]+'</span> ' + name + ' from ' + city + ' just ' + action.split(' ')[1] + ' a shop';
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3200);
+  }, 1200);
+}
+
+// Notification subscribe — bottom sheet (one-time)
+function maybeShowNotifSheet(){
+  if (localStorage.getItem('dl_notif_asked') === '1') return;
+  if (document.getElementById('notifSheet').classList.contains('show')) return;
+  // Only ask once per session
+  if (window._notifAsked) return;
+  window._notifAsked = true;
+  // Slight delay so it feels natural
+  setTimeout(function(){
+    var sheet = document.getElementById('notifSheet');
+    if (sheet) sheet.classList.add('show');
+  }, 800);
+}
+function dismissNotifSheet(){
+  var sheet = document.getElementById('notifSheet');
+  if (sheet) sheet.classList.remove('show');
+  localStorage.setItem('dl_notif_asked', '1');
+}
+function acceptNotifSheet(){
+  var sheet = document.getElementById('notifSheet');
+  if (sheet) sheet.classList.remove('show');
+  localStorage.setItem('dl_notif_asked', '1');
+  // Use browser Notification API as light subscribe (full push uses sw.js)
+  if ('Notification' in window){
+    if (Notification.permission === 'default'){
+      Notification.requestPermission().then(function(p){
+        if (p === 'granted'){
+          showToast('🔔 You\'re subscribed! We\'ll notify you of new shops.');
+          new Notification('DukanList', {
+            body: 'You\'re all set! We\'ll notify you of trending shops in your area.',
+            icon: '/assets/icons/icon-192.png'
+          });
+        } else {
+          showToast('No worries — you can enable later.');
+        }
+      });
+    } else if (Notification.permission === 'granted'){
+      showToast('🔔 Already subscribed!');
+    } else {
+      showToast('🔒 Notifications blocked. Enable from browser settings.');
+    }
+  } else {
+    showToast('Notifications not supported on this browser.');
   }
 }
 
