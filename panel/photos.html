@@ -107,20 +107,28 @@
     <div class="card" style="margin-top:18px">
       <div class="card-title"><span data-i18n-en>📤 Upload Photo</span><span data-i18n-hi>📤 फोटो अपलोड करें</span></div>
 
+      <!-- PRIMARY: Gallery picker (works on ALL phones — Android, iPhone, etc.) -->
       <label class="uploader" id="dropzone">
         <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-        <span class="ico">📷</span>
-        <div class="uploader-label"><span data-i18n-en>Click here to choose photos from your phone</span><span data-i18n-hi>यहाँ click करके फोटो चुनें</span></div>
-        <div class="uploader-help"><span data-i18n-en>or drag photos onto this box · auto-compressed if &gt;2MB</span><span data-i18n-hi>या यहाँ खींचें · 2MB से बड़ी होने पर auto-compress होगी</span></div>
+        <span class="ico">🖼️</span>
+        <div class="uploader-label"><span data-i18n-en>Choose photos from your phone gallery</span><span data-i18n-hi>अपने फोन की gallery से फोटो चुनें</span></div>
+        <div class="uploader-help"><span data-i18n-en>iPhone HEIC + Android JPG · all formats supported · auto-compressed if &gt;2MB</span><span data-i18n-hi>iPhone HEIC + Android JPG · हर format चलेगा · 2MB से बड़ी photos auto-compress होंगी</span></div>
       </label>
 
-      <!-- iPhone-friendly camera capture (always outputs JPEG, NEVER HEIC) -->
-      <div style="margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;border-radius:10px">
-        <div style="font-size:.82rem;color:#78350F;font-weight:700;margin-bottom:6px">🍎 <span data-i18n-en>iPhone users — having trouble?</span><span data-i18n-hi>iPhone पर परेशानी?</span></div>
-        <div style="font-size:.76rem;color:#92400E;line-height:1.5;margin-bottom:8px"><span data-i18n-en>iPhone photos sometimes fail to convert. Use this button to take a fresh photo with your camera — it will always upload successfully:</span><span data-i18n-hi>iPhone की HEIC photos कभी-कभी convert नहीं हो पातीं। यह बटन use करें — fresh photo लें, हमेशा successful upload होगा:</span></div>
+      <!-- Divider with "OR" -->
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px">
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+        <div style="font-size:.7rem;font-weight:700;color:#94a3b8;letter-spacing:.1em">OR</div>
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+      </div>
+
+      <!-- ALTERNATIVE: Direct camera capture (always outputs JPEG, useful if iPhone HEIC fails) -->
+      <div style="padding:12px 14px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;border-radius:10px">
+        <div style="font-size:.82rem;color:#78350F;font-weight:700;margin-bottom:4px">📸 <span data-i18n-en>Take Fresh Photo (skip gallery)</span><span data-i18n-hi>अभी नई Photo लें (gallery skip)</span></div>
+        <div style="font-size:.74rem;color:#92400E;line-height:1.5;margin-bottom:8px"><span data-i18n-en>If gallery photo fails (iPhone HEIC), use this — opens camera directly, always JPG, never fails.</span><span data-i18n-hi>अगर gallery photo fail ho (iPhone HEIC), तो इसे use करें — camera खुलेगा, हमेशा JPG, कभी fail नहीं होगा।</span></div>
         <label style="display:block;width:100%;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:11px;border-radius:8px;font-weight:800;font-size:.92rem;text-align:center;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,.3)">
           <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
-          📷 <span data-i18n-en>Take Fresh Photo Now</span><span data-i18n-hi>अभी नई Photo लें</span>
+          📷 <span data-i18n-en>Open Camera Now</span><span data-i18n-hi>Camera खोलें</span>
         </label>
       </div>
 
@@ -457,244 +465,4 @@ async function compressImage(file, maxBytes, forceConvert){
         }
         tryQuality();
       };
-      img.onerror = () => resolve(file);
-      img.src = e.target.result;
-    };
-    reader.onerror = () => resolve(file);
-    reader.readAsDataURL(file);
-  });
-}
-
-function fmtSize(bytes){
-  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
-  if (bytes >= 1024)    return (bytes / 1024).toFixed(0)   + ' KB';
-  return bytes + ' B';
-}
-
-function addQueueItem(name){
-  const queue = document.getElementById('uploadQueue');
-  if (!queue) return null;
-  queue.style.display = '';
-  const item = document.createElement('div');
-  item.className = 'upload-item';
-  item.innerHTML = '<div class="upload-item-ico">⏳</div>' +
-    '<div class="upload-item-info"><div class="upload-item-name"></div><div class="upload-item-status">Preparing...</div></div>' +
-    '<div class="upload-item-progress"><div class="upload-item-bar" style="width:0%"></div></div>';
-  item.querySelector('.upload-item-name').textContent = name;
-  queue.appendChild(item);
-  return item;
-}
-
-function updateQueueItem(item, opts){
-  if (!item) return;
-  if (opts.ico)    item.querySelector('.upload-item-ico').textContent = opts.ico;
-  if (opts.status){
-    const s = item.querySelector('.upload-item-status');
-    s.textContent = opts.status;
-    s.className = 'upload-item-status' + (opts.ok ? ' ok' : opts.err ? ' err' : '');
-  }
-  if (typeof opts.pct === 'number') item.querySelector('.upload-item-bar').style.width = opts.pct + '%';
-}
-
-async function handleFiles(files){
-  if (!files || !files.length) return;
-  const errEl = document.getElementById('uploadErr');
-  const okEl  = document.getElementById('uploadOk');
-  errEl.style.display = okEl.style.display = 'none';
-
-  const existing = (MY_BIZ.photos || []).length;
-  if (existing >= MAX_PHOTOS){
-    errEl.innerHTML = '<span class="a-icon">⚠️</span><div>Max ' + MAX_PHOTOS + ' photos allowed. Pehle koi photo remove karein.</div>';
-    errEl.style.display = 'flex'; return;
-  }
-
-  const queue = document.getElementById('uploadQueue');
-  if (queue) queue.innerHTML = '';
-
-  const c = ShopDB.client;
-  const toUpload = Array.from(files).slice(0, MAX_PHOTOS - existing);
-  let uploaded = 0;
-  let failed = 0;
-
-  for (const origFile of toUpload){
-    const item = addQueueItem(origFile.name);
-
-    const isImage = (origFile.type || '').startsWith('image/');
-    const isHeicByName = /\.(heic|heif)$/i.test(origFile.name || '');
-    if (!isImage && !isHeicByName){
-      updateQueueItem(item, { ico: '❌', status: '"' + origFile.name + '" valid image nahi hai (JPG/PNG/WebP/HEIC supported)', err: true });
-      failed++; continue;
-    }
-
-    let f = origFile;
-
-    // STEP 1: If HEIC (iPhone) — convert to JPEG FIRST using multi-strategy
-    if (isHeicFile(origFile)){
-      const origMB = (origFile.size / 1048576).toFixed(1);
-      updateQueueItem(item, { ico: '🍎', status: 'iPhone HEIC photo — converting to JPG (' + origMB + ' MB)... wait 5-15 sec', pct: 15 });
-      try {
-        f = await convertHeicToJpeg(origFile);
-        const newMB = (f.size / 1048576).toFixed(2);
-        updateQueueItem(item, { ico: '✅', status: 'HEIC converted (' + newMB + ' MB). Preparing upload...', pct: 35 });
-      } catch(heicErr){
-        console.warn('HEIC conversion failed:', heicErr);
-        const techErr = (heicErr && heicErr.message) || 'Unknown error';
-        const fileInfo = origFile.name + ' (' + origMB + ' MB, type=' + (origFile.type || 'empty') + ')';
-        const fullErr = 'File: ' + fileInfo + '\nError: ' + techErr;
-        const friendlyMsg =
-          '❌ HEIC convert failed.\n\n' +
-          '✅ SOLUTION 1 (recommended): Yellow "📷 Take Fresh Photo Now" button neeche use karein — woh hamesha JPG bnata hai.\n\n' +
-          '✅ SOLUTION 2: iPhone Settings → Camera → Formats → "Most Compatible" select karein, fir nayi photo lein.\n\n' +
-          '✅ SOLUTION 3: WhatsApp pe photo bhej kar wahan se save karein — WhatsApp auto-converts to JPG.\n\n' +
-          'Debug: ' + techErr;
-        updateQueueItem(item, { ico: '❌', status: friendlyMsg, err: true });
-        // Stash the error on window for support inspection
-        try { window.__lastHeicError = { file: fileInfo, error: techErr, full: heicErr }; } catch(_){}
-        failed++; continue;
-      }
-    }
-
-    // STEP 2: Compress if >2MB (works on the JPEG we now have)
-    const needsCompress = f.size > MAX_BYTES;
-    if (needsCompress){
-      const origMB = (f.size / 1048576).toFixed(1);
-      updateQueueItem(item, { ico: '🪄', status: 'Auto-compressing (' + origMB + ' MB → under 2 MB)...', pct: 45 });
-      try {
-        f = await compressImage(f, MAX_BYTES, false);
-        const newMB = (f.size / 1048576).toFixed(2);
-        updateQueueItem(item, { status: 'Ready (' + newMB + ' MB). Uploading...', pct: 60 });
-      } catch(compressErr) {
-        updateQueueItem(item, { ico: '⚠️', status: 'Auto-compress fail. Phone gallery se manually resize karein.', err: true });
-        failed++; continue;
-      }
-    } else {
-      updateQueueItem(item, { ico: '📤', status: 'Uploading (' + fmtSize(f.size) + ')...', pct: 50 });
-    }
-
-    if (f.size > MAX_BYTES){
-      updateQueueItem(item, { ico: '⚠️', status: 'Photo abhi bhi 2 MB se bada hai. Phone gallery se manually resize karein.', err: true });
-      failed++; continue;
-    }
-
-    updateQueueItem(item, { pct: 65, status: 'Uploading (' + fmtSize(f.size) + ')...' });
-
-    // =====================================================
-    // Master Fix: use server-side upload endpoint
-    // - Bypasses storage RLS (no more "permission issue" errors)
-    // - Self-heals missing business_owners link on the fly
-    // - Validates session + business status server-side
-    // =====================================================
-    let uploadResp = null;
-    let uploadErr  = null;
-    try {
-      // Get current session token
-      const sess = await c.auth.getSession();
-      const token = sess && sess.data && sess.data.session && sess.data.session.access_token;
-      if (!token){
-        uploadErr = { message: 'Session not active. Please logout and login again.' };
-      } else {
-        // Read file as base64 data URL
-        const dataUrl = await new Promise(function(resolve, reject){
-          const r = new FileReader();
-          r.onload  = function(){ resolve(r.result); };
-          r.onerror = function(){ reject(new Error('Could not read file')); };
-          r.readAsDataURL(f);
-        });
-
-        const apiRes = await fetch('/api/upload-shop-photo', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-          body: JSON.stringify({ file: dataUrl, filename: f.name })
-        });
-        const apiJson = await apiRes.json().catch(function(){ return {}; });
-        if (!apiRes.ok || !apiJson.ok){
-          uploadErr = { message: apiJson.message || apiJson.error || ('HTTP ' + apiRes.status) };
-        } else {
-          uploadResp = apiJson;
-        }
-      }
-    } catch (e) {
-      uploadErr = { message: (e && e.message) || 'Network error' };
-    }
-
-    if (uploadErr){
-      var raw = String(uploadErr.message || '');
-      var friendly;
-      if (/no_shop_linked|not linked to any shop|contact admin to link/i.test(raw)) {
-        friendly = 'Your account is not yet linked to a shop. Please WhatsApp us a screenshot — we will link it instantly.';
-      } else if (/verify your email|email_confirmed|email not verified/i.test(raw)) {
-        friendly = 'Your email is not yet verified. Please check your inbox/spam and click the verification link.';
-      } else if (/disabled/i.test(raw)) {
-        friendly = 'Your business has been disabled. Please contact admin.';
-      } else if (/session|jwt|expired|unauthorized|invalid session/i.test(raw)) {
-        friendly = 'Your session has expired. Please logout and login again, then retry.';
-      } else if (/network|fetch|failed to fetch|timeout/i.test(raw)) {
-        friendly = 'Internet connection is weak. Check WiFi/4G and retry.';
-      } else if (/too large|size|payload/i.test(raw)) {
-        friendly = 'Photo is too large. Please compress in phone gallery and retry.';
-      } else if (/unsupported|file type|format/i.test(raw)) {
-        friendly = 'Only JPG, PNG, WebP photos are supported.';
-      } else {
-        friendly = 'Upload failed: ' + raw + '. Please retry. If issue persists, WhatsApp us a screenshot.';
-      }
-      updateQueueItem(item, { ico: '❌', status: friendly, err: true });
-      failed++; continue;
-    }
-
-    // Success — refresh local state
-    MY_BIZ.photos = [...(MY_BIZ.photos || []), uploadResp.url];
-    uploaded++;
-    updateQueueItem(item, { ico: '✅', status: 'Uploaded successfully — ' + fmtSize(f.size), ok: true, pct: 100 });
-  }
-
-  if (uploaded > 0){
-    // SECURITY: photo upload no longer auto-activates a pending business.
-    // RPC now only sets verified_photo=TRUE flag. Admin must approve via
-    // moderation page before listing goes live. This restores the admin gate.
-    if (MY_BIZ.status === 'pending'){
-      try { await c.rpc('activate_business_after_photos', { p_business_id: MY_BIZ.id }); } catch(_){}
-    }
-    const stillPending = (MY_BIZ.status === 'pending');
-    okEl.innerHTML = '<span class="a-icon">🎉</span><div>' + uploaded + ' photo' + (uploaded > 1 ? 's' : '') + ' uploaded!' + (failed > 0 ? ' (' + failed + ' failed)' : '') + (stillPending ? '<br><small style="color:#92400E;font-weight:600">⏳ Listing abhi admin review me hai — approve hote hi live ho jaayegi.</small>' : '') + '</div>';
-    okEl.style.display = 'flex';
-    renderState();
-  } else if (failed > 0){
-    errEl.innerHTML = '<span class="a-icon">⚠️</span><div>Photos upload nahi huyi. Details upar dekhein. <br>Madad chahiye? <a href="https://wa.me/919541223377?text=Photo%20upload%20me%20issue%20aa%20raha%20hai" target="_blank" style="color:#FF6B1A;font-weight:700">WhatsApp pe hum madad karenge</a></div>';
-    errEl.style.display = 'flex';
-  }
-  fi.value = '';
-}
-
-async function deletePhoto(idx){
-  if (!confirm('Remove this photo?')) return;
-  const photos = [...(MY_BIZ.photos || [])];
-  const removed = photos.splice(idx, 1)[0];
-  const c = ShopDB.client;
-
-  // Try delete from storage (best-effort)
-  try{
-    const match = removed.match(/shop-photos\/(.+)$/);
-    if (match) await c.storage.from('shop-photos').remove([match[1]]);
-  }catch(_) {}
-
-  const { error } = await c.from('businesses').update({ photos }).eq('id', MY_BIZ.id);
-  if (error){ alert('Delete failed: ' + error.message); return; }
-  MY_BIZ.photos = photos;
-  renderState();
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadMyBusiness();
-});
-</script>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<script src="/assets/js/error-reporter.js" defer></script>
-</body>
-</html>
+      img.onerror 
