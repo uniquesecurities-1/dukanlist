@@ -154,23 +154,10 @@ async function renderWidget(containerId, opts){
     btn.style.display = 'none';
 
     if (data && data.error) {
-      _errCount++;
-      // After 2 failures, gracefully hide the widget so user isn't stuck
-      if (_errCount >= 2){
-        el.style.display = 'none';
-        try { localStorage.setItem('dukanlist.geo.hidden_today', String(Date.now())); } catch(_){}
-        return;
-      }
-      results.innerHTML =
-        '<div class="ony-empty">' +
-        '  <div style="margin-bottom:10px">Could not load shops (' + (data.error === 'timeout' ? 'timeout — slow network' : 'connection issue') + ').</div>' +
-        '  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">' +
-        '    <button type="button" class="ony-cta ony-retry">🔄 Try Again</button>' +
-        '    <a href="/browse.html" style="background:#FBBF24;color:#78350F;padding:8px 14px;border-radius:99px;font-size:13px;font-weight:700;text-decoration:none">📚 Browse All Shops</a>' +
-        '  </div>' +
-        '</div>';
-      const r = results.querySelector('.ony-retry');
-      if (r) r.addEventListener('click', () => load(currentCoords, currentRadius));
+      // RPC broken — don't bother user with retry. Hide widget immediately for 12 hours.
+      console.warn('[GeoNearby] RPC failed:', data.error, '— hiding widget for 12h');
+      el.style.display = 'none';
+      try { localStorage.setItem('dukanlist.geo.hidden_today', String(Date.now())); } catch(_){}
       return;
     }
     _errCount = 0; // reset on success

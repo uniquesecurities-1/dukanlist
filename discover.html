@@ -561,13 +561,21 @@ function openCityPicker(){
     counts[cid] = (counts[cid] || 0) + 1;
   });
   var sorted = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
-  var html = '<button onclick="setCity(null)" style="background:' + (STATE.cityFilter ? 'rgba(255,255,255,.08)' : 'linear-gradient(135deg,#FBBF24,#F59E0B)') + ';color:' + (STATE.cityFilter ? '#fff' : '#78350F') + ';border:0;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-align:left;width:100%;display:flex;justify-content:space-between;align-items:center">🌟 All Cities <span style="opacity:.7;font-size:12px">' + STATE.allRows.length + '</span></button>';
+  var html = '<button data-cid="" style="background:' + (STATE.cityFilter ? 'rgba(255,255,255,.08)' : 'linear-gradient(135deg,#FBBF24,#F59E0B)') + ';color:' + (STATE.cityFilter ? '#fff' : '#78350F') + ';border:0;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-align:left;width:100%;display:flex;justify-content:space-between;align-items:center">🌟 All Cities <span style="opacity:.7;font-size:12px">' + STATE.allRows.length + '</span></button>';
   sorted.forEach(function(cid){
     var cname = STATE.cityMap[cid] || 'Unknown';
     var sel = STATE.cityFilter === cid;
-    html += '<button onclick="setCity(\'' + esc(cid) + '\')" style="background:' + (sel ? 'linear-gradient(135deg,#FBBF24,#F59E0B)' : 'rgba(255,255,255,.08)') + ';color:' + (sel ? '#78350F' : '#fff') + ';border:0;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-align:left;width:100%;display:flex;justify-content:space-between;align-items:center">📍 ' + esc(cname) + ' <span style="opacity:.7;font-size:12px">' + counts[cid] + '</span></button>';
+    // Use data-cid attribute + click handler instead of inline onclick to avoid quote-escaping issues
+    html += '<button data-cid="' + esc(cid) + '" style="background:' + (sel ? 'linear-gradient(135deg,#FBBF24,#F59E0B)' : 'rgba(255,255,255,.08)') + ';color:' + (sel ? '#78350F' : '#fff') + ';border:0;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-align:left;width:100%;display:flex;justify-content:space-between;align-items:center">📍 ' + esc(cname) + ' <span style="opacity:.7;font-size:12px">' + counts[cid] + '</span></button>';
   });
   box.innerHTML = html;
+  // Wire click handlers (no inline onclick — avoids quote escaping issues with UUIDs)
+  box.querySelectorAll('button[data-cid]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var cid = btn.getAttribute('data-cid') || null;
+      setCity(cid || null);
+    });
+  });
   document.getElementById('cityPickerOverlay').style.display = 'flex';
 }
 function closeCityPicker(){
@@ -589,7 +597,7 @@ async function init(){
       .select('id, slug, name, photos, mobile, whatsapp, usp_text, address_line1, pincode, rating_avg, rating_count, verified_score, walk_ins_today, sub_category_id, category_id, city_id, hours_json, featured_until, created_at')
       .eq('status', 'active')
       .order('updated_at', { ascending: false })
-      .limit(60);
+      .limit(200);
     if (r.error) throw r.error;
     var rows = r.data || [];
     if (rows.length === 0){
