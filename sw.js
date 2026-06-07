@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.7.9';  // bumped — Discover HOT Phase 2: progress bar + streak + reactions + social toast + notif sheet
+const VERSION    = 'dukan-v1.8.0';  // bumped — SW bypass /discover + nav label fix (My List vs Saved confusion)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
@@ -49,6 +49,9 @@ function shouldBypass(url, request) {
   if (url.pathname.startsWith('/admin/')) return true;
   if (url.pathname.startsWith('/panel/')) return true;
   if (url.pathname.startsWith('/api/')) return true;
+  // BYPASS frequently-updated pages so users always see fresh content
+  if (url.pathname === '/discover' || url.pathname === '/discover.html') return true;
+  if (url.pathname === '/index.html' || url.pathname === '/') return true;
   // BYPASS all app JS — they update frequently, must always be fresh
   if (url.pathname.startsWith('/assets/js/')) return true;
   // Supabase + auth endpoints
