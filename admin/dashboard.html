@@ -36,8 +36,8 @@
   .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
   .page-sub{font-size:14px;color:#64748b;margin-bottom:24px}
 
-  /* KPI Grid — COMPACT (more cards per row) */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+  /* KPI Grid — TIGHT (fits 8 across on wide screens, 4 per row min) */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:18px}
   .kpi{
     background:white;padding:11px 13px;border-radius:10px;
     box-shadow:0 1px 3px rgba(0,0,0,0.04);border:1px solid #e2e8f0;
@@ -98,7 +98,7 @@
 .see-all{display:inline-block;margin-top:12px;color:#1E3A8A;font-size:13px;font-weight:700;text-decoration:none}
 .see-all:hover{text-decoration:underline}
 
-.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px}
 .task-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;text-decoration:none;color:inherit;transition:.15s;display:block;position:relative;overflow:hidden}
 .task-card:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,23,42,.07)}
 .task-card.urgent{border-color:#FCA5A5;background:linear-gradient(135deg,#FEF2F2 0%,#FFFFFF 60%)}
@@ -277,7 +277,7 @@
   <!-- Recent Registrations -->
   <div class="section">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-      <h2 class="section-title" style="margin:0">📋 Recent Registrations <span id="recentLabel" style="color:#94a3b8;font-size:12px;font-weight:500">(latest 10)</span></h2>
+      <h2 class="section-title" style="margin:0">📋 Recent Registrations <span id="recentLabel" style="color:#94a3b8;font-size:12px;font-weight:500">(latest 25)</span></h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button id="showAllBtn" onclick="toggleShowAll()"
           style="background:#7C3AED;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
@@ -452,7 +452,7 @@ async function runDashboard(){
       .catch(e => console.warn('Scope load:', e.message));
 
     withTimeout(c.rpc('admin_list_businesses', {
-      p_status: null, p_limit: 10, p_offset: 0, p_sort: 'newest'
+      p_status: null, p_limit: 25, p_offset: 0, p_sort: 'newest'
     }), 10000, 'recent')
       .then(({ data: recent }) => renderRecent(recent || []))
       .catch(e => {
@@ -1224,19 +1224,19 @@ async function toggleShowAll(){
       box.insertAdjacentHTML('beforebegin', '<div class="err">Failed: ' + (e.message || e) + '</div>');
     } finally { btn.disabled = false; }
   } else {
-    // Switch back to latest 10
+    // Switch back to latest 25
     btn.disabled = true; btn.innerHTML = '⏳ Loading...';
     try {
       const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
       const { data, error } = await c.rpc('admin_list_businesses', {
-        p_status: null, p_limit: 10, p_offset: 0, p_sort: 'newest'
+        p_status: null, p_limit: 25, p_offset: 0, p_sort: 'newest'
       });
       if (error) throw error;
       renderRecent(data || []);
       __showingAll = false;
       btn.innerHTML = '👁 Show All';
       btn.style.background = '#7C3AED';
-      label.textContent = '(latest 10)';
+      label.textContent = '(latest 25)';
     } catch(e){ btn.innerHTML = '⚠ Retry'; }
     finally { btn.disabled = false; }
   }
@@ -1350,6 +1350,4 @@ function escapeHtml(s){
 
 </script>
 
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+<script src="/assets/js/admin-auto-logout.js"></s
