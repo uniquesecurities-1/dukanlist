@@ -119,19 +119,49 @@ async function renderWidget(containerId, opts){
   const btn = document.getElementById('onyEnableBtn');
   const results = document.getElementById('onyResults');
 
-  async function load(coords){
+  let currentRadius = 3;
+  let currentCoords = null;
+
+  async function load(coords, radius){
+    radius = radius || 3;
+    currentRadius = radius;
+    currentCoords = coords;
     btn.disabled = true;
     btn.textContent = 'Finding…';
-    const data = await fetchNearby(coords, 3);
+    results.innerHTML = '<div class="ony-empty" style="opacity:.6">Searching ' + radius + ' km radius…</div>';
+    results.style.display = 'block';
+    const data = await fetchNearby(coords, radius);
     btn.disabled = false;
     btn.style.display = 'none';
     if (!data || !data.count) {
-      results.innerHTML = '<div class="ony-empty">No open shops within 3 km. Try increasing your range or check again later.</div>';
+      const nextRadius = radius < 5 ? 5 : (radius < 10 ? 10 : (radius < 25 ? 25 : 50));
+      const showExpand = radius < 50;
+      results.innerHTML =
+        '<div class="ony-empty">' +
+        '  <div style="margin-bottom:10px">No open shops within ' + radius + ' km.</div>' +
+        '  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">' +
+        (showExpand
+          ? '    <button type="button" class="ony-cta ony-expand" data-r="' + nextRadius + '">🔍 Try ' + nextRadius + ' km</button>'
+          : '') +
+        '    <button type="button" class="ony-cta ony-refresh" style="background:#f3f4f6;color:#374151">🔄 Refresh</button>' +
+        '  </div>' +
+        '</div>';
       results.style.display = 'block';
+      const exp = results.querySelector('.ony-expand');
+      const ref = results.querySelector('.ony-refresh');
+      if (exp) exp.addEventListener('click', () => load(currentCoords, Number(exp.getAttribute('data-r')) || nextRadius));
+      if (ref) ref.addEventListener('click', () => load(currentCoords, currentRadius));
       return;
     }
-    results.innerHTML = (data.items || []).map(renderShopRow).join('');
+    const headerHtml =
+      '<div class="ony-results-head" style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px 10px;font-size:12px;color:#6b7280">' +
+      '  <span>' + data.count + ' open within ' + radius + ' km</span>' +
+      '  <button type="button" class="ony-refresh" style="background:transparent;border:0;color:#2563eb;font-weight:600;cursor:pointer;font-size:12px">🔄 Refresh</button>' +
+      '</div>';
+    results.innerHTML = headerHtml + (data.items || []).map(renderShopRow).join('');
     results.style.display = 'block';
+    const ref = results.querySelector('.ony-refresh');
+    if (ref) ref.addEventListener('click', () => load(currentCoords, currentRadius));
   }
 
   // Cached coords — skip prompt
@@ -166,40 +196,4 @@ async function renderWidget(containerId, opts){
 
 function renderShopRow(b){
   const dist = (b.dist_km != null) ? (Number(b.dist_km).toFixed(1) + ' km') : '';
-  const rating = (b.rating_count > 0) ? '⭐ ' + Number(b.rating_avg).toFixed(1) : '';
-  const photo = b.photo
-    ? '<img src="' + escAttr(b.photo) + '" alt="" loading="lazy">'
-    : '<span class="ony-row-emoji">🏪</span>';
-  const phone = (b.mobile || '').replace(/\D/g, '');
-  const wa    = (b.whatsapp || b.mobile || '').replace(/\D/g, '');
-  const phoneBtn = phone ? '<a class="ony-act call" href="tel:' + escAttr(phone) + '">📞 Call</a>' : '';
-  const waBtn   = wa    ? '<a class="ony-act wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '';
-  return '' +
-    '<a class="ony-row" href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '">' +
-    '  <div class="ony-row-photo">' + photo + '</div>' +
-    '  <div class="ony-row-body">' +
-    '    <div class="ony-row-name">' + escHtml(b.name || '') + '</div>' +
-    '    <div class="ony-row-meta">' +
-    '      <span class="ony-dist">' + escHtml(dist) + ' away</span>' +
-    (rating ? '<span class="ony-rating">' + escHtml(rating) + '</span>' : '') +
-    '    </div>' +
-    '    <div class="ony-row-actions">' + phoneBtn + waBtn + '</div>' +
-    '  </div>' +
-    '</a>';
-}
-
-// ─── helpers ────────────────────────────────────────────────
-function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escAttr(s){ return escHtml(s); }
-
-// ─── Public API ─────────────────────────────────────────────
-global.GeoNearby = {
-  getStoredCoords,
-  storeCoords,
-  requestLocation,
-  fetchNearby,
-  renderWidget,
-  isDenied
-};
-
-})(window);
+  const rating = (b.rating_count > 0)

@@ -108,7 +108,7 @@
       <div class="card-title"><span data-i18n-en>📤 Upload Photo</span><span data-i18n-hi>📤 फोटो अपलोड करें</span></div>
 
       <label class="uploader" id="dropzone">
-        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
         <span class="ico">📷</span>
         <div class="uploader-label"><span data-i18n-en>Click here to choose photos from your phone</span><span data-i18n-hi>यहाँ click करके फोटो चुनें</span></div>
         <div class="uploader-help"><span data-i18n-en>or drag photos onto this box · auto-compressed if &gt;2MB</span><span data-i18n-hi>या यहाँ खींचें · 2MB से बड़ी होने पर auto-compress होगी</span></div>
@@ -245,15 +245,24 @@ dz.addEventListener('drop', e => {
   handleFiles(e.dataTransfer.files);
 });
 
+// Detect HEIC/HEIF / unsupported MIME (iPhone default format)
+function isiPhoneFormat(file){
+  const t = (file && file.type || '').toLowerCase();
+  const n = (file && file.name || '').toLowerCase();
+  return /heic|heif/.test(t) || /\.(heic|heif)$/i.test(n) || (!t && /\.(jpg|jpeg|png|webp)$/i.test(n) === false);
+}
+
 // Client-side image compression to <2MB
-async function compressImage(file, maxBytes){
-  if (file.size <= maxBytes) return file;
-  return new Promise((resolve) => {
+// ALWAYS converts through canvas → outputs JPEG (handles iPhone HEIC → JPG natively in Safari)
+async function compressImage(file, maxBytes, forceConvert){
+  if (!forceConvert && file.size <= maxBytes && /^image\/(jpeg|jpg|png|webp)$/i.test(file.type)) return file;
+  return new Promise((resolve, reject) => {
     const img = new Image();
     const reader = new FileReader();
     reader.onload = (e) => {
       img.onload = () => {
         let { width, height } = img;
+        if (!width || !height){ resolve(file); return; }
         const maxDim = 1600;
         if (width > maxDim || height > maxDim){
           const ratio = Math.min(maxDim / width, maxDim / height);
@@ -264,16 +273,36 @@ async function compressImage(file, maxBytes){
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+        // White bg for any transparency
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        try { ctx.drawImage(img, 0, 0, width, height); }
+        catch(drawErr){ resolve(file); return; }
         let q = 0.85;
+        let attempts = 0;
         function tryQuality(){
-          canvas.toBlob((blob) => {
-            if (!blob){ resolve(file); return; }
-            if (blob.size <= maxBytes || q <= 0.4){
-              const compressed = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg', lastModified: Date.now() });
-              resolve(compressed);
-            } else { q -= 0.1; tryQuality(); }
-          }, 'image/jpeg', q);
+          attempts++;
+          if (attempts > 8){ resolve(file); return; }
+          try {
+            canvas.toBlob((blob) => {
+              if (!blob){
+                // iOS Safari sometimes returns null on toBlob with HEIC source — try dataURL fallback
+                try {
+                  const dataUrl = canvas.toDataURL('image/jpeg', q);
+                  if (!dataUrl || dataUrl === 'data:,'){ resolve(file); return; }
+                  fetch(dataUrl).then(r => r.blob()).then(b => {
+                    const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+                    resolve(new File([b], newName, { type: 'image/jpeg', lastModified: Date.now() }));
+                  }).catch(() => resolve(file));
+                } catch(_){ resolve(file); }
+                return;
+              }
+              if (blob.size <= maxBytes || q <= 0.4){
+                const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+                resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() }));
+              } else { q -= 0.1; tryQuality(); }
+            }, 'image/jpeg', q);
+          } catch(blobErr){ resolve(file); }
         }
         tryQuality();
       };
@@ -339,21 +368,31 @@ async function handleFiles(files){
   for (const origFile of toUpload){
     const item = addQueueItem(origFile.name);
 
-    if (!origFile.type.startsWith('image/')){
-      updateQueueItem(item, { ico: '❌', status: '"' + origFile.name + '" valid image nahi hai (JPG/PNG/WebP only)', err: true });
+    const isImage = (origFile.type || '').startsWith('image/');
+    const isHeicByName = /\.(heic|heif)$/i.test(origFile.name || '');
+    if (!isImage && !isHeicByName){
+      updateQueueItem(item, { ico: '❌', status: '"' + origFile.name + '" valid image nahi hai (JPG/PNG/WebP/HEIC supported)', err: true });
       failed++; continue;
     }
 
     let f = origFile;
-    if (origFile.size > MAX_BYTES){
+    const needsConvert = isiPhoneFormat(origFile); // HEIC from iPhone — convert to JPG always
+    const needsCompress = origFile.size > MAX_BYTES;
+    if (needsConvert || needsCompress){
       const origMB = (origFile.size / 1048576).toFixed(1);
-      updateQueueItem(item, { ico: '🪄', status: 'Auto-compressing (' + origMB + ' MB → under 2 MB)...', pct: 20 });
+      const msg = needsConvert
+        ? 'iPhone format detected — converting to JPG (' + origMB + ' MB)...'
+        : 'Auto-compressing (' + origMB + ' MB → under 2 MB)...';
+      updateQueueItem(item, { ico: '🪄', status: msg, pct: 20 });
       try {
-        f = await compressImage(origFile, MAX_BYTES);
+        f = await compressImage(origFile, MAX_BYTES, needsConvert);
         const newMB = (f.size / 1048576).toFixed(2);
-        updateQueueItem(item, { status: 'Compressed: ' + origMB + ' MB → ' + newMB + ' MB. Uploading...', pct: 50 });
+        if (needsConvert && /^image\/(jpeg|jpg|png|webp)$/i.test(f.type) === false){
+          throw new Error('iPhone HEIC conversion failed on this browser');
+        }
+        updateQueueItem(item, { status: 'Ready (' + newMB + ' MB). Uploading...', pct: 50 });
       } catch(compressErr) {
-        updateQueueItem(item, { ico: '⚠️', status: 'Auto-compress fail. Phone gallery se "Resize" karke retry karein, ya WhatsApp pe humein bhejein.', err: true });
+        updateQueueItem(item, { ico: '⚠️', status: 'Auto-convert failed. Try sharing photo via WhatsApp (auto-converts), then save and retry.', err: true });
         failed++; continue;
       }
     } else {
@@ -441,49 +480,4 @@ async function handleFiles(files){
 
   if (uploaded > 0){
     // SECURITY: photo upload no longer auto-activates a pending business.
-    // RPC now only sets verified_photo=TRUE flag. Admin must approve via
-    // moderation page before listing goes live. This restores the admin gate.
-    if (MY_BIZ.status === 'pending'){
-      try { await c.rpc('activate_business_after_photos', { p_business_id: MY_BIZ.id }); } catch(_){}
-    }
-    const stillPending = (MY_BIZ.status === 'pending');
-    okEl.innerHTML = '<span class="a-icon">🎉</span><div>' + uploaded + ' photo' + (uploaded > 1 ? 's' : '') + ' uploaded!' + (failed > 0 ? ' (' + failed + ' failed)' : '') + (stillPending ? '<br><small style="color:#92400E;font-weight:600">⏳ Listing abhi admin review me hai — approve hote hi live ho jaayegi.</small>' : '') + '</div>';
-    okEl.style.display = 'flex';
-    renderState();
-  } else if (failed > 0){
-    errEl.innerHTML = '<span class="a-icon">⚠️</span><div>Photos upload nahi huyi. Details upar dekhein. <br>Madad chahiye? <a href="https://wa.me/919541223377?text=Photo%20upload%20me%20issue%20aa%20raha%20hai" target="_blank" style="color:#FF6B1A;font-weight:700">WhatsApp pe hum madad karenge</a></div>';
-    errEl.style.display = 'flex';
-  }
-  fi.value = '';
-}
-
-async function deletePhoto(idx){
-  if (!confirm('Remove this photo?')) return;
-  const photos = [...(MY_BIZ.photos || [])];
-  const removed = photos.splice(idx, 1)[0];
-  const c = ShopDB.client;
-
-  // Try delete from storage (best-effort)
-  try{
-    const match = removed.match(/shop-photos\/(.+)$/);
-    if (match) await c.storage.from('shop-photos').remove([match[1]]);
-  }catch(_) {}
-
-  const { error } = await c.from('businesses').update({ photos }).eq('id', MY_BIZ.id);
-  if (error){ alert('Delete failed: ' + error.message); return; }
-  MY_BIZ.photos = photos;
-  renderState();
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadMyBusiness();
-});
-</script>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<script src="/assets/js/error-reporter.js" defer></script>
-</body>
-</html>
+    // RPC now onl

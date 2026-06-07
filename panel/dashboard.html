@@ -720,6 +720,29 @@
     <!-- Verification CTA card (decoupled from approval - rendered by renderVerificationCta) -->
     <div id="verificationCta" style="margin-top:18px"></div>
 
+    <!-- ===== Walk-In Counter — Main Hero (visible on main area) ===== -->
+    <div id="walkInMainCard" class="card" style="margin-bottom:14px;background:linear-gradient(135deg,#FDF2F8 0%,#FBCFE8 60%,#F9A8D4 100%);border:1.5px solid #EC4899;padding:16px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 8px 20px rgba(236,72,153,.18)">
+      <div style="flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:1.7rem;box-shadow:0 4px 12px rgba(157,23,77,.22)">🚶</div>
+      <div style="flex:1 1 200px;min-width:0">
+        <div style="font-size:.7rem;letter-spacing:.08em;font-weight:800;color:#9D174D;text-transform:uppercase">
+          <span data-i18n-en>Walk-In Counter · Live</span><span data-i18n-hi>ग्राहक काउंटर · लाइव</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-top:4px;flex-wrap:wrap">
+          <div>
+            <span id="walkInTodayMain" style="font-size:2.2rem;font-weight:900;color:#831843;line-height:1">0</span>
+            <span style="font-size:.72rem;font-weight:700;color:#9D174D;margin-left:5px"><span data-i18n-en>today</span><span data-i18n-hi>आज</span></span>
+          </div>
+          <div style="font-size:.85rem;color:#9D174D;font-weight:700">
+            <span data-i18n-en>Total visits:</span><span data-i18n-hi>कुल:</span>
+            <span id="walkInTotalMain" style="font-weight:900">0</span>
+          </div>
+        </div>
+      </div>
+      <button id="walkInBtnMain" type="button" style="flex:0 0 auto;background:#EC4899;color:#fff;border:none;padding:14px 22px;border-radius:99px;font-weight:900;font-size:1rem;cursor:pointer;box-shadow:0 6px 16px rgba(236,72,153,.4);transition:.15s" onmouseover="this.style.transform='translateY(-2px) scale(1.02)'" onmouseout="this.style.transform='translateY(0) scale(1)'">
+        +1 <span data-i18n-en>Customer Aaya</span><span data-i18n-hi>ग्राहक आया</span> 🚶
+      </button>
+    </div>
+
     <!-- KPI -->
     <div class="dash-grid">
       <div class="kpi">
@@ -1434,41 +1457,63 @@ async function loadDashboard(){
 async function initWalkInWidget(biz){
   if (!biz || !biz.id) return;
   var c = ShopDB.client;
+  function setCounts(t, T){
+    var byId = function(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; };
+    byId('walkInToday', t);
+    byId('walkInTotal', T);
+    byId('walkInTodayMain', t);
+    byId('walkInTotalMain', T);
+  }
   // Initial load — get today's + total
   try {
     var r = await c.rpc('get_walk_ins', { p_business_id: biz.id });
-    if (r.data){
-      document.getElementById('walkInToday').textContent = r.data.today || 0;
-      document.getElementById('walkInTotal').textContent = r.data.total || 0;
-    }
+    if (r.data){ setCounts(r.data.today || 0, r.data.total || 0); }
   } catch(e){ console.warn('walk-in get failed:', e); }
-  // Wire button
-  var btn = document.getElementById('walkInBtn');
-  if (!btn) return;
-  btn.addEventListener('click', async function(){
-    btn.disabled = true;
-    var origTxt = btn.innerHTML;
-    btn.innerHTML = '⏳ ...';
-    try {
-      var r = await c.rpc('bump_walk_in', { p_business_id: biz.id });
-      if (r.error) throw r.error;
-      var t = (r.data && r.data.today) || 0;
-      var T = (r.data && r.data.total) || 0;
-      document.getElementById('walkInToday').textContent = t;
-      document.getElementById('walkInTotal').textContent = T;
-      btn.innerHTML = '✓ Counted!';
-      setTimeout(function(){ btn.innerHTML = origTxt; btn.disabled = false; }, 800);
-    } catch(e){
-      console.warn('walk-in bump failed:', e);
-      btn.innerHTML = origTxt;
-      btn.disabled = false;
-      // If RPC not deployed yet, hide widget silently
-      if (/function.*does not exist|404|400/i.test(String(e.message||e))){
-        var w = document.getElementById('walkInWidget');
-        if (w) w.style.display = 'none';
+
+  // Wire BOTH buttons (sidebar + main hero)
+  function wireBtn(btn){
+    if (!btn) return;
+    btn.addEventListener('click', async function(){
+      // Disable BOTH buttons during the bump to prevent double-count
+      var b1 = document.getElementById('walkInBtn');
+      var b2 = document.getElementById('walkInBtnMain');
+      var origTxt = btn.innerHTML;
+      if (b1){ b1.disabled = true; }
+      if (b2){ b2.disabled = true; }
+      btn.innerHTML = '⏳ ...';
+      try {
+        var r = await c.rpc('bump_walk_in', { p_business_id: biz.id });
+        if (r.error) throw r.error;
+        var t = (r.data && r.data.today) || 0;
+        var T = (r.data && r.data.total) || 0;
+        setCounts(t, T);
+        btn.innerHTML = '✓ Counted!';
+        // Subtle pulse on main card to confirm
+        var mc = document.getElementById('walkInMainCard');
+        if (mc){
+          mc.style.transition = 'transform .2s';
+          mc.style.transform = 'scale(1.015)';
+          setTimeout(function(){ mc.style.transform = 'scale(1)'; }, 200);
+        }
+        setTimeout(function(){
+          btn.innerHTML = origTxt;
+          if (b1){ b1.disabled = false; }
+          if (b2){ b2.disabled = false; }
+        }, 800);
+      } catch(e){
+        console.warn('walk-in bump failed:', e);
+        btn.innerHTML = origTxt;
+        if (b1){ b1.disabled = false; }
+        if (b2){ b2.disabled = false; }
+        if (/function.*does not exist|404|400/i.test(String(e.message||e))){
+          var w = document.getElementById('walkInWidget'); if (w) w.style.display = 'none';
+          var m = document.getElementById('walkInMainCard'); if (m) m.style.display = 'none';
+        }
       }
-    }
-  });
+    });
+  }
+  wireBtn(document.getElementById('walkInBtn'));
+  wireBtn(document.getElementById('walkInBtnMain'));
 }
 
 async function loadCategoryBadges(bizId){
@@ -2614,72 +2659,4 @@ async function setupReferralWidget(){
       fillReferral(b.slug);
     } catch(fbErr){
       const box = document.getElementById('referralLinkBox');
-      if (box) box.innerHTML = '<span style="color:#9A3412">Shop not loaded. <a href="javascript:location.reload()" style="color:#1E3A8A;text-decoration:underline">Refresh page</a></span>';
-      console.warn('Referral fallback:', fbErr && fbErr.message || fbErr);
-    }
-  } catch(e){ console.warn('Referral setup:', e); }
-}
-
-function fillReferral(slug){
-  const refLink = window.location.origin + '/register.html?ref=' + encodeURIComponent(slug);
-  const box = document.getElementById('referralLinkBox');
-  if (box) box.textContent = refLink;
-  window._referralLink = refLink;
-  const clicks = parseInt(localStorage.getItem('dl_ref_clicks_' + slug) || '0', 10);
-  const ctr = document.getElementById('refCounter');
-  if (ctr) ctr.textContent = clicks;
-}
-
-function copyReferralLink(){
-  const link = window._referralLink;
-  if (!link) return;
-  try {
-    navigator.clipboard.writeText(link).then(() => {
-      const btn = document.getElementById('copyRefBtn');
-      const orig = btn.innerHTML;
-      btn.innerHTML = '✓ Copied!';
-      btn.style.background = '#16A34A';
-      setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#0F172A'; }, 2000);
-    });
-  } catch(_){
-    prompt('Copy this link:', link);
-  }
-}
-
-function shareReferralWhatsApp(){
-  const link = window._referralLink;
-  if (!link) return;
-  const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-  const message = lang === 'hi'
-    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Aaj hi karein: ' + link
-    : 'Namaste! List your shop on DukanList — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Register today: ' + link;
-  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
-}
-
-(function(){
-  function init(){
-    setupReferralWidget();
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-
-<!-- Daily Poster Engine (2026-06-05) — 7-day theme rotation for Aaj ka Poster card -->
-<script src="/assets/js/daily-poster-engine.js" defer></script>
-<!-- Festival Engine (2026-06-05): Auto-override poster theme on festival days -->
-<script src="/assets/js/festival-engine.js" defer></script>
-<!-- Template Mega Pack (2026-06-05): 30+ designs -->
-<script src="/assets/js/template-mega-pack.js" defer></script>
-<!-- Daily Buzz Stories (Phase 9) -->
-<script src="/assets/js/daily-buzz.js" defer></script>
-<!-- Engagement Engine (2026-06-05) -->
-<script src="/assets/js/engagement-engine.js" defer></script>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
-<script src="/assets/js/error-reporter.js" defer></script>
-</body>
-</html>
+      if (box) box.in

@@ -29,7 +29,6 @@
     position:absolute; inset:0;
     background-size:cover; background-position:center;
     filter:brightness(.6);
-    transition:transform .6s ease;
   }
   .card.no-photo .bg{ background:linear-gradient(135deg,#1E3A8A,#7C3AED) }
 
@@ -39,21 +38,46 @@
     pointer-events:none;
   }
 
-  .card .top{
-    position:absolute; top:env(safe-area-inset-top, 12px); left:14px; right:14px;
-    display:flex; align-items:center; justify-content:space-between; z-index:2;
+  /* Top bar with category chips */
+  .top-nav{
+    position:fixed; top:env(safe-area-inset-top, 8px); left:0; right:0;
+    z-index:10; padding:8px 12px;
+    display:flex; align-items:center; gap:8px;
+    background:linear-gradient(to bottom, rgba(15,23,42,.7), transparent);
   }
-  .card .top .logo{
-    background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
-    border-radius:99px; padding:5px 11px;
+  .top-nav .home-btn, .top-nav .fav-btn{
+    background:rgba(255,255,255,.16); backdrop-filter:blur(12px);
+    color:#fff; text-decoration:none;
+    padding:7px 12px; border-radius:99px;
     font-size:12px; font-weight:800;
-    color:#fff;
+    border:1px solid rgba(255,255,255,.2);
+    flex-shrink:0;
+    cursor:pointer;
   }
-  .card .top .logo em{ color:#FBBF24; font-style:normal }
-  .card .top a{
-    color:#fff; text-decoration:none; font-size:11px; font-weight:700;
-    background:rgba(255,255,255,.12); padding:5px 11px; border-radius:99px; backdrop-filter:blur(10px);
+  .top-nav .logo{
+    background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
+    border-radius:99px; padding:6px 11px;
+    font-size:12px; font-weight:800; color:#fff;
+    flex-shrink:0;
   }
+  .top-nav .logo em{ color:#FBBF24; font-style:normal }
+
+  /* Filter chips row (scrolls horizontally) */
+  .chips{
+    position:fixed; top:calc(env(safe-area-inset-top, 8px) + 48px); left:0; right:0;
+    z-index:9;
+    display:flex; gap:6px; overflow-x:auto; padding:0 12px 8px;
+    scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{ display:none }
+  .chip{
+    flex-shrink:0; background:rgba(255,255,255,.1); backdrop-filter:blur(10px);
+    color:#fff; padding:6px 12px; border-radius:99px;
+    font-size:12px; font-weight:700; cursor:pointer;
+    border:1px solid rgba(255,255,255,.15);
+    white-space:nowrap;
+  }
+  .chip.active{ background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F; border-color:transparent }
 
   .card .body{
     position:absolute; bottom:0; left:0; right:0;
@@ -69,8 +93,11 @@
     color:#fff;
   }
   .badge.verified{ background:rgba(245,158,11,.25); color:#FBBF24; border:1px solid rgba(245,158,11,.4) }
-  .badge.open{ background:rgba(16,185,129,.25); color:#6EE7B7; border:1px solid rgba(16,185,129,.4) }
+  .badge.open{ background:rgba(16,185,129,.28); color:#6EE7B7; border:1px solid rgba(16,185,129,.45) }
+  .badge.closed{ background:rgba(239,68,68,.25); color:#FCA5A5; border:1px solid rgba(239,68,68,.4) }
   .badge.walkins{ background:rgba(236,72,153,.25); color:#FBCFE8; border:1px solid rgba(236,72,153,.4) }
+  .badge.featured{ background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff; border:none }
+  .badge.fresh{ background:rgba(124,58,237,.3); color:#DDD6FE; border:1px solid rgba(124,58,237,.5) }
 
   .card h2{
     font-family:'Manrope',sans-serif;
@@ -101,6 +128,7 @@
     display:flex; flex-direction:column; gap:14px; z-index:3;
   }
   .act{
+    position:relative;
     width:48px; height:48px; border-radius:50%;
     background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
     border:1px solid rgba(255,255,255,.18);
@@ -155,7 +183,7 @@
 
   /* Swipe hint (only first card, fades out) */
   .swipe-hint{
-    position:absolute; bottom:160px; left:50%; transform:translateX(-50%);
+    position:absolute; bottom:170px; left:50%; transform:translateX(-50%);
     color:rgba(255,255,255,.85); font-size:12px; font-weight:700;
     background:rgba(0,0,0,.4); padding:8px 14px; border-radius:99px;
     backdrop-filter:blur(8px);
@@ -167,6 +195,17 @@
     50%{ transform:translateX(-50%) translateY(-8px) }
   }
   .swipe-hint.hide{ opacity:0; transition:opacity .4s }
+
+  /* Toast for save/share confirmation */
+  .toast{
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:rgba(15,23,42,.95); color:#fff; backdrop-filter:blur(10px);
+    padding:10px 18px; border-radius:99px; font-size:13px; font-weight:700;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s; z-index:50;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
 
   html[data-lang="hi"] body, html[data-lang="hi"] .card h2, html[data-lang="hi"] .card .meta{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
 </style>
@@ -180,16 +219,28 @@
   </div>
 </div>
 
+<div id="topNav" class="top-nav" style="display:none">
+  <a href="/" class="home-btn">← Home</a>
+  <div class="logo">Dukan<em>List</em></div>
+  <div style="flex:1"></div>
+  <a href="/panel/favorites.html" class="fav-btn">❤️ Saved</a>
+</div>
+
+<div id="chips" class="chips" style="display:none"></div>
+
 <div id="feed" class="feed" style="display:none"></div>
 
 <div id="emptyScreen" class="center" style="display:none">
   <div style="text-align:center;padding:0 24px">
     <div style="font-size:48px;margin-bottom:14px">🏪</div>
-    <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops yet in this view</h2>
-    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try searching for what you need or browse by category.</p>
-    <a href="/" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none">← Back to Home</a>
+    <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops here yet</h2>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try a different category or browse all shops.</p>
+    <a href="/browse.html" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none">📚 Browse All</a>
+    <a href="/" style="display:inline-block;margin-top:14px;margin-left:8px;background:rgba(255,255,255,.12);color:#fff;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2)">← Home</a>
   </div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
@@ -199,16 +250,57 @@ function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_favs')||'[]
 function setFavs(a){ try { localStorage.setItem('dl_favs', JSON.stringify(a)); } catch(_){} }
 function isFav(id){ return getFavs().indexOf(id) > -1 }
 function toggleFav(id){ var f=getFavs(); var i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); setFavs(f); return f.indexOf(id)>-1 }
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+
+// Open/Closed check (light — uses hours_json if present)
+function isOpenNow(hours){
+  if (!hours || typeof hours !== 'object') return null;
+  try {
+    var d = new Date();
+    var day = ['sun','mon','tue','wed','thu','fri','sat'][d.getDay()];
+    var entry = hours[day];
+    if (!entry || !entry.open || !entry.close) return null;
+    var now = d.getHours()*60 + d.getMinutes();
+    function toMin(t){ var p = t.split(':'); return parseInt(p[0],10)*60 + parseInt(p[1]||0,10); }
+    var o = toMin(entry.open), cl = toMin(entry.close);
+    return now >= o && now <= cl;
+  } catch(_){ return null; }
+}
+
+// Build filter chips from data
+function buildChips(allRows, catMap, activeFilter){
+  var byCat = {};
+  allRows.forEach(function(b){
+    var k = b.sub_category_id || b.category_id;
+    if (!k) return;
+    byCat[k] = (byCat[k] || 0) + 1;
+  });
+  var sorted = Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; }).slice(0, 12);
+  var chips = '<div class="chip '+(!activeFilter?'active':'')+'" data-cat="all">🌟 All</div>';
+  sorted.forEach(function(id){
+    var c = catMap[id] || {};
+    var label = (c.icon || '🏪') + ' ' + (c.name || 'Shop');
+    chips += '<div class="chip '+(activeFilter===id?'active':'')+'" data-cat="'+esc(id)+'">'+esc(label)+'</div>';
+  });
+  return chips;
+}
+
+var STATE = { allRows: [], catMap: {}, cityMap: {}, filter: null };
 
 async function init(){
   try {
     var c = ShopDB.client;
     // Pull a randomised mix of recent active shops
     var r = await c.from('businesses')
-      .select('id, slug, name, photos, mobile, whatsapp, usp_text, address_line1, pincode, rating_avg, rating_count, verified_score, walk_ins_today, sub_category_id, category_id, city_id, hours_json')
+      .select('id, slug, name, photos, mobile, whatsapp, usp_text, address_line1, pincode, rating_avg, rating_count, verified_score, walk_ins_today, sub_category_id, category_id, city_id, hours_json, featured_until, created_at')
       .eq('status', 'active')
       .order('updated_at', { ascending: false })
-      .limit(40);
+      .limit(60);
     if (r.error) throw r.error;
     var rows = r.data || [];
     if (rows.length === 0){
@@ -216,108 +308,154 @@ async function init(){
       document.getElementById('emptyScreen').style.display = '';
       return;
     }
-    // Shuffle for fun
+    // Shuffle for variety
     rows = rows.sort(function(){ return Math.random() - 0.5; });
 
     // Look up city + cat names in batch
-    var cityIds = [...new Set(rows.map(function(r){return r.city_id}).filter(Boolean))];
-    var catIds  = [...new Set(rows.map(function(r){return r.sub_category_id || r.category_id}).filter(Boolean))];
-    var cityMap = {}, catMap = {};
+    var cityIds = Array.from(new Set(rows.map(function(r){return r.city_id}).filter(Boolean)));
+    var catIds  = Array.from(new Set(rows.map(function(r){return r.sub_category_id || r.category_id}).filter(Boolean)));
     if (cityIds.length){
       var cr = await c.from('geo_cities').select('id,name').in('id', cityIds);
-      (cr.data||[]).forEach(function(x){ cityMap[x.id] = x.name; });
+      (cr.data||[]).forEach(function(x){ STATE.cityMap[x.id] = x.name; });
     }
     if (catIds.length){
       var kr = await c.from('categories').select('id,name,icon').in('id', catIds);
-      (kr.data||[]).forEach(function(x){ catMap[x.id] = x; });
+      (kr.data||[]).forEach(function(x){ STATE.catMap[x.id] = x; });
     }
-
-    // Render cards
-    var html = rows.map(function(b, idx){
-      var photo = (b.photos && b.photos[0]) || '';
-      var cat = catMap[b.sub_category_id || b.category_id] || {};
-      var city = cityMap[b.city_id] || '';
-      var verified = b.verified_score >= 1;
-      var rating = (b.rating_avg||0).toFixed(1);
-      var rc = b.rating_count || 0;
-      var fav = isFav(b.id);
-      var walks = b.walk_ins_today || 0;
-      var addrShort = (b.address_line1 || '').split(',')[0] || city;
-      return ''+
-      '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'">'+
-        '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
-        '<div class="gradient"></div>'+
-        '<div class="top">'+
-          '<div class="logo">Dukan<em>List</em></div>'+
-          '<a href="/">← Home</a>'+
-        '</div>'+
-        '<div class="body">'+
-          '<div class="badges">'+
-            (cat.icon ? '<span class="badge">'+cat.icon+' '+esc(cat.name||'')+'</span>' : '')+
-            (verified ? '<span class="badge verified">✓ Verified</span>' : '')+
-            (rc > 0 ? '<span class="badge">⭐ '+rating+' ('+rc+')</span>' : '')+
-            (walks > 0 ? '<span class="badge walkins">🚶 '+walks+' today</span>' : '')+
-          '</div>'+
-          '<h2>'+esc(b.name||'')+'</h2>'+
-          (city ? '<div class="meta">📍 '+esc(city)+'</div>' : '')+
-          (b.usp_text ? '<div class="usp">"'+esc(b.usp_text.slice(0,140))+(b.usp_text.length>140?'…':'')+'"</div>' : '')+
-          (addrShort && addrShort!==city ? '<div class="addr">📌 '+esc(addrShort)+'</div>' : '')+
-        '</div>'+
-        '<div class="actions">'+
-          '<div class="act fav '+(fav?'faved':'')+'" data-id="'+b.id+'">'+
-            '<span class="heart-out">🤍</span><span class="heart-fill">❤️</span>'+
-            '<span class="lbl">Save</span>'+
-          '</div>'+
-          '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'">📤<span class="lbl">Share</span></div>'+
-          (b.mobile ? '<a class="act call" href="tel:'+esc(b.mobile)+'">📞<span class="lbl">Call</span></a>' : '')+
-          (b.whatsapp || b.mobile ? '<a class="act wa" href="https://wa.me/91'+esc(String(b.whatsapp||b.mobile||"").replace(/[^0-9]/g,""))+'" target="_blank">💬<span class="lbl">Chat</span></a>' : '')+
-        '</div>'+
-        '<div class="cta-row">'+
-          '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Shop →</a>'+
-        '</div>'+
-        (idx===0 ? '<div class="swipe-hint" id="swipeHint">⬆️ Swipe up for next</div>' : '')+
-      '</div>';
-    }).join('');
-
-    var feed = document.getElementById('feed');
-    feed.innerHTML = html;
-    document.getElementById('loadingScreen').style.display = 'none';
-    feed.style.display = '';
-
-    // Wire favorites
-    feed.querySelectorAll('.act.fav').forEach(function(btn){
-      btn.addEventListener('click', function(e){
-        e.preventDefault();
-        var on = toggleFav(btn.dataset.id);
-        btn.classList.toggle('faved', on);
-      });
-    });
-    // Wire share
-    feed.querySelectorAll('.act.share').forEach(function(btn){
-      btn.addEventListener('click', function(e){
-        e.preventDefault();
-        var name = btn.dataset.name;
-        var slug = btn.dataset.slug;
-        var url  = location.origin + '/business.html?slug=' + slug;
-        var msg  = name + '\\n' + url + '\\n\\nDukanList par mila — Bharat ki local directory.';
-        if (navigator.share){
-          navigator.share({ title:name, text:msg, url:url }).catch(function(){});
-        } else {
-          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
-        }
-      });
-    });
-
-    // Hide swipe hint after first scroll
-    feed.addEventListener('scroll', function(){
-      var h = document.getElementById('swipeHint');
-      if (h) h.classList.add('hide');
-    }, { once:true });
-
+    STATE.allRows = rows;
+    renderFiltered();
   } catch(e){
-    document.getElementById('loadingScreen').innerHTML = '<div style="color:#FCA5A5;text-align:center;padding:24px"><h2>Could not load shops</h2><p style="margin-top:8px;font-size:13px">'+(e.message||e)+'</p><a href="/" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:10px 16px;border-radius:8px;font-weight:800;text-decoration:none">← Back</a></div>';
+    document.getElementById('loadingScreen').innerHTML = '<div style="color:#FCA5A5;text-align:center;padding:24px"><h2>Could not load shops</h2><p style="margin-top:8px;font-size:13px">'+esc(e.message||String(e))+'</p><a href="/" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:10px 16px;border-radius:8px;font-weight:800;text-decoration:none">← Back</a></div>';
   }
 }
+
+function renderFiltered(){
+  var rows = STATE.allRows;
+  if (STATE.filter){
+    rows = rows.filter(function(b){ return (b.sub_category_id||b.category_id) === STATE.filter; });
+  }
+  if (rows.length === 0){
+    document.getElementById('feed').style.display = 'none';
+    document.getElementById('emptyScreen').style.display = '';
+    return;
+  }
+  document.getElementById('emptyScreen').style.display = 'none';
+
+  var nowDate = new Date();
+  var sevenDaysAgo = new Date(nowDate.getTime() - 7*24*60*60*1000);
+
+  var html = rows.map(function(b, idx){
+    var photo = (b.photos && b.photos[0]) || '';
+    var cat = STATE.catMap[b.sub_category_id || b.category_id] || {};
+    var city = STATE.cityMap[b.city_id] || '';
+    var verified = b.verified_score >= 1;
+    var rating = (b.rating_avg||0).toFixed(1);
+    var rc = b.rating_count || 0;
+    var fav = isFav(b.id);
+    var walks = b.walk_ins_today || 0;
+    var addrShort = (b.address_line1 || '').split(',')[0] || city;
+    var uspText = typeof b.usp_text === 'string' ? b.usp_text : '';
+    var openStatus = isOpenNow(b.hours_json);
+    var isFeatured = b.featured_until && new Date(b.featured_until) > nowDate;
+    var isFresh = b.created_at && new Date(b.created_at) > sevenDaysAgo;
+
+    return ''+
+    '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'">'+
+      '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
+      '<div class="gradient"></div>'+
+      '<div class="body">'+
+        '<div class="badges">'+
+          (isFeatured ? '<span class="badge featured">⭐ Featured</span>' : '')+
+          (cat.icon ? '<span class="badge">'+esc(cat.icon)+' '+esc(cat.name||'')+'</span>' : '')+
+          (verified ? '<span class="badge verified">✓ Verified</span>' : '')+
+          (openStatus === true ? '<span class="badge open">🟢 Open now</span>' : '')+
+          (openStatus === false ? '<span class="badge closed">🔴 Closed</span>' : '')+
+          (rc > 0 ? '<span class="badge">⭐ '+rating+' ('+rc+')</span>' : '')+
+          (walks > 0 ? '<span class="badge walkins">🚶 '+walks+' today</span>' : '')+
+          (isFresh ? '<span class="badge fresh">✨ New</span>' : '')+
+        '</div>'+
+        '<h2>'+esc(b.name||'')+'</h2>'+
+        (city ? '<div class="meta">📍 '+esc(city)+'</div>' : '')+
+        (uspText ? '<div class="usp">"'+esc(uspText.slice(0,140))+(uspText.length>140?'…':'')+'"</div>' : '')+
+        (addrShort && addrShort!==city ? '<div class="addr">📌 '+esc(addrShort)+'</div>' : '')+
+      '</div>'+
+      '<div class="actions">'+
+        '<div class="act fav '+(fav?'faved':'')+'" data-id="'+esc(b.id)+'">'+
+          '<span class="heart-out">🤍</span><span class="heart-fill">❤️</span>'+
+          '<span class="lbl">Save</span>'+
+        '</div>'+
+        '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'">📤<span class="lbl">Share</span></div>'+
+        (b.mobile ? '<a class="act call" href="tel:'+esc(b.mobile)+'">📞<span class="lbl">Call</span></a>' : '')+
+        ((b.whatsapp || b.mobile) ? '<a class="act wa" href="https://wa.me/91'+esc(String(b.whatsapp||b.mobile||"").replace(/[^0-9]/g,""))+'" target="_blank" rel="noopener">💬<span class="lbl">Chat</span></a>' : '')+
+      '</div>'+
+      '<div class="cta-row">'+
+        '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Shop →</a>'+
+      '</div>'+
+      (idx===0 ? '<div class="swipe-hint" id="swipeHint">⬆️ Swipe up for next</div>' : '')+
+    '</div>';
+  }).join('');
+
+  var feed = document.getElementById('feed');
+  feed.innerHTML = html;
+  feed.scrollTop = 0;
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('topNav').style.display = '';
+
+  // Build + show chips
+  var chipsEl = document.getElementById('chips');
+  chipsEl.innerHTML = buildChips(STATE.allRows, STATE.catMap, STATE.filter);
+  chipsEl.style.display = '';
+  chipsEl.querySelectorAll('.chip').forEach(function(ch){
+    ch.addEventListener('click', function(){
+      var cat = ch.getAttribute('data-cat');
+      STATE.filter = (cat === 'all' ? null : cat);
+      renderFiltered();
+    });
+  });
+
+  feed.style.display = '';
+
+  // Wire favorites
+  feed.querySelectorAll('.act.fav').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var on = toggleFav(btn.getAttribute('data-id'));
+      btn.classList.toggle('faved', on);
+      showToast(on ? '❤️ Saved' : '💔 Removed');
+    });
+  });
+  // Wire share — proper newlines (not literal \\n)
+  feed.querySelectorAll('.act.share').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var name = btn.getAttribute('data-name') || '';
+      var slug = btn.getAttribute('data-slug') || '';
+      var url  = location.origin + '/business.html?slug=' + slug;
+      var msg  = name + '\n' + url + '\n\nFound on DukanList — Bharat ki local directory.';
+      if (navigator.share){
+        navigator.share({ title:name, text:msg, url:url }).catch(function(){});
+      } else {
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+      }
+    });
+  });
+
+  // Hide swipe hint after first scroll
+  feed.addEventListener('scroll', function(){
+    var h = document.getElementById('swipeHint');
+    if (h) h.classList.add('hide');
+  }, { once:true });
+
+  // Preload the next 3 photos for smooth swipe
+  var cards = feed.querySelectorAll('.card');
+  for (var i = 1; i <= 3 && i < cards.length; i++){
+    var bg = cards[i].querySelector('.bg');
+    var style = bg && bg.getAttribute('style') || '';
+    var m = style.match(/url\(([^)]+)\)/);
+    if (m){ var img = new Image(); img.src = m[1]; }
+  }
+}
+
 init();
 </script>
 

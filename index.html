@@ -1153,6 +1153,24 @@ function dismissFestBanner(){
   <div class="cats-wrap">
     <div class="wn-grid" id="wnGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:1180px;margin:0 auto">
 
+      <a href="/discover.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#F0ABFC !important;background:linear-gradient(135deg,#FAF5FF 0%,#FCE7F3 100%);position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(192,38,211,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff">🎬</div><span class="wn-badge new" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;animation:pulseGlow 2.4s ease-in-out infinite">JUST DROPPED</span></div>
+        <h3><span data-i18n-en>Discover Feed — TikTok-Style Shops</span><span data-i18n-hi>Discover फ़ीड — TikTok जैसा अनुभव</span></h3>
+        <p><span data-i18n-en>Swipe up through Sirsa-Bathinda shops one by one — full-screen photos, ratings, instant Call &amp; WhatsApp buttons. Built for thumbs.</span><span data-i18n-hi>Sirsa-Bathinda की दुकानें एक-एक करके swipe करें — full-screen photos, rating, सीधे Call &amp; WhatsApp। मोबाइल के लिए बनाया।</span></p>
+      </a>
+
+      <a href="/panel/dashboard.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FBCFE8 !important;background:linear-gradient(135deg,#FDF2F8 0%,#FCE7F3 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(236,72,153,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#EC4899,#BE185D);color:#fff">🚶</div><span class="wn-badge new" style="background:linear-gradient(135deg,#EC4899,#BE185D);color:#fff">FOR OWNERS</span></div>
+        <h3><span data-i18n-en>Live Walk-In Counter</span><span data-i18n-hi>लाइव ग्राहक काउंटर</span></h3>
+        <p><span data-i18n-en>One-tap "+1 Customer Aaya" button on your dashboard. Live count appears on your shop page → instant social proof for new visitors.</span><span data-i18n-hi>Dashboard पर एक-tap "+1 ग्राहक आया" बटन। आपकी दुकान page पर live count दिखेगा → नए ग्राहकों के लिए social proof।</span></p>
+      </a>
+
+      <a href="/discover.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FDE68A !important;background:linear-gradient(135deg,#FFFBEB 0%,#FEF9C3 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(245,158,11,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff">⭐</div><span class="wn-badge new" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff">WEEKLY</span></div>
+        <h3><span data-i18n-en>Shop of the Week Spotlight</span><span data-i18n-hi>हफ़्ते की शॉप</span></h3>
+        <p><span data-i18n-en>Every week we hand-pick one outstanding shop and feature it on Discover + homepage banner. Free reward for top-quality listings.</span><span data-i18n-hi>हर हफ़्ते एक बेहतरीन दुकान चुनी जाती है — Discover &amp; homepage पर feature होती है। Top quality listings के लिए मुफ़्त इनाम।</span></p>
+      </a>
+
       <a href="/panel/poster-studio.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FCD34D !important;background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(245,158,11,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#0A0A0A,#404040);color:#FBBF24">✨</div><span class="wn-badge new" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#78350F">PREMIUM</span></div>
         <h3><span data-i18n-en>Premium Poster Studio v2</span><span data-i18n-hi>प्रीमियम पोस्टर स्टूडियो v2</span></h3>
@@ -2240,135 +2258,4 @@ if (window.DukanPTR){
       });
     } catch(_){}
     try {
-      // Recent reviews
-      const { data: reviews } = await c.from('reviews')
-        .select('rating,created_at,businesses(name)')
-        .eq('status', 'active')
-        .gte('rating', 4)
-        .order('created_at', { ascending: false })
-        .limit(3);
-      (reviews || []).forEach(r => {
-        if (!r.businesses || !r.businesses.name) return;
-        events.push({
-          en: '⭐ ' + r.rating + '-star review for <b>' + esc(r.businesses.name) + '</b> · ' + fmtAgo(r.created_at),
-          hi: '⭐ ' + r.rating + '-star review मिला <b>' + esc(r.businesses.name) + '</b> को · ' + fmtAgo(r.created_at)
-        });
-      });
-    } catch(_){}
-
-    if (events.length === 0){
-      // Static fallback (so ticker is never empty)
-      events.push(
-        { en: '🏪 Sirsa · Bathinda · Mansa · Muktsar ka apna local directory — join FREE', hi: '🏪 Sirsa · Bathinda · Mansa · Muktsar का local directory — FREE जुड़ें' },
-        { en: '💬 Customers daily WhatsApp local shops directly', hi: '💬 Customers रोज़ local shops से WhatsApp पर बात करते हैं' }
-      );
-    }
-
-    // Shuffle for variety
-    events.sort(() => Math.random() - 0.5);
-
-    let idx = 0;
-    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-    function show(){
-      const msg = document.getElementById('actMsg');
-      if (!msg) return;
-      msg.innerHTML = events[idx % events.length][lang] || events[idx % events.length].en;
-      idx++;
-    }
-    show();
-    ticker.style.display = '';
-    setInterval(show, 5000);
-
-    // Push body padding to avoid covering content at bottom.
-    // On mobile, mobile-nav already adds its own padding so we add only ticker height.
-    const isMobile = window.matchMedia('(max-width:700px)').matches;
-    document.body.style.paddingBottom = (isMobile ? '110px' : '52px');
-  }
-
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', () => setTimeout(loadActivity, 1800));
-  } else {
-    setTimeout(loadActivity, 1800);
-  }
-})();
-function dismissActTicker(){
-  try { localStorage.setItem('dl_act_dismissed_today', new Date().toISOString().slice(0,10)); } catch(_){}
-  const t = document.getElementById('actTicker');
-  if (t) t.style.display = 'none';
-  document.body.style.paddingBottom = '';
-}
-</script>
-
-<script>
-// Phase 5: Local Pulse widget
-(async function(){
-  if (!window.ShopDB || !ShopDB.client) {
-    setTimeout(arguments.callee, 500);
-    return;
-  }
-  let citySlug = null;
-  try {
-    if (window.CityPersist && CityPersist.getCity) {
-      citySlug = (CityPersist.getCity() || {}).slug || null;
-    }
-    if (!citySlug) {
-      citySlug = localStorage.getItem('dukanlist.city') || null;
-    }
-  } catch(_){}
-  try {
-    const { data, error } = await ShopDB.client.rpc('get_local_pulse', { p_city_slug: citySlug });
-    if (error || !data) return;
-    const newShops = parseInt(data.new_shops, 10) || 0;
-    const newDeals = parseInt(data.new_deals, 10) || 0;
-    const newRev   = parseInt(data.new_reviews, 10) || 0;
-    if (newShops + newDeals + newRev === 0) return;
-    const el = document.getElementById('localPulse');
-    if (!el) return;
-    document.getElementById('pulseCity').textContent = data.city_name || 'your city';
-    document.getElementById('pulseNewShops').textContent = newShops;
-    document.getElementById('pulseNewDeals').textContent = newDeals;
-    document.getElementById('pulseNewReviews').textContent = newRev;
-    const catsEl = document.getElementById('pulseCats');
-    if (catsEl && Array.isArray(data.top_categories)) {
-      catsEl.innerHTML = data.top_categories.slice(0, 3).map(function(c){
-        return '<a class="pulse-cat-pill" href="/search.html?cat='+encodeURIComponent(c.category_id||'')+'">#'+(c.category_name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</a>';
-      }).join('');
-    }
-    el.style.display = 'flex';
-  } catch(_){}
-})();
-</script>
-<script>
-// Phase 6: Init Open Near You widget on homepage
-(function(){
-  function init(){
-    if (window.GeoNearby) {
-      GeoNearby.renderWidget('openNearYou');
-    } else {
-      setTimeout(init, 400);
-    }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-<script>
-(function(){
-  function init(){
-    if (window.DailyBuzz && window.ShopDB && ShopDB.client) {
-      let citySlug = null;
-      try {
-        if (window.CityPersist && CityPersist.getCity) citySlug = (CityPersist.getCity() || {}).slug || null;
-        if (!citySlug) citySlug = localStorage.getItem('dukanlist.city') || null;
-      } catch(_){}
-      DailyBuzz.renderHomepageCarousel('homepageBuzz', ShopDB.client, citySlug);
-    } else {
-      setTimeout(init, 400);
-    }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
-</body>
-</html>
+  
