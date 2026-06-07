@@ -1006,4 +1006,67 @@ function updateBulkBar(){
 function clearBulkSelection(){
   _selectedBulk.clear();
   document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = false; });
-  docu
+  document.querySelectorAll('.biz-card.bulk-selected').forEach(c => c.classList.remove('bulk-selected'));
+  document.querySelectorAll('input[id^="selAll-"]').forEach(c => c.checked = false);
+  updateBulkBar();
+}
+
+function toggleAllSelected(panelKind, checked){
+  // Iterate checkboxes inside the matching panel only
+  const panel = document.getElementById('panel-' + panelKind);
+  if (!panel) return;
+  panel.querySelectorAll('.bulk-cb').forEach(cb => {
+    if (cb.checked !== checked){
+      cb.checked = checked;
+      onBulkToggle(cb);
+    }
+  });
+}
+
+async function performBulkAction(action){
+  if (_selectedBulk.size === 0) return;
+  const ids = Array.from(_selectedBulk.keys());
+  const names = Array.from(_selectedBulk.values()).map(v => v.name).slice(0, 5);
+  const previewList = names.join(', ') + (_selectedBulk.size > 5 ? ' + ' + (_selectedBulk.size - 5) + ' more' : '');
+  const verb = action === 'approve' ? 'approve & activate' : 'ban';
+  if (!confirm(verb.toUpperCase() + ' ' + _selectedBulk.size + ' shop' + (_selectedBulk.size === 1 ? '' : 's') + '?\n\n' + previewList)) return;
+
+  const rpcName = action === 'approve' ? 'admin_bulk_approve' : 'admin_bulk_ban';
+  const params = action === 'approve' ? { p_ids: ids } : { p_ids: ids, p_reason: null };
+  const r = await C.rpc(rpcName, params);
+  if (r.error){
+    alert('Bulk action failed: ' + r.error.message);
+    return;
+  }
+  const changed = r.data?.changed_count ?? 0;
+  showToast('✓ ' + changed + ' shop' + (changed === 1 ? '' : 's') + ' updated', 'success');
+  clearBulkSelection();
+  // Reload all panels so the moved shops disappear from their old tabs
+  await Promise.all([loadPending(), loadFlaggedBiz(), loadFlags(), loadPendingEdits()]);
+}
+
+function showToast(msg, kind){
+  // Use existing toast() if available, else fallback
+  if (typeof toast === 'function'){ toast(msg, kind); return; }
+  alert(msg);
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+function escapeJs(s){
+  return String(s == null ? '' : s).replace(/[\\'"]/g, ch => '\\' + ch);
+}
+
+async function logout(){
+  if (!confirm('Logout from admin panel?')) return;
+  await C.auth.signOut();
+  window.location.href = '/admin/login';
+}
+</script>
+
+<script src="/assets/js/admin-auto-logout.js"></script>
+</body>
+</html>
