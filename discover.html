@@ -207,6 +207,150 @@
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
 
+  /* ===== ANIMATIONS — wonderful UX ===== */
+
+  /* Ken Burns slow zoom on photo background */
+  .card.active .bg{
+    animation:kenBurns 18s ease-in-out infinite alternate;
+  }
+  @keyframes kenBurns{
+    0%   { transform:scale(1.0) translate(0, 0) }
+    100% { transform:scale(1.12) translate(-2%, 1%) }
+  }
+
+  /* Body content slide up + fade on activation */
+  .card .body, .card .actions, .card .cta-row{
+    opacity:0; transform:translateY(18px);
+    transition:opacity .55s ease, transform .55s cubic-bezier(.2,.85,.3,1.1);
+  }
+  .card.active .body{ opacity:1; transform:translateY(0); transition-delay:.10s }
+  .card.active .actions{ opacity:1; transform:translateY(0); transition-delay:.25s }
+  .card.active .cta-row{ opacity:1; transform:translateY(0); transition-delay:.35s }
+
+  /* Badges pop in with stagger */
+  .card.active .badge{
+    animation:badgePop .45s cubic-bezier(.2,.9,.4,1.4) backwards;
+  }
+  .card.active .badge:nth-child(1){ animation-delay:.20s }
+  .card.active .badge:nth-child(2){ animation-delay:.27s }
+  .card.active .badge:nth-child(3){ animation-delay:.34s }
+  .card.active .badge:nth-child(4){ animation-delay:.41s }
+  .card.active .badge:nth-child(5){ animation-delay:.48s }
+  .card.active .badge:nth-child(6){ animation-delay:.55s }
+  .card.active .badge:nth-child(7){ animation-delay:.62s }
+  @keyframes badgePop{
+    0%   { opacity:0; transform:scale(.7) translateY(8px) }
+    60%  { opacity:1; transform:scale(1.08) translateY(0) }
+    100% { opacity:1; transform:scale(1) translateY(0) }
+  }
+
+  /* Featured badge shimmer */
+  .badge.featured{
+    background:linear-gradient(135deg,#F59E0B 0%,#FBBF24 50%,#F59E0B 100%);
+    background-size:200% 100%;
+    animation:shimmer 2.5s linear infinite;
+  }
+  @keyframes shimmer{
+    0%{ background-position:200% 0 }
+    100%{ background-position:-200% 0 }
+  }
+
+  /* Action button ripple on tap */
+  .act{ position:relative; overflow:hidden }
+  .act::after{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at center, rgba(255,255,255,.5) 0%, transparent 60%);
+    opacity:0; transform:scale(0);
+    pointer-events:none;
+  }
+  .act.tapped::after{ animation:ripple .55s ease-out }
+  @keyframes ripple{
+    0%{ opacity:.7; transform:scale(0) }
+    100%{ opacity:0; transform:scale(2.5) }
+  }
+
+  /* Heart burst — emits sparkles around */
+  .heart-burst{
+    position:absolute; inset:0; pointer-events:none; z-index:5;
+  }
+  .heart-burst span{
+    position:absolute; left:50%; top:50%;
+    width:6px; height:6px; border-radius:50%;
+    background:#fda4af;
+    animation:burst .7s ease-out forwards;
+  }
+  @keyframes burst{
+    0%{ opacity:1; transform:translate(-50%,-50%) scale(1) }
+    100%{
+      opacity:0;
+      transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2);
+    }
+  }
+
+  /* Heart bounce when toggled on */
+  .act.fav.faved{ animation:heartBeat .6s ease }
+  @keyframes heartBeat{
+    0%{ transform:scale(1) }
+    25%{ transform:scale(1.35) }
+    50%{ transform:scale(.9) }
+    75%{ transform:scale(1.15) }
+    100%{ transform:scale(1) }
+  }
+
+  /* CTA gentle glow pulse */
+  .cta.primary{
+    box-shadow:0 6px 18px rgba(245,158,11,.35), 0 0 0 0 rgba(251,191,36,.5);
+    animation:ctaGlow 2.8s ease-in-out infinite;
+  }
+  @keyframes ctaGlow{
+    0%,100%{ box-shadow:0 6px 18px rgba(245,158,11,.35), 0 0 0 0 rgba(251,191,36,.5) }
+    50%   { box-shadow:0 8px 22px rgba(245,158,11,.5),  0 0 0 8px rgba(251,191,36,0) }
+  }
+
+  /* Chip click pop */
+  .chip{ transition:transform .15s, background .2s }
+  .chip:active{ transform:scale(.92) }
+  .chip.active{ animation:chipPop .35s cubic-bezier(.2,.9,.4,1.4) }
+  @keyframes chipPop{
+    0%{ transform:scale(.85) }
+    60%{ transform:scale(1.1) }
+    100%{ transform:scale(1) }
+  }
+
+  /* CTA-row click press */
+  .cta:active{ transform:scale(.96); transition:transform .1s }
+
+  /* Card swipe arrow finger animation */
+  .swipe-hint{
+    animation:bounce 1.6s infinite, pillGlow 2.4s ease-in-out infinite;
+  }
+  @keyframes pillGlow{
+    0%,100%{ background:rgba(0,0,0,.4) }
+    50%   { background:rgba(124,58,237,.55) }
+  }
+
+  /* Toast slide+scale */
+  .toast.show{
+    opacity:1; transform:translateX(-50%) translateY(0) scale(1);
+    animation:toastIn .35s cubic-bezier(.2,.9,.4,1.4);
+  }
+  @keyframes toastIn{
+    0%{ opacity:0; transform:translateX(-50%) translateY(20px) scale(.8) }
+    60%{ opacity:1; transform:translateX(-50%) translateY(0) scale(1.06) }
+    100%{ opacity:1; transform:translateX(-50%) translateY(0) scale(1) }
+  }
+
+  /* Respect reduced-motion preference */
+  @media (prefers-reduced-motion: reduce){
+    .card.active .bg{ animation:none }
+    .card .body, .card .actions, .card .cta-row{
+      opacity:1; transform:none; transition:none;
+    }
+    .card.active .badge{ animation:none }
+    .cta.primary{ animation:none }
+    .badge.featured{ animation:none }
+  }
+
   html[data-lang="hi"] body, html[data-lang="hi"] .card h2, html[data-lang="hi"] .card .meta{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
 </style>
 </head>
@@ -246,6 +390,31 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script>
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];}); }
+
+// Normalize Indian mobile to exactly 10 digits (no country code).
+// Handles: "9876543210", "+919876543210", "919876543210", "09876543210",
+//          "+91 98765-43210", "91-9876543210", etc.
+function normIN(raw){
+  var d = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+  if (!d) return '';
+  // Strip leading "91" if number is 12 digits (i.e., country code prepended)
+  if (d.length === 12 && d.charAt(0) === '9' && d.charAt(1) === '1') d = d.slice(2);
+  // Strip leading "0" if number is 11 digits (e.g., "09876543210")
+  else if (d.length === 11 && d.charAt(0) === '0') d = d.slice(1);
+  // Strip leading "+" already removed; for safety strip another "91" only if d starts with "91" AND length still 12 (extreme edge)
+  // Final length sanity
+  return d.length === 10 ? d : d;
+}
+// tel: href — use raw 10-digit, dialer will accept it
+function telHref(raw){
+  var d = normIN(raw);
+  return d ? 'tel:' + d : '';
+}
+// wa.me href — needs 91 country code prefix, exactly once
+function waHref(raw){
+  var d = normIN(raw);
+  return d ? 'https://wa.me/91' + d : '';
+}
 function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_favs')||'[]'); } catch(_){return []} }
 function setFavs(a){ try { localStorage.setItem('dl_favs', JSON.stringify(a)); } catch(_){} }
 function isFav(id){ return getFavs().indexOf(id) > -1 }
@@ -385,8 +554,8 @@ function renderFiltered(){
           '<span class="lbl">Save</span>'+
         '</div>'+
         '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'">📤<span class="lbl">Share</span></div>'+
-        (b.mobile ? '<a class="act call" href="tel:'+esc(b.mobile)+'">📞<span class="lbl">Call</span></a>' : '')+
-        ((b.whatsapp || b.mobile) ? '<a class="act wa" href="https://wa.me/91'+esc(String(b.whatsapp||b.mobile||"").replace(/[^0-9]/g,""))+'" target="_blank" rel="noopener">💬<span class="lbl">Chat</span></a>' : '')+
+        (telHref(b.mobile) ? '<a class="act call" href="'+esc(telHref(b.mobile))+'">📞<span class="lbl">Call</span></a>' : '')+
+        (waHref(b.whatsapp || b.mobile) ? '<a class="act wa" href="'+esc(waHref(b.whatsapp || b.mobile))+'" target="_blank" rel="noopener">💬<span class="lbl">Chat</span></a>' : '')+
       '</div>'+
       '<div class="cta-row">'+
         '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Shop →</a>'+
@@ -401,7 +570,6 @@ function renderFiltered(){
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('topNav').style.display = '';
 
-  // Build + show chips
   var chipsEl = document.getElementById('chips');
   chipsEl.innerHTML = buildChips(STATE.allRows, STATE.catMap, STATE.filter);
   chipsEl.style.display = '';
@@ -415,16 +583,28 @@ function renderFiltered(){
 
   feed.style.display = '';
 
-  // Wire favorites
   feed.querySelectorAll('.act.fav').forEach(function(btn){
     btn.addEventListener('click', function(e){
       e.preventDefault();
       var on = toggleFav(btn.getAttribute('data-id'));
       btn.classList.toggle('faved', on);
+      if (on){
+        btn.classList.remove('faved');
+        void btn.offsetWidth;
+        btn.classList.add('faved');
+        spawnHeartBurst(btn);
+      }
       showToast(on ? '❤️ Saved' : '💔 Removed');
     });
   });
-  // Wire share — proper newlines (not literal \\n)
+  feed.querySelectorAll('.act').forEach(function(btn){
+    btn.addEventListener('pointerdown', function(){
+      btn.classList.remove('tapped');
+      void btn.offsetWidth;
+      btn.classList.add('tapped');
+    });
+  });
+
   feed.querySelectorAll('.act.share').forEach(function(btn){
     btn.addEventListener('click', function(e){
       e.preventDefault();
@@ -440,13 +620,11 @@ function renderFiltered(){
     });
   });
 
-  // Hide swipe hint after first scroll
   feed.addEventListener('scroll', function(){
     var h = document.getElementById('swipeHint');
     if (h) h.classList.add('hide');
   }, { once:true });
 
-  // Preload the next 3 photos for smooth swipe
   var cards = feed.querySelectorAll('.card');
   for (var i = 1; i <= 3 && i < cards.length; i++){
     var bg = cards[i].querySelector('.bg');
@@ -454,6 +632,46 @@ function renderFiltered(){
     var m = style.match(/url\(([^)]+)\)/);
     if (m){ var img = new Image(); img.src = m[1]; }
   }
+
+  if ('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.intersectionRatio > 0.5){
+          en.target.classList.add('active');
+          var idx = parseInt(en.target.getAttribute('data-idx') || '0', 10);
+          var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
+          if (nxt){
+            var bg2 = nxt.querySelector('.bg');
+            var style2 = bg2 && bg2.getAttribute('style') || '';
+            var m2 = style2.match(/url\(([^)]+)\)/);
+            if (m2){ var im = new Image(); im.src = m2[1]; }
+          }
+        }
+      });
+    }, { root: feed, threshold: [0.5] });
+    cards.forEach(function(card){ obs.observe(card); });
+    if (cards[0]) cards[0].classList.add('active');
+  } else {
+    cards.forEach(function(card){ card.classList.add('active'); });
+  }
+}
+
+function spawnHeartBurst(btn){
+  var burst = document.createElement('div');
+  burst.className = 'heart-burst';
+  var colors = ['#fda4af','#fbbf24','#f472b6','#a78bfa','#fde68a','#86efac'];
+  for (var i = 0; i < 8; i++){
+    var s = document.createElement('span');
+    var angle = (i / 8) * Math.PI * 2;
+    var dist = 32 + Math.random() * 14;
+    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    s.style.background = colors[i % colors.length];
+    s.style.animationDelay = (Math.random() * 0.05) + 's';
+    burst.appendChild(s);
+  }
+  btn.appendChild(burst);
+  setTimeout(function(){ burst.remove(); }, 800);
 }
 
 init();

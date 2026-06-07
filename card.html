@@ -522,8 +522,8 @@ function render(d){
     +   '📥 Save ' + escapeHtml((d.displayName || d.business_name).split(/\s+/).slice(0,2).join(' ')) + ' to my Contacts'
     + '</button>'
     + '<div class="quick-actions" style="grid-template-columns:repeat(' + (mapsUrl ? 4 : 3) + ', 1fr)">'
-    + (d.mobile ? '<a class="qa" href="tel:+91' + escapeHtml(d.mobile) + '"><span class="qa-ico">📞</span>Call</a>' : '<span></span>')
-    + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + escapeHtml(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
+    + (d.mobile ? '<a class="qa" href="tel:+91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.mobile) + '"><span class="qa-ico">📞</span>Call</a>' : '<span></span>')
+    + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
     + (mapsUrl ? '<a class="qa" href="' + escapeHtml(mapsUrl) + '" target="_blank"><span class="qa-ico">📍</span>Directions</a>' : '')
     + '<a class="qa" href="' + escapeHtml('/business.html?slug=' + encodeURIComponent(d.slug || '')) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
     + '</div>';
@@ -642,19 +642,4 @@ async function loadCard(){
       youtube:   b.youtube_url    || '',
       x_twitter: b.x_twitter_url  || '',
       linkedin:  b.linkedin_url   || '',
-      website:   b.website_url    || ''
-    }
-  };
-
-  // Page title + meta
-  document.title = (data.displayName || data.business_name) + ' · Digital Business Card';
-  var topTag = document.getElementById('topTag');
-  if (topTag) topTag.innerHTML = '<em>📇 ' + escapeHtml(data.business_name) + '</em> · Digital Card';
-
-  render(data);
-}
-
-loadCard();
-</script>
-
-<
+      website:   b.website_url    |
