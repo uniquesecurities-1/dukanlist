@@ -1102,9 +1102,14 @@ function renderOwnerDiagnostics(s){
       + (s.owner_email_confirmed_at ? '<span style="font-weight:500;color:#047857;font-size:11px">· ' + new Date(s.owner_email_confirmed_at).toLocaleDateString("en-IN") + '</span>' : '')
       + '</div>';
   } else {
+    // PREFERRED: Resend a fresh verification email so user can self-verify with one click
+    html += '<button type="button" onclick="adminResendVerification(\'' + emailEsc + '\', this)" '
+      + 'style="display:block;width:100%;background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:none;padding:11px 14px;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 3px 10px rgba(255,107,26,.3)">'
+      + '📧 Resend Verification Email <span style="font-weight:500;font-size:10.5px;opacity:.92;display:block;margin-top:2px">User ko fresh confirmation email bhejega</span></button>';
+    // FALLBACK: Force-verify (admin override) for cases where user can never receive email
     html += '<button type="button" onclick="adminForceVerifyEmail(\'' + emailEsc + '\')" '
       + 'style="display:block;width:100%;background:#1D4ED8;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:8px">'
-      + '📧 Force Verify Email <span style="font-weight:500;font-size:10.5px;opacity:.85">(email unverified)</span></button>';
+      + '🔓 Force-Verify (last resort) <span style="font-weight:500;font-size:10.5px;opacity:.85">— bypass email check</span></button>';
   }
 
   // Reset Password - always available when auth exists
@@ -1365,6 +1370,31 @@ function showCredentialsModal(opts){
   }
 }
 
+// ====== Resend Verification Email (preferred — user self-verifies) ======
+async function adminResendVerification(email, btn){
+  if (!email) { alert('No email on file'); return; }
+  if (!confirm('Resend verification email to:\n\n' + email + '\n\nUser ko fresh DukanList confirmation email milegi (bada Orange button waala). Continue?')) return;
+  var orig = btn ? btn.innerHTML : '';
+  if (btn){ btn.disabled = true; btn.innerHTML = '⏳ Sending fresh email...'; }
+  try {
+    var sess = await ShopDB.client.auth.getSession();
+    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    if (!jwt) throw new Error('Login expired. Please refresh and try again.');
+    var r = await fetch('/api/admin-resend-verification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await r.json().catch(function(){ return {}; });
+    if (!r.ok || !data.ok) throw new Error(data.error || data.detail || ('HTTP ' + r.status));
+    toast('✅ ' + (data.message || 'Verification email sent again'));
+    if (btn){ btn.innerHTML = '✅ Sent — user ko email check karne ko bolein'; setTimeout(function(){ if(btn){ btn.disabled = false; btn.innerHTML = orig; } }, 3500); }
+  } catch(e){
+    alert('❌ ' + (e.message || 'Could not resend'));
+    if (btn){ btn.disabled = false; btn.innerHTML = orig; }
+  }
+}
+
 // ====== Force Verify Email (admin override) ======
 async function adminForceVerifyEmail(email){
   if (!email) return;
@@ -1504,65 +1534,4 @@ init();
     <div class="sub">Mark this shop as featured to boost its visibility across browse, search, and homepage.</div>
     <div id="fmCurrent"></div>
 
-    <form onsubmit="submitFeatured(event)">
-      <div class="field">
-        <label>Duration — quick pick</label>
-        <div class="duration-grid">
-          <div class="dur-chip" onclick="setDays(7,this)">7 days</div>
-          <div class="dur-chip active" onclick="setDays(30,this)">30 days</div>
-          <div class="dur-chip" onclick="setDays(90,this)">90 days</div>
-          <div class="dur-chip" onclick="setDays(180,this)">180 days</div>
-        </div>
-      </div>
-
-      <div class="fm-row">
-        <div class="field">
-          <label>Days *</label>
-          <input id="fmDays" type="number" min="1" max="730" value="30" required>
-        </div>
-        <div class="field">
-          <label>Amount (₹) *</label>
-          <input id="fmAmount" type="number" min="0" step="0.01" placeholder="e.g. 999" required>
-        </div>
-      </div>
-
-      <div class="fm-row">
-        <div class="field">
-          <label>Payment method</label>
-          <select id="fmMethod">
-            <option value="cash">Cash</option>
-            <option value="upi">UPI</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="cheque">Cheque</option>
-            <option value="complimentary">Complimentary (₹0)</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Notes (optional)</label>
-          <input id="fmNotes" type="text" placeholder="e.g. Diwali campaign">
-        </div>
-      </div>
-
-      <div id="fmHistory"></div>
-
-      <div class="fm-actions">
-        <button type="button" class="btn" onclick="closeFeaturedModal()">Cancel</button>
-        <button type="button" class="btn danger" id="fmRevokeBtn" onclick="revokeFeatured()" style="display:none">Revoke Now</button>
-        <button type="submit" class="btn pri" id="fmSaveBtn">★ Save & Mark Featured</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-function setDays(d, el){
-  document.getElementById('fmDays').value = d;
-  document.querySelectorAll('.dur-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-}
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+    <form onsubmit="submit
