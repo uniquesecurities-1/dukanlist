@@ -28,14 +28,22 @@
   .card .bg{
     position:absolute; inset:0;
     background-size:cover; background-position:center;
-    filter:brightness(.6);
+    /* Brighter, less faded — small saturation boost so photos pop */
+    filter:brightness(.92) saturate(1.08);
   }
   .card.no-photo .bg{ background:linear-gradient(135deg,#1E3A8A,#7C3AED) }
 
   .card .gradient{
     position:absolute; inset:0;
-    background:linear-gradient(to top, rgba(15,23,42,.95) 0%, rgba(15,23,42,.5) 35%, rgba(15,23,42,0) 70%);
+    /* Lighter gradient — only darken the BOTTOM area where text sits */
+    background:linear-gradient(to top, rgba(15,23,42,.92) 0%, rgba(15,23,42,.75) 18%, rgba(15,23,42,.25) 42%, rgba(15,23,42,0) 65%);
     pointer-events:none;
+  }
+  /* Tiny top vignette so the top-nav chips stay readable */
+  .card .gradient-top{
+    position:absolute; top:0; left:0; right:0; height:120px;
+    background:linear-gradient(to bottom, rgba(15,23,42,.55) 0%, rgba(15,23,42,0) 100%);
+    pointer-events:none; z-index:1;
   }
 
   /* Top bar with category chips */
@@ -367,6 +375,7 @@
   <a href="/" class="home-btn">← Home</a>
   <div class="logo">Dukan<em>List</em></div>
   <div style="flex:1"></div>
+  <button id="muteBtn" class="fav-btn" onclick="toggleMute()" type="button" aria-label="Toggle sound" style="border:0;font-size:14px">🔊</button>
   <a href="/panel/favorites.html" class="fav-btn">❤️ Saved</a>
 </div>
 
@@ -390,6 +399,73 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script>
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];}); }
+
+// ============================================================
+// Web Audio whoosh — subtle swipe sound on card change
+// ============================================================
+var _audioCtx = null;
+var _soundEnabled = true;
+// Read user preference (mute persists across visits)
+try {
+  if (localStorage.getItem('dl_discover_mute') === '1') _soundEnabled = false;
+} catch(_){}
+
+function getAudioCtx(){
+  if (_audioCtx) return _audioCtx;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    _audioCtx = new AC();
+    return _audioCtx;
+  } catch(_){ return null; }
+}
+
+// Subtle "whoosh" — quick downward sweep on a sine + noise burst
+function playSwipeSound(){
+  if (!_soundEnabled) return;
+  var ctx = getAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended'){ ctx.resume().catch(function(){}); }
+  var now = ctx.currentTime;
+
+  // Main tone — pleasant downward swoosh (800Hz → 220Hz over 200ms)
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, now);
+  osc.frequency.exponentialRampToValueAtTime(220, now + 0.18);
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.12, now + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.25);
+
+  // Subtle high-end shimmer — 1.6kHz quick blip
+  var osc2 = ctx.createOscillator();
+  var gain2 = ctx.createGain();
+  osc2.type = 'triangle';
+  osc2.frequency.setValueAtTime(1600, now);
+  osc2.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+  gain2.gain.setValueAtTime(0, now);
+  gain2.gain.linearRampToValueAtTime(0.035, now + 0.01);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.10);
+  osc2.connect(gain2).connect(ctx.destination);
+  osc2.start(now);
+  osc2.stop(now + 0.12);
+}
+
+function toggleMute(){
+  _soundEnabled = !_soundEnabled;
+  try { localStorage.setItem('dl_discover_mute', _soundEnabled ? '0' : '1'); } catch(_){}
+  var btn = document.getElementById('muteBtn');
+  if (btn) btn.textContent = _soundEnabled ? '🔊' : '🔇';
+  if (_soundEnabled){
+    // Play once to confirm + unlock iOS audio
+    try { var c = getAudioCtx(); if (c && c.state === 'suspended') c.resume(); } catch(_){}
+    playSwipeSound();
+  }
+}
 
 // Normalize Indian mobile to exactly 10 digits (no country code).
 // Handles: "9876543210", "+919876543210", "919876543210", "09876543210",
@@ -522,16 +598,21 @@ function renderFiltered(){
     var rc = b.rating_count || 0;
     var fav = isFav(b.id);
     var walks = b.walk_ins_today || 0;
-    // Build a readable address: prefer 2-3 segments of address_line1, fallback to city
+    // Build a complete readable address: full address_line1 + pincode + city
     var rawAddr = (b.address_line1 || '').trim();
     var addrShort = '';
     if (rawAddr){
-      var parts = rawAddr.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
-      // Skip pure shop/sco numbers as first part (Sco-01, Shop No 5 etc.) — use 2nd onward
-      var firstIsJustNumber = parts[0] && /^(sco|shop|no|h\.?no|plot)[\s\-\.]*\d+$/i.test(parts[0]);
-      var useParts = firstIsJustNumber && parts.length > 1 ? parts.slice(1, 4) : parts.slice(0, 3);
-      addrShort = useParts.join(', ');
-      if (addrShort.length > 70) addrShort = addrShort.slice(0, 68) + '…';
+      addrShort = rawAddr;
+      // Append city if not already in the address
+      if (city && rawAddr.toLowerCase().indexOf(city.toLowerCase()) === -1){
+        addrShort += ', ' + city;
+      }
+      // Append pincode if present and not already in address
+      if (b.pincode && rawAddr.indexOf(String(b.pincode)) === -1){
+        addrShort += ' - ' + b.pincode;
+      }
+      // Soft truncate to keep card clean
+      if (addrShort.length > 110) addrShort = addrShort.slice(0, 107) + '…';
     }
     if (!addrShort) addrShort = city;
     var uspText = typeof b.usp_text === 'string' ? b.usp_text : '';
@@ -542,6 +623,7 @@ function renderFiltered(){
     return ''+
     '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'">'+
       '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
+      '<div class="gradient-top"></div>'+
       '<div class="gradient"></div>'+
       '<div class="body">'+
         '<div class="badges">'+
@@ -604,89 +686,4 @@ function renderFiltered(){
         void btn.offsetWidth;
         btn.classList.add('faved');
         spawnHeartBurst(btn);
-      }
-      showToast(on ? '❤️ Saved' : '💔 Removed');
-    });
-  });
-  feed.querySelectorAll('.act').forEach(function(btn){
-    btn.addEventListener('pointerdown', function(){
-      btn.classList.remove('tapped');
-      void btn.offsetWidth;
-      btn.classList.add('tapped');
-    });
-  });
-
-  feed.querySelectorAll('.act.share').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      var name = btn.getAttribute('data-name') || '';
-      var slug = btn.getAttribute('data-slug') || '';
-      var url  = location.origin + '/business.html?slug=' + slug;
-      var msg  = name + '\n' + url + '\n\nFound on DukanList — Bharat ki local directory.';
-      if (navigator.share){
-        navigator.share({ title:name, text:msg, url:url }).catch(function(){});
-      } else {
-        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
-      }
-    });
-  });
-
-  feed.addEventListener('scroll', function(){
-    var h = document.getElementById('swipeHint');
-    if (h) h.classList.add('hide');
-  }, { once:true });
-
-  var cards = feed.querySelectorAll('.card');
-  for (var i = 1; i <= 3 && i < cards.length; i++){
-    var bg = cards[i].querySelector('.bg');
-    var style = bg && bg.getAttribute('style') || '';
-    var m = style.match(/url\(([^)]+)\)/);
-    if (m){ var img = new Image(); img.src = m[1]; }
-  }
-
-  if ('IntersectionObserver' in window){
-    var obs = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if (en.intersectionRatio > 0.5){
-          en.target.classList.add('active');
-          var idx = parseInt(en.target.getAttribute('data-idx') || '0', 10);
-          var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
-          if (nxt){
-            var bg2 = nxt.querySelector('.bg');
-            var style2 = bg2 && bg2.getAttribute('style') || '';
-            var m2 = style2.match(/url\(([^)]+)\)/);
-            if (m2){ var im = new Image(); im.src = m2[1]; }
-          }
-        }
-      });
-    }, { root: feed, threshold: [0.5] });
-    cards.forEach(function(card){ obs.observe(card); });
-    if (cards[0]) cards[0].classList.add('active');
-  } else {
-    cards.forEach(function(card){ card.classList.add('active'); });
-  }
-}
-
-function spawnHeartBurst(btn){
-  var burst = document.createElement('div');
-  burst.className = 'heart-burst';
-  var colors = ['#fda4af','#fbbf24','#f472b6','#a78bfa','#fde68a','#86efac'];
-  for (var i = 0; i < 8; i++){
-    var s = document.createElement('span');
-    var angle = (i / 8) * Math.PI * 2;
-    var dist = 32 + Math.random() * 14;
-    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-    s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-    s.style.background = colors[i % colors.length];
-    s.style.animationDelay = (Math.random() * 0.05) + 's';
-    burst.appendChild(s);
-  }
-  btn.appendChild(burst);
-  setTimeout(function(){ burst.remove(); }, 800);
-}
-
-init();
-</script>
-
-</body>
-</html>
+   
