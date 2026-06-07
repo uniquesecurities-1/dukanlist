@@ -97,7 +97,7 @@
       </div>
       <div class="pg-rules">
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Max 2 MB</span><span data-i18n-hi>अधिकतम 2 MB</span></b><div><span data-i18n-en>Auto-compresses bigger photos</span><span data-i18n-hi>बड़ी photos auto-compress होंगी</span></div></div></div>
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>JPG, PNG, or WebP</span><span data-i18n-hi>JPG, PNG, या WebP</span></b><div><span data-i18n-en>Phone camera photos work great</span><span data-i18n-hi>Phone camera से ली photos best</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>JPG, PNG, WebP, or HEIC</span><span data-i18n-hi>JPG, PNG, WebP, या HEIC</span></b><div><span data-i18n-en>iPhone HEIC photos auto-convert. Android &amp; phone camera photos work great.</span><span data-i18n-hi>iPhone HEIC photos auto-convert होंगी। Android &amp; phone camera से ली photos best।</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Bright lighting</span><span data-i18n-hi>अच्छी रोशनी</span></b><div><span data-i18n-en>Day time, no shadows on subject</span><span data-i18n-hi>दिन में, बिना shadow</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>3 angles best</span><span data-i18n-hi>3 angles best</span></b><div><span data-i18n-en>Outside · Inside · Product</span><span data-i18n-hi>बाहर · अंदर · प्रोडक्ट</span></div></div></div>
       </div>
@@ -245,11 +245,50 @@ dz.addEventListener('drop', e => {
   handleFiles(e.dataTransfer.files);
 });
 
-// Detect HEIC/HEIF / unsupported MIME (iPhone default format)
-function isiPhoneFormat(file){
+// Detect HEIC/HEIF (iPhone default format)
+function isHeicFile(file){
   const t = (file && file.type || '').toLowerCase();
   const n = (file && file.name || '').toLowerCase();
-  return /heic|heif/.test(t) || /\.(heic|heif)$/i.test(n) || (!t && /\.(jpg|jpeg|png|webp)$/i.test(n) === false);
+  return /heic|heif/.test(t) || /\.(heic|heif)$/i.test(n);
+}
+function isiPhoneFormat(file){
+  if (isHeicFile(file)) return true;
+  const t = (file && file.type || '').toLowerCase();
+  const n = (file && file.name || '').toLowerCase();
+  return (!t && !/\.(jpg|jpeg|png|webp)$/i.test(n));
+}
+
+// Lazy-load heic2any (only when needed) — runtime polyfill for HEIC → JPEG
+let _heic2anyPromise = null;
+function loadHeic2Any(){
+  if (window.heic2any) return Promise.resolve(window.heic2any);
+  if (_heic2anyPromise) return _heic2anyPromise;
+  _heic2anyPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+    s.async = true;
+    s.onload = function(){
+      if (window.heic2any) resolve(window.heic2any);
+      else reject(new Error('heic2any loaded but not exposed'));
+    };
+    s.onerror = function(){ reject(new Error('Failed to load HEIC converter')); };
+    document.head.appendChild(s);
+  });
+  return _heic2anyPromise;
+}
+
+// Convert HEIC → JPEG Blob using heic2any (server-free, runs in browser)
+async function convertHeicToJpeg(file){
+  const heic2any = await loadHeic2Any();
+  const blob = await heic2any({
+    blob: file,
+    toType: 'image/jpeg',
+    quality: 0.85
+  });
+  // heic2any may return Blob or Blob[]
+  const finalBlob = Array.isArray(blob) ? blob[0] : blob;
+  const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+  return new File([finalBlob], newName, { type: 'image/jpeg', lastModified: Date.now() });
 }
 
 // Client-side image compression to <2MB
@@ -376,27 +415,38 @@ async function handleFiles(files){
     }
 
     let f = origFile;
-    const needsConvert = isiPhoneFormat(origFile); // HEIC from iPhone — convert to JPG always
-    const needsCompress = origFile.size > MAX_BYTES;
-    if (needsConvert || needsCompress){
+
+    // STEP 1: If HEIC (iPhone) — convert to JPEG FIRST using heic2any
+    // This is the robust fix. Canvas-based conversion fails on many iOS versions.
+    if (isHeicFile(origFile)){
       const origMB = (origFile.size / 1048576).toFixed(1);
-      const msg = needsConvert
-        ? 'iPhone format detected — converting to JPG (' + origMB + ' MB)...'
-        : 'Auto-compressing (' + origMB + ' MB → under 2 MB)...';
-      updateQueueItem(item, { ico: '🪄', status: msg, pct: 20 });
+      updateQueueItem(item, { ico: '🍎', status: 'iPhone HEIC photo — converting to JPG (' + origMB + ' MB)... 5-10 sec', pct: 15 });
       try {
-        f = await compressImage(origFile, MAX_BYTES, needsConvert);
+        f = await convertHeicToJpeg(origFile);
         const newMB = (f.size / 1048576).toFixed(2);
-        if (needsConvert && /^image\/(jpeg|jpg|png|webp)$/i.test(f.type) === false){
-          throw new Error('iPhone HEIC conversion failed on this browser');
-        }
-        updateQueueItem(item, { status: 'Ready (' + newMB + ' MB). Uploading...', pct: 50 });
+        updateQueueItem(item, { ico: '✅', status: 'HEIC converted (' + newMB + ' MB). Preparing upload...', pct: 35 });
+      } catch(heicErr){
+        console.warn('HEIC conversion failed:', heicErr);
+        updateQueueItem(item, { ico: '❌', status: 'iPhone HEIC photo convert nahi ho payi. Fix: Phone Settings → Camera → Formats → "Most Compatible" select karein, fir nayi photo lein. Ya WhatsApp pe humein bhejein, hum process kar denge.', err: true });
+        failed++; continue;
+      }
+    }
+
+    // STEP 2: Compress if >2MB (works on the JPEG we now have)
+    const needsCompress = f.size > MAX_BYTES;
+    if (needsCompress){
+      const origMB = (f.size / 1048576).toFixed(1);
+      updateQueueItem(item, { ico: '🪄', status: 'Auto-compressing (' + origMB + ' MB → under 2 MB)...', pct: 45 });
+      try {
+        f = await compressImage(f, MAX_BYTES, false);
+        const newMB = (f.size / 1048576).toFixed(2);
+        updateQueueItem(item, { status: 'Ready (' + newMB + ' MB). Uploading...', pct: 60 });
       } catch(compressErr) {
-        updateQueueItem(item, { ico: '⚠️', status: 'Auto-convert failed. Try sharing photo via WhatsApp (auto-converts), then save and retry.', err: true });
+        updateQueueItem(item, { ico: '⚠️', status: 'Auto-compress fail. Phone gallery se manually resize karein.', err: true });
         failed++; continue;
       }
     } else {
-      updateQueueItem(item, { ico: '📤', status: 'Uploading (' + fmtSize(f.size) + ')...', pct: 40 });
+      updateQueueItem(item, { ico: '📤', status: 'Uploading (' + fmtSize(f.size) + ')...', pct: 50 });
     }
 
     if (f.size > MAX_BYTES){
@@ -437,92 +487,4 @@ async function handleFiles(files){
           },
           body: JSON.stringify({ file: dataUrl, filename: f.name })
         });
-        const apiJson = await apiRes.json().catch(function(){ return {}; });
-        if (!apiRes.ok || !apiJson.ok){
-          uploadErr = { message: apiJson.message || apiJson.error || ('HTTP ' + apiRes.status) };
-        } else {
-          uploadResp = apiJson;
-        }
-      }
-    } catch (e) {
-      uploadErr = { message: (e && e.message) || 'Network error' };
-    }
-
-    if (uploadErr){
-      var raw = String(uploadErr.message || '');
-      var friendly;
-      if (/no_shop_linked|not linked to any shop|contact admin to link/i.test(raw)) {
-        friendly = 'Your account is not yet linked to a shop. Please WhatsApp us a screenshot — we will link it instantly.';
-      } else if (/verify your email|email_confirmed|email not verified/i.test(raw)) {
-        friendly = 'Your email is not yet verified. Please check your inbox/spam and click the verification link.';
-      } else if (/disabled/i.test(raw)) {
-        friendly = 'Your business has been disabled. Please contact admin.';
-      } else if (/session|jwt|expired|unauthorized|invalid session/i.test(raw)) {
-        friendly = 'Your session has expired. Please logout and login again, then retry.';
-      } else if (/network|fetch|failed to fetch|timeout/i.test(raw)) {
-        friendly = 'Internet connection is weak. Check WiFi/4G and retry.';
-      } else if (/too large|size|payload/i.test(raw)) {
-        friendly = 'Photo is too large. Please compress in phone gallery and retry.';
-      } else if (/unsupported|file type|format/i.test(raw)) {
-        friendly = 'Only JPG, PNG, WebP photos are supported.';
-      } else {
-        friendly = 'Upload failed: ' + raw + '. Please retry. If issue persists, WhatsApp us a screenshot.';
-      }
-      updateQueueItem(item, { ico: '❌', status: friendly, err: true });
-      failed++; continue;
-    }
-
-    // Success — refresh local state
-    MY_BIZ.photos = [...(MY_BIZ.photos || []), uploadResp.url];
-    uploaded++;
-    updateQueueItem(item, { ico: '✅', status: 'Uploaded successfully — ' + fmtSize(f.size), ok: true, pct: 100 });
-  }
-
-  if (uploaded > 0){
-    // SECURITY: photo upload no longer auto-activates a pending business.
-    // RPC now only sets verified_photo=TRUE flag. Admin must approve via
-    // moderation page before listing goes live. This restores the admin gate.
-    if (MY_BIZ.status === 'pending'){
-      try { await c.rpc('activate_business_after_photos', { p_business_id: MY_BIZ.id }); } catch(_){}
-    }
-    const stillPending = (MY_BIZ.status === 'pending');
-    okEl.innerHTML = '<span class="a-icon">🎉</span><div>' + uploaded + ' photo' + (uploaded > 1 ? 's' : '') + ' uploaded!' + (failed > 0 ? ' (' + failed + ' failed)' : '') + (stillPending ? '<br><small style="color:#92400E;font-weight:600">⏳ Listing abhi admin review me hai — approve hote hi live ho jaayegi.</small>' : '') + '</div>';
-    okEl.style.display = 'flex';
-    renderState();
-  } else if (failed > 0){
-    errEl.innerHTML = '<span class="a-icon">⚠️</span><div>Photos upload nahi huyi. Details upar dekhein. <br>Madad chahiye? <a href="https://wa.me/919541223377?text=Photo%20upload%20me%20issue%20aa%20raha%20hai" target="_blank" style="color:#FF6B1A;font-weight:700">WhatsApp pe hum madad karenge</a></div>';
-    errEl.style.display = 'flex';
-  }
-  fi.value = '';
-}
-
-async function deletePhoto(idx){
-  if (!confirm('Remove this photo?')) return;
-  const photos = [...(MY_BIZ.photos || [])];
-  const removed = photos.splice(idx, 1)[0];
-  const c = ShopDB.client;
-
-  // Try delete from storage (best-effort)
-  try{
-    const match = removed.match(/shop-photos\/(.+)$/);
-    if (match) await c.storage.from('shop-photos').remove([match[1]]);
-  }catch(_) {}
-
-  const { error } = await c.from('businesses').update({ photos }).eq('id', MY_BIZ.id);
-  if (error){ alert('Delete failed: ' + error.message); return; }
-  MY_BIZ.photos = photos;
-  renderState();
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadMyBusiness();
-});
-</script>
-
-<!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-
-<script src="/assets/js/error-reporter.js" defer></script>
-</body>
-</html>
+        const ap
