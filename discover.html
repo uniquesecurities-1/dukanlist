@@ -158,25 +158,85 @@
   .act.faved .heart-out{ display:none }
   .act.faved{ background:linear-gradient(135deg,#EF4444,#DC2626); border-color:transparent }
 
-  /* VIRAL Love button — public count, shopkeepers compete */
-  .act.love{ background:linear-gradient(135deg,#FB923C,#F97316); border-color:transparent }
-  .act.love.loved{ background:linear-gradient(135deg,#DC2626,#7C2D12); animation:lovePulse .6s ease }
-  .act.love .love-emoji{ font-size:24px; display:block; line-height:1 }
+  /* === VIRAL Love button — BIG visible count, satisfying tap === */
+  .act.love{
+    background:linear-gradient(135deg,#FB923C,#F97316);
+    border-color:transparent;
+    overflow:visible !important;     /* count must show outside circle */
+    box-shadow:0 4px 14px rgba(249,115,22,.45);
+  }
+  .act.love.loved{
+    background:linear-gradient(135deg,#DC2626,#991B1B);
+    box-shadow:0 0 0 4px rgba(239,68,68,.4), 0 6px 22px rgba(220,38,38,.6);
+    animation:lovePulse .9s cubic-bezier(.2,.85,.3,1.3);
+  }
+  .act.love .love-emoji{ font-size:24px; display:block; line-height:1; transition:transform .2s }
+  .act.love.loved .love-emoji{ transform:scale(1.18) }
+  /* Count BADGE — pill below button, always visible */
+  .act.love .love-count{
+    position:absolute;
+    left:50%; bottom:-22px;
+    transform:translateX(-50%);
+    background:rgba(15,23,42,.85);
+    color:#FBBF24;
+    padding:2px 9px;
+    border-radius:99px;
+    font-size:13px;
+    font-weight:900;
+    min-width:28px;
+    text-align:center;
+    backdrop-filter:blur(8px);
+    border:1.5px solid rgba(251,191,36,.4);
+    white-space:nowrap;
+    transition:all .25s;
+  }
+  .act.love.loved .love-count{
+    background:linear-gradient(135deg,#FBBF24,#F59E0B);
+    color:#78350F;
+    border-color:#fff;
+    animation:countBump .55s cubic-bezier(.2,.9,.4,1.4);
+  }
   @keyframes lovePulse{
-    0%{ transform:scale(1) }
-    30%{ transform:scale(1.4) rotate(-8deg) }
-    60%{ transform:scale(.9) }
+    0%{ transform:scale(1) rotate(0) }
+    20%{ transform:scale(1.55) rotate(-12deg) }
+    40%{ transform:scale(.85) rotate(8deg) }
+    60%{ transform:scale(1.2) rotate(-3deg) }
+    80%{ transform:scale(.95) rotate(0) }
     100%{ transform:scale(1) }
   }
-  /* Sparkle pop on love */
-  .love-spark{ position:absolute; inset:0; pointer-events:none; z-index:5 }
+  @keyframes countBump{
+    0%{ transform:translateX(-50%) scale(.6) }
+    50%{ transform:translateX(-50%) scale(1.35) }
+    100%{ transform:translateX(-50%) scale(1) }
+  }
+  /* Sparkle burst — bigger, more particles */
+  .love-spark{ position:absolute; inset:0; pointer-events:none; z-index:6 }
   .love-spark span{
-    position:absolute; left:50%; top:50%; width:6px; height:6px; border-radius:50%;
-    animation:sparkBurst .7s ease-out forwards;
+    position:absolute; left:50%; top:50%; width:8px; height:8px; border-radius:50%;
+    animation:sparkBurst .85s ease-out forwards;
+    box-shadow:0 0 4px currentColor;
   }
   @keyframes sparkBurst{
-    0%{ opacity:1; transform:translate(-50%,-50%) scale(1.4) }
-    100%{ opacity:0; transform:translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(.2) }
+    0%{ opacity:1; transform:translate(-50%,-50%) scale(1.6) }
+    100%{ opacity:0; transform:translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(.15) }
+  }
+  /* Floating +1 indicator on tap */
+  .love-plus1{
+    position:absolute;
+    left:50%; top:0;
+    transform:translateX(-50%);
+    color:#FBBF24;
+    font-size:22px;
+    font-weight:900;
+    text-shadow:0 2px 8px rgba(0,0,0,.7);
+    pointer-events:none;
+    z-index:7;
+    animation:plus1Float 1s ease-out forwards;
+  }
+  @keyframes plus1Float{
+    0%{ opacity:0; transform:translateX(-50%) translateY(0) scale(.5) }
+    20%{ opacity:1; transform:translateX(-50%) translateY(-10px) scale(1.2) }
+    100%{ opacity:0; transform:translateX(-50%) translateY(-55px) scale(1) }
   }
 
   /* Main CTA buttons */
@@ -455,36 +515,55 @@ function markLoved(id){ try { var s = getLovedSet(); s.add(id); localStorage.set
 function spawnLoveSparkles(btn){
   var burst = document.createElement('div');
   burst.className = 'love-spark';
-  var colors = ['#FBBF24','#F59E0B','#FB923C','#F472B6','#EF4444','#FDE68A'];
-  for (var i = 0; i < 10; i++){
+  var colors = ['#FBBF24','#F59E0B','#FB923C','#F472B6','#EF4444','#FDE68A','#FB7185','#FACC15'];
+  // 16 particles for a satisfying burst
+  for (var i = 0; i < 16; i++){
     var s = document.createElement('span');
-    var angle = (i / 10) * Math.PI * 2;
-    var dist = 30 + Math.random() * 18;
+    var angle = (i / 16) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+    var dist = 36 + Math.random() * 24;
     s.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
     s.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
     s.style.background = colors[i % colors.length];
-    s.style.animationDelay = (Math.random() * 0.05) + 's';
+    s.style.color = colors[i % colors.length];
+    s.style.animationDelay = (Math.random() * 0.06) + 's';
     burst.appendChild(s);
   }
   btn.appendChild(burst);
-  setTimeout(function(){ burst.remove(); }, 800);
+  setTimeout(function(){ burst.remove(); }, 900);
+}
+
+function spawnPlus1(btn){
+  var el = document.createElement('div');
+  el.className = 'love-plus1';
+  el.textContent = '+1';
+  btn.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 1000);
 }
 
 async function bumpLove(btn){
   var bizId = btn.getAttribute('data-id');
   if (!bizId) return;
   if (getLovedSet().has(bizId)){
-    showToast('Already loved 🔥');
+    showToast('Already loved 🔥 — share to grow this shop!');
+    // Mini pulse just to confirm tap landed
+    btn.classList.remove('loved'); void btn.offsetWidth; btn.classList.add('loved');
     return;
   }
-  // Optimistic UI
+  // Haptic feedback (phone vibration if supported)
+  try { if (navigator.vibrate) navigator.vibrate([30, 20, 50]); } catch(_){}
+  // Optimistic UI — restart animation reliably
   btn.classList.remove('loved'); void btn.offsetWidth; btn.classList.add('loved');
   spawnLoveSparkles(btn);
+  spawnPlus1(btn);
   var countEl = btn.querySelector('.love-count');
   var current = parseInt(btn.getAttribute('data-count') || '0', 10);
   var optimistic = current + 1;
   btn.setAttribute('data-count', optimistic);
-  if (countEl) countEl.textContent = optimistic;
+  if (countEl){
+    countEl.textContent = optimistic;
+    // Restart count bump animation
+    countEl.style.animation = 'none'; void countEl.offsetWidth; countEl.style.animation = '';
+  }
   markLoved(bizId);
   // Server call
   try {
@@ -788,7 +867,7 @@ function renderFiltered(){
         // VIRAL: public Love button with live count — shopkeepers compete for likes
         '<div class="act love" data-id="'+esc(b.id)+'" data-count="'+(b.likes_count||0)+'">'+
           '<span class="love-emoji">🔥</span>'+
-          '<span class="love-count" style="position:absolute;bottom:-18px;font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)">'+(b.likes_count||0)+'</span>'+
+          '<span class="love-count">'+(b.likes_count||0)+'</span>'+
         '</div>'+
         '<div class="act fav '+(fav?'faved':'')+'" data-id="'+esc(b.id)+'">'+
           '<span class="heart-out">🤍</span><span class="heart-fill">❤️</span>'+
