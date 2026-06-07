@@ -158,6 +158,27 @@
   .act.faved .heart-out{ display:none }
   .act.faved{ background:linear-gradient(135deg,#EF4444,#DC2626); border-color:transparent }
 
+  /* VIRAL Love button — public count, shopkeepers compete */
+  .act.love{ background:linear-gradient(135deg,#FB923C,#F97316); border-color:transparent }
+  .act.love.loved{ background:linear-gradient(135deg,#DC2626,#7C2D12); animation:lovePulse .6s ease }
+  .act.love .love-emoji{ font-size:24px; display:block; line-height:1 }
+  @keyframes lovePulse{
+    0%{ transform:scale(1) }
+    30%{ transform:scale(1.4) rotate(-8deg) }
+    60%{ transform:scale(.9) }
+    100%{ transform:scale(1) }
+  }
+  /* Sparkle pop on love */
+  .love-spark{ position:absolute; inset:0; pointer-events:none; z-index:5 }
+  .love-spark span{
+    position:absolute; left:50%; top:50%; width:6px; height:6px; border-radius:50%;
+    animation:sparkBurst .7s ease-out forwards;
+  }
+  @keyframes sparkBurst{
+    0%{ opacity:1; transform:translate(-50%,-50%) scale(1.4) }
+    100%{ opacity:0; transform:translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(.2) }
+  }
+
   /* Main CTA buttons */
   .cta-row{
     position:absolute; bottom:24px; left:18px; right:78px;
@@ -412,6 +433,73 @@
 <script>
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];}); }
 
+// === VIRAL Love button — session-stable id for dedup ===
+function getLoveSessionId(){
+  try {
+    var sid = localStorage.getItem('dl_love_sid');
+    if (sid && sid.length >= 16) return sid;
+    sid = (Date.now().toString(36) + Math.random().toString(36).slice(2,12) + Math.random().toString(36).slice(2,10));
+    localStorage.setItem('dl_love_sid', sid);
+    return sid;
+  } catch(_){
+    // private mode — fallback to in-memory
+    if (!window._tmpSid) window._tmpSid = Date.now().toString(36) + Math.random().toString(36).slice(2,12);
+    return window._tmpSid;
+  }
+}
+
+// Track which shops user already loved this device (UX feedback)
+function getLovedSet(){ try { return new Set(JSON.parse(localStorage.getItem('dl_loved')||'[]')); } catch(_){ return new Set(); } }
+function markLoved(id){ try { var s = getLovedSet(); s.add(id); localStorage.setItem('dl_loved', JSON.stringify(Array.from(s))); } catch(_){} }
+
+function spawnLoveSparkles(btn){
+  var burst = document.createElement('div');
+  burst.className = 'love-spark';
+  var colors = ['#FBBF24','#F59E0B','#FB923C','#F472B6','#EF4444','#FDE68A'];
+  for (var i = 0; i < 10; i++){
+    var s = document.createElement('span');
+    var angle = (i / 10) * Math.PI * 2;
+    var dist = 30 + Math.random() * 18;
+    s.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+    s.style.background = colors[i % colors.length];
+    s.style.animationDelay = (Math.random() * 0.05) + 's';
+    burst.appendChild(s);
+  }
+  btn.appendChild(burst);
+  setTimeout(function(){ burst.remove(); }, 800);
+}
+
+async function bumpLove(btn){
+  var bizId = btn.getAttribute('data-id');
+  if (!bizId) return;
+  if (getLovedSet().has(bizId)){
+    showToast('Already loved 🔥');
+    return;
+  }
+  // Optimistic UI
+  btn.classList.remove('loved'); void btn.offsetWidth; btn.classList.add('loved');
+  spawnLoveSparkles(btn);
+  var countEl = btn.querySelector('.love-count');
+  var current = parseInt(btn.getAttribute('data-count') || '0', 10);
+  var optimistic = current + 1;
+  btn.setAttribute('data-count', optimistic);
+  if (countEl) countEl.textContent = optimistic;
+  markLoved(bizId);
+  // Server call
+  try {
+    var sid = getLoveSessionId();
+    var r = await ShopDB.client.rpc('bump_shop_like', { p_business_id: bizId, p_session_id: sid });
+    if (!r.error && typeof r.data === 'number'){
+      btn.setAttribute('data-count', r.data);
+      if (countEl) countEl.textContent = r.data;
+    }
+    showToast('🔥 Loved! Share with friends to grow this shop');
+  } catch(e){
+    console.warn('bump_shop_like failed:', e);
+  }
+}
+
 // ============================================================
 // Web Audio whoosh — subtle swipe sound on card change
 // ============================================================
@@ -594,7 +682,7 @@ async function init(){
     var c = ShopDB.client;
     // Pull a randomised mix of recent active shops
     var r = await c.from('businesses')
-      .select('id, slug, name, photos, mobile, whatsapp, usp_text, address_line1, pincode, rating_avg, rating_count, verified_score, walk_ins_today, sub_category_id, category_id, city_id, hours_json, featured_until, created_at')
+      .select('id, slug, name, photos, mobile, whatsapp, usp_text, address_line1, pincode, rating_avg, rating_count, verified_score, walk_ins_today, sub_category_id, category_id, city_id, hours_json, featured_until, created_at, likes_count')
       .eq('status', 'active')
       .order('updated_at', { ascending: false })
       .limit(200);
@@ -697,11 +785,16 @@ function renderFiltered(){
         (addrShort && addrShort!==city ? '<div class="addr">📌 '+esc(addrShort)+'</div>' : '')+
       '</div>'+
       '<div class="actions">'+
+        // VIRAL: public Love button with live count — shopkeepers compete for likes
+        '<div class="act love" data-id="'+esc(b.id)+'" data-count="'+(b.likes_count||0)+'">'+
+          '<span class="love-emoji">🔥</span>'+
+          '<span class="love-count" style="position:absolute;bottom:-18px;font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)">'+(b.likes_count||0)+'</span>'+
+        '</div>'+
         '<div class="act fav '+(fav?'faved':'')+'" data-id="'+esc(b.id)+'">'+
           '<span class="heart-out">🤍</span><span class="heart-fill">❤️</span>'+
           '<span class="lbl">Save</span>'+
         '</div>'+
-        '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'">📤<span class="lbl">Share</span></div>'+
+        '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'" data-loves="'+(b.likes_count||0)+'">📤<span class="lbl">Share</span></div>'+
         (telHref(b.mobile) ? '<a class="act call" href="'+esc(telHref(b.mobile))+'">📞<span class="lbl">Call</span></a>' : '')+
         (waHref(b.whatsapp || b.mobile) ? '<a class="act wa" href="'+esc(waHref(b.whatsapp || b.mobile))+'" target="_blank" rel="noopener">💬<span class="lbl">Chat</span></a>' : '')+
       '</div>'+
@@ -743,6 +836,15 @@ function renderFiltered(){
         spawnHeartBurst(btn);
       }
       showToast(on ? '❤️ Saved' : '💔 Removed');
+    });
+  });
+  // VIRAL Love button wiring — public count + share encouragement
+  feed.querySelectorAll('.act.love').forEach(function(btn){
+    var bizId = btn.getAttribute('data-id');
+    if (bizId && getLovedSet().has(bizId)){ btn.classList.add('loved'); }
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      bumpLove(btn);
     });
   });
   feed.querySelectorAll('.act').forEach(function(btn){

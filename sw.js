@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.6.1';  // bumped — discover .limit(200) + city picker click fix + geo immediate-hide
+const VERSION    = 'dukan-v1.7.0';  // bumped — VIRAL Love button + Open Near You removed + Discover polish
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

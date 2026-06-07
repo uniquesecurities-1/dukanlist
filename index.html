@@ -1030,7 +1030,11 @@ function dismissFestBanner(){
   <div class="pulse-cats" id="pulseCats"></div>
 </div>
 
+<!-- Open Near You widget temporarily disabled — RPC failing intermittently
+     User can use /discover.html or /browse.html instead.
 <div id="openNearYou"></div>
+-->
+
 
 <div id="homepageBuzz" style="display:none"></div>
 
@@ -1565,7 +1569,9 @@ function dismissFestBanner(){
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/daily-buzz.js" defer></script>
-<script src="/assets/js/geo-nearby.js?v=20260607-1410" defer></script>
+<!-- geo-nearby.js disabled — open-near-you RPC was failing intermittently -->
+<!-- <script src="/assets/js/geo-nearby.js?v=20260607-1410" defer></script> -->
+
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/voice.js"></script>
 <script src="/assets/js/install.js"></script>
