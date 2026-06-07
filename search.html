@@ -1267,4 +1267,26 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadDropdowns();
   // Populate sidebar filter rail (desktop only — CSS hides on mobile)
   populateSidebar();
-  re
+  restoreSidebarState();
+  // Search v2: quick chips + sticky bar
+  renderQuickCats();
+  initStickySearch();
+  try{
+    const v = localStorage.getItem('shop_view');
+    if (v === 'map'){ setView('map'); }
+  }catch(_){}
+  runSearch();
+});
+
+// Mobile pull-to-refresh
+if (window.DukanPTR){
+  DukanPTR.attach(() => runSearch());
+}
+window.addEventListener('popstate', runSearch);
+</script>
+
+<script src="/assets/js/city-persist.js"></script>
+
+<script src="/assets/js/error-reporter.js" defer></script>
+</body>
+</html>
