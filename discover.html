@@ -270,7 +270,7 @@ async function init(){
           '</div>'+
           '<div class="act share" data-name="'+esc(b.name||'')+'" data-slug="'+esc(b.slug||'')+'">📤<span class="lbl">Share</span></div>'+
           (b.mobile ? '<a class="act call" href="tel:'+esc(b.mobile)+'">📞<span class="lbl">Call</span></a>' : '')+
-          (b.whatsapp || b.mobile ? '<a class="act wa" href="https://wa.me/91'+esc((b.whatsapp||b.mobile).replace(/\\D/g,\"\"))+'" target="_blank">💬<span class="lbl">Chat</span></a>' : '')+
+          (b.whatsapp || b.mobile ? '<a class="act wa" href="https://wa.me/91'+esc(String(b.whatsapp||b.mobile||"").replace(/[^0-9]/g,""))+'" target="_blank">💬<span class="lbl">Chat</span></a>' : '')+
         '</div>'+
         '<div class="cta-row">'+
           '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Shop →</a>'+
@@ -321,5 +321,4 @@ async function init(){
 init();
 </script>
 
-</body>
-</html>
+</bod
