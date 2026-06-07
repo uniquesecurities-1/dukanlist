@@ -2330,4 +2330,45 @@ function dismissActTicker(){
     document.getElementById('pulseNewReviews').textContent = newRev;
     const catsEl = document.getElementById('pulseCats');
     if (catsEl && Array.isArray(data.top_categories)) {
-      catsEl.innerHTML = data.top_categories.slice(0, 3).
+      catsEl.innerHTML = data.top_categories.slice(0, 3).map(function(c){
+        return '<a class="pulse-cat-pill" href="/search.html?cat='+encodeURIComponent(c.category_id||'')+'">#'+(c.category_name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</a>';
+      }).join('');
+    }
+    el.style.display = 'flex';
+  } catch(_){}
+})();
+</script>
+<script>
+// Phase 6: Init Open Near You widget on homepage
+(function(){
+  function init(){
+    if (window.GeoNearby) {
+      GeoNearby.renderWidget('openNearYou');
+    } else {
+      setTimeout(init, 400);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+<script>
+(function(){
+  function init(){
+    if (window.DailyBuzz && window.ShopDB && ShopDB.client) {
+      let citySlug = null;
+      try {
+        if (window.CityPersist && CityPersist.getCity) citySlug = (CityPersist.getCity() || {}).slug || null;
+        if (!citySlug) citySlug = localStorage.getItem('dukanlist.city') || null;
+      } catch(_){}
+      DailyBuzz.renderHomepageCarousel('homepageBuzz', ShopDB.client, citySlug);
+    } else {
+      setTimeout(init, 400);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
