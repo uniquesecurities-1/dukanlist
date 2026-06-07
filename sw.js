@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.8.0';  // bumped — SW bypass /discover + nav label fix (My List vs Saved confusion)
+const VERSION    = 'dukan-v1.8.1';  // bumped — Discover saves sync to DB (favorites work with /panel/favorites.html)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

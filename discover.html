@@ -1077,7 +1077,48 @@ function waHref(raw){
 function getFavs(){ try { return JSON.parse(localStorage.getItem('dl_favs')||'[]'); } catch(_){return []} }
 function setFavs(a){ try { localStorage.setItem('dl_favs', JSON.stringify(a)); } catch(_){} }
 function isFav(id){ return getFavs().indexOf(id) > -1 }
-function toggleFav(id){ var f=getFavs(); var i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); setFavs(f); return f.indexOf(id)>-1 }
+function toggleFav(id){
+  // 1. Update localStorage immediately (instant UX)
+  var f = getFavs();
+  var i = f.indexOf(id);
+  var nowFav;
+  if (i > -1){ f.splice(i, 1); nowFav = false; }
+  else       { f.push(id);     nowFav = true;  }
+  setFavs(f);
+  // 2. ALSO sync to DB if user is logged in (so /panel/favorites.html shows it)
+  try {
+    if (window.ShopDB && ShopDB.client && ShopDB.client.auth){
+      ShopDB.client.auth.getUser().then(function(r){
+        if (r && r.data && r.data.user){
+          ShopDB.client.rpc('toggle_favorite', { p_business_id: id }).then(function(rr){
+            // Reconcile if server state disagrees with local
+            if (!rr.error && typeof rr.data === 'boolean'){
+              var cur = getFavs();
+              var idx = cur.indexOf(id);
+              if (rr.data && idx < 0){ cur.push(id); setFavs(cur); }
+              if (!rr.data && idx >= 0){ cur.splice(idx,1); setFavs(cur); }
+            }
+          }).catch(function(){});
+        }
+      }).catch(function(){});
+    }
+  } catch(_){}
+  return nowFav;
+}
+
+// On page load, pull DB favorites into localStorage (for logged-in users)
+async function syncFavsFromDb(){
+  try {
+    if (!window.ShopDB || !ShopDB.client) return;
+    var u = await ShopDB.client.auth.getUser();
+    if (!u || !u.data || !u.data.user) return;
+    var r = await ShopDB.client.rpc('my_favorites');
+    if (r.error || !Array.isArray(r.data)) return;
+    var local = new Set(getFavs());
+    r.data.forEach(function(row){ if (row.business_id) local.add(row.business_id); });
+    setFavs(Array.from(local));
+  } catch(_){}
+}
 function showToast(msg){
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -1161,6 +1202,8 @@ function setCity(cid){
 }
 
 async function init(){
+  // Sync DB favorites into localStorage on load (for logged-in users)
+  syncFavsFromDb();
   try {
     var c = ShopDB.client;
     // Pull a randomised mix of recent active shops
@@ -1359,7 +1402,7 @@ function renderFiltered(){
         btn.classList.add('faved');
         spawnHeartBurst(btn);
       }
-      showToast(on ? '❤️ Saved' : '💔 Removed');
+      showToast(on ? '❤️ Saved to My List! Tap 📋 above to view.' : '💔 Removed from My List');
     });
   });
   // VIRAL Love button wiring — public count + share encouragement
