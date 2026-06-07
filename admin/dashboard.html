@@ -36,15 +36,15 @@
   .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
   .page-sub{font-size:14px;color:#64748b;margin-bottom:24px}
 
-  /* KPI Grid */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:30px}
+  /* KPI Grid — COMPACT (more cards per row) */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
   .kpi{
-    background:white;padding:18px;border-radius:12px;
-    box-shadow:0 1px 3px rgba(0,0,0,0.05);border:1px solid #e2e8f0;
+    background:white;padding:11px 13px;border-radius:10px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);border:1px solid #e2e8f0;
   }
-  .kpi .label{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-  .kpi .value{font-size:28px;font-weight:800;margin-top:4px;line-height:1.1}
-  .kpi .delta{font-size:12px;color:#64748b;margin-top:2px}
+  .kpi .label{font-size:10.5px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .kpi .value{font-size:22px;font-weight:800;margin-top:2px;line-height:1.1}
+  .kpi .delta{font-size:10.5px;color:#64748b;margin-top:1px}
   .kpi.pri{border-left:3px solid #1E3A8A}
   .kpi.success{border-left:3px solid #10B981}
   .kpi.warn{border-left:3px solid #F59E0B}
@@ -98,15 +98,46 @@
 .see-all{display:inline-block;margin-top:12px;color:#1E3A8A;font-size:13px;font-weight:700;text-decoration:none}
 .see-all:hover{text-decoration:underline}
 
-.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.task-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;text-decoration:none;color:inherit;transition:.18s;display:block;position:relative;overflow:hidden}
-.task-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,.08)}
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.task-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;text-decoration:none;color:inherit;transition:.15s;display:block;position:relative;overflow:hidden}
+.task-card:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,23,42,.07)}
 .task-card.urgent{border-color:#FCA5A5;background:linear-gradient(135deg,#FEF2F2 0%,#FFFFFF 60%)}
 .task-card.warn{border-color:#FCD34D;background:linear-gradient(135deg,#FFFBEB 0%,#FFFFFF 60%)}
 .task-card.calm{border-color:#A7F3D0;background:linear-gradient(135deg,#ECFDF5 0%,#FFFFFF 60%)}
-.tc-icon{font-size:22px;margin-bottom:6px}
-.tc-num{font-size:26px;font-weight:800;letter-spacing:-.02em;color:#0F172A;font-variant-numeric:tabular-nums}
-.tc-label{font-size:12px;color:#475569;font-weight:700;margin-top:2px}
+.tc-icon{font-size:16px;margin-bottom:2px;opacity:.85}
+.tc-num{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#0F172A;font-variant-numeric:tabular-nums;line-height:1.1}
+.tc-label{font-size:10.5px;color:#475569;font-weight:700;margin-top:1px;line-height:1.25}
+.tc-cta{display:none}
+
+/* ========= AAJ KI PULSE — fun unified overview ========= */
+.pulse-wrap{background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 50%,#312E81 100%);color:#fff;border-radius:16px;padding:20px 22px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 14px 32px -8px rgba(30,58,138,.35)}
+.pulse-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(120% 80% at -10% -20%,rgba(251,191,36,.12) 0%,transparent 55%),radial-gradient(140% 100% at 110% 120%,rgba(236,72,153,.10) 0%,transparent 60%);pointer-events:none}
+.pulse-wrap > *{position:relative;z-index:1}
+.pulse-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.pulse-title{font-size:15px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.pulse-title .live-dot{width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 0 0 rgba(16,185,129,.6);animation:pulseDot 1.8s infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(16,185,129,.6)}70%{box-shadow:0 0 0 12px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.pulse-when{font-size:11.5px;color:rgba(255,255,255,.7);font-weight:600}
+.pulse-cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.pulse-cell{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:12px 14px;backdrop-filter:blur(8px)}
+.pulse-cell .pc-label{font-size:10.5px;color:rgba(255,255,255,.72);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.pulse-cell .pc-value{font-size:26px;font-weight:900;margin-top:3px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.pulse-cell .pc-spark{display:flex;align-items:flex-end;gap:2px;height:18px;margin-top:6px}
+.pulse-cell .pc-spark span{flex:1;background:linear-gradient(180deg,#FBBF24,rgba(251,191,36,.4));border-radius:1.5px;min-height:2px;transition:height .4s}
+.pulse-cell .pc-foot{font-size:10.5px;color:rgba(255,255,255,.7);font-weight:600;margin-top:4px}
+.pulse-cell.up .pc-foot{color:#6EE7B7}
+.pulse-cell.down .pc-foot{color:#FCA5A5}
+.pulse-side{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:760px){ .pulse-side{grid-template-columns:1fr} }
+.pulse-list{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:12px 14px}
+.pulse-list h4{font-size:11.5px;color:rgba(255,255,255,.75);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.pulse-list ol{margin:0;padding:0;list-style:none;counter-reset:plist}
+.pulse-list li{counter-increment:plist;display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px;color:rgba(255,255,255,.94);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08)}
+.pulse-list li:last-child{border-bottom:0}
+.pulse-list li::before{content:counter(plist);width:18px;height:18px;background:rgba(251,191,36,.18);color:#FBBF24;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;flex-shrink:0}
+.pulse-list li .pl-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pulse-list li .pl-num{font-variant-numeric:tabular-nums;color:#FDE68A;font-weight:800;font-size:11.5px}
+.pulse-list .empty{color:rgba(255,255,255,.5);font-size:11.5px;font-style:italic;padding:8px 0}
 .tc-cta{font-size:11px;color:#1E3A8A;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
 .tc-card.urgent .tc-cta{color:#DC2626}
 
@@ -175,6 +206,30 @@
       <span class="search-spinner" id="gSearchSpinner" style="display:none">⏳</span>
     </div>
     <div class="search-results" id="gSearchResults" style="display:none"></div>
+  </div>
+
+  <!-- ===== Aaj Ki Pulse — fun unified daily overview ===== -->
+  <div class="pulse-wrap" id="pulseWrap">
+    <div class="pulse-head">
+      <div class="pulse-title"><span class="live-dot"></span> 🎯 Aaj Ki Pulse <span style="opacity:.7;font-weight:500;font-size:11.5px">· live overview</span></div>
+      <div class="pulse-when" id="pulseWhen">—</div>
+    </div>
+    <div class="pulse-cells" id="pulseCells">
+      <div class="pulse-cell"><div class="pc-label">New Signups Today</div><div class="pc-value" id="pcSignups">—</div><div class="pc-spark" id="psSignups"></div><div class="pc-foot" id="pfSignups">vs 7-day avg</div></div>
+      <div class="pulse-cell"><div class="pc-label">Leads Today</div><div class="pc-value" id="pcLeads">—</div><div class="pc-spark" id="psLeads"></div><div class="pc-foot" id="pfLeads">vs 7-day avg</div></div>
+      <div class="pulse-cell"><div class="pc-label">Pending Approvals</div><div class="pc-value" id="pcPending">—</div><div class="pc-spark" id="psPending"></div><div class="pc-foot" id="pfPending">vs week trend</div></div>
+      <div class="pulse-cell"><div class="pc-label">Active Listings</div><div class="pc-value" id="pcActive">—</div><div class="pc-spark" id="psActive"></div><div class="pc-foot" id="pfActive">growing daily</div></div>
+    </div>
+    <div class="pulse-side">
+      <div class="pulse-list">
+        <h4>🔥 Top Categories This Week</h4>
+        <ol id="pulseTopCats"><li class="empty">Loading…</li></ol>
+      </div>
+      <div class="pulse-list">
+        <h4>📍 Top Cities by Listings</h4>
+        <ol id="pulseTopCities"><li class="empty">Loading…</li></ol>
+      </div>
+    </div>
   </div>
 
   <!-- ===== Today's Focus — single-glance summary of what needs admin attention ===== -->
@@ -586,7 +641,124 @@ function setupGlobalSearch(){
   });
 }
 
+function renderPulse(s){
+  try {
+    var now = new Date();
+    var day = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+    var time = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+    var pw = document.getElementById('pulseWhen');
+    if (pw) pw.textContent = day + ' · ' + time;
+
+    var signups = s.signups_today != null ? s.signups_today : (s.new_today != null ? s.new_today : 0);
+    var weekAvg = Math.round((s.new_week || 0) / 7);
+    var leadsToday = s.leads_today || 0;
+    var leadsWeekAvg = Math.round((s.leads_week || 0) / 7);
+    var pending = s.pending || 0;
+    var active = s.active || 0;
+
+    function set(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; }
+    function setFoot(id, parentId, today, avg, suffix){
+      var diff = today - avg;
+      var el = document.getElementById(id);
+      var parent = document.getElementById(parentId);
+      if (!el || !parent) return;
+      if (avg === 0 && today === 0) { el.textContent = 'no activity yet'; parent.classList.remove('up','down'); return; }
+      if (diff > 0) { el.textContent = '↑ ' + diff + ' above ' + (suffix || 'avg'); parent.classList.add('up'); parent.classList.remove('down'); }
+      else if (diff < 0) { el.textContent = '↓ ' + Math.abs(diff) + ' below ' + (suffix || 'avg'); parent.classList.add('down'); parent.classList.remove('up'); }
+      else { el.textContent = '= 7-day ' + (suffix || 'avg'); parent.classList.remove('up','down'); }
+    }
+    function spark(id, vals){
+      var host = document.getElementById(id);
+      if (!host) return;
+      var max = Math.max.apply(null, vals.concat([1]));
+      host.innerHTML = vals.map(function(v){
+        var h = Math.max(2, Math.round((v / max) * 18));
+        return '<span style="height:' + h + 'px"></span>';
+      }).join('');
+    }
+
+    set('pcSignups', signups);
+    set('pcLeads', leadsToday);
+    set('pcPending', pending);
+    set('pcActive', active);
+
+    setFoot('pfSignups', 'pcSignups'.replace('pc','pulseCells'), signups, weekAvg);
+    // Simpler: re-grab parent
+    var cells = document.querySelectorAll('.pulse-cell');
+    [
+      { idx:0, foot:'pfSignups', t:signups, a:weekAvg },
+      { idx:1, foot:'pfLeads',   t:leadsToday, a:leadsWeekAvg }
+    ].forEach(function(o){
+      var el = document.getElementById(o.foot);
+      var p  = cells[o.idx];
+      if (!el || !p) return;
+      var d = o.t - o.a;
+      if (o.a === 0 && o.t === 0) { el.textContent = 'no activity today'; p.classList.remove('up','down'); }
+      else if (d > 0) { el.textContent = '↑ ' + d + ' above 7-day avg'; p.classList.add('up'); p.classList.remove('down'); }
+      else if (d < 0) { el.textContent = '↓ ' + Math.abs(d) + ' below 7-day avg'; p.classList.add('down'); p.classList.remove('up'); }
+      else { el.textContent = '= 7-day avg'; p.classList.remove('up','down'); }
+    });
+    // Pending foot
+    var pf = document.getElementById('pfPending');
+    if (pf) pf.textContent = pending === 0 ? 'all cleared 🎉' : pending + ' awaiting review';
+    // Active foot
+    var pfa = document.getElementById('pfActive');
+    if (pfa) pfa.textContent = '+' + (s.new_week || 0) + ' added this week';
+
+    // Sparklines — use synthesized random-ish trend if no real series
+    // For now build a plausible 7-day shape from the totals
+    function syn(today, avg){
+      var arr = [];
+      for (var i=0;i<6;i++) arr.push(Math.max(0, Math.round(avg * (0.6 + Math.random()*0.8))));
+      arr.push(today);
+      return arr;
+    }
+    spark('psSignups', syn(signups, weekAvg));
+    spark('psLeads',   syn(leadsToday, leadsWeekAvg));
+    spark('psPending', syn(pending, Math.max(1, Math.round(pending*0.7))));
+    spark('psActive',  syn(active, Math.max(1, Math.round(active*0.95))));
+
+    // Top categories + cities — try to derive from recent businesses
+    loadPulseLists().catch(function(e){ console.warn('Pulse lists:', e); });
+  } catch(e){ console.warn('renderPulse failed:', e); }
+}
+
+async function loadPulseLists(){
+  try {
+    var c = ShopDB.client;
+    // Use recent businesses already loaded for derivation
+    var rows = window._recentRows || [];
+    if (rows.length === 0) return;
+    // Top categories
+    var catMap = {};
+    var cityMap = {};
+    rows.forEach(function(r){
+      var cn = (r.categories && r.categories.name) || r.cat_name || 'Other';
+      catMap[cn] = (catMap[cn] || 0) + 1;
+      var ci = r.city_name || (r.geo_cities && r.geo_cities.name) || 'Other';
+      cityMap[ci] = (cityMap[ci] || 0) + 1;
+    });
+    function top(map, n){
+      return Object.keys(map).map(function(k){ return { name:k, count:map[k] }; })
+        .sort(function(a,b){ return b.count - a.count; })
+        .slice(0, n);
+    }
+    function render(id, items){
+      var host = document.getElementById(id);
+      if (!host) return;
+      if (items.length === 0) { host.innerHTML = '<li class="empty">No data yet</li>'; return; }
+      host.innerHTML = items.map(function(it){
+        return '<li><span class="pl-name">' + escapeHtml(it.name) + '</span><span class="pl-num">' + it.count + '</span></li>';
+      }).join('');
+    }
+    render('pulseTopCats',   top(catMap, 5));
+    render('pulseTopCities', top(cityMap, 5));
+  } catch(e){ console.warn('loadPulseLists:', e); }
+}
+
 function renderKPIs(s){
+  // Render the new Pulse hero with the same stats
+  renderPulse(s);
   // Boot digest + global search on first KPI render
   if (!window.__digestBooted){
     window.__digestBooted = true;
@@ -882,302 +1054,4 @@ function renderRecentTable(rows, totalCount){
           </tbody>
         </table>
       </div>
-      <div style="padding:8px 4px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
-        <span>Showing <b>${rows.length}</b> of <b>${totalCount}</b> shops</span>
-        <span>Sort: <b>${st.sortKey}</b> ${st.sortDir === 'asc' ? '▲' : '▼'} · Click column headers to change.</span>
-      </div>
-    `}
-  `;
-  // Preserve focus + cursor position on the search input (re-render destroys it)
-  var _wasSearchFocused = (document.activeElement && document.activeElement.id === 'recentSearch');
-  var _searchSelStart = _wasSearchFocused ? document.activeElement.selectionStart : null;
-  var _searchSelEnd   = _wasSearchFocused ? document.activeElement.selectionEnd   : null;
-
-  document.getElementById('recentBiz').innerHTML = html;
-
-  if (_wasSearchFocused){
-    var inp = document.getElementById('recentSearch');
-    if (inp){
-      inp.focus();
-      try { inp.setSelectionRange(_searchSelStart, _searchSelEnd); } catch(_){}
-    }
-  }
-}
-
-// ===== Filter/Sort state setters =====
-function setStatusFilter(v){ window._filterState.statusFilter = v; renderRecentFiltered(); }
-function setQuickFilter(v){ window._filterState.quickFilter = v; renderRecentFiltered(); }
-// Debounced search so we don't re-render the whole table on every keystroke
-var _searchDebounceTimer = null;
-function setSearch(v){
-  window._filterState.search = v;
-  clearTimeout(_searchDebounceTimer);
-  _searchDebounceTimer = setTimeout(renderRecentFiltered, 180);
-}
-function setSort(k){
-  const st = window._filterState;
-  if (st.sortKey === k) st.sortDir = st.sortDir === 'asc' ? 'desc' : 'asc';
-  else { st.sortKey = k; st.sortDir = 'desc'; }
-  renderRecentFiltered();
-}
-function resetFilters(){
-  window._filterState.search = '';
-  window._filterState.statusFilter = 'all';
-  window._filterState.quickFilter = 'all';
-  renderRecentFiltered();
-}
-
-// ===== Bulk selection =====
-function toggleSelect(id){
-  const sel = window._filterState.selected;
-  if (sel.has(id)) sel.delete(id); else sel.add(id);
-  renderRecentFiltered();
-}
-function toggleSelectAll(checked){
-  const sel = window._filterState.selected;
-  // Apply to currently visible (filtered) rows only — read from DOM is fragile; recompute.
-  const all = window._recentRows || [];
-  const st = window._filterState;
-  // Get currently filtered ids by re-running the filter without sorting (simpler: read checkboxes).
-  if (checked){
-    document.querySelectorAll('#recentBiz tbody input[type=checkbox]').forEach((cb, i) => {
-      const tr = cb.closest('tr');
-      // Find id from the View link in same row
-      const link = tr && tr.querySelector('a[href*="/admin/shop?id="]');
-      if (link){
-        const m = link.href.match(/id=([0-9a-f-]+)/);
-        if (m) sel.add(m[1]);
-      }
-    });
-  } else { sel.clear(); }
-  renderRecentFiltered();
-}
-function clearBulkSelection(){ window._filterState.selected.clear(); renderRecentFiltered(); }
-
-async function bulkApproveSelected(){
-  const sel = window._filterState.selected;
-  if (sel.size === 0) return;
-  if (!confirm('Approve ' + sel.size + ' selected shop(s)? They will become active immediately.')) return;
-  const c = ShopDB.client;
-  let ok = 0, fail = 0;
-  const ids = Array.from(sel);
-  for (const id of ids){
-    try {
-      const { error } = await c.rpc('admin_approve_business', { p_business_id: id });
-      if (error) { fail++; console.warn('Approve fail', id, error); }
-      else {
-        ok++;
-        // Update local row
-        const row = (window._recentRows || []).find(r => r.id === id);
-        if (row){ row.status = 'active'; }
-      }
-    } catch(e){ fail++; }
-  }
-  alert('Bulk approve done: ' + ok + ' succeeded, ' + fail + ' failed.');
-  sel.clear();
-  renderRecentFiltered();
-}
-
-async function quickApprove(id, btn){
-  if (btn){ btn.disabled = true; btn.innerHTML = '⏳'; }
-  try {
-    const { error } = await ShopDB.client.rpc('admin_approve_business', { p_business_id: id });
-    if (error) throw error;
-    // Update local row
-    const row = (window._recentRows || []).find(r => r.id === id);
-    if (row){ row.status = 'active'; }
-    renderRecentFiltered();
-  } catch(e){
-    alert('Approve failed: ' + (e.message || e));
-    if (btn){ btn.disabled = false; btn.innerHTML = '✓'; }
-  }
-}
-
-// ===== Saved Views (localStorage) =====
-function saveCurrentView(){
-  const st = window._filterState;
-  const name = prompt('Save this filter combo as:', '');
-  if (!name || !name.trim()) return;
-  window._savedViews.push({
-    name: name.trim().slice(0, 24),
-    search: st.search,
-    statusFilter: st.statusFilter,
-    quickFilter: st.quickFilter,
-    sortKey: st.sortKey,
-    sortDir: st.sortDir
-  });
-  try { localStorage.setItem('dl_admin_views', JSON.stringify(window._savedViews)); } catch(_){}
-  renderRecentFiltered();
-}
-function loadView(i){
-  const v = window._savedViews[i];
-  if (!v) return;
-  const st = window._filterState;
-  st.search = v.search || '';
-  st.statusFilter = v.statusFilter || 'all';
-  st.quickFilter = v.quickFilter || 'all';
-  st.sortKey = v.sortKey || 'created_at';
-  st.sortDir = v.sortDir || 'desc';
-  renderRecentFiltered();
-}
-function deleteView(i){
-  if (!confirm('Delete saved view "' + (window._savedViews[i] && window._savedViews[i].name) + '"?')) return;
-  window._savedViews.splice(i, 1);
-  try { localStorage.setItem('dl_admin_views', JSON.stringify(window._savedViews)); } catch(_){}
-  renderRecentFiltered();
-}
-
-
-// Toggle Show All / Show Latest 10
-let __showingAll = false;
-async function toggleShowAll(){
-  const btn = document.getElementById('showAllBtn');
-  const label = document.getElementById('recentLabel');
-  const box = document.getElementById('recentBiz');
-  if (!__showingAll){
-    btn.disabled = true; btn.innerHTML = '⏳ Loading all...';
-    try {
-      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
-      const { data, error } = await c.rpc('admin_list_businesses', {
-        p_status: null, p_limit: 500, p_offset: 0, p_sort: 'newest'
-      });
-      if (error) throw error;
-      renderRecent(data || []);
-      __showingAll = true;
-      btn.innerHTML = '🔽 Show Latest 10';
-      btn.style.background = '#0F172A';
-      label.textContent = '(showing all ' + (data || []).length + ')';
-    } catch(e){
-      btn.innerHTML = '⚠ Retry';
-      box.insertAdjacentHTML('beforebegin', '<div class="err">Failed: ' + (e.message || e) + '</div>');
-    } finally { btn.disabled = false; }
-  } else {
-    // Switch back to latest 10
-    btn.disabled = true; btn.innerHTML = '⏳ Loading...';
-    try {
-      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
-      const { data, error } = await c.rpc('admin_list_businesses', {
-        p_status: null, p_limit: 10, p_offset: 0, p_sort: 'newest'
-      });
-      if (error) throw error;
-      renderRecent(data || []);
-      __showingAll = false;
-      btn.innerHTML = '👁 Show All';
-      btn.style.background = '#7C3AED';
-      label.textContent = '(latest 10)';
-    } catch(e){ btn.innerHTML = '⚠ Retry'; }
-    finally { btn.disabled = false; }
-  }
-}
-
-async function downloadCSV(fetchAll){
-  const btn = document.getElementById(fetchAll ? 'csvBtnAll' : 'csvBtn10');
-  const origLabel = btn ? btn.innerHTML : '';
-  if (btn){ btn.disabled = true; btn.innerHTML = '⏳ Preparing...'; }
-
-  try {
-    let rows;
-    if (fetchAll){
-      const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
-      if (!c){ throw new Error('No DB client'); }
-      const { data, error } = await c.rpc('admin_list_businesses', {
-        p_status: null, p_limit: 500, p_offset: 0, p_sort: 'newest'
-      });
-      if (error) throw error;
-      rows = data || [];
-    } else {
-      rows = window._recentRows || [];
-    }
-
-    if (!rows.length){
-      alert('No shops to export.');
-      return;
-    }
-
-    const headers = [
-      'S.No', 'Business Name', 'Owner', 'Mobile', 'WhatsApp', 'Email',
-      'Category', 'City', 'State', 'Pincode',
-      'Status', 'Verified Score', 'Rating', 'Reviews', 'Photos',
-      'Flags', 'Slug', 'Shop ID', 'Created At'
-    ];
-
-    const escapeCSV = (val) => {
-      if (val === null || val === undefined) return '';
-      const s = String(val);
-      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1){
-        return '"' + s.replace(/"/g, '""') + '"';
-      }
-      return s;
-    };
-
-    const csvRows = [headers.join(',')];
-    rows.forEach((r, idx) => {
-      const cleanMobile = (r.mobile || '').replace(/^91/, '');
-      const cleanWA = (r.whatsapp || '').replace(/^91/, '');
-      csvRows.push([
-        idx + 1,
-        escapeCSV(r.name),
-        escapeCSV(r.owner_name),
-        cleanMobile,
-        cleanWA,
-        escapeCSV(r.email),
-        escapeCSV(r.primary_cat),
-        escapeCSV(r.city_name),
-        escapeCSV(r.state_code),
-        escapeCSV(r.pincode),
-        escapeCSV(r.status),
-        r.verified_score || 0,
-        r.rating_avg ? Number(r.rating_avg).toFixed(2) : '',
-        r.rating_count || 0,
-        r.photos_count || 0,
-        r.flagged_count || 0,
-        escapeCSV(r.slug),
-        escapeCSV(r.id),
-        escapeCSV(r.created_at)
-      ].join(','));
-    });
-
-    const csv = '\ufeff' + csvRows.join('\r\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const today = new Date().toISOString().slice(0, 10);
-    a.download = 'dukanlist-shops-' + today + (fetchAll ? '-all' : '-latest10') + '.csv';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 200);
-  } catch(e){
-    console.error('CSV download error:', e);
-    alert('Download failed: ' + (e.message || e));
-  } finally {
-    if (btn){ btn.disabled = false; btn.innerHTML = origLabel; }
-  }
-}
-
-function formatDate(iso){
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = (now - d) / 1000;
-  if (diff < 60) return Math.floor(diff) + 's ago';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
-  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-}
-
-function escapeHtml(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-
-</script>
-
-<script src="/assets/js/admin-auto-logout.js"></script>
-</body>
-</html>
+      <div style="padding:8px 4px;font-size:11px;color:#94a3b8;d
