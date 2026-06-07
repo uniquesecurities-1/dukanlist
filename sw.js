@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.7.7';  // bumped — qr-code.html rewritten truncation-proof (no template literal)
+const VERSION    = 'dukan-v1.7.8';  // bumped — Discover HOT v2: trending ribbon + social proof + double-tap heart + Ken Burns
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

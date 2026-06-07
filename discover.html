@@ -130,20 +130,122 @@
     display:flex; align-items:center; gap:5px;
   }
 
-  /* Right rail action buttons */
+  /* ============================================================
+     HOT v2 — TikTok-style additions
+     ============================================================ */
+
+  /* (1) Trending RIBBON — top-left corner of every card */
+  .trend-ribbon{
+    position:absolute; top:14px; left:-4px; z-index:4;
+    display:flex; flex-direction:column; gap:6px; pointer-events:none;
+  }
+  .trend-ribbon .ribbon{
+    padding:6px 14px 6px 12px;
+    font-size:11px; font-weight:900;
+    letter-spacing:.06em; text-transform:uppercase;
+    color:#fff;
+    border-radius:0 8px 8px 0;
+    box-shadow:0 4px 12px rgba(0,0,0,.30);
+    text-shadow:0 1px 2px rgba(0,0,0,.20);
+    transform-origin:left center;
+    animation:ribbonSlideIn .55s cubic-bezier(.2,.85,.3,1.2) both;
+    display:inline-flex; align-items:center; gap:5px;
+    white-space:nowrap;
+  }
+  .trend-ribbon .ribbon.hot{
+    background:linear-gradient(135deg,#EF4444,#DC2626,#991B1B);
+    animation:ribbonSlideIn .55s cubic-bezier(.2,.85,.3,1.2) both, hotFlame 1.6s ease-in-out infinite;
+  }
+  .trend-ribbon .ribbon.trending{
+    background:linear-gradient(135deg,#F59E0B,#D97706);
+  }
+  .trend-ribbon .ribbon.top-rated{
+    background:linear-gradient(135deg,#7C3AED,#5B21B6);
+  }
+  .trend-ribbon .ribbon.new{
+    background:linear-gradient(135deg,#10B981,#059669);
+  }
+  @keyframes ribbonSlideIn{
+    from{ opacity:0; transform:translateX(-100%) }
+    to  { opacity:1; transform:translateX(0) }
+  }
+  @keyframes hotFlame{
+    0%,100% { box-shadow:0 4px 12px rgba(239,68,68,.4) }
+    50%     { box-shadow:0 4px 22px rgba(239,68,68,.8) }
+  }
+
+  /* (2) Social Proof STRIP — above shop name */
+  .social-proof{
+    display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(90deg,rgba(239,68,68,.30),rgba(245,158,11,.20));
+    border:1px solid rgba(251,191,36,.40);
+    padding:5px 12px; border-radius:99px;
+    font-size:11px; font-weight:800; color:#FBBF24;
+    letter-spacing:.02em; margin-bottom:8px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+    animation:proofPulse 2.5s ease-in-out infinite;
+    max-width:fit-content;
+  }
+  .social-proof .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:#10B981;
+    box-shadow:0 0 0 0 rgba(16,185,129,.5);
+    animation:liveDot 1.2s ease-out infinite;
+  }
+  @keyframes proofPulse{
+    0%,100%{ transform:scale(1) }
+    50%    { transform:scale(1.02) }
+  }
+  @keyframes liveDot{
+    0%   { box-shadow:0 0 0 0 rgba(16,185,129,.6) }
+    70%  { box-shadow:0 0 0 8px rgba(16,185,129,0) }
+    100% { box-shadow:0 0 0 0 rgba(16,185,129,0) }
+  }
+
+  /* (3) Double-tap heart explosion at finger location */
+  .dt-heart{
+    position:absolute; pointer-events:none; z-index:50;
+    font-size:120px; line-height:1;
+    transform:translate(-50%,-50%) scale(0);
+    animation:dtHeartPop 1.1s cubic-bezier(.2,.9,.3,1.2) forwards;
+    text-shadow:0 6px 24px rgba(239,68,68,.6), 0 0 60px rgba(255,255,255,.4);
+    filter:drop-shadow(0 4px 16px rgba(239,68,68,.7));
+  }
+  @keyframes dtHeartPop{
+    0%   { transform:translate(-50%,-50%) scale(0) rotate(-20deg); opacity:0 }
+    20%  { transform:translate(-50%,-50%) scale(1.45) rotate(8deg); opacity:1 }
+    45%  { transform:translate(-50%,-50%) scale(1.05) rotate(-3deg); opacity:1 }
+    100% { transform:translate(-50%,-65%) scale(.85) rotate(0); opacity:0 }
+  }
+  .dt-spark{
+    position:absolute; pointer-events:none; z-index:49;
+    width:8px; height:8px;
+    background:#FBBF24; border-radius:50%;
+    box-shadow:0 0 12px #FBBF24, 0 0 24px #F59E0B;
+    transform:translate(-50%,-50%);
+    animation:dtSparkFly 1s cubic-bezier(.1,.7,.4,1) forwards;
+  }
+  @keyframes dtSparkFly{
+    0%   { opacity:1; transform:translate(-50%,-50%) scale(1) }
+    100% { opacity:0; transform:translate(var(--tx),var(--ty)) scale(.3) }
+  }
+
+  /* (5) Right rail visual polish — bigger + bouncier */
   .actions{
-    position:absolute; right:12px; bottom:110px;
-    display:flex; flex-direction:column; gap:14px; z-index:3;
+    position:absolute; right:10px; bottom:108px;
+    display:flex; flex-direction:column; gap:16px; z-index:3;
   }
   .act{
     position:relative;
-    width:48px; height:48px; border-radius:50%;
-    background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,.18);
+    width:52px; height:52px; border-radius:50%;
+    background:rgba(255,255,255,.14); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.22);
     display:grid; place-items:center;
-    font-size:22px; color:#fff;
-    cursor:pointer; transition:.15s;
+    font-size:24px; color:#fff;
+    cursor:pointer; transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
     text-decoration:none;
+    box-shadow:0 4px 14px rgba(0,0,0,.28);
   }
   .act:active{ transform:scale(.9) }
   .act:hover{ background:rgba(255,255,255,.22) }
@@ -368,11 +470,16 @@
 
   /* Ken Burns slow zoom on photo background */
   .card.active .bg{
-    animation:kenBurns 18s ease-in-out infinite alternate;
+    animation:kenBurnsHot 12s ease-in-out infinite alternate, bgBreath 6s ease-in-out infinite;
   }
-  @keyframes kenBurns{
-    0%   { transform:scale(1.0) translate(0, 0) }
-    100% { transform:scale(1.12) translate(-2%, 1%) }
+  @keyframes kenBurnsHot{
+    0%   { transform:scale(1.04) translate(0, 0) }
+    50%  { transform:scale(1.10) translate(-1.5%, .8%) }
+    100% { transform:scale(1.16) translate(-3%, 1.5%) }
+  }
+  @keyframes bgBreath{
+    0%,100% { filter:brightness(.92) saturate(1.08) contrast(1.02) }
+    50%     { filter:brightness(.98) saturate(1.14) contrast(1.04) }
   }
 
   /* Body content slide up + fade on activation */
@@ -940,6 +1047,11 @@ function renderFiltered(){
   var nowDate = new Date();
   var sevenDaysAgo = new Date(nowDate.getTime() - 7*24*60*60*1000);
 
+  // HOT v2 — compute trending threshold (top 20% by likes_count, min 3 likes)
+  var allLikes = rows.map(function(r){ return r.likes_count||0; }).sort(function(a,b){ return b-a; });
+  var topIdx = Math.max(0, Math.floor(allLikes.length * 0.2) - 1);
+  var hotThreshold = Math.max(3, allLikes[topIdx] || 3);
+
   var html = rows.map(function(b, idx){
     var photo = (b.photos && b.photos[0]) || '';
     var cat = STATE.catMap[b.sub_category_id || b.category_id] || {};
@@ -971,12 +1083,41 @@ function renderFiltered(){
     var isFeatured = b.featured_until && new Date(b.featured_until) > nowDate;
     var isFresh = b.created_at && new Date(b.created_at) > sevenDaysAgo;
 
+    // HOT v2 — Trending ribbons (priority order: HOT > TOP RATED > TRENDING > NEW)
+    var likes = b.likes_count || 0;
+    var trendRibbons = '';
+    if (likes >= hotThreshold && likes >= 5){
+      trendRibbons += '<div class="ribbon hot">🔥 HOT</div>';
+    } else if (b.rating_avg >= 4.5 && rc >= 5){
+      trendRibbons += '<div class="ribbon top-rated">👑 TOP RATED</div>';
+    } else if (walks >= 3 || likes >= 3){
+      trendRibbons += '<div class="ribbon trending">⚡ TRENDING</div>';
+    } else if (isFresh){
+      trendRibbons += '<div class="ribbon new">✨ NEW</div>';
+    }
+
+    // HOT v2 — Social proof live strip (uses real data when available)
+    var proofText = '';
+    if (likes >= 10){
+      proofText = '🔥 ' + likes + ' people loved this';
+    } else if (walks >= 5){
+      proofText = '🚶 ' + walks + ' visited today';
+    } else if (b.rating_avg >= 4.5 && rc >= 3){
+      proofText = '⭐ ' + rating + ' star favourite';
+    } else if (isFeatured){
+      proofText = '⭐ Featured shop in ' + (city||'your area');
+    } else if (city){
+      proofText = '📍 Trending in ' + city;
+    }
+
     return ''+
     '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'">'+
       '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
       '<div class="gradient-top"></div>'+
       '<div class="gradient"></div>'+
+      (trendRibbons ? '<div class="trend-ribbon">'+trendRibbons+'</div>' : '')+
       '<div class="body">'+
+        (proofText ? '<div class="social-proof"><span class="dot"></span><span>'+esc(proofText)+'</span></div>' : '')+
         '<div class="badges">'+
           (isFeatured ? '<span class="badge featured">⭐ Featured</span>' : '')+
           (cat.icon ? '<span class="badge">'+esc(cat.icon)+' '+esc(cat.name||'')+'</span>' : '')+
@@ -985,7 +1126,6 @@ function renderFiltered(){
           (openStatus === false ? '<span class="badge closed">🔴 Closed</span>' : '')+
           (rc > 0 ? '<span class="badge">⭐ '+rating+' ('+rc+')</span>' : '')+
           (walks > 0 ? '<span class="badge walkins">🚶 '+walks+' today</span>' : '')+
-          (isFresh ? '<span class="badge fresh">✨ New</span>' : '')+
         '</div>'+
         '<h2>'+esc(b.name||'')+'</h2>'+
         (city ? '<div class="meta">📍 '+esc(city)+'</div>' : '')+
@@ -1060,6 +1200,36 @@ function renderFiltered(){
       btn.classList.remove('tapped');
       void btn.offsetWidth;
       btn.classList.add('tapped');
+    });
+  });
+
+  // HOT v2 — Double-tap photo to LOVE (Instagram-style)
+  feed.querySelectorAll('.card').forEach(function(card){
+    var lastTap = 0;
+    var lastX = 0, lastY = 0;
+    card.addEventListener('pointerdown', function(e){
+      // Ignore if tap is on action button / CTA / nav element
+      if (e.target.closest('.act, .cta, .cta-row, .chip, .top-nav, button, a, .badges')) return;
+      var t = Date.now();
+      var dt = t - lastTap;
+      // Compute coords relative to card
+      var rect = card.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      var dx = Math.abs(x - lastX);
+      var dy = Math.abs(y - lastY);
+      if (dt < 320 && dt > 50 && dx < 60 && dy < 60){
+        // DOUBLE TAP confirmed — spawn heart explosion at point + trigger love
+        spawnDoubleTapHeart(card, x, y);
+        var loveBtn = card.querySelector('.act.love');
+        if (loveBtn && !loveBtn.classList.contains('loved')){
+          bumpLove(loveBtn);
+        }
+        lastTap = 0;
+      } else {
+        lastTap = t;
+        lastX = x; lastY = y;
+      }
     });
   });
 
@@ -1147,6 +1317,35 @@ function spawnHeartBurst(btn){
   }
   btn.appendChild(burst);
   setTimeout(function(){ burst.remove(); }, 800);
+}
+
+// HOT v2 — Giant heart explosion at tap location (Instagram-style double-tap)
+function spawnDoubleTapHeart(card, x, y){
+  var heart = document.createElement('div');
+  heart.className = 'dt-heart';
+  heart.textContent = '❤️';
+  heart.style.left = x + 'px';
+  heart.style.top  = y + 'px';
+  card.appendChild(heart);
+  // Sparks flying outward from heart point
+  for (var i = 0; i < 14; i++){
+    var spark = document.createElement('div');
+    spark.className = 'dt-spark';
+    var angle = (i / 14) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
+    var dist  = 80 + Math.random() * 80;
+    spark.style.left = x + 'px';
+    spark.style.top  = y + 'px';
+    spark.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
+    spark.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+    spark.style.animationDelay = (Math.random() * 0.06) + 's';
+    card.appendChild(spark);
+  }
+  // Haptic feedback
+  if (navigator.vibrate) navigator.vibrate([40, 30, 90]);
+  setTimeout(function(){
+    if (heart.parentNode) heart.remove();
+    card.querySelectorAll('.dt-spark').forEach(function(s){ s.remove(); });
+  }, 1200);
 }
 
 init();
