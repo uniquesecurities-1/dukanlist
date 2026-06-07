@@ -933,6 +933,25 @@
       </div>
     </div>
 
+    <!-- Walk-In Counter widget — tap to log a real customer visit -->
+    <div class="side-widget" id="walkInWidget" style="background:linear-gradient(135deg,#FDF2F8,#FBCFE8);border-color:#EC4899">
+      <div class="side-widget-title" style="color:#9D174D">🚶 <span data-i18n-en>Walk-In Counter</span><span data-i18n-hi>दुकान आए ग्राहक</span></div>
+      <div style="font-size:.78rem;color:#9D174D;margin-bottom:10px;line-height:1.45"><span data-i18n-en>Tap every time a customer visits in person. Shows live count on your shop page = trust + social proof.</span><span data-i18n-hi>हर ग्राहक के आते ही एक tap। आपकी shop page पर live count दिखेगा = trust।</span></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:.66rem;color:#9D174D;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Today</div>
+          <div id="walkInToday" style="font-size:1.9rem;font-weight:900;color:#831843;line-height:1">0</div>
+        </div>
+        <div style="flex:1;border-left:1.5px solid rgba(157,23,77,.2);padding-left:10px">
+          <div style="font-size:.66rem;color:#9D174D;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Total</div>
+          <div id="walkInTotal" style="font-size:1.6rem;font-weight:900;color:#831843;line-height:1">0</div>
+        </div>
+      </div>
+      <button id="walkInBtn" type="button" style="display:block;width:100%;background:#EC4899;color:#fff;padding:11px;border-radius:8px;font-weight:800;border:none;font-size:.92rem;cursor:pointer">
+        <span data-i18n-en>+1 Customer Aaya 🚶</span><span data-i18n-hi>+1 ग्राहक आया 🚶</span>
+      </button>
+    </div>
+
     <!-- Profile Completeness widget -->
     <!-- WhatsApp Status Poster widget -->
     <div class="side-widget" style="background:linear-gradient(135deg,#F0FDF4,#BBF7D0);border-color:#16A34A">
@@ -1375,6 +1394,7 @@ async function loadDashboard(){
   // Power widgets (panel sidebar)
   try { renderProfileCompleteness(biz); } catch(e){ console.warn('PC widget:', e); }
   try { loadRankingBattle(biz); }       catch(e){ console.warn('Rank widget:', e); }
+  try { initWalkInWidget(biz); }        catch(e){ console.warn('Walk-in:', e); }
 
   // Load multi-cat badges
   loadCategoryBadges(biz.id);
@@ -1400,6 +1420,49 @@ async function loadDashboard(){
   //
   // To re-enable: verify db/73-og-share-card-storage.sql is fully deployed
   // in Supabase (column + bucket + 4 RLS policies + 2 RPCs) and uncomment.
+}
+
+// ============================================================
+// Walk-In Counter Widget — db/117
+// ============================================================
+async function initWalkInWidget(biz){
+  if (!biz || !biz.id) return;
+  var c = ShopDB.client;
+  // Initial load — get today's + total
+  try {
+    var r = await c.rpc('get_walk_ins', { p_business_id: biz.id });
+    if (r.data){
+      document.getElementById('walkInToday').textContent = r.data.today || 0;
+      document.getElementById('walkInTotal').textContent = r.data.total || 0;
+    }
+  } catch(e){ console.warn('walk-in get failed:', e); }
+  // Wire button
+  var btn = document.getElementById('walkInBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async function(){
+    btn.disabled = true;
+    var origTxt = btn.innerHTML;
+    btn.innerHTML = '⏳ ...';
+    try {
+      var r = await c.rpc('bump_walk_in', { p_business_id: biz.id });
+      if (r.error) throw r.error;
+      var t = (r.data && r.data.today) || 0;
+      var T = (r.data && r.data.total) || 0;
+      document.getElementById('walkInToday').textContent = t;
+      document.getElementById('walkInTotal').textContent = T;
+      btn.innerHTML = '✓ Counted!';
+      setTimeout(function(){ btn.innerHTML = origTxt; btn.disabled = false; }, 800);
+    } catch(e){
+      console.warn('walk-in bump failed:', e);
+      btn.innerHTML = origTxt;
+      btn.disabled = false;
+      // If RPC not deployed yet, hide widget silently
+      if (/function.*does not exist|404|400/i.test(String(e.message||e))){
+        var w = document.getElementById('walkInWidget');
+        if (w) w.style.display = 'none';
+      }
+    }
+  });
 }
 
 async function loadCategoryBadges(bizId){
