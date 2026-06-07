@@ -1228,17 +1228,30 @@ async function loadDashboard(){
 
     document.getElementById('loading').innerHTML =
       '<div style="max-width:560px;margin:24px auto;padding:0 16px;font-family:Manrope,Inter,-apple-system,sans-serif">'
-      // -------- Header card (info, not warning) --------
-      + '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:18px;padding:24px 24px 22px;box-shadow:0 6px 22px rgba(15,23,42,0.06);margin-bottom:16px">'
-      +   '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">'
-      +     '<div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#DBEAFE,#BFDBFE);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0">&#128279;</div>'
+      // -------- 🎉 Email verified celebration banner --------
+      + '<div id="verifyCelebrate" style="position:relative;background:linear-gradient(135deg,#10B981 0%,#059669 50%,#047857 100%);border-radius:20px;padding:26px 24px;margin-bottom:18px;color:#fff;box-shadow:0 12px 32px rgba(16,185,129,0.35);overflow:hidden;animation:celebSlideIn .55s cubic-bezier(.2,.85,.3,1.2) both">'
+      +   '<div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:rgba(255,255,255,0.10);border-radius:50%;pointer-events:none"></div>'
+      +   '<div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:rgba(255,255,255,0.08);border-radius:50%;pointer-events:none"></div>'
+      +   '<div style="display:flex;gap:14px;align-items:flex-start;position:relative">'
+      +     '<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.22);display:grid;place-items:center;font-size:1.9rem;flex-shrink:0;animation:bouncePop .8s cubic-bezier(.4,1.6,.5,1) .15s both">&#127881;</div>'
       +     '<div style="flex:1;min-width:0">'
-      +       '<div style="font-size:1.2rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:4px">Link your shop to this account</div>'
-      +       '<div style="font-size:.88rem;color:#475569;line-height:1.5">Your email is verified. Now connect your existing shop listing or register a new one.</div>'
+      +       '<div style="font-size:1.35rem;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,0.15)">Email Verified Successfully!</div>'
+      +       '<div style="font-size:.92rem;opacity:.95;line-height:1.5;font-weight:500">Welcome to DukanList, ' + escapeHtmlSafe((userEmail.split("@")[0] || "shopkeeper")) + '! Your account is now active. One last step — connect your shop below.</div>'
       +     '</div>'
       +   '</div>'
-      +   '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:11px 14px;font-size:.84rem;color:#334155;line-height:1.5">'
-      +     '<span style="color:#64748B;font-weight:600">Signed in as</span> <b style="color:#0F172A;word-break:break-all">' + escapeHtmlSafe(userEmail) + '</b>'
+      + '</div>'
+      + '<style>@keyframes celebSlideIn{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes bouncePop{0%{transform:scale(0) rotate(-180deg)}60%{transform:scale(1.25) rotate(15deg)}100%{transform:scale(1) rotate(0)}}</style>'
+      // -------- Header card (info, not warning) --------
+      + '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:18px;padding:22px 24px 20px;box-shadow:0 6px 22px rgba(15,23,42,0.06);margin-bottom:16px">'
+      +   '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">'
+      +     '<div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#DBEAFE,#BFDBFE);display:grid;place-items:center;font-size:1.3rem;flex-shrink:0">&#128279;</div>'
+      +     '<div style="flex:1;min-width:0">'
+      +       '<div style="font-size:1.1rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:3px">Connect Your Shop</div>'
+      +       '<div style="font-size:.86rem;color:#475569;line-height:1.5">Link your existing listing using the mobile number you registered with, or create a new shop.</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:10px 14px;font-size:.84rem;color:#334155;line-height:1.5">'
+      +     '<span style="color:#64748B;font-weight:600">Signed in as</span> <b style="color:#0F172A;word-break:break-all">' + escapeHtmlSafe(userEmail) + '</b> <span style="color:#10B981;font-weight:700">&#10003; verified</span>'
       +   '</div>'
       + '</div>'
       // -------- Option 1: Link by mobile --------
