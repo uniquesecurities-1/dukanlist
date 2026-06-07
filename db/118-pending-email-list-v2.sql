@@ -21,6 +21,9 @@
 
 BEGIN;
 
+-- Drop any prior version to avoid "structure of query does not match" cache from a previous bad RETURNS TABLE
+DROP FUNCTION IF EXISTS admin_pending_email_list_v2(INT, INT);
+
 CREATE OR REPLACE FUNCTION admin_pending_email_list_v2(
   p_limit  INT DEFAULT 100,
   p_offset INT DEFAULT 0
@@ -51,14 +54,14 @@ BEGIN
   RETURN QUERY
   SELECT
     b.id                                                          AS business_id,
-    COALESCE(b.name, '(unnamed)')                                  AS business_name,
-    COALESCE(b.owner_name, '')                                     AS owner_name,
-    COALESCE(b.mobile, '')                                         AS mobile,
-    COALESCE(b.whatsapp, '')                                       AS whatsapp,
-    COALESCE(u.email, '')                                          AS login_email,
-    COALESCE(b.email, '')                                          AS business_email,
-    COALESCE(c.name, '')                                           AS city_name,
-    COALESCE(cat.name, '')                                         AS primary_cat,
+    COALESCE(b.name::TEXT,       '(unnamed)')                      AS business_name,
+    COALESCE(b.owner_name::TEXT, '')                               AS owner_name,
+    COALESCE(b.mobile::TEXT,     '')                               AS mobile,
+    COALESCE(b.whatsapp::TEXT,   '')                               AS whatsapp,
+    COALESCE(u.email::TEXT,      '')                               AS login_email,
+    COALESCE(b.email::TEXT,      '')                               AS business_email,
+    COALESCE(c.name::TEXT,       '')                               AS city_name,
+    COALESCE(cat.name::TEXT,     '')                               AS primary_cat,
     b.created_at                                                   AS created_at,
     EXTRACT(DAY FROM (NOW() - b.created_at))::INT                  AS days_since_signup
   FROM businesses b
