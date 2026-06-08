@@ -1537,7 +1537,8 @@ async function loadDashboard(){
   try { if (window.DailyBuzz) DailyBuzz.renderOwnerWidget('dailyBuzzWidget', c, biz); else setTimeout(() => window.DailyBuzz && DailyBuzz.renderOwnerWidget('dailyBuzzWidget', c, biz), 800); } catch(e){ console.warn('DailyBuzz:', e); }
 
   // ===== STRATEGIC PHASE 2 (2026-06-05) — Town Rank + Smart Tips + Badges + Streak =====
-  try { initPhase2Cards(biz, c); } catch(e){ console.warn('Phase 2:', e); }
+  // initPhase2Cards was removed; guard against legacy references.
+  try { if (typeof initPhase2Cards === 'function') initPhase2Cards(biz, c); } catch(e){ /* silent */ }
 
   // ===== OG SHARE CARD auto-generation (DISABLED 2026-06-01) =====
   // Disabled on dashboard load to keep console clean. The auto-hook was

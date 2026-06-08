@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.8.1';  // bumped — Discover saves sync to DB (favorites work with /panel/favorites.html)
+const VERSION    = 'dukan-v1.8.2';  // bumped — Get Reviews universal copy + photos error UI + dashboard initPhase2Cards guard
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

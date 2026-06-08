@@ -322,10 +322,53 @@
     <div class="gr-stat"><div class="v" id="statThis">—</div><div class="l" data-i18n-en>This Month</div><div class="l" data-i18n-hi>इस माह</div></div>
   </div>
 
-  <!-- Tabs -->
+  <!-- ============ HERO COPY CARD — Universal one-tap copy ============ -->
   <div id="grContent" style="display:none">
+
+  <div class="gr-card" style="background:linear-gradient(135deg,#ECFDF5 0%,#D1FAE5 100%);border:2px solid #10B981;box-shadow:0 8px 24px -8px rgba(16,185,129,.25);position:relative;overflow:hidden">
+    <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(16,185,129,.2),transparent 70%);border-radius:50%;pointer-events:none"></div>
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#10B981;color:#fff;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:900;letter-spacing:.06em;margin-bottom:10px">⚡ EASIEST WAY</div>
+    <h2 style="color:#064E3B;font-size:1.3rem;margin-bottom:6px">
+      <span data-i18n-en>Copy &amp; Paste Anywhere</span>
+      <span data-i18n-hi>एक टैप कॉपी — कहीं भी पेस्ट करें</span>
+    </h2>
+    <p class="sub" style="color:#065F46;margin-bottom:14px;font-weight:500">
+      <span data-i18n-en>One tap to copy. Then paste in WhatsApp, Telegram, SMS, Email, Instagram DM — anywhere your customers chat.</span>
+      <span data-i18n-hi>एक टैप पर कॉपी हो जाएगा। फिर WhatsApp, Telegram, SMS, Email कहीं भी पेस्ट करें।</span>
+    </p>
+
+    <!-- Preview of message -->
+    <div style="background:#fff;border:1.5px dashed #10B981;border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.72rem;font-weight:800;color:#10B981;letter-spacing:.08em;margin-bottom:6px;text-transform:uppercase">📋 What gets copied:</div>
+      <div id="copyPreview" style="font-size:.92rem;color:#0F172A;line-height:1.55;white-space:pre-line;word-break:break-word">Loading…</div>
+    </div>
+
+    <!-- ONE BIG COPY BUTTON -->
+    <button onclick="copyUniversalMsg(this)" id="bigCopyBtn" style="width:100%;padding:18px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:0;border-radius:14px;font-size:1.1rem;font-weight:900;letter-spacing:-.01em;cursor:pointer;box-shadow:0 8px 22px -6px rgba(16,185,129,.50);font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s ease">
+      📋 <span data-i18n-en>Copy Message + Link</span><span data-i18n-hi>मैसेज और लिंक कॉपी करें</span>
+    </button>
+    <div style="text-align:center;font-size:.78rem;color:#065F46;margin-top:10px;font-weight:600">
+      💡 <span data-i18n-en>Tip: After copy, just paste in any chat and send. Easiest way ever.</span>
+      <span data-i18n-hi>टिप: कॉपी के बाद किसी भी चैट में पेस्ट करके भेजें।</span>
+    </div>
+
+    <!-- Quick share strip -->
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(16,185,129,.30);display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button onclick="openShareApp('wa')" style="background:#25D366;color:#fff;border:0;padding:9px 14px;border-radius:10px;font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">📲 WhatsApp</button>
+      <button onclick="openShareApp('tg')" style="background:#0088CC;color:#fff;border:0;padding:9px 14px;border-radius:10px;font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">✈️ Telegram</button>
+      <button onclick="openShareApp('sms')" style="background:#6366F1;color:#fff;border:0;padding:9px 14px;border-radius:10px;font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">💬 SMS</button>
+      <button onclick="openShareApp('email')" style="background:#EF4444;color:#fff;border:0;padding:9px 14px;border-radius:10px;font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">📧 Email</button>
+      <button onclick="openShareApp('native')" style="background:#0F172A;color:#fff;border:0;padding:9px 14px;border-radius:10px;font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">⤴️ Share</button>
+    </div>
+  </div>
+
+  <!-- Tabs (advanced options) -->
+  <div style="margin-top:24px;text-align:center;font-size:.82rem;color:#94A3B8;font-weight:700;letter-spacing:.06em;text-transform:uppercase">
+    <span data-i18n-en>— Or use these advanced options —</span>
+    <span data-i18n-hi>— या नीचे advanced विकल्प —</span>
+  </div>
   <div class="gr-tabs">
-    <button class="active" data-tab="wa"><span data-i18n-en>📲 WhatsApp</span><span data-i18n-hi>📲 व्हाट्सऐप</span></button>
+    <button class="active" data-tab="wa"><span data-i18n-en>📲 To One Customer</span><span data-i18n-hi>📲 एक ग्राहक</span></button>
     <button data-tab="qr"><span data-i18n-en>🔳 QR Code</span><span data-i18n-hi>🔳 QR कोड</span></button>
     <button data-tab="card"><span data-i18n-en>🖨 Counter Card</span><span data-i18n-hi>🖨 काउंटर कार्ड</span></button>
   </div>
@@ -525,6 +568,10 @@ async function loadBiz(){
   // Default message
   document.getElementById('singleMsg').value = defaultMsg();
 
+  // Update universal copy preview
+  var prev = document.getElementById('copyPreview');
+  if (prev) prev.textContent = defaultMsg();
+
   // QR code
   renderQR('qrBox', SHOP_URL, 8, 4);
   renderQR('ccQrBox', SHOP_URL, 6, 3);
@@ -654,6 +701,47 @@ function triggerDownload(href, filename){
 }
 
 function copyShopUrl(){ copyToClipboard(SHOP_URL, 'Shop link copied!'); }
+
+// ============ UNIVERSAL COPY (hero CTA) ============
+function copyUniversalMsg(btn){
+  var msg = defaultMsg();
+  copyToClipboard(msg, '✅ Copied! Now paste anywhere — WhatsApp, SMS, Email, anything.');
+  if (btn){
+    var orig = btn.innerHTML;
+    btn.innerHTML = '✅ <span>Copied! Paste anywhere now.</span>';
+    btn.style.background = 'linear-gradient(135deg,#059669,#047857)';
+    setTimeout(function(){
+      btn.innerHTML = orig;
+      btn.style.background = '';
+    }, 2400);
+  }
+  if (navigator.vibrate) navigator.vibrate(20);
+}
+
+function openShareApp(kind){
+  var msg = defaultMsg();
+  var enc = encodeURIComponent(msg);
+  var url;
+  if (kind === 'wa'){
+    url = 'https://wa.me/?text=' + enc;
+  } else if (kind === 'tg'){
+    url = 'https://t.me/share/url?url=' + encodeURIComponent(SHOP_URL) + '&text=' + encodeURIComponent(msg.replace(SHOP_URL, '').trim());
+  } else if (kind === 'sms'){
+    url = 'sms:?body=' + enc;
+  } else if (kind === 'email'){
+    var subj = encodeURIComponent('Quick favour — rate ' + ((MY_BIZ && MY_BIZ.name) || 'our shop') + ' on DukanList?');
+    url = 'mailto:?subject=' + subj + '&body=' + enc;
+  } else if (kind === 'native'){
+    if (navigator.share){
+      navigator.share({ title: 'Review Request', text: msg, url: SHOP_URL }).catch(function(){});
+      return;
+    } else {
+      copyToClipboard(msg, 'Copied! Paste anywhere to share.');
+      return;
+    }
+  }
+  if (url) window.open(url, '_blank');
+}
 
 // ============ Utility ============
 function copyToClipboard(text, okMsg){
