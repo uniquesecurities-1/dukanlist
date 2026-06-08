@@ -507,4 +507,147 @@ async function compressImage(file, maxBytes, forceConvert){
         }
         tryQuality();
       };
-      img.onerror 
+      img.onerror = function(){ resolve(file); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function(){ resolve(file); };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================================
+// FILE HANDLING — main entry point
+// ============================================================
+async function handleFiles(files){
+  if (!MY_BIZ){ alert('Shop not loaded yet. Please wait or refresh.'); return; }
+  if (!files || !files.length) return;
+
+  const existing = (MY_BIZ.photos || []).length;
+  const slots = MAX_PHOTOS - existing;
+  if (slots <= 0){
+    alert('You already have ' + MAX_PHOTOS + ' photos. Delete one to upload another.');
+    return;
+  }
+
+  const toUpload = Array.from(files).slice(0, slots);
+  const progress = document.getElementById('progress');
+  if (progress) progress.style.display = '';
+
+  let okCount = 0, failCount = 0;
+  for (let i = 0; i < toUpload.length; i++){
+    const f = toUpload[i];
+    if (progress) progress.textContent = 'Processing ' + (i+1) + ' of ' + toUpload.length + '...';
+    try {
+      // Convert HEIC if needed, then compress to <= 2MB
+      let processed = f;
+      const fname = (f.name || '').toLowerCase();
+      const isHeic = fname.endsWith('.heic') || fname.endsWith('.heif') || (f.type || '').toLowerCase().indexOf('heic') >= 0;
+      if (isHeic){
+        try { processed = await convertHeicToJpeg(f); } catch(_){}
+      }
+      if (processed.size > MAX_BYTES || processed.type !== 'image/jpeg'){
+        try { processed = await compressImage(processed, MAX_BYTES, true); } catch(_){}
+      }
+      await uploadOne(processed);
+      okCount++;
+    } catch(err){
+      console.error('[photos] upload failed for', f.name, err);
+      failCount++;
+    }
+  }
+
+  if (progress) progress.style.display = 'none';
+  if (okCount > 0){
+    showToast(okCount + ' photo' + (okCount>1?'s':'') + ' uploaded ✓');
+  }
+  if (failCount > 0){
+    alert(failCount + ' photo' + (failCount>1?'s':'') + ' could not be uploaded. Please try a different image.');
+  }
+  // Refresh state from server
+  await refreshBiz();
+}
+
+async function uploadOne(file){
+  const c = ShopDB.client;
+  const user = (await c.auth.getUser()).data.user;
+  if (!user) throw new Error('Not authenticated');
+  const ext = 'jpg';
+  const path = MY_BIZ.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+  const { error: upErr } = await c.storage.from('business-photos').upload(path, file, {
+    contentType: 'image/jpeg',
+    cacheControl: '3600',
+    upsert: false
+  });
+  if (upErr) throw upErr;
+  const { data: pub } = c.storage.from('business-photos').getPublicUrl(path);
+  const url = pub.publicUrl;
+  // Append to businesses.photos array
+  const newPhotos = (MY_BIZ.photos || []).concat([url]);
+  const { error: dbErr } = await c.from('businesses').update({ photos: newPhotos }).eq('id', MY_BIZ.id);
+  if (dbErr) throw dbErr;
+  MY_BIZ.photos = newPhotos;
+}
+
+async function removePhoto(idx){
+  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) return;
+  if (!confirm('Remove this photo?')) return;
+  const c = ShopDB.client;
+  const remaining = MY_BIZ.photos.filter((_, i) => i !== idx);
+  const { error } = await c.from('businesses').update({ photos: remaining }).eq('id', MY_BIZ.id);
+  if (error){ alert('Could not remove: ' + (error.message || 'unknown')); return; }
+  MY_BIZ.photos = remaining;
+  await refreshBiz();
+  showToast('Photo removed');
+}
+
+async function setHero(idx){
+  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) return;
+  const c = ShopDB.client;
+  const arr = MY_BIZ.photos.slice();
+  const hero = arr.splice(idx, 1)[0];
+  arr.unshift(hero);
+  const { error } = await c.from('businesses').update({ photos: arr }).eq('id', MY_BIZ.id);
+  if (error){ alert('Could not set hero: ' + (error.message || 'unknown')); return; }
+  MY_BIZ.photos = arr;
+  await refreshBiz();
+  showToast('Set as first photo ✓');
+}
+
+async function refreshBiz(){
+  try {
+    const c = ShopDB.client;
+    const { data: biz } = await c.from('businesses')
+      .select('id, slug, name, status, photos, verified_photo')
+      .eq('id', MY_BIZ.id).maybeSingle();
+    if (biz){ MY_BIZ = biz; renderState(); }
+  } catch(e){ console.warn('[photos] refresh failed', e); }
+}
+
+function showToast(msg){
+  let t = document.getElementById('photoToast');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'photoToast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10B981;color:#fff;padding:11px 22px;border-radius:12px;font-weight:700;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,.30);z-index:9999;font-family:Manrope,Inter,sans-serif;opacity:0;transition:opacity .25s ease';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 2400);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', function(){
+  setLang(localStorage.getItem('shop_lang') || 'en');
+  loadMyBusiness();
+});
+</script>
+
+<script src="/assets/js/owner-notifications.js" defer></script>
+<script src="/assets/js/error-reporter.js" defer></script>
+
+</body>
+</html>

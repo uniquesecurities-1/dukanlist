@@ -512,7 +512,13 @@ let SHOP_URL_BASE = ''; // base profile URL
 
 function defaultMsg(){
   const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our shop';
-  return 'Hi! Thank you for visiting ' + name + '. We would love your honest feedback on DukanList — it just takes 10 seconds. Please rate us here: ' + SHOP_URL;
+  // SHOP-FIRST message: sender (shop) highlighted, DukanList minimised to just URL
+  return 'Namaste 🙏\n\n' +
+         'Thank you for choosing *' + name + '*. It was great serving you!\n\n' +
+         'Could you please share a quick rating? It takes just 10 seconds and means a lot to us:\n\n' +
+         '👉 ' + SHOP_URL + '\n\n' +
+         'Your honest feedback helps us serve you better.\n\n' +
+         '— Team ' + name;
 }
 
 async function loadBiz(){

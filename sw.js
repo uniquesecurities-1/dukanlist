@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.8.2';  // bumped — Get Reviews universal copy + photos error UI + dashboard initPhase2Cards guard
+const VERSION    = 'dukan-v1.8.3';  // bumped — Restored photos.html (truncated) + shop-first review message
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
