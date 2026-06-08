@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.8.8';  // bumped — Photos page bulletproof: X button works + Set Hero + CSS + better errors
+const VERSION    = 'dukan-v1.8.9';  // bumped — Photo upload fix: correct MIME + progress overlay + input clear + size guard
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

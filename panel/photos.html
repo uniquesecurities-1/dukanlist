@@ -394,20 +394,58 @@ function renderState(){
 const dz = document.getElementById('dropzone');
 const fi = document.getElementById('fileInput');
 dz.addEventListener('click', () => fi.click());
-fi.addEventListener('change', () => handleFiles(fi.files));
+fi.addEventListener('change', async () => {
+  if (fi.files && fi.files.length){
+    const files = fi.files;
+    fi.value = '';  // Clear immediately so same photo can be re-picked
+    await handleFiles(files);
+  }
+});
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
 dz.addEventListener('drop', e => {
   e.preventDefault(); dz.classList.remove('dragover');
-  handleFiles(e.dataTransfer.files);
+  if (e.dataTransfer.files && e.dataTransfer.files.length){
+    handleFiles(e.dataTransfer.files);
+  }
 });
 
 // iPhone-friendly camera capture — always outputs JPEG, never HEIC
 const cam = document.getElementById('cameraInput');
 if (cam){
-  cam.addEventListener('change', () => {
-    if (cam.files && cam.files.length){ handleFiles(cam.files); }
+  cam.addEventListener('change', async () => {
+    if (cam.files && cam.files.length){
+      const files = cam.files;
+      cam.value = '';  // Clear so same camera shot can re-trigger
+      await handleFiles(files);
+    }
   });
+}
+
+// ============================================================
+// Progress overlay — shows while upload is in progress
+// ============================================================
+function showProgress(msg){
+  let el = document.getElementById('uploadProgress');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'uploadProgress';
+    el.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);color:#fff;padding:24px 30px;border-radius:18px;font-weight:700;font-size:.95rem;z-index:10000;box-shadow:0 20px 60px rgba(0,0,0,0.40);backdrop-filter:blur(10px);text-align:center;min-width:260px;font-family:Manrope,Inter,sans-serif;letter-spacing:-.01em';
+    el.innerHTML = '<div style="font-size:2rem;margin-bottom:10px" class="spin">⏳</div><div id="uploadProgressMsg"></div><div style="margin-top:8px;font-size:.78rem;color:#FBBF24;opacity:.9">Please don\'t close this page</div>';
+    document.body.appendChild(el);
+    if (!document.getElementById('upProgStyle')){
+      const s = document.createElement('style');
+      s.id = 'upProgStyle';
+      s.textContent = '@keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}.spin{display:inline-block;animation:spinSlow 1.4s linear infinite}';
+      document.head.appendChild(s);
+    }
+  }
+  document.getElementById('uploadProgressMsg').textContent = msg;
+  el.style.display = 'block';
+}
+function hideProgress(){
+  const el = document.getElementById('uploadProgress');
+  if (el) el.style.display = 'none';
 }
 
 // Detect HEIC/HEIF (iPhone default format)
@@ -627,36 +665,55 @@ async function handleFiles(files){
   }
 
   const toUpload = Array.from(files).slice(0, slots);
-  const progress = document.getElementById('progress');
-  if (progress) progress.style.display = '';
+  // Show in-page progress overlay (more reliable than legacy #progress div)
+  showProgress('⏳ Preparing your photo...');
 
   let okCount = 0, failCount = 0;
   for (let i = 0; i < toUpload.length; i++){
     const f = toUpload[i];
-    if (progress) progress.textContent = 'Processing ' + (i+1) + ' of ' + toUpload.length + '...';
+    showProgress('📸 Processing photo ' + (i+1) + ' of ' + toUpload.length + '...');
     try {
-      // Convert HEIC if needed, then compress to <= 2MB
+      // Step 1: Convert HEIC if needed
       let processed = f;
       const fname = (f.name || '').toLowerCase();
       const isHeic = fname.endsWith('.heic') || fname.endsWith('.heif') || (f.type || '').toLowerCase().indexOf('heic') >= 0;
       if (isHeic){
-        try { processed = await convertHeicToJpeg(f); } catch(_){}
+        showProgress('🔄 Converting iPhone HEIC photo...');
+        try { processed = await convertHeicToJpeg(f); }
+        catch(heicErr){
+          console.warn('[photos] HEIC conversion failed:', heicErr);
+          // Continue with original - compressImage will try to handle it
+        }
       }
-      if (processed.size > MAX_BYTES || processed.type !== 'image/jpeg'){
-        try { processed = await compressImage(processed, MAX_BYTES, true); } catch(_){}
+
+      // Step 2: Always run through compressImage to NORMALIZE to JPEG
+      // (handles PNG, WebP, oversize, weird formats — outputs clean JPEG)
+      showProgress('🗜 Compressing photo ' + (i+1) + '...');
+      try {
+        processed = await compressImage(processed, MAX_BYTES, true);
+      } catch(compErr){
+        console.warn('[photos] compression failed, will try raw upload:', compErr);
+        // Fall through with original processed
       }
+
+      // Step 3: Final safety — if still not JPEG and > 3MB, abort
+      if (processed.size > 3 * 1024 * 1024){
+        throw new Error('Photo size ' + (processed.size/1024/1024).toFixed(1) + 'MB exceeds server limit (3MB). Try a smaller photo.');
+      }
+
+      // Step 4: Upload with CORRECT contentType (don't hardcode!)
+      showProgress('☁️ Uploading photo ' + (i+1) + '...');
       await uploadOne(processed);
       okCount++;
     } catch(err){
       console.error('[photos] upload failed for', f.name, err);
       failCount++;
-      // Capture the most useful error message to show user
       const msg = err && (err.message || err.error || err.statusText) || String(err);
       window._lastUploadError = msg;
     }
   }
 
-  if (progress) progress.style.display = 'none';
+  hideProgress();
   if (okCount > 0){
     showToast(okCount + ' photo' + (okCount>1?'s':'') + ' uploaded ✓');
   }
@@ -703,11 +760,25 @@ async function handleFiles(files){
 async function uploadOne(file){
   const c = ShopDB.client;
   const user = (await c.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const ext = 'jpg';
+  if (!user) throw new Error('Not authenticated. Please log out and log in again.');
+
+  // Determine extension + MIME type from the ACTUAL file (not hardcoded)
+  // shop-photos bucket allows: image/jpeg, image/jpg, image/png, image/webp
+  let mime = (file.type || '').toLowerCase().trim();
+  let ext = 'jpg';
+  if (mime === 'image/png')        { ext = 'png'; }
+  else if (mime === 'image/webp')  { ext = 'webp'; }
+  else if (mime === 'image/jpeg' || mime === 'image/jpg') { ext = 'jpg'; mime = 'image/jpeg'; }
+  else {
+    // Unknown/unsupported MIME — force to JPEG (compressImage should have done this)
+    console.warn('[photos] unknown MIME type:', mime, '— forcing image/jpeg');
+    mime = 'image/jpeg';
+    ext = 'jpg';
+  }
+
   const path = MY_BIZ.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
   const { error: upErr } = await c.storage.from('shop-photos').upload(path, file, {
-    contentType: 'image/jpeg',
+    contentType: mime,
     cacheControl: '3600',
     upsert: false
   });
