@@ -553,8 +553,11 @@ async function loadBiz(){
   }
 
   MY_BIZ = biz;
-  SHOP_URL_BASE = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(biz.slug || biz.id);
-  SHOP_URL = SHOP_URL_BASE + (SHOP_URL_BASE.indexOf('?') >= 0 ? '&' : '?') + 'review=1';
+  // Route through /api/share so the preview card shows SHOP'S OWN PHOTO
+  // (not DukanList branding). /api/share preserves r=1 and redirects to
+  // /business.html?slug=X&review=1 — same destination, cleaner card.
+  SHOP_URL_BASE = 'https://dukanlist.com/api/share?slug=' + encodeURIComponent(biz.slug || biz.id);
+  SHOP_URL = SHOP_URL_BASE + '&r=1';
 
   // Stats
   document.getElementById('statRating').textContent = biz.rating_avg ? (Number(biz.rating_avg).toFixed(1) + '★') : '—';

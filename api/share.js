@@ -58,7 +58,7 @@ async function fetchBusiness(field, value){
   return rows && rows.length ? rows[0] : null;
 }
 
-function renderHtml(biz, targetUrl){
+function renderHtml(biz, targetUrl, isReview){
   // ----- SHOP-FIRST title with star rating
   const name = biz.name || 'Local Shop';
   const city = biz.geo_cities && biz.geo_cities.name ? biz.geo_cities.name : '';
@@ -71,34 +71,58 @@ function renderHtml(biz, targetUrl){
     ? ('\u2b50 ' + ratingAvg.toFixed(1) + ' (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')')
     : '';
 
-  // Title: 'Shop Name  *  4.5  *  Mandi Dabwali'
-  let titleParts = [name];
-  if (hasRating) titleParts.push('\u2b50 ' + ratingAvg.toFixed(1));
-  if (place)     titleParts.push(place);
-  const title = truncate(titleParts.join(' \u00b7 '), 100);
+  // Title: shop-first; review-prompt leads with a soft ask
+  let title;
+  if (isReview){
+    let parts = ['\u2728 ' + name];
+    if (place) parts.push(place);
+    title = truncate(parts.join(' \u00b7 ') + ' \u2014 Rate your experience', 100);
+  } else {
+    let titleParts = [name];
+    if (hasRating) titleParts.push('\u2b50 ' + ratingAvg.toFixed(1));
+    if (place)     titleParts.push(place);
+    title = truncate(titleParts.join(' \u00b7 '), 100);
+  }
 
   // ----- SHOP-FIRST description with rating up front
   let descParts = [];
-  if (ratingStr) descParts.push(ratingStr + '.');
-  if (biz.usp_text)         descParts.push(biz.usp_text);
-  else if (biz.about_text)  descParts.push(biz.about_text);
-  if (biz.owner_name && biz.mobile){
-    descParts.push('Call ' + biz.owner_name + ' at +91-' + biz.mobile + '.');
-  } else if (biz.mobile){
-    descParts.push('Call +91-' + biz.mobile + '.');
+  if (isReview){
+    descParts.push('Hi! Thank you for choosing ' + name + '.');
+    descParts.push('Tap to share a quick rating \u2014 it takes 10 seconds and means a lot to us.');
+  } else {
+    if (ratingStr) descParts.push(ratingStr + '.');
+    if (biz.usp_text)         descParts.push(biz.usp_text);
+    else if (biz.about_text)  descParts.push(biz.about_text);
+    if (biz.owner_name && biz.mobile){
+      descParts.push('Call ' + biz.owner_name + ' at +91-' + biz.mobile + '.');
+    } else if (biz.mobile){
+      descParts.push('Call +91-' + biz.mobile + '.');
+    }
+    if (place) descParts.push(place + '.');
+    if (!descParts.length) descParts.push(name + ' \u2014 your local shop. Tap to view photos, ratings & contact.');
   }
-  if (place) descParts.push(place + '.');
-  if (!descParts.length) descParts.push(name + ' \u2014 your local shop. Tap to view photos, ratings & contact.');
   const desc = truncate(descParts.join(' '), 200);
 
-  // ----- IMAGE: shop-branded OG card → first photo → static fallback
+  // ----- IMAGE preference
+  // For review-prompt shares: PREFER shop's own photo (no DukanList branding).
+  // Standard shares: use generated OG card if available, else photo, else default.
   let image = DEFAULT_OG_IMAGE;
   let imageType = 'image/png';
-  if (biz.og_image_url && typeof biz.og_image_url === 'string'){
-    image = biz.og_image_url;
-  } else if (biz.photos && Array.isArray(biz.photos) && biz.photos.length && typeof biz.photos[0] === 'string'){
-    image = biz.photos[0];
-    imageType = 'image/jpeg';
+  const hasShopPhoto = biz.photos && Array.isArray(biz.photos) && biz.photos.length && typeof biz.photos[0] === 'string';
+  if (isReview){
+    if (hasShopPhoto){
+      image = biz.photos[0];
+      imageType = 'image/jpeg';
+    } else if (biz.og_image_url && typeof biz.og_image_url === 'string'){
+      image = biz.og_image_url;
+    }
+  } else {
+    if (biz.og_image_url && typeof biz.og_image_url === 'string'){
+      image = biz.og_image_url;
+    } else if (hasShopPhoto){
+      image = biz.photos[0];
+      imageType = 'image/jpeg';
+    }
   }
 
   const canonical = SITE_ORIGIN + targetUrl;
@@ -158,6 +182,8 @@ export default async function handler(req, res){
     // Vercel parses ?foo=bar into req.query.foo
     const slug = (req.query && req.query.slug) || null;
     const id   = (req.query && req.query.id)   || null;
+    // Preserve review-prompt flag through the redirect (?r=1 or ?review=1)
+    const isReview = !!(req.query && (req.query.r || req.query.review));
 
     if (!slug && !id){
       res.statusCode = 302;
@@ -179,9 +205,10 @@ export default async function handler(req, res){
     }
 
     const target = '/business.html?slug=' + encodeURIComponent(biz.slug || '') +
-                   '&utm_source=share&utm_medium=link';
+                   '&utm_source=share&utm_medium=link' +
+                   (isReview ? '&review=1' : '');
     res.statusCode = 200;
-    return res.end(renderHtml(biz, target));
+    return res.end(renderHtml(biz, target, isReview));
 
   } catch (err){
     console.error('share endpoint error:', err);

@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.8.3';  // bumped — Restored photos.html (truncated) + shop-first review message
+const VERSION    = 'dukan-v1.8.4';  // bumped — Shop-first OG card via /api/share?r=1 (no DukanList branding in WhatsApp preview)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
