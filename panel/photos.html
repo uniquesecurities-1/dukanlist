@@ -739,38 +739,57 @@ async function handleFiles(files){
 }
 
 async function uploadOne(file){
+  // SERVER-SIDE upload via /api/upload-shop-photo.
+  // Bypasses Supabase Storage RLS (which has been flaky with "schema invalid"
+  // errors). Server-side endpoint:
+  //   - verifies JWT
+  //   - self-heals broken business_owners link via RPC
+  //   - uploads with service-role key (no RLS conflicts)
+  //   - atomically appends URL to businesses.photos
+  //   - auto-activates pending shops after first photo
   var c = ShopDB.client;
-  var userRes = await c.auth.getUser();
-  var user = userRes && userRes.data && userRes.data.user;
-  if (!user) throw new Error('Not authenticated. Please log out and log in again.');
-
-  // Real MIME type from file
-  var mime = (file.type || '').toLowerCase().trim();
-  var ext = 'jpg';
-  if (mime === 'image/png')       { ext = 'png'; }
-  else if (mime === 'image/webp') { ext = 'webp'; }
-  else if (mime === 'image/jpeg' || mime === 'image/jpg') { ext = 'jpg'; mime = 'image/jpeg'; }
-  else {
-    console.warn('[photos] unknown MIME type:', mime, '— forcing image/jpeg');
-    mime = 'image/jpeg';
-    ext = 'jpg';
+  var sessRes = await c.auth.getSession();
+  var session = sessRes && sessRes.data && sessRes.data.session;
+  if (!session || !session.access_token){
+    throw new Error('Not authenticated. Please log out and log in again.');
   }
 
-  var path = MY_BIZ.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-  var upRes = await c.storage.from('shop-photos').upload(path, file, {
-    contentType: mime,
-    cacheControl: '3600',
-    upsert: false
+  // Convert File to base64 data URL
+  var dataUrl = await new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(){ resolve(reader.result); };
+    reader.onerror = function(){ reject(new Error('Could not read file from disk')); };
+    reader.readAsDataURL(file);
   });
-  if (upRes.error) throw upRes.error;
 
-  var pubRes = c.storage.from('shop-photos').getPublicUrl(path);
-  var url = pubRes.data.publicUrl;
+  var resp = await fetch('/api/upload-shop-photo', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + session.access_token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      file: dataUrl,
+      filename: file.name || 'photo.jpg'
+    })
+  });
 
-  var newPhotos = (MY_BIZ.photos || []).concat([url]);
-  var dbRes = await c.from('businesses').update({ photos: newPhotos }).eq('id', MY_BIZ.id);
-  if (dbRes.error) throw dbRes.error;
-  MY_BIZ.photos = newPhotos;
+  var resBody = null;
+  try { resBody = await resp.json(); } catch(_){ resBody = { error: 'Invalid server response' }; }
+
+  if (!resp.ok || !resBody.ok){
+    var msg = (resBody && (resBody.message || resBody.error || resBody.detail)) || ('HTTP ' + resp.status);
+    var err = new Error(msg);
+    err.serverResponse = resBody;
+    throw err;
+  }
+
+  // Server returned the new photo URL — update local state
+  if (Array.isArray(resBody.photos_now)){
+    MY_BIZ.photos = resBody.photos_now;
+  } else if (resBody.url){
+    MY_BIZ.photos = (MY_BIZ.photos || []).concat([resBody.url]);
+  }
 }
 
 async function removePhoto(idx){
