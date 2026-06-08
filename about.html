@@ -45,6 +45,60 @@ html[data-lang="hi"] .section-block h2{ font-family:'Noto Sans Devanagari',sans-
 
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+
+<!-- Hreflang -->
+<link rel="alternate" hreflang="en-IN" href="https://dukanlist.com/about.html">
+<link rel="alternate" hreflang="hi-IN" href="https://dukanlist.com/about.html?lang=hi">
+
+<!-- FAQ Schema — high CTR rich snippet for About page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is DukanList?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DukanList is Bharat's local business directory connecting customers with verified shops, doctors, professionals and services in small towns across Haryana and Punjab — Sirsa, Bathinda, Mansa, Muktsar, and Mandi Dabwali."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who runs DukanList?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DukanList is operated by DigiMutual Goals Pvt. Ltd. — registered office at SCO-01, Near IndusInd Bank, Aastha Hospital Street, Chotala Road, Mandi Dabwali, Haryana 125104. Founded by Deepak Singla and Navneet Singla, AMFI registered (ARN-332982) and SEBI registered authorised persons."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is DukanList really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. DukanList is 100% free for both customers (searching shops) and shopkeepers (listing their business). No registration fee, no listing fee, no commission. We may offer optional featured-listing upgrades in the future, but the core directory will always remain free."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I add my shop to DukanList?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Visit dukanlist.com/register, fill the 4-step form with shop name, mobile, category, address and photos. Verify your email and submit. Most listings are approved within 24 hours."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How are shops verified on DukanList?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every shop is verified across 4 signals — mobile number (OTP), pincode-locality address match, at least one shop photo, and optional in-person community visit. Shops earn Bronze, Silver, or Gold trust badges based on verification depth, visible to all customers."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 

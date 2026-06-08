@@ -1818,6 +1818,32 @@ function injectSchemaOrg(b){
   script.id = 'schema-org-ld';
   script.textContent = JSON.stringify(schema, null, 2);
   document.head.appendChild(script);
+
+  // ---------- BreadcrumbList — rich snippet trail in SERP ----------
+  try {
+    const bcExisting = document.getElementById('schema-breadcrumb-ld');
+    if (bcExisting) bcExisting.remove();
+    const cityName = BIZ.geo_cities && BIZ.geo_cities.name ? BIZ.geo_cities.name : '';
+    const catName  = BIZ.categories  && BIZ.categories.name  ? BIZ.categories.name  : 'Local Business';
+    const catSlug  = BIZ.categories  && BIZ.categories.slug  ? BIZ.categories.slug  : '';
+    const items = [
+      { "@type": "ListItem", "position": 1, "name": "Home",   "item": "https://dukanlist.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Browse", "item": "https://dukanlist.com/browse.html" }
+    ];
+    if (catName && catSlug){
+      items.push({ "@type": "ListItem", "position": items.length+1, "name": catName, "item": "https://dukanlist.com/search.html?cat=" + encodeURIComponent(catSlug) });
+    }
+    if (cityName){
+      items.push({ "@type": "ListItem", "position": items.length+1, "name": cityName, "item": "https://dukanlist.com/search.html?city=" + encodeURIComponent(cityName.toLowerCase().replace(/ /g,'-')) });
+    }
+    items.push({ "@type": "ListItem", "position": items.length+1, "name": BIZ.name || 'Shop', "item": location.href });
+    const bcSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": items };
+    const bcTag = document.createElement('script');
+    bcTag.type = 'application/ld+json';
+    bcTag.id = 'schema-breadcrumb-ld';
+    bcTag.textContent = JSON.stringify(bcSchema);
+    document.head.appendChild(bcTag);
+  } catch(e){ /* schema is bonus, never break page */ }
 }
 
 function render(){

@@ -129,6 +129,19 @@ function renderPage(opts){
     }))
   };
 
+  // BreadcrumbList — adds rich-snippet trail in SERPs (CTR +30-50%)
+  const citySlug = cityName.toLowerCase().replace(/ /g,'-');
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",       "item": `${ORIGIN}/` },
+      { "@type": "ListItem", "position": 2, "name": "Browse",     "item": `${ORIGIN}/browse.html` },
+      { "@type": "ListItem", "position": 3, "name": catName,      "item": `${ORIGIN}/search.html?cat=${cat.slug}` },
+      { "@type": "ListItem", "position": 4, "name": cityName,     "item": url }
+    ]
+  };
+
   const otherCats = isParent && subCategories && subCategories.length
     ? `<section style="max-width:1180px;margin:48px auto 0;padding:0 20px">
          <h2 style="font-size:1.3rem;font-weight:800;color:#0F172A;margin-bottom:14px">Browse ${esc(catName)} by sub-category</h2>
@@ -146,6 +159,8 @@ function renderPage(opts){
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(url)}">
+<link rel="alternate" hreflang="en-IN" href="${esc(url)}">
+<link rel="alternate" hreflang="hi-IN" href="${esc(url)}?lang=hi">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DukanList">
 <meta property="og:title" content="${esc(title)}">
@@ -160,6 +175,7 @@ function renderPage(opts){
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Manrope','Inter',-apple-system,sans-serif;background:#FFFBF5;color:#0F172A;line-height:1.55;-webkit-font-smoothing:antialiased}

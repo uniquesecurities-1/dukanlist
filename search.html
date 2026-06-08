@@ -4,15 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#FF6B1A">
-<title>Search Listings — dukanlist.com</title>
-<meta name="description" content="Find local listings, services, doctors, carpenters, mechanics near you.">
+<title>Search Local Shops — DukanList</title>
+<meta name="description" content="Find verified local shops, doctors, mechanics, and services in Sirsa, Bathinda, Mansa, Muktsar, Mandi Dabwali. Free directory with photos, ratings & one-tap WhatsApp.">
 <link rel="canonical" href="https://dukanlist.com/search.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dukanlist.com/search.html">
-<meta property="og:title" content="Search Listings — dukanlist.com">
-<meta property="og:description" content="Search verified local businesses, services and professionals near you. Free for customers, free for shopkeepers.">
+<meta property="og:title" content="Search Local Shops — DukanList">
+<meta property="og:description" content="Verified local businesses in Haryana &amp; Punjab small towns. 195+ categories. Free for customers and shopkeepers.">
 <meta property="og:image" content="https://dukanlist.com/assets/icons/icon-512.png">
 <meta name="twitter:card" content="summary">
+<link rel="alternate" hreflang="en-IN" href="https://dukanlist.com/search.html">
+<link rel="alternate" hreflang="hi-IN" href="https://dukanlist.com/search.html?lang=hi">
+<!-- Dynamic title/desc updater — runs BEFORE Googlebot indexes the rendered HTML on subsequent crawls -->
+<script>
+(function(){
+  try {
+    var p = new URLSearchParams(location.search);
+    var q = (p.get('q') || '').trim();
+    var city = (p.get('city') || '').trim();
+    var cat = (p.get('cat') || '').trim();
+    var parts = [];
+    if (q)    parts.push(decodeURIComponent(q).replace(/\+/g,' '));
+    if (cat)  parts.push(cat.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }));
+    if (city) parts.push('in ' + city.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }));
+    if (parts.length){
+      var newTitle = parts.join(' ') + ' — DukanList';
+      document.title = newTitle.slice(0, 60);
+      var md = document.querySelector('meta[name="description"]');
+      if (md){
+        var subject = parts.join(' ');
+        md.setAttribute('content', 'Top verified ' + subject + '. Photos, ratings, contact numbers, and one-tap WhatsApp on DukanList — Bharat’s local business directory.');
+      }
+    }
+  } catch(e){}
+})();
+</script>
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
