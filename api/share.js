@@ -111,10 +111,14 @@ function renderHtml(biz, targetUrl, isReview){
   const hasShopPhoto = biz.photos && Array.isArray(biz.photos) && biz.photos.length && typeof biz.photos[0] === 'string';
   if (isReview){
     if (hasShopPhoto){
+      // Best: shop's own photo (clean, no branding)
       image = biz.photos[0];
       imageType = 'image/jpeg';
-    } else if (biz.og_image_url && typeof biz.og_image_url === 'string'){
-      image = biz.og_image_url;
+    } else {
+      // Fallback: dynamic shop-branded card with shop name + city + stars
+      // (NEVER falls back to DukanList default for review shares)
+      image = SITE_ORIGIN + '/api/og-card?slug=' + encodeURIComponent(biz.slug || '');
+      imageType = 'image/svg+xml';
     }
   } else {
     if (biz.og_image_url && typeof biz.og_image_url === 'string'){
@@ -214,6 +218,4 @@ export default async function handler(req, res){
     console.error('share endpoint error:', err);
     res.statusCode = 500;
     res.setHeader('Content-Type', 'text/html');
-    return res.end(renderNotFound());
-  }
-}
+    return res.end(renderNotFound(

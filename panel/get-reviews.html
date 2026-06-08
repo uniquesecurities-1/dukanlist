@@ -545,7 +545,7 @@ async function loadBiz(){
   }
 
   const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, name_hi, rating_avg, rating_count').eq('id', bizId).maybeSingle();
+    .select('id, slug, name, name_hi, rating_avg, rating_count, photos').eq('id', bizId).maybeSingle();
   if (error || !biz){
     console.error('[get-reviews] biz fetch err', error);
     document.getElementById('loading').innerHTML = '⚠ Could not load your shop. <a href="/panel/dashboard.html" style="color:#FF6B1A;font-weight:700;text-decoration:underline">Go to Dashboard</a>';
@@ -562,6 +562,23 @@ async function loadBiz(){
   // Stats
   document.getElementById('statRating').textContent = biz.rating_avg ? (Number(biz.rating_avg).toFixed(1) + '★') : '—';
   document.getElementById('statCount').textContent  = biz.rating_count || 0;
+
+  // No-photo tip: best preview cards need at least 1 shop photo
+  var noPhoto = !biz.photos || !biz.photos.length;
+  if (noPhoto){
+    var heroCard = document.querySelector('.gr-card');
+    if (heroCard && !document.getElementById('noPhotoTip')){
+      var tip = document.createElement('div');
+      tip.id = 'noPhotoTip';
+      tip.style.cssText = 'margin-bottom:12px;padding:12px 14px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1.5px solid #F59E0B;border-radius:12px;display:flex;gap:10px;align-items:flex-start';
+      tip.innerHTML = '<div style="font-size:1.3rem">💡</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:800;color:#92400E;font-size:.92rem;margin-bottom:3px">For the best WhatsApp preview, add a shop photo</div>' +
+          '<div style="font-size:.82rem;color:#92400E;opacity:.88;line-height:1.45">Right now we show a clean branded card with your shop name. With a photo, customers see your actual shop. <a href="/panel/photos.html" style="color:#7C2D12;font-weight:800;text-decoration:underline">Upload now &rarr;</a></div>' +
+        '</div>';
+      heroCard.parentNode.insertBefore(tip, heroCard);
+    }
+  }
 
   // This-month reviews
   try{
