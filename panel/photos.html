@@ -567,10 +567,17 @@ async function handleFiles(files){
     const reason = window._lastUploadError || 'Unknown error';
     let userMsg = 'Could not upload ' + failCount + ' photo' + (failCount>1?'s':'') + '.\n\n';
     // Friendly translation of common Supabase Storage errors
-    if (/not.found|404/i.test(reason)){
-      userMsg += 'Storage bucket missing. Please contact support.';
+    if (/schema is invalid|incompatible|schema cache/i.test(reason)){
+      userMsg += 'Server upload permissions are not set up correctly.\n\n' +
+                 'This is a one-time server fix. Please WhatsApp the team at +91 95412 23377 with this message:\n' +
+                 '"Photo upload — schema invalid. Run db/87 in Supabase."';
+    } else if (/not.found|404/i.test(reason)){
+      userMsg += 'Storage bucket missing. Please contact support at +91 95412 23377.';
     } else if (/permission|denied|policy|rls|403/i.test(reason)){
-      userMsg += 'Permission denied. Please log out and log in again, then retry.';
+      userMsg += 'Permission denied. Possible reasons:\n' +
+                 '  • Your account is not linked to a shop (admin can fix)\n' +
+                 '  • RLS policies need refresh\n\n' +
+                 'WhatsApp +91 95412 23377 to get linked, or log out + log in again.';
     } else if (/payload too large|413/i.test(reason)){
       userMsg += 'Photo too large even after compression. Try a smaller image.';
     } else if (/duplicate|already exists|409/i.test(reason)){
