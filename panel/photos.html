@@ -657,89 +657,67 @@ async function handleFiles(files){
   if (!MY_BIZ){ alert('Shop not loaded yet. Please wait or refresh.'); return; }
   if (!files || !files.length) return;
 
-  const existing = (MY_BIZ.photos || []).length;
-  const slots = MAX_PHOTOS - existing;
+  var existing = (MY_BIZ.photos || []).length;
+  var slots = MAX_PHOTOS - existing;
   if (slots <= 0){
     alert('You already have ' + MAX_PHOTOS + ' photos. Delete one to upload another.');
     return;
   }
 
-  const toUpload = Array.from(files).slice(0, slots);
-  // Show in-page progress overlay (more reliable than legacy #progress div)
+  var toUpload = Array.from(files).slice(0, slots);
   showProgress('⏳ Preparing your photo...');
 
-  let okCount = 0, failCount = 0;
-  for (let i = 0; i < toUpload.length; i++){
-    const f = toUpload[i];
+  var okCount = 0, failCount = 0;
+  for (var i = 0; i < toUpload.length; i++){
+    var f = toUpload[i];
     showProgress('📸 Processing photo ' + (i+1) + ' of ' + toUpload.length + '...');
     try {
-      // Step 1: Convert HEIC if needed
-      let processed = f;
-      const fname = (f.name || '').toLowerCase();
-      const isHeic = fname.endsWith('.heic') || fname.endsWith('.heif') || (f.type || '').toLowerCase().indexOf('heic') >= 0;
+      var processed = f;
+      var fname = (f.name || '').toLowerCase();
+      var isHeic = fname.endsWith('.heic') || fname.endsWith('.heif') || (f.type || '').toLowerCase().indexOf('heic') >= 0;
       if (isHeic){
         showProgress('🔄 Converting iPhone HEIC photo...');
         try { processed = await convertHeicToJpeg(f); }
-        catch(heicErr){
-          console.warn('[photos] HEIC conversion failed:', heicErr);
-          // Continue with original - compressImage will try to handle it
-        }
+        catch(heicErr){ console.warn('[photos] HEIC conversion failed:', heicErr); }
       }
 
-      // Step 2: Always run through compressImage to NORMALIZE to JPEG
-      // (handles PNG, WebP, oversize, weird formats — outputs clean JPEG)
       showProgress('🗜 Compressing photo ' + (i+1) + '...');
       try {
         processed = await compressImage(processed, MAX_BYTES, true);
       } catch(compErr){
         console.warn('[photos] compression failed, will try raw upload:', compErr);
-        // Fall through with original processed
       }
 
-      // Step 3: Final safety — if still not JPEG and > 3MB, abort
       if (processed.size > 3 * 1024 * 1024){
         throw new Error('Photo size ' + (processed.size/1024/1024).toFixed(1) + 'MB exceeds server limit (3MB). Try a smaller photo.');
       }
 
-      // Step 4: Upload with CORRECT contentType (don't hardcode!)
       showProgress('☁️ Uploading photo ' + (i+1) + '...');
       await uploadOne(processed);
       okCount++;
     } catch(err){
       console.error('[photos] upload failed for', f.name, err);
       failCount++;
-      const msg = err && (err.message || err.error || err.statusText) || String(err);
+      var msg = err && (err.message || err.error || err.statusText) || String(err);
       window._lastUploadError = msg;
     }
   }
 
   hideProgress();
+
   if (okCount > 0){
     showToast(okCount + ' photo' + (okCount>1?'s':'') + ' uploaded ✓');
   }
   if (failCount > 0){
-    const reason = window._lastUploadError || 'Unknown error';
-    let userMsg = 'Could not upload ' + failCount + ' photo' + (failCount>1?'s':'') + '.\n\n';
-    // Friendly translation of common Supabase Storage errors
+    var reason = window._lastUploadError || 'Unknown error';
+    var userMsg = 'Could not upload ' + failCount + ' photo' + (failCount>1?'s':'') + '.\n\n';
     if (/schema is invalid|incompatible|schema cache/i.test(reason)){
-      // This often means the SPECIFIC photo had an issue, not the server.
-      // Best advice: retry with a different image or use camera capture.
-      userMsg += 'This photo could not be processed. Common reasons:\n\n' +
-                 '  • Photo format is unusual (HEIC, HEIF, RAW)\n' +
-                 '  • File size still too large after compression\n' +
-                 '  • Image data is corrupt or partial\n\n' +
+      userMsg += 'This photo format could not be processed.\n\n' +
                  'TRY THIS:\n' +
-                 '  1. Use the orange "Open Camera Now" button below — it always works\n' +
+                 '  1. Use the orange "Open Camera Now" button below\n' +
                  '  2. Or pick a different photo (WhatsApp photos work great)\n' +
-                 '  3. Or save the photo to your phone gallery first, then upload\n\n' +
+                 '  3. Or save the photo to gallery first, then upload\n\n' +
                  'Already-uploaded photos are saved ✓';
-    } else if (/not.found|404/i.test(reason)){
-      userMsg += 'Storage bucket missing. Please contact support at +91 95412 23377.';
-    } else if (/permission|denied|policy|rls|403/i.test(reason)){
-      userMsg += 'Permission denied. Possible reasons:\n' +
-                 '  • Your account is not linked to a shop (admin can fix)\n' +
-                 '  • RLS policies need refresh\n\n' +
-                 'WhatsApp +91 95412 23377 to get linked, or log out + log in again.';
     } else if (/payload too large|413/i.test(reason)){
       userMsg += 'Photo too large even after compression. Try a smaller image.';
     } else if (/duplicate|already exists|409/i.test(reason)){
@@ -748,94 +726,93 @@ async function handleFiles(files){
       userMsg += 'Network slow or offline. Please check connection and retry.';
     } else if (/auth|jwt|token|unauthorized|401/i.test(reason)){
       userMsg += 'Login session expired. Please log out and log in again.';
+    } else if (/permission|denied|policy|rls|403/i.test(reason)){
+      userMsg += 'Permission denied. WhatsApp +91 95412 23377 for help.';
+    } else if (/not.found|404/i.test(reason)){
+      userMsg += 'Storage bucket missing. Contact support at +91 95412 23377.';
     } else {
-      userMsg += 'Reason: ' + reason + '\n\nTry: (1) a different image, (2) take a fresh photo via Camera button, or (3) log out + back in.';
+      userMsg += 'Reason: ' + reason + '\n\nTry: (1) Open Camera Now, (2) a different image, or (3) log out + back in.';
     }
     alert(userMsg);
   }
-  // Refresh state from server
   await refreshBiz();
 }
 
 async function uploadOne(file){
-  const c = ShopDB.client;
-  const user = (await c.auth.getUser()).data.user;
+  var c = ShopDB.client;
+  var userRes = await c.auth.getUser();
+  var user = userRes && userRes.data && userRes.data.user;
   if (!user) throw new Error('Not authenticated. Please log out and log in again.');
 
-  // Determine extension + MIME type from the ACTUAL file (not hardcoded)
-  // shop-photos bucket allows: image/jpeg, image/jpg, image/png, image/webp
-  let mime = (file.type || '').toLowerCase().trim();
-  let ext = 'jpg';
-  if (mime === 'image/png')        { ext = 'png'; }
-  else if (mime === 'image/webp')  { ext = 'webp'; }
+  // Real MIME type from file
+  var mime = (file.type || '').toLowerCase().trim();
+  var ext = 'jpg';
+  if (mime === 'image/png')       { ext = 'png'; }
+  else if (mime === 'image/webp') { ext = 'webp'; }
   else if (mime === 'image/jpeg' || mime === 'image/jpg') { ext = 'jpg'; mime = 'image/jpeg'; }
   else {
-    // Unknown/unsupported MIME — force to JPEG (compressImage should have done this)
     console.warn('[photos] unknown MIME type:', mime, '— forcing image/jpeg');
     mime = 'image/jpeg';
     ext = 'jpg';
   }
 
-  const path = MY_BIZ.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-  const { error: upErr } = await c.storage.from('shop-photos').upload(path, file, {
+  var path = MY_BIZ.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+  var upRes = await c.storage.from('shop-photos').upload(path, file, {
     contentType: mime,
     cacheControl: '3600',
     upsert: false
   });
-  if (upErr) throw upErr;
-  const { data: pub } = c.storage.from('shop-photos').getPublicUrl(path);
-  const url = pub.publicUrl;
-  // Append to businesses.photos array
-  const newPhotos = (MY_BIZ.photos || []).concat([url]);
-  const { error: dbErr } = await c.from('businesses').update({ photos: newPhotos }).eq('id', MY_BIZ.id);
-  if (dbErr) throw dbErr;
+  if (upRes.error) throw upRes.error;
+
+  var pubRes = c.storage.from('shop-photos').getPublicUrl(path);
+  var url = pubRes.data.publicUrl;
+
+  var newPhotos = (MY_BIZ.photos || []).concat([url]);
+  var dbRes = await c.from('businesses').update({ photos: newPhotos }).eq('id', MY_BIZ.id);
+  if (dbRes.error) throw dbRes.error;
   MY_BIZ.photos = newPhotos;
 }
 
 async function removePhoto(idx){
-  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) {
-    console.warn('[photos] removePhoto called with invalid idx:', idx);
+  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]){
+    console.warn('[photos] removePhoto invalid idx:', idx);
     return;
   }
   if (!confirm('Remove this photo?')) return;
   try {
-    const c = ShopDB.client;
-    const remaining = MY_BIZ.photos.filter((_, i) => i !== idx);
-    const { error } = await c.from('businesses').update({ photos: remaining }).eq('id', MY_BIZ.id);
-    if (error){
-      console.error('[photos] removePhoto DB error:', error);
-      alert('Could not remove photo.\n\nReason: ' + (error.message || 'unknown') + '\n\nPlease retry or refresh the page.');
+    var c = ShopDB.client;
+    var remaining = MY_BIZ.photos.filter(function(_, i){ return i !== idx; });
+    var dbRes = await c.from('businesses').update({ photos: remaining }).eq('id', MY_BIZ.id);
+    if (dbRes.error){
+      console.error('[photos] removePhoto error:', dbRes.error);
+      alert('Could not remove photo: ' + (dbRes.error.message || 'unknown'));
       return;
     }
     MY_BIZ.photos = remaining;
-    renderState();  // immediate UI update
+    renderState();
     showToast('Photo removed ✓');
-    // Background refresh for consistency
     refreshBiz();
   } catch(err){
     console.error('[photos] removePhoto fatal:', err);
-    alert('Could not remove photo. Please refresh the page and retry.');
+    alert('Could not remove photo. Please refresh and try again.');
   }
 }
 
 async function setHero(idx){
-  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) {
-    console.warn('[photos] setHero called with invalid idx:', idx);
+  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]){
+    console.warn('[photos] setHero invalid idx:', idx);
     return;
   }
-  if (idx === 0) {
-    showToast('Already the first photo');
-    return;
-  }
+  if (idx === 0){ showToast('Already the first photo'); return; }
   try {
-    const c = ShopDB.client;
-    const arr = MY_BIZ.photos.slice();
-    const hero = arr.splice(idx, 1)[0];
+    var c = ShopDB.client;
+    var arr = MY_BIZ.photos.slice();
+    var hero = arr.splice(idx, 1)[0];
     arr.unshift(hero);
-    const { error } = await c.from('businesses').update({ photos: arr }).eq('id', MY_BIZ.id);
-    if (error){
-      console.error('[photos] setHero DB error:', error);
-      alert('Could not set as first photo.\n\nReason: ' + (error.message || 'unknown'));
+    var dbRes = await c.from('businesses').update({ photos: arr }).eq('id', MY_BIZ.id);
+    if (dbRes.error){
+      console.error('[photos] setHero error:', dbRes.error);
+      alert('Could not set as first: ' + (dbRes.error.message || 'unknown'));
       return;
     }
     MY_BIZ.photos = arr;
@@ -844,26 +821,26 @@ async function setHero(idx){
     refreshBiz();
   } catch(err){
     console.error('[photos] setHero fatal:', err);
-    alert('Could not set as first photo. Please refresh the page and retry.');
+    alert('Could not set as first photo. Please refresh and try again.');
   }
 }
 
 async function refreshBiz(){
   try {
-    const c = ShopDB.client;
-    const { data: biz } = await c.from('businesses')
+    var c = ShopDB.client;
+    var res = await c.from('businesses')
       .select('id, slug, name, status, photos, verified_photo')
       .eq('id', MY_BIZ.id).maybeSingle();
-    if (biz){ MY_BIZ = biz; renderState(); }
+    if (res.data){ MY_BIZ = res.data; renderState(); }
   } catch(e){ console.warn('[photos] refresh failed', e); }
 }
 
 function showToast(msg){
-  let t = document.getElementById('photoToast');
+  var t = document.getElementById('photoToast');
   if (!t){
     t = document.createElement('div');
     t.id = 'photoToast';
-    t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10B981;color:#fff;padding:11px 22px;border-radius:12px;font-weight:700;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,.30);z-index:9999;font-family:Manrope,Inter,sans-serif;opacity:0;transition:opacity .25s ease';
+    t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10B981;color:#fff;padding:11px 22px;border-radius:12px;font-weight:700;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,0.30);z-index:9999;font-family:Manrope,Inter,sans-serif;opacity:0;transition:opacity .25s ease';
     document.body.appendChild(t);
   }
   t.textContent = msg;
