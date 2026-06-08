@@ -393,7 +393,11 @@ function renderState(){
 // ============================================================
 const dz = document.getElementById('dropzone');
 const fi = document.getElementById('fileInput');
-dz.addEventListener('click', () => fi.click());
+// Mobile bug fix: <label> for hidden input fires native click + our JS click = picker opens TWICE.
+// First click → user picks photo → change event fires.
+// Second queued click → picker re-opens after selection (the bug).
+// Fix: preventDefault on the label click so ONLY our JS fi.click() runs.
+dz.addEventListener('click', (e) => { e.preventDefault(); fi.click(); });
 fi.addEventListener('change', async () => {
   if (fi.files && fi.files.length){
     // CRITICAL: snapshot files into a real Array BEFORE clearing fi.value.
@@ -879,7 +883,7 @@ function showToast(msg){
 
 // ============================================================
 // INIT
-// ============================================================
+// ================
 window.addEventListener('DOMContentLoaded', function(){
   setLang(localStorage.getItem('shop_lang') || 'en');
   loadMyBusiness();

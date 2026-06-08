@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.9.2';  // bumped — FIX: snapshot files BEFORE clearing input (live FileList bug)
+const VERSION    = 'dukan-v1.9.3';  // bumped — Mobile gallery double-open fix (label + JS double-click)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
