@@ -396,9 +396,12 @@ const fi = document.getElementById('fileInput');
 dz.addEventListener('click', () => fi.click());
 fi.addEventListener('change', async () => {
   if (fi.files && fi.files.length){
-    const files = fi.files;
-    fi.value = '';  // Clear immediately so same photo can be re-picked
-    await handleFiles(files);
+    // CRITICAL: snapshot files into a real Array BEFORE clearing fi.value.
+    // fi.files is a LIVE FileList — setting fi.value = '' empties it,
+    // making the previously-captured reference appear empty too.
+    const filesArr = Array.from(fi.files);
+    fi.value = '';  // Now safe to clear so same photo can be re-picked
+    await handleFiles(filesArr);
   }
 });
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
@@ -415,9 +418,9 @@ const cam = document.getElementById('cameraInput');
 if (cam){
   cam.addEventListener('change', async () => {
     if (cam.files && cam.files.length){
-      const files = cam.files;
-      cam.value = '';  // Clear so same camera shot can re-trigger
-      await handleFiles(files);
+      const filesArr = Array.from(cam.files);
+      cam.value = '';
+      await handleFiles(filesArr);
     }
   });
 }
@@ -655,7 +658,13 @@ async function compressImage(file, maxBytes, forceConvert){
 // ============================================================
 async function handleFiles(files){
   if (!MY_BIZ){ alert('Shop not loaded yet. Please wait or refresh.'); return; }
-  if (!files || !files.length) return;
+  if (!files || !files.length) {
+    console.warn('[photos] handleFiles called with empty files list');
+    return;
+  }
+  // Expose to window for debugging
+  window.MY_BIZ = MY_BIZ;
+  console.log('[photos] handleFiles called with', files.length, 'file(s)');
 
   var existing = (MY_BIZ.photos || []).length;
   var slots = MAX_PHOTOS - existing;

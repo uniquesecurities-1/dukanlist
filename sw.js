@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.9.1';  // bumped — photo upload now uses /api/upload-shop-photo (server-side, bypasses RLS)
+const VERSION    = 'dukan-v1.9.2';  // bumped — FIX: snapshot files BEFORE clearing input (live FileList bug)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
