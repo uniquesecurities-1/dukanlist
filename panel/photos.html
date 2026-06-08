@@ -397,7 +397,11 @@ const fi = document.getElementById('fileInput');
 // First click → user picks photo → change event fires.
 // Second queued click → picker re-opens after selection (the bug).
 // Fix: preventDefault on the label click so ONLY our JS fi.click() runs.
-dz.addEventListener('click', (e) => { e.preventDefault(); fi.click(); });
+// NO JS click handler needed — the <label id="dropzone"> natively triggers
+// the wrapped <input id="fileInput"> on click/tap on ALL browsers.
+// Adding a JS click handler causes a double-fire (native + JS) which on
+// mobile reopens the gallery after photo selection. Removed entirely.
+// Reference held for drag-drop handlers below.
 fi.addEventListener('change', async () => {
   if (fi.files && fi.files.length){
     // CRITICAL: snapshot files into a real Array BEFORE clearing fi.value.
