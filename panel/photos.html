@@ -34,6 +34,84 @@
 
 <!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+
+<!-- Photo thumbnail grid styling — bulletproof, mobile-first -->
+<style>
+.photo-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:12px;
+  margin-top:10px;
+}
+.photo-thumb{
+  position:relative;
+  aspect-ratio:1/1;
+  background:#F1F5F9;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(15,23,42,0.08);
+  border:1.5px solid #E2E8F0;
+  cursor:default;
+}
+.photo-thumb img{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+.photo-thumb .x{
+  position:absolute; top:8px; right:8px;
+  width:32px; height:32px;
+  border-radius:50%;
+  background:rgba(239,68,68,0.95);
+  color:#fff;
+  border:2px solid #fff;
+  font-size:18px; font-weight:900;
+  line-height:1;
+  cursor:pointer;
+  display:grid; place-items:center;
+  z-index:2;
+  box-shadow:0 4px 12px rgba(239,68,68,0.5);
+  transition:transform .12s ease, background .12s ease;
+  font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+  padding:0;
+}
+.photo-thumb .x:hover{ transform:scale(1.1); background:#DC2626 }
+.photo-thumb .x:active{ transform:scale(.92) }
+.photo-thumb .hero-pill{
+  position:absolute; bottom:8px; left:8px;
+  background:linear-gradient(135deg,#F59E0B,#D97706);
+  color:#fff;
+  padding:3px 9px;
+  border-radius:99px;
+  font-size:.7rem; font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  box-shadow:0 2px 6px rgba(0,0,0,0.25);
+  z-index:2;
+}
+.photo-thumb .set-hero-btn{
+  position:absolute; bottom:8px; right:8px;
+  background:rgba(15,23,42,0.85);
+  color:#fff;
+  border:0;
+  padding:5px 11px;
+  border-radius:99px;
+  font-size:.72rem;
+  font-weight:700;
+  cursor:pointer;
+  display:none;
+  font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+  backdrop-filter:blur(8px);
+}
+.photo-thumb:hover .set-hero-btn,
+.photo-thumb:focus-within .set-hero-btn{ display:inline-block }
+.photo-thumb .set-hero-btn:hover{ background:#FF6B1A }
+@media (max-width:520px){
+  .photo-thumb .set-hero-btn{ display:inline-block } /* always visible on mobile */
+}
+</style>
 </head>
 <body>
 <!-- Impersonation banner -->
@@ -284,10 +362,29 @@ function renderState(){
   } else {
     grid.innerHTML = photos.map((p, i) => `
       <div class="photo-thumb">
-        <img src="${p}" alt="Shop photo ${i+1}">
-        <button class="x" onclick="deletePhoto(${i})" title="Remove">×</button>
+        <img src="${p}" alt="Shop photo ${i+1}" loading="lazy">
+        ${i === 0 ? '<div class="hero-pill">⭐ Hero</div>' : '<button type="button" class="set-hero-btn" data-idx="' + i + '" title="Make this the first photo">Set as 1st</button>'}
+        <button type="button" class="x" data-idx="${i}" title="Remove photo" aria-label="Remove photo ${i+1}">×</button>
       </div>
     `).join('');
+
+    // Wire up handlers via event delegation (more reliable than inline onclick)
+    grid.querySelectorAll('.x').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        removePhoto(idx);
+      });
+    });
+    grid.querySelectorAll('.set-hero-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        setHero(idx);
+      });
+    });
   }
 }
 
@@ -568,9 +665,17 @@ async function handleFiles(files){
     let userMsg = 'Could not upload ' + failCount + ' photo' + (failCount>1?'s':'') + '.\n\n';
     // Friendly translation of common Supabase Storage errors
     if (/schema is invalid|incompatible|schema cache/i.test(reason)){
-      userMsg += 'Server upload permissions are not set up correctly.\n\n' +
-                 'This is a one-time server fix. Please WhatsApp the team at +91 95412 23377 with this message:\n' +
-                 '"Photo upload — schema invalid. Run db/87 in Supabase."';
+      // This often means the SPECIFIC photo had an issue, not the server.
+      // Best advice: retry with a different image or use camera capture.
+      userMsg += 'This photo could not be processed. Common reasons:\n\n' +
+                 '  • Photo format is unusual (HEIC, HEIF, RAW)\n' +
+                 '  • File size still too large after compression\n' +
+                 '  • Image data is corrupt or partial\n\n' +
+                 'TRY THIS:\n' +
+                 '  1. Use the orange "Open Camera Now" button below — it always works\n' +
+                 '  2. Or pick a different photo (WhatsApp photos work great)\n' +
+                 '  3. Or save the photo to your phone gallery first, then upload\n\n' +
+                 'Already-uploaded photos are saved ✓';
     } else if (/not.found|404/i.test(reason)){
       userMsg += 'Storage bucket missing. Please contact support at +91 95412 23377.';
     } else if (/permission|denied|policy|rls|403/i.test(reason)){
@@ -617,28 +722,59 @@ async function uploadOne(file){
 }
 
 async function removePhoto(idx){
-  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) return;
+  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) {
+    console.warn('[photos] removePhoto called with invalid idx:', idx);
+    return;
+  }
   if (!confirm('Remove this photo?')) return;
-  const c = ShopDB.client;
-  const remaining = MY_BIZ.photos.filter((_, i) => i !== idx);
-  const { error } = await c.from('businesses').update({ photos: remaining }).eq('id', MY_BIZ.id);
-  if (error){ alert('Could not remove: ' + (error.message || 'unknown')); return; }
-  MY_BIZ.photos = remaining;
-  await refreshBiz();
-  showToast('Photo removed');
+  try {
+    const c = ShopDB.client;
+    const remaining = MY_BIZ.photos.filter((_, i) => i !== idx);
+    const { error } = await c.from('businesses').update({ photos: remaining }).eq('id', MY_BIZ.id);
+    if (error){
+      console.error('[photos] removePhoto DB error:', error);
+      alert('Could not remove photo.\n\nReason: ' + (error.message || 'unknown') + '\n\nPlease retry or refresh the page.');
+      return;
+    }
+    MY_BIZ.photos = remaining;
+    renderState();  // immediate UI update
+    showToast('Photo removed ✓');
+    // Background refresh for consistency
+    refreshBiz();
+  } catch(err){
+    console.error('[photos] removePhoto fatal:', err);
+    alert('Could not remove photo. Please refresh the page and retry.');
+  }
 }
 
 async function setHero(idx){
-  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) return;
-  const c = ShopDB.client;
-  const arr = MY_BIZ.photos.slice();
-  const hero = arr.splice(idx, 1)[0];
-  arr.unshift(hero);
-  const { error } = await c.from('businesses').update({ photos: arr }).eq('id', MY_BIZ.id);
-  if (error){ alert('Could not set hero: ' + (error.message || 'unknown')); return; }
-  MY_BIZ.photos = arr;
-  await refreshBiz();
-  showToast('Set as first photo ✓');
+  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]) {
+    console.warn('[photos] setHero called with invalid idx:', idx);
+    return;
+  }
+  if (idx === 0) {
+    showToast('Already the first photo');
+    return;
+  }
+  try {
+    const c = ShopDB.client;
+    const arr = MY_BIZ.photos.slice();
+    const hero = arr.splice(idx, 1)[0];
+    arr.unshift(hero);
+    const { error } = await c.from('businesses').update({ photos: arr }).eq('id', MY_BIZ.id);
+    if (error){
+      console.error('[photos] setHero DB error:', error);
+      alert('Could not set as first photo.\n\nReason: ' + (error.message || 'unknown'));
+      return;
+    }
+    MY_BIZ.photos = arr;
+    renderState();
+    showToast('Set as first photo ✓');
+    refreshBiz();
+  } catch(err){
+    console.error('[photos] setHero fatal:', err);
+    alert('Could not set as first photo. Please refresh the page and retry.');
+  }
 }
 
 async function refreshBiz(){
