@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.8.6';  // bumped — SEO MEGA Pack: BreadcrumbList + FAQ + HowTo + Hreflang + dynamic search titles + locality link strip
+const VERSION    = 'dukan-v1.8.7';  // bumped — Photo upload fix: shop-photos bucket name + actionable error UI
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

@@ -553,6 +553,9 @@ async function handleFiles(files){
     } catch(err){
       console.error('[photos] upload failed for', f.name, err);
       failCount++;
+      // Capture the most useful error message to show user
+      const msg = err && (err.message || err.error || err.statusText) || String(err);
+      window._lastUploadError = msg;
     }
   }
 
@@ -561,7 +564,25 @@ async function handleFiles(files){
     showToast(okCount + ' photo' + (okCount>1?'s':'') + ' uploaded ✓');
   }
   if (failCount > 0){
-    alert(failCount + ' photo' + (failCount>1?'s':'') + ' could not be uploaded. Please try a different image.');
+    const reason = window._lastUploadError || 'Unknown error';
+    let userMsg = 'Could not upload ' + failCount + ' photo' + (failCount>1?'s':'') + '.\n\n';
+    // Friendly translation of common Supabase Storage errors
+    if (/not.found|404/i.test(reason)){
+      userMsg += 'Storage bucket missing. Please contact support.';
+    } else if (/permission|denied|policy|rls|403/i.test(reason)){
+      userMsg += 'Permission denied. Please log out and log in again, then retry.';
+    } else if (/payload too large|413/i.test(reason)){
+      userMsg += 'Photo too large even after compression. Try a smaller image.';
+    } else if (/duplicate|already exists|409/i.test(reason)){
+      userMsg += 'Same photo already uploaded. Try a different one.';
+    } else if (/network|fetch|timeout/i.test(reason)){
+      userMsg += 'Network slow or offline. Please check connection and retry.';
+    } else if (/auth|jwt|token|unauthorized|401/i.test(reason)){
+      userMsg += 'Login session expired. Please log out and log in again.';
+    } else {
+      userMsg += 'Reason: ' + reason + '\n\nTry: (1) a different image, (2) take a fresh photo via Camera button, or (3) log out + back in.';
+    }
+    alert(userMsg);
   }
   // Refresh state from server
   await refreshBiz();
@@ -573,13 +594,13 @@ async function uploadOne(file){
   if (!user) throw new Error('Not authenticated');
   const ext = 'jpg';
   const path = MY_BIZ.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-  const { error: upErr } = await c.storage.from('business-photos').upload(path, file, {
+  const { error: upErr } = await c.storage.from('shop-photos').upload(path, file, {
     contentType: 'image/jpeg',
     cacheControl: '3600',
     upsert: false
   });
   if (upErr) throw upErr;
-  const { data: pub } = c.storage.from('business-photos').getPublicUrl(path);
+  const { data: pub } = c.storage.from('shop-photos').getPublicUrl(path);
   const url = pub.publicUrl;
   // Append to businesses.photos array
   const newPhotos = (MY_BIZ.photos || []).concat([url]);
