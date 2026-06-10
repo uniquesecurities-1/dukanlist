@@ -1,7 +1,7 @@
 {
   "version": "3.4",
-  "updated": "2026-06-04T05:09:00.214669Z",
-  "note": "v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL.",
+  "updated": "2026-06-08",
+  "note": "v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL. [db/123: 6 duplicate slugs merged]",
   "parents": [
     {
       "slug": "healthcare",
@@ -246,14 +246,44 @@
           "name": "Fancy Lights",
           "name_hi": "फैंसी लाइट्स",
           "icon": "✨",
-          "keywords": ["chandelier","decorative lights","fairy lights","ceiling lights","wall lights","jhumar","pendant light","designer light","party lights","string lights","झूमर","फैंसी लाइट"]
+          "keywords": [
+            "chandelier",
+            "decorative lights",
+            "fairy lights",
+            "ceiling lights",
+            "wall lights",
+            "jhumar",
+            "pendant light",
+            "designer light",
+            "party lights",
+            "string lights",
+            "झूमर",
+            "फैंसी लाइट"
+          ]
         },
         {
           "slug": "home-decor",
           "name": "Home Decor",
           "name_hi": "होम डेकोर",
           "icon": "🖼️",
-          "keywords": ["wall art","showpiece","vase","wallpaper","curtains","cushion","rugs","carpets","artificial plants","decoration items","interior items","wall hanging","photo frame","gift items","होम डेकोर","सजावट"]
+          "keywords": [
+            "wall art",
+            "showpiece",
+            "vase",
+            "wallpaper",
+            "curtains",
+            "cushion",
+            "rugs",
+            "carpets",
+            "artificial plants",
+            "decoration items",
+            "interior items",
+            "wall hanging",
+            "photo frame",
+            "gift items",
+            "होम डेकोर",
+            "सजावट"
+          ]
         },
         {
           "slug": "solar-inverter",
@@ -460,12 +490,6 @@
           "icon": "🍬"
         },
         {
-          "slug": "bakery",
-          "name": "Bakery / Cake Shop",
-          "name_hi": "बेकरी / केक शॉप",
-          "icon": "🎂"
-        },
-        {
           "slug": "tiffin-service",
           "name": "Tiffin / Mess Service",
           "name_hi": "टिफिन सर्विस / मेस",
@@ -583,12 +607,6 @@
       "color": "#16A34A",
       "subs": [
         {
-          "slug": "grocery",
-          "name": "Grocery / Kirana Store",
-          "name_hi": "किराना स्टोर",
-          "icon": "🛒"
-        },
-        {
           "slug": "clothes",
           "name": "Clothes / Tailor",
           "name_hi": "कपड़ा / दर्ज़ी",
@@ -617,12 +635,6 @@
           "name": "Electronics / Appliances",
           "name_hi": "इलेक्ट्रॉनिक्स",
           "icon": "📺"
-        },
-        {
-          "slug": "footwear",
-          "name": "Footwear / Shoes",
-          "name_hi": "जूते / चप्पल",
-          "icon": "👞"
         },
         {
           "slug": "stationery",
@@ -749,12 +761,6 @@
           "name": "Photocopy / Cyber Cafe",
           "name_hi": "फोटोकॉपी / साइबर",
           "icon": "🖨️"
-        },
-        {
-          "slug": "gift-stationery",
-          "name": "Gift Shop / Cards",
-          "name_hi": "गिफ्ट / कार्ड शॉप",
-          "icon": "🎁"
         },
         {
           "slug": "toy-shop",
@@ -905,12 +911,6 @@
           "name": "RO / Aquaguard Sales Showroom",
           "name_hi": "RO / एक्वागार्ड शोरूम",
           "icon": "💧"
-        },
-        {
-          "slug": "plant-nursery",
-          "name": "Plant Nursery / Garden Centre",
-          "name_hi": "पौधा नर्सरी",
-          "icon": "🌱"
         },
         {
           "slug": "pet-shop",
@@ -1207,12 +1207,6 @@
           "name": "Library / Study Center",
           "name_hi": "लाइब्रेरी / स्टडी सेंटर",
           "icon": "📚"
-        },
-        {
-          "slug": "music-class",
-          "name": "Music / Dance Class",
-          "name_hi": "संगीत / नृत्य",
-          "icon": "🎵"
         },
         {
           "slug": "computer-class",

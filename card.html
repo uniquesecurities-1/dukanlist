@@ -409,14 +409,59 @@ async function photoToBase64(url){
 }
 
 function downloadVCard(vcfText, filename){
-  var blob = new Blob([vcfText], { type: 'text/vcard;charset=utf-8' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = (filename || 'contact') + '.vcf';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  // Detect platform — iOS handles vCard download poorly via blob URLs.
+  // iOS Safari needs a navigation to a data: URL to trigger the "Add Contact" sheet.
+  // Android downloads .vcf fine via blob + download attribute.
+  var ua = (navigator.userAgent || '').toLowerCase();
+  var isIOS = /iphone|ipad|ipod/.test(ua) || (ua.indexOf('mac') >= 0 && navigator.maxTouchPoints > 1);
+  var safeName = (filename || 'contact') + '.vcf';
+
+  // METHOD 1 (Android, Desktop): blob + <a download>
+  // METHOD 2 (iOS): navigate to data: URL — iOS detects vCard MIME and prompts user
+  try {
+    if (isIOS) {
+      // iOS: use data URL so Safari triggers "Add Contact" sheet
+      var b64;
+      try {
+        // Use TextEncoder + btoa for proper UTF-8 base64 (handles names with Hindi/emoji)
+        var bytes = new TextEncoder().encode(vcfText);
+        var bin = '';
+        for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        b64 = btoa(bin);
+      } catch(e) {
+        b64 = btoa(unescape(encodeURIComponent(vcfText)));  // legacy fallback
+      }
+      var dataUrl = 'data:text/vcard;charset=utf-8;base64,' + b64;
+      // Open in new tab so user can tap "Add Contact" without losing the page
+      var w = window.open(dataUrl, '_blank');
+      if (!w) {
+        // Popup blocked — fall back to direct navigation
+        window.location.href = dataUrl;
+      }
+      return;
+    }
+    // Android / Desktop: blob download (browser handles native .vcf import)
+    var blob = new Blob([vcfText], { type: 'text/vcard;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = safeName;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){
+      try { document.body.removeChild(a); } catch(_){}
+      try { URL.revokeObjectURL(url); } catch(_){}
+    }, 200);
+  } catch(err) {
+    // Final fallback: data URL navigation works everywhere
+    try {
+      var fallbackUrl = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcfText);
+      window.location.href = fallbackUrl;
+    } catch(_){
+      alert('Could not download contact. Please copy the details manually.');
+    }
+  }
 }
 
 window.CARD_DATA = null;

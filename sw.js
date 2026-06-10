@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.9.4';  // bumped — Mobile gallery fix v2: removed JS click handler, label handles natively
+const VERSION    = 'dukan-v1.9.5';  // bumped — Search dedup categories + Digital Card iOS vCard fix
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
