@@ -408,6 +408,67 @@ async function photoToBase64(url){
   } catch(e){ return null; }
 }
 
+// Big visual modal explaining what to do after download
+function showSaveInstructions(isIOS, isAndroid, d){
+  var existing = document.getElementById('saveInstrOverlay');
+  if (existing) existing.remove();
+
+  var steps;
+  if (isIOS){
+    steps = [
+      ['📥', 'Contact downloaded', 'A vCard file just saved to Files app'],
+      ['📂', 'Open Files app', 'Find "' + (d.displayName || 'contact') + '.vcf" in Downloads'],
+      ['✅', 'Tap "Add Contact"', 'iPhone will prompt to save → tap to finish']
+    ];
+  } else if (isAndroid){
+    steps = [
+      ['📥', 'Contact downloaded', 'Check the download notification at top'],
+      ['👆', 'Tap the notification', 'Or open Files/Downloads → ' + (d.displayName || 'contact') + '.vcf'],
+      ['📇', '"Open with Contacts"', 'Pick Contacts app → contact saved instantly']
+    ];
+  } else {
+    steps = [
+      ['📥', 'Contact downloaded', '.vcf file saved to Downloads'],
+      ['👆', 'Double-click the file', 'Opens in your default address book'],
+      ['📇', 'Click Save/Import', 'Contact added to address book']
+    ];
+  }
+
+  var stepsHtml = steps.map(function(s, i){
+    return '<div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.10)">' +
+             '<div style="width:42px;height:42px;border-radius:50%;background:rgba(251,191,36,.18);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0;border:2px solid rgba(251,191,36,.40)">' + s[0] + '</div>' +
+             '<div style="flex:1;min-width:0">' +
+               '<div style="font-weight:800;color:#fff;font-size:.98rem;margin-bottom:2px;letter-spacing:-.01em">Step ' + (i+1) + ': ' + s[1] + '</div>' +
+               '<div style="font-size:.84rem;color:rgba(255,255,255,.78);line-height:1.45">' + s[2] + '</div>' +
+             '</div>' +
+           '</div>';
+  }).join('');
+
+  var overlay = document.createElement('div');
+  overlay.id = 'saveInstrOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s ease;font-family:Manrope,Inter,sans-serif';
+  overlay.innerHTML =
+    '<div style="background:linear-gradient(135deg,#1E1B4B,#312E81);border-radius:24px;padding:24px 22px 22px;max-width:380px;width:100%;border:1.5px solid rgba(251,191,36,.30);box-shadow:0 20px 60px rgba(0,0,0,.50)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">' +
+        '<div>' +
+          '<div style="font-size:.72rem;font-weight:800;color:#FBBF24;letter-spacing:.10em;text-transform:uppercase">Almost done!</div>' +
+          '<div style="font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:-.02em;margin-top:2px">Save to Contacts</div>' +
+        '</div>' +
+        '<button onclick="document.getElementById(\'saveInstrOverlay\').remove()" style="background:rgba(255,255,255,.10);border:0;width:34px;height:34px;border-radius:50%;color:#fff;cursor:pointer;font-size:1.1rem;line-height:1">×</button>' +
+      '</div>' +
+      stepsHtml +
+      '<button onclick="document.getElementById(\'saveInstrOverlay\').remove()" style="width:100%;margin-top:18px;background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#1E1B4B;border:0;padding:13px;border-radius:12px;font-weight:900;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:-.01em">Got it!</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  if (!document.getElementById('saveInstrStyle')){
+    var s = document.createElement('style');
+    s.id = 'saveInstrStyle';
+    s.textContent = '@keyframes fadeIn{from{opacity:0}to{opacity:1}}';
+    document.head.appendChild(s);
+  }
+}
+
 function downloadVCard(vcfText, filename){
   // Detect platform — iOS handles vCard download poorly via blob URLs.
   // iOS Safari needs a navigation to a data: URL to trigger the "Add Contact" sheet.
@@ -609,13 +670,31 @@ async function saveContact(){
 
   // ============================================================
   // STRATEGY 1: Web Share API with file — BEST for Android/iOS.
-  // Must run SYNCHRONOUSLY after the user click — no awaits before.
+  // Must run SYNCHRONOUSLY after the user click.
+  // Android Chrome blocks some MIME types — try alternates in order.
   // ============================================================
   var sharedViaApi = false;
+  console.log('[saveContact] Attempting share. canShare available?', !!navigator.canShare);
   try {
     if (navigator.canShare && typeof File !== 'undefined') {
-      var vcfFile = new File([vcf], safeName + '.vcf', { type: 'text/vcard' });
-      if (navigator.canShare({ files: [vcfFile] })) {
+      // Try multiple MIME types — Chrome on Android sometimes blocks text/vcard
+      var mimeAttempts = ['text/vcard', 'text/x-vcard', 'text/directory', 'text/plain'];
+      var vcfFile = null;
+      var pickedMime = null;
+      for (var mi = 0; mi < mimeAttempts.length; mi++){
+        var trial = new File([vcf], safeName + '.vcf', { type: mimeAttempts[mi] });
+        var ok = false;
+        try { ok = navigator.canShare({ files: [trial] }); } catch(_){ ok = false; }
+        console.log('[saveContact] canShare', mimeAttempts[mi], '→', ok);
+        if (ok){
+          vcfFile = trial;
+          pickedMime = mimeAttempts[mi];
+          break;
+        }
+      }
+
+      if (vcfFile){
+        console.log('[saveContact] Sharing with MIME:', pickedMime);
         // Fire share() IMMEDIATELY — user gesture still active here.
         var sharePromise = navigator.share({
           files: [vcfFile],
@@ -625,36 +704,31 @@ async function saveContact(){
         btn.textContent = '📲 Opening share sheet…';
         await sharePromise;
         sharedViaApi = true;
+        console.log('[saveContact] Share completed successfully');
+      } else {
+        console.warn('[saveContact] No MIME type accepted by canShare — falling through to download');
       }
+    } else {
+      console.warn('[saveContact] navigator.canShare not available');
     }
   } catch (e) {
     console.warn('[saveContact] Web Share failed:', e && e.name, e && e.message);
     if (e && e.name === 'AbortError') {
-      // User dismissed the share sheet — don't fall through to download
       btn.className = 'save-cta';
       btn.textContent = '📥 Save ' + ((d.displayName || d.business_name || '').split(/\s+/).slice(0,2).join(' ')) + ' to my Contacts';
       return;
     }
-    // Any other error → fall through to download
   }
 
   // ============================================================
-  // STRATEGY 2: Platform-specific fallback
+  // STRATEGY 2: Platform-specific fallback with VISUAL guide
   // ============================================================
   if (!sharedViaApi) {
     btn.textContent = '⏳ Opening contact…';
     downloadVCard(vcf, safeName);
 
-    // Show platform-specific instructions
-    var instructionMsg;
-    if (isIOS) {
-      instructionMsg = '✓ Tap "Add Contact" on the next screen';
-    } else if (isAndroid) {
-      instructionMsg = '✓ Check notifications → tap to open in Contacts';
-    } else {
-      instructionMsg = '✓ Contact file downloaded — open to import';
-    }
-    toast(instructionMsg);
+    // Show a BIG overlay with clear next-step instructions
+    showSaveInstructions(isIOS, isAndroid, d);
   }
 
   // Visual confirmation
