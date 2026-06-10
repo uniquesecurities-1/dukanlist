@@ -1064,10 +1064,11 @@ function normIN(raw){
   // Final length sanity
   return d.length === 10 ? d : d;
 }
-// tel: href — use raw 10-digit, dialer will accept it
+// tel: href — always use E.164 format (+91 prefix) for universal dialer compatibility.
+// Without "+", a 12-digit "919541223377" gets interpreted as "91 9541223377" (wrong number).
 function telHref(raw){
   var d = normIN(raw);
-  return d ? 'tel:' + d : '';
+  return d ? 'tel:+91' + d : '';
 }
 // wa.me href — needs 91 country code prefix, exactly once
 function waHref(raw){

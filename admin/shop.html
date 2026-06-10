@@ -237,8 +237,8 @@ function render(){
           + '</div>'
           + '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'
             + '<a class="btn sm" target="_blank" href="/business.html?slug=' + esc(s.slug) + '">🌐 View Public Page →</a>'
-            + (s.mobile ? '<a class="btn sm" href="tel:' + esc(s.mobile) + '">📞 Call ' + esc(s.mobile) + '</a>' : '')
-            + (s.whatsapp || s.mobile ? '<a class="btn sm" target="_blank" href="https://wa.me/91' + esc(s.whatsapp || s.mobile) + '">💬 WhatsApp Owner</a>' : '')
+            + (s.mobile ? '<a class="btn sm" href="tel:+91' + (function(r){var d=String(r||'').replace(/[^0-9]/g,'');if(d.length===12&&d.slice(0,2)==='91')d=d.slice(2);else if(d.length===11&&d.charAt(0)==='0')d=d.slice(1);return d;})(s.mobile) + '">📞 Call ' + esc(s.mobile) + '</a>' : '')
+            + (s.whatsapp || s.mobile ? '<a class="btn sm" target="_blank" href="https://wa.me/91' + (function(r){var d=String(r||'').replace(/[^0-9]/g,'');if(d.length===12&&d.slice(0,2)==='91')d=d.slice(2);else if(d.length===11&&d.charAt(0)==='0')d=d.slice(1);return d;})(s.whatsapp || s.mobile) + '">💬 WhatsApp Owner</a>' : '')
           + '</div>'
         + '</div>'
         + '<hr>'

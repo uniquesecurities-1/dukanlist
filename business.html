@@ -2004,7 +2004,10 @@ function render(){
   document.getElementById('ctaWa').href = `https://wa.me/${wa}?text=${waMsg}`;
   document.getElementById('ctaWa').addEventListener('click', () => logLead('whatsapp'));
 
-  document.getElementById('ctaCall').href = `tel:${b.mobile}`;
+  // Normalize phone to 10-digit Indian, then prepend +91 E.164 format.
+  // Avoids the bug where stored 12-digit numbers like "919541223377"
+  // get dialed as "91 9541223377" (wrong) when used directly.
+  document.getElementById('ctaCall').href = 'tel:+91' + normIndianPhone(b.mobile);
   document.getElementById('ctaCall').addEventListener('click', () => logLead('call'));
 
   const mapsQ = encodeURIComponent(addrParts.join(', '));
@@ -2108,7 +2111,7 @@ function render(){
   const sWa = document.getElementById('mmtStickyWa');
   const sPhone = document.getElementById('stickyPhone');
   const sStatus = document.getElementById('stickyStatus');
-  if (sCall) sCall.href = 'tel:' + b.mobile;
+  if (sCall) sCall.href = 'tel:+91' + normIndianPhone(b.mobile);
   if (sWa)   sWa.href = `https://wa.me/${wa}?text=${waMsg}`;
   // Format phone like +91 95412 23377
   if (sPhone && b.mobile){
@@ -2631,6 +2634,16 @@ async function renderDetailTrustStrip(b){
     }
     return '<span class="dt-pill ' + (p.cls || '') + '">' + inner + '</span>';
   }).join('');
+}
+
+// Normalize any Indian phone variant → clean 10-digit national number.
+// Handles: "9541223377", "+919541223377", "919541223377", "09541223377",
+// "+91 95412 23377", numbers with hyphens/spaces. Returns 10-digit or ''.
+function normIndianPhone(raw){
+  var d = String(raw || '').replace(/[^0-9]/g, '');
+  if (d.length === 12 && d.slice(0, 2) === '91') d = d.slice(2);
+  else if (d.length === 11 && d.charAt(0) === '0') d = d.slice(1);
+  return d.length === 10 ? d : d;
 }
 
 async function logLead(action){

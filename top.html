@@ -246,9 +246,12 @@
     const photo = b.photo
       ? '<img src="' + escAttr(b.photo) + '" alt="' + escAttr(b.name) + '" loading="lazy">'
       : '<span>🏪</span>';
-    const phone = (b.mobile || '').replace(/\D/g, '');
-    const wa    = (b.whatsapp || b.mobile || '').replace(/\D/g, '');
-    const callBtn = phone ? '<a class="seo-btn call" href="tel:' + escAttr(phone) + '">📞 Call</a>' : '';
+    // Normalize to clean 10-digit Indian, prepend +91 for tel/wa to avoid
+    // double-91 and dialer misinterpretation bugs.
+    const _norm = function(r){var d=String(r||'').replace(/[^0-9]/g,'');if(d.length===12&&d.slice(0,2)==='91')d=d.slice(2);else if(d.length===11&&d.charAt(0)==='0')d=d.slice(1);return d;};
+    const phone = _norm(b.mobile);
+    const wa    = _norm(b.whatsapp || b.mobile);
+    const callBtn = phone ? '<a class="seo-btn call" href="tel:+91' + escAttr(phone) + '">📞 Call</a>' : '';
     const waBtn   = wa    ? '<a class="seo-btn wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WA</a>' : '';
     const verifiedBadge = b.verified ? '<span class="ver">✓ Verified</span>' : '';
     const rating = (b.rating_count > 0)

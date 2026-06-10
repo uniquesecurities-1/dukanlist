@@ -249,7 +249,7 @@ function renderShopRow(b){
     : '<span class="ony-row-emoji">🏪</span>';
   const phone = normIN(b.mobile);
   const wa    = normIN(b.whatsapp || b.mobile);
-  const phoneBtn = phone ? '<a class="ony-act call" href="tel:' + escAttr(phone) + '">📞 Call</a>' : '';
+  const phoneBtn = phone ? '<a class="ony-act call" href="tel:+91' + escAttr(phone) + '">📞 Call</a>' : '';
   const waBtn   = wa    ? '<a class="ony-act wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '';
   return '' +
     '<a class="ony-row" href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '">' +
