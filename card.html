@@ -566,6 +566,10 @@ function render(d){
     + '<button class="save-cta" id="saveBtn" onclick="saveContact()">'
     +   '📥 Save ' + escapeHtml((d.displayName || d.business_name).split(/\s+/).slice(0,2).join(' ')) + ' to my Contacts'
     + '</button>'
+    + '<div class="save-hint" style="font-size:.78rem;color:rgba(255,255,255,.78);text-align:center;margin-top:8px;line-height:1.45">'
+    +   '💡 Tap the button → your phone will show '
+    +   '<b style="color:#FBBF24">"Add Contact"</b> screen → tap to save'
+    + '</div>'
     + '<div class="quick-actions" style="grid-template-columns:repeat(' + (mapsUrl ? 4 : 3) + ', 1fr)">'
     + (d.mobile ? '<a class="qa" href="tel:+91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.mobile) + '"><span class="qa-ico">📞</span>Call</a>' : '<span></span>')
     + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
@@ -581,20 +585,79 @@ async function saveContact(){
   if (!d){ toast('Card not loaded yet'); return; }
   var btn = document.getElementById('saveBtn');
   btn.textContent = '⏳ Preparing contact…';
-  // Try to embed photo (best-effort, doesn't block)
+
+  // Embed photo (best-effort)
   if (d.photo_url && !d.photo_data){
     try { d.photo_data = await photoToBase64(d.photo_url); } catch(_){}
   }
   var vcf = buildVCard(d);
   var safeName = (d.displayName || d.business_name || 'contact').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,40);
-  downloadVCard(vcf, safeName);
+
+  var ua = (navigator.userAgent || '').toLowerCase();
+  var isIOS = /iphone|ipad|ipod/.test(ua) || (ua.indexOf('mac') >= 0 && navigator.maxTouchPoints > 1);
+  var isAndroid = /android/.test(ua);
+
+  // ============================================================
+  // STRATEGY 1: Web Share API with file — BEST for Android.
+  // Triggers native share sheet which has "Contacts" as a target.
+  // User taps Contacts → "Add contact" form pre-filled.
+  // ============================================================
+  var sharedViaApi = false;
+  try {
+    if (navigator.canShare && typeof File !== 'undefined') {
+      var vcfFile = new File([vcf], safeName + '.vcf', { type: 'text/vcard' });
+      if (navigator.canShare({ files: [vcfFile] })) {
+        btn.textContent = '📲 Opening share sheet…';
+        await navigator.share({
+          files: [vcfFile],
+          title: 'Add ' + (d.displayName || d.business_name || 'contact'),
+          text: 'Tap "Contacts" to save'
+        });
+        sharedViaApi = true;
+      }
+    }
+  } catch (e) {
+    // User cancelled OR sharing failed — fall through to other strategies
+    if (e && e.name === 'AbortError') {
+      btn.className = 'save-cta';
+      btn.textContent = '📥 Save ' + ((d.displayName || d.business_name || '').split(/\s+/).slice(0,2).join(' ')) + ' to my Contacts';
+      return;
+    }
+  }
+
+  // ============================================================
+  // STRATEGY 2: Platform-specific fallback
+  // ============================================================
+  if (!sharedViaApi) {
+    btn.textContent = '⏳ Opening contact…';
+    downloadVCard(vcf, safeName);
+
+    // Show platform-specific instructions
+    var instructionMsg;
+    if (isIOS) {
+      instructionMsg = '✓ Tap "Add Contact" on the next screen';
+    } else if (isAndroid) {
+      instructionMsg = '✓ Check notifications → tap to open in Contacts';
+    } else {
+      instructionMsg = '✓ Contact file downloaded — open to import';
+    }
+    toast(instructionMsg);
+  }
+
+  // Visual confirmation
   btn.className = 'save-cta success';
-  btn.textContent = '✓ Saved! Check your contacts';
-  toast('Contact downloaded — phone will prompt to save');
+  btn.textContent = sharedViaApi ? '✓ Share opened — pick Contacts' : '✓ Contact ready to add';
   setTimeout(function(){
     btn.className = 'save-cta';
     btn.textContent = '📥 Save again';
-  }, 4000);
+  }, 5000);
+
+  // Track save action
+  try {
+    if (window.ShopDB && ShopDB.client && d.id) {
+      ShopDB.client.rpc('log_lead', { p_business_id: d.id, p_action: 'card_save' }).catch(function(){});
+    }
+  } catch(_){}
 }
 
 async function loadCard(){

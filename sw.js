@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.9.6';  // bumped — Phone tel: links normalized to +91 E.164 (fixes wrong-number bug)
+const VERSION    = 'dukan-v1.9.7';  // bumped — Digital Card uses Web Share API for direct-to-contacts UX
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
