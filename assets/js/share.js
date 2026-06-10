@@ -96,20 +96,73 @@
 
   // ---- Inline button HTML helper (for cards) ----
   // Use: ${DukanShare.btn({slug, name, city, category})}
+  //
+  // SAFETY: We do NOT inline shop data into onclick anymore. Apostrophes
+  // (L'Oreal, Women's Health, Don't) in JSON inlined into onclick="..."
+  // produce "Uncaught SyntaxError: Unexpected identifier 's'" at click
+  // time because the HTML parser decodes &quot; → " BEFORE the JS parser
+  // sees the attribute value, so a single apostrophe inside the JSON
+  // ends up adjacent to identifiers in the JS context.
+  // Instead, we store data via HTML-safe attributes (escape EVERY char
+  // properly through textContent → HTML encoding) and bind clicks via a
+  // single delegated event listener.
+  function htmlEscape(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
   function btn(b, opts){
     opts = opts || {};
     var size = opts.size || 'sm'; // sm or md
-    var bSafe = JSON.stringify({ slug:b.slug||'', id:b.id||'', name:b.name||'', city:b.city||'', category:b.category||'' })
-      .replace(/"/g, '&quot;');
     var px = size === 'md' ? '10px 14px' : '6px 10px';
     var fs = size === 'md' ? '14px' : '12px';
-    return '<button type="button" onclick="DukanShare.whatsapp(event, ' + bSafe + ')" '
-      + 'title="Share on WhatsApp" aria-label="Share on WhatsApp" '
-      + 'style="display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;'
+    // Encode each field separately into its own attribute. Even if any
+    // field contains apostrophes, double-quotes, or angle brackets, the
+    // HTML-attribute escaping keeps the markup valid AND the JS parser
+    // never sees user data — clicks go through a clean delegated handler.
+    return '<button type="button" class="dukan-share-btn"'
+      + ' data-slug="'     + htmlEscape(b.slug     || '') + '"'
+      + ' data-id="'       + htmlEscape(b.id       || '') + '"'
+      + ' data-name="'     + htmlEscape(b.name     || '') + '"'
+      + ' data-city="'     + htmlEscape(b.city     || '') + '"'
+      + ' data-category="' + htmlEscape(b.category || '') + '"'
+      + ' title="Share on WhatsApp" aria-label="Share on WhatsApp"'
+      + ' style="display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;'
       + 'border:0;border-radius:8px;padding:' + px + ';font-size:' + fs + ';font-weight:700;'
       + 'cursor:pointer;line-height:1;box-shadow:0 1px 3px rgba(37,211,102,.35);'
       + 'transition:transform .12s">'
       + '<span style="font-size:1.1em">💬</span><span>Share</span></button>';
+  }
+
+  // ---- One delegated click handler for every DukanShare button ----
+  // Mounts once. Reads data-* attributes from the clicked button and
+  // calls whatsapp(). Apostrophes in data are never an issue because
+  // dataset values are plain strings, not parsed as code.
+  function ensureDelegate(){
+    if (window.__dukanShareDelegateBound) return;
+    window.__dukanShareDelegateBound = true;
+    document.addEventListener('click', function(ev){
+      var t = ev.target;
+      // Walk up to find the share button if user clicked its inner span
+      while (t && t !== document.body && !(t.classList && t.classList.contains('dukan-share-btn'))){
+        t = t.parentNode;
+      }
+      if (!t || !t.classList || !t.classList.contains('dukan-share-btn')) return;
+      var ds = t.dataset || {};
+      whatsapp(ev, {
+        slug:     ds.slug     || '',
+        id:       ds.id       || '',
+        name:     ds.name     || '',
+        city:     ds.city     || '',
+        category: ds.category || ''
+      });
+    });
+  }
+  // Bind as soon as DOM is ready (or immediately if it's already past)
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ensureDelegate);
+  } else {
+    ensureDelegate();
   }
 
   global.DukanShare = {

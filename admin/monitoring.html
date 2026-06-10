@@ -227,14 +227,36 @@ function renderTable(d){
     host.innerHTML = '<div class="empty"><div class="empty-emoji">🎉</div>No errors in the last ' + (d.window_hours||24) + ' hours. Everything looks healthy.</div>';
     return;
   }
+  // Extract first useful "file:line:col" frame out of a JS stack string.
+  // Handles V8 ("at functionName (https://.../file.js:1234:56)") and
+  // Firefox ("functionName@https://.../file.js:1234:56") formats.
+  function firstFrame(stk){
+    if (!stk) return null;
+    const lines = stk.split('\n');
+    for (let i = 0; i < lines.length; i++){
+      const m = lines[i].match(/((?:https?:\/\/|\/)[^\s()]+?):(\d+):(\d+)/);
+      if (m){
+        const url = m[1].replace(/^https?:\/\/[^/]+/, ''); // strip origin
+        return { url, line: m[2], col: m[3] };
+      }
+    }
+    return null;
+  }
   const rows = errors.map(e => {
     const sevCls = 'sev-' + (e.severity || 'error');
     const pagesHtml = (e.pages || []).slice(0, 3).map(p => '<span class="page-pill">' + escapeHtml(shortPage(p)) + '</span>').join('');
+    const frame = firstFrame(e.latest_stack || '');
+    const frameHtml = frame
+      ? '<div style="margin-top:6px;font-family:\'SFMono-Regular\',Consolas,monospace;font-size:11px;color:#0F172A;background:#FEF3C7;display:inline-block;padding:3px 7px;border-radius:5px"><b>'
+        + escapeHtml(frame.url) + '</b>:<span style="color:#B91C1C">' + escapeHtml(frame.line)
+        + '</span>:<span style="color:#B91C1C">' + escapeHtml(frame.col) + '</span></div>'
+      : '';
     return `<tr>
       <td><span class="sev ${sevCls}">${escapeHtml(e.severity || 'error')}</span></td>
       <td><span class="count-pill">${e.occurrences || 0}</span><br><small style="color:#94A3B8">${e.affected_users || 0} user${e.affected_users===1?'':'s'}</small></td>
       <td>
         <div class="err-msg">${escapeHtml(e.error_msg || '')}</div>
+        ${frameHtml}
         <div class="pages-pills">${pagesHtml}</div>
         ${e.latest_stack ? '<details style="margin-top:6px"><summary style="cursor:pointer;font-size:11px;color:#64748B">stack ▾</summary><pre class="err-stack">' + escapeHtml(e.latest_stack) + '</pre></details>' : ''}
       </td>

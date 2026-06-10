@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.9.9';  // bumped — Digital Card: try multi-MIME for share + visual save-steps modal on fallback
+const VERSION    = 'dukan-v2.0.0';  // bumped — Share button: data-* attrs + delegated handler (fixes apostrophe SyntaxError, 70 errors/33 users) + monitoring page now shows file:line:col
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
