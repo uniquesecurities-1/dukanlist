@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v1.9.7';  // bumped — Digital Card uses Web Share API for direct-to-contacts UX
+const VERSION    = 'dukan-v1.9.8';  // bumped — Digital Card: fix user-gesture loss in saveContact (photo embed moved to background)
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

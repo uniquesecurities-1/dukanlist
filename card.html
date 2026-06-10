@@ -468,6 +468,15 @@ window.CARD_DATA = null;
 
 function render(d){
   window.CARD_DATA = d;
+
+  // Pre-fetch photo as base64 in background so subsequent save attempts
+  // (which avoid await for gesture-token safety) can embed it.
+  if (d.photo_url && !d.photo_data){
+    photoToBase64(d.photo_url).then(function(p64){
+      if (p64) d.photo_data = p64;
+    }).catch(function(){});
+  }
+
   var theme = pickTheme(d.role, d.category_name, new URLSearchParams(location.search).get('theme'));
 
   var photoHtml = d.photo_url
@@ -584,13 +593,14 @@ async function saveContact(){
   var d = window.CARD_DATA;
   if (!d){ toast('Card not loaded yet'); return; }
   var btn = document.getElementById('saveBtn');
-  btn.textContent = '⏳ Preparing contact…';
 
-  // Embed photo (best-effort)
-  if (d.photo_url && !d.photo_data){
-    try { d.photo_data = await photoToBase64(d.photo_url); } catch(_){}
-  }
-  var vcf = buildVCard(d);
+  // CRITICAL: Build vCard SYNCHRONOUSLY before navigator.share() —
+  // any await between user click and share() expires the user-gesture
+  // token, causing share() to silently fall through to download path.
+  // Photo embed deliberately SKIPPED here (it requires async fetch +
+  // base64 conversion which kills the gesture). Photo is fetched in
+  // the background instead and used on subsequent saves.
+  var vcf = buildVCard(d);  // SYNC — vCard text without photo (still complete contact)
   var safeName = (d.displayName || d.business_name || 'contact').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,40);
 
   var ua = (navigator.userAgent || '').toLowerCase();
@@ -598,31 +608,34 @@ async function saveContact(){
   var isAndroid = /android/.test(ua);
 
   // ============================================================
-  // STRATEGY 1: Web Share API with file — BEST for Android.
-  // Triggers native share sheet which has "Contacts" as a target.
-  // User taps Contacts → "Add contact" form pre-filled.
+  // STRATEGY 1: Web Share API with file — BEST for Android/iOS.
+  // Must run SYNCHRONOUSLY after the user click — no awaits before.
   // ============================================================
   var sharedViaApi = false;
   try {
     if (navigator.canShare && typeof File !== 'undefined') {
       var vcfFile = new File([vcf], safeName + '.vcf', { type: 'text/vcard' });
       if (navigator.canShare({ files: [vcfFile] })) {
-        btn.textContent = '📲 Opening share sheet…';
-        await navigator.share({
+        // Fire share() IMMEDIATELY — user gesture still active here.
+        var sharePromise = navigator.share({
           files: [vcfFile],
           title: 'Add ' + (d.displayName || d.business_name || 'contact'),
           text: 'Tap "Contacts" to save'
         });
+        btn.textContent = '📲 Opening share sheet…';
+        await sharePromise;
         sharedViaApi = true;
       }
     }
   } catch (e) {
-    // User cancelled OR sharing failed — fall through to other strategies
+    console.warn('[saveContact] Web Share failed:', e && e.name, e && e.message);
     if (e && e.name === 'AbortError') {
+      // User dismissed the share sheet — don't fall through to download
       btn.className = 'save-cta';
       btn.textContent = '📥 Save ' + ((d.displayName || d.business_name || '').split(/\s+/).slice(0,2).join(' ')) + ' to my Contacts';
       return;
     }
+    // Any other error → fall through to download
   }
 
   // ============================================================
