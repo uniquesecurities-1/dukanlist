@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.0.0';  // bumped — Share button: data-* attrs + delegated handler (fixes apostrophe SyntaxError, 70 errors/33 users) + monitoring page now shows file:line:col
+const VERSION    = 'dukan-v2.0.2';  // bumped — Our Promise: revenue-free dignity-only message + Pros→CA + share apostrophe fix
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
