@@ -165,6 +165,23 @@ var SHOP = null;
 var BIZ_ID = new URLSearchParams(location.search).get('id');
 var ROOT = document.getElementById('root');
 
+// UUID v1–v5 sanity check. If the URL was constructed with id=undefined
+// (or with anything that isn't a real UUID), don't even hit the RPC —
+// show a clear, actionable message and offer a way back to admin.
+var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+if (!BIZ_ID || BIZ_ID === 'undefined' || BIZ_ID === 'null' || !UUID_RE.test(BIZ_ID)){
+  ROOT.innerHTML =
+    '<div class="err" style="line-height:1.6">' +
+    '  <b>Invalid shop ID</b><br>' +
+    '  The URL is missing a valid shop UUID (got: <code>' + esc(BIZ_ID || '—') + '</code>).<br>' +
+    '  This usually means the page that linked here had a code bug.<br><br>' +
+    '  <a href="/admin/dashboard" style="background:#1E3A8A;color:#fff;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:700">← Back to Admin</a>' +
+    '  &nbsp;<a href="/admin/moderation" style="background:#fff;color:#1E3A8A;border:1px solid #1E3A8A;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:700">Moderation</a>' +
+    '  &nbsp;<a href="/admin/suspicious" style="background:#fff;color:#B91C1C;border:1px solid #B91C1C;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:700">Suspicious</a>' +
+    '</div>';
+  throw new Error('admin/shop: missing or invalid id parameter');
+}
+
 function toast(msg, isErr){
   var t = document.getElementById('toast');
   t.textContent = msg;
