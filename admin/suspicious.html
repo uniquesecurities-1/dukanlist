@@ -255,14 +255,20 @@ function renderTable(){
   };
 
   const reasonLabel = (r) => ({
-    'duplicate_mobile':   '🔁 Duplicate Mobile',
-    'spam_keyword':       '🚫 Spam Keyword',
-    'fake_owner_name':    '👤 Fake Name',
-    'low_completeness':   '📉 Empty Profile',
-    'bulk_registration':  '🌊 Bulk Wave',
-    'multiple_flags':     '⚠ User Flags',
-    'inactive_verified':  '💤 Inactive Verified',
-    'mismatched_data':    '❓ Mismatched Data'
+    // Current RPC flag names (db/104)
+    'duplicate_mobile':    '🔁 Duplicate Mobile',
+    'no_photos':           '📷 No Photos',
+    'short_owner_name':    '👤 Short Owner Name',
+    'fake_owner_name':     '👤 Fake-looking Name',
+    'multiple_flags':      '⚠ User Flags',
+    'bulk_new_empty':      '🌊 Bulk + Empty',
+    'verified_no_photos':  '💤 Verified, No Photos',
+    // Legacy aliases (older RPC versions — keep so UI never breaks)
+    'spam_keyword':        '🚫 Spam Keyword',
+    'low_completeness':    '📉 Empty Profile',
+    'bulk_registration':   '🌊 Bulk Wave',
+    'inactive_verified':   '💤 Inactive Verified',
+    'mismatched_data':     '❓ Mismatched Data'
   }[r] || r);
 
   const html = `
@@ -291,13 +297,13 @@ function renderTable(){
               <tr>
                 <td>${riskBadge(r.risk_score || 0)}</td>
                 <td>
-                  <a class="biz-link" href="/admin/shop?id=${r.business_id}">${escapeHtml(r.name || '—')}</a>
+                  <a class="biz-link" href="/admin/shop?id=${r.id}">${escapeHtml(r.name || '—')}</a>
                   <div class="owner">${escapeHtml(r.owner_name || '—')}</div>
                   <div class="meta">${escapeHtml(r.primary_cat || '')}</div>
                 </td>
                 <td>
                   <div class="reasons">
-                    ${(r.reasons || []).map(re => `<span class="reason-tag r-${re}">${reasonLabel(re)}</span>`).join('')}
+                    ${(r.flags || r.reasons || []).map(re => `<span class="reason-tag r-${re}">${reasonLabel(re)}</span>`).join('')}
                   </div>
                 </td>
                 <td><span class="status-pill s-${r.status}">${r.status}</span>${r.flagged_count > 0 ? `<div class="meta" style="color:#EF4444">⚠ ${r.flagged_count} flag(s)</div>` : ''}</td>
@@ -309,7 +315,7 @@ function renderTable(){
                 <td style="font-size:11px;color:#64748b">${fmtDate(r.created_at)}</td>
                 <td>
                   <div class="actions">
-                    <a class="btn btn-view" href="/admin/shop?id=${r.business_id}">🛡 View</a>
+                    <a class="btn btn-view" href="/admin/shop?id=${r.id}">🛡 View</a>
                     ${waLink ? `<a class="btn btn-wa" href="${waLink}" target="_blank" rel="noopener">💬</a>` : ''}
                   </div>
                 </td>

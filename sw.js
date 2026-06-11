@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.0.3';  // bumped — Pulse Top Cats/Cities fix (was stuck on Loading…) + dignity-only Our Promise + Pros→CA + share apostrophe fix
+const VERSION    = 'dukan-v2.0.4';  // bumped — Suspicious page: business_id→id + reasons→flags (View button was id=undefined) + Pulse Loading fix + dignity Our Promise
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
