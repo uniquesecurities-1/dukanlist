@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.0.6';  // bumped — 10 new categories (Hotel, Marriage Palace, Banquet Hall, Resort, Guest House, Dharamshala, Ticket Booking, Training Institute, Placement Agency + new Hospitality parent) + admin/shop guards + Suspicious View fix + Pulse Loading fix
+const VERSION    = 'dukan-v2.1.0';  // bumped — Homepage UX upgrades: Quick Pick chip count badges + 3-step "How does this work?" strip + mobile sticky mini-search bar. Plus 10 new categories + admin/shop guards + Suspicious View fix + Pulse Loading fix.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

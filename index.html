@@ -188,6 +188,42 @@ html[data-lang="hi"] .hero-tag{ font-family:'Noto Sans Devanagari',sans-serif }
 .hchip{ background:#fff; border:1px solid rgba(15,23,42,.08); border-radius:11px; padding:10px 6px; text-align:center; font-size:.82rem; font-weight:700; color:var(--ink); text-decoration:none; transition:.18s; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 1px 2px rgba(15,23,42,.03) }
 .hchip:hover{ background:#FFF7ED; border-color:var(--saffron); color:var(--saffron-deep); transform:translateY(-2px); text-decoration:none; box-shadow:0 6px 14px rgba(255,107,26,.15) }
 .hchip-all{ background:linear-gradient(135deg,#FAFAFA,#F1F5F9); font-weight:800 }
+.hchip{ position:relative }
+.hchip-badge{ display:none; margin-left:3px; font-size:.62rem; font-weight:800; color:#9A3412; background:#FED7AA; padding:1px 6px; border-radius:99px; letter-spacing:.02em; min-width:18px; text-align:center; line-height:1.4 }
+.hchip-badge.show{ display:inline-block; animation:chipBadgeIn .4s ease }
+@keyframes chipBadgeIn{ from{ transform:scale(0); opacity:0 } to{ transform:scale(1); opacity:1 } }
+
+/* ===== "How does this work?" 3-step strip ===== */
+.hdtw-strip{ display:flex; align-items:stretch; justify-content:center; gap:6px; max-width:620px; margin:0 auto 18px; padding:10px 12px; background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%); border:1px solid #FED7AA; border-radius:14px; box-shadow:0 4px 14px rgba(255,107,26,.08) }
+.hdtw-step{ display:flex; align-items:center; gap:9px; flex:1; min-width:0; padding:4px 6px }
+.hdtw-ico{ width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-size:1.15rem; flex-shrink:0; box-shadow:0 3px 8px rgba(255,107,26,.18); animation:hdtwBounce 2.8s ease-in-out infinite }
+.hdtw-ico-1{ background:linear-gradient(135deg,#FBBF24,#F59E0B); animation-delay:0s }
+.hdtw-ico-2{ background:linear-gradient(135deg,#34D399,#10B981); animation-delay:0.9s }
+.hdtw-ico-3{ background:linear-gradient(135deg,#60A5FA,#3B82F6); animation-delay:1.8s }
+.hdtw-txt{ display:flex; flex-direction:column; min-width:0 }
+.hdtw-txt b{ font-size:.78rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.25 }
+.hdtw-txt span{ font-size:.68rem; color:#64748B; font-weight:500; line-height:1.3 }
+.hdtw-arrow{ display:grid; place-items:center; font-size:1.1rem; font-weight:800; color:#FB923C; flex-shrink:0; padding:0 1px }
+@keyframes hdtwBounce{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-4px) } }
+@media (max-width:560px){
+  .hdtw-strip{ padding:9px 8px; border-radius:12px; gap:2px }
+  .hdtw-step{ padding:2px 2px; gap:6px }
+  .hdtw-ico{ width:30px; height:30px; font-size:.95rem }
+  .hdtw-txt b{ font-size:.66rem }
+  .hdtw-txt span{ font-size:.56rem; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden }
+  .hdtw-arrow{ font-size:.78rem }
+}
+
+/* ===== Sticky mini search bar (mobile, on scroll) ===== */
+#stickyMiniSearch{ position:fixed; top:0; left:0; right:0; z-index:998; background:#fff; border-bottom:1px solid rgba(15,23,42,.08); padding:8px 12px; box-shadow:0 4px 12px rgba(15,23,42,.08); transform:translateY(-100%); transition:transform .25s ease; display:flex; align-items:center; gap:8px }
+#stickyMiniSearch.show{ transform:translateY(0) }
+#stickyMiniSearch .sm-icon{ font-size:1.05rem; flex-shrink:0; padding-left:4px }
+#stickyMiniSearch input{ flex:1; min-width:0; border:1.5px solid #E2E8F0; border-radius:10px; padding:9px 12px; font-size:.92rem; font-family:inherit; outline:none; background:#FAFAFA; color:var(--ink); transition:border-color .15s }
+#stickyMiniSearch input:focus{ border-color:var(--saffron); background:#fff }
+#stickyMiniSearch button{ background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); color:#fff; border:0; border-radius:10px; padding:9px 14px; font-weight:800; font-size:.84rem; cursor:pointer; box-shadow:0 3px 8px rgba(255,107,26,.3); font-family:inherit }
+#stickyMiniSearch button:active{ transform:scale(.96) }
+/* Only show on mobile to avoid clashing with desktop hero */
+@media (min-width:760px){ #stickyMiniSearch{ display:none !important } }
 .hero-extras{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:22px }
 #openNowHome{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; background:#fff; border:1.5px solid #E2E8F0; border-radius:99px; font-weight:700; font-size:.82rem; color:var(--ink); cursor:pointer; box-shadow:0 1px 3px rgba(15,23,42,.04); transition:all .15s }
 #openNowHome input{ margin:0; cursor:pointer; accent-color:var(--emerald-light) }
@@ -692,6 +728,13 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 </head>
 <body>
 
+<!-- ===== STICKY MINI SEARCH (mobile only, shows on scroll past hero) ===== -->
+<div id="stickyMiniSearch" role="search" aria-label="Quick search">
+  <span class="sm-icon">🔍</span>
+  <input type="text" id="stickyMiniInput" placeholder="Search shops, services…" autocomplete="off" data-ph-en="Search shops, services…" data-ph-hi="दुकान, सेवा…">
+  <button type="button" id="stickyMiniBtn" data-i18n-en="Go" data-i18n-hi="खोजें">Go</button>
+</div>
+
 <!-- ===== FESTIVAL MODE banner (auto-shown only during Indian festivals) ===== -->
 <div id="festBanner" style="display:none;position:relative;padding:10px 18px;color:#fff;font-weight:700;font-size:.86rem;text-align:center;font-family:'Plus Jakarta Sans','Manrope',sans-serif;z-index:50;line-height:1.4">
   <span id="festEmoji" style="font-size:1.05rem;margin-right:5px"></span>
@@ -857,14 +900,41 @@ function dismissFestBanner(){
         <span data-i18n-en>Quick pick:</span><span data-i18n-hi>तुरंत चुनें:</span>
       </div>
       <div class="hero-chips">
-        <a href="/search.html?q=doctor" class="hchip">🏥 <span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></a>
-        <a href="/search.html?q=mechanic" class="hchip">🔧 <span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span></a>
-        <a href="/search.html?q=grocery" class="hchip">🛒 <span data-i18n-en>Grocery</span><span data-i18n-hi>किराना</span></a>
-        <a href="/search.html?q=salon" class="hchip">💇 <span data-i18n-en>Salon</span><span data-i18n-hi>सैलून</span></a>
-        <a href="/search.html?q=tutor" class="hchip">📚 <span data-i18n-en>Tutor</span><span data-i18n-hi>ट्यूटर</span></a>
-        <a href="/search.html?q=medical" class="hchip">💊 <span data-i18n-en>Medical</span><span data-i18n-hi>मेडिकल</span></a>
-        <a href="/search.html?q=bakery" class="hchip">🍰 <span data-i18n-en>Bakery</span><span data-i18n-hi>बेकरी</span></a>
+        <a href="/search.html?q=doctor"   class="hchip" data-chip="doctor"  >🏥 <span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span><span class="hchip-badge" data-chip-count></span></a>
+        <a href="/search.html?q=mechanic" class="hchip" data-chip="mechanic">🔧 <span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span><span class="hchip-badge" data-chip-count></span></a>
+        <a href="/search.html?q=grocery"  class="hchip" data-chip="grocery" >🛒 <span data-i18n-en>Grocery</span><span data-i18n-hi>किराना</span><span class="hchip-badge" data-chip-count></span></a>
+        <a href="/search.html?q=salon"    class="hchip" data-chip="salon"   >💇 <span data-i18n-en>Salon</span><span data-i18n-hi>सैलून</span><span class="hchip-badge" data-chip-count></span></a>
+        <a href="/search.html?q=tutor"    class="hchip" data-chip="tutor"   >📚 <span data-i18n-en>Tutor</span><span data-i18n-hi>ट्यूटर</span><span class="hchip-badge" data-chip-count></span></a>
+        <a href="/search.html?q=medical"  class="hchip" data-chip="medical" >💊 <span data-i18n-en>Medical</span><span data-i18n-hi>मेडिकल</span><span class="hchip-badge" data-chip-count></span></a>
+        <a href="/search.html?q=bakery"   class="hchip" data-chip="bakery"  >🍰 <span data-i18n-en>Bakery</span><span data-i18n-hi>बेकरी</span><span class="hchip-badge" data-chip-count></span></a>
         <a href="/browse.html" class="hchip hchip-all">→ <span data-i18n-en>All</span><span data-i18n-hi>सभी</span></a>
+      </div>
+    </div>
+
+    <!-- "How does this work?" — 3-step visual onboarding strip -->
+    <div class="hdtw-strip" aria-label="How DukanList works">
+      <div class="hdtw-step">
+        <div class="hdtw-ico hdtw-ico-1">🔍</div>
+        <div class="hdtw-txt">
+          <b data-i18n-en>1. Search</b><b data-i18n-hi>1. ढूंढो</b>
+          <span data-i18n-en>name, service, or city</span><span data-i18n-hi>नाम, सेवा या शहर</span>
+        </div>
+      </div>
+      <div class="hdtw-arrow">→</div>
+      <div class="hdtw-step">
+        <div class="hdtw-ico hdtw-ico-2">👆</div>
+        <div class="hdtw-txt">
+          <b data-i18n-en>2. Tap shop</b><b data-i18n-hi>2. दुकान चुनो</b>
+          <span data-i18n-en>verified, photos, rating</span><span data-i18n-hi>वेरिफाइड, फोटो, रेटिंग</span>
+        </div>
+      </div>
+      <div class="hdtw-arrow">→</div>
+      <div class="hdtw-step">
+        <div class="hdtw-ico hdtw-ico-3">📞</div>
+        <div class="hdtw-txt">
+          <b data-i18n-en>3. Call / WhatsApp</b><b data-i18n-hi>3. कॉल / WhatsApp</b>
+          <span data-i18n-en>directly, no middlemen</span><span data-i18n-hi>सीधे, बिना बिचौलिए</span>
+        </div>
       </div>
     </div>
 
@@ -2479,6 +2549,117 @@ function dismissActTicker(){
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+})();
+</script>
+
+<!-- ===== Sticky mini search + Quick Pick count badges ===== -->
+<script>
+(function(){
+  'use strict';
+
+  // ------- A. STICKY MINI SEARCH (mobile only) -------
+  // Show when user scrolls past the hero search card; hide when scrolled back up.
+  function initStickySearch(){
+    var mini   = document.getElementById('stickyMiniSearch');
+    var input  = document.getElementById('stickyMiniInput');
+    var btn    = document.getElementById('stickyMiniBtn');
+    var heroEl = document.querySelector('.hero-search-card');
+    if (!mini || !input || !btn || !heroEl) return;
+
+    // Sync placeholder with current language
+    try {
+      var lang = document.documentElement.getAttribute('data-lang') || 'en';
+      input.placeholder = (lang === 'hi') ? (input.dataset.phHi || input.placeholder) : (input.dataset.phEn || input.placeholder);
+    } catch(_){}
+
+    // Only animate on mobile (CSS hides on desktop)
+    var threshold = 0;
+    function recalc(){
+      var rect = heroEl.getBoundingClientRect();
+      threshold = window.scrollY + rect.bottom; // scroll position where hero ends
+    }
+    recalc();
+    window.addEventListener('resize', recalc, { passive: true });
+
+    var lastShown = false;
+    window.addEventListener('scroll', function(){
+      var shouldShow = window.scrollY > threshold + 40;
+      if (shouldShow !== lastShown){
+        mini.classList.toggle('show', shouldShow);
+        lastShown = shouldShow;
+      }
+    }, { passive: true });
+
+    function doSearch(){
+      var q = (input.value || '').trim();
+      if (!q){ input.focus(); return; }
+      // Reuse main search routing — go to /search.html with same query
+      var url = '/search.html?q=' + encodeURIComponent(q);
+      try {
+        var citySel = document.getElementById('citySelect');
+        if (citySel && citySel.value) url += '&city=' + encodeURIComponent(citySel.value);
+      } catch(_){}
+      location.href = url;
+    }
+    btn.addEventListener('click', doSearch);
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); doSearch(); }
+    });
+  }
+
+  // ------- B. QUICK PICK COUNT BADGES -------
+  // Map each chip's search term to the slugs that the corresponding category covers,
+  // then count active shops bucketed by slug.
+  var CHIP_TO_SLUGS = {
+    'doctor':   ['doctor', 'dentist', 'ayurveda', 'homeopathy', 'hospital', 'physiotherapist', 'eye-care', 'gynecologist', 'pediatrician'],
+    'mechanic': ['car-service', 'two-wheeler-service', 'tyre-shop', 'spare-parts', 'cycle-shop', 'puncture-shop', 'tractor-parts', 'battery-shop'],
+    'grocery':  ['kirana-grocery', 'general-store', 'wholesale-dealer'],
+    'salon':    ['salon-beauty', 'unisex-salon', 'mens-salon', 'beauty-parlour', 'salon', 'spa'],
+    'tutor':    ['tuition-coaching', 'coaching-institute', 'training-institute', 'skill-vocational', 'english-speaking', 'computer-classes', 'computer-class', 'art-craft-class'],
+    'medical':  ['pharmacy'],
+    'bakery':   ['bakery-cake']
+  };
+
+  async function loadChipCounts(){
+    try {
+      if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+      var c = ShopDB.client;
+      // Fetch all active business category IDs (light query)
+      var bizP = c.from('businesses')
+        .select('category_id, sub_category_id')
+        .eq('status', 'active');
+      var catP = c.from('categories').select('id, slug');
+      var [bizR, catR] = await Promise.all([bizP, catP]);
+      if (bizR.error || catR.error) return;
+      var idToSlug = {};
+      (catR.data || []).forEach(function(r){ idToSlug[r.id] = r.slug; });
+      var slugCount = {};
+      (bizR.data || []).forEach(function(b){
+        var s = idToSlug[b.sub_category_id] || idToSlug[b.category_id];
+        if (s) slugCount[s] = (slugCount[s] || 0) + 1;
+      });
+      // Update each chip
+      document.querySelectorAll('[data-chip]').forEach(function(chip){
+        var key = chip.getAttribute('data-chip');
+        var slugs = CHIP_TO_SLUGS[key] || [];
+        var total = 0;
+        slugs.forEach(function(s){ total += (slugCount[s] || 0); });
+        var badge = chip.querySelector('[data-chip-count]');
+        if (badge && total > 0){
+          badge.textContent = total;
+          badge.classList.add('show');
+        }
+      });
+    } catch(e){ console.warn('loadChipCounts:', e); }
+  }
+
+  function boot(){
+    initStickySearch();
+    // Load counts after a short delay so it doesn't fight hero render
+    setTimeout(loadChipCounts, 800);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
 </script>
 </body>
