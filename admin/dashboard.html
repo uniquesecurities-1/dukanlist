@@ -733,34 +733,64 @@ function renderPulse(s){
 async function loadPulseLists(){
   try {
     var c = ShopDB.client;
-    // Use recent businesses already loaded for derivation
-    var rows = window._recentRows || [];
-    if (rows.length === 0) return;
-    // Top categories
-    var catMap = {};
-    var cityMap = {};
-    rows.forEach(function(r){
-      var cn = (r.categories && r.categories.name) || r.cat_name || 'Other';
-      catMap[cn] = (catMap[cn] || 0) + 1;
-      var ci = r.city_name || (r.geo_cities && r.geo_cities.name) || 'Other';
-      cityMap[ci] = (cityMap[ci] || 0) + 1;
-    });
+
     function top(map, n){
       return Object.keys(map).map(function(k){ return { name:k, count:map[k] }; })
         .sort(function(a,b){ return b.count - a.count; })
         .slice(0, n);
     }
-    function render(id, items){
+    function render(id, items, emptyMsg){
       var host = document.getElementById(id);
       if (!host) return;
-      if (items.length === 0) { host.innerHTML = '<li class="empty">No data yet</li>'; return; }
+      if (!items || items.length === 0) {
+        host.innerHTML = '<li class="empty">' + (emptyMsg || 'No data yet') + '</li>';
+        return;
+      }
       host.innerHTML = items.map(function(it){
         return '<li><span class="pl-name">' + escapeHtml(it.name) + '</span><span class="pl-num">' + it.count + '</span></li>';
       }).join('');
     }
-    render('pulseTopCats',   top(catMap, 5));
-    render('pulseTopCities', top(cityMap, 5));
-  } catch(e){ console.warn('loadPulseLists:', e); }
+
+    // -------- Top categories THIS WEEK (new listings in last 7 days) --------
+    var weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    var catMap = {};
+    try {
+      var qc = await c.from('businesses')
+        .select('id, categories(name), geo_cities(name), created_at, status')
+        .gte('created_at', weekAgo)
+        .eq('status', 'active')
+        .limit(1000);
+      var weekRows = (qc && qc.data) || [];
+      weekRows.forEach(function(r){
+        var cn = (r.categories && r.categories.name) || 'Uncategorized';
+        catMap[cn] = (catMap[cn] || 0) + 1;
+      });
+    } catch(e){ console.warn('top-cats query:', e); }
+    render('pulseTopCats', top(catMap, 5), 'No new listings this week');
+
+    // -------- Top cities BY TOTAL LISTINGS (all active) --------
+    // Prefer an aggregated count via the city -> shops relation
+    var cityMap = {};
+    try {
+      var qci = await c.from('businesses')
+        .select('id, geo_cities(name)')
+        .eq('status', 'active')
+        .limit(5000);
+      var allRows = (qci && qci.data) || [];
+      allRows.forEach(function(r){
+        var ci = (r.geo_cities && r.geo_cities.name) || 'Other';
+        cityMap[ci] = (cityMap[ci] || 0) + 1;
+      });
+    } catch(e){ console.warn('top-cities query:', e); }
+    render('pulseTopCities', top(cityMap, 5), 'No active listings yet');
+  } catch(e){
+    console.warn('loadPulseLists:', e);
+    // On total failure show explicit error so it doesn't sit on "Loading…" forever
+    var c1 = document.getElementById('pulseTopCats');
+    var c2 = document.getElementById('pulseTopCities');
+    if (c1) c1.innerHTML = '<li class="empty">Could not load</li>';
+    if (c2) c2.innerHTML = '<li class="empty">Could not load</li>';
+  }
 }
 
 function renderKPIs(s){
