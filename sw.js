@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.0.5';  // bumped — admin/shop guards against bad/undefined UUID + Suspicious View fix + Pulse Loading fix + dignity Our Promise
+const VERSION    = 'dukan-v2.0.6';  // bumped — 10 new categories (Hotel, Marriage Palace, Banquet Hall, Resort, Guest House, Dharamshala, Ticket Booking, Training Institute, Placement Agency + new Hospitality parent) + admin/shop guards + Suspicious View fix + Pulse Loading fix
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

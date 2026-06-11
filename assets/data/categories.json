@@ -1,7 +1,7 @@
 {
-  "version": "3.4",
-  "updated": "2026-06-08",
-  "note": "v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories (music instruments, sports goods, dry fruits/mewa, namkeen, sofa set, glass/mirror, mithai wholesale, gift bouquet, aluminium fabricator, iron grills, fridge/washing repair, hearing aid, drone/pre-wedding photo, generator/DG set, office furniture). Also synced handloom-shop to DB via SQL. [db/123: 6 duplicate slugs merged]",
+  "version": "3.5",
+  "updated": "2026-06-11",
+  "note": "v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
   "parents": [
     {
       "slug": "healthcare",
@@ -1203,6 +1203,12 @@
           "icon": "🛠️"
         },
         {
+          "slug": "training-institute",
+          "name": "Training Centre / Institute",
+          "name_hi": "ट्रेनिंग सेंटर / संस्थान",
+          "icon": "🎯"
+        },
+        {
           "slug": "library",
           "name": "Library / Study Center",
           "name_hi": "लाइब्रेरी / स्टडी सेंटर",
@@ -1276,6 +1282,12 @@
           "name": "Event Management",
           "name_hi": "इवेंट मैनेजमेंट",
           "icon": "🎪"
+        },
+        {
+          "slug": "placement-agency",
+          "name": "Placement Agency / HR Consultant",
+          "name_hi": "प्लेसमेंट एजेंसी / HR कंसल्टेंट",
+          "icon": "💼"
         },
         {
           "slug": "printing-press",
@@ -1692,6 +1704,57 @@
           "name": "Hostel / PG / Paying Guest",
           "name_hi": "हॉस्टल / PG",
           "icon": "🏘️"
+        }
+      ]
+    },
+    {
+      "slug": "hospitality-travel",
+      "name": "Hospitality, Hotels & Banquets",
+      "name_hi": "होटल, बैंक्वेट एवं आतिथ्य",
+      "icon": "🏨",
+      "color": "#0891B2",
+      "subs": [
+        {
+          "slug": "hotel",
+          "name": "Hotel",
+          "name_hi": "होटल",
+          "icon": "🏨"
+        },
+        {
+          "slug": "marriage-palace",
+          "name": "Marriage Palace",
+          "name_hi": "मैरिज पैलेस",
+          "icon": "💒"
+        },
+        {
+          "slug": "banquet-hall",
+          "name": "Banquet Hall / Party Lawn",
+          "name_hi": "बैंक्वेट हॉल / पार्टी लॉन",
+          "icon": "🎉"
+        },
+        {
+          "slug": "resort-farm-stay",
+          "name": "Resort / Farm Stay",
+          "name_hi": "रिज़ॉर्ट / फार्म स्टे",
+          "icon": "🏝️"
+        },
+        {
+          "slug": "guest-house-lodge",
+          "name": "Guest House / Lodge",
+          "name_hi": "गेस्ट हाउस / लॉज",
+          "icon": "🛏️"
+        },
+        {
+          "slug": "dharamshala",
+          "name": "Dharamshala / Religious Stay",
+          "name_hi": "धर्मशाला",
+          "icon": "🛕"
+        },
+        {
+          "slug": "ticket-booking-counter",
+          "name": "Bus / Train / Flight Booking Counter",
+          "name_hi": "बस / रेल / फ्लाइट बुकिंग",
+          "icon": "🎫"
         }
       ]
     }
