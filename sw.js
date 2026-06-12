@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.1';  // bumped — Bundle D part 2: extended /admin/incomplete-shops.html with Address Quality validators (detects test/dummy data, too-short addresses, no-spaces blobs, repeated chars, missing or city-mismatched pincode). Adds Bad Address KPI + Bad-address & Pincode-issue filter chips + targeted WhatsApp nudge lines.
+const VERSION    = 'dukan-v2.8.2';  // bumped — discoverability fix: /admin/incomplete-shops.html now linked from admin/dashboard.html (between Suspicious and Duplicates), admin/suspicious.html nav, and admin/moderation.html nav. Plus all Bundle D part 2 features still intact.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
