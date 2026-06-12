@@ -584,7 +584,7 @@ function renderEmailWaitRow(b){
 
   const ageColor = days >= 7 ? '#991B1B' : days >= 3 ? '#92400E' : '#65A30D';
 
-  return '<div style="background:#FFFDF7;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">'
+  return '<div class="pe-wait-card" data-pending-email-row="1" data-row-email="' + (usableEmail || '').replace(/"/g, "&quot;") + '" style="background:#FFFDF7;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">'
     + '<div style="flex:0 0 auto;padding-top:4px"><input type="checkbox" class="email-wait-check" data-email="' + usableEmail + '" style="width:18px;height:18px;cursor:pointer"' + (usableEmail ? '' : ' disabled title="no email"') + '></div>'
     + '<div style="flex:1;min-width:220px">'
     +   '<div style="font-weight:800;color:#0F172A;font-size:14px">' + name + (cat ? ' <span style="color:#94a3b8;font-weight:500;font-size:11px">· ' + cat + '</span>' : '') + '</div>'
@@ -658,13 +658,14 @@ async function adminResendVerificationEmail(email, btn){
     });
     const j = await res.json().catch(function(){ return {}; });
     if (!res.ok || !j.ok) throw new Error(j.error || j.detail || ('HTTP ' + res.status));
-    if (j.already_verified){
-      // Owner is verified — auto-heal RAN on the server. Visually remove
-      // this shop's card immediately so admin sees the queue shrink in real-time.
-      showToast('✓ ' + (j.message || 'Owner verified. Shop moved out of queue.'), 'success');
+    if (j.magic_link_sent || j.already_verified){
+      // Either a magic sign-in link was sent OR owner is verified — both are
+      // a positive outcome. Visually remove this shop's card so admin sees
+      // the queue shrink in real-time.
+      showToast('✓ ' + (j.message || 'Owner can sign in now. Shop moved out of queue.'), 'success');
       if (btn){
         // Animate the shop card out of the queue
-        const card = btn.closest('.pe-row, [data-pending-email-row], .moderation-card, .biz-row, div');
+        const card = btn.closest('.pe-wait-card, [data-pending-email-row]');
         if (card){
           card.style.transition = 'opacity .35s ease, transform .35s ease, max-height .4s ease';
           card.style.opacity = '0';

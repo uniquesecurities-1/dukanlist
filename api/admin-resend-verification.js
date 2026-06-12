@@ -109,10 +109,26 @@ module.exports = async (req, res) => {
     return res.status(404).json({ error: 'No account found with this email' });
   }
   if (targetUser.email_confirmed_at) {
-    // EDGE CASE: User confirmed via Supabase Auth, but business_owners table
-    // still has NULL auth_user_id (signup-mismatch / case-sensitivity / etc.)
-    // → Trigger the self-heal RPC so the moderation list stops showing this
-    // shop as "pending email verification", then return a friendly success.
+    // EDGE CASE: Supabase Auth has email_confirmed_at SET, but the owner
+    // says they never actually verified. Possible causes:
+    //   - Project had 'auto-confirm emails' enabled at some point
+    //   - A prior signup attempt with the same email was confirmed
+    //   - User created via admin invite / OAuth path
+    // We can't re-send a signup-confirmation email (Supabase will refuse).
+    // Best UX: send a MAGIC SIGN-IN LINK so the owner can log in immediately
+    // without any verification step — they just click the email and they're in.
+    const magicRes = await sbAdmin('/auth/v1/admin/generate_link', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'magiclink',
+        email: email,
+        options: {
+          redirect_to: 'https://dukanlist.com/panel/dashboard.html'
+        }
+      })
+    });
+
+    // Also trigger self-heal so the moderation list catches up
     try {
       await sbAsUser('/rest/v1/rpc/self_heal_owner_links_by_email', {
         method: 'POST',
@@ -120,10 +136,21 @@ module.exports = async (req, res) => {
       });
     } catch(_) { /* best effort */ }
 
+    if (magicRes.ok) {
+      return res.status(200).json({
+        ok: true,
+        magic_link_sent: true,
+        message: '✓ Magic sign-in link sent to ' + email + '. Owner can click that email to log in directly — no separate verification step needed.',
+        user_id: targetUser.id
+      });
+    }
+
+    // Magic link failed (e.g. SMTP issue) — still return success for the shop
+    // moving out of pending, but tell admin to send WhatsApp reminder instead.
     return res.status(200).json({
       ok: true,
       already_verified: true,
-      message: '✓ Owner is already verified. Shop has been auto-moved out of pending email queue.',
+      message: '✓ This email is already confirmed in our system. Owner can sign in directly. (Magic link send failed — use the WhatsApp Reminder button to nudge them.)',
       user_id: targetUser.id
     });
   }

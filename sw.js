@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.6';  // bumped — better Resend Email UX: API message rewritten as positive '✓ Owner is already verified. Shop has been auto-moved out of pending email queue.' (no 'error'-sounding 'already verified' lead). Frontend animates the shop card out of the queue with smooth fade + slide so admin sees the queue physically shrink in real time, plus background list refresh.
+const VERSION    = 'dukan-v2.8.7';  // bumped — Resend Email now sends MAGIC SIGN-IN LINK when Supabase reports email already confirmed (handles edge case where auto-confirm or prior signup left the email confirmed despite owner never actually receiving anything). Owner gets a clickable email and can log in directly, shop leaves the pending queue.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
