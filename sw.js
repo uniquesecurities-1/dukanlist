@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.4.0';  // bumped — UX Phase 3: Sticky bottom action bar on shop pages (Call/WA/Directions) + Save to Shortlist (no-login, localStorage, 50 max) with header counter pill + dedicated /shortlist.html page + Open Now LIVE pulsing badge with "Closes in X" + Empty search → "Be the first" registration CTA.
+const VERSION    = 'dukan-v2.5.0';  // bumped — Shopkeeper Power-Up: 3 Quick Wins cards on dashboard (data-driven highest-impact actions) + WhatsApp customer template generator (copy-paste-ready bilingual) + Photo Progress Badge (gamified milestone tracker on photos page). Plus prior UX Phase 3, Hyperlocal Phase 1+2.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

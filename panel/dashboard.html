@@ -1522,6 +1522,8 @@ async function loadDashboard(){
   renderDashboard(biz);
   // Power widgets (panel sidebar)
   try { renderProfileCompleteness(biz); } catch(e){ console.warn('PC widget:', e); }
+  try { renderQuickWins(biz); }         catch(e){ console.warn('Quick Wins:', e); }
+  try { renderWhatsAppTemplate(biz); }  catch(e){ console.warn('WA Template:', e); }
   try { loadRankingBattle(biz); }       catch(e){ console.warn('Rank widget:', e); }
   try { initWalkInWidget(biz); }        catch(e){ console.warn('Walk-in:', e); }
 
@@ -2640,6 +2642,305 @@ function renderProfileCompleteness(b){
       </div>
     `}
   `;
+}
+
+// =============================================================
+// QUICK WINS — 3 highest-impact actions, with concrete payoff
+// =============================================================
+// Shows up to 3 cards based on what's actually missing in shop data.
+// Each card shows: icon · what to do · expected payoff · CTA button.
+// Skips items that are already done. Hides if shop is fully complete.
+function renderQuickWins(b){
+  if (!b) return;
+  const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+  const host = document.getElementById('smartTipsCard');
+  if (!host) return;
+
+  // Each candidate: { check, icon, en, hi, payoffEn, payoffHi, href, color }
+  // Order is rough priority — higher impact first.
+  const photosCount = Array.isArray(b.photos) ? b.photos.length : 0;
+  const hasHours    = !!(b.hours_json && Object.keys(b.hours_json || {}).length > 0);
+  const hasUSP      = !!(b.usp_text && b.usp_text.trim().length > 10);
+  const hasAbout    = !!(b.about_text && b.about_text.trim().length > 50);
+  const hasFaqs     = Array.isArray(b.faqs_json) && b.faqs_json.length >= 3;
+  const hasYear     = !!(b.established_year && b.established_year > 1900);
+  const hasSocial   = !!(b.facebook_url || b.instagram_url || b.youtube_url || b.x_twitter_url || b.linkedin_url || b.website_url);
+
+  const candidates = [];
+
+  // PHOTOS — biggest impact, especially when 0
+  if (photosCount === 0){
+    candidates.push({
+      icon: '📷', color: '#EF4444',
+      en: 'Add your first photo',
+      hi: 'पहली फोटो अपलोड करें',
+      payoffEn: 'Shops with photos get <b>5× more views</b>. Listing also gets activated.',
+      payoffHi: 'फोटो वाली दुकानों को <b>5× ज़्यादा views</b>. लिस्टिंग भी चालू हो जाएगी.',
+      href: '/panel/photos.html',
+      ctaEn: 'Upload Photo →', ctaHi: 'फोटो अपलोड करें →'
+    });
+  } else if (photosCount < 3){
+    candidates.push({
+      icon: '📷', color: '#F59E0B',
+      en: 'Add ' + (3 - photosCount) + ' more photo' + (3 - photosCount === 1 ? '' : 's'),
+      hi: (3 - photosCount) + ' और फोटो जोड़ें',
+      payoffEn: 'Reach <b>3 photos</b> to unlock photo-quality bonus and Trust Tier upgrade.',
+      payoffHi: '<b>3 फोटो</b> से Trust Tier upgrade और photo-quality bonus मिलेगा.',
+      href: '/panel/photos.html',
+      ctaEn: 'Add Photos →', ctaHi: 'फोटो जोड़ें →'
+    });
+  }
+
+  // HOURS — needed for "Open Now" filter
+  if (!hasHours){
+    candidates.push({
+      icon: '🕐', color: '#3B82F6',
+      en: 'Set business hours',
+      hi: 'खुलने का समय सेट करें',
+      payoffEn: 'Show up in <b>"Open Now"</b> search filter — customers searching right now will see you.',
+      payoffHi: '<b>"अभी खुले"</b> फ़िल्टर में दिखोगे — अभी खोज रहे ग्राहक देखेंगे.',
+      href: '/panel/profile.html#hours',
+      ctaEn: 'Set Hours →', ctaHi: 'समय सेट करें →'
+    });
+  }
+
+  // USP — featured chance
+  if (!hasUSP){
+    candidates.push({
+      icon: '✨', color: '#10B981',
+      en: 'Write your USP / tagline',
+      hi: 'अपनी USP / टैगलाइन लिखें',
+      payoffEn: 'A strong USP makes you eligible for <b>Featured Shop of the Week</b> on homepage.',
+      payoffHi: 'मज़बूत USP से <b>"Featured Shop of the Week"</b> में आने का chance मिलेगा.',
+      href: '/panel/profile.html#usp',
+      ctaEn: 'Write USP →', ctaHi: 'USP लिखें →'
+    });
+  }
+
+  // ABOUT — better SEO + customer decision
+  if (!hasAbout){
+    candidates.push({
+      icon: '📝', color: '#8B5CF6',
+      en: 'Add an About section',
+      hi: '"हमारे बारे में" जोड़ें',
+      payoffEn: 'Customers compare 3 shops before calling. Strong About = <b>higher pick rate</b>.',
+      payoffHi: 'ग्राहक call करने से पहले 3 shops compare करते हैं. अच्छा About = <b>higher pick rate</b>.',
+      href: '/panel/profile.html#about',
+      ctaEn: 'Add About →', ctaHi: 'जोड़ें →'
+    });
+  }
+
+  // FAQs — answers common buyer questions
+  if (!hasFaqs){
+    candidates.push({
+      icon: '❓', color: '#EC4899',
+      en: 'Add 3 FAQs',
+      hi: '3 FAQs जोड़ें',
+      payoffEn: 'FAQs answer customer questions before they call. <b>Saves your time</b> + reduces missed leads.',
+      payoffHi: 'Call से पहले FAQs answer देती हैं. आपका <b>time बचाता है</b>, leads नहीं छूटतीं.',
+      href: '/panel/profile.html#faqs',
+      ctaEn: 'Add FAQs →', ctaHi: 'FAQs जोड़ें →'
+    });
+  }
+
+  // YEAR — trust signal
+  if (!hasYear){
+    candidates.push({
+      icon: '📅', color: '#0EA5E9',
+      en: 'Add established year',
+      hi: 'स्थापना वर्ष जोड़ें',
+      payoffEn: '<b>"Since 2009"</b> badge shows credibility. Old shops outrank new ones in trust.',
+      payoffHi: '<b>"Since 2009"</b> badge से credibility दिखेगी. पुरानी दुकानों को trust में बढ़त मिलती है.',
+      href: '/panel/profile.html#trust',
+      ctaEn: 'Add Year →', ctaHi: 'वर्ष जोड़ें →'
+    });
+  }
+
+  // SOCIAL — viral mechanic
+  if (!hasSocial){
+    candidates.push({
+      icon: '📱', color: '#F97316',
+      en: 'Link 1 social media account',
+      hi: '1 सोशल मीडिया लिंक जोड़ें',
+      payoffEn: 'Customers verify shops by checking Instagram/Facebook. Builds <b>cross-platform trust</b>.',
+      payoffHi: 'ग्राहक Insta/FB चेक करके दुकान verify करते हैं. <b>cross-platform trust</b> बनाओ.',
+      href: '/panel/profile.html#social',
+      ctaEn: 'Link Social →', ctaHi: 'लिंक करें →'
+    });
+  }
+
+  // Show only top 3
+  const picks = candidates.slice(0, 3);
+  if (picks.length === 0){
+    // All done — show a positive message and hide normally
+    host.style.display = 'none';
+    return;
+  }
+
+  const titleHTML = (lang === 'hi')
+    ? '🎯 <b>आज के Quick Wins</b> <span style="font-weight:500;color:#64748B;font-size:.78rem">· सबसे ज़्यादा फ़ायदा</span>'
+    : '🎯 <b>Today\'s Quick Wins</b> <span style="font-weight:500;color:#64748B;font-size:.78rem">· highest payoff</span>';
+
+  host.innerHTML = `
+    <style>
+      .qw-wrap{ background:#fff; border:1px solid #E2E8F0; border-radius:16px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,23,42,.04); margin-bottom:6px }
+      .qw-head{ font-size:.78rem; font-weight:700; color:#0F172A; letter-spacing:.02em; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:6px }
+      .qw-head b{ font-size:.92rem; text-transform:none; letter-spacing:-.01em; font-weight:800 }
+      .qw-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px }
+      .qw-card{ background:linear-gradient(135deg,#FAFAFA,#fff); border:1px solid #E2E8F0; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:8px; transition:transform .15s, box-shadow .15s, border-color .15s }
+      .qw-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(15,23,42,.06) }
+      .qw-icon{ width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-size:1.15rem; color:#fff; flex-shrink:0 }
+      .qw-row{ display:flex; align-items:center; gap:10px }
+      .qw-title{ font-weight:800; font-size:.95rem; color:#0F172A; letter-spacing:-.01em; line-height:1.25 }
+      .qw-payoff{ font-size:.8rem; color:#475569; line-height:1.45; font-weight:500 }
+      .qw-payoff b{ color:#0F172A; font-weight:700 }
+      .qw-cta{ display:inline-flex; align-items:center; gap:5px; padding:8px 12px; border-radius:8px; font-weight:700; font-size:.82rem; text-decoration:none; color:#fff; align-self:flex-start; transition:.15s; font-family:inherit }
+      .qw-cta:hover{ transform:translateY(-1px); text-decoration:none; filter:brightness(1.08) }
+    </style>
+    <div class="qw-wrap">
+      <div class="qw-head">${titleHTML}</div>
+      <div class="qw-grid">
+        ${picks.map(p => `
+          <div class="qw-card" style="border-left:3px solid ${p.color}">
+            <div class="qw-row">
+              <div class="qw-icon" style="background:${p.color}">${p.icon}</div>
+              <div class="qw-title">${escapeHTML(lang==='hi' ? p.hi : p.en)}</div>
+            </div>
+            <div class="qw-payoff">${lang==='hi' ? p.payoffHi : p.payoffEn}</div>
+            <a class="qw-cta" href="${p.href}" style="background:${p.color}">${lang==='hi' ? p.ctaHi : p.ctaEn}</a>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  host.style.display = '';
+}
+
+// =============================================================
+// WHATSAPP TEMPLATE — Auto-generated message owner can send
+// =============================================================
+// Gives the owner a ready-to-paste WhatsApp message with their shop
+// link, owner name, and a soft pitch. One-tap copy + share button.
+function renderWhatsAppTemplate(b){
+  if (!b) return;
+  const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+  // Inject after existing completeness widget; create a host div on demand.
+  let host = document.getElementById('waTemplateCard');
+  if (!host){
+    const completeness = document.getElementById('completenessWidget');
+    if (!completeness) return;
+    host = document.createElement('div');
+    host.id = 'waTemplateCard';
+    host.style.marginTop = '12px';
+    completeness.parentNode.insertBefore(host, completeness.nextSibling);
+  }
+
+  const shopName = b.name || 'our shop';
+  const cityName = (b.geo_cities && b.geo_cities.name) || '';
+  const ownerName = b.owner_name || '';
+  const shopUrl = 'https://dukanlist.com/business?slug=' + encodeURIComponent(b.slug || '');
+
+  const msgEn =
+    'Namaste! ' + (ownerName ? ownerName + ' here from ' : '') + shopName + (cityName ? ', ' + cityName : '') + '.\n\n'
+    + '✅ Find us with photos, hours, and reviews on DukanList:\n'
+    + shopUrl + '\n\n'
+    + '📞 Call or 💬 WhatsApp us directly from there.\n'
+    + 'Please save this link — we are always here to help.\n\n'
+    + '— ' + shopName;
+
+  const msgHi =
+    'नमस्ते! ' + (ownerName ? ownerName + ' ' : '') + shopName + (cityName ? ', ' + cityName : '') + '\n\n'
+    + '✅ हमारी दुकान — फोटो, समय, रिव्यू सब DukanList पर:\n'
+    + shopUrl + '\n\n'
+    + '📞 Call या 💬 WhatsApp सीधे वहीं से कर सकते हैं.\n'
+    + 'Link save कर लो — हम हमेशा help के लिए हैं.\n\n'
+    + '— ' + shopName;
+
+  const escMsgEn = escapeHTML(msgEn);
+  const escMsgHi = escapeHTML(msgHi);
+  const titleEn = '💬 Your customer-WhatsApp message';
+  const titleHi = '💬 Customer के लिए आपका WhatsApp message';
+  const subEn = 'Copy-paste-ready. Send to every customer after first visit — invites them to save your DukanList page for next time.';
+  const subHi = 'Copy-paste ready. हर ग्राहक के पहले visit के बाद भेजो — अगली बार के लिए link save रहेगा.';
+
+  host.innerHTML = `
+    <style>
+      .wat-card{ background:linear-gradient(135deg,#ECFDF5 0%,#D1FAE5 100%); border:1.5px solid #6EE7B7; border-radius:16px; padding:18px 20px; box-shadow:0 4px 14px rgba(16,185,129,.08) }
+      .wat-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:12px }
+      .wat-title{ font-size:.95rem; font-weight:800; color:#065F46; letter-spacing:-.01em }
+      .wat-sub{ font-size:.78rem; color:#047857; font-weight:600; margin-top:4px; line-height:1.4 }
+      .wat-box{ background:#fff; border:1px solid #BBF7D0; border-radius:10px; padding:12px 14px; font-family:'SFMono-Regular',Consolas,monospace; font-size:.82rem; color:#0F172A; white-space:pre-wrap; word-break:break-word; line-height:1.5; max-height:180px; overflow:auto }
+      .wat-actions{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap }
+      .wat-btn{ display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:99px; font-weight:800; font-size:.85rem; text-decoration:none; border:0; cursor:pointer; font-family:inherit; transition:transform .12s, box-shadow .15s }
+      .wat-btn:active{ transform:scale(.96) }
+      .wat-btn-copy{ background:#0F172A; color:#fff }
+      .wat-btn-copy:hover{ background:#1F2937; text-decoration:none }
+      .wat-btn-wa{ background:#25D366; color:#fff; box-shadow:0 3px 10px rgba(37,211,102,.32) }
+      .wat-btn-wa:hover{ background:#1EAA53; text-decoration:none }
+      .wat-toast{ position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:#0F172A; color:#fff; padding:11px 22px; border-radius:99px; font-size:.86rem; font-weight:700; z-index:99999; box-shadow:0 10px 30px rgba(15,23,42,.35); opacity:0; transition:opacity .2s, transform .25s; pointer-events:none }
+      .wat-toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+    </style>
+    <div class="wat-card">
+      <div class="wat-head">
+        <div>
+          <div class="wat-title">${lang==='hi' ? titleHi : titleEn}</div>
+          <div class="wat-sub">${lang==='hi' ? subHi : subEn}</div>
+        </div>
+      </div>
+      <div class="wat-box" id="watBox">${lang==='hi' ? escMsgHi : escMsgEn}</div>
+      <div class="wat-actions">
+        <button class="wat-btn wat-btn-copy" id="watCopyBtn" type="button">
+          📋 ${lang==='hi' ? 'Copy karo' : 'Copy text'}
+        </button>
+        <a class="wat-btn wat-btn-wa" id="watShareBtn" target="_blank" rel="noopener" href="#">
+          💬 ${lang==='hi' ? 'WhatsApp par bhejo' : 'Open in WhatsApp'}
+        </a>
+      </div>
+    </div>
+  `;
+
+  // Wire up actions
+  const msg = (lang === 'hi') ? msgHi : msgEn;
+  const copyBtn = document.getElementById('watCopyBtn');
+  const shareBtn = document.getElementById('watShareBtn');
+
+  if (shareBtn){
+    shareBtn.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  }
+  if (copyBtn){
+    copyBtn.addEventListener('click', async function(){
+      try {
+        await navigator.clipboard.writeText(msg);
+        watToast(lang === 'hi' ? '✓ Copy हो गया!' : '✓ Copied!');
+      } catch(_) {
+        // Fallback for older browsers
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = msg;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          watToast(lang === 'hi' ? '✓ Copy हो गया!' : '✓ Copied!');
+        } catch(__){
+          watToast(lang === 'hi' ? 'Copy fail — manually select karo' : 'Could not copy — select manually');
+        }
+      }
+    });
+  }
+  function watToast(text){
+    const t = document.createElement('div');
+    t.className = 'wat-toast';
+    t.textContent = text;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => { try { t.remove(); } catch(_){} }, 280);
+    }, 2200);
+  }
 }
 
 // ============= Ranking Battle Widget =============

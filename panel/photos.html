@@ -217,6 +217,9 @@
       <div class="alert success" id="uploadOk" style="display:none;margin-top:14px"></div>
     </div>
 
+    <!-- Photo Progress Badge — gamified milestone tracker -->
+    <div id="photoProgressBadge" style="display:none;margin-top:18px"></div>
+
     <div class="card" style="margin-top:18px">
       <div class="card-title">
         <span data-i18n-en>Your Photos</span><span data-i18n-hi>आपकी फोटो</span>
@@ -357,6 +360,79 @@ function renderState(){
   const grid = document.getElementById('photoGrid');
   const photos = MY_BIZ.photos || [];
   document.getElementById('photoCount').textContent = `(${photos.length}/${MAX_PHOTOS})`;
+
+  // -------- Photo Progress Badge (gamified milestone) --------
+  try {
+    const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+    const n = photos.length;
+    // Milestones: 0 → "Add your first" · 1-2 → "Reach 3" · 3-4 → "Reach 5" · 5+ → done
+    let milestone, target, color, payoffEn, payoffHi, emoji, headlineEn, headlineHi;
+    if (n === 0){
+      target = 1; milestone = 0; color = '#EF4444'; emoji = '⚠️';
+      headlineEn = 'Listing not yet activated';
+      headlineHi = 'Listing अभी active नहीं';
+      payoffEn = 'Upload your <b>first photo</b> to activate your listing and start receiving customer leads.';
+      payoffHi = '<b>पहली फोटो</b> upload करने पर listing चालू हो जाएगी और customer leads मिलने लगेंगी.';
+    } else if (n < 3){
+      target = 3; milestone = n; color = '#F59E0B'; emoji = '🎯';
+      headlineEn = `${3 - n} more to unlock <b>Trust Tier bonus</b>`;
+      headlineHi = `<b>Trust Tier bonus</b> के लिए ${3 - n} और चाहिए`;
+      payoffEn = 'Shops with <b>3+ photos</b> get a photo-quality bonus and rank higher in search.';
+      payoffHi = '<b>3+ फोटो</b> वाली दुकानों को photo-quality bonus और search में बढ़त मिलती है.';
+    } else if (n < 5){
+      target = 5; milestone = n; color = '#3B82F6'; emoji = '🚀';
+      headlineEn = `${5 - n} more to reach <b>Excellent</b> tier`;
+      headlineHi = `<b>Excellent tier</b> के लिए ${5 - n} और जोड़ें`;
+      payoffEn = '<b>5+ photos</b> means customers see your shop properly. Featured chance opens up.';
+      payoffHi = '<b>5+ फोटो</b> से ग्राहक दुकान अच्छे से देख पाते हैं. Featured chance खुलता है.';
+    } else if (n < 8){
+      target = 8; milestone = n; color = '#10B981'; emoji = '✨';
+      headlineEn = `Strong gallery! ${8 - n} more for <b>Platinum</b>`;
+      headlineHi = `अच्छी gallery! <b>Platinum</b> के लिए ${8 - n} और`;
+      payoffEn = 'Top shops have <b>8+ photos</b>. Variety helps customers decide faster.';
+      payoffHi = 'Top shops में <b>8+ फोटो</b> होती हैं. Variety से ग्राहक जल्दी decide करते हैं.';
+    } else {
+      target = n; milestone = n; color = '#10B981'; emoji = '🏆';
+      headlineEn = 'Platinum gallery — fantastic!';
+      headlineHi = 'Platinum gallery — शानदार!';
+      payoffEn = 'You have the maximum photo trust score. Your listing is top-tier.';
+      payoffHi = 'आपको maximum photo trust score मिल गया है. Listing top-tier पर है.';
+    }
+    const pct = Math.min(100, Math.round((milestone / target) * 100));
+    const badge = document.getElementById('photoProgressBadge');
+    if (badge){
+      badge.innerHTML = `
+        <style>
+          .ppb-card{ background:#fff; border:1.5px solid ${color}33; border-left:4px solid ${color}; border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(15,23,42,.04); display:flex; align-items:center; gap:16px; flex-wrap:wrap }
+          .ppb-icon{ font-size:2rem; flex-shrink:0 }
+          .ppb-body{ flex:1; min-width:200px }
+          .ppb-head{ font-size:.95rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; margin-bottom:3px }
+          .ppb-head b{ color:${color}; font-weight:900 }
+          .ppb-sub{ font-size:.82rem; color:#475569; font-weight:500; line-height:1.45 }
+          .ppb-sub b{ color:#0F172A; font-weight:700 }
+          .ppb-progress{ flex:0 0 140px; min-width:140px }
+          .ppb-bar{ height:8px; background:#F1F5F9; border-radius:6px; overflow:hidden }
+          .ppb-bar > div{ height:100%; background:linear-gradient(90deg, ${color}, ${color}cc); border-radius:6px; transition:width .6s cubic-bezier(.4,0,.2,1); width:${pct}%; box-shadow:0 0 6px ${color}66 }
+          .ppb-num{ font-size:.78rem; color:${color}; font-weight:800; margin-top:5px; text-align:right; letter-spacing:.02em }
+          @media(max-width:480px){
+            .ppb-progress{ flex:0 0 100%; min-width:auto }
+          }
+        </style>
+        <div class="ppb-card">
+          <div class="ppb-icon">${emoji}</div>
+          <div class="ppb-body">
+            <div class="ppb-head">${lang==='hi' ? headlineHi : headlineEn}</div>
+            <div class="ppb-sub">${lang==='hi' ? payoffHi : payoffEn}</div>
+          </div>
+          <div class="ppb-progress">
+            <div class="ppb-bar"><div></div></div>
+            <div class="ppb-num">${milestone} / ${target} photos · ${pct}%</div>
+          </div>
+        </div>
+      `;
+      badge.style.display = '';
+    }
+  } catch(e){ console.warn('Photo progress badge:', e); }
   if (!photos.length){
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.88rem">No photos uploaded yet</div>`;
   } else {
