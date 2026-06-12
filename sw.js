@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.9';  // bumped — HOTFIX Phase 2 Discover Auto-play hang: rewrote autoplay logic to (a) use single timer with clearInterval before every setInterval (b) remove touchstart/touchend handlers which were firing during normal scroll and stacking up dozens of overlapping intervals (c) reduce interval from 100ms to 250ms (4 fps progress bar — easy on battery) (d) rely on IntersectionObserver to naturally restart timer on each new card. No more pause-on-touch — user taps the ⏸️ toggle if they want manual mode. Smart sort + seen tracking + autoplay toggle unchanged.
+const VERSION    = 'dukan-v2.9.10';  // HOTFIX v2 — blank screen fix: (a) wrapped IntersectionObserver callback in try/catch so a single error inside can't prevent .active class from being added — body content was invisible because .active wasn't sticking (b) added 600ms safety net: if no card has .active after IO finishes, force-activate cards[0] (c) one-time migration: reset dl_discover_autoplay to '0' so users who had autoplay ON in buggy v2.9.8 don't carry the broken state forward. Users can re-enable autoplay via the ▶️ toggle after confirming the feed renders properly.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

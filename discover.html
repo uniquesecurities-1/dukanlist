@@ -1613,46 +1613,64 @@ function renderFiltered(){
     }, 250);  // 4 fps — smooth enough, easy on battery
   }
 
+  // One-time migration: in v2.9.8 autoplay could hang. Force reset to OFF on first
+  // v2.9.9+ load to give user a clean restart. They can re-enable via the toggle.
+  try {
+    if (!localStorage.getItem('dl_autoplay_reset_v299')){
+      localStorage.setItem('dl_discover_autoplay', '0');
+      localStorage.setItem('dl_autoplay_reset_v299', '1');
+    }
+  } catch(_){}
+
   updateAutoplayBtnUI();
 
   if ('IntersectionObserver' in window){
     var obs = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
         if (en.intersectionRatio > 0.5){
+          // STEP 1 — Always add .active first (must not throw)
           en.target.classList.add('active');
           var idx = parseInt(en.target.getAttribute('data-idx') || '0', 10);
-          if (!_firstActivation && _hasInteracted && idx !== _lastActiveIdx){
-            playSwipeSound();
-          }
           _firstActivation = false;
           _lastActiveIdx = idx;
-          // Phase 2 — mark as seen after dwell + start autoplay timer
-          var bid = en.target.getAttribute('data-id');
-          setTimeout(function(){ if (_lastActiveIdx === idx) markSeen(bid); }, SEEN_DWELL_MS);
-          startAutoplayTimer(idx);
-          // HOT v2 Phase 2 — update progress bar + streak
-          updatePosBar(idx, cards.length);
-          bumpStreak();
-          // After 5 cards viewed → offer notif subscribe
-          if (idx >= 4) maybeShowNotifSheet();
-          // Show social proof toast on first activation of each new card
-          maybeShowSocialToast(en.target);
-          // Lazy load next card image
-          var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
-          if (nxt){
-            var bg2 = nxt.querySelector('.bg');
-            var style2 = bg2 && bg2.getAttribute('style') || '';
-            var m2 = style2.match(/url\(([^)]+)\)/);
-            if (m2){ var im = new Image(); im.src = m2[1]; }
-          }
+          // STEP 2 — Everything else wrapped so a single failure can't
+          //         keep .body invisible.
+          try { if (_hasInteracted && idx !== 0) playSwipeSound(); } catch(_){}
+          try {
+            var bid = en.target.getAttribute('data-id');
+            setTimeout(function(){ if (_lastActiveIdx === idx) markSeen(bid); }, SEEN_DWELL_MS);
+          } catch(_){}
+          try { startAutoplayTimer(idx); } catch(_){}
+          try { updatePosBar(idx, cards.length); } catch(_){}
+          try { bumpStreak(); } catch(_){}
+          try { if (idx >= 4) maybeShowNotifSheet(); } catch(_){}
+          try { maybeShowSocialToast(en.target); } catch(_){}
+          try {
+            var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
+            if (nxt){
+              var bg2 = nxt.querySelector('.bg');
+              var style2 = bg2 && bg2.getAttribute('style') || '';
+              var m2 = style2.match(/url\(([^)]+)\)/);
+              if (m2){ var im = new Image(); im.src = m2[1]; }
+            }
+          } catch(_){}
         }
       });
     }, { root: feed, threshold: [0.5] });
     cards.forEach(function(card){ obs.observe(card); });
     if (cards[0]){
       cards[0].classList.add('active');
-      updatePosBar(0, cards.length);
+      try { updatePosBar(0, cards.length); } catch(_){}
     }
+    // SAFETY NET — if for some reason IO + cards[0] both failed to activate
+    // the first card, force it after 600ms. This guarantees body always shows.
+    setTimeout(function(){
+      var any = feed.querySelector('.card.active');
+      if (!any){
+        var first = feed.querySelector('.card');
+        if (first){ first.classList.add('active'); }
+      }
+    }, 600);
   } else {
     cards.forEach(function(card){ card.classList.add('active'); });
   }
