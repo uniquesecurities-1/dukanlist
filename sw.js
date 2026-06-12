@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.1.0';  // bumped — Homepage UX upgrades: Quick Pick chip count badges + 3-step "How does this work?" strip + mobile sticky mini-search bar. Plus 10 new categories + admin/shop guards + Suspicious View fix + Pulse Loading fix.
+const VERSION    = 'dukan-v2.2.0';  // bumped — HYPERLOCAL AREA FEATURE Phase 1: locality slug column + 11 new Mandi Dabwali areas (Meena Bazaar, Main Bazaar etc.) + registration locality dropdown re-enabled with "3x more views" nudge + hyperlocal landing pages /area/:city/:locality (SEO goldmine). Plus prior fixes: Quick Pick badges, sticky mini-search, How-does-this-work strip, 10 new categories.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

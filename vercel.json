@@ -36,6 +36,10 @@
       "destination": "/api/locality?city=:city&cat=:cat"
     },
     {
+      "source": "/area/:city/:locality",
+      "destination": "/api/area?city=:city&locality=:locality"
+    },
+    {
       "source": "/puchobhai",
       "destination": "/pucho-bhai.html"
     },

@@ -779,14 +779,21 @@
         <label><span data-i18n-en>City</span><span data-i18n-hi>शहर</span><span class="req">*</span></label>
         <select id="cityId" class="select" onchange="onCityChange()"></select>
       </div>
-      <!-- Locality dropdown removed (2026-06-02) — confusing for shopkeepers
-           who add area/mohalla details in Address Line 1 anyway. The
-           hidden select below stays so existing JS that references it
-           does not break, but it is invisible and never submitted as a
-           value (always defaults to NULL via the parseInt fallback). -->
-      <select id="localityId" class="select" style="display:none" aria-hidden="true">
-        <option value="">— optional —</option>
-      </select>
+      <!-- Locality dropdown — RE-ENABLED 2026-06-11 with strong nudge.
+           Local area search ("Meena Bazaar mein doctor") is how people
+           ACTUALLY look for shops. Optional but the help text below
+           strongly nudges shopkeepers to fill it for 3x more views. -->
+      <div class="form-group" id="localityWrap" style="display:none">
+        <label>
+          <span data-i18n-en>🎯 Area / Market</span><span data-i18n-hi>🎯 क्षेत्र / बाज़ार</span>
+          <span style="background:#FEF3C7;color:#92400E;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em;text-transform:uppercase">Recommended</span>
+        </label>
+        <select id="localityId" class="select"></select>
+        <div class="help" style="color:#059669;font-weight:600">
+          <span data-i18n-en>💡 Area daalne wale shops ko <b>3x zyada local customers</b> milte hain — "Meena Bazaar mein doctor" jaise searches me top par dikhte ho.</span>
+          <span data-i18n-hi>💡 क्षेत्र भरने वाली दुकानों को <b>3x ज़्यादा local ग्राहक</b> मिलते हैं — "मीना बाज़ार में डॉक्टर" जैसी खोज में सबसे ऊपर दिखते हो।</span>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label><span data-i18n-en>Pincode</span><span data-i18n-hi>पिनकोड</span><span class="req">*</span></label>
@@ -1467,6 +1474,7 @@ async function onStateChange(){
   document.getElementById('districtId').innerHTML = '<option value="">— Select district —</option>';
   document.getElementById('cityId').innerHTML = '<option value="">— Select city —</option>';
   document.getElementById('localityId').innerHTML = '<option value="">— optional —</option>';
+  { const lw = document.getElementById('localityWrap'); if (lw) lw.style.display = 'none'; }
   if (!stateId) return;
   const districts = await Geo.loadDistricts(stateId);
   Geo.fillSelect(document.getElementById('districtId'), districts, '— Select district —', lang);
@@ -1476,6 +1484,7 @@ async function onDistrictChange(){
   const distId = +document.getElementById('districtId').value;
   document.getElementById('cityId').innerHTML = '<option value="">— Select city —</option>';
   document.getElementById('localityId').innerHTML = '<option value="">— optional —</option>';
+  { const lw = document.getElementById('localityWrap'); if (lw) lw.style.display = 'none'; }
   if (!distId) return;
   const cities = await Geo.loadCities(distId);
   Geo.fillSelect(document.getElementById('cityId'), cities, '— Select city —', lang);
@@ -1484,9 +1493,14 @@ async function onCityChange(){
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
   const cityId = +document.getElementById('cityId').value;
   document.getElementById('localityId').innerHTML = '<option value="">— optional —</option>';
+  // Hide locality wrap if no city selected
+  const locWrap = document.getElementById('localityWrap');
+  if (locWrap) locWrap.style.display = cityId ? '' : 'none';
   if (!cityId) return;
   const locs = await Geo.loadLocalities(cityId);
-  Geo.fillSelect(document.getElementById('localityId'), locs, '— Optional locality —', lang);
+  // Show locality wrap only if the city has localities curated
+  if (locWrap) locWrap.style.display = (locs && locs.length) ? '' : 'none';
+  Geo.fillSelect(document.getElementById('localityId'), locs, lang === 'hi' ? '— क्षेत्र चुनें (वैकल्पिक) —' : '— Select area (optional) —', lang);
   const cityOpt = document.querySelector('#cityId option:checked');
   if (cityOpt && cityOpt.dataset.pincodes){
     const pins = cityOpt.dataset.pincodes.split(',').filter(Boolean);
