@@ -42,6 +42,132 @@ git status --short
 echo ------------------------------------------------
 echo.
 
+REM ============================================================
+REM  PRE-FLIGHT GUARDRAIL — syntax-check critical files
+REM  Catches Windows-mount truncation bugs BEFORE they reach prod.
+REM  - All api/*.js are parsed by Node — refuses push on any syntax error
+REM  - All assets/js/*.js similarly checked
+REM  - Top-level HTML files checked for missing </html> closer
+REM ============================================================
+echo Running pre-flight syntax checks...
+echo ------------------------------------------------
+
+REM Verify node is available
+node --version >nul 2>&1
+if errorlevel 1 (
+  color 0E
+  echo [WARN] Node.js not found in PATH ^- skipping syntax checks.
+  echo        Install Node to enable pre-flight guards.
+  echo.
+  goto :SKIP_GUARD
+)
+
+set "SYNTAX_FAIL=0"
+
+REM ---- Check every .js file under api/ ----
+for %%f in (api\*.js) do (
+  node --check "%%f" >nul 2>&1
+  if errorlevel 1 (
+    color 0C
+    echo [SYNTAX ERROR] %%f
+    node --check "%%f"
+    set "SYNTAX_FAIL=1"
+  )
+)
+
+REM ---- Check every .js file under assets\js\ ----
+for %%f in (assets\js\*.js) do (
+  node --check "%%f" >nul 2>&1
+  if errorlevel 1 (
+    color 0C
+    echo [SYNTAX ERROR] %%f
+    node --check "%%f"
+    set "SYNTAX_FAIL=1"
+  )
+)
+
+REM ---- Check sw.js ----
+if exist sw.js (
+  node --check sw.js >nul 2>&1
+  if errorlevel 1 (
+    color 0C
+    echo [SYNTAX ERROR] sw.js
+    node --check sw.js
+    set "SYNTAX_FAIL=1"
+  )
+)
+
+REM ---- Check critical HTML files have closing </html> ----
+REM  (Windows mount truncation often eats the tail of large files)
+for %%h in (index.html business.html search.html shortlist.html browse.html register.html) do (
+  if exist %%h (
+    findstr /C:"</html>" %%h >nul 2>&1
+    if errorlevel 1 (
+      color 0C
+      echo [TRUNCATED HTML] %%h ^- missing closing ^</html^> tag
+      set "SYNTAX_FAIL=1"
+    )
+  )
+)
+
+REM ---- Check panel/*.html closing tags ----
+for %%h in (panel\dashboard.html panel\profile.html panel\photos.html panel\digital-card.html) do (
+  if exist %%h (
+    findstr /C:"</html>" %%h >nul 2>&1
+    if errorlevel 1 (
+      color 0C
+      echo [TRUNCATED HTML] %%h ^- missing closing ^</html^> tag
+      set "SYNTAX_FAIL=1"
+    )
+  )
+)
+
+REM ---- Check admin/*.html closing tags ----
+for %%h in (admin\dashboard.html admin\monitoring.html admin\shop.html admin\moderation.html admin\suspicious.html) do (
+  if exist %%h (
+    findstr /C:"</html>" %%h >nul 2>&1
+    if errorlevel 1 (
+      color 0C
+      echo [TRUNCATED HTML] %%h ^- missing closing ^</html^> tag
+      set "SYNTAX_FAIL=1"
+    )
+  )
+)
+
+REM ---- Check categories.json is valid JSON ----
+if exist assets\data\categories.json (
+  node -e "JSON.parse(require('fs').readFileSync('assets/data/categories.json','utf8'))" >nul 2>&1
+  if errorlevel 1 (
+    color 0C
+    echo [INVALID JSON] assets\data\categories.json
+    set "SYNTAX_FAIL=1"
+  )
+)
+
+if "%SYNTAX_FAIL%"=="1" (
+  echo.
+  echo ================================================
+  echo    PUSH ABORTED ^- syntax errors detected
+  echo ================================================
+  echo.
+  echo One or more files would crash in production.
+  echo Fix the errors above and try again.
+  echo.
+  echo Tip: most truncations come from the Windows mount
+  echo cutting large file writes. Re-save the broken file
+  echo or restore from git: git restore ^<file^>
+  echo.
+  pause
+  exit /b 1
+)
+
+color 0A
+echo [OK] All syntax checks passed.
+color 0B
+echo.
+
+:SKIP_GUARD
+
 echo Adding all changes...
 git add -A
 

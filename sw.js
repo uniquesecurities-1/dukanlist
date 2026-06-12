@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.7.1';  // bumped — Language polish: replaced casual Hinglish ("Yeh shop dekho", "DukanList par dekho", "kahi bhi", "banao") with professional English defaults across share messages, search toasts, Be-First CTA, Quick Wins payoffs, WhatsApp template, photo progress badge. Hindi versions are now pure Devanagari (no Roman mix).
+const VERSION    = 'dukan-v2.7.3';  // hotfix bundle — /api/share truncation fix + index.html truncation fix (loadChipCounts mid-statement) + quick-push.bat now has pre-flight syntax guardrail (node --check on api/*.js + assets/js/*.js + sw.js, plus </html> closing-tag check on critical HTML, plus categories.json JSON validation). Push aborts on any failure.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
