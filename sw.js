@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.2';  // bumped — discoverability fix: /admin/incomplete-shops.html now linked from admin/dashboard.html (between Suspicious and Duplicates), admin/suspicious.html nav, and admin/moderation.html nav. Plus all Bundle D part 2 features still intact.
+const VERSION    = 'dukan-v2.8.3';  // bumped — hotfix: /admin/incomplete-shops.html was missing Supabase CDN script tag, causing 'Could not verify admin access' error. Added the same CDN load order other admin pages use.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
