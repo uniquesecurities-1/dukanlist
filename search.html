@@ -1147,15 +1147,23 @@ function renderMapPins(){
 // ============================================================
 // SEARCH v2: Quick category chips strip
 // ============================================================
+// Multi-slug chips — each chip's slug is a comma-separated list of category slugs.
+// runSearch() detects the comma and fans out parallel RPCs, then merges by id.
+// Active-state matching is exact string compare on full slug, so the chip stays
+// highlighted when its slug matches the URL ?cat= value.
 const QUICK_CAT_LIST = [
-  { slug: 'doctor',          name: 'Doctor',     emoji: '\u{1F469}‍⚕️' },
-  { slug: 'beauty-salon',    name: 'Salon',      emoji: '\u{1F488}' },
-  { slug: 'mechanic',        name: 'Mechanic',   emoji: '\u{1F527}' },
-  { slug: 'grocery',         name: 'Grocery',    emoji: '\u{1F6D2}' },
-  { slug: 'restaurant',      name: 'Restaurant', emoji: '\u{1F37D}️' },
-  { slug: 'tutor',           name: 'Tutor',      emoji: '\u{1F9D1}‍\u{1F3EB}' },
-  { slug: 'pharmacy',        name: 'Pharmacy',   emoji: '\u{1F48A}' },
-  { slug: 'mutual-fund-distributor', name: 'Mutual Funds', emoji: '\u{1F4CA}' }
+  { slug: 'doctor,dentist,ayurveda,homeopathy,hospital,physiotherapist,eye-care,gynecologist,pediatrician', name: 'Doctor', emoji: '\u{1F469}‍⚕️' },
+  { slug: 'pharmacy',                                                                                       name: 'Pharmacy', emoji: '\u{1F48A}' },
+  { slug: 'kirana-grocery,general-store,wholesale-dealer',                                                  name: 'Grocery', emoji: '\u{1F6D2}' },
+  { slug: 'mutual-fund-distributor,financial-advisor,stock-broker,insurance-agent',                         name: 'Mutual Funds', emoji: '\u{1F4CA}' },
+  { slug: 'salon-beauty,unisex-salon,mens-salon,beauty-parlour,salon,spa',                                  name: 'Salon', emoji: '\u{1F488}' },
+  { slug: 'car-service,two-wheeler-service,tyre-shop,spare-parts,cycle-shop,puncture-shop,tractor-parts,battery-shop', name: 'Mechanic', emoji: '\u{1F527}' },
+  { slug: 'tuition-coaching,coaching-institute,training-institute,skill-vocational,english-speaking,computer-classes,computer-class,art-craft-class', name: 'Tutor', emoji: '\u{1F9D1}‍\u{1F3EB}' },
+  { slug: 'restaurant,dhaba,cafe,fast-food,sweet-shop,chinese,south-indian',                                name: 'Restaurant', emoji: '\u{1F37D}️' },
+  { slug: 'clothing-store,tailor,boutique,readymade-garments',                                              name: 'Clothes / Tailor', emoji: '\u{1F455}' },
+  { slug: 'bakery-cake',                                                                                    name: 'Bakery', emoji: '\u{1F370}' },
+  { slug: 'electrician,plumber,carpenter,painter,ac-repair',                                                name: 'Repair', emoji: '⚡' },
+  { slug: 'mobile-shop,mobile-repair,computer-shop,electronics-store',                                      name: 'Mobile / Electronics', emoji: '\u{1F4F1}' }
 ];
 
 // ============================================================

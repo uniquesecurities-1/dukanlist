@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.13';  // FIX — category chips on main page (index.html) now use ?cat=slug1,slug2,... instead of ?q=text. Old hrefs (?q=doctor, ?q=grocery, etc.) did text-search on shop names but most doctor shops are named "Dr. X Clinic" or "Aastha Hospital" — no literal "doctor" string. Result: chips showed counts (Doctor: 3) but click gave empty results. New approach: each chip maps to its full slug list from CHIP_TO_SLUGS (doctor → 9 slugs incl. dentist/ayurveda/etc.). search.html updated to parse comma-separated cat slugs, run parallel RPCs, merge + dedupe by id. Backward compatible — single cat slug still uses fast single-RPC path.
+const VERSION    = 'dukan-v2.9.14';  // FIX — (1) search.html quick-cat chips (Doctor, Salon, Mechanic, Grocery, etc.) now use multi-slug format so clicking Doctor finds dentist/hospital/ayurveda etc. not just shops with literal slug 'doctor'. Same pattern as index.html chips in v2.9.13. Added Mutual Funds and Clothes/Tailor and Repair and Mobile/Electronics chips. (2) Recently Viewed totally redesigned — list-style cards with category badge, rating, verified pill, city + last-seen-time, plus inline 📞 Call and 💬 WhatsApp circular buttons. Tracks mobile/whatsapp/category_icon/verified on view so the buttons work. Up to 6 most recent shown.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
