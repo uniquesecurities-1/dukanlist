@@ -84,6 +84,31 @@
   textarea.subtitle.hi{ font-family:'Noto Sans Devanagari',sans-serif }
   .sub-label{ font-size:.68rem; color:#94A3B8; font-weight:700; margin-top:6px; letter-spacing:.04em; text-transform:uppercase }
 
+  /* Shop brand toggle + bizPill */
+  .brand-toggle{ display:inline-flex; align-items:center; gap:8px; background:#F0FDF4; border:1px solid #BBF7D0; padding:7px 12px; border-radius:99px; font-size:.78rem; font-weight:700; color:#065F46; cursor:pointer; transition:.15s; user-select:none }
+  .brand-toggle:hover{ background:#DCFCE7 }
+  .brand-toggle input{ accent-color:#16A34A; cursor:pointer; width:14px; height:14px }
+  .brand-toggle.locked{ background:#FEF3C7; border-color:#FCD34D; color:#92400E; cursor:default }
+
+  /* Format selector — Square / Story / Card */
+  .fmt-row{ display:inline-flex; background:#F1F5F9; padding:3px; border-radius:10px; gap:2px; margin-left:auto }
+  .fmt-row button{ background:transparent; border:0; padding:6px 12px; border-radius:8px; font-family:inherit; font-size:.76rem; font-weight:800; color:#64748B; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:4px }
+  .fmt-row button.active{ background:#0F172A; color:#fff; box-shadow:0 2px 6px rgba(15,23,42,.18) }
+  .fmt-row button .fmt-ico{ font-size:.9rem }
+
+  /* Festival banner — auto-shown when festival is upcoming */
+  .fest-banner{ display:none; align-items:center; gap:12px; background:linear-gradient(135deg,#FFF7ED 0%,#FED7AA 100%); border:1.5px solid #FB923C; border-radius:12px; padding:12px 16px; margin-bottom:14px; box-shadow:0 4px 14px rgba(251,146,60,.18); animation:festPulse 3s ease-in-out infinite }
+  .fest-banner.show{ display:flex }
+  @keyframes festPulse{ 0%,100%{ box-shadow:0 4px 14px rgba(251,146,60,.18) } 50%{ box-shadow:0 6px 22px rgba(251,146,60,.32) } }
+  .fest-banner .fb-icon{ font-size:1.8rem; flex-shrink:0; filter:drop-shadow(0 2px 4px rgba(251,146,60,.4)) }
+  .fest-banner .fb-text{ flex:1; min-width:0 }
+  .fest-banner .fb-title{ font-weight:800; color:#9A3412; font-size:.92rem; letter-spacing:-.01em }
+  .fest-banner .fb-sub{ font-size:.76rem; color:#9A3412; opacity:.85; margin-top:2px; font-weight:600 }
+  .fest-banner .fb-cta{ background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; border:0; padding:8px 14px; border-radius:8px; font-family:inherit; font-size:.82rem; font-weight:800; cursor:pointer; flex-shrink:0; box-shadow:0 3px 8px rgba(255,107,26,.3); white-space:nowrap }
+  .fest-banner .fb-cta:active{ transform:scale(.96) }
+  .fest-banner .fb-close{ background:transparent; border:0; color:#9A3412; font-size:1.2rem; cursor:pointer; padding:2px 6px; opacity:.55; line-height:1 }
+  .fest-banner .fb-close:hover{ opacity:1 }
+
   .topbar{ background:#fff; border-bottom:1px solid #E2E8F0; padding:12px 18px; display:flex; align-items:center; justify-content:space-between }
   .topbar a{ color:#0F172A; text-decoration:none; font-weight:800; font-size:1rem; letter-spacing:-.02em }
   .topbar .links a{ font-size:.84rem; font-weight:700; color:#475569; margin-left:14px }
@@ -106,6 +131,17 @@
 <main class="page">
   <h1>⚡ <span>Quick Poster Maker</span></h1>
   <div class="page-sub">Type your message → pick a style → share. No template browsing, no setup.</div>
+
+  <!-- Festival auto-detect banner — only shown when a festival is upcoming -->
+  <div class="fest-banner" id="festBanner">
+    <div class="fb-icon" id="fbIcon">🪔</div>
+    <div class="fb-text">
+      <div class="fb-title" id="fbTitle">Festival coming soon</div>
+      <div class="fb-sub" id="fbSub">Tap to create your festive poster</div>
+    </div>
+    <button type="button" class="fb-cta" id="fbCta">Create poster</button>
+    <button type="button" class="fb-close" id="fbClose" title="Dismiss">×</button>
+  </div>
 
   <!-- 1. Quick category — solves blank canvas problem -->
   <div class="card">
@@ -160,7 +196,21 @@ e.g. FLAT 30% OFF" maxlength="80"></textarea>
 
   <!-- 3. Preview + Share -->
   <div class="card">
-    <div class="section-label">4. Preview & share</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="section-label" style="margin-bottom:0">4. Preview & share</div>
+      <div class="fmt-row" id="fmtRow">
+        <button type="button" class="active" data-fmt="square"><span class="fmt-ico">⬛</span> Square</button>
+        <button type="button" data-fmt="story"><span class="fmt-ico">▭</span> Story</button>
+        <button type="button" data-fmt="card"><span class="fmt-ico">▬</span> Card</button>
+      </div>
+    </div>
+    <!-- Optional: brand the poster with shop name + phone -->
+    <div style="margin-bottom:12px" id="brandToggleWrap" style="display:none">
+      <label class="brand-toggle" id="brandToggle">
+        <input type="checkbox" id="brandChk" checked>
+        <span>Brand with my shop name + phone</span>
+      </label>
+    </div>
     <div class="preview-wrap" id="previewWrap">
       <div class="empty-hint" id="emptyHint">Type your message above to see the live preview.</div>
       <canvas id="mainCanvas" width="1080" height="1080" style="display:none"></canvas>
@@ -176,6 +226,8 @@ e.g. FLAT 30% OFF" maxlength="80"></textarea>
 
 <div id="toast" class="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
 <script>
 'use strict';
 
@@ -188,7 +240,16 @@ const STATE = {
   lang: 'en',
   photo: null,           // HTMLImageElement
   styleId: 'saffron-pop',// default style
-  category: null         // currently selected category (offer/greeting/new/hours/festival)
+  category: null,        // currently selected category
+  format: 'square',      // 'square' (1080x1080) | 'story' (1080x1920) | 'card' (1200x630)
+  brand: true,           // include shop name + phone at the bottom
+  biz: null              // { name, mobile } — loaded from logged-in shop on boot
+};
+
+const FORMATS = {
+  square: { w: 1080, h: 1080, label: 'Square' },
+  story:  { w: 1080, h: 1920, label: 'Story'  },
+  card:   { w: 1200, h: 630,  label: 'Card'   }
 };
 
 // Category presets — pre-fills (msg, sub, styleId) for one-tap blank-canvas escape
@@ -279,6 +340,38 @@ function drawSubtitle(ctx, sub, x, y, opts){
     ctx.shadowBlur = 0;
     yy += f.lineH;
   }
+}
+
+// Draws a small shop-brand footer at bottom-center — shop name + phone
+function drawShopFooter(ctx, w, h, biz, opts){
+  if (!biz || !biz.name) return;
+  const phoneStr = biz.mobile ? '📞 ' + biz.mobile : '';
+  const text = biz.name + (phoneStr ? '  ·  ' + phoneStr : '');
+  // Backdrop pill for legibility on photo styles
+  ctx.save();
+  ctx.font = "700 26px 'Plus Jakarta Sans', sans-serif";
+  const m = ctx.measureText(text);
+  const padX = 22, padY = 11;
+  const pillW = m.width + padX*2;
+  const pillH = 26 + padY*2;
+  const x = w/2 - pillW/2;
+  const y = h - pillH - 60;
+  ctx.fillStyle = (opts && opts.dark) ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.55)';
+  // rounded rect
+  const r = pillH/2;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + pillW, y, x + pillW, y + pillH, r);
+  ctx.arcTo(x + pillW, y + pillH, x, y + pillH, r);
+  ctx.arcTo(x, y + pillH, x, y, r);
+  ctx.arcTo(x, y, x + pillW, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = (opts && opts.dark) ? '#0F172A' : '#fff';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, w/2, y + pillH/2 + 1);
+  ctx.restore();
 }
 
 function drawBrandPromo(ctx, w, h, color){
@@ -520,12 +613,28 @@ const RENDERERS = {
   'photo-overlay': renderPhotoOverlay
 };
 
-function renderInto(canvas, styleId){
+function renderInto(canvas, styleId, opts){
+  opts = opts || {};
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
   const fn = RENDERERS[styleId] || RENDERERS['saffron-pop'];
-  fn(ctx, w, h, { msg: STATE.msg, sub: STATE.sub, lang: STATE.lang, photo: STATE.photo });
+  const renderOpts = {
+    msg: STATE.msg,
+    sub: STATE.sub,
+    lang: STATE.lang,
+    photo: STATE.photo,
+    // Only include brand footer when rendering the BIG preview, not thumbnails
+    brand: opts.includeFooter ? STATE.brand : false,
+    biz: STATE.biz
+  };
+  fn(ctx, w, h, renderOpts);
+  // After style draws, overlay brand footer if requested
+  if (renderOpts.brand && renderOpts.biz && renderOpts.biz.name){
+    // Cream Minimal has light bg — invert to dark text on light pill
+    const lightBg = (styleId === 'cream-minimal');
+    drawShopFooter(ctx, w, h, renderOpts.biz, { dark: lightBg });
+  }
 }
 
 // ============================================================
@@ -574,7 +683,13 @@ function renderMain(){
   }
   hint.style.display = 'none';
   cv.style.display = 'block';
-  renderInto(cv, STATE.styleId);
+  // Resize main canvas to match selected format
+  const f = FORMATS[STATE.format] || FORMATS.square;
+  if (cv.width !== f.w || cv.height !== f.h){
+    cv.width = f.w;
+    cv.height = f.h;
+  }
+  renderInto(cv, STATE.styleId, { includeFooter: true });
 }
 
 function renderAll(){
@@ -743,9 +858,131 @@ document.getElementById('copyBtn').addEventListener('click', async () => {
   }
 });
 
+// === Format selector ===
+document.querySelectorAll('#fmtRow button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#fmtRow button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    STATE.format = b.getAttribute('data-fmt');
+    renderMain();   // resize + re-render the big preview only
+  });
+});
+
+// === Brand toggle ===
+document.getElementById('brandChk').addEventListener('change', (e) => {
+  STATE.brand = !!e.target.checked;
+  renderMain();
+});
+
+// === Load shop info (BIZ data) so brand stamp can include name + phone ===
+async function loadShopInfo(){
+  try {
+    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client){
+      // Without a logged-in shop, hide the brand toggle entirely
+      document.getElementById('brandToggleWrap').style.display = 'none';
+      STATE.brand = false;
+      return;
+    }
+    const c = ShopDB.client;
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user){
+      document.getElementById('brandToggleWrap').style.display = 'none';
+      STATE.brand = false;
+      return;
+    }
+    // Find the shop owned by this user
+    const userId = u.data.user.id;
+    const r = await c.from('business_owners')
+      .select('business_id, businesses(name, mobile, whatsapp)')
+      .eq('auth_user_id', userId)
+      .limit(1)
+      .maybeSingle();
+    if (r.error || !r.data || !r.data.businesses) return;
+    const biz = r.data.businesses;
+    const phone = String(biz.whatsapp || biz.mobile || '').replace(/\D/g, '').slice(-10);
+    STATE.biz = {
+      name:   biz.name || '',
+      mobile: phone ? ('+91 ' + phone) : ''
+    };
+    document.getElementById('brandToggleWrap').style.display = '';
+    renderMain();
+  } catch(e){ console.warn('Shop info load:', e); }
+}
+
+// === Festival auto-detect ===
+const FESTIVALS = [
+  // Approximate dates for 2026 — adjust as needed for production
+  { name:'Diwali',           emoji:'🪔', month:11, day: 8,  msg:'Wishing you a sparkling Diwali',     sub:'Lights, joy, and prosperity to all', style:'festival-bold' },
+  { name:'Holi',             emoji:'🎨', month:3,  day:6,   msg:'Happy Holi to all',                   sub:'May your day be full of colour',     style:'magenta-glow' },
+  { name:'Independence Day', emoji:'🇮🇳', month:8,  day:15,  msg:'Happy Independence Day',              sub:'Saluting the spirit of India',       style:'festival-bold' },
+  { name:'Republic Day',     emoji:'🇮🇳', month:1,  day:26,  msg:'Happy Republic Day',                  sub:'Proud of our democracy',             style:'festival-bold' },
+  { name:'Raksha Bandhan',   emoji:'🎗️', month:8,  day:9,   msg:'Happy Raksha Bandhan',                sub:'A bond that lasts forever',          style:'saffron-pop' },
+  { name:'Eid',              emoji:'🌙', month:3,  day:21,  msg:'Eid Mubarak',                         sub:'May this day bring joy to you',      style:'cream-minimal' },
+  { name:'Christmas',        emoji:'🎄', month:12, day:25,  msg:'Merry Christmas',                     sub:'Warm wishes from our family',         style:'cream-minimal' },
+  { name:'New Year',         emoji:'🎆', month:1,  day:1,   msg:'Happy New Year',                      sub:'May this year bring you success',     style:'magenta-glow' }
+];
+
+function detectUpcomingFestival(){
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  let best = null;
+  let bestDays = 9999;
+  for (const f of FESTIVALS){
+    // Try this year + next year, pick closest in future or within last 1 day
+    for (const yr of [thisYear, thisYear + 1]){
+      const d = new Date(yr, f.month - 1, f.day);
+      const diff = Math.round((d - now) / 86400000);
+      if (diff >= -1 && diff <= 14 && diff < bestDays){
+        bestDays = diff;
+        best = { ...f, daysAway: diff, dateObj: d };
+      }
+    }
+  }
+  return best;
+}
+
+function showFestivalBannerIfAny(){
+  try {
+    const dismissed = localStorage.getItem('dl_fest_banner_dismissed_at');
+    if (dismissed && (Date.now() - parseInt(dismissed, 10)) < 6 * 3600 * 1000) return; // 6hr cooldown
+    const fest = detectUpcomingFestival();
+    if (!fest) return;
+    const banner = document.getElementById('festBanner');
+    if (!banner) return;
+    document.getElementById('fbIcon').textContent = fest.emoji;
+    const dayText = fest.daysAway <= 0 ? 'today' : (fest.daysAway === 1 ? 'tomorrow' : 'in ' + fest.daysAway + ' days');
+    document.getElementById('fbTitle').textContent = fest.name + ' ' + dayText;
+    document.getElementById('fbSub').textContent = 'Tap to create your ' + fest.name.toLowerCase() + ' poster';
+    document.getElementById('fbCta').onclick = () => {
+      STATE.msg = fest.msg;
+      STATE.sub = fest.sub;
+      STATE.styleId = fest.style;
+      document.getElementById('msg').value = fest.msg;
+      document.getElementById('sub').value = fest.sub;
+      document.getElementById('charCount').textContent = fest.msg.length + ' / 80';
+      document.querySelectorAll('.style-card').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-style') === fest.style);
+      });
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      const festChip = document.querySelector('.cat-chip[data-cat="festival"]');
+      if (festChip) festChip.classList.add('active');
+      renderAll();
+      banner.classList.remove('show');
+      showToast('🎉 ' + fest.name + ' poster ready — pick a style or share now');
+    };
+    document.getElementById('fbClose').onclick = () => {
+      banner.classList.remove('show');
+      try { localStorage.setItem('dl_fest_banner_dismissed_at', String(Date.now())); } catch(_){}
+    };
+    banner.classList.add('show');
+  } catch(e){ console.warn('festival detect:', e); }
+}
+
 // === Boot ===
 buildStyleGrid();
 renderAll();
+loadShopInfo();
+showFestivalBannerIfAny();
 
 // Helpful sample on first focus if empty
 document.getElementById('msg').addEventListener('focus', (e) => {

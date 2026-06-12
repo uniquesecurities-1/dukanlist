@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.1';  // bumped — Quick Poster Maker v2: Category chip row (Offer/Greeting/New Arrival/Hours/Festival — one-tap pre-fills message + style) solves blank-canvas problem + Two-line mode (Headline + Subtitle) for pro-grade visual impact + Emoji quick-insert row (10 popular emojis) for instant punch. Char limit lowered 140→80 for the headline (subtitle is separate).
+const VERSION    = 'dukan-v2.9.2';  // bumped — Quick Poster Maker v3 (3 big upgrades): Shop Info Auto-Stamp (pulls logged-in shop name + phone, optional toggle, renders as bottom-center pill on poster) + Format Selector (Square 1080x1080 / Story 1080x1920 / Card 1200x630, canvas resizes on toggle) + Festival Auto-Detect Banner (Diwali, Holi, Eid, Christmas, Republic Day, Independence Day, Raksha Bandhan, New Year — 14-day lookahead, one-tap pre-fills festive message + style).
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
