@@ -1156,7 +1156,7 @@ function buildChips(allRows, catMap, activeFilter){
   sorted.forEach(function(id){
     var c = catMap[id] || {};
     var label = (c.icon || '🏪') + ' ' + (c.name || 'Shop');
-    chips += '<div class="chip '+(activeFilter===id?'active':'')+'" data-cat="'+esc(id)+'">'+esc(label)+'</div>';
+    chips += '<div class="chip '+(String(activeFilter)===String(id)?'active':'')+'" data-cat="'+esc(id)+'">'+esc(label)+'</div>';
   });
   return chips;
 }
@@ -1244,11 +1244,22 @@ async function init(){
 
 function renderFiltered(){
   var rows = STATE.allRows.slice();
+  // Type-safe filter: DOM data-cat attribute is always a string, but Supabase
+  // category_id/city_id columns may be INTEGER or UUID. Coerce to String on both
+  // sides so 123 === "123" works. (This is the root cause of the Discover "filter
+  // returns 0 even though chip exists" bug — fixed in v2.9.18.)
   if (STATE.filter){
-    rows = rows.filter(function(b){ return (b.sub_category_id||b.category_id) === STATE.filter; });
+    var fStr = String(STATE.filter);
+    rows = rows.filter(function(b){
+      var k = b.sub_category_id || b.category_id;
+      return k != null && String(k) === fStr;
+    });
   }
   if (STATE.cityFilter){
-    rows = rows.filter(function(b){ return b.city_id === STATE.cityFilter; });
+    var cStr = String(STATE.cityFilter);
+    rows = rows.filter(function(b){
+      return b.city_id != null && String(b.city_id) === cStr;
+    });
   }
   // ALWAYS re-render chips first so the active chip visually reflects STATE.filter.
   // (Previously this happened later in the function, so 0-result branches skipped it

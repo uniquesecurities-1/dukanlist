@@ -785,7 +785,19 @@ async function runSearch(){
       runSearch();
     };
     const cityLabel = cityId ? (document.querySelector('#citySel option[value="' + cityId + '"]')?.textContent || 'City') : null;
-    const catLabel  = catSlug ? (document.querySelector('#catSel option[value="' + catSlug + '"]')?.textContent || catSlug) : null;
+    let catLabel = null;
+    if (catSlug){
+      // Same friendly-label logic as renderActiveFilters
+      const qc2 = (typeof QUICK_CAT_LIST !== 'undefined') ? QUICK_CAT_LIST.find(c => c.slug === catSlug) : null;
+      if (qc2){ catLabel = (qc2.emoji ? qc2.emoji + ' ' : '') + qc2.name; }
+      else if (catSlug.indexOf(',') !== -1){
+        const parts = catSlug.split(',');
+        const firstName = document.querySelector('#catSel option[value="' + parts[0] + '"]')?.textContent || parts[0];
+        catLabel = parts.length > 1 ? (firstName.replace(/^.*?\s/, '') + ' + ' + (parts.length - 1) + ' more') : firstName;
+      } else {
+        catLabel = document.querySelector('#catSel option[value="' + catSlug + '"]')?.textContent || catSlug;
+      }
+    }
     const locLabel = locSlug ? ('📍 ' + locSlug.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase())) : null;
     DukanChips.render('filterChipsSlot', {
       q:    q       ? { label: q,         remove: rmAndSearch('q') }    : null,
@@ -1326,8 +1338,26 @@ function renderActiveFilters(){
   if (params.get('q')) pills.push({ label:'\u{1F50D} "' + params.get('q') + '"', remove:() => { const p=new URLSearchParams(location.search); p.delete('q'); pushAndRun(p); } });
   if (params.get('cat')){
     const catSlug = params.get('cat');
-    const catLabel = (CATEGORIES.find(c => c.slug === catSlug) || {}).name || catSlug;
-    pills.push({ label:'\u{1F3F7}️ ' + catLabel, remove:() => { const p=new URLSearchParams(location.search); p.delete('cat'); pushAndRun(p); } });
+    // Friendly label resolution:
+    //  1. Multi-slug chip match (e.g. "doctor,dentist,ayurveda,..." → "Doctor")
+    //  2. Single-slug exact match in QUICK_CAT_LIST
+    //  3. Single-slug in CATEGORIES master list
+    //  4. Raw slug as last resort
+    let catLabel = catSlug;
+    let catEmoji = '\u{1F3F7}️';
+    const qc = (typeof QUICK_CAT_LIST !== 'undefined') ? QUICK_CAT_LIST.find(c => c.slug === catSlug) : null;
+    if (qc){
+      catLabel = qc.name;
+      catEmoji = qc.emoji || catEmoji;
+    } else if (catSlug.indexOf(',') !== -1){
+      // Comma list that didn't match QUICK_CAT_LIST — pretty-print as "Slug1 + N more"
+      const parts = catSlug.split(',');
+      const first = (CATEGORIES.find(c => c.slug === parts[0]) || {}).name || parts[0];
+      catLabel = parts.length > 1 ? (first + ' + ' + (parts.length - 1) + ' more') : first;
+    } else {
+      catLabel = (CATEGORIES.find(c => c.slug === catSlug) || {}).name || catSlug;
+    }
+    pills.push({ label: catEmoji + ' ' + catLabel, remove:() => { const p=new URLSearchParams(location.search); p.delete('cat'); pushAndRun(p); } });
   }
   if (params.get('city')){
     const cid = resolveCityParam(params.get('city'));
