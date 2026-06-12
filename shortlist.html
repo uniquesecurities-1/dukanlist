@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Shortlist — DukanList</title>
+<meta name="description" content="Your personal shortlist of saved shops on DukanList. Compare, call, WhatsApp — never lose track of a good shop again.">
+<meta name="robots" content="noindex,follow">
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<style>
+  body{ margin:0; font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif; background:#FAFAFA; color:#0F172A }
+  .topbar{ background:#fff; border-bottom:1px solid #e2e8f0; padding:12px 20px; display:flex; align-items:center; justify-content:space-between }
+  .topbar a.brand{ font-weight:900; font-size:1.05rem; color:#0F172A; text-decoration:none; letter-spacing:-.02em }
+  .topbar a.brand .b{ background:#FFF7ED; color:#9A3412; font-size:.6rem; font-weight:800; padding:2px 7px; border-radius:5px; margin-left:5px; letter-spacing:.06em }
+  .topbar .actions a{ margin-left:14px; color:#475569; font-size:.85rem; text-decoration:none; font-weight:600 }
+
+  .page{ max-width:1180px; margin:0 auto; padding:24px 20px 60px }
+  .page h1{ font-family:'Manrope',sans-serif; font-size:1.85rem; font-weight:900; letter-spacing:-.025em; margin:8px 0 6px; line-height:1.2 }
+  .page h1 .grad{ background:linear-gradient(135deg,#FF6B1A,#E55100); -webkit-background-clip:text; background-clip:text; color:transparent }
+  .page .sub{ color:#64748B; font-size:.95rem; margin-bottom:24px; max-width:600px }
+
+  .stats-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px }
+  .stat-chip{ background:#fff; border:1px solid #E2E8F0; padding:10px 16px; border-radius:14px; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+  .stat-chip b{ display:block; font-size:1.3rem; font-weight:800; letter-spacing:-.02em; color:#0F172A; font-family:'Manrope',sans-serif }
+  .stat-chip span{ color:#64748B; font-size:.74rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px }
+  .card{ background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:16px; overflow:hidden; box-shadow:0 1px 3px rgba(15,23,42,.04); display:flex; flex-direction:column; position:relative; transition:transform .18s, box-shadow .18s }
+  .card:hover{ transform:translateY(-3px); box-shadow:0 16px 36px rgba(15,23,42,.08) }
+  .card-photo{ aspect-ratio:16/10; background:linear-gradient(135deg,#FAFAFA,#F1F5F9); display:grid; place-items:center; font-size:2.4rem; opacity:.55 }
+  .card-photo img{ width:100%; height:100%; object-fit:cover; opacity:1 }
+  .card-remove{ position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.95); border:1px solid rgba(15,23,42,.06); cursor:pointer; font-size:16px; display:grid; place-items:center; box-shadow:0 3px 10px rgba(15,23,42,.12); transition:.15s; padding:0 }
+  .card-remove:hover{ background:#FEE2E2; border-color:#FCA5A5 }
+  .card-body{ padding:14px; display:flex; flex-direction:column; gap:5px }
+  .card-cat{ font-size:.72rem; color:#FF6B1A; font-weight:800; letter-spacing:.02em }
+  .card-name{ font-family:'Manrope',sans-serif; font-size:1.05rem; font-weight:800; color:#0F172A; letter-spacing:-.015em; line-height:1.3; text-decoration:none }
+  .card-name:hover{ color:#FF6B1A; text-decoration:none }
+  .card-city{ font-size:.82rem; color:#64748B; font-weight:600 }
+  .card-ts{ font-size:.7rem; color:#94A3B8; font-weight:600; margin-top:2px }
+  .card-acts{ display:flex; gap:8px; padding:0 14px 14px }
+  .card-acts a{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:9px 6px; border-radius:10px; font-size:.78rem; font-weight:800; text-decoration:none; transition:.12s }
+  .card-acts a:active{ transform:scale(.96) }
+  .ca-view{ background:#0F172A; color:#fff }
+  .ca-view:hover{ background:#1F2937; text-decoration:none }
+
+  .empty{ text-align:center; padding:60px 20px; background:#fff; border-radius:18px; border:1px dashed #E2E8F0 }
+  .empty-emoji{ font-size:4rem; margin-bottom:14px; opacity:.6 }
+  .empty h2{ font-size:1.35rem; font-weight:800; margin:6px 0; letter-spacing:-.015em }
+  .empty p{ color:#64748B; max-width:480px; margin:0 auto 22px; font-size:.95rem; line-height:1.55 }
+  .empty .cta{ display:inline-block; background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; padding:12px 26px; border-radius:99px; font-weight:800; text-decoration:none; box-shadow:0 6px 16px rgba(255,107,26,.35) }
+  .empty .cta:hover{ transform:translateY(-2px); text-decoration:none }
+
+  .toolbar{ display:flex; gap:10px; justify-content:flex-end; margin-bottom:18px }
+  .toolbar button{ background:#fff; border:1px solid #E2E8F0; padding:8px 14px; border-radius:99px; font-family:inherit; font-size:.82rem; font-weight:700; color:#475569; cursor:pointer; transition:.15s }
+  .toolbar button:hover{ background:#FEF2F2; border-color:#FCA5A5; color:#991B1B }
+
+  @media(max-width:560px){
+    .page h1{ font-size:1.5rem }
+    .grid{ grid-template-columns:1fr }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="/">DukanList<span class="b">SHORTLIST</span></a>
+  <div class="actions">
+    <a href="/search.html">🔍 Search</a>
+    <a href="/browse.html">📚 Browse</a>
+  </div>
+</header>
+
+<main class="page">
+  <h1>❤️ My <span class="grad">Shortlist</span></h1>
+  <p class="sub">Your saved shops — direct call, WhatsApp, or open full listing. Stored on this device only (no login needed).</p>
+
+  <div class="stats-row">
+    <div class="stat-chip">
+      <b id="statCount">0</b>
+      <span>Saved shops</span>
+    </div>
+    <div class="stat-chip">
+      <b id="statCities">0</b>
+      <span>Cities</span>
+    </div>
+    <div class="stat-chip">
+      <b id="statCats">0</b>
+      <span>Categories</span>
+    </div>
+  </div>
+
+  <div class="toolbar" id="toolbar" style="display:none">
+    <button type="button" id="btnClear">🗑 Clear all</button>
+  </div>
+
+  <div id="resultRoot"></div>
+</main>
+
+<script src="/assets/js/shortlist.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  function fmtAgo(ts){
+    if (!ts) return '';
+    var d = (Date.now() - ts) / 1000;
+    if (d < 60) return 'just now';
+    if (d < 3600) return Math.floor(d/60) + 'm ago';
+    if (d < 86400) return Math.floor(d/3600) + 'h ago';
+    var days = Math.floor(d/86400);
+    if (days < 7) return days + 'd ago';
+    if (days < 30) return Math.floor(days/7) + 'w ago';
+    return new Date(ts).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+  }
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
+  function render(){
+    var items = DukanShortlist.list();
+    var host = document.getElementById('resultRoot');
+    var toolbar = document.getElementById('toolbar');
+
+    // Stats
+    document.getElementById('statCount').textContent = items.length;
+    var cities = new Set(), cats = new Set();
+    items.forEach(function(it){
+      if (it.city)     cities.add(it.city);
+      if (it.category) cats.add(it.category);
+    });
+    document.getElementById('statCities').textContent = cities.size;
+    document.getElementById('statCats').textContent   = cats.size;
+
+    if (items.length === 0){
+      toolbar.style.display = 'none';
+      host.innerHTML =
+        '<div class="empty">'
+        + '<div class="empty-emoji">🤍</div>'
+        + '<h2>Your shortlist is empty</h2>'
+        + '<p>Tap the heart 🤍 on any shop to save it here. Build your personal directory of trusted local shops — no login needed, saved on this device.</p>'
+        + '<a class="cta" href="/search.html">Start exploring shops →</a>'
+        + '</div>';
+      return;
+    }
+
+    toolbar.style.display = '';
+
+    var cards = items.map(function(it){
+      var photoHTML = it.photo
+        ? '<img src="' + esc(it.photo) + '" alt="' + esc(it.name) + '" loading="lazy">'
+        : (esc(it.icon) || '🏪');
+      var city = it.city ? '<div class="card-city">📍 ' + esc(it.city) + '</div>' : '';
+      var cat  = it.category ? '<div class="card-cat">' + esc(it.icon || '') + ' ' + esc(it.category) + '</div>' : '';
+      return ''
+        + '<div class="card">'
+        +   '<button class="card-remove" data-remove="' + esc(it.slug) + '" title="Remove" aria-label="Remove">✕</button>'
+        +   '<div class="card-photo">' + photoHTML + '</div>'
+        +   '<div class="card-body">'
+        +     cat
+        +     '<a class="card-name" href="/business.html?slug=' + encodeURIComponent(it.slug) + '">' + esc(it.name) + '</a>'
+        +     city
+        +     '<div class="card-ts">Saved ' + esc(fmtAgo(it.ts)) + '</div>'
+        +   '</div>'
+        +   '<div class="card-acts">'
+        +     '<a class="ca-view" href="/business.html?slug=' + encodeURIComponent(it.slug) + '">Open →</a>'
+        +   '</div>'
+        + '</div>';
+    }).join('');
+
+    host.innerHTML = '<div class="grid">' + cards + '</div>';
+
+    // Wire remove buttons
+    host.querySelectorAll('[data-remove]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var slug = btn.getAttribute('data-remove');
+        DukanShortlist.remove(slug);
+        DukanShortlist.toast('Removed from Shortlist');
+      });
+    });
+  }
+
+  document.getElementById('btnClear').addEventListener('click', function(){
+    if (DukanShortlist.count() === 0) return;
+    if (confirm('Clear ALL ' + DukanShortlist.count() + ' shops from your Shortlist? This cannot be undone.')){
+      DukanShortlist.clear();
+    }
+  });
+
+  // Subscribe so stats + grid stay in sync when user interacts
+  DukanShortlist.onChange(function(){ render(); });
+})();
+</script>
+</body>
+</html>

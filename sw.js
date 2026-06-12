@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.3.0';  // bumped — HYPERLOCAL Phase 2: auto-link existing shops by address scan + search_businesses now accepts p_locality_slug + search page locality chip filter + business card "More shops in {area} →" pill + sitemap.xml auto-includes /area URLs + homepage "Browse by area" strip.
+const VERSION    = 'dukan-v2.4.0';  // bumped — UX Phase 3: Sticky bottom action bar on shop pages (Call/WA/Directions) + Save to Shortlist (no-login, localStorage, 50 max) with header counter pill + dedicated /shortlist.html page + Open Now LIVE pulsing badge with "Closes in X" + Empty search → "Be the first" registration CTA.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
