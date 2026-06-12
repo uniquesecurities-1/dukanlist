@@ -1520,12 +1520,21 @@ function renderFiltered(){
   feed.addEventListener('scroll',     unlockAudio, { passive: true, once: true });
 
   // ============================================================
-  // Phase 2 — Auto-advance + Smart sort + Seen tracking
+  // Phase 2 — Auto-advance + Smart sort + Seen tracking (v2 — race-free)
+  // ============================================================
+  // Design notes:
+  //   * Single timer at a time. clearInterval BEFORE every setInterval.
+  //   * No pause-on-touchstart — that fires during normal scroll on mobile
+  //     and was creating timer storms. User can just tap ⏸️ to stop.
+  //   * IntersectionObserver naturally restarts the timer on each new card,
+  //     so no need to manually pause/resume around swipes.
+  //   * 250ms interval (not 100ms) — 4 updates/sec is plenty for a progress
+  //     bar and saves battery.
   // ============================================================
   var AUTOPLAY_KEY = 'dl_discover_autoplay';
   var SEEN_KEY = 'dl_discover_seen';
-  var AUTOPLAY_DURATION = 7000;     // 7 seconds per card
-  var SEEN_DWELL_MS = 2500;         // mark as "seen" after 2.5 sec dwell
+  var AUTOPLAY_DURATION = 7000;
+  var SEEN_DWELL_MS = 2500;
 
   function getAutoplay(){ try { return localStorage.getItem(AUTOPLAY_KEY) === '1'; } catch(_){ return false; } }
   function setAutoplay(v){ try { localStorage.setItem(AUTOPLAY_KEY, v ? '1' : '0'); } catch(_){} updateAutoplayBtnUI(); }
@@ -1548,73 +1557,61 @@ function renderFiltered(){
 
   var _autoplayTimer = null;
   var _autoplayStarted = 0;
-  var _autoplayPausedAt = 0;
   var _autoplayCurrentBar = null;
+
+  function _clearTimer(){
+    if (_autoplayTimer){
+      try { clearInterval(_autoplayTimer); } catch(_){}
+      _autoplayTimer = null;
+    }
+  }
   function stopAutoplayTimer(){
-    if (_autoplayTimer){ clearInterval(_autoplayTimer); _autoplayTimer = null; }
-    if (_autoplayCurrentBar){ var fill = _autoplayCurrentBar.querySelector('.ap-fill'); if (fill){ fill.style.width = '0%'; } _autoplayCurrentBar = null; }
+    _clearTimer();
+    if (_autoplayCurrentBar){
+      var fill = _autoplayCurrentBar.querySelector('.ap-fill');
+      if (fill) fill.style.width = '0%';
+      _autoplayCurrentBar.classList.remove('paused');
+      _autoplayCurrentBar = null;
+    }
   }
   function startAutoplayTimer(idx){
-    stopAutoplayTimer();
+    // ALWAYS clear before starting — single source of truth
+    _clearTimer();
     if (!getAutoplay()) return;
+    if (typeof idx !== 'number' || idx < 0) return;
     var card = document.querySelector('.card[data-idx="' + idx + '"]');
     if (!card) return;
     var bar = card.querySelector('.ap-bar');
     var fill = bar && bar.querySelector('.ap-fill');
     if (!fill) return;
+    // Reset any previous bar state
+    if (_autoplayCurrentBar && _autoplayCurrentBar !== bar){
+      var prev = _autoplayCurrentBar.querySelector('.ap-fill');
+      if (prev) prev.style.width = '0%';
+      _autoplayCurrentBar.classList.remove('paused');
+    }
     _autoplayCurrentBar = bar;
     _autoplayStarted = Date.now();
     fill.style.width = '0%';
+    bar.classList.remove('paused');
     _autoplayTimer = setInterval(function(){
+      // Defensive — if document hidden, just freeze progress (don't advance)
+      if (document.hidden) return;
       var elapsed = Date.now() - _autoplayStarted;
       var pct = Math.min(100, (elapsed / AUTOPLAY_DURATION) * 100);
       fill.style.width = pct + '%';
       if (elapsed >= AUTOPLAY_DURATION){
-        stopAutoplayTimer();
+        _clearTimer();
         var next = document.querySelector('.card[data-idx="' + (idx + 1) + '"]');
         if (next){
           next.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
-          // End of feed → loop back
           var first = document.querySelector('.card[data-idx="0"]');
           if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
-    }, 100);
+    }, 250);  // 4 fps — smooth enough, easy on battery
   }
-
-  // Pause autoplay on user touch/scroll, resume after they stop
-  var _userInteractTimer = null;
-  function pauseAutoplay(){
-    if (_autoplayCurrentBar) _autoplayCurrentBar.classList.add('paused');
-    if (_autoplayTimer){ clearInterval(_autoplayTimer); _autoplayTimer = null; _autoplayPausedAt = Date.now(); }
-  }
-  function resumeAutoplay(){
-    if (_autoplayCurrentBar) _autoplayCurrentBar.classList.remove('paused');
-    if (!getAutoplay()) return;
-    if (!_autoplayCurrentBar) return;
-    var fill = _autoplayCurrentBar.querySelector('.ap-fill');
-    if (!fill) return;
-    var alreadyElapsed = parseFloat(fill.style.width || '0') / 100 * AUTOPLAY_DURATION;
-    _autoplayStarted = Date.now() - alreadyElapsed;
-    _autoplayTimer = setInterval(function(){
-      var elapsed = Date.now() - _autoplayStarted;
-      var pct = Math.min(100, (elapsed / AUTOPLAY_DURATION) * 100);
-      fill.style.width = pct + '%';
-      if (elapsed >= AUTOPLAY_DURATION){
-        stopAutoplayTimer();
-        var idx = _lastActiveIdx;
-        var next = document.querySelector('.card[data-idx="' + (idx + 1) + '"]');
-        if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
-  }
-  feed.addEventListener('touchstart', function(){ pauseAutoplay(); clearTimeout(_userInteractTimer); }, { passive:true });
-  feed.addEventListener('touchend',   function(){ clearTimeout(_userInteractTimer); _userInteractTimer = setTimeout(resumeAutoplay, 1500); }, { passive:true });
-  feed.addEventListener('mousedown',  function(){ pauseAutoplay(); }, { passive:true });
-  feed.addEventListener('mouseup',    function(){ clearTimeout(_userInteractTimer); _userInteractTimer = setTimeout(resumeAutoplay, 1500); }, { passive:true });
-  // Pause when tab is hidden
-  document.addEventListener('visibilitychange', function(){ if (document.hidden) pauseAutoplay(); else resumeAutoplay(); });
 
   updateAutoplayBtnUI();
 

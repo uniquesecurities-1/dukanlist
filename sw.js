@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.8';  // bumped — Phase 2 Discover Feed Polish: (1) Auto-advance — 7-sec timer per card with animated progress bar (gold gradient at top of card), pauses on touch/scroll/hidden-tab, resumes 1.5 sec after interaction stops, loops back at end. (2) Auto-play toggle button (▶️/⏸️) next to mute in topNav with localStorage persistence. (3) Smart sort — renderFiltered now puts un-seen shops first (tracked by 2.5 sec dwell), then by likes_count desc, then by created_at desc. Cards have visible progress bar while autoplay running so user knows when next swipe will happen.
+const VERSION    = 'dukan-v2.9.9';  // bumped — HOTFIX Phase 2 Discover Auto-play hang: rewrote autoplay logic to (a) use single timer with clearInterval before every setInterval (b) remove touchstart/touchend handlers which were firing during normal scroll and stacking up dozens of overlapping intervals (c) reduce interval from 100ms to 250ms (4 fps progress bar — easy on battery) (d) rely on IntersectionObserver to naturally restart timer on each new card. No more pause-on-touch — user taps the ⏸️ toggle if they want manual mode. Smart sort + seen tracking + autoplay toggle unchanged.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
