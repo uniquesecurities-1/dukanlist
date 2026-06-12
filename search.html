@@ -985,11 +985,17 @@ function _renderResultsInner(){
           + '</div>';
       }
 
+      // Detect if ANY filter is active so we can suggest "Clear all" prominently
+      const anyFilterActive = !!(sParams.get('q') || sParams.get('cat') || sParams.get('city') || sParams.get('pin') || sParams.get('area') || sParams.get('locality') || RATING_FILTER || RATING_BUCKET >= 2 || VERIFIED_FILTER || OPEN_NOW || DEALS_FILTER);
+      const clearAllBtn = anyFilterActive
+        ? '<div style="margin-bottom:18px"><button onclick="clearAllFilters(event)" class="se-btn primary" style="padding:12px 22px;font-size:.92rem">🔄 <span data-i18n-en>Clear all filters &amp; start over</span><span data-i18n-hi>सभी फिल्टर हटाकर फिर से देखें</span></button></div>'
+        : '';
       resEl.innerHTML = firstHTML
         + '<div class="smart-empty">'
         + '<span class="se-emoji">\u{1F50E}</span>'
-        + '<div class="se-title">No shops match your filters</div>'
-        + '<div class="se-sub">Try removing some filters or browse a different category.</div>'
+        + '<div class="se-title"><span data-i18n-en>No shops match your filters</span><span data-i18n-hi>आपके फ़िल्टर से कोई दुकान नहीं मिली</span></div>'
+        + '<div class="se-sub"><span data-i18n-en>Try removing some filters or browse a different category.</span><span data-i18n-hi>कुछ फ़िल्टर हटाएँ या अलग category देखें।</span></div>'
+        + clearAllBtn
         + '<div class="se-suggestions">' + sugHTML + '</div>'
         + '</div>';
 

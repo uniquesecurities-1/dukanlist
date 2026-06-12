@@ -10,11 +10,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260528">
 <style>
-.cat-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;font-size:.78rem;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);text-decoration:none}
-.cat-pill.primary{background:#FFFBEB;border-color:#F59E0B;color:#92400E;font-weight:800}
-.cat-pill .x{cursor:pointer;color:#94a3b8;font-weight:700;margin-left:2px}
-.cat-pill .x:hover{color:#dc2626}
-.cat-pill .star{cursor:pointer;color:#F59E0B}
+.cat-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:.84rem;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);text-decoration:none;transition:.15s;animation:catPillIn .25s ease-out}
+.cat-pill:hover{border-color:#94a3b8;box-shadow:0 4px 12px rgba(15,23,42,.06);transform:translateY(-1px)}
+.cat-pill.primary{background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border-color:#F59E0B;color:#92400E;font-weight:800;box-shadow:0 2px 6px rgba(245,158,11,.18)}
+.cat-pill.primary:hover{box-shadow:0 6px 14px rgba(245,158,11,.28)}
+.cat-pill .x{cursor:pointer;color:#94a3b8;font-weight:700;margin-left:4px;width:20px;height:20px;display:inline-grid;place-items:center;border-radius:50%;transition:.15s;font-size:.95rem;line-height:1}
+.cat-pill .x:hover{color:#fff;background:#dc2626;transform:scale(1.1)}
+.cat-pill .star{cursor:pointer;color:#cbd5e1;width:20px;height:20px;display:inline-grid;place-items:center;border-radius:50%;transition:.15s}
+.cat-pill .star:hover{color:#F59E0B;background:#FEF3C7;transform:scale(1.15)}
+@keyframes catPillIn{ from{ opacity:0; transform:translateY(-6px) scale(.85) } to{ opacity:1; transform:translateY(0) scale(1) } }
 .hours-row{display:grid;grid-template-columns:100px 1fr 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
 .hours-row .d{font-weight:700;color:var(--ink)}
 .hours-row input[type=time]{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit}

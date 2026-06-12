@@ -2090,14 +2090,20 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
     <div class="cat-modal-foot">
-      <span>
+      <span style="flex:1;min-width:0">
         <span data-i18n-en>🤔 Can't find your category?</span>
         <span data-i18n-hi>🤔 आपकी श्रेणी नहीं मिल रही?</span>
       </span>
       <a href="https://wa.me/919541223377?text=Hi%2C%20DukanList%20me%20meri%20category%20nahi%20mil%20rahi%3A%20" target="_blank">
-        💬 <span data-i18n-en>WhatsApp us</span><span data-i18n-hi>WhatsApp करें</span>
+        💬 <span data-i18n-en>WhatsApp</span><span data-i18n-hi>WA</span>
       </a>
+      <button type="button" id="catModalDoneBtn" onclick="closeCatPicker()" style="background:#0F172A;color:#fff;border:0;padding:9px 16px;border-radius:99px;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;transition:.15s;flex-shrink:0">Close</button>
     </div>
+    <style>
+      #catModalDoneBtn.has-selection{ background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F; box-shadow:0 4px 12px rgba(245,158,11,.35) }
+      #catModalDoneBtn:active{ transform:scale(.96) }
+      .cat-modal-foot{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+    </style>
   </div>
 </div>
 <script>
@@ -2109,6 +2115,7 @@ function openCatPicker(){
   document.body.style.overflow = 'hidden';
   // Build tile grid from CAT_STATE.catsById
   renderCatTiles('');
+  updateCatModalDoneCount();
   // Focus search input
   setTimeout(() => {
     const inp = document.getElementById('catSearchInput');
@@ -2217,7 +2224,6 @@ function pickCatFromModal(id){
   // Simulate select change for compatibility with existing handleAddCategory
   const sel = document.getElementById('catSelect');
   if (sel){
-    // Make sure option exists
     let opt = sel.querySelector('option[value="' + id + '"]');
     if (!opt){
       opt = document.createElement('option');
@@ -2228,7 +2234,20 @@ function pickCatFromModal(id){
     handleAddCategory({ target: sel });
     sel.value = '';
   }
-  closeCatPicker();
+  // KEEP MODAL OPEN — let user pick multiple categories rapidly.
+  // Re-render tiles so the just-picked one shows as selected/disabled.
+  const inp = document.getElementById('catSearchInput');
+  renderCatTiles((inp && inp.value || '').toLowerCase().trim());
+  // Update Done button count
+  updateCatModalDoneCount();
+}
+
+function updateCatModalDoneCount(){
+  const btn = document.getElementById('catModalDoneBtn');
+  if (!btn) return;
+  const n = (CAT_STATE && CAT_STATE.selected) ? CAT_STATE.selected.length : 0;
+  btn.textContent = (n > 0) ? ('✓ Done (' + n + ' selected)') : 'Close';
+  btn.classList.toggle('has-selection', n > 0);
 }
 
 // Helper used in modal templates

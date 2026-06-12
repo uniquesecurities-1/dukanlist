@@ -91,6 +91,7 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
   box-shadow:0 8px 20px rgba(15,23,42,.12);
 }
 
+.p-shop-badge{ display:inline-flex; align-items:center; gap:4px; background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F; font-size:.72rem; font-weight:800; padding:3px 9px; border-radius:99px; vertical-align:middle; margin-left:6px; letter-spacing:.02em; box-shadow:0 2px 4px rgba(245,158,11,.25) }
 .sub-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
@@ -350,6 +351,16 @@ async function loadAll(){
   document.getElementById('subEN').textContent = `${cats.length} categories organized in ${parents.length} segments. Tap any to find verified listings near you.`;
   document.getElementById('subHI').textContent = `${parents.length} वर्गों में ${cats.length} श्रेणियाँ। नज़दीकी दुकान खोजने के लिए क्लिक करें।`;
 
+  // Compute totalShops per parent + sort parents most-populated first
+  PARENTS.forEach(p => {
+    p._totalShops = p.subs.reduce((sum, s) => sum + (s.business_count || 0), 0);
+  });
+  PARENTS.sort((a, b) => (b._totalShops || 0) - (a._totalShops || 0));
+  // Within each parent, sort subs by business_count desc too
+  PARENTS.forEach(p => {
+    p.subs.sort((a, b) => (b.business_count || 0) - (a.business_count || 0));
+  });
+
   renderParents();
 }
 
@@ -383,16 +394,19 @@ function renderParentCard(p, lang){
 
   const subsHtml = p.subs.map(s => renderSubTile(s, lang)).join('');
 
+  // Shop-count badge (only if non-zero) — visual highlight of category activity
+  const shopBadge = totalShops > 0
+    ? `<span class="p-shop-badge" title="${totalShops} ${lang==='hi'?'दुकानें':'active shops'}">🏪 ${totalShops}</span>`
+    : '';
   return `
     <div class="parent-card" style="--p-color:${color}; --p-tint:${tint}">
       <div class="parent-header">
         <div class="p-icon" style="background:${color}">${p.icon || '📂'}</div>
         <div class="p-info">
-          <h2>${escapeHTML(pName)}</h2>
+          <h2>${escapeHTML(pName)} ${shopBadge}</h2>
           <p class="p-sub">
             ${pSubName ? escapeHTML(pSubName) + ' · ' : ''}
             <b>${subCount}</b> ${lang==='hi' ? 'उप-श्रेणियाँ' : 'sub-categories'}
-            ${totalShops > 0 ? ' · <b>'+totalShops+'</b> ' + (lang==='hi'?'दुकानें':'shops') : ''}
           </p>
         </div>
         <a class="view-all" href="/search.html?cat=${encodeURIComponent(p.slug)}">

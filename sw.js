@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.18';  // CRITICAL FIX — Discover category filter root-cause finally found and fixed: type coercion mismatch. DOM data-cat attribute is always a String ("123"), but Supabase returns sub_category_id/category_id/city_id as Number (123). Strict equality 123 === "123" is false in JavaScript, so chip click always returned 0 results no matter what category. Even though buildChips correctly grouped shops by category and chips appeared with proper labels, the filter immediately afterward couldn't match anything. Fix: coerce both sides to String() before === comparison. Same fix applied in: (a) category filter inside renderFiltered (b) city filter inside renderFiltered (c) buildChips active-state highlight matching. User had been seeing "No shops match" for Grocery, Clothes, Doctor — all because of this hidden 1-character bug.
+const VERSION    = 'dukan-v2.9.20';  // GENERAL POLISH — (1) What's New: trimmed to 6 latest items visible by default, 13 older items hidden behind 'Show 13 older updates ▾' expander. Cleaner on both desktop & mobile. (2) Footer: rebuilt with trust pills (Mutual Funds / Stock Broking / Insurance / SIP) + Unique Securities brand line + AMFI ARN-332982 + SEBI-Authorised Person credentials + 1000+ families since 2009. Tighter link rows with separators. (3) Empty states: search.html smart-empty now has prominent '🔄 Clear all filters & start over' button at top when any filter active. shortlist.html empty state has 3 CTAs (Search / Discover Swipe / Browse categories). (4) Browse.html: parents sorted by total shop count desc, subs within sorted by business_count desc, prominent gold 🏪 N shop-count badge on parent header. (5) Register.html: category picker modal stays open after pick (multi-pick rapid flow), 'Done (N selected)' button in foot shows count and changes to gold gradient when categories picked. (6) Profile.html: cat-pill bigger touch targets, hover lift, primary pill gradient + shadow, entry animation, larger remove × button.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
@@ -49,9 +49,19 @@ function shouldBypass(url, request) {
   if (url.pathname.startsWith('/admin/')) return true;
   if (url.pathname.startsWith('/panel/')) return true;
   if (url.pathname.startsWith('/api/')) return true;
-  // BYPASS frequently-updated pages so users always see fresh content
+  // BYPASS frequently-updated pages so users always see fresh content.
+  // CRITICAL: include ALL user-facing HTML pages here. Previously only
+  // /discover and / were bypassed, so search.html and friends were served
+  // from cache for hours after a deploy — fix updates never reached users.
   if (url.pathname === '/discover' || url.pathname === '/discover.html') return true;
   if (url.pathname === '/index.html' || url.pathname === '/') return true;
+  if (url.pathname === '/search' || url.pathname === '/search.html') return true;
+  if (url.pathname === '/browse' || url.pathname === '/browse.html') return true;
+  if (url.pathname === '/business' || url.pathname === '/business.html') return true;
+  if (url.pathname === '/shortlist' || url.pathname === '/shortlist.html') return true;
+  if (url.pathname === '/register' || url.pathname === '/register.html') return true;
+  // BYPASS any HTML at root (covers /local/* dynamic landing pages too)
+  if (url.pathname.endsWith('.html')) return true;
   // BYPASS all app JS — they update frequently, must always be fresh
   if (url.pathname.startsWith('/assets/js/')) return true;
   // Supabase + auth endpoints
