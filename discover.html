@@ -607,6 +607,17 @@
   }
   .swipe-hint.hide{ opacity:0; transition:opacity .4s }
 
+  /* Auto-advance progress bar on active card */
+  .card .ap-bar{ position:absolute; left:0; right:0; top:0; height:3px; background:rgba(255,255,255,.12); z-index:5; pointer-events:none }
+  .card .ap-bar .ap-fill{ height:100%; width:0%; background:linear-gradient(90deg,#FBBF24,#F59E0B); box-shadow:0 0 8px rgba(251,191,36,.6); transition:width .1s linear; border-radius:0 2px 2px 0 }
+  .card .ap-bar.paused .ap-fill{ background:rgba(255,255,255,.35); box-shadow:none }
+  .card.no-photo .ap-bar{ background:rgba(0,0,0,.18) }
+
+  /* Auto-play toggle button (next to mute in topNav) */
+  #autoplayBtn{ background:rgba(0,0,0,.4); color:#fff; border:0; padding:7px 11px; border-radius:99px; font-size:14px; cursor:pointer; backdrop-filter:blur(8px); transition:.15s }
+  #autoplayBtn.on{ background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F }
+  #autoplayBtn:active{ transform:scale(.96) }
+
   /* Toast for save/share confirmation */
   .toast{
     position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
@@ -784,6 +795,7 @@
   <div class="logo">Dukan<em>List</em></div>
   <button id="cityBtn" class="fav-btn" onclick="openCityPicker()" type="button" aria-label="Choose city" style="border:0;font-size:12px;display:flex;align-items:center;gap:4px">📍 <span id="cityBtnLabel">All</span> ▾</button>
   <div style="flex:1"></div>
+  <button id="autoplayBtn" type="button" onclick="toggleAutoplay()" aria-label="Auto-play" title="Auto-advance every 7 sec" class="">▶️</button>
   <button id="muteBtn" class="fav-btn" onclick="toggleMute()" type="button" aria-label="Toggle sound" style="border:0;font-size:14px">🔊</button>
   <a href="/panel/favorites.html" class="fav-btn" aria-label="My saved shops list" style="display:inline-flex;align-items:center;gap:4px">📋 <span style="font-size:11px;font-weight:700">My List</span></a>
 </div>
@@ -1242,13 +1254,26 @@ async function init(){
 }
 
 function renderFiltered(){
-  var rows = STATE.allRows;
+  var rows = STATE.allRows.slice();
   if (STATE.filter){
     rows = rows.filter(function(b){ return (b.sub_category_id||b.category_id) === STATE.filter; });
   }
   if (STATE.cityFilter){
     rows = rows.filter(function(b){ return b.city_id === STATE.cityFilter; });
   }
+  // Phase 2 — smart sort: un-seen shops first, then by trending/likes
+  try {
+    var seen = JSON.parse(localStorage.getItem('dl_discover_seen') || '{}') || {};
+    rows.sort(function(a, b){
+      var aSeen = !!seen[a.id], bSeen = !!seen[b.id];
+      if (aSeen !== bSeen) return aSeen ? 1 : -1; // un-seen first
+      var aLikes = a.likes_count || 0, bLikes = b.likes_count || 0;
+      if (aLikes !== bLikes) return bLikes - aLikes; // then by likes
+      var aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+      var bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return bDate - aDate; // then newest first
+    });
+  } catch(_){}
   if (rows.length === 0){
     document.getElementById('feed').style.display = 'none';
     document.getElementById('emptyScreen').style.display = '';
@@ -1324,6 +1349,7 @@ function renderFiltered(){
 
     return ''+
     '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'">'+
+      '<div class="ap-bar"><div class="ap-fill"></div></div>'+
       '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
       '<div class="gradient-top"></div>'+
       '<div class="gradient"></div>'+
@@ -1493,6 +1519,105 @@ function renderFiltered(){
   feed.addEventListener('wheel',      unlockAudio, { passive: true, once: true });
   feed.addEventListener('scroll',     unlockAudio, { passive: true, once: true });
 
+  // ============================================================
+  // Phase 2 — Auto-advance + Smart sort + Seen tracking
+  // ============================================================
+  var AUTOPLAY_KEY = 'dl_discover_autoplay';
+  var SEEN_KEY = 'dl_discover_seen';
+  var AUTOPLAY_DURATION = 7000;     // 7 seconds per card
+  var SEEN_DWELL_MS = 2500;         // mark as "seen" after 2.5 sec dwell
+
+  function getAutoplay(){ try { return localStorage.getItem(AUTOPLAY_KEY) === '1'; } catch(_){ return false; } }
+  function setAutoplay(v){ try { localStorage.setItem(AUTOPLAY_KEY, v ? '1' : '0'); } catch(_){} updateAutoplayBtnUI(); }
+  function updateAutoplayBtnUI(){
+    var btn = document.getElementById('autoplayBtn');
+    if (!btn) return;
+    if (getAutoplay()){ btn.classList.add('on'); btn.textContent = '▶️'; btn.title = 'Auto-play ON — tap to disable'; }
+    else { btn.classList.remove('on'); btn.textContent = '⏸️'; btn.title = 'Auto-play OFF — tap to enable'; }
+  }
+  window.toggleAutoplay = function(){
+    var newVal = !getAutoplay();
+    setAutoplay(newVal);
+    if (newVal){ startAutoplayTimer(_lastActiveIdx); }
+    else { stopAutoplayTimer(); }
+  };
+
+  function loadSeen(){ try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') || {}; } catch(_){ return {}; } }
+  function saveSeen(o){ try { localStorage.setItem(SEEN_KEY, JSON.stringify(o)); } catch(_){} }
+  function markSeen(bid){ if (!bid) return; var o = loadSeen(); o[bid] = Date.now(); saveSeen(o); }
+
+  var _autoplayTimer = null;
+  var _autoplayStarted = 0;
+  var _autoplayPausedAt = 0;
+  var _autoplayCurrentBar = null;
+  function stopAutoplayTimer(){
+    if (_autoplayTimer){ clearInterval(_autoplayTimer); _autoplayTimer = null; }
+    if (_autoplayCurrentBar){ var fill = _autoplayCurrentBar.querySelector('.ap-fill'); if (fill){ fill.style.width = '0%'; } _autoplayCurrentBar = null; }
+  }
+  function startAutoplayTimer(idx){
+    stopAutoplayTimer();
+    if (!getAutoplay()) return;
+    var card = document.querySelector('.card[data-idx="' + idx + '"]');
+    if (!card) return;
+    var bar = card.querySelector('.ap-bar');
+    var fill = bar && bar.querySelector('.ap-fill');
+    if (!fill) return;
+    _autoplayCurrentBar = bar;
+    _autoplayStarted = Date.now();
+    fill.style.width = '0%';
+    _autoplayTimer = setInterval(function(){
+      var elapsed = Date.now() - _autoplayStarted;
+      var pct = Math.min(100, (elapsed / AUTOPLAY_DURATION) * 100);
+      fill.style.width = pct + '%';
+      if (elapsed >= AUTOPLAY_DURATION){
+        stopAutoplayTimer();
+        var next = document.querySelector('.card[data-idx="' + (idx + 1) + '"]');
+        if (next){
+          next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          // End of feed → loop back
+          var first = document.querySelector('.card[data-idx="0"]');
+          if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }, 100);
+  }
+
+  // Pause autoplay on user touch/scroll, resume after they stop
+  var _userInteractTimer = null;
+  function pauseAutoplay(){
+    if (_autoplayCurrentBar) _autoplayCurrentBar.classList.add('paused');
+    if (_autoplayTimer){ clearInterval(_autoplayTimer); _autoplayTimer = null; _autoplayPausedAt = Date.now(); }
+  }
+  function resumeAutoplay(){
+    if (_autoplayCurrentBar) _autoplayCurrentBar.classList.remove('paused');
+    if (!getAutoplay()) return;
+    if (!_autoplayCurrentBar) return;
+    var fill = _autoplayCurrentBar.querySelector('.ap-fill');
+    if (!fill) return;
+    var alreadyElapsed = parseFloat(fill.style.width || '0') / 100 * AUTOPLAY_DURATION;
+    _autoplayStarted = Date.now() - alreadyElapsed;
+    _autoplayTimer = setInterval(function(){
+      var elapsed = Date.now() - _autoplayStarted;
+      var pct = Math.min(100, (elapsed / AUTOPLAY_DURATION) * 100);
+      fill.style.width = pct + '%';
+      if (elapsed >= AUTOPLAY_DURATION){
+        stopAutoplayTimer();
+        var idx = _lastActiveIdx;
+        var next = document.querySelector('.card[data-idx="' + (idx + 1) + '"]');
+        if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
+  feed.addEventListener('touchstart', function(){ pauseAutoplay(); clearTimeout(_userInteractTimer); }, { passive:true });
+  feed.addEventListener('touchend',   function(){ clearTimeout(_userInteractTimer); _userInteractTimer = setTimeout(resumeAutoplay, 1500); }, { passive:true });
+  feed.addEventListener('mousedown',  function(){ pauseAutoplay(); }, { passive:true });
+  feed.addEventListener('mouseup',    function(){ clearTimeout(_userInteractTimer); _userInteractTimer = setTimeout(resumeAutoplay, 1500); }, { passive:true });
+  // Pause when tab is hidden
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) pauseAutoplay(); else resumeAutoplay(); });
+
+  updateAutoplayBtnUI();
+
   if ('IntersectionObserver' in window){
     var obs = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
@@ -1504,6 +1629,10 @@ function renderFiltered(){
           }
           _firstActivation = false;
           _lastActiveIdx = idx;
+          // Phase 2 — mark as seen after dwell + start autoplay timer
+          var bid = en.target.getAttribute('data-id');
+          setTimeout(function(){ if (_lastActiveIdx === idx) markSeen(bid); }, SEEN_DWELL_MS);
+          startAutoplayTimer(idx);
           // HOT v2 Phase 2 — update progress bar + streak
           updatePosBar(idx, cards.length);
           bumpStreak();

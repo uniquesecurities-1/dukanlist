@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.7';  // bumped — Poster Studio Phase 1 Bundle: (1) Streak counter — localStorage tracks daily poster shares with smart yesterday/today gap detection, banner shows '5-day poster streak!' with motivating sub-text. (2) AI Caption Generator — new /api/ai-caption Vercel function calls Groq llama-3.1-8b-instant if GROQ_API_KEY env var set, else falls back to rich local rotation library (50+ variations across 5 categories in EN + HI). (3) Analytics mini-dashboard — tracks shares per style/format/channel/hour over last 30 days, compact 3-KPI card shows Posters shared, Active days, Peak hour, plus most-used style highlight.
+const VERSION    = 'dukan-v2.9.8';  // bumped — Phase 2 Discover Feed Polish: (1) Auto-advance — 7-sec timer per card with animated progress bar (gold gradient at top of card), pauses on touch/scroll/hidden-tab, resumes 1.5 sec after interaction stops, loops back at end. (2) Auto-play toggle button (▶️/⏸️) next to mute in topNav with localStorage persistence. (3) Smart sort — renderFiltered now puts un-seen shops first (tracked by 2.5 sec dwell), then by likes_count desc, then by created_at desc. Cards have visible progress bar while autoplay running so user knows when next swipe will happen.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
