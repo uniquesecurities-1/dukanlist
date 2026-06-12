@@ -242,6 +242,25 @@ html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif; 
   margin-bottom:12px; letter-spacing:-.005em;
 }
 .biz-rating-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; background:linear-gradient(135deg,#FFFBEB,#FFF7ED); border:1px solid #FED7AA; border-radius:11px }
+
+/* "Why this shop?" — fast-scan verdict pills */
+.why-shop-row{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 12px; padding:10px 12px; background:linear-gradient(135deg,#F0F9FF 0%,#E0F2FE 100%); border:1px solid #BAE6FD; border-radius:11px }
+.why-shop-row .wts-pill{ display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:99px; font-size:.78rem; font-weight:700; background:#fff; border:1px solid rgba(15,23,42,.06); color:#0F172A; box-shadow:0 1px 2px rgba(15,23,42,.04); white-space:nowrap }
+.why-shop-row .wts-pill b{ font-weight:800 }
+.why-shop-row .wts-pill.verified{ background:#DCFCE7; border-color:#86EFAC; color:#166534 }
+.why-shop-row .wts-pill.rating{ background:#FEF3C7; border-color:#FCD34D; color:#92400E }
+.why-shop-row .wts-pill.open{ background:#D1FAE5; border-color:#6EE7B7; color:#065F46; animation:wtsPulse 2.4s ease-in-out infinite }
+.why-shop-row .wts-pill.closed{ background:#F1F5F9; border-color:#CBD5E1; color:#475569 }
+.why-shop-row .wts-pill.year{ background:#FCE7F3; border-color:#F9A8D4; color:#9D174D }
+.why-shop-row .wts-pill.area{ background:#FFF7ED; border-color:#FED7AA; color:#9A3412 }
+@keyframes wtsPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(16,185,129,.5) } 50%{ box-shadow:0 0 0 6px rgba(16,185,129,0) } }
+
+/* Customer activity social proof */
+.cust-activity-row{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px }
+.cust-activity-row .ca-pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:99px; font-size:.78rem; font-weight:700; background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5 }
+.cust-activity-row .ca-pill b{ color:#7F1D1D; font-weight:900 }
+.cust-activity-row .ca-pill .ca-dot{ width:7px; height:7px; border-radius:50%; background:#DC2626; box-shadow:0 0 0 0 rgba(220,38,38,.6); animation:caBlink 1.4s ease-in-out infinite }
+@keyframes caBlink{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,.6) } 50%{ box-shadow:0 0 0 5px rgba(220,38,38,0) } }
 .biz-rating{ display:flex; align-items:center; gap:6px; font-weight:800; color:var(--ink) }
 .biz-rating .num{ font-size:1.3rem; font-family:'Manrope',sans-serif; color:var(--saffron-deep) }
 .biz-rating .rc{ color:var(--muted); font-weight:600; font-size:.85rem }
@@ -1137,6 +1156,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
       <span id="publicLoyaltyBadge" style="display:none;margin-left:8px"></span>
           <div class="owner-credit" id="ownerCredit" style="display:none"></div>
           <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
+
+          <!-- "Why this shop?" — auto-summary verdict pill row -->
+          <div id="whyThisShop" class="why-shop-row" style="display:none"></div>
+          <!-- Customer activity social proof — "5 customers called today" -->
+          <div id="customerActivity" class="cust-activity-row" style="display:none"></div>
           <div class="biz-rating-row">
             <div class="biz-rating" id="bizRating"></div>
             <div id="openStatus"></div>
@@ -2021,9 +2045,14 @@ function render(){
     }
   } catch(_){}
 
-  // CTAs
+  // CTAs — WhatsApp message includes shop name + area so owner gets useful context
   const wa = (b.whatsapp || b.mobile).replace(/[^\d]/g,'');
-  const waMsg = encodeURIComponent(`Hi ${b.owner_name || ''}, I found your listing on dukanlist.com — interested in your services.`);
+  const _shopRef = b.name || 'your shop';
+  const _areaRef = (b.geo_localities && b.geo_localities.name)
+    || (b.geo_cities && b.geo_cities.name)
+    || '';
+  const _waText = `Namaste${b.owner_name ? ' ' + b.owner_name : ''}!\n\nI found *${_shopRef}*${_areaRef ? ' (' + _areaRef + ')' : ''} on DukanList — interested in your services. Can you share details?\n\nThanks 🙏`;
+  const waMsg = encodeURIComponent(_waText);
   document.getElementById('ctaWa').href = `https://wa.me/${wa}?text=${waMsg}`;
   document.getElementById('ctaWa').addEventListener('click', () => logLead('whatsapp'));
 
@@ -2036,6 +2065,15 @@ function render(){
   const mapsQ = encodeURIComponent(addrParts.join(', '));
   document.getElementById('ctaDir').href = `https://www.google.com/maps/search/?api=1&query=${mapsQ}`;
   document.getElementById('ctaDir').addEventListener('click', () => logLead('direction'));
+
+  // "Why this shop?" — fast verdict pills for quick customer decision
+  try { renderWhyThisShop(b); } catch(e){ console.warn('Why this shop:', e); }
+
+  // Customer activity — "5 customers called today" social proof
+  try { loadCustomerActivity(b.id); } catch(e){ console.warn('Cust activity:', e); }
+
+  // Photo auto-carousel — auto-advance gallery to expose all photos
+  try { initPhotoAutoCarousel(); } catch(e){ console.warn('Auto carousel:', e); }
 
   // MMT-style stat strip — rating breakdown + shop highlights
   renderMmtStatStrip(b);
@@ -2326,6 +2364,187 @@ function getDistance(bizLat, bizLng){
       { timeout: 5000, maximumAge: 5 * 60 * 1000 }
     );
   });
+}
+
+// =============================================================
+// "Why this shop?" — auto-generated verdict pill row
+// =============================================================
+// Quick-scan summary so customer can decide in 3 seconds.
+// All data is already loaded — no extra fetches.
+function renderWhyThisShop(b){
+  if (!b) return;
+  const host = document.getElementById('whyThisShop');
+  if (!host) return;
+  const pills = [];
+
+  // Verified (only if score >= 3 — i.e. mobile + address + photo all done)
+  if ((b.verified_score || 0) >= 3){
+    const tier = (b.verified_score >= 5) ? 'GOLD' : (b.verified_score >= 4 ? 'SILVER' : 'BRONZE');
+    pills.push({
+      cls: 'verified',
+      html: '✓ <b>Verified</b> · ' + tier
+    });
+  }
+
+  // Rating
+  if (b.rating_count > 0 && b.rating_avg > 0){
+    pills.push({
+      cls: 'rating',
+      html: '⭐ <b>' + Number(b.rating_avg).toFixed(1) + '</b> · ' + b.rating_count + ' review' + (b.rating_count === 1 ? '' : 's')
+    });
+  }
+
+  // Open status — uses existing hours.js getOpenStatus
+  if (b.hours_json && typeof getOpenStatus === 'function'){
+    const st = getOpenStatus(b.hours_json);
+    if (st && st.isOpen){
+      pills.push({
+        cls: 'open',
+        html: '🟢 <b>Open now</b>' + (st.closesIn ? ' · closes in ' + st.closesIn : '')
+      });
+    } else if (st && !st.isOpen){
+      pills.push({
+        cls: 'closed',
+        html: '⚫ ' + (st.label || 'Closed')
+      });
+    }
+  }
+
+  // Area / locality
+  const area = (b.geo_localities && b.geo_localities.name);
+  if (area){
+    pills.push({ cls: 'area', html: '📍 ' + escapeHTML(area) });
+  }
+
+  // Established year — "Since 2010"
+  if (b.established_year && Number(b.established_year) >= 1900 && Number(b.established_year) <= (new Date().getFullYear())){
+    const years = (new Date().getFullYear()) - Number(b.established_year);
+    if (years >= 1){
+      pills.push({ cls: 'year', html: '📅 Since <b>' + b.established_year + '</b> · ' + years + ' year' + (years === 1 ? '' : 's') });
+    }
+  }
+
+  if (pills.length === 0){ host.style.display = 'none'; return; }
+
+  host.innerHTML = pills.map(p => '<span class="wts-pill ' + p.cls + '">' + p.html + '</span>').join('');
+  host.style.display = '';
+}
+
+// =============================================================
+// Customer Activity — "X customers contacted in last 24h"
+// =============================================================
+// Reads from `leads` table where action ∈ (call, whatsapp).
+// Only shows when count ≥ 2 so it feels socially meaningful, not lonely.
+async function loadCustomerActivity(bizId){
+  if (!bizId) return;
+  const host = document.getElementById('customerActivity');
+  if (!host) return;
+  try {
+    const c = ShopDB.client;
+    if (!c) return;
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    // Try counting from a leads/log_lead table
+    const { count: callCount } = await c.from('leads')
+      .select('id', { count: 'exact', head: true })
+      .eq('business_id', bizId)
+      .eq('action', 'call')
+      .gte('created_at', since);
+    const { count: waCount } = await c.from('leads')
+      .select('id', { count: 'exact', head: true })
+      .eq('business_id', bizId)
+      .in('action', ['whatsapp', 'wa'])
+      .gte('created_at', since);
+
+    const calls = Math.max(0, callCount || 0);
+    const wa    = Math.max(0, waCount    || 0);
+    const total = calls + wa;
+
+    const pills = [];
+    if (calls >= 2){
+      pills.push('<span class="ca-pill"><span class="ca-dot"></span>📞 <b>' + calls + ' customer' + (calls === 1 ? '' : 's') + '</b> called in last 24h</span>');
+    }
+    if (wa >= 2){
+      pills.push('<span class="ca-pill"><span class="ca-dot"></span>💬 <b>' + wa + '</b> WhatsApp chat' + (wa === 1 ? '' : 's') + ' in last 24h</span>');
+    }
+    // Fallback: combined if neither individual hits threshold but total does
+    if (pills.length === 0 && total >= 3){
+      pills.push('<span class="ca-pill"><span class="ca-dot"></span>🔥 <b>' + total + ' customers</b> contacted this shop in last 24h</span>');
+    }
+
+    if (pills.length === 0){ host.style.display = 'none'; return; }
+    host.innerHTML = pills.join('');
+    host.style.display = '';
+  } catch(e){
+    // leads table may not exist or RLS may block — fail silently
+    host.style.display = 'none';
+  }
+}
+
+// =============================================================
+// Photo Auto-Carousel — cycle through gallery every 3.5s
+// =============================================================
+// Pauses on mouseenter/touchstart so user can study a photo.
+// Stops if user manually swaps via thumbs OR opens lightbox.
+function initPhotoAutoCarousel(){
+  const mainImg = document.getElementById('mainImg');
+  if (!mainImg) return;
+  const photos = (BIZ && BIZ.photos) || [];
+  if (photos.length < 2) return;
+
+  let idx = 0;
+  let paused = false;
+  let timerId = null;
+
+  function next(){
+    if (paused) return;
+    idx = (idx + 1) % photos.length;
+    // Skip if lightbox is showing (manual mode)
+    const lb = document.getElementById('lightbox');
+    if (lb && lb.classList.contains('show')) return;
+    mainImg.style.opacity = '0.4';
+    setTimeout(() => {
+      mainImg.src = photos[idx];
+      mainImg.style.opacity = '1';
+      // Sync thumbnail active state
+      document.querySelectorAll('.gallery .thumbs img').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }, 180);
+  }
+  function start(){
+    if (timerId) return;
+    timerId = setInterval(next, 3500);
+  }
+  function stop(){
+    if (timerId){ clearInterval(timerId); timerId = null; }
+  }
+
+  // Smooth fade transition
+  mainImg.style.transition = 'opacity .25s ease';
+
+  // Pause on hover (desktop) or touch (mobile)
+  mainImg.parentElement.addEventListener('mouseenter', () => { paused = true; });
+  mainImg.parentElement.addEventListener('mouseleave', () => { paused = false; });
+  mainImg.parentElement.addEventListener('touchstart', () => { paused = true; }, { passive: true });
+  // Resume 2 seconds after touch ends
+  mainImg.parentElement.addEventListener('touchend', () => {
+    setTimeout(() => { paused = false; }, 2000);
+  }, { passive: true });
+
+  // Stop if user clicks a specific thumbnail (manual mode)
+  document.querySelectorAll('.gallery .thumbs img').forEach(t => {
+    t.addEventListener('click', () => { stop(); paused = true; });
+  });
+
+  // Stop when lightbox opens — let user browse manually
+  const mainImgClickStopper = () => { stop(); paused = true; };
+  mainImg.addEventListener('click', mainImgClickStopper);
+
+  // Stop when tab is hidden (battery saver)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop();
+    else if (!paused) start();
+  });
+
+  start();
 }
 
 function renderMmtStatStrip(b){
@@ -3376,208 +3595,32 @@ function copyShopUrl(){
 <script>
 // ============= Customer Review Auto-Prompt =============
 (function(){
-  // When user clicks Call or WhatsApp on a business, save event for later prompt
   function trackLead(bizId, bizName){
     try {
       const key = 'dl_pending_review_' + bizId;
       const existing = JSON.parse(localStorage.getItem(key) || 'null');
-      if (existing && (Date.now() - existing.ts) < 86400000) return; // Already pending
-      localStorage.setItem(key, JSON.stringify({ ts: Date.now(), name: bizName, id: bizId }));
+      if (existing && (Date.now() - existing.ts) < 86400000) return;
+      localStorage.setItem(key, JSON.stringify({ ts: Date.now(), bizId: bizId, bizName: bizName || '' }));
     } catch(_){}
   }
-
-  // Check pending reviews when ANY business page loads — show prompt for events >24h old
-  function checkPendingReview(){
-    try {
-      const keys = Object.keys(localStorage).filter(k => k.startsWith('dl_pending_review_'));
-      const now = Date.now();
-      for (const key of keys){
-        const data = JSON.parse(localStorage.getItem(key) || 'null');
-        if (!data) continue;
-        // Only prompt for events 24 hours - 7 days old
-        const ageMs = now - data.ts;
-        if (ageMs < 86400000 || ageMs > 604800000) {
-          if (ageMs > 604800000) localStorage.removeItem(key); // Cleanup very old
-          continue;
-        }
-        // Don't prompt for THIS business if currently viewing it
-        const currentBizId = window.BIZ ? window.BIZ.id : null;
-        if (data.id === currentBizId) continue;
-        showReviewBoosterPrompt(data);
-        break; // Show one at a time
-      }
-    } catch(_){}
-  }
-
-  function showReviewBoosterPrompt(data){
-    if (document.getElementById('reviewBoosterModal')) return;
-    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-    const modal = document.createElement('div');
-    modal.id = 'reviewBoosterModal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:rbFadeIn 0.3s';
-
-    const styleId = 'rb-style';
-    if (!document.getElementById(styleId)){
-      const s = document.createElement('style');
-      s.id = styleId;
-      s.textContent = '@keyframes rbFadeIn{from{opacity:0}to{opacity:1}} @keyframes rbStarHover{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}';
-      document.head.appendChild(s);
-    }
-
-    const headline = lang === 'hi'
-      ? 'Aapne <b>' + data.name + '</b> ko contact kiya tha. Experience kaisa raha?'
-      : 'You contacted <b>' + data.name + '</b>. How was your experience?';
-    const sub = lang === 'hi'
-      ? 'Apna rating dein (kuch likhna optional hai)'
-      : 'Give your rating (text is optional)';
-
-    modal.innerHTML =
-      '<div style="background:#fff;border-radius:20px;max-width:420px;width:100%;padding:28px 24px;box-shadow:0 20px 60px rgba(15,23,42,0.3);position:relative;text-align:center">' +
-        '<button onclick="closeReviewBooster()" style="position:absolute;top:14px;right:14px;background:#F1F5F9;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer">×</button>' +
-        '<div style="font-size:3rem;margin-bottom:8px">⭐</div>' +
-        '<h3 style="font-family:Manrope,sans-serif;font-size:1.15rem;font-weight:900;color:#0F172A;margin-bottom:6px;line-height:1.35">' + headline + '</h3>' +
-        '<p style="color:#64748B;font-size:.88rem;margin-bottom:20px">' + sub + '</p>' +
-        '<div id="rbStars" style="display:flex;justify-content:center;gap:8px;margin-bottom:18px">' +
-          [1,2,3,4,5].map(n => '<button onclick="goToReview(\'' + data.id + '\',' + n + ')" style="background:none;border:none;font-size:2rem;cursor:pointer;transition:transform .15s;padding:4px" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'\'">⭐</button>').join('') +
-        '</div>' +
-        '<button onclick="closeReviewBooster()" style="background:none;border:none;color:#64748B;font-size:.82rem;cursor:pointer">Skip for now</button>' +
-      '</div>';
-    document.body.appendChild(modal);
-  }
-
-  window.closeReviewBooster = function(){
-    const m = document.getElementById('reviewBoosterModal');
-    if (m) m.remove();
-  };
-
-  window.goToReview = function(bizId, rating){
-    // Mark as handled (remove from pending)
-    try { localStorage.removeItem('dl_pending_review_' + bizId); } catch(_){}
-    // Open the business detail page review form with pre-filled rating
-    window.location.href = '/business.html?id=' + encodeURIComponent(bizId) + '#review-' + rating;
-  };
-
-  // Hook into existing Call/WhatsApp click handlers
   document.addEventListener('click', function(e){
-    const t = e.target.closest('[data-track-lead], a[href^="tel:"], a[href^="https://wa.me/"], a[href^="whatsapp://"]');
+    const t = e.target.closest('a[href^="tel:"],a[href^="https://wa.me/"],a[href^="http://wa.me/"]');
     if (!t) return;
     const biz = window.BIZ;
     if (biz && biz.id && biz.name) trackLead(biz.id, biz.name);
   });
-
-  // Mark this so we don't double-init
   window.dl_pending_review_check = true;
-  // Run check after page settles
-  setTimeout(checkPendingReview, 2500);
 })();
 </script>
-<script id="biz-premium-helpers">
 
-/* Owner-with-role credit — appears below shop name with dignity */
-function renderOwnerCredit(){
-  if (!BIZ) return;
-  const el = document.getElementById('ownerCredit');
-  if (!el) return;
-  const name = (BIZ.owner_name || '').trim();
-  const role = (BIZ.owner_role || '').trim();
-  if (!name && !role){ el.style.display = 'none'; return; }
-
-  // Smart prefix: Doctor → "Dr.", CA → "CA", Advocate → "Adv.", Pandit ji → "Pt."
-  let displayName = name;
-  let prefix = '';
-  const roleLower = role.toLowerCase();
-  if (roleLower.includes('doctor'))               prefix = 'Dr.';
-  else if (roleLower.includes('chartered accountant') || roleLower === 'ca') prefix = 'CA';
-  else if (roleLower.includes('advocate'))        prefix = 'Adv.';
-  else if (roleLower.includes('pandit') || roleLower.includes('acharya')) prefix = 'Pt.';
-  else if (roleLower.includes('architect'))       prefix = 'Ar.';
-  else if (roleLower.includes('engineer'))        prefix = 'Er.';
-  if (prefix && name && !name.match(/^(dr|ca|adv|pt|ar|er)\.?\s/i)){
-    displayName = prefix + ' ' + name;
-  }
-
-  const initial = (displayName.charAt(0) || '?').toUpperCase();
-  const safeName = escapeHTML(displayName || 'Listed by');
-  const safeRole = role ? escapeHTML(role) : '';
-
-  el.innerHTML =
-    '<div class="oc-avatar">' + initial + '</div>'
-    + '<div class="oc-info">'
-    + (safeName ? '<div class="oc-name">' + safeName + '</div>' : '')
-    + (safeRole ? '<div class="oc-role">' + safeRole + '</div>' : '<div class="oc-role" data-i18n-en="Listed & managed by owner" data-i18n-hi="मालिक द्वारा सूचीबद्ध">Listed &amp; managed by owner</div>')
-    + '</div>';
-  el.style.display = '';
-}
-
-/* Social links row — runs after BIZ is loaded */
-function renderSocialRow(){
-  if (!BIZ) return;
-  const wrap = document.getElementById('socialCardWrap');
-  const el = document.getElementById('socialRow');
-  if (!el || !wrap) return;
-  const items = [
-    { url: BIZ.website_url,   cls: 'web', icon: '\ud83c\udf10', label: 'Website' },
-    { url: BIZ.facebook_url,  cls: 'fb',  icon: 'f',                label: 'Facebook' },
-    { url: BIZ.instagram_url, cls: 'ig',  icon: '\ud83d\udcf7', label: 'Instagram' },
-    { url: BIZ.youtube_url,   cls: 'yt',  icon: '\u25b6',          label: 'YouTube' },
-    { url: BIZ.x_twitter_url, cls: 'tw',  icon: 'X',                label: 'X' },
-    { url: BIZ.linkedin_url,  cls: 'li',  icon: 'in',               label: 'LinkedIn' }
-  ].filter(x => x.url && /^https?:\/\//i.test(x.url));
-  if (!items.length){ wrap.style.display = 'none'; return; }
-  wrap.style.display = '';
-  el.innerHTML = items.map(l => '<a class="social-pill ' + l.cls + '" href="'
-    + escapeAttr(l.url) + '" target="_blank" rel="nofollow noopener">'
-    + '<span style="font-weight:900;min-width:14px;text-align:center">'
-    + l.icon + '</span>' + l.label + '</a>').join('');
-}
-
-function prefillQA(text){
-  if (typeof openQAModal === 'function') openQAModal();
-  setTimeout(function(){
-    var t = document.getElementById('qaQuestionText');
-    if (t){ t.value = text; t.focus(); try{ t.setSelectionRange(t.value.length, t.value.length) }catch(_){} }
-  }, 150);
-}
-
-// Phase 3: Trigger view burst check once BIZ is loaded
-(function(){
-  const startTime = Date.now();
-  const waitForBiz = setInterval(() => {
-    if (window.BIZ && window.BIZ.id) {
-      clearInterval(waitForBiz);
-      try { _checkViewBurst(); } catch(_){}
-    } else if (Date.now() - startTime > 15000) {
-      clearInterval(waitForBiz);
-    }
-  }, 500);
-})();
-
-// Phase 4: Public loyalty count badge on business page
-async function loadPublicLoyaltyCount(){
-  if (!BIZ || !BIZ.id || !ShopDB || !ShopDB.client) return;
-  try {
-    const r = await ShopDB.client.rpc('get_public_loyalty_count', { p_business_id: BIZ.id });
-    const count = parseInt(r.data, 10) || 0;
-    if (count < 3) return; // Don't show until socially meaningful
-    const el = document.getElementById('publicLoyaltyBadge');
-    if (el) {
-      el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#FEE2E2,#FECACA);color:#991B1B;padding:5px 11px;border-radius:99px;font-size:.78rem;font-weight:800;border:1px solid #FCA5A5">❤️ ' + count + ' customers love this</span>';
-      el.style.display = 'inline-block';
-    }
-  } catch(_){}
-}
-</script>
-
-<!-- ============================================================
-     STICKY BOTTOM ACTION BAR (mobile only)
-     ============================================================ -->
+<!-- STICKY BOTTOM ACTION BAR (mobile only) -->
 <div id="stickyActionBar" aria-label="Quick actions" style="display:none">
   <a id="sabCall" class="sab-btn sab-call" aria-label="Call this shop">
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     <span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span>
   </a>
   <a id="sabWa" class="sab-btn sab-wa" target="_blank" rel="noopener" aria-label="WhatsApp this shop">
-    <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.8 5.5 2.2 7.9L.3 31.6l7.9-2.1c2.3 1.3 4.9 1.9 7.7 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.3c-2.4 0-4.8-.7-6.9-1.9l-.5-.3-4.7 1.3 1.3-4.6-.3-.5c-1.3-2.1-2-4.5-2-7 0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9c.1 7.1-5.7 13-12.7 13zm7-9.7c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.3-.6.1-.2 0-.5-.1-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.7-.9-.7h-.7c-.2 0-.6.1-1 .5s-1.3 1.3-1.3 3.2 1.4 3.7 1.6 3.9c.2.2 2.7 4.2 6.6 5.8.9.4 1.6.6 2.2.8.9.3 1.7.2 2.4.1.7-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.4-.3-.8-.5z"/></svg>
+    <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.8 5.5 2.2 7.9L.3 31.6l7.9-2.1c2.3 1.3 4.9 1.9 7.7 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.3c-2.4 0-4.8-.7-6.9-1.9l-.5-.3-4.7 1.3 1.3-4.6-.3-.5c-1.3-2.1-2-4.5-2-7 0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9c.1 7.1-5.7 13-12.7 13z"/></svg>
     <span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span>
   </a>
   <a id="sabDir" class="sab-btn sab-dir" target="_blank" rel="noopener" aria-label="Get directions">
@@ -3586,16 +3629,7 @@ async function loadPublicLoyaltyCount(){
   </a>
 </div>
 <style>
-  #stickyActionBar{
-    position:fixed; left:0; right:0; bottom:0; z-index:990;
-    display:none; align-items:stretch; justify-content:stretch;
-    background:rgba(255,255,255,.98); backdrop-filter:saturate(180%) blur(8px);
-    border-top:1px solid rgba(15,23,42,.08);
-    box-shadow:0 -6px 20px rgba(15,23,42,.08);
-    padding:8px 8px calc(8px + env(safe-area-inset-bottom)) 8px;
-    gap:6px;
-    transform:translateY(100%); transition:transform .25s ease;
-  }
+  #stickyActionBar{ position:fixed; left:0; right:0; bottom:0; z-index:990; display:none; align-items:stretch; justify-content:stretch; background:rgba(255,255,255,.98); backdrop-filter:saturate(180%) blur(8px); border-top:1px solid rgba(15,23,42,.08); box-shadow:0 -6px 20px rgba(15,23,42,.08); padding:8px 8px calc(8px + env(safe-area-inset-bottom)) 8px; gap:6px; transform:translateY(100%); transition:transform .25s ease }
   #stickyActionBar.show{ display:flex; transform:translateY(0); animation:sabSlideUp .3s ease }
   @keyframes sabSlideUp{ from{ transform:translateY(100%) } to{ transform:translateY(0) } }
   .sab-btn{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:11px 6px; border-radius:11px; font-family:inherit; font-size:.84rem; font-weight:800; letter-spacing:.01em; text-decoration:none; transition:transform .12s, box-shadow .15s; min-width:0; white-space:nowrap }
@@ -3632,10 +3666,7 @@ async function loadPublicLoyaltyCount(){
     var shown = false;
     function onScroll(){
       var should = window.scrollY > threshold;
-      if (should !== shown){
-        bar.classList.toggle('show', should);
-        shown = should;
-      }
+      if (should !== shown){ bar.classList.toggle('show', should); shown = should; }
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     sCall.addEventListener('click', function(){ try { if (typeof logLead === 'function') logLead('call'); } catch(_){} });

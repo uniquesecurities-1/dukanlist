@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.5.0';  // bumped — Shopkeeper Power-Up: 3 Quick Wins cards on dashboard (data-driven highest-impact actions) + WhatsApp customer template generator (copy-paste-ready bilingual) + Photo Progress Badge (gamified milestone tracker on photos page). Plus prior UX Phase 3, Hyperlocal Phase 1+2.
+const VERSION    = 'dukan-v2.6.0';  // bumped — Customer Decision Speed: "Why this shop?" auto-summary pills (Verified/Rating/Open/Area/Year) on shop pages + Customer Activity social proof ("5 customers called today") + Photo auto-carousel (3.5s cycle, pause-on-tap) + richer WhatsApp pre-fill with shop name + area context.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
