@@ -1240,6 +1240,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <h3>⭐ <span data-i18n-en>Customer Reviews</span><span data-i18n-hi>ग्राहक रिव्यू</span>
           <span id="reviewCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:auto"></span>
         </h3>
+        <div id="reviewTopWeek" style="display:none"></div>
         <div class="reviews-list" id="reviewsList">
           <div class="rev-clean-empty">
             <div class="rce-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
@@ -1615,6 +1616,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/shortlist.js" defer></script>
+<script src="/assets/js/review-boost.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
 <script>
 function setLang(lang){
@@ -1682,6 +1684,14 @@ async function loadBusiness(){
   // Load all categories (multi-cat badges), reviews and deals in parallel
   loadCategoryBadges(BIZ.id);
   loadReviews(BIZ.id);
+  // Render the Hot Reviews This Week widget once reviews land
+  setTimeout(() => {
+    try {
+      if (window.DukanReviewBoost && window._latestReviews) {
+        DukanReviewBoost.renderTopWeekWidget('reviewTopWeek', window._latestReviews);
+      }
+    } catch(_){}
+  }, 1500);
   loadDealsForShop(slug);
 }
 
@@ -2057,17 +2067,26 @@ function render(){
   const _waText = `Namaste${b.owner_name ? ' ' + b.owner_name : ''}!\n\nI found *${_shopRef}*${_areaRef ? ' (' + _areaRef + ')' : ''} on DukanList — interested in your services. Can you share details?\n\nThanks 🙏`;
   const waMsg = encodeURIComponent(_waText);
   document.getElementById('ctaWa').href = `https://wa.me/${wa}?text=${waMsg}`;
-  document.getElementById('ctaWa').addEventListener('click', () => logLead('whatsapp'));
+  document.getElementById('ctaWa').addEventListener('click', () => {
+    logLead('whatsapp');
+    try { if (window.DukanReviewBoost) DukanReviewBoost.trackContact(b, 'whatsapp'); } catch(_){}
+  });
 
   // Normalize phone to 10-digit Indian, then prepend +91 E.164 format.
   // Avoids the bug where stored 12-digit numbers like "919541223377"
   // get dialed as "91 9541223377" (wrong) when used directly.
   document.getElementById('ctaCall').href = 'tel:+91' + normIndianPhone(b.mobile);
-  document.getElementById('ctaCall').addEventListener('click', () => logLead('call'));
+  document.getElementById('ctaCall').addEventListener('click', () => {
+    logLead('call');
+    try { if (window.DukanReviewBoost) DukanReviewBoost.trackContact(b, 'call'); } catch(_){}
+  });
 
   const mapsQ = encodeURIComponent(addrParts.join(', '));
   document.getElementById('ctaDir').href = `https://www.google.com/maps/search/?api=1&query=${mapsQ}`;
   document.getElementById('ctaDir').addEventListener('click', () => logLead('direction'));
+
+  // Review-boost: if customer previously contacted this shop, schedule a soft prompt
+  try { if (window.DukanReviewBoost) DukanReviewBoost.maybePrompt({ slug: b.slug, name: b.name, id: b.id }); } catch(_){}
 
   // "Why this shop?" — fast verdict pills for quick customer decision
   try { renderWhyThisShop(b); } catch(e){ console.warn('Why this shop:', e); }
@@ -2760,6 +2779,8 @@ async function loadReviews(bizId){
     .order('created_at', { ascending: false })
     .limit(50);
   if (!data || !data.length) return;
+  // Stash for review-boost widget
+  try { window._latestReviews = data; } catch(_){}
   const TOTAL_REVIEWS = data.length;
   const REVIEW_VISIBLE = 4;
   document.getElementById('reviewCount').textContent = `(${TOTAL_REVIEWS})`;

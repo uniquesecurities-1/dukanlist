@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.5';  // bumped — Owner Daily Engagement Bundle: 4 new widgets on panel/dashboard.html (Login Streak counter localStorage-tracked with 5 tiers from Day 1 to 30+, Yesterday's Digest with views/calls/WA/reviews + smart contextual message, Today's Quick Win rotating action card filtered by what shop actually needs, Morning WhatsApp Digest opt-in for backend cron). All logic in new /assets/js/owner-engagement.js — dashboard.html got just 4 host divs + 1 init call + 1 script tag.
+const VERSION    = 'dukan-v2.9.6';  // bumped — Customer Review Boost Toolkit: new /assets/js/review-boost.js with 4 mechanisms — (1) contact-event tracking on Call/WhatsApp clicks via localStorage, (2) post-contact review prompt modal that appears 4 sec after a customer revisits a shop they previously contacted (6 hr min gap + 3 day cooldown, beautiful 5-star modal that hands off to existing review flow), (3) Hottest Reviews This Week widget (saffron gradient card with top 1-3 reviews from last 7 days where rating>=4 and text>=30 chars), (4) buildRequestUrl + buildRequestMessage helpers for shopkeeper review-asks.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
