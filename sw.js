@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.6';  // bumped — Customer Review Boost Toolkit: new /assets/js/review-boost.js with 4 mechanisms — (1) contact-event tracking on Call/WhatsApp clicks via localStorage, (2) post-contact review prompt modal that appears 4 sec after a customer revisits a shop they previously contacted (6 hr min gap + 3 day cooldown, beautiful 5-star modal that hands off to existing review flow), (3) Hottest Reviews This Week widget (saffron gradient card with top 1-3 reviews from last 7 days where rating>=4 and text>=30 chars), (4) buildRequestUrl + buildRequestMessage helpers for shopkeeper review-asks.
+const VERSION    = 'dukan-v2.9.7';  // bumped — Poster Studio Phase 1 Bundle: (1) Streak counter — localStorage tracks daily poster shares with smart yesterday/today gap detection, banner shows '5-day poster streak!' with motivating sub-text. (2) AI Caption Generator — new /api/ai-caption Vercel function calls Groq llama-3.1-8b-instant if GROQ_API_KEY env var set, else falls back to rich local rotation library (50+ variations across 5 categories in EN + HI). (3) Analytics mini-dashboard — tracks shares per style/format/channel/hour over last 30 days, compact 3-KPI card shows Posters shared, Active days, Peak hour, plus most-used style highlight.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
