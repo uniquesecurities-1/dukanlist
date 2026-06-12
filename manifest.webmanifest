@@ -1,60 +1,119 @@
 {
-  "name": "DukanList — Every Shop, One App",
+  "id": "/?source=pwa",
+  "name": "DukanList — Local Businesses, Services & Professionals",
   "short_name": "DukanList",
-  "description": "Bharat's local business directory — 82 categories, verified shopkeepers, free registration.",
-  "start_url": "/",
+  "description": "Bharat's local discovery platform — doctors, mechanics, shops, clinics, offices and professionals across 195+ categories. Verified businesses, free for owners, instant Call & WhatsApp.",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "orientation": "portrait-primary",
   "theme_color": "#FF6B1A",
   "background_color": "#FFFBF5",
-  "lang": "en",
+  "lang": "en-IN",
   "dir": "ltr",
-  "categories": ["business", "shopping", "lifestyle"],
+  "categories": ["business", "shopping", "lifestyle", "productivity"],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/assets/icons/logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "https://dukanlist.com/assets/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-192.png",
+      "src": "https://dukanlist.com/assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-512.png",
+      "src": "https://dukanlist.com/assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-maskable-512.png",
+      "src": "https://dukanlist.com/assets/icons/icon-maskable-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://dukanlist.com/assets/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://dukanlist.com/assets/icons/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://dukanlist.com/assets/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "DukanList homepage — discover verified local businesses"
+    },
+    {
+      "src": "https://dukanlist.com/assets/screenshots/mobile.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "DukanList mobile — Bharat's local business directory"
     }
   ],
   "shortcuts": [
     {
       "name": "Browse Categories",
       "short_name": "Browse",
-      "url": "/browse.html",
-      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Browse all 195+ categories of local businesses",
+      "url": "/browse.html?source=pwa-shortcut",
+      "icons": [
+        { "src": "https://dukanlist.com/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
     },
     {
-      "name": "Search Shops",
+      "name": "Search Businesses",
       "short_name": "Search",
-      "url": "/search.html",
-      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Search businesses, services and professionals",
+      "url": "/search.html?source=pwa-shortcut",
+      "icons": [
+        { "src": "https://dukanlist.com/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
     },
     {
-      "name": "Register Your Shop",
+      "name": "List Your Business",
       "short_name": "Register",
-      "url": "/register.html",
-      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Register your shop, clinic, office or service for free",
+      "url": "/register.html?source=pwa-shortcut",
+      "icons": [
+        { "src": "https://dukanlist.com/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
+    },
+    {
+      "name": "Discover Feed",
+      "short_name": "Discover",
+      "description": "Swipe through verified local businesses TikTok-style",
+      "url": "/discover.html?source=pwa-shortcut",
+      "icons": [
+        { "src": "https://dukanlist.com/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
     }
-  ]
+  ],
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "handle_links": "preferred",
+  "protocol_handlers": []
 }
