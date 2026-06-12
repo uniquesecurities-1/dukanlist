@@ -123,7 +123,7 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       ok: true,
       already_verified: true,
-      message: 'Email already verified — owner link refreshed. The shop will leave the pending list on next reload.',
+      message: '✓ Owner is already verified. Shop has been auto-moved out of pending email queue.',
       user_id: targetUser.id
     });
   }

@@ -659,10 +659,27 @@ async function adminResendVerificationEmail(email, btn){
     const j = await res.json().catch(function(){ return {}; });
     if (!res.ok || !j.ok) throw new Error(j.error || j.detail || ('HTTP ' + res.status));
     if (j.already_verified){
-      // Email is verified but the moderation list was stale. We auto-healed
-      // the owner link on the server — just refresh the local list.
-      showToast('ℹ️ ' + (j.message || 'Already verified — list refreshed.'), 'info');
-      if (btn){ btn.innerHTML = '✓ Verified'; setTimeout(function(){ if(btn){ btn.disabled=false; btn.innerHTML = orig; } }, 2500); }
+      // Owner is verified — auto-heal RAN on the server. Visually remove
+      // this shop's card immediately so admin sees the queue shrink in real-time.
+      showToast('✓ ' + (j.message || 'Owner verified. Shop moved out of queue.'), 'success');
+      if (btn){
+        // Animate the shop card out of the queue
+        const card = btn.closest('.pe-row, [data-pending-email-row], .moderation-card, .biz-row, div');
+        if (card){
+          card.style.transition = 'opacity .35s ease, transform .35s ease, max-height .4s ease';
+          card.style.opacity = '0';
+          card.style.transform = 'translateX(40px)';
+          setTimeout(function(){
+            card.style.maxHeight = '0';
+            card.style.overflow = 'hidden';
+            card.style.padding = '0';
+            card.style.margin = '0';
+            card.style.border = '0';
+            setTimeout(function(){ if (card.parentNode) card.parentNode.removeChild(card); }, 350);
+          }, 350);
+        }
+      }
+      // Refresh the count badge + list in background
       _emailWaitLoaded = false;
       try { await loadPending(); } catch(_){}
       return;

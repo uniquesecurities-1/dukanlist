@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.5';  // bumped — Resend Email bug fix: moderation now calls v2 RPC (admin_pending_email_list_v2 with auto-heal) instead of stale legacy RPC, plus the resend endpoint no longer hard-fails on already-verified — it triggers self_heal_owner_links_by_email() and returns success so the moderation list refreshes and the shop disappears from 'awaiting email verification'.
+const VERSION    = 'dukan-v2.8.6';  // bumped — better Resend Email UX: API message rewritten as positive '✓ Owner is already verified. Shop has been auto-moved out of pending email queue.' (no 'error'-sounding 'already verified' lead). Frontend animates the shop card out of the queue with smooth fade + slide so admin sees the queue physically shrink in real time, plus background list refresh.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
