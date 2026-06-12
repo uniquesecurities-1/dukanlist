@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.2';  // bumped — Quick Poster Maker v3 (3 big upgrades): Shop Info Auto-Stamp (pulls logged-in shop name + phone, optional toggle, renders as bottom-center pill on poster) + Format Selector (Square 1080x1080 / Story 1080x1920 / Card 1200x630, canvas resizes on toggle) + Festival Auto-Detect Banner (Diwali, Holi, Eid, Christmas, Republic Day, Independence Day, Raksha Bandhan, New Year — 14-day lookahead, one-tap pre-fills festive message + style).
+const VERSION    = 'dukan-v2.9.3';  // bumped — Quick Poster Maker hotfix: brand stamp (shop name + phone) was silently failing when the Supabase auto-load returned no business_owners row (admin testing / new accounts / RLS edge case). Now ALWAYS shows two editable text inputs (Shop name + Phone) that auto-prefill from Supabase if available, and persist via localStorage so user types once and it's remembered forever.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

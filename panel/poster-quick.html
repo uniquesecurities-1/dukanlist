@@ -204,12 +204,18 @@ e.g. FLAT 30% OFF" maxlength="80"></textarea>
         <button type="button" data-fmt="card"><span class="fmt-ico">▬</span> Card</button>
       </div>
     </div>
-    <!-- Optional: brand the poster with shop name + phone -->
-    <div style="margin-bottom:12px" id="brandToggleWrap" style="display:none">
-      <label class="brand-toggle" id="brandToggle">
+    <!-- Optional: brand the poster with shop name + phone (always editable) -->
+    <div id="brandToggleWrap" style="margin-bottom:12px">
+      <label class="brand-toggle">
         <input type="checkbox" id="brandChk" checked>
-        <span>Brand with my shop name + phone</span>
+        <span>Stamp my shop name + phone on the poster</span>
       </label>
+      <div id="brandFields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <input type="text" id="brandName" placeholder="Shop name" maxlength="40"
+               style="border:1.5px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-family:inherit;font-size:.88rem;color:#0F172A">
+        <input type="text" id="brandPhone" placeholder="📞 +91 9876543210" maxlength="20"
+               style="border:1.5px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-family:inherit;font-size:.88rem;color:#0F172A">
+      </div>
     </div>
     <div class="preview-wrap" id="previewWrap">
       <div class="empty-hint" id="emptyHint">Type your message above to see the live preview.</div>
@@ -871,26 +877,42 @@ document.querySelectorAll('#fmtRow button').forEach(b => {
 // === Brand toggle ===
 document.getElementById('brandChk').addEventListener('change', (e) => {
   STATE.brand = !!e.target.checked;
+  document.getElementById('brandFields').style.display = STATE.brand ? 'grid' : 'none';
   renderMain();
 });
 
-// === Load shop info (BIZ data) so brand stamp can include name + phone ===
+// Manual shop name + phone editors
+function _syncBiz(){
+  const name = (document.getElementById('brandName').value || '').trim();
+  const mobile = (document.getElementById('brandPhone').value || '').trim();
+  STATE.biz = (name || mobile) ? { name, mobile } : null;
+  // Cache in localStorage so user doesn't re-type next time
+  try {
+    if (STATE.biz) localStorage.setItem('dl_poster_brand', JSON.stringify(STATE.biz));
+    else localStorage.removeItem('dl_poster_brand');
+  } catch(_){}
+  renderMain();
+}
+document.getElementById('brandName').addEventListener('input', _syncBiz);
+document.getElementById('brandPhone').addEventListener('input', _syncBiz);
+
+// === Load shop info (BIZ data) — prefills the manual inputs if logged in ===
 async function loadShopInfo(){
   try {
-    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client){
-      // Without a logged-in shop, hide the brand toggle entirely
-      document.getElementById('brandToggleWrap').style.display = 'none';
-      STATE.brand = false;
-      return;
-    }
+    // Also restore from localStorage so the user's previous entries persist
+    try {
+      const saved = JSON.parse(localStorage.getItem('dl_poster_brand') || 'null');
+      if (saved && saved.name){
+        document.getElementById('brandName').value = saved.name;
+        document.getElementById('brandPhone').value = saved.mobile || '';
+        STATE.biz = { name: saved.name, mobile: saved.mobile || '' };
+      }
+    } catch(_){}
+
+    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
     const c = ShopDB.client;
     const u = await c.auth.getUser();
-    if (!u || !u.data || !u.data.user){
-      document.getElementById('brandToggleWrap').style.display = 'none';
-      STATE.brand = false;
-      return;
-    }
-    // Find the shop owned by this user
+    if (!u || !u.data || !u.data.user) return;
     const userId = u.data.user.id;
     const r = await c.from('business_owners')
       .select('business_id, businesses(name, mobile, whatsapp)')
@@ -900,11 +922,14 @@ async function loadShopInfo(){
     if (r.error || !r.data || !r.data.businesses) return;
     const biz = r.data.businesses;
     const phone = String(biz.whatsapp || biz.mobile || '').replace(/\D/g, '').slice(-10);
-    STATE.biz = {
-      name:   biz.name || '',
-      mobile: phone ? ('+91 ' + phone) : ''
-    };
-    document.getElementById('brandToggleWrap').style.display = '';
+    const name = biz.name || '';
+    const phoneFmt = phone ? ('+91 ' + phone) : '';
+    // Only fill if user hasn't manually typed something else
+    const nameEl = document.getElementById('brandName');
+    const phoneEl = document.getElementById('brandPhone');
+    if (!nameEl.value && name){ nameEl.value = name; }
+    if (!phoneEl.value && phoneFmt){ phoneEl.value = phoneFmt; }
+    STATE.biz = { name: nameEl.value, mobile: phoneEl.value };
     renderMain();
   } catch(e){ console.warn('Shop info load:', e); }
 }
