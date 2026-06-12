@@ -65,6 +65,8 @@
   .issue.about   { background:#FEF3C7; color:#92400E }
   .issue.locality{ background:#FFF7ED; color:#9A3412 }
   .issue.year    { background:#FCE7F3; color:#9D174D }
+  .issue.address { background:#FEE2E2; color:#7F1D1D; border:1px solid #FCA5A5 }
+  .issue.pincode { background:#FCE7F3; color:#831843; border:1px solid #F9A8D4 }
 
   .shop-actions{ display:flex; gap:6px; flex-shrink:0 }
   .act{ display:inline-flex; align-items:center; gap:4px; padding:7px 12px; border-radius:8px; font-size:.78rem; font-weight:800; text-decoration:none; border:0; cursor:pointer; font-family:inherit; transition:.15s; white-space:nowrap }
@@ -108,7 +110,8 @@
     <div class="kpi orange"><div class="label">No Hours Set</div><div class="value" id="kNoHours">—</div><div class="delta">Not in "Open Now" filter</div></div>
     <div class="kpi green"><div class="label">No USP</div><div class="value" id="kNoUsp">—</div><div class="delta">Weak for SEO + sharing</div></div>
     <div class="kpi blue"><div class="label">No Locality</div><div class="value" id="kNoLoc">—</div><div class="delta">Missing from hyperlocal pages</div></div>
-    <div class="kpi purple"><div class="label">Total flagged</div><div class="value" id="kTotal">—</div><div class="delta">Across all 4 issues</div></div>
+    <div class="kpi" style="border-top:3px solid #DC2626"><div class="label">Bad Address</div><div class="value" id="kBadAddr">—</div><div class="delta">Address fails quality checks</div></div>
+    <div class="kpi purple"><div class="label">Total flagged</div><div class="value" id="kTotal">—</div><div class="delta">Across all issues</div></div>
   </div>
 
   <div class="filters" id="filters">
@@ -119,6 +122,8 @@
     <button type="button" class="filt" data-f="about">📝 No About <span class="count" id="cAbout">0</span></button>
     <button type="button" class="filt" data-f="locality">📍 No locality <span class="count" id="cLoc">0</span></button>
     <button type="button" class="filt" data-f="year">📅 No year <span class="count" id="cYear">0</span></button>
+    <button type="button" class="filt" data-f="address">🚩 Bad address <span class="count" id="cAddr">0</span></button>
+    <button type="button" class="filt" data-f="pincode">🔢 Pincode issue <span class="count" id="cPin">0</span></button>
   </div>
 
   <div class="toolbar">
@@ -187,6 +192,12 @@ function buildNudgeMessage(shop, issues){
   if (issues.includes('year')){
     lines.push('• 📅  *Established year* — adds a "Since 2010" credibility badge that customers look for when comparing shops.');
   }
+  if (issues.includes('address')){
+    lines.push('• 🚩  *Address detail* — your address line looks incomplete. Please add the street/landmark/area so customers can actually reach your shop.');
+  }
+  if (issues.includes('pincode')){
+    lines.push('• 🔢  *Pincode* — your pincode is missing or does not match your city. Please update so the listing appears in correct local searches.');
+  }
 
   lines.push('');
   lines.push('Quick links:');
@@ -199,6 +210,30 @@ function buildNudgeMessage(shop, issues){
   return lines.join('\n');
 }
 
+// Pattern detectors for low-quality / test-data addresses
+const _BAD_PATTERNS = /\b(test|asdf|aaaa|xxxx|aaa|bbb|abc|123456|qwerty|dummy|sample|nothing|none|na|n\/a|null|tbd|wip)\b/i;
+function _isBadAddress(addr1, addr2){
+  const a = String(addr1 == null ? '' : addr1).trim();
+  // Must have at least one of these to qualify as a real address:
+  if (!a) return true;
+  if (a.length < 8) return true;                          // too short
+  if (_BAD_PATTERNS.test(a)) return true;                 // test/dummy keywords
+  if (!/[\s,]/.test(a)) return true;                     // no spaces/commas — looks like a single blob
+  if (!/[a-zA-Z\u0900-\u097F]{3,}/.test(a)) return true; // no real word chars
+  // Repeated single-char patterns like "aaaaa" or "xxxxxx"
+  if (/^(.)\1{4,}$/.test(a.replace(/[^a-zA-Z]/g, ''))) return true;
+  return false;
+}
+function _isBadPincode(b){
+  const p = String(b.pincode || '').trim();
+  if (!p) return true; // missing entirely
+  if (!/^\d{6}$/.test(p)) return true; // not a 6-digit number
+  // If we have the city's known pincodes, ensure ours matches one
+  const cityPins = (b.geo_cities && Array.isArray(b.geo_cities.pincodes)) ? b.geo_cities.pincodes : null;
+  if (cityPins && cityPins.length && !cityPins.includes(p)) return true;
+  return false;
+}
+
 function computeIssues(b){
   const issues = [];
   if (!(Array.isArray(b.photos) && b.photos.length))                                   issues.push('photos');
@@ -207,6 +242,8 @@ function computeIssues(b){
   if (!(b.about_text && b.about_text.trim().length >= 50))                              issues.push('about');
   if (!b.locality_id)                                                                   issues.push('locality');
   if (!(b.established_year && b.established_year > 1900))                               issues.push('year');
+  if (_isBadAddress(b.address_line1, b.address_line2))                                  issues.push('address');
+  if (_isBadPincode(b))                                                                 issues.push('pincode');
   return issues;
 }
 
@@ -225,7 +262,7 @@ async function loadShops(){
     }
 
     const { data, error } = await c.from('businesses')
-      .select('id, slug, name, owner_name, mobile, whatsapp, photos, hours_json, usp_text, about_text, locality_id, established_year, status, created_at, geo_cities(name), geo_localities(name)')
+      .select('id, slug, name, owner_name, mobile, whatsapp, photos, hours_json, usp_text, about_text, address_line1, address_line2, pincode, locality_id, established_year, status, created_at, geo_cities(name, pincodes), geo_localities(name)')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(500);
@@ -240,12 +277,13 @@ async function loadShops(){
 }
 
 function updateKPIs(){
-  const counts = { photos:0, hours:0, usp:0, about:0, locality:0, year:0 };
+  const counts = { photos:0, hours:0, usp:0, about:0, locality:0, year:0, address:0, pincode:0 };
   SHOPS.forEach(b => b._issues.forEach(i => counts[i] = (counts[i] || 0) + 1));
   document.getElementById('kNoPhoto').textContent = counts.photos;
   document.getElementById('kNoHours').textContent = counts.hours;
   document.getElementById('kNoUsp').textContent   = counts.usp;
   document.getElementById('kNoLoc').textContent   = counts.locality;
+  document.getElementById('kBadAddr').textContent = counts.address;
   document.getElementById('kTotal').textContent   = SHOPS.length;
   document.getElementById('cAll').textContent     = SHOPS.length;
   document.getElementById('cPhotos').textContent  = counts.photos;
@@ -254,6 +292,8 @@ function updateKPIs(){
   document.getElementById('cAbout').textContent   = counts.about;
   document.getElementById('cLoc').textContent     = counts.locality;
   document.getElementById('cYear').textContent    = counts.year;
+  document.getElementById('cAddr').textContent    = counts.address;
+  document.getElementById('cPin').textContent     = counts.pincode;
 }
 
 function render(){

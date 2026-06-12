@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.0';  // bumped — Bundle D Data Quality Sweep: new admin page /admin/incomplete-shops.html (KPIs + filters + WhatsApp nudge per issue type) + Locality auto-suggest on registration Address Line 1 (typing 'Meena' shows 'Meena Bazaar' chip → 1-tap fills locality dropdown + appends to address). Plus pre-flight guardrail in quick-push.bat.
+const VERSION    = 'dukan-v2.8.1';  // bumped — Bundle D part 2: extended /admin/incomplete-shops.html with Address Quality validators (detects test/dummy data, too-short addresses, no-spaces blobs, repeated chars, missing or city-mismatched pincode). Adds Bad Address KPI + Bad-address & Pincode-issue filter chips + targeted WhatsApp nudge lines.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
