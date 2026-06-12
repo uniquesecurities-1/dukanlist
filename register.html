@@ -756,9 +756,11 @@
       <span data-i18n-hi>पिनकोड शहर से मेल खाना चाहिए — हम वेरिफाई करते हैं।</span>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" style="position:relative">
       <label><span data-i18n-en>Address Line 1</span><span data-i18n-hi>पता लाइन 1</span><span class="req">*</span></label>
-      <input id="addr1" class="input" type="text" placeholder="Shop No. 12, Main Bazaar Road" maxlength="120">
+      <input id="addr1" class="input" type="text" placeholder="Shop No. 12, Main Bazaar Road" maxlength="120" autocomplete="off">
+      <!-- Locality auto-suggest dropdown — appears when user types ≥2 chars matching an area in this city -->
+      <div id="addr1Suggest" style="display:none;position:absolute;left:0;right:0;top:100%;z-index:50;background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 12px 30px rgba(15,23,42,.12);margin-top:4px;max-height:240px;overflow-y:auto"></div>
     </div>
     <div class="form-group">
       <label><span data-i18n-en>Address Line 2</span><span data-i18n-hi>पता लाइन 2</span><span class="opt">(optional)</span></label>
@@ -1496,8 +1498,13 @@ async function onCityChange(){
   // Hide locality wrap if no city selected
   const locWrap = document.getElementById('localityWrap');
   if (locWrap) locWrap.style.display = cityId ? '' : 'none';
-  if (!cityId) return;
+  if (!cityId) {
+    window.__currentCityLocalities = [];
+    return;
+  }
   const locs = await Geo.loadLocalities(cityId);
+  // Cache for address-line typeahead
+  window.__currentCityLocalities = locs || [];
   // Show locality wrap only if the city has localities curated
   if (locWrap) locWrap.style.display = (locs && locs.length) ? '' : 'none';
   Geo.fillSelect(document.getElementById('localityId'), locs, lang === 'hi' ? '— क्षेत्र चुनें (वैकल्पिक) —' : '— Select area (optional) —', lang);
@@ -1510,6 +1517,93 @@ async function onCityChange(){
     }
   }
 }
+
+// =============================================================
+// Address-line locality auto-suggest
+// =============================================================
+// As the user types in Address Line 1, surface matching areas
+// from the city's curated locality list. One tap fills the area
+// dropdown AND inserts the locality name into the address itself.
+(function(){
+  function init(){
+    var input = document.getElementById('addr1');
+    var sugBox = document.getElementById('addr1Suggest');
+    if (!input || !sugBox) return;
+    var debounceTimer = null;
+
+    function rerender(){
+      var locs = window.__currentCityLocalities || [];
+      var q = (input.value || '').trim().toLowerCase();
+      if (!locs.length || q.length < 2){
+        sugBox.style.display = 'none';
+        return;
+      }
+      // Match by name (EN or HI) — case-insensitive substring
+      var matches = locs.filter(function(l){
+        var name = (l.name || '').toLowerCase();
+        var nameHi = (l.name_hi || '').toLowerCase();
+        return name.indexOf(q) >= 0 || (nameHi && nameHi.indexOf(q) >= 0);
+      }).slice(0, 6);
+      if (matches.length === 0){
+        sugBox.style.display = 'none';
+        return;
+      }
+      sugBox.innerHTML = matches.map(function(l){
+        return '<div class="al-sug" data-id="' + l.id + '" data-name="' + (l.name || '').replace(/"/g, '&quot;') + '" '
+             + 'style="padding:10px 14px;cursor:pointer;font-size:.86rem;font-weight:600;color:#0F172A;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .12s">'
+             + '<span><span style="opacity:.6;margin-right:6px">📍</span>' + (l.name || '')
+             + (l.name_hi ? ' <span style="color:#64748B;font-weight:500;margin-left:5px">(' + l.name_hi + ')</span>' : '')
+             + '</span>'
+             + '<span style="font-size:.7rem;color:#3B82F6;font-weight:700">Tap to use</span>'
+             + '</div>';
+      }).join('');
+      sugBox.style.display = '';
+
+      sugBox.querySelectorAll('.al-sug').forEach(function(row){
+        row.addEventListener('mouseenter', function(){ row.style.background = '#F8FAFC'; });
+        row.addEventListener('mouseleave', function(){ row.style.background = ''; });
+        row.addEventListener('mousedown', function(ev){
+          ev.preventDefault();
+          var id = row.getAttribute('data-id');
+          var name = row.getAttribute('data-name');
+          // 1. Set the locality dropdown
+          var locSel = document.getElementById('localityId');
+          if (locSel) locSel.value = id;
+          var locWrap = document.getElementById('localityWrap');
+          if (locWrap) locWrap.style.display = '';
+          // 2. Append locality name to address if it's not already there
+          var cur = input.value.trim();
+          var lower = cur.toLowerCase();
+          if (lower.indexOf(name.toLowerCase()) < 0){
+            // Replace the partial match the user typed with the full canonical name
+            // For UX, keep what they have if it's longer, just append the area.
+            if (cur.length < name.length){
+              input.value = name;
+            } else if (cur.length > 0 && cur.charAt(cur.length - 1) !== ',') {
+              input.value = cur + ', ' + name;
+            } else {
+              input.value = cur + ' ' + name;
+            }
+          }
+          sugBox.style.display = 'none';
+          input.focus();
+        });
+      });
+    }
+
+    input.addEventListener('input', function(){
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(rerender, 120);
+    });
+    input.addEventListener('focus', rerender);
+    input.addEventListener('blur', function(){
+      // Delay hide so click registers
+      setTimeout(function(){ sugBox.style.display = 'none'; }, 200);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
 
 async function validatePincode(){
   const pin = document.getElementById('pincode').value.trim();

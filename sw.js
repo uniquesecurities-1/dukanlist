@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.7.3';  // hotfix bundle — /api/share truncation fix + index.html truncation fix (loadChipCounts mid-statement) + quick-push.bat now has pre-flight syntax guardrail (node --check on api/*.js + assets/js/*.js + sw.js, plus </html> closing-tag check on critical HTML, plus categories.json JSON validation). Push aborts on any failure.
+const VERSION    = 'dukan-v2.8.0';  // bumped — Bundle D Data Quality Sweep: new admin page /admin/incomplete-shops.html (KPIs + filters + WhatsApp nudge per issue type) + Locality auto-suggest on registration Address Line 1 (typing 'Meena' shows 'Meena Bazaar' chip → 1-tap fills locality dropdown + appends to address). Plus pre-flight guardrail in quick-push.bat.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
