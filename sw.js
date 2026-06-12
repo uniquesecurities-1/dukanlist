@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.3';  // bumped — Quick Poster Maker hotfix: brand stamp (shop name + phone) was silently failing when the Supabase auto-load returned no business_owners row (admin testing / new accounts / RLS edge case). Now ALWAYS shows two editable text inputs (Shop name + Phone) that auto-prefill from Supabase if available, and persist via localStorage so user types once and it's remembered forever.
+const VERSION    = 'dukan-v2.9.4';  // bumped — Quick Poster Maker mobile fix: brand input fields (Shop name + Phone) were overflowing the viewport on narrow screens because grid-template-columns:1fr 1fr without min-width:0 hits the classic CSS Grid min-content overflow bug. Now uses class-based responsive grid: stacks 1-col below 560px, side-by-side with minmax(0, 1fr) above. Inputs also box-sizing:border-box + min-width:0 for safety.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

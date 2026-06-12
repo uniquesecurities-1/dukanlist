@@ -90,6 +90,14 @@
   .brand-toggle input{ accent-color:#16A34A; cursor:pointer; width:14px; height:14px }
   .brand-toggle.locked{ background:#FEF3C7; border-color:#FCD34D; color:#92400E; cursor:default }
 
+  /* Brand-stamp manual inputs — full-width on mobile, side-by-side on wider screens */
+  .brand-fields{ display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px }
+  @media (min-width:560px){
+    .brand-fields{ grid-template-columns:minmax(0, 1fr) minmax(0, 1fr) }
+  }
+  .brand-input{ width:100%; min-width:0; border:1.5px solid #E5E7EB; border-radius:8px; padding:9px 12px; font-family:inherit; font-size:.88rem; color:#0F172A; box-sizing:border-box; background:#fff; transition:border-color .15s }
+  .brand-input:focus{ outline:none; border-color:#FF6B1A; box-shadow:0 0 0 3px rgba(255,107,26,.1) }
+
   /* Format selector — Square / Story / Card */
   .fmt-row{ display:inline-flex; background:#F1F5F9; padding:3px; border-radius:10px; gap:2px; margin-left:auto }
   .fmt-row button{ background:transparent; border:0; padding:6px 12px; border-radius:8px; font-family:inherit; font-size:.76rem; font-weight:800; color:#64748B; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:4px }
@@ -210,11 +218,9 @@ e.g. FLAT 30% OFF" maxlength="80"></textarea>
         <input type="checkbox" id="brandChk" checked>
         <span>Stamp my shop name + phone on the poster</span>
       </label>
-      <div id="brandFields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-        <input type="text" id="brandName" placeholder="Shop name" maxlength="40"
-               style="border:1.5px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-family:inherit;font-size:.88rem;color:#0F172A">
-        <input type="text" id="brandPhone" placeholder="📞 +91 9876543210" maxlength="20"
-               style="border:1.5px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-family:inherit;font-size:.88rem;color:#0F172A">
+      <div id="brandFields" class="brand-fields">
+        <input type="text" id="brandName" class="brand-input" placeholder="Shop name" maxlength="40">
+        <input type="text" id="brandPhone" class="brand-input" placeholder="📞 +91 9876543210" maxlength="20">
       </div>
     </div>
     <div class="preview-wrap" id="previewWrap">
