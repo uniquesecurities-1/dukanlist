@@ -607,22 +607,6 @@
   }
   .swipe-hint.hide{ opacity:0; transition:opacity .4s }
 
-  /* Auto-advance progress bar on active card */
-  .card .ap-bar{ position:absolute; left:0; right:0; top:0; height:3px; background:rgba(255,255,255,.12); z-index:5; pointer-events:none }
-  .card .ap-bar .ap-fill{ height:100%; width:0%; background:linear-gradient(90deg,#FBBF24,#F59E0B); box-shadow:0 0 8px rgba(251,191,36,.6); transition:width .1s linear; border-radius:0 2px 2px 0 }
-  .card .ap-bar.paused .ap-fill{ background:rgba(255,255,255,.35); box-shadow:none }
-  .card.no-photo .ap-bar{ background:rgba(0,0,0,.18) }
-
-  /* Auto-play toggle button (next to mute in topNav) — COMPACT for narrow phones */
-  #autoplayBtn{ background:rgba(0,0,0,.4); color:#fff; border:0; padding:5px 8px; border-radius:99px; font-size:13px; cursor:pointer; backdrop-filter:blur(8px); transition:.15s; flex-shrink:0; line-height:1 }
-  #autoplayBtn.on{ background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F }
-  #autoplayBtn:active{ transform:scale(.96) }
-  /* Tighter topNav on phones so all buttons fit */
-  @media (max-width:420px){
-    .top-nav{ gap:5px; padding:8px 8px }
-    .top-nav .home-btn, .top-nav .fav-btn{ padding:6px 9px; font-size:11px }
-    .top-nav .logo{ padding:5px 8px; font-size:11px }
-  }
 
   /* Toast for save/share confirmation */
   .toast{
@@ -801,9 +785,8 @@
   <div class="logo">Dukan<em>List</em></div>
   <button id="cityBtn" class="fav-btn" onclick="openCityPicker()" type="button" aria-label="Choose city" style="border:0;font-size:12px;display:flex;align-items:center;gap:4px">📍 <span id="cityBtnLabel">All</span> ▾</button>
   <div style="flex:1"></div>
-  <button id="autoplayBtn" type="button" onclick="toggleAutoplay()" aria-label="Auto-play" title="Auto-advance every 7 sec" class="">▶️</button>
   <button id="muteBtn" class="fav-btn" onclick="toggleMute()" type="button" aria-label="Toggle sound" style="border:0;font-size:14px">🔊</button>
-  <a href="/panel/favorites.html" class="fav-btn" aria-label="My saved shops list" style="display:inline-flex;align-items:center;gap:3px;padding:6px 9px" title="My saved shops"><span style="font-size:14px">📋</span></a>
+  <a href="/panel/favorites.html" class="fav-btn" aria-label="My saved shops list" style="display:inline-flex;align-items:center;gap:4px">📋 <span style="font-size:11px;font-weight:700">My List</span></a>
 </div>
 
 <!-- City picker overlay — opens on tap, closes without disturbing feed -->
@@ -838,15 +821,12 @@
 <div id="feed" class="feed" style="display:none"></div>
 
 <div id="emptyScreen" class="center" style="display:none">
-  <div style="text-align:center;padding:0 24px;max-width:380px">
+  <div style="text-align:center;padding:0 24px">
     <div style="font-size:48px;margin-bottom:14px">🏪</div>
     <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops here yet</h2>
-    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try a different category, or reset filters to see all shops.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px">
-      <button type="button" onclick="resetAllFilters()" style="background:#FBBF24;color:#78350F;border:0;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;font-size:13px;cursor:pointer">🔄 Reset Filters</button>
-      <a href="/browse.html" style="display:inline-block;background:rgba(255,255,255,.12);color:#fff;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2);font-size:13px">📚 Browse All</a>
-      <a href="/" style="display:inline-block;background:rgba(255,255,255,.12);color:#fff;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2);font-size:13px">← Home</a>
-    </div>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try a different category or browse all shops.</p>
+    <a href="/browse.html" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none">📚 Browse All</a>
+    <a href="/" style="display:inline-block;margin-top:14px;margin-left:8px;background:rgba(255,255,255,.12);color:#fff;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2)">← Home</a>
   </div>
 </div>
 
@@ -1265,25 +1245,11 @@ async function init(){
 function renderFiltered(){
   var rows = STATE.allRows.slice();
   if (STATE.filter){
-    var fStr = String(STATE.filter);
-    rows = rows.filter(function(b){ return String(b.sub_category_id||b.category_id) === fStr; });
+    rows = rows.filter(function(b){ return (b.sub_category_id||b.category_id) === STATE.filter; });
   }
   if (STATE.cityFilter){
     rows = rows.filter(function(b){ return b.city_id === STATE.cityFilter; });
   }
-  // Phase 2 — smart sort: un-seen shops first, then by trending/likes
-  try {
-    var seen = JSON.parse(localStorage.getItem('dl_discover_seen') || '{}') || {};
-    rows.sort(function(a, b){
-      var aSeen = !!seen[a.id], bSeen = !!seen[b.id];
-      if (aSeen !== bSeen) return aSeen ? 1 : -1; // un-seen first
-      var aLikes = a.likes_count || 0, bLikes = b.likes_count || 0;
-      if (aLikes !== bLikes) return bLikes - aLikes; // then by likes
-      var aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
-      var bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
-      return bDate - aDate; // then newest first
-    });
-  } catch(_){}
   if (rows.length === 0){
     document.getElementById('feed').style.display = 'none';
     document.getElementById('emptyScreen').style.display = '';
@@ -1359,7 +1325,6 @@ function renderFiltered(){
 
     return ''+
     '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'">'+
-      '<div class="ap-bar"><div class="ap-fill"></div></div>'+
       '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
       '<div class="gradient-top"></div>'+
       '<div class="gradient"></div>'+
@@ -1529,158 +1494,40 @@ function renderFiltered(){
   feed.addEventListener('wheel',      unlockAudio, { passive: true, once: true });
   feed.addEventListener('scroll',     unlockAudio, { passive: true, once: true });
 
-  // ============================================================
-  // Phase 2 — Auto-advance + Smart sort + Seen tracking (v2 — race-free)
-  // ============================================================
-  // Design notes:
-  //   * Single timer at a time. clearInterval BEFORE every setInterval.
-  //   * No pause-on-touchstart — that fires during normal scroll on mobile
-  //     and was creating timer storms. User can just tap ⏸️ to stop.
-  //   * IntersectionObserver naturally restarts the timer on each new card,
-  //     so no need to manually pause/resume around swipes.
-  //   * 250ms interval (not 100ms) — 4 updates/sec is plenty for a progress
-  //     bar and saves battery.
-  // ============================================================
-  var AUTOPLAY_KEY = 'dl_discover_autoplay';
-  var SEEN_KEY = 'dl_discover_seen';
-  var AUTOPLAY_DURATION = 7000;
-  var SEEN_DWELL_MS = 2500;
-
-  function getAutoplay(){ try { return localStorage.getItem(AUTOPLAY_KEY) === '1'; } catch(_){ return false; } }
-  function setAutoplay(v){ try { localStorage.setItem(AUTOPLAY_KEY, v ? '1' : '0'); } catch(_){} updateAutoplayBtnUI(); }
-  function updateAutoplayBtnUI(){
-    var btn = document.getElementById('autoplayBtn');
-    if (!btn) return;
-    if (getAutoplay()){ btn.classList.add('on'); btn.textContent = '▶️'; btn.title = 'Auto-play ON — tap to disable'; }
-    else { btn.classList.remove('on'); btn.textContent = '⏸️'; btn.title = 'Auto-play OFF — tap to enable'; }
-  }
-  window.toggleAutoplay = function(){
-    var newVal = !getAutoplay();
-    setAutoplay(newVal);
-    if (newVal){ startAutoplayTimer(_lastActiveIdx); }
-    else { stopAutoplayTimer(); }
-  };
-
-  function loadSeen(){ try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') || {}; } catch(_){ return {}; } }
-  function saveSeen(o){ try { localStorage.setItem(SEEN_KEY, JSON.stringify(o)); } catch(_){} }
-  function markSeen(bid){ if (!bid) return; var o = loadSeen(); o[bid] = Date.now(); saveSeen(o); }
-
-  var _autoplayTimer = null;
-  var _autoplayStarted = 0;
-  var _autoplayCurrentBar = null;
-
-  function _clearTimer(){
-    if (_autoplayTimer){
-      try { clearInterval(_autoplayTimer); } catch(_){}
-      _autoplayTimer = null;
-    }
-  }
-  function stopAutoplayTimer(){
-    _clearTimer();
-    if (_autoplayCurrentBar){
-      var fill = _autoplayCurrentBar.querySelector('.ap-fill');
-      if (fill) fill.style.width = '0%';
-      _autoplayCurrentBar.classList.remove('paused');
-      _autoplayCurrentBar = null;
-    }
-  }
-  function startAutoplayTimer(idx){
-    // ALWAYS clear before starting — single source of truth
-    _clearTimer();
-    if (!getAutoplay()) return;
-    if (typeof idx !== 'number' || idx < 0) return;
-    var card = document.querySelector('.card[data-idx="' + idx + '"]');
-    if (!card) return;
-    var bar = card.querySelector('.ap-bar');
-    var fill = bar && bar.querySelector('.ap-fill');
-    if (!fill) return;
-    // Reset any previous bar state
-    if (_autoplayCurrentBar && _autoplayCurrentBar !== bar){
-      var prev = _autoplayCurrentBar.querySelector('.ap-fill');
-      if (prev) prev.style.width = '0%';
-      _autoplayCurrentBar.classList.remove('paused');
-    }
-    _autoplayCurrentBar = bar;
-    _autoplayStarted = Date.now();
-    fill.style.width = '0%';
-    bar.classList.remove('paused');
-    _autoplayTimer = setInterval(function(){
-      // Defensive — if document hidden, just freeze progress (don't advance)
-      if (document.hidden) return;
-      var elapsed = Date.now() - _autoplayStarted;
-      var pct = Math.min(100, (elapsed / AUTOPLAY_DURATION) * 100);
-      fill.style.width = pct + '%';
-      if (elapsed >= AUTOPLAY_DURATION){
-        _clearTimer();
-        var next = document.querySelector('.card[data-idx="' + (idx + 1) + '"]');
-        if (next){
-          next.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          var first = document.querySelector('.card[data-idx="0"]');
-          if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-    }, 250);  // 4 fps — smooth enough, easy on battery
-  }
-
-  // One-time migration: in v2.9.8 autoplay could hang. Force reset to OFF on first
-  // v2.9.9+ load to give user a clean restart. They can re-enable via the toggle.
-  try {
-    if (!localStorage.getItem('dl_autoplay_reset_v299')){
-      localStorage.setItem('dl_discover_autoplay', '0');
-      localStorage.setItem('dl_autoplay_reset_v299', '1');
-    }
-  } catch(_){}
-
-  updateAutoplayBtnUI();
-
   if ('IntersectionObserver' in window){
     var obs = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
         if (en.intersectionRatio > 0.5){
-          // STEP 1 — Always add .active first (must not throw)
           en.target.classList.add('active');
           var idx = parseInt(en.target.getAttribute('data-idx') || '0', 10);
+          if (!_firstActivation && _hasInteracted && idx !== _lastActiveIdx){
+            playSwipeSound();
+          }
           _firstActivation = false;
           _lastActiveIdx = idx;
-          // STEP 2 — Everything else wrapped so a single failure can't
-          //         keep .body invisible.
-          try { if (_hasInteracted && idx !== 0) playSwipeSound(); } catch(_){}
-          try {
-            var bid = en.target.getAttribute('data-id');
-            setTimeout(function(){ if (_lastActiveIdx === idx) markSeen(bid); }, SEEN_DWELL_MS);
-          } catch(_){}
-          try { startAutoplayTimer(idx); } catch(_){}
-          try { updatePosBar(idx, cards.length); } catch(_){}
-          try { bumpStreak(); } catch(_){}
-          try { if (idx >= 4) maybeShowNotifSheet(); } catch(_){}
-          try { maybeShowSocialToast(en.target); } catch(_){}
-          try {
-            var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
-            if (nxt){
-              var bg2 = nxt.querySelector('.bg');
-              var style2 = bg2 && bg2.getAttribute('style') || '';
-              var m2 = style2.match(/url\(([^)]+)\)/);
-              if (m2){ var im = new Image(); im.src = m2[1]; }
-            }
-          } catch(_){}
+          // HOT v2 Phase 2 — update progress bar + streak
+          updatePosBar(idx, cards.length);
+          bumpStreak();
+          // After 5 cards viewed → offer notif subscribe
+          if (idx >= 4) maybeShowNotifSheet();
+          // Show social proof toast on first activation of each new card
+          maybeShowSocialToast(en.target);
+          // Lazy load next card image
+          var nxt = feed.querySelector('.card[data-idx="'+(idx+2)+'"]');
+          if (nxt){
+            var bg2 = nxt.querySelector('.bg');
+            var style2 = bg2 && bg2.getAttribute('style') || '';
+            var m2 = style2.match(/url\(([^)]+)\)/);
+            if (m2){ var im = new Image(); im.src = m2[1]; }
+          }
         }
       });
     }, { root: feed, threshold: [0.5] });
     cards.forEach(function(card){ obs.observe(card); });
     if (cards[0]){
       cards[0].classList.add('active');
-      try { updatePosBar(0, cards.length); } catch(_){}
+      updatePosBar(0, cards.length);
     }
-    // SAFETY NET — if for some reason IO + cards[0] both failed to activate
-    // the first card, force it after 600ms. This guarantees body always shows.
-    setTimeout(function(){
-      var any = feed.querySelector('.card.active');
-      if (!any){
-        var first = feed.querySelector('.card');
-        if (first){ first.classList.add('active'); }
-      }
-    }, 600);
   } else {
     cards.forEach(function(card){ card.classList.add('active'); });
   }
@@ -1875,18 +1722,6 @@ function spawnDoubleTapHeart(card, x, y){
     card.querySelectorAll('.dt-spark').forEach(function(s){ s.remove(); });
   }, 1200);
 }
-
-// Global reset — clears all filters AND re-renders. Used by empty-state button
-// to recover from any stuck filter state (city/category mismatch, etc.)
-window.resetAllFilters = function(){
-  try {
-    STATE.filter = null;
-    STATE.cityFilter = null;
-    var lbl = document.getElementById('cityBtnLabel');
-    if (lbl) lbl.textContent = 'All';
-    renderFiltered();
-  } catch(e){ location.reload(); }
-};
 
 init();
 </script>

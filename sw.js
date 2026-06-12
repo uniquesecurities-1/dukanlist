@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.11';  // bumped — Discover UX: (a) Autoplay button + My List icon-only compact mode for narrow phones — My List label was getting clipped (b) topNav extra tight padding under 420px width (c) Empty state now has "Reset Filters" button — clears category + city in one tap, fixes stuck-filter scenarios where a previously selected city/category leaves no matches (d) Category filter comparison string-coerced — protects against type mismatches between chip data-cat and shop category_id.
+const VERSION    = 'dukan-v2.9.12';  // REVERT — removed entire Phase 2 Discover Feed Polish (autoplay toggle, progress bar, smart sort, seen tracking, ap-bar CSS+HTML, IO callback try-catch wrapping, 600ms safety net, resetAllFilters, autoplay reset migration, compact topNav CSS, icon-only My List). Discover page restored to pre-Phase-2 stable state. User reported multiple live issues with the autoplay/smart-sort experience — going back to known-good baseline.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
