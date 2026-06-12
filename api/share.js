@@ -121,11 +121,22 @@ function renderHtml(biz, targetUrl, isReview){
       imageType = 'image/svg+xml';
     }
   } else {
+    // STANDARD SHARE — fallback chain:
+    //  1. Custom og_image_url (shopkeeper-set)
+    //  2. Shop's own first photo
+    //  3. Dynamic shop-branded SVG card (NOT the generic DukanList default)
+    // The generic DEFAULT_OG_IMAGE is only used as the absolute last resort
+    // for pages where biz lookup completely fails.
     if (biz.og_image_url && typeof biz.og_image_url === 'string'){
       image = biz.og_image_url;
     } else if (hasShopPhoto){
       image = biz.photos[0];
       imageType = 'image/jpeg';
+    } else {
+      // Dynamic shop-branded card: gradient + initial badge + shop name + city + rating
+      // "LOCAL · VERIFIED" pill instead of "RATE US", and "Tap to view photos, hours, contact →" CTA
+      image = SITE_ORIGIN + '/api/og-card?slug=' + encodeURIComponent(biz.slug || '') + '&mode=share';
+      imageType = 'image/svg+xml';
     }
   }
 

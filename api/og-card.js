@@ -83,6 +83,8 @@ async function fetchBusiness(field, value){
 
 function buildSvg(biz, opts){
   opts = opts || {};
+  const mode = opts.mode || 'review';  // 'review' (default) | 'share'
+  const isShare = (mode === 'share');
   const name = biz.name || 'Our Shop';
   const city = biz.geo_cities && biz.geo_cities.name ? biz.geo_cities.name : '';
   const locality = biz.geo_localities && biz.geo_localities.name ? biz.geo_localities.name : '';
@@ -110,9 +112,14 @@ function buildSvg(biz, opts){
              'stroke="rgba(0,0,0,0.06)" stroke-width="1"/>';
   }
 
-  const ratingText = hasRating
-    ? ratingAvg.toFixed(1) + ' (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')'
-    : 'Rate your experience';
+  let ratingText;
+  if (hasRating){
+    ratingText = '⭐ ' + ratingAvg.toFixed(1) + ' (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')';
+  } else if (isShare){
+    ratingText = 'Photos · Business hours · Direct call';
+  } else {
+    ratingText = 'Rate your experience';
+  }
 
   // 1200x630 spec for OG cards
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -139,8 +146,8 @@ function buildSvg(biz, opts){
 '  <circle cx="120" cy="120" r="58" fill="rgba(255,255,255,0.22)" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>\n' +
 '  <text x="120" y="148" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="68" font-weight="800" fill="#ffffff" text-anchor="middle">' + xmlEscape(initial) + '</text>\n' +
 '  <!-- Top-right pill: brand tag -->\n' +
-'  <rect x="940" y="86" width="180" height="56" rx="28" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.30)" stroke-width="2"/>\n' +
-'  <text x="1030" y="123" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="22" font-weight="800" fill="#ffffff" letter-spacing="2" text-anchor="middle">RATE US</text>\n' +
+'  <rect x="' + (isShare ? 880 : 940) + '" y="86" width="' + (isShare ? 240 : 180) + '" height="56" rx="28" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.30)" stroke-width="2"/>\n' +
+'  <text x="' + (isShare ? 1000 : 1030) + '" y="123" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="' + (isShare ? 20 : 22) + '" font-weight="800" fill="#ffffff" letter-spacing="2" text-anchor="middle">' + (isShare ? 'LOCAL · VERIFIED' : 'RATE US') + '</text>\n' +
 '  <!-- Shop name (huge) -->\n' +
 '  <text x="80" y="' + (320 + (fontSize > 100 ? 0 : 12)) + '" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="' + fontSize + '" font-weight="900" fill="#ffffff" letter-spacing="-2">' + xmlEscape(displayName) + '</text>\n' +
 '  <!-- Location subtitle -->\n' +
@@ -150,7 +157,9 @@ function buildSvg(biz, opts){
 '  <!-- Rating text -->\n' +
 '  <text x="80" y="555" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="30" font-weight="700" fill="#ffffff">' + xmlEscape(ratingText) + '</text>\n' +
 '  <!-- CTA -->\n' +
-'  <text x="80" y="595" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="22" font-weight="600" fill="rgba(255,255,255,0.78)" letter-spacing="1">Tap to share your feedback — takes 10 seconds</text>\n' +
+'  <text x="80" y="595" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="22" font-weight="600" fill="rgba(255,255,255,0.78)" letter-spacing="1">' + (isShare ? 'Tap to view photos, hours, and direct contact →' : 'Tap to share your feedback — takes 10 seconds') + '</text>\n' +
+'  <!-- Subtle DukanList watermark (share mode only) -->\n' +
+'  ' + (isShare ? '<text x="1120" y="600" font-family="ui-rounded,Arial,sans-serif" font-size="18" font-weight="600" fill="rgba(255,255,255,0.55)" text-anchor="end" letter-spacing="1">dukanlist.com</text>' : '') + '\n' +
 '</svg>\n';
 }
 
@@ -172,6 +181,7 @@ export default async function handler(req, res){
     const slug = (req.query && req.query.slug) || null;
     const id   = (req.query && req.query.id)   || null;
     const noStars = !!(req.query && req.query.noStars);
+    const mode = (req.query && req.query.mode === 'share') ? 'share' : 'review';
 
     let biz = null;
     if (slug) biz = await fetchBusiness('slug', slug);
@@ -182,7 +192,7 @@ export default async function handler(req, res){
     res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     res.setHeader('X-Robots-Tag', 'noindex');
 
-    const svg = biz ? buildSvg(biz, { noStars }) : buildGenericSvg();
+    const svg = biz ? buildSvg(biz, { noStars, mode }) : buildGenericSvg();
     res.statusCode = 200;
     return res.end(svg);
 

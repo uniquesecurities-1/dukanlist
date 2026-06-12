@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.3';  // bumped — hotfix: /admin/incomplete-shops.html was missing Supabase CDN script tag, causing 'Could not verify admin access' error. Added the same CDN load order other admin pages use.
+const VERSION    = 'dukan-v2.8.4';  // bumped — Share preview cards: when a shop has no photo, WhatsApp/Facebook share previews now use a beautiful dynamic SVG card (gradient picked from shop name hash + initial badge + huge shop name + city + rating + 'LOCAL · VERIFIED' pill + 'Tap to view photos, hours, contact →' CTA + subtle dukanlist.com watermark) instead of the generic DukanList default image.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
