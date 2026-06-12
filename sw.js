@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.0';  // bumped — Poster Studio simplified: new /panel/poster-quick.html — single message textbox + EN/HI toggle + optional photo upload renders into 6 canvas styles (Saffron Pop, Premium Dark, Cream Minimal, Magenta Glow, Festival Bold, Photo Overlay), all 1080x1080 with subtle dukanlist.com promo. Dashboard 'Today's poster is ready' card now points here. Old Pro Studio still accessible.
+const VERSION    = 'dukan-v2.9.1';  // bumped — Quick Poster Maker v2: Category chip row (Offer/Greeting/New Arrival/Hours/Festival — one-tap pre-fills message + style) solves blank-canvas problem + Two-line mode (Headline + Subtitle) for pro-grade visual impact + Emoji quick-insert row (10 popular emojis) for instant punch. Char limit lowered 140→80 for the headline (subtitle is separate).
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

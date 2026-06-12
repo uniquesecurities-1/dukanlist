@@ -64,6 +64,26 @@
 
   .empty-hint{ color:#94A3B8; font-size:.9rem; text-align:center; padding:30px 14px }
 
+  /* Quick category chips */
+  .cat-row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px }
+  .cat-chip{ flex:1; min-width:80px; background:#fff; border:1.5px solid #E2E8F0; border-radius:10px; padding:10px 8px; font-family:inherit; font-size:.75rem; font-weight:800; color:#475569; cursor:pointer; transition:.15s; display:flex; flex-direction:column; align-items:center; gap:4px; line-height:1.2; text-align:center }
+  .cat-chip:hover{ background:#FFF7ED; border-color:#FB923C; color:#9A3412; transform:translateY(-1px) }
+  .cat-chip .cc-emoji{ font-size:1.3rem }
+  .cat-chip.active{ background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; border-color:transparent; box-shadow:0 6px 16px rgba(255,107,26,.35) }
+  .cat-chip.active .cc-emoji{ filter:drop-shadow(0 2px 4px rgba(0,0,0,.3)) }
+
+  /* Emoji quick-insert row */
+  .emoji-row{ display:flex; gap:4px; flex-wrap:wrap; margin-bottom:8px }
+  .emoji-row button{ background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:5px 9px; font-size:1.05rem; cursor:pointer; transition:.12s; font-family:inherit; line-height:1 }
+  .emoji-row button:hover{ background:#FFF7ED; border-color:#FB923C; transform:scale(1.12) }
+  .emoji-row button:active{ transform:scale(.92) }
+
+  /* Subtitle input — smaller than main message */
+  textarea.subtitle{ width:100%; min-height:46px; border:1.5px solid #E5E7EB; border-radius:10px; padding:9px 12px; font-size:.88rem; font-family:inherit; resize:vertical; transition:border-color .15s; margin-top:8px; color:#475569 }
+  textarea.subtitle:focus{ outline:none; border-color:#FF6B1A; box-shadow:0 0 0 3px rgba(255,107,26,.1) }
+  textarea.subtitle.hi{ font-family:'Noto Sans Devanagari',sans-serif }
+  .sub-label{ font-size:.68rem; color:#94A3B8; font-weight:700; margin-top:6px; letter-spacing:.04em; text-transform:uppercase }
+
   .topbar{ background:#fff; border-bottom:1px solid #E2E8F0; padding:12px 18px; display:flex; align-items:center; justify-content:space-between }
   .topbar a{ color:#0F172A; text-decoration:none; font-weight:800; font-size:1rem; letter-spacing:-.02em }
   .topbar .links a{ font-size:.84rem; font-weight:700; color:#475569; margin-left:14px }
@@ -87,11 +107,34 @@
   <h1>⚡ <span>Quick Poster Maker</span></h1>
   <div class="page-sub">Type your message → pick a style → share. No template browsing, no setup.</div>
 
-  <!-- 1. Message + Language -->
+  <!-- 1. Quick category — solves blank canvas problem -->
   <div class="card">
-    <div class="section-label">1. Your message</div>
-    <textarea id="msg" class="message" placeholder="Type any message — offer, announcement, greeting…
-e.g. FLAT 30% OFF on all sarees, today only" maxlength="140"></textarea>
+    <div class="section-label">1. What are you sharing today?</div>
+    <div class="cat-row" id="catRow">
+      <button type="button" class="cat-chip" data-cat="offer"><span class="cc-emoji">🎁</span>Offer</button>
+      <button type="button" class="cat-chip" data-cat="greeting"><span class="cc-emoji">💌</span>Greeting</button>
+      <button type="button" class="cat-chip" data-cat="new"><span class="cc-emoji">✨</span>New Arrival</button>
+      <button type="button" class="cat-chip" data-cat="hours"><span class="cc-emoji">🕐</span>Hours</button>
+      <button type="button" class="cat-chip" data-cat="festival"><span class="cc-emoji">🎉</span>Festival</button>
+    </div>
+
+    <div class="section-label" style="margin-top:6px">2. Your message</div>
+    <div class="emoji-row">
+      <button type="button" data-emoji="🔥">🔥</button>
+      <button type="button" data-emoji="⭐">⭐</button>
+      <button type="button" data-emoji="🎉">🎉</button>
+      <button type="button" data-emoji="🛍️">🛍️</button>
+      <button type="button" data-emoji="💰">💰</button>
+      <button type="button" data-emoji="🪔">🪔</button>
+      <button type="button" data-emoji="🎁">🎁</button>
+      <button type="button" data-emoji="✨">✨</button>
+      <button type="button" data-emoji="📞">📞</button>
+      <button type="button" data-emoji="🕐">🕐</button>
+    </div>
+    <textarea id="msg" class="message" placeholder="Headline — keep it short and punchy
+e.g. FLAT 30% OFF" maxlength="80"></textarea>
+    <div class="sub-label">Subtitle (optional)</div>
+    <textarea id="sub" class="subtitle" placeholder="Smaller detail line below — e.g. Today only · All sarees" maxlength="100"></textarea>
     <div class="row">
       <div class="lang-toggle">
         <button type="button" class="active" data-lang="en">EN</button>
@@ -105,19 +148,19 @@ e.g. FLAT 30% OFF on all sarees, today only" maxlength="140"></textarea>
         ✓ Photo added
         <button type="button" id="clearPhoto" title="Remove photo">×</button>
       </span>
-      <span style="color:#94A3B8;font-size:.78rem;margin-left:auto" id="charCount">0 / 140</span>
+      <span style="color:#94A3B8;font-size:.78rem;margin-left:auto" id="charCount">0 / 80</span>
     </div>
   </div>
 
   <!-- 2. Style picker -->
   <div class="card">
-    <div class="section-label">2. Choose a style</div>
+    <div class="section-label">3. Choose a style</div>
     <div class="style-grid" id="styleGrid"></div>
   </div>
 
   <!-- 3. Preview + Share -->
   <div class="card">
-    <div class="section-label">3. Preview & share</div>
+    <div class="section-label">4. Preview & share</div>
     <div class="preview-wrap" id="previewWrap">
       <div class="empty-hint" id="emptyHint">Type your message above to see the live preview.</div>
       <canvas id="mainCanvas" width="1080" height="1080" style="display:none"></canvas>
@@ -141,9 +184,20 @@ e.g. FLAT 30% OFF on all sarees, today only" maxlength="140"></textarea>
 // ============================================================
 const STATE = {
   msg: '',
+  sub: '',               // subtitle (smaller line below headline)
   lang: 'en',
   photo: null,           // HTMLImageElement
-  styleId: 'saffron-pop' // default style
+  styleId: 'saffron-pop',// default style
+  category: null         // currently selected category (offer/greeting/new/hours/festival)
+};
+
+// Category presets — pre-fills (msg, sub, styleId) for one-tap blank-canvas escape
+const CATEGORY_PRESETS = {
+  offer:    { msg:'FLAT 30% OFF',           sub:'Today only · Limited stock',         styleId:'saffron-pop'   },
+  greeting: { msg:'Have a wonderful day!',  sub:'From your trusted neighbourhood shop', styleId:'cream-minimal' },
+  new:      { msg:'NEW ARRIVAL',            sub:'Fresh stock just landed in store',    styleId:'magenta-glow'  },
+  hours:    { msg:'OPEN TODAY',             sub:'Visit us 10 AM to 9 PM',              styleId:'premium-dark'  },
+  festival: { msg:'Happy Festival',         sub:'Warm wishes from our family to yours', styleId:'festival-bold' }
 };
 
 const STYLES = [
@@ -211,6 +265,22 @@ function drawText(ctx, text, x, y, opts){
   return f.size;
 }
 
+// Draws optional subtitle below the main title in a smaller, lighter weight
+function drawSubtitle(ctx, sub, x, y, opts){
+  if (!sub || !sub.trim()) return;
+  const fam = (opts.lang === 'hi') ? "'Noto Sans Devanagari', sans-serif" : "'Plus Jakarta Sans', sans-serif";
+  const f = fitFont(ctx, sub, opts.maxW, opts.maxH || 200, fam, '600', opts.size || 44, 22);
+  ctx.textBaseline = 'top';
+  ctx.textAlign = opts.align || 'center';
+  let yy = y;
+  for (const ln of f.lines){
+    if (opts.shadow){ ctx.shadowColor = opts.shadow; ctx.shadowBlur = 8; }
+    ctx.fillText(ln, x, yy);
+    ctx.shadowBlur = 0;
+    yy += f.lineH;
+  }
+}
+
 function drawBrandPromo(ctx, w, h, color){
   // Small dukanlist.com promo in bottom-right
   ctx.save();
@@ -268,9 +338,14 @@ function renderSaffronPop(ctx, w, h, opts){
   }
   // Big text
   ctx.fillStyle = '#fff';
-  drawText(ctx, (opts.msg || '').toUpperCase(), w/2, h/2 + (opts.photo ? h*0.06 : 0),
-    { maxW: w*0.86, maxH: h*0.55, lang: opts.lang, weight:'900', size: 130, minSize: 56,
+  drawText(ctx, (opts.msg || '').toUpperCase(), w/2, h/2 + (opts.photo ? h*0.06 : 0) - (opts.sub ? h*0.06 : 0),
+    { maxW: w*0.86, maxH: h*0.48, lang: opts.lang, weight:'900', size: 130, minSize: 56,
       shadow:'rgba(0,0,0,0.18)' });
+  if (opts.sub){
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    drawSubtitle(ctx, opts.sub, w/2, h*0.72,
+      { maxW: w*0.78, lang: opts.lang, size: 48, shadow:'rgba(0,0,0,0.18)' });
+  }
   drawBrandPromo(ctx, w, h, 'rgba(255,255,255,0.85)');
 }
 
@@ -294,11 +369,18 @@ function renderPremiumDark(ctx, w, h, opts){
   const f = fitFont(ctx, opts.msg || '', w*0.78, h*0.55, fam, '900', 120, 52);
   ctx.fillStyle = '#D4AF37';
   ctx.textBaseline = 'top'; ctx.textAlign = 'center';
-  let yy = h/2 - (f.lines.length * f.lineH)/2;
+  // Shift title up if we have subtitle
+  const titleY = (opts.sub ? h/2 - h*0.06 : h/2) - (f.lines.length * f.lineH)/2;
+  let yy = titleY;
   for (const ln of f.lines){
     ctx.font = f.size && '900 ' + f.size + 'px ' + fam;
     ctx.fillText(ln, w/2, yy);
     yy += f.lineH;
+  }
+  if (opts.sub){
+    ctx.fillStyle = 'rgba(212,175,55,0.92)';
+    drawSubtitle(ctx, opts.sub, w/2, h*0.66,
+      { maxW: w*0.74, lang: opts.lang, size: 42 });
   }
   drawBrandPromo(ctx, w, h, 'rgba(212,175,55,0.65)');
 }
@@ -312,8 +394,13 @@ function renderCreamMinimal(ctx, w, h, opts){
   ctx.beginPath(); ctx.moveTo(w*0.1, h*0.18); ctx.lineTo(w*0.32, h*0.18); ctx.stroke();
   // Text
   ctx.fillStyle = '#0F172A';
-  drawText(ctx, opts.msg || '', w/2, h/2,
-    { maxW: w*0.82, maxH: h*0.55, lang: opts.lang, weight:'800', size: 110, minSize: 48, align:'center' });
+  drawText(ctx, opts.msg || '', w/2, h/2 - (opts.sub ? h*0.05 : 0),
+    { maxW: w*0.82, maxH: h*0.48, lang: opts.lang, weight:'800', size: 110, minSize: 48, align:'center' });
+  if (opts.sub){
+    ctx.fillStyle = 'rgba(71,85,105,0.92)';
+    drawSubtitle(ctx, opts.sub, w/2, h*0.68,
+      { maxW: w*0.74, lang: opts.lang, size: 38 });
+  }
   drawBrandPromo(ctx, w, h, 'rgba(15,23,42,0.55)');
 }
 
@@ -335,9 +422,14 @@ function renderMagentaGlow(ctx, w, h, opts){
   }
   // Text with subtle white glow
   ctx.fillStyle = '#fff';
-  drawText(ctx, opts.msg || '', w/2, h/2,
-    { maxW: w*0.84, maxH: h*0.55, lang: opts.lang, weight:'900', size: 120, minSize: 50,
+  drawText(ctx, opts.msg || '', w/2, h/2 - (opts.sub ? h*0.06 : 0),
+    { maxW: w*0.84, maxH: h*0.48, lang: opts.lang, weight:'900', size: 120, minSize: 50,
       shadow:'rgba(255,255,255,0.45)' });
+  if (opts.sub){
+    ctx.fillStyle = 'rgba(255,255,255,0.93)';
+    drawSubtitle(ctx, opts.sub, w/2, h*0.70,
+      { maxW: w*0.78, lang: opts.lang, size: 44, shadow:'rgba(255,255,255,0.4)' });
+  }
   drawBrandPromo(ctx, w, h, 'rgba(255,255,255,0.78)');
 }
 
@@ -373,9 +465,14 @@ function renderFestivalBold(ctx, w, h, opts){
   ctx.stroke();
   // Text — bright gold
   ctx.fillStyle = '#FFD86B';
-  drawText(ctx, opts.msg || '', w/2, h/2,
-    { maxW: w*0.78, maxH: h*0.5, lang: opts.lang, weight:'900', size: 120, minSize: 52,
+  drawText(ctx, opts.msg || '', w/2, h/2 - (opts.sub ? h*0.06 : 0),
+    { maxW: w*0.78, maxH: h*0.43, lang: opts.lang, weight:'900', size: 120, minSize: 52,
       shadow:'rgba(0,0,0,0.4)' });
+  if (opts.sub){
+    ctx.fillStyle = 'rgba(255,240,180,0.95)';
+    drawSubtitle(ctx, opts.sub, w/2, h*0.70,
+      { maxW: w*0.74, lang: opts.lang, size: 44, shadow:'rgba(0,0,0,0.35)' });
+  }
   drawBrandPromo(ctx, w, h, 'rgba(255,216,107,0.7)');
 }
 
@@ -396,9 +493,14 @@ function renderPhotoOverlay(ctx, w, h, opts){
   ctx.fillRect(0, h*0.45, w, h*0.55);
   // Text at bottom
   ctx.fillStyle = '#fff';
-  drawText(ctx, opts.msg || '', w/2, h*0.75,
-    { maxW: w*0.85, maxH: h*0.32, lang: opts.lang, weight:'900', size: 96, minSize: 44,
+  drawText(ctx, opts.msg || '', w/2, h*0.72 - (opts.sub ? h*0.03 : 0),
+    { maxW: w*0.85, maxH: h*0.27, lang: opts.lang, weight:'900', size: 96, minSize: 44,
       shadow:'rgba(0,0,0,0.6)' });
+  if (opts.sub){
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    drawSubtitle(ctx, opts.sub, w/2, h*0.86,
+      { maxW: w*0.78, lang: opts.lang, size: 38, shadow:'rgba(0,0,0,0.5)' });
+  }
   if (!opts.photo){
     // Hint text
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
@@ -423,7 +525,7 @@ function renderInto(canvas, styleId){
   const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
   const fn = RENDERERS[styleId] || RENDERERS['saffron-pop'];
-  fn(ctx, w, h, { msg: STATE.msg, lang: STATE.lang, photo: STATE.photo });
+  fn(ctx, w, h, { msg: STATE.msg, sub: STATE.sub, lang: STATE.lang, photo: STATE.photo });
 }
 
 // ============================================================
@@ -491,8 +593,63 @@ function scheduleRender(){
 
 document.getElementById('msg').addEventListener('input', (e) => {
   STATE.msg = e.target.value;
-  document.getElementById('charCount').textContent = STATE.msg.length + ' / 140';
+  document.getElementById('charCount').textContent = STATE.msg.length + ' / 80';
+  // User typed → unlock from category preset state
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  STATE.category = null;
   scheduleRender();
+});
+
+// Subtitle input
+document.getElementById('sub').addEventListener('input', (e) => {
+  STATE.sub = e.target.value;
+  scheduleRender();
+});
+
+// Quick category chips — one-tap blank-canvas escape
+document.querySelectorAll('.cat-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const cat = chip.getAttribute('data-cat');
+    const preset = CATEGORY_PRESETS[cat];
+    if (!preset) return;
+    STATE.category = cat;
+    STATE.msg = preset.msg;
+    STATE.sub = preset.sub;
+    STATE.styleId = preset.styleId;
+    document.getElementById('msg').value = preset.msg;
+    document.getElementById('sub').value = preset.sub;
+    document.getElementById('charCount').textContent = preset.msg.length + ' / 80';
+    // Sync UI
+    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    document.querySelectorAll('.style-card').forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-style') === preset.styleId);
+    });
+    renderAll();
+    showToast('✓ Ready — tap a style to preview or share now');
+  });
+});
+
+// Emoji quick-insert — inserts at cursor position
+document.querySelectorAll('.emoji-row button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const emoji = btn.getAttribute('data-emoji');
+    const ta = document.getElementById('msg');
+    const start = ta.selectionStart || 0;
+    const end = ta.selectionEnd || 0;
+    const before = ta.value.slice(0, start);
+    const after = ta.value.slice(end);
+    // Add a space before if needed, after if needed
+    const sep = (before && !/\s$/.test(before)) ? ' ' : '';
+    ta.value = before + sep + emoji + after;
+    STATE.msg = ta.value;
+    document.getElementById('charCount').textContent = STATE.msg.length + ' / 80';
+    // Move cursor after the emoji
+    const newPos = (before + sep + emoji).length;
+    ta.focus();
+    ta.setSelectionRange(newPos, newPos);
+    scheduleRender();
+  });
 });
 
 document.querySelectorAll('.lang-toggle button').forEach(b => {
@@ -500,8 +657,8 @@ document.querySelectorAll('.lang-toggle button').forEach(b => {
     document.querySelectorAll('.lang-toggle button').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     STATE.lang = b.getAttribute('data-lang');
-    const ta = document.getElementById('msg');
-    ta.classList.toggle('hi', STATE.lang === 'hi');
+    document.getElementById('msg').classList.toggle('hi', STATE.lang === 'hi');
+    document.getElementById('sub').classList.toggle('hi', STATE.lang === 'hi');
     scheduleRender();
   });
 });
