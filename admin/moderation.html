@@ -458,7 +458,12 @@ async function autoLoadEmailWaitList(){
   // Fallback to v1 RPC (db/82) if v2 returned nothing
   if (rows.length === 0){
     try {
-      const r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+      // Prefer v2 RPC (db/120 fix — uses business_email_verified_anywhere + auto-heals owner links)
+      // Fallback to legacy RPC if v2 hasn't been deployed in Supabase yet.
+      let r = await C.rpc('admin_pending_email_list_v2', { p_limit: 100, p_offset: 0 });
+      if (r.error && r.error.message && r.error.message.match(/does not exist|not found/i)){
+        r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+      }
       if (!r.error && Array.isArray(r.data)) rows = r.data;
       else if (r.error) errMsg += ' | v1: ' + (r.error.message || '');
     } catch(e){ errMsg += ' | v1: ' + (e.message || e); }
@@ -521,7 +526,12 @@ async function toggleEmailWaitList(){
     if (!_emailWaitLoaded){
       box.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E">⏳ Loading…</div>';
       try {
-        const r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+        // Prefer v2 RPC (db/120 fix — uses business_email_verified_anywhere + auto-heals owner links)
+      // Fallback to legacy RPC if v2 hasn't been deployed in Supabase yet.
+      let r = await C.rpc('admin_pending_email_list_v2', { p_limit: 100, p_offset: 0 });
+      if (r.error && r.error.message && r.error.message.match(/does not exist|not found/i)){
+        r = await C.rpc('admin_pending_awaiting_email_list', { p_limit: 100, p_offset: 0 });
+      }
         if (r.error) throw r.error;
         const rows = r.data || [];
         if (!rows.length){
@@ -648,6 +658,15 @@ async function adminResendVerificationEmail(email, btn){
     });
     const j = await res.json().catch(function(){ return {}; });
     if (!res.ok || !j.ok) throw new Error(j.error || j.detail || ('HTTP ' + res.status));
+    if (j.already_verified){
+      // Email is verified but the moderation list was stale. We auto-healed
+      // the owner link on the server — just refresh the local list.
+      showToast('ℹ️ ' + (j.message || 'Already verified — list refreshed.'), 'info');
+      if (btn){ btn.innerHTML = '✓ Verified'; setTimeout(function(){ if(btn){ btn.disabled=false; btn.innerHTML = orig; } }, 2500); }
+      _emailWaitLoaded = false;
+      try { await loadPending(); } catch(_){}
+      return;
+    }
     showToast('✅ ' + (j.message || 'Verification email re-sent'), 'success');
     if (btn){ btn.innerHTML = '✅ Sent'; setTimeout(function(){ if(btn){ btn.disabled=false; btn.innerHTML = orig; } }, 2500); }
   } catch(e){

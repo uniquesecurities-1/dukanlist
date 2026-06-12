@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.4';  // bumped — Share preview cards: when a shop has no photo, WhatsApp/Facebook share previews now use a beautiful dynamic SVG card (gradient picked from shop name hash + initial badge + huge shop name + city + rating + 'LOCAL · VERIFIED' pill + 'Tap to view photos, hours, contact →' CTA + subtle dukanlist.com watermark) instead of the generic DukanList default image.
+const VERSION    = 'dukan-v2.8.5';  // bumped — Resend Email bug fix: moderation now calls v2 RPC (admin_pending_email_list_v2 with auto-heal) instead of stale legacy RPC, plus the resend endpoint no longer hard-fails on already-verified — it triggers self_heal_owner_links_by_email() and returns success so the moderation list refreshes and the shop disappears from 'awaiting email verification'.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

@@ -109,7 +109,23 @@ module.exports = async (req, res) => {
     return res.status(404).json({ error: 'No account found with this email' });
   }
   if (targetUser.email_confirmed_at) {
-    return res.status(409).json({ error: 'Email already verified — no need to resend' });
+    // EDGE CASE: User confirmed via Supabase Auth, but business_owners table
+    // still has NULL auth_user_id (signup-mismatch / case-sensitivity / etc.)
+    // → Trigger the self-heal RPC so the moderation list stops showing this
+    // shop as "pending email verification", then return a friendly success.
+    try {
+      await sbAsUser('/rest/v1/rpc/self_heal_owner_links_by_email', {
+        method: 'POST',
+        body: JSON.stringify({})
+      });
+    } catch(_) { /* best effort */ }
+
+    return res.status(200).json({
+      ok: true,
+      already_verified: true,
+      message: 'Email already verified — owner link refreshed. The shop will leave the pending list on next reload.',
+      user_id: targetUser.id
+    });
   }
 
   // ===== 5. Generate a fresh signup confirmation link AND send email =====
