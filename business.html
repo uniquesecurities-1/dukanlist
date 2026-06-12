@@ -1126,11 +1126,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             </div>
             <div class="sh-row sh-share-row">
               <div class="sh-row-label">
-                <span data-i18n-en>💌 Send to a friend</span><span data-i18n-hi>💌 दोस्त को भेजो</span>
-                <span style="font-weight:500;color:#94A3B8;font-size:.7rem;margin-left:5px">— viral way to help local shops</span>
+                <span data-i18n-en>💌 Share with a friend</span><span data-i18n-hi>💌 मित्र को साझा करें</span>
+                <span style="font-weight:500;color:#94A3B8;font-size:.7rem;margin-left:5px">— help your contacts discover trusted local shops</span>
               </div>
               <div class="sh-pills" id="shSharePills">
-                <button type="button" id="shSendFriendBtn" class="sh-share-btn sh-wa" style="cursor:pointer;font-family:inherit;border:0">💬 <span data-i18n-en>Send via WhatsApp</span><span data-i18n-hi>WhatsApp पर भेजो</span></button>
+                <button type="button" id="shSendFriendBtn" class="sh-share-btn sh-wa" style="cursor:pointer;font-family:inherit;border:0">💬 <span data-i18n-en>Share via WhatsApp</span><span data-i18n-hi>WhatsApp पर साझा करें</span></button>
                 <a id="shShareFb" target="_blank" rel="noopener" class="sh-share-btn sh-fb">📘 Facebook</a>
                 <button class="sh-share-btn sh-copy" onclick="copyShopUrl()">🔗 <span data-i18n-en>Copy link</span><span data-i18n-hi>लिंक copy</span></button>
               </div>
@@ -3154,12 +3154,12 @@ function buildFriendShareText(){
   const credParts = [verified, rating].filter(Boolean).join(' · ');
   const url = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
 
-  let msg = 'Yeh shop dekho! Maine DukanList par dhundi —\n\n';
+  let msg = 'Thought you would find this shop useful — I came across it on DukanList:\n\n';
   msg += '*' + name + '*' + (loc ? ' (' + loc + ')' : '') + '\n';
   if (cat) msg += '🏷️ ' + cat + '\n';
   if (credParts) msg += credParts + '\n';
   msg += '\n' + url + '\n\n';
-  msg += 'Photos, hours, direct WhatsApp/Call — sab yahi se. 👇';
+  msg += 'Photos, hours, ratings, and direct call/WhatsApp — all on one page.';
   return msg;
 }
 

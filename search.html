@@ -468,7 +468,7 @@
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <button type="button" id="shareSearchBtn" title="Share these results" style="background:#fff;color:#475569;border:1px solid #E2E8F0;padding:6px 12px;border-radius:99px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">
         <span style="font-size:1rem">🔗</span>
-        <span data-i18n-en>Share results</span><span data-i18n-hi>लिंक share</span>
+        <span data-i18n-en>Share results</span><span data-i18n-hi>परिणाम साझा करें</span>
       </button>
       <label for="sortSel" style="font-size:.78rem;color:var(--muted);font-weight:600">
         <span data-i18n-en>Sort:</span><span data-i18n-hi>क्रम:</span>
@@ -927,11 +927,11 @@ function _renderResultsInner(){
           +   '<div class="bfc-body">'
           +     '<div class="bfc-title">'
           +       '<span data-i18n-en>Be the first <b>' + escAttr(catLabel) + '</b> shop in <b>' + escAttr(cityLabel) + '</b>!</span>'
-          +       '<span data-i18n-hi><b>' + escAttr(cityLabel) + '</b> mein pehli <b>' + escAttr(catLabel) + '</b> dukan banाओ — 100% FREE</span>'
+          +       '<span data-i18n-hi><b>' + escAttr(cityLabel) + '</b> में पहली <b>' + escAttr(catLabel) + '</b> दुकान — 100% निःशुल्क!</span>'
           +     '</div>'
           +     '<div class="bfc-sub">'
           +       '<span data-i18n-en>Free forever · 2 minutes · Direct WhatsApp + Call leads from your area</span>'
-          +       '<span data-i18n-hi>Hamesha free · 2 min mें ho jata hai · Direct WhatsApp + Call leads</span>'
+          +       '<span data-i18n-hi>हमेशा निःशुल्क · 2 मिनट में पूरा · सीधे WhatsApp + Call leads</span>'
           +     '</div>'
           +     '<a class="bfc-btn" href="' + regUrl + '">'
           +       '<span data-i18n-en>List your shop FREE →</span><span data-i18n-hi>FREE list karo →</span>'
@@ -1562,9 +1562,9 @@ window.addEventListener('popstate', runSearch);
     if (areaLabel) locParts.push(areaLabel);
     if (cityLabel) locParts.push(cityLabel);
     var locStr = locParts.join(', ');
-    return '🔎 ' + title + (locStr ? ' in ' + locStr : '') + ' — DukanList par dekho:\n\n'
+    return '🔎 ' + title + (locStr ? ' in ' + locStr : '') + ' — verified local shops on DukanList:\n\n'
          + location.href + '\n\n'
-         + '✨ Verified shops · photos · direct call/WhatsApp\n'
+         + '✨ Verified · photos · direct call/WhatsApp · ratings\n'
          + '_Shared via dukanlist.com_';
   }
   function bindShareBtn(){
@@ -1578,7 +1578,7 @@ window.addEventListener('popstate', runSearch);
       }
       try { await navigator.clipboard.writeText(msg); } catch(_){}
       var t = document.createElement('div');
-      t.textContent = '✓ Link copied — share kahi bhi';
+      t.textContent = '✓ Link copied to clipboard';
       t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:11px 22px;border-radius:99px;font-size:.86rem;font-weight:700;z-index:99999;box-shadow:0 10px 30px rgba(15,23,42,.35)';
       document.body.appendChild(t);
       setTimeout(function(){ try { t.remove(); } catch(_){} }, 2400);

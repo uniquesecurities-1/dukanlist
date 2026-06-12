@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.7.0';  // bumped — Viral Growth Bundle C: Share search results button (native + WhatsApp + clipboard) + Recently-viewed strip on search page + Friend-style WhatsApp share (rich copy: rating, verified, area, photos+hours pitch) + 'Send to a friend' button on shop pages.
+const VERSION    = 'dukan-v2.7.1';  // bumped — Language polish: replaced casual Hinglish ("Yeh shop dekho", "DukanList par dekho", "kahi bhi", "banao") with professional English defaults across share messages, search toasts, Be-First CTA, Quick Wins payoffs, WhatsApp template, photo progress badge. Hindi versions are now pure Devanagari (no Roman mix).
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
