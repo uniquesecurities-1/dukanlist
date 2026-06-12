@@ -1250,9 +1250,48 @@ function renderFiltered(){
   if (STATE.cityFilter){
     rows = rows.filter(function(b){ return b.city_id === STATE.cityFilter; });
   }
+  // ALWAYS re-render chips first so the active chip visually reflects STATE.filter.
+  // (Previously this happened later in the function, so 0-result branches skipped it
+  // and the "All" chip stayed highlighted even when user had filtered to Grocery.)
+  try {
+    var chipsEarly = document.getElementById('chips');
+    if (chipsEarly){
+      chipsEarly.innerHTML = buildChips(STATE.allRows, STATE.catMap, STATE.filter);
+      chipsEarly.style.display = '';
+      chipsEarly.querySelectorAll('.chip').forEach(function(ch){
+        ch.addEventListener('click', function(){
+          var cat = ch.getAttribute('data-cat');
+          STATE.filter = (cat === 'all' ? null : cat);
+          renderFiltered();
+        });
+      });
+    }
+  } catch(_){}
   if (rows.length === 0){
     document.getElementById('feed').style.display = 'none';
-    document.getElementById('emptyScreen').style.display = '';
+    var empty = document.getElementById('emptyScreen');
+    empty.style.display = '';
+    // If a filter is active, replace the static empty-state text with a more
+    // helpful "Reset filter" CTA so the user can recover with one tap.
+    if (STATE.filter || STATE.cityFilter){
+      var labelTxt = '';
+      if (STATE.filter){
+        var cm = STATE.catMap[STATE.filter] || {};
+        labelTxt = (cm.icon || '🏷️') + ' ' + (cm.name || 'this category');
+      } else if (STATE.cityFilter){
+        labelTxt = '📍 ' + (STATE.cityMap[STATE.cityFilter] || 'this city');
+      }
+      empty.innerHTML =
+        '<div style="text-align:center;padding:0 24px;max-width:380px">'
+        + '<div style="font-size:48px;margin-bottom:14px">🔍</div>'
+        + '<h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops match</h2>'
+        + '<p style="color:#94a3b8;font-size:13px;line-height:1.5">Filter active: <b style="color:#FBBF24">' + esc(labelTxt) + '</b><br>Reset to see all shops.</p>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px">'
+        + '<button type="button" onclick="window.__dlResetDiscover&&window.__dlResetDiscover()" style="background:#FBBF24;color:#78350F;border:0;padding:11px 16px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer">🔄 Show All Shops</button>'
+        + '<a href="/browse.html" style="background:rgba(255,255,255,.12);color:#fff;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2);font-size:13px">📚 Browse</a>'
+        + '<a href="/" style="background:rgba(255,255,255,.12);color:#fff;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2);font-size:13px">← Home</a>'
+        + '</div></div>';
+    }
     return;
   }
   document.getElementById('emptyScreen').style.display = 'none';
@@ -1722,6 +1761,27 @@ function spawnDoubleTapHeart(card, x, y){
     card.querySelectorAll('.dt-spark').forEach(function(s){ s.remove(); });
   }, 1200);
 }
+
+// One-tap reset for filtered empty state — clears category + city filters
+window.__dlResetDiscover = function(){
+  STATE.filter = null;
+  STATE.cityFilter = null;
+  var lbl = document.getElementById('cityBtnLabel');
+  if (lbl) lbl.textContent = 'All';
+  // Restore original empty state markup in case it was customized
+  var empty = document.getElementById('emptyScreen');
+  if (empty){
+    empty.innerHTML =
+      '<div style="text-align:center;padding:0 24px">'
+      + '<div style="font-size:48px;margin-bottom:14px">🏪</div>'
+      + '<h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops here yet</h2>'
+      + '<p style="color:#94a3b8;font-size:13px;line-height:1.5">Try a different category or browse all shops.</p>'
+      + '<a href="/browse.html" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none">📚 Browse All</a>'
+      + '<a href="/" style="display:inline-block;margin-top:14px;margin-left:8px;background:rgba(255,255,255,.12);color:#fff;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2)">← Home</a>'
+      + '</div>';
+  }
+  renderFiltered();
+};
 
 init();
 </script>

@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.15';  // FIX — Recently Viewed on search page was pushing actual search results way below the fold when user had a query active. New behavior: (1) renderSearchRecent() checks URL for active query/cat/city/pin/area/locality params — hides RV if any present. (2) _renderResultsInner() hides RV slot after results render when rows>0. (3) RV only re-shown when search returns 0 results AND no query active. (4) Max items reduced from 6 to 4 (via opts.max). User said the Recently Viewed list was making interface feel "very bad" — pushing search material below large RV list. Now invisible when user is actively searching, visible only for the idle landing state.
+const VERSION    = 'dukan-v2.9.16';  // FIX — Discover category filter UX bug. Root cause: when user clicked a category chip (e.g. Grocery/Kirana) and the filter returned 0 shops, renderFiltered() returned EARLY before re-rendering chips. So the chip visual state stayed at "All highlighted" while STATE.filter was actually set to Grocery. User saw "No shops here yet" with All-active chip and had no way to understand they were filtered. Fix: (1) re-render chips BEFORE the empty-state early return so active chip reflects actual STATE.filter. (2) When 0 results AND a filter is active, replace static empty state with a helpful card showing which filter is active and a one-tap "🔄 Show All Shops" button (calls __dlResetDiscover which clears both category and city filters and re-renders).
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
