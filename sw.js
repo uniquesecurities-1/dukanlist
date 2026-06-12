@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.4';  // bumped — Quick Poster Maker mobile fix: brand input fields (Shop name + Phone) were overflowing the viewport on narrow screens because grid-template-columns:1fr 1fr without min-width:0 hits the classic CSS Grid min-content overflow bug. Now uses class-based responsive grid: stacks 1-col below 560px, side-by-side with minmax(0, 1fr) above. Inputs also box-sizing:border-box + min-width:0 for safety.
+const VERSION    = 'dukan-v2.9.5';  // bumped — Owner Daily Engagement Bundle: 4 new widgets on panel/dashboard.html (Login Streak counter localStorage-tracked with 5 tiers from Day 1 to 30+, Yesterday's Digest with views/calls/WA/reviews + smart contextual message, Today's Quick Win rotating action card filtered by what shop actually needs, Morning WhatsApp Digest opt-in for backend cron). All logic in new /assets/js/owner-engagement.js — dashboard.html got just 4 host divs + 1 init call + 1 script tag.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

@@ -643,6 +643,12 @@
     <div class="dash-layout-v2">
   <div class="dash-main-v2">
 
+    <!-- ===== Owner Daily Engagement widgets (mounted by owner-engagement.js) ===== -->
+    <div id="ownerStreakBanner"      style="display:none"></div>
+    <div id="ownerQuickWin"          style="display:none"></div>
+    <div id="ownerYesterdayDigest"   style="display:none"></div>
+    <div id="ownerDigestOptin"       style="display:none"></div>
+
     <!-- ===== AAJ KA SCORE — Live dopamine hero ===== -->
     <div class="aaj-score-hero" id="aajScoreHero" style="display:none">
       <div class="aaj-top">
@@ -1522,6 +1528,7 @@ async function loadDashboard(){
   renderDashboard(biz);
   // Power widgets (panel sidebar)
   try { renderProfileCompleteness(biz); } catch(e){ console.warn('PC widget:', e); }
+  try { if (window.DukanOwnerEng) DukanOwnerEng.init(biz); } catch(e){ console.warn('Owner engagement:', e); }
   try { renderQuickWins(biz); }         catch(e){ console.warn('Quick Wins:', e); }
   try { renderWhatsAppTemplate(biz); }  catch(e){ console.warn('WA Template:', e); }
   try { loadRankingBattle(biz); }       catch(e){ console.warn('Rank widget:', e); }
@@ -3125,6 +3132,7 @@ function shareReferralWhatsApp(){
 
 <!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
 <script src="/assets/js/owner-notifications.js" defer></script>
+<script src="/assets/js/owner-engagement.js" defer></script>
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
