@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.21';  // FIX — Latest on DukanList section was capped at 8 shops (RPC p_limit:8) and mobile CSS hid all but first 4 (nth-child n+5 display:none). User reported many new shops registered but only 3-4 showing. Now: (1) RPC fetches 24 shops, (2) mobile shows first 6 with Show More expander, (3) desktop shows first 12 with Show More expander, (4) Show More button auto-revealed when total shops > 6, toggles all hidden items via .featured-expanded class. Same UX pattern as What's New section.
+const VERSION    = 'dukan-v2.9.22';  // FIX — 'Latest on DukanList' was showing same 3-4 shops every visit because search_businesses RPC uses stable match_rank ordering with null query. Users thought no new shops joining. Now: (a) fetch 12 NEWEST shops by created_at DESC directly (guarantees fresh content surfaces — newly-registered shops appear immediately), (b) fetch broader pool of 60 active shops sorted by updated_at, then SHUFFLE client-side via Fisher-Yates so different shops appear every visit, (c) merge with featured (sticky top) + newest 6 + shuffled random fill, dedupe by id, slice to 24. Every page refresh now shows different mix of shops. National Bakery and other recent registrations will surface immediately.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

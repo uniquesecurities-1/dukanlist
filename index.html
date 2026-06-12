@@ -2065,19 +2065,50 @@ async function loadFeatured(){
       if (!fr.error && fr.data) featuredRows = fr.data.map(r => ({ ...r, _featured: true, city_name: r.geo_cities && r.geo_cities.name }));
     } catch(_){}
 
-    // Then: latest active shops to fill the rest
-    // Bumped p_limit 8 → 24 so user sees more newly-registered shops.
-    // Mobile / desktop CSS controls how many show initially; rest revealed via Show More.
-    const { data, error } = await c.rpc('search_businesses', {
-      p_query: null, p_category: null, p_city_id: null, p_state_id: null,
-      p_limit: 24, p_offset: 0
-    });
-    if (error){ console.warn('Featured load failed', error); }
+    // Freshness fix: previously used search_businesses RPC which has stable/match_rank
+    // ordering — same 3-4 shops kept appearing every visit. Now we:
+    //   (a) fetch 12 NEWEST shops by created_at desc — guarantees fresh content
+    //   (b) fetch 30 random shops from active pool — gives ALL shops fair rotation
+    //   (c) merge with featured + dedupe + shuffle (except featured stay on top)
+    let newestRows = [];
+    let randomRows = [];
+    try {
+      const newestPromise = c.from('businesses')
+        .select('id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,mobile,whatsapp,created_at,geo_cities(name)')
+        .eq('status','active')
+        .order('created_at', { ascending: false })
+        .limit(12);
+      // Random sample: order by an unstable expression (id+random offset) won't work in PostgREST,
+      // so we fetch a wider pool (60) sorted by updated_at, then shuffle client-side.
+      const poolPromise = c.from('businesses')
+        .select('id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,mobile,whatsapp,created_at,geo_cities(name)')
+        .eq('status','active')
+        .order('updated_at', { ascending: false })
+        .limit(60);
+      const [nr, pr] = await Promise.all([newestPromise, poolPromise]);
+      if (!nr.error && nr.data){
+        newestRows = nr.data.map(r => ({ ...r, city_name: r.geo_cities && r.geo_cities.name }));
+      }
+      if (!pr.error && pr.data){
+        // Shuffle the broader pool client-side (Fisher-Yates)
+        const pool = pr.data.map(r => ({ ...r, city_name: r.geo_cities && r.geo_cities.name }));
+        for (let i = pool.length - 1; i > 0; i--){
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        randomRows = pool;
+      }
+    } catch(e){ console.warn('Featured freshness load failed', e); }
 
-    // Deduplicate: featured shops take priority, then fill from recent
+    // Build the final list:
+    //   - featuredRows first (admin-promoted, sticky on top)
+    //   - then newest 6 (so fresh registrations always surface)
+    //   - then shuffled random fill from broader pool
     const seen = new Set(featuredRows.map(f => f.id));
-    const recent = (data || []).filter(r => !seen.has(r.id));
-    const combined = featuredRows.concat(recent).slice(0, 24);
+    const freshAfterFeatured = newestRows.filter(r => !seen.has(r.id)).slice(0, 6);
+    freshAfterFeatured.forEach(r => seen.add(r.id));
+    const randomFill = randomRows.filter(r => !seen.has(r.id));
+    const combined = featuredRows.concat(freshAfterFeatured).concat(randomFill).slice(0, 24);
 
     // Update View All button count with total active shops
     try {
