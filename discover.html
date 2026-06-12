@@ -613,10 +613,16 @@
   .card .ap-bar.paused .ap-fill{ background:rgba(255,255,255,.35); box-shadow:none }
   .card.no-photo .ap-bar{ background:rgba(0,0,0,.18) }
 
-  /* Auto-play toggle button (next to mute in topNav) */
-  #autoplayBtn{ background:rgba(0,0,0,.4); color:#fff; border:0; padding:7px 11px; border-radius:99px; font-size:14px; cursor:pointer; backdrop-filter:blur(8px); transition:.15s }
+  /* Auto-play toggle button (next to mute in topNav) — COMPACT for narrow phones */
+  #autoplayBtn{ background:rgba(0,0,0,.4); color:#fff; border:0; padding:5px 8px; border-radius:99px; font-size:13px; cursor:pointer; backdrop-filter:blur(8px); transition:.15s; flex-shrink:0; line-height:1 }
   #autoplayBtn.on{ background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#78350F }
   #autoplayBtn:active{ transform:scale(.96) }
+  /* Tighter topNav on phones so all buttons fit */
+  @media (max-width:420px){
+    .top-nav{ gap:5px; padding:8px 8px }
+    .top-nav .home-btn, .top-nav .fav-btn{ padding:6px 9px; font-size:11px }
+    .top-nav .logo{ padding:5px 8px; font-size:11px }
+  }
 
   /* Toast for save/share confirmation */
   .toast{
@@ -797,7 +803,7 @@
   <div style="flex:1"></div>
   <button id="autoplayBtn" type="button" onclick="toggleAutoplay()" aria-label="Auto-play" title="Auto-advance every 7 sec" class="">▶️</button>
   <button id="muteBtn" class="fav-btn" onclick="toggleMute()" type="button" aria-label="Toggle sound" style="border:0;font-size:14px">🔊</button>
-  <a href="/panel/favorites.html" class="fav-btn" aria-label="My saved shops list" style="display:inline-flex;align-items:center;gap:4px">📋 <span style="font-size:11px;font-weight:700">My List</span></a>
+  <a href="/panel/favorites.html" class="fav-btn" aria-label="My saved shops list" style="display:inline-flex;align-items:center;gap:3px;padding:6px 9px" title="My saved shops"><span style="font-size:14px">📋</span></a>
 </div>
 
 <!-- City picker overlay — opens on tap, closes without disturbing feed -->
@@ -832,12 +838,15 @@
 <div id="feed" class="feed" style="display:none"></div>
 
 <div id="emptyScreen" class="center" style="display:none">
-  <div style="text-align:center;padding:0 24px">
+  <div style="text-align:center;padding:0 24px;max-width:380px">
     <div style="font-size:48px;margin-bottom:14px">🏪</div>
     <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">No shops here yet</h2>
-    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try a different category or browse all shops.</p>
-    <a href="/browse.html" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none">📚 Browse All</a>
-    <a href="/" style="display:inline-block;margin-top:14px;margin-left:8px;background:rgba(255,255,255,.12);color:#fff;padding:12px 18px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2)">← Home</a>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5">Try a different category, or reset filters to see all shops.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px">
+      <button type="button" onclick="resetAllFilters()" style="background:#FBBF24;color:#78350F;border:0;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;font-size:13px;cursor:pointer">🔄 Reset Filters</button>
+      <a href="/browse.html" style="display:inline-block;background:rgba(255,255,255,.12);color:#fff;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2);font-size:13px">📚 Browse All</a>
+      <a href="/" style="display:inline-block;background:rgba(255,255,255,.12);color:#fff;padding:11px 16px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.2);font-size:13px">← Home</a>
+    </div>
   </div>
 </div>
 
@@ -1256,7 +1265,8 @@ async function init(){
 function renderFiltered(){
   var rows = STATE.allRows.slice();
   if (STATE.filter){
-    rows = rows.filter(function(b){ return (b.sub_category_id||b.category_id) === STATE.filter; });
+    var fStr = String(STATE.filter);
+    rows = rows.filter(function(b){ return String(b.sub_category_id||b.category_id) === fStr; });
   }
   if (STATE.cityFilter){
     rows = rows.filter(function(b){ return b.city_id === STATE.cityFilter; });
@@ -1865,6 +1875,18 @@ function spawnDoubleTapHeart(card, x, y){
     card.querySelectorAll('.dt-spark').forEach(function(s){ s.remove(); });
   }, 1200);
 }
+
+// Global reset — clears all filters AND re-renders. Used by empty-state button
+// to recover from any stuck filter state (city/category mismatch, etc.)
+window.resetAllFilters = function(){
+  try {
+    STATE.filter = null;
+    STATE.cityFilter = null;
+    var lbl = document.getElementById('cityBtnLabel');
+    if (lbl) lbl.textContent = 'All';
+    renderFiltered();
+  } catch(e){ location.reload(); }
+};
 
 init();
 </script>

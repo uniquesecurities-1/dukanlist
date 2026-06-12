@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.10';  // HOTFIX v2 — blank screen fix: (a) wrapped IntersectionObserver callback in try/catch so a single error inside can't prevent .active class from being added — body content was invisible because .active wasn't sticking (b) added 600ms safety net: if no card has .active after IO finishes, force-activate cards[0] (c) one-time migration: reset dl_discover_autoplay to '0' so users who had autoplay ON in buggy v2.9.8 don't carry the broken state forward. Users can re-enable autoplay via the ▶️ toggle after confirming the feed renders properly.
+const VERSION    = 'dukan-v2.9.11';  // bumped — Discover UX: (a) Autoplay button + My List icon-only compact mode for narrow phones — My List label was getting clipped (b) topNav extra tight padding under 420px width (c) Empty state now has "Reset Filters" button — clears category + city in one tap, fixes stuck-filter scenarios where a previously selected city/category leaves no matches (d) Category filter comparison string-coerced — protects against type mismatches between chip data-cat and shop category_id.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
