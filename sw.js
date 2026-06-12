@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.2.0';  // bumped — HYPERLOCAL AREA FEATURE Phase 1: locality slug column + 11 new Mandi Dabwali areas (Meena Bazaar, Main Bazaar etc.) + registration locality dropdown re-enabled with "3x more views" nudge + hyperlocal landing pages /area/:city/:locality (SEO goldmine). Plus prior fixes: Quick Pick badges, sticky mini-search, How-does-this-work strip, 10 new categories.
+const VERSION    = 'dukan-v2.3.0';  // bumped — HYPERLOCAL Phase 2: auto-link existing shops by address scan + search_businesses now accepts p_locality_slug + search page locality chip filter + business card "More shops in {area} →" pill + sitemap.xml auto-includes /area URLs + homepage "Browse by area" strip.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

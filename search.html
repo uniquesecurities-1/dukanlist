@@ -332,6 +332,22 @@
 
   <div class="quick-cats" id="quickCats" aria-label="Popular categories"></div>
 
+  <!-- 📍 LOCALITY CHIPS — auto-shown when a city has curated areas -->
+  <div id="localityChips" style="display:none;margin:6px 0 14px">
+    <div style="font-size:.74rem;color:#94A3B8;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;padding:0 4px">
+      <span data-i18n-en>📍 Search by area:</span><span data-i18n-hi>📍 क्षेत्र से खोजें:</span>
+    </div>
+    <div id="localityChipsRow" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 6px;scrollbar-width:none"></div>
+    <style>
+      #localityChipsRow::-webkit-scrollbar{ display:none }
+      .loc-chip{ flex-shrink:0; background:#fff; border:1px solid #FED7AA; color:#9A3412; padding:7px 14px; border-radius:99px; font-size:.82rem; font-weight:700; text-decoration:none; transition:.15s; white-space:nowrap; cursor:pointer; font-family:inherit }
+      .loc-chip:hover{ background:#FFF7ED; border-color:#FB923C; transform:translateY(-1px); text-decoration:none }
+      .loc-chip.active{ background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(255,107,26,.3) }
+      .loc-chip .lc-count{ background:rgba(255,255,255,.32); color:inherit; padding:1px 7px; border-radius:99px; font-size:.66rem; font-weight:800; margin-left:5px; letter-spacing:.02em }
+      .loc-chip:not(.active) .lc-count{ background:#FEF3C7; color:#92400E }
+    </style>
+  </div>
+
   <div class="filter-row">
     <button type="button" id="openNowToggle" class="open-toggle" onclick="toggleOpenNow()" aria-pressed="false">
       <span class="sw"></span>
@@ -679,6 +695,7 @@ async function runSearch(){
   const catSlug = params.get('cat')  || '';
   const cityId  = resolveCityParam(params.get('city'));
   const pin     = (params.get('pin') || '').replace(/\D/g, '').slice(0, 6);
+  const locSlug = (params.get('area') || params.get('locality') || '').trim();
 
   document.getElementById('q').value = q;
   document.getElementById('catSel').value = catSlug;
@@ -696,10 +713,12 @@ async function runSearch(){
     };
     const cityLabel = cityId ? (document.querySelector('#citySel option[value="' + cityId + '"]')?.textContent || 'City') : null;
     const catLabel  = catSlug ? (document.querySelector('#catSel option[value="' + catSlug + '"]')?.textContent || catSlug) : null;
+    const locLabel = locSlug ? ('📍 ' + locSlug.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase())) : null;
     DukanChips.render('filterChipsSlot', {
       q:    q       ? { label: q,         remove: rmAndSearch('q') }    : null,
       cat:  catLabel ? { label: catLabel, remove: rmAndSearch('cat') }  : null,
       city: cityLabel ? { label: cityLabel.replace(/^.*?\s/,''), remove: rmAndSearch('city') } : null,
+      loc:  locLabel ? { label: locLabel, remove: () => { rmAndSearch('area')(); rmAndSearch('locality')(); } } : null,
       pin:  pin     ? { label: pin,       remove: rmAndSearch('pin') }  : null
     });
   }
@@ -718,13 +737,14 @@ async function runSearch(){
   }
 
   const { data, error } = await c.rpc('search_businesses', {
-    p_query   : q || null,
-    p_category: catSlug || null,
-    p_city_id : cityId,
-    p_state_id: null,
-    p_limit   : 250,
-    p_offset  : 0,
-    p_pincode : pin || null
+    p_query        : q || null,
+    p_category     : catSlug || null,
+    p_city_id      : cityId,
+    p_state_id     : null,
+    p_limit        : 250,
+    p_offset       : 0,
+    p_pincode      : pin || null,
+    p_locality_slug: locSlug || null
   });
 
   if (error){
@@ -980,7 +1000,77 @@ const QUICK_CAT_LIST = [
   { slug: 'mutual-fund-distributor', name: 'Mutual Funds', emoji: '\u{1F4CA}' }
 ];
 
+// ============================================================
+// LOCALITY CHIPS — show areas for selected city
+// ============================================================
+async function renderLocalityChips(cityId, activeLocSlug){
+  const wrap = document.getElementById('localityChips');
+  const row  = document.getElementById('localityChipsRow');
+  if (!wrap || !row) return;
+
+  if (!cityId){
+    wrap.style.display = 'none';
+    return;
+  }
+
+  // Map cityId → city slug for RPC. Read from the option's label.
+  let citySlug = '';
+  try {
+    const opt = document.querySelector('#citySel option[value="' + cityId + '"]');
+    const label = (opt && opt.textContent) || '';
+    citySlug = label.replace(/^.*?\s/, '').toLowerCase().replace(/\s+/g, '-');
+  } catch(_){}
+  if (!citySlug) { wrap.style.display = 'none'; return; }
+
+  try {
+    const c = ShopDB.client;
+    const { data, error } = await c.rpc('list_localities_by_city', { p_city_slug: citySlug });
+    if (error || !Array.isArray(data) || data.length === 0){
+      wrap.style.display = 'none';
+      return;
+    }
+    // Sort: active shops desc, then name. Show "All areas" first.
+    const items = data.slice().sort((a, b) => (b.shop_count || 0) - (a.shop_count || 0) || a.name.localeCompare(b.name));
+    const allActive = !activeLocSlug;
+    const chips = ['<button type="button" class="loc-chip' + (allActive ? ' active' : '') + '" data-loc=""><span>All areas</span></button>']
+      .concat(items.map(l => {
+        const active = (l.slug === activeLocSlug) ? ' active' : '';
+        const count = (l.shop_count > 0) ? ('<span class="lc-count">' + l.shop_count + '</span>') : '';
+        return '<button type="button" class="loc-chip' + active + '" data-loc="' + escAttr(l.slug) + '">'
+          + '📍 <span>' + escAttr(l.name) + '</span>'
+          + count
+          + '</button>';
+      }));
+    row.innerHTML = chips.join('');
+    wrap.style.display = '';
+
+    // Wire click handlers — update URL + re-run search
+    row.querySelectorAll('[data-loc]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const slug = btn.getAttribute('data-loc');
+        const p = new URLSearchParams(location.search);
+        if (slug){ p.set('area', slug); p.delete('locality'); }
+        else { p.delete('area'); p.delete('locality'); }
+        const url = '/search.html' + (p.toString() ? '?' + p.toString() : '');
+        history.pushState({}, '', url);
+        runSearch();
+      });
+    });
+  } catch(e){
+    console.warn('renderLocalityChips:', e);
+    wrap.style.display = 'none';
+  }
+}
+
 function renderQuickCats(){
+  // Also refresh locality chips whenever quick cats refresh
+  try {
+    const _p = new URLSearchParams(location.search);
+    const _cityId = resolveCityParam(_p.get('city'));
+    const _loc = (_p.get('area') || _p.get('locality') || '').trim();
+    renderLocalityChips(_cityId, _loc);
+  } catch(_){}
+
   const host = document.getElementById('quickCats');
   if (!host) return;
   const currentSlug = (new URLSearchParams(location.search)).get('cat') || '';

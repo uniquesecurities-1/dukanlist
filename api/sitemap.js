@@ -79,10 +79,12 @@ function urlBlock(loc, priority, freq, lastmod){
 export default async function handler(req, res){
   try {
     // Fetch live data in parallel
-    const [categories, businesses, cities] = await Promise.all([
+    const [categories, businesses, cities, localities] = await Promise.all([
       fetchFromSupabase('categories?active=eq.true&select=slug,sort_order&order=sort_order'),
       fetchFromSupabase('businesses?status=eq.active&select=slug,updated_at,created_at'),
       fetchFromSupabase('geo_cities?active=eq.true&select=name'),
+      // Hyperlocal landing pages: every locality is a SEO long-tail page
+      fetchFromSupabase('geo_localities?select=slug,city_id,geo_cities(name)').catch(() => []),
     ]);
 
     const urls = [];
@@ -123,6 +125,21 @@ export default async function handler(req, res){
         ));
       });
     });
+
+    // 4b. Hyperlocal AREA landing pages — /area/:city/:locality
+    // Highest long-tail SEO value: "meena bazaar mandi dabwali", "chotala road dukan"
+    try {
+      (localities || []).forEach(l => {
+        const cityName = l.geo_cities && l.geo_cities.name;
+        if (!cityName || !l.slug) return;
+        const citySlug = String(cityName).toLowerCase().replace(/\s+/g, '-');
+        urls.push(urlBlock(
+          ORIGIN + '/area/' + encodeURIComponent(citySlug) + '/' + encodeURIComponent(l.slug),
+          '0.7',
+          'weekly'
+        ));
+      });
+    } catch(_){}
 
     // 5. Business profiles (highest SEO value)
     businesses.forEach(b => {

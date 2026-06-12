@@ -1141,6 +1141,58 @@ function dismissFestBanner(){
   </style>
 </section>
 
+<!-- ===== HYPERLOCAL: Browse by area ===== -->
+<section id="browseByArea" style="display:none;max-width:1180px;margin:0 auto 28px;padding:0 20px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="font-size:.84rem;font-weight:800;color:#0F172A;letter-spacing:.02em">📍 <span data-i18n-en>Browse by area</span><span data-i18n-hi>क्षेत्र से ब्राउज़ करें</span></span>
+    <span style="font-size:.74rem;color:var(--muted)" id="browseAreaSubtitle"><span data-i18n-en>Hyperlocal — Meena Bazaar, Chotala Road & more</span><span data-i18n-hi>हाइपरलोकल — मीना बाज़ार, चोटाला रोड और भी</span></span>
+  </div>
+  <div id="browseAreaChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  <style>
+    .area-chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #FED7AA; color:#9A3412; padding:7px 14px; border-radius:99px; font-size:.82rem; font-weight:700; text-decoration:none; transition:.15s; font-family:inherit }
+    .area-chip:hover{ background:linear-gradient(135deg,#FFF7ED,#FED7AA); border-color:#FB923C; transform:translateY(-1px); box-shadow:0 4px 12px rgba(251,146,60,0.18); text-decoration:none }
+    .area-chip .ac-count{ background:#FEF3C7; color:#92400E; padding:1px 7px; border-radius:99px; font-size:.66rem; font-weight:800; margin-left:3px }
+  </style>
+</section>
+<script>
+(function(){
+  'use strict';
+  async function loadBrowseByArea(){
+    try {
+      if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+      const c = ShopDB.client;
+      // Choose city: respect user's saved city pref, fallback to Mandi Dabwali
+      let citySlug = null;
+      try {
+        const stored = localStorage.getItem('dukanlist.city');
+        if (stored && stored.length){ citySlug = stored.replace(/\s+/g,'-').toLowerCase(); }
+      } catch(_){}
+      if (!citySlug) citySlug = 'mandi-dabwali';
+
+      const { data, error } = await c.rpc('list_localities_by_city', { p_city_slug: citySlug });
+      if (error || !Array.isArray(data) || !data.length) return;
+
+      // Top 10 by shop count
+      const top = data.slice().sort((a, b) => (b.shop_count || 0) - (a.shop_count || 0)).slice(0, 10);
+      if (!top.length) return;
+
+      const host = document.getElementById('browseAreaChips');
+      if (!host) return;
+      host.innerHTML = top.map(l => {
+        const count = (l.shop_count > 0) ? '<span class="ac-count">' + l.shop_count + '</span>' : '';
+        return '<a class="area-chip" href="/area/' + encodeURIComponent(citySlug) + '/' + encodeURIComponent(l.slug) + '">'
+             + '📍 <span>' + (l.name || '').replace(/[<>&"]/g, '') + '</span>'
+             + count
+             + '</a>';
+      }).join('');
+      document.getElementById('browseByArea').style.display = '';
+    } catch(e){ console.warn('loadBrowseByArea:', e); }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(loadBrowseByArea, 1400));
+  else setTimeout(loadBrowseByArea, 1400);
+})();
+</script>
+
 <div id="localPulse" class="pulse-widget" style="display:none">
   <div class="pulse-head">
     <span class="pulse-dot"></span>
