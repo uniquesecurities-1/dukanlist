@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.8.7';  // bumped — Resend Email now sends MAGIC SIGN-IN LINK when Supabase reports email already confirmed (handles edge case where auto-confirm or prior signup left the email confirmed despite owner never actually receiving anything). Owner gets a clickable email and can log in directly, shop leaves the pending queue.
+const VERSION    = 'dukan-v2.9.0';  // bumped — Poster Studio simplified: new /panel/poster-quick.html — single message textbox + EN/HI toggle + optional photo upload renders into 6 canvas styles (Saffron Pop, Premium Dark, Cream Minimal, Magenta Glow, Festival Bold, Photo Overlay), all 1080x1080 with subtle dukanlist.com promo. Dashboard 'Today's poster is ready' card now points here. Old Pro Studio still accessible.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

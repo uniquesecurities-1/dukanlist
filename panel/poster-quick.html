@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Poster Maker — DukanList</title>
+<meta name="robots" content="noindex,nofollow">
+
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@500;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260612">
+
+<style>
+  *,*::before,*::after{ box-sizing:border-box }
+  body{ margin:0; font-family:'Plus Jakarta Sans',-apple-system,sans-serif; background:#FAFAFA; color:#0F172A; line-height:1.5 }
+
+  .page{ max-width:880px; margin:0 auto; padding:20px 18px 80px }
+  .page h1{ font-family:'Manrope',sans-serif; font-size:1.6rem; font-weight:900; letter-spacing:-.025em; margin:8px 0 6px; line-height:1.15; display:flex; align-items:center; gap:8px }
+  .page-sub{ color:#64748B; font-size:.88rem; margin-bottom:22px }
+
+  .card{ background:#fff; border:1px solid #E5E7EB; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(15,23,42,.04); margin-bottom:14px }
+
+  .section-label{ font-size:.74rem; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px }
+
+  textarea.message{ width:100%; min-height:80px; border:1.5px solid #E5E7EB; border-radius:10px; padding:12px 14px; font-size:1rem; font-family:inherit; resize:vertical; transition:border-color .15s }
+  textarea.message:focus{ outline:none; border-color:#FF6B1A; box-shadow:0 0 0 3px rgba(255,107,26,.1) }
+  textarea.message.hi{ font-family:'Noto Sans Devanagari',sans-serif }
+
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px }
+
+  .lang-toggle{ display:inline-flex; background:#F1F5F9; padding:3px; border-radius:10px; gap:2px }
+  .lang-toggle button{ background:transparent; border:0; padding:7px 14px; border-radius:8px; font-family:inherit; font-size:.84rem; font-weight:800; color:#64748B; cursor:pointer; transition:.15s }
+  .lang-toggle button.active{ background:#0F172A; color:#fff; box-shadow:0 2px 6px rgba(15,23,42,.18) }
+
+  .upload-btn{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px dashed #CBD5E1; color:#475569; padding:9px 14px; border-radius:10px; font-family:inherit; font-size:.84rem; font-weight:700; cursor:pointer; transition:.15s }
+  .upload-btn:hover{ border-color:#FF6B1A; color:#FF6B1A; background:#FFF7ED }
+  .upload-btn input{ display:none }
+
+  .photo-pill{ display:none; align-items:center; gap:6px; background:#ECFDF5; border:1px solid #6EE7B7; color:#065F46; padding:6px 12px; border-radius:99px; font-size:.78rem; font-weight:700 }
+  .photo-pill button{ background:transparent; border:0; color:#065F46; font-weight:800; cursor:pointer; font-size:1rem; padding:0 0 0 4px; line-height:1 }
+  .photo-pill.show{ display:inline-flex }
+
+  .style-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:6px }
+  .style-card{ background:#F8FAFC; border:2px solid transparent; border-radius:12px; padding:6px; cursor:pointer; transition:transform .15s, border-color .15s; position:relative; overflow:hidden }
+  .style-card:hover{ transform:translateY(-2px); border-color:#CBD5E1 }
+  .style-card.active{ border-color:#FF6B1A; box-shadow:0 6px 18px rgba(255,107,26,.25) }
+  .style-card.active::after{ content:'✓'; position:absolute; top:6px; right:6px; background:#FF6B1A; color:#fff; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-weight:900; font-size:.78rem; box-shadow:0 2px 6px rgba(0,0,0,.18) }
+  .style-card canvas{ width:100%; aspect-ratio:1/1; border-radius:7px; display:block }
+  .style-card .name{ display:block; font-size:.7rem; font-weight:700; color:#475569; margin-top:6px; text-align:center; letter-spacing:.02em }
+
+  @media(max-width:480px){
+    .style-grid{ grid-template-columns:repeat(2, 1fr) }
+  }
+
+  .preview-wrap{ background:linear-gradient(135deg,#F8FAFC,#F1F5F9); border-radius:14px; padding:18px; display:grid; place-items:center; min-height:280px }
+  .preview-wrap canvas{ max-width:100%; max-height:60vh; height:auto; border-radius:10px; box-shadow:0 18px 40px rgba(15,23,42,.12) }
+
+  .actions{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px; margin-top:14px }
+  .act{ display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:11px 14px; border-radius:10px; font-family:inherit; font-size:.88rem; font-weight:800; text-decoration:none; border:0; cursor:pointer; transition:transform .12s; color:#fff }
+  .act:active{ transform:scale(.97) }
+  .act.wa{ background:#25D366; box-shadow:0 3px 10px rgba(37,211,102,.35) }
+  .act.dl{ background:#0F172A; box-shadow:0 3px 10px rgba(15,23,42,.25) }
+  .act.copy{ background:#475569 }
+
+  .empty-hint{ color:#94A3B8; font-size:.9rem; text-align:center; padding:30px 14px }
+
+  .topbar{ background:#fff; border-bottom:1px solid #E2E8F0; padding:12px 18px; display:flex; align-items:center; justify-content:space-between }
+  .topbar a{ color:#0F172A; text-decoration:none; font-weight:800; font-size:1rem; letter-spacing:-.02em }
+  .topbar .links a{ font-size:.84rem; font-weight:700; color:#475569; margin-left:14px }
+  .topbar .links a:hover{ color:#FF6B1A }
+
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#0F172A; color:#fff; padding:12px 22px; border-radius:99px; font-size:.86rem; font-weight:700; z-index:99999; box-shadow:0 10px 30px rgba(15,23,42,.4); opacity:0; transition:opacity .2s, transform .25s; pointer-events:none }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/panel/dashboard.html">⚡ Quick Poster Maker</a>
+  <div class="links">
+    <a href="/panel/dashboard.html">← Dashboard</a>
+    <a href="/panel/poster-studio.html">Pro Studio →</a>
+  </div>
+</header>
+
+<main class="page">
+  <h1>⚡ <span>Quick Poster Maker</span></h1>
+  <div class="page-sub">Type your message → pick a style → share. No template browsing, no setup.</div>
+
+  <!-- 1. Message + Language -->
+  <div class="card">
+    <div class="section-label">1. Your message</div>
+    <textarea id="msg" class="message" placeholder="Type any message — offer, announcement, greeting…
+e.g. FLAT 30% OFF on all sarees, today only" maxlength="140"></textarea>
+    <div class="row">
+      <div class="lang-toggle">
+        <button type="button" class="active" data-lang="en">EN</button>
+        <button type="button" data-lang="hi">हिं</button>
+      </div>
+      <label class="upload-btn">
+        📤 Upload photo (optional)
+        <input id="photoFile" type="file" accept="image/*">
+      </label>
+      <span class="photo-pill" id="photoPill">
+        ✓ Photo added
+        <button type="button" id="clearPhoto" title="Remove photo">×</button>
+      </span>
+      <span style="color:#94A3B8;font-size:.78rem;margin-left:auto" id="charCount">0 / 140</span>
+    </div>
+  </div>
+
+  <!-- 2. Style picker -->
+  <div class="card">
+    <div class="section-label">2. Choose a style</div>
+    <div class="style-grid" id="styleGrid"></div>
+  </div>
+
+  <!-- 3. Preview + Share -->
+  <div class="card">
+    <div class="section-label">3. Preview & share</div>
+    <div class="preview-wrap" id="previewWrap">
+      <div class="empty-hint" id="emptyHint">Type your message above to see the live preview.</div>
+      <canvas id="mainCanvas" width="1080" height="1080" style="display:none"></canvas>
+    </div>
+    <div class="actions">
+      <button type="button" class="act wa" id="shareWa">💬 WhatsApp</button>
+      <button type="button" class="act dl" id="downloadBtn">📥 Download</button>
+      <button type="button" class="act copy" id="copyBtn">📋 Copy image</button>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+
+// ============================================================
+// State
+// ============================================================
+const STATE = {
+  msg: '',
+  lang: 'en',
+  photo: null,           // HTMLImageElement
+  styleId: 'saffron-pop' // default style
+};
+
+const STYLES = [
+  { id:'saffron-pop',   name:'Saffron Pop'   },
+  { id:'premium-dark',  name:'Premium Dark'  },
+  { id:'cream-minimal', name:'Cream Minimal' },
+  { id:'magenta-glow',  name:'Magenta Glow'  },
+  { id:'festival-bold', name:'Festival Bold' },
+  { id:'photo-overlay', name:'Photo Overlay' }
+];
+
+// ============================================================
+// Renderers — each takes (ctx, w, h, opts) and draws into canvas
+// opts = { msg, lang, photo }
+// ============================================================
+function wrapLines(ctx, text, maxWidth){
+  const words = (text || '').split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  const lines = [];
+  let cur = '';
+  for (const w of words){
+    const test = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(test).width <= maxWidth) cur = test;
+    else { if (cur) lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function fitFont(ctx, text, maxWidth, maxHeight, family, weight, startSize, minSize){
+  let size = startSize;
+  while (size >= minSize){
+    ctx.font = weight + ' ' + size + 'px ' + family;
+    const lines = wrapLines(ctx, text, maxWidth);
+    const lineH = size * 1.12;
+    if (lines.length * lineH <= maxHeight && lines.every(l => ctx.measureText(l).width <= maxWidth)){
+      return { size, lines, lineH };
+    }
+    size -= 4;
+  }
+  ctx.font = weight + ' ' + minSize + 'px ' + family;
+  const lines = wrapLines(ctx, text, maxWidth);
+  return { size: minSize, lines, lineH: minSize * 1.12 };
+}
+
+function drawText(ctx, text, x, y, opts){
+  const fam = (opts.lang === 'hi') ? "'Noto Sans Devanagari', sans-serif" : "'Manrope', sans-serif";
+  const weight = opts.weight || '900';
+  const startSize = opts.size || 110;
+  const minSize = opts.minSize || 48;
+  const f = fitFont(ctx, text, opts.maxW, opts.maxH, fam, weight, startSize, minSize);
+  ctx.textBaseline = 'top';
+  ctx.textAlign = opts.align || 'center';
+  const totalH = f.lines.length * f.lineH;
+  let yy = y - totalH/2;
+  for (const ln of f.lines){
+    if (opts.shadow){
+      ctx.shadowColor = opts.shadow;
+      ctx.shadowBlur = 14;
+    }
+    ctx.fillText(ln, x, yy);
+    ctx.shadowBlur = 0;
+    yy += f.lineH;
+  }
+  return f.size;
+}
+
+function drawBrandPromo(ctx, w, h, color){
+  // Small dukanlist.com promo in bottom-right
+  ctx.save();
+  ctx.font = "600 22px 'Plus Jakarta Sans', sans-serif";
+  ctx.textBaseline = 'bottom';
+  ctx.textAlign = 'right';
+  ctx.fillStyle = color || 'rgba(255,255,255,0.75)';
+  ctx.fillText('dukanlist.com', w - 36, h - 30);
+  ctx.restore();
+}
+
+function drawBackdropPhoto(ctx, w, h, photo, opts){
+  if (!photo) return;
+  // Cover-fit
+  const iw = photo.naturalWidth, ih = photo.naturalHeight;
+  const sr = iw/ih, dr = w/h;
+  let sx=0, sy=0, sw=iw, sh=ih;
+  if (sr > dr){ sw = ih*dr; sx = (iw - sw)/2; }
+  else        { sh = iw/dr; sy = (ih - sh)/2; }
+  ctx.drawImage(photo, sx, sy, sw, sh, 0, 0, w, h);
+  if (opts && opts.dim){
+    ctx.fillStyle = 'rgba(0,0,0,' + opts.dim + ')';
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+// === Renderers ===
+
+function renderSaffronPop(ctx, w, h, opts){
+  // Diagonal saffron-orange gradient
+  const g = ctx.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, '#FF8C00');
+  g.addColorStop(0.5, '#FF6B1A');
+  g.addColorStop(1, '#E55100');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  // Subtle bloom top-right
+  const r = ctx.createRadialGradient(w*0.85, h*0.15, 0, w*0.85, h*0.15, w*0.6);
+  r.addColorStop(0, 'rgba(255,255,255,0.35)');
+  r.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = r;
+  ctx.fillRect(0, 0, w, h);
+  if (opts.photo){
+    // Small circular photo top-center
+    const pr = w*0.13;
+    const cx = w/2, cy = h*0.22;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI*2); ctx.clip();
+    drawBackdropPhoto(ctx, w, h, opts.photo, {});
+    // Re-fill background outside circle is fine — clipped
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI*2); ctx.stroke();
+  }
+  // Big text
+  ctx.fillStyle = '#fff';
+  drawText(ctx, (opts.msg || '').toUpperCase(), w/2, h/2 + (opts.photo ? h*0.06 : 0),
+    { maxW: w*0.86, maxH: h*0.55, lang: opts.lang, weight:'900', size: 130, minSize: 56,
+      shadow:'rgba(0,0,0,0.18)' });
+  drawBrandPromo(ctx, w, h, 'rgba(255,255,255,0.85)');
+}
+
+function renderPremiumDark(ctx, w, h, opts){
+  ctx.fillStyle = '#0A0A0F';
+  ctx.fillRect(0, 0, w, h);
+  // Gold radial glow
+  const r = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w*0.7);
+  r.addColorStop(0, 'rgba(212,175,55,0.18)');
+  r.addColorStop(1, 'rgba(212,175,55,0)');
+  ctx.fillStyle = r;
+  ctx.fillRect(0, 0, w, h);
+  // Gold border frame
+  ctx.strokeStyle = '#D4AF37';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(36, 36, w-72, h-72);
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(54, 54, w-108, h-108);
+  // Text — gold serif
+  const fam = (opts.lang === 'hi') ? "'Noto Sans Devanagari', sans-serif" : "'Playfair Display', serif";
+  const f = fitFont(ctx, opts.msg || '', w*0.78, h*0.55, fam, '900', 120, 52);
+  ctx.fillStyle = '#D4AF37';
+  ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+  let yy = h/2 - (f.lines.length * f.lineH)/2;
+  for (const ln of f.lines){
+    ctx.font = f.size && '900 ' + f.size + 'px ' + fam;
+    ctx.fillText(ln, w/2, yy);
+    yy += f.lineH;
+  }
+  drawBrandPromo(ctx, w, h, 'rgba(212,175,55,0.65)');
+}
+
+function renderCreamMinimal(ctx, w, h, opts){
+  ctx.fillStyle = '#FAF6EE';
+  ctx.fillRect(0, 0, w, h);
+  // Thin accent line top
+  ctx.strokeStyle = '#FF6B1A';
+  ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.moveTo(w*0.1, h*0.18); ctx.lineTo(w*0.32, h*0.18); ctx.stroke();
+  // Text
+  ctx.fillStyle = '#0F172A';
+  drawText(ctx, opts.msg || '', w/2, h/2,
+    { maxW: w*0.82, maxH: h*0.55, lang: opts.lang, weight:'800', size: 110, minSize: 48, align:'center' });
+  drawBrandPromo(ctx, w, h, 'rgba(15,23,42,0.55)');
+}
+
+function renderMagentaGlow(ctx, w, h, opts){
+  // Radial pink-purple
+  const r = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w*0.75);
+  r.addColorStop(0, '#F472B6');
+  r.addColorStop(0.5, '#C026D3');
+  r.addColorStop(1, '#7C3AED');
+  ctx.fillStyle = r;
+  ctx.fillRect(0, 0, w, h);
+  // Star sparkles
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  for (let i = 0; i < 25; i++){
+    const sx = (i * 137) % w;
+    const sy = (i * 211) % h;
+    const sr = 2 + (i % 4);
+    ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI*2); ctx.fill();
+  }
+  // Text with subtle white glow
+  ctx.fillStyle = '#fff';
+  drawText(ctx, opts.msg || '', w/2, h/2,
+    { maxW: w*0.84, maxH: h*0.55, lang: opts.lang, weight:'900', size: 120, minSize: 50,
+      shadow:'rgba(255,255,255,0.45)' });
+  drawBrandPromo(ctx, w, h, 'rgba(255,255,255,0.78)');
+}
+
+function renderFestivalBold(ctx, w, h, opts){
+  // Deep maroon bg with gold ornaments
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, '#7A1414');
+  g.addColorStop(1, '#4A0202');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  // Gold corner ornaments
+  ctx.strokeStyle = '#FFC93D';
+  ctx.lineWidth = 5;
+  // top-left ornament
+  ctx.beginPath();
+  ctx.moveTo(60, 60); ctx.lineTo(60, 180); ctx.moveTo(60, 60); ctx.lineTo(180, 60);
+  ctx.arc(160, 160, 8, 0, Math.PI*2);
+  ctx.stroke();
+  // top-right
+  ctx.beginPath();
+  ctx.moveTo(w-60, 60); ctx.lineTo(w-60, 180); ctx.moveTo(w-60, 60); ctx.lineTo(w-180, 60);
+  ctx.arc(w-160, 160, 8, 0, Math.PI*2);
+  ctx.stroke();
+  // bottom-left
+  ctx.beginPath();
+  ctx.moveTo(60, h-60); ctx.lineTo(60, h-180); ctx.moveTo(60, h-60); ctx.lineTo(180, h-60);
+  ctx.arc(160, h-160, 8, 0, Math.PI*2);
+  ctx.stroke();
+  // bottom-right
+  ctx.beginPath();
+  ctx.moveTo(w-60, h-60); ctx.lineTo(w-60, h-180); ctx.moveTo(w-60, h-60); ctx.lineTo(w-180, h-60);
+  ctx.arc(w-160, h-160, 8, 0, Math.PI*2);
+  ctx.stroke();
+  // Text — bright gold
+  ctx.fillStyle = '#FFD86B';
+  drawText(ctx, opts.msg || '', w/2, h/2,
+    { maxW: w*0.78, maxH: h*0.5, lang: opts.lang, weight:'900', size: 120, minSize: 52,
+      shadow:'rgba(0,0,0,0.4)' });
+  drawBrandPromo(ctx, w, h, 'rgba(255,216,107,0.7)');
+}
+
+function renderPhotoOverlay(ctx, w, h, opts){
+  if (opts.photo){
+    drawBackdropPhoto(ctx, w, h, opts.photo, { dim: 0.42 });
+  } else {
+    // Fallback — gradient if no photo
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, '#1E293B'); g.addColorStop(1, '#0F172A');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  }
+  // Bottom-half black gradient for text contrast
+  const bg = ctx.createLinearGradient(0, h*0.45, 0, h);
+  bg.addColorStop(0, 'rgba(0,0,0,0)');
+  bg.addColorStop(1, 'rgba(0,0,0,0.85)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, h*0.45, w, h*0.55);
+  // Text at bottom
+  ctx.fillStyle = '#fff';
+  drawText(ctx, opts.msg || '', w/2, h*0.75,
+    { maxW: w*0.85, maxH: h*0.32, lang: opts.lang, weight:'900', size: 96, minSize: 44,
+      shadow:'rgba(0,0,0,0.6)' });
+  if (!opts.photo){
+    // Hint text
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = "600 22px 'Plus Jakarta Sans', sans-serif";
+    ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+    ctx.fillText('📤 Upload a photo for this style', w/2, h*0.4);
+  }
+  drawBrandPromo(ctx, w, h, 'rgba(255,255,255,0.78)');
+}
+
+const RENDERERS = {
+  'saffron-pop':   renderSaffronPop,
+  'premium-dark':  renderPremiumDark,
+  'cream-minimal': renderCreamMinimal,
+  'magenta-glow':  renderMagentaGlow,
+  'festival-bold': renderFestivalBold,
+  'photo-overlay': renderPhotoOverlay
+};
+
+function renderInto(canvas, styleId){
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  const fn = RENDERERS[styleId] || RENDERERS['saffron-pop'];
+  fn(ctx, w, h, { msg: STATE.msg, lang: STATE.lang, photo: STATE.photo });
+}
+
+// ============================================================
+// UI wiring
+// ============================================================
+
+function showToast(text){
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function buildStyleGrid(){
+  const host = document.getElementById('styleGrid');
+  host.innerHTML = STYLES.map(s => {
+    return '<div class="style-card' + (s.id === STATE.styleId ? ' active' : '') + '" data-style="' + s.id + '">'
+      + '  <canvas width="360" height="360" data-thumb="' + s.id + '"></canvas>'
+      + '  <span class="name">' + s.name + '</span>'
+      + '</div>';
+  }).join('');
+
+  host.querySelectorAll('.style-card').forEach(card => {
+    card.addEventListener('click', () => {
+      STATE.styleId = card.getAttribute('data-style');
+      host.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      renderMain();
+    });
+  });
+}
+
+function renderThumbnails(){
+  document.querySelectorAll('canvas[data-thumb]').forEach(cv => {
+    renderInto(cv, cv.getAttribute('data-thumb'));
+  });
+}
+
+function renderMain(){
+  const cv = document.getElementById('mainCanvas');
+  const hint = document.getElementById('emptyHint');
+  if (!STATE.msg || STATE.msg.trim().length < 2){
+    cv.style.display = 'none';
+    hint.style.display = 'block';
+    return;
+  }
+  hint.style.display = 'none';
+  cv.style.display = 'block';
+  renderInto(cv, STATE.styleId);
+}
+
+function renderAll(){
+  renderThumbnails();
+  renderMain();
+}
+
+// Debounced re-render on typing
+let _renderTimer = null;
+function scheduleRender(){
+  clearTimeout(_renderTimer);
+  _renderTimer = setTimeout(renderAll, 120);
+}
+
+// === Event handlers ===
+
+document.getElementById('msg').addEventListener('input', (e) => {
+  STATE.msg = e.target.value;
+  document.getElementById('charCount').textContent = STATE.msg.length + ' / 140';
+  scheduleRender();
+});
+
+document.querySelectorAll('.lang-toggle button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.lang-toggle button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    STATE.lang = b.getAttribute('data-lang');
+    const ta = document.getElementById('msg');
+    ta.classList.toggle('hi', STATE.lang === 'hi');
+    scheduleRender();
+  });
+});
+
+document.getElementById('photoFile').addEventListener('change', (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    STATE.photo = img;
+    document.getElementById('photoPill').classList.add('show');
+    // Switch to photo-overlay automatically if currently saffron-pop
+    scheduleRender();
+  };
+  img.src = URL.createObjectURL(f);
+});
+
+document.getElementById('clearPhoto').addEventListener('click', () => {
+  STATE.photo = null;
+  document.getElementById('photoFile').value = '';
+  document.getElementById('photoPill').classList.remove('show');
+  scheduleRender();
+});
+
+// === Share / Download / Copy ===
+
+function getBlob(){
+  return new Promise(resolve => {
+    document.getElementById('mainCanvas').toBlob(b => resolve(b), 'image/png', 0.95);
+  });
+}
+
+document.getElementById('downloadBtn').addEventListener('click', async () => {
+  if (!STATE.msg) { showToast('Type a message first'); return; }
+  const blob = await getBlob();
+  if (!blob) { showToast('Render failed'); return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dukanlist-poster-' + Date.now() + '.png';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+  showToast('✓ Saved to Downloads');
+});
+
+document.getElementById('shareWa').addEventListener('click', async () => {
+  if (!STATE.msg) { showToast('Type a message first'); return; }
+  const blob = await getBlob();
+  if (!blob) { showToast('Render failed'); return; }
+  const file = new File([blob], 'poster.png', { type: 'image/png' });
+
+  // Try Web Share API with files (best on mobile)
+  if (navigator.canShare && navigator.canShare({ files: [file] })){
+    try {
+      await navigator.share({
+        files: [file],
+        title: 'My poster',
+        text: STATE.msg + '\n\nhttps://dukanlist.com'
+      });
+      return;
+    } catch(_) { /* user cancelled */ return; }
+  }
+
+  // Fallback: copy to clipboard + open WA web
+  try {
+    if (navigator.clipboard && navigator.clipboard.write){
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      showToast('✓ Image copied — paste in WhatsApp');
+    }
+  } catch(_){}
+  window.open('https://web.whatsapp.com/', '_blank', 'noopener');
+});
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  if (!STATE.msg) { showToast('Type a message first'); return; }
+  const blob = await getBlob();
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    showToast('✓ Image copied to clipboard');
+  } catch(e) {
+    showToast('Copy not supported — use Download instead');
+  }
+});
+
+// === Boot ===
+buildStyleGrid();
+renderAll();
+
+// Helpful sample on first focus if empty
+document.getElementById('msg').addEventListener('focus', (e) => {
+  if (!STATE.msg) e.target.placeholder = "FLAT 30% OFF on all sarees, today only";
+}, { once: true });
+</script>
+</body>
+</html>
