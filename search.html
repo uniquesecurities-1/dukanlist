@@ -809,16 +809,49 @@ async function runSearch(){
     return;
   }
 
-  const { data, error } = await c.rpc('search_businesses', {
-    p_query        : q || null,
-    p_category     : catSlug || null,
-    p_city_id      : cityId,
-    p_state_id     : null,
-    p_limit        : 250,
-    p_offset       : 0,
-    p_pincode      : pin || null,
-    p_locality_slug: locSlug || null
-  });
+  // Multi-category support: ?cat=doctor,dentist,ayurveda → run parallel RPCs and merge.
+  // Single-category (?cat=doctor) takes the fast path with one RPC call.
+  let data, error;
+  if (catSlug && catSlug.indexOf(',') !== -1){
+    const slugs = catSlug.split(',').map(s => s.trim()).filter(Boolean);
+    try {
+      const results = await Promise.all(slugs.map(s => c.rpc('search_businesses', {
+        p_query        : q || null,
+        p_category     : s,
+        p_city_id      : cityId,
+        p_state_id     : null,
+        p_limit        : 250,
+        p_offset       : 0,
+        p_pincode      : pin || null,
+        p_locality_slug: locSlug || null
+      })));
+      // Merge + dedupe by id, sort by match_rank desc
+      const seen = new Set();
+      const merged = [];
+      results.forEach(r => {
+        if (r.error) console.warn('multi-cat slug error:', r.error);
+        (r.data || []).forEach(b => {
+          if (!seen.has(b.id)){ seen.add(b.id); merged.push(b); }
+        });
+      });
+      merged.sort((a, b) => (b.match_rank || 0) - (a.match_rank || 0));
+      data = merged;
+      error = null;
+    } catch(e){ error = e; }
+  } else {
+    const r = await c.rpc('search_businesses', {
+      p_query        : q || null,
+      p_category     : catSlug || null,
+      p_city_id      : cityId,
+      p_state_id     : null,
+      p_limit        : 250,
+      p_offset       : 0,
+      p_pincode      : pin || null,
+      p_locality_slug: locSlug || null
+    });
+    data = r.data;
+    error = r.error;
+  }
 
   if (error){
     console.error(error);

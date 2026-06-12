@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.12';  // REVERT — removed entire Phase 2 Discover Feed Polish (autoplay toggle, progress bar, smart sort, seen tracking, ap-bar CSS+HTML, IO callback try-catch wrapping, 600ms safety net, resetAllFilters, autoplay reset migration, compact topNav CSS, icon-only My List). Discover page restored to pre-Phase-2 stable state. User reported multiple live issues with the autoplay/smart-sort experience — going back to known-good baseline.
+const VERSION    = 'dukan-v2.9.13';  // FIX — category chips on main page (index.html) now use ?cat=slug1,slug2,... instead of ?q=text. Old hrefs (?q=doctor, ?q=grocery, etc.) did text-search on shop names but most doctor shops are named "Dr. X Clinic" or "Aastha Hospital" — no literal "doctor" string. Result: chips showed counts (Doctor: 3) but click gave empty results. New approach: each chip maps to its full slug list from CHIP_TO_SLUGS (doctor → 9 slugs incl. dentist/ayurveda/etc.). search.html updated to parse comma-separated cat slugs, run parallel RPCs, merge + dedupe by id. Backward compatible — single cat slug still uses fast single-RPC path.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
