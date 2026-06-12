@@ -19,10 +19,18 @@
 .cat-pill .star{cursor:pointer;color:#cbd5e1;width:20px;height:20px;display:inline-grid;place-items:center;border-radius:50%;transition:.15s}
 .cat-pill .star:hover{color:#F59E0B;background:#FEF3C7;transform:scale(1.15)}
 @keyframes catPillIn{ from{ opacity:0; transform:translateY(-6px) scale(.85) } to{ opacity:1; transform:translateY(0) scale(1) } }
-.hours-row{display:grid;grid-template-columns:100px 1fr 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
-.hours-row .d{font-weight:700;color:var(--ink)}
-.hours-row input[type=time]{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit}
-.hours-row .closed-cb{font-size:.8rem;color:var(--muted);font-weight:600}
+.hours-row{display:grid;grid-template-columns:90px minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.hours-row .d{font-weight:700;color:var(--ink);font-size:.92rem}
+.hours-row input[type=time]{padding:7px 6px;border:1px solid var(--line);border-radius:6px;font-family:inherit;width:100%;min-width:0;box-sizing:border-box;font-size:.88rem}
+.hours-row .closed-cb{font-size:.78rem;color:var(--muted);font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.hours-row .closed-cb input[type=checkbox]{margin:0;width:16px;height:16px;cursor:pointer}
+/* Mobile: stack Closed checkbox on its own row so time pickers + day label all fit */
+@media (max-width:480px){
+  .hours-row{grid-template-columns:62px minmax(0,1fr) minmax(0,1fr);gap:6px;padding:10px 0}
+  .hours-row .d{font-size:.85rem}
+  .hours-row input[type=time]{padding:7px 4px;font-size:.85rem}
+  .hours-row .closed-cb{grid-column:1 / -1;justify-self:end;padding-top:4px;font-size:.82rem}
+}
 
 /* Template picker modal */
 .tpl-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;background:linear-gradient(135deg,#F97316,#EA580C);border:none;color:#fff;font-size:.92rem;font-weight:800;cursor:pointer;margin-top:10px;box-shadow:0 4px 14px rgba(249,115,22,0.35);transition:.18s;letter-spacing:.3px}
@@ -329,11 +337,11 @@
         📣 <span data-i18n-en>Get more reviews</span><span data-i18n-hi>ज़्यादा रिव्यू पाएं</span>
       </div>
       <div class="card-sub">
-        <span data-i18n-en>Send a polite WhatsApp link to satisfied customers asking them to review your shop. More 5-star reviews = higher ranking on DukanList.</span>
+        <span data-i18n-en>Send a polite WhatsApp link to satisfied customers asking them to review your business. More 5-star reviews = higher ranking on DukanList.</span>
         <span data-i18n-hi>संतुष्ट ग्राहकों को WhatsApp से रिव्यू मांगें। अधिक 5-स्टार रिव्यू = बेहतर रैंकिंग।</span>
       </div>
 
-      <div class="form-row" style="grid-template-columns:140px 1fr;gap:8px;align-items:end">
+      <div class="form-row" style="grid-template-columns:130px minmax(0,1fr);gap:8px;align-items:end">
         <div>
           <label><span data-i18n-en>Country code</span><span data-i18n-hi>देश कोड</span></label>
           <select id="askCC" class="select keep-en">

@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.24';  // FIX — What's New section was showing 9 cards instead of 6 because <a class="wn-card" style="...display:block..."> inline styles were overriding the #wnGrid [data-wn-extra="1"]{ display:none } rule. Added !important. Also changed default visible count from 6 → 8 for clean 2-row grid on desktop (4+4) — items 7 (Construction Material/Paint/Hardware) and 8 (Tag Any Shop in Pucho Bhai) un-tagged from wn-extra so they're visible by default. Show More button label updated to '11 older updates'.
+const VERSION    = 'dukan-v2.9.25';  // FIX — panel/profile.html Business Hours grid was overflowing mobile viewport. Old: grid-template-columns:100px 1fr 1fr auto — fixed 100px day label + two flex time inputs + auto Closed checkbox totaled too much for narrow phones, Closed column got pushed off-screen. Fixed: (a) day label 90px, time inputs minmax(0,1fr) with width:100% min-width:0 box-sizing:border-box, (b) mobile @media max-width:480px collapses to 3-column grid (62px day + 1fr + 1fr) with Closed checkbox grid-column:1/-1 justify-self:end so it wraps to its own row right-aligned. Also: Country code form-row 140px → 130px minmax(0,1fr) for same overflow safety. Wording: 'review your shop' → 'review your business'.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
