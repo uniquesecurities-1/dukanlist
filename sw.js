@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.14';  // FIX — (1) search.html quick-cat chips (Doctor, Salon, Mechanic, Grocery, etc.) now use multi-slug format so clicking Doctor finds dentist/hospital/ayurveda etc. not just shops with literal slug 'doctor'. Same pattern as index.html chips in v2.9.13. Added Mutual Funds and Clothes/Tailor and Repair and Mobile/Electronics chips. (2) Recently Viewed totally redesigned — list-style cards with category badge, rating, verified pill, city + last-seen-time, plus inline 📞 Call and 💬 WhatsApp circular buttons. Tracks mobile/whatsapp/category_icon/verified on view so the buttons work. Up to 6 most recent shown.
+const VERSION    = 'dukan-v2.9.15';  // FIX — Recently Viewed on search page was pushing actual search results way below the fold when user had a query active. New behavior: (1) renderSearchRecent() checks URL for active query/cat/city/pin/area/locality params — hides RV if any present. (2) _renderResultsInner() hides RV slot after results render when rows>0. (3) RV only re-shown when search returns 0 results AND no query active. (4) Max items reduced from 6 to 4 (via opts.max). User said the Recently Viewed list was making interface feel "very bad" — pushing search material below large RV list. Now invisible when user is actively searching, visible only for the idle landing state.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

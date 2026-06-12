@@ -91,7 +91,7 @@
         #${slotId} .rv-btn:active{transform:scale(.92)}
       </style>
       <div class="rv-list">
-        ${items.slice(0, 6).map(b => {
+        ${items.slice(0, (opts.max || 4)).map(b => {
           const rateStr = b.rating_avg > 0 ? '<span class="rv-rate">⭐ ' + Number(b.rating_avg).toFixed(1) + '</span>' : '';
           const catStr  = b.category ? '<span class="rv-cat">' + (b.category_icon ? esc(b.category_icon) + ' ' : '') + esc(b.category) + '</span>' : '';
           const verify  = b.verified ? '<span class="rv-verify">✓ Verified</span>' : '';

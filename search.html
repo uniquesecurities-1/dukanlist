@@ -1017,6 +1017,17 @@ function _renderResultsInner(){
   }
   resEl.innerHTML = `<div class="biz-grid stagger">${rows.map(renderCard).join('')}</div>`;
   renderActiveFilters();
+  // Hide Recently Viewed when we have actual search results — declutters the page
+  try {
+    var rvSlot = document.getElementById('searchRecentSlot');
+    if (rvSlot){
+      if (rows.length > 0){ rvSlot.style.display = 'none'; }
+      else if (!new URLSearchParams(location.search).get('q') && !new URLSearchParams(location.search).get('cat')){
+        // No query AND no results — re-show RV so the page isn't blank
+        if (typeof renderSearchRecent === 'function') renderSearchRecent();
+      }
+    }
+  } catch(_){}
 }
 
 function renderCard(b){
@@ -1580,6 +1591,11 @@ window.addEventListener('popstate', runSearch);
     try {
       var slot = document.getElementById('searchRecentSlot');
       if (!slot) return;
+      // Hide Recently Viewed if there's an active search query, category, or city filter —
+      // user wants to see RESULTS, not a list of shops they already viewed.
+      var p = new URLSearchParams(location.search);
+      var hasActiveQuery = !!(p.get('q') || p.get('cat') || p.get('city') || p.get('pin') || p.get('area') || p.get('locality'));
+      if (hasActiveQuery){ slot.style.display = 'none'; return; }
       var items = DukanRecent.load();
       if (!items || items.length < 2) { slot.style.display = 'none'; return; }
       DukanRecent.render('searchRecentSlot');
