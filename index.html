@@ -18,7 +18,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#FF6B1A">
-<title>DukanList — Local Shops in Sirsa, Bathinda, Mansa, Muktsar</title>
+<title>DukanList — Local Businesses, Services & Professionals in Sirsa, Bathinda, Mansa, Muktsar</title>
 <!-- Hreflang declarations — Hindi-speaking small-town audience -->
 <link rel="alternate" hreflang="en-IN" href="https://dukanlist.com/">
 <link rel="alternate" hreflang="hi-IN" href="https://dukanlist.com/?lang=hi">
@@ -698,9 +698,9 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   .how-step h3{ font-size:.88rem !important; line-height:1.3 !important; margin-bottom:0 !important; letter-spacing:-.005em }
   .how-step p{ display:none !important }
 
-  /* Featured shops — single column for readability, show 6 initially on mobile */
+  /* Featured listings — single column on mobile, 4 visible. Rest via "View All Listings" CTA. */
   #featuredGrid{ grid-template-columns:1fr !important; gap:12px !important }
-  #featuredGrid:not(.featured-expanded) > *:nth-child(n+7){ display:none !important }
+  #featuredGrid > *:nth-child(n+5){ display:none !important }
   /* Compact card padding for mobile so it doesn't waste space */
   #featuredGrid > article{ border-radius:14px !important }
 
@@ -843,7 +843,7 @@ function dismissFestBanner(){
       <span data-i18n-hi>सिरसा · बठिंडा · मानसा · मुक्तसर में <span class="grad">कुछ भी local</span> खोजें</span>
     </h1>
     <p class="hero-sub">
-      <span data-i18n-en>Doctor, CA, mechanic, school, NGO, dukan · verified · free · one tap to call</span>
+      <span data-i18n-en>Doctor · CA · Mechanic · School · NGO · Shop · Clinic · Office — verified · free · one tap to call</span>
       <span data-i18n-hi>डॉक्टर, CA, मिस्त्री, स्कूल, NGO, दुकान · वेरिफाइड · फ्री · एक टैप पर कॉल</span>
     </p>
 
@@ -883,7 +883,7 @@ function dismissFestBanner(){
     <div style="text-align:center;margin:12px 0 18px">
       <a href="/discover.html" id="discoverPill" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED 0%,#EC4899 50%,#F59E0B 100%);color:#fff;padding:9px 18px;border-radius:99px;font-weight:900;font-size:.92rem;text-decoration:none;box-shadow:0 8px 22px rgba(124,58,237,.38);font-family:'Manrope',sans-serif;animation:pulseGlow 2.4s infinite;letter-spacing:.01em;white-space:nowrap;max-width:calc(100% - 24px)">
         <span style="font-size:1.05rem">🎬</span>
-        <span data-i18n-en>Discover Shops</span><span data-i18n-hi>दुकानें खोजें</span>
+        <span data-i18n-en>Discover Listings</span><span data-i18n-hi>लिस्टिंग देखें</span>
         <span style="background:rgba(255,255,255,.28);padding:2px 7px;border-radius:99px;font-size:.62rem;font-weight:900;letter-spacing:.06em">NEW</span>
       </a>
     </div>
@@ -924,7 +924,7 @@ function dismissFestBanner(){
       <div class="hdtw-step">
         <div class="hdtw-ico hdtw-ico-2">👆</div>
         <div class="hdtw-txt">
-          <b data-i18n-en>2. Tap shop</b><b data-i18n-hi>2. दुकान चुनो</b>
+          <b data-i18n-en>2. Tap to view</b><b data-i18n-hi>2. विवरण देखें</b>
           <span data-i18n-en>verified, photos, rating</span><span data-i18n-hi>वेरिफाइड, फोटो, रेटिंग</span>
         </div>
       </div>
@@ -1104,7 +1104,7 @@ function dismissFestBanner(){
 
     <div class="hero-register-strip">
       <span>
-        <span data-i18n-en>Shop, doctor, school, bank or office?</span>
+        <span data-i18n-en>Looking for a business, professional or service?</span>
         <span data-i18n-hi>दुकान, डॉक्टर, स्कूल, बैंक या ऑफिस?</span>
       </span>
       <a href="/register.html" class="btn btn-pri">
@@ -1199,7 +1199,7 @@ function dismissFestBanner(){
     <span class="pulse-title">Live in <span id="pulseCity">your city</span></span>
   </div>
   <div class="pulse-stats">
-    <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewShops">0</span><span class="pulse-stat-lbl">new shops today</span></div>
+    <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewShops">0</span><span class="pulse-stat-lbl">new listings today</span></div>
     <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewDeals">0</span><span class="pulse-stat-lbl">new deals</span></div>
     <div class="pulse-stat"><span class="pulse-stat-num" id="pulseNewReviews">0</span><span class="pulse-stat-lbl">new reviews</span></div>
   </div>
@@ -1290,14 +1290,10 @@ function dismissFestBanner(){
   </div>
   <div class="cats-wrap">
     <style>
-      /* Desktop: show 12 featured initially. Mobile: 6. Both expand via button. */
+      /* Desktop: 8 visible initially. Rest accessible via "View All Listings" CTA below. */
       @media (min-width:561px){
-        #featuredGrid:not(.featured-expanded) > *:nth-child(n+13){ display:none !important }
+        #featuredGrid > *:nth-child(n+9){ display:none !important }
       }
-      #featuredShowMoreWrap{ text-align:center; margin-top:20px }
-      #featuredShowMoreBtn{ background:#fff; color:#FF6B1A; border:1.5px solid #FED7AA; padding:11px 24px; border-radius:99px; font-size:.92rem; font-weight:800; cursor:pointer; font-family:inherit; transition:.18s; box-shadow:0 2px 6px rgba(255,107,26,.08) }
-      #featuredShowMoreBtn:hover{ background:#FFF7ED; border-color:#FB923C; transform:translateY(-1px); box-shadow:0 6px 14px rgba(255,107,26,.18) }
-      #featuredShowMoreBtn.expanded{ background:#F1F5F9; color:#475569; border-color:#CBD5E1 }
     </style>
     <div id="featuredGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div></div>
@@ -1309,27 +1305,6 @@ function dismissFestBanner(){
       <span data-i18n-en class="block">No active listings yet. Be the first!</span>
       <span data-i18n-hi class="block">अभी कोई लाइव लिस्टिंग नहीं। पहले बनें!</span>
     </div>
-
-    <!-- Show more featured listings button (appears only when there are hidden items) -->
-    <div id="featuredShowMoreWrap" style="display:none">
-      <button type="button" id="featuredShowMoreBtn" onclick="toggleFeaturedExpanded()">
-        <span data-i18n-en class="fsm-collapse">Show more shops ▾</span>
-        <span data-i18n-hi class="fsm-collapse">और दुकानें दिखाएँ ▾</span>
-      </button>
-    </div>
-    <script>
-      function toggleFeaturedExpanded(){
-        var grid = document.getElementById('featuredGrid');
-        var btn = document.getElementById('featuredShowMoreBtn');
-        if (!grid || !btn) return;
-        var expanded = grid.classList.toggle('featured-expanded');
-        btn.classList.toggle('expanded', expanded);
-        var en = btn.querySelector('[data-i18n-en]');
-        var hi = btn.querySelector('[data-i18n-hi]');
-        if (en) en.textContent = expanded ? 'Show fewer ▴' : 'Show more shops ▾';
-        if (hi) hi.textContent = expanded ? 'कम दिखाएँ ▴' : 'और दुकानें दिखाएँ ▾';
-      }
-    </script>
 
     <!-- View All Listings CTA -->
     <div id="viewAllShopsRow" style="text-align:center;margin-top:28px">
@@ -1608,7 +1583,7 @@ function dismissFestBanner(){
     }
   </style>
   <div class="section-head reveal">
-    <span class="eyebrow" style="color:#E55100">⭐ <span data-i18n-en>Featured Shop of the Week</span><span data-i18n-hi>हफ़्ते का चुना हुआ शॉप</span></span>
+    <span class="eyebrow" style="color:#E55100">⭐ <span data-i18n-en>Spotlight of the Week</span><span data-i18n-hi>हफ़्ते का स्पॉटलाइट</span></span>
     <h2><span data-i18n-en id="fsotwH2">Spotlight on a local legend</span><span data-i18n-hi>स्थानीय legend पर रोशनी</span></h2>
     <p><span data-i18n-en>Hand-picked weekly. Top-rated, photo-rich, customer-loved shops from our directory.</span><span data-i18n-hi>हर हफ़्ते हाथ से चुना — टॉप rated, photo-rich, customer-loved shops।</span></p>
   </div>
@@ -1656,7 +1631,7 @@ function dismissFestBanner(){
     </div>
     <div class="trust-item">
       <span class="ico">📸</span>
-      <span data-i18n-en>Real Shop Photos</span>
+      <span data-i18n-en>Real On-Premise Photos</span>
       <span data-i18n-hi>असली दुकान की फोटो</span>
     </div>
     <div class="trust-item">
@@ -1679,7 +1654,7 @@ function dismissFestBanner(){
   <div class="trust-strip">
     <div class="ts-item">
       <div class="ts-icon">✅</div>
-      <div class="ts-text"><div class="ts-title"><span data-i18n-en>Verified Shops</span><span data-i18n-hi>वेरिफाइड दुकानें</span></div><div class="ts-sub"><span data-i18n-en>Personally checked</span><span data-i18n-hi>व्यक्तिगत जांच</span></div></div>
+      <div class="ts-text"><div class="ts-title"><span data-i18n-en>Verified Listings</span><span data-i18n-hi>वेरिफाइड लिस्टिंग</span></div><div class="ts-sub"><span data-i18n-en>Personally checked</span><span data-i18n-hi>व्यक्तिगत जांच</span></div></div>
     </div>
     <div class="ts-item">
       <div class="ts-icon">🎁</div>
@@ -1715,11 +1690,11 @@ function dismissFestBanner(){
     <div class="how-step">
       <div class="n">1</div>
       <h3>
-        <span data-i18n-en>🏪 Register Your Shop</span>
+        <span data-i18n-en>🏪 List Your Business</span>
         <span data-i18n-hi>🏪 अपनी दुकान रजिस्टर करें</span>
       </h3>
       <p>
-        <span data-i18n-en>Free signup via mobile OTP in 2 minutes. Add shop name, category, photos and your USP.</span>
+        <span data-i18n-en>Free signup via mobile OTP in 2 minutes. Add your business name, category, photos and your USP.</span>
         <span data-i18n-hi>मोबाइल OTP से 2 मिनट में फ्री साइनअप। दुकान का नाम, श्रेणी, फोटो और USP डालें।</span>
       </p>
     </div>
@@ -1730,7 +1705,7 @@ function dismissFestBanner(){
         <span data-i18n-hi>✅ ऑटो-वेरिफिकेशन</span>
       </h3>
       <p>
-        <span data-i18n-en>Mobile OTP + Pincode-Address match + Shop photo. 95% trust level achieved automatically.</span>
+        <span data-i18n-en>Mobile OTP + Pincode-Address match + On-Premise photo. 95% trust level achieved automatically.</span>
         <span data-i18n-hi>मोबाइल OTP + पिनकोड-पता मैच + दुकान की फोटो। 95% ट्रस्ट लेवल।</span>
       </p>
     </div>
@@ -1767,7 +1742,7 @@ function dismissFestBanner(){
       <span data-i18n-hi>क्या आप <span class="grad">व्यवसायी हैं?</span></span>
     </h2>
     <p>
-      <span data-i18n-en>Register free today. Give your shop a digital identity. Let customers find you.</span>
+      <span data-i18n-en>Register free today. Give your business a digital identity. Let customers find you.</span>
       <span data-i18n-hi>आज ही फ्री रजिस्टर करें। अपने व्यवसाय को डिजिटल पहचान दें। ग्राहक आपको ढूंढें।</span>
     </p>
     <a href="/register.html" class="btn btn-pri">
@@ -1831,17 +1806,15 @@ function dismissFestBanner(){
       <a href="/terms.html"><span data-i18n-en>Terms</span><span data-i18n-hi>शर्तें</span></a>
     </div>
 
-    <!-- Trust & credentials block — your AMFI + SEBI line -->
+    <!-- About-the-platform block — no third-party brand cross-promotion -->
     <div class="footer-trust">
-      <div class="ft-row">
-        <span class="ft-pill">📊 Mutual Funds</span>
-        <span class="ft-pill">📈 Stock Broking</span>
-        <span class="ft-pill">🛡️ Insurance</span>
-        <span class="ft-pill">💰 SIP &amp; Bonds</span>
-      </div>
       <div class="ft-trust-line">
-        <b>Unique Securities</b> — Investment services by DigiMutual Goals Pvt. Ltd.<br>
-        <span class="ft-creds">AMFI ARN-332982 · SEBI-Authorised Person (Nuvama &amp; Master Trust) · Serving 1000+ families since 2009</span>
+        <span data-i18n-en>A free local discovery platform for verified businesses, professionals and service providers across Bharat.</span>
+        <span data-i18n-hi>भारत भर के सत्यापित व्यवसायों, प्रोफेशनल्स और सेवाओं के लिए एक निःशुल्क लोकल डिस्कवरी प्लेटफ़ॉर्म।</span><br>
+        <span class="ft-creds">
+          <span data-i18n-en>Built &amp; operated by DigiMutual Goals Pvt. Ltd. · Mandi Dabwali, Haryana</span>
+          <span data-i18n-hi>संचालन: DigiMutual Goals Pvt. Ltd. · मंडी डबवाली, हरियाणा</span>
+        </span>
       </div>
     </div>
 
@@ -1861,7 +1834,6 @@ function dismissFestBanner(){
     footer .footer-trust .ft-row{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:12px }
     footer .footer-trust .ft-pill{ background:rgba(255,255,255,.1); padding:5px 11px; border-radius:99px; font-size:.78rem; font-weight:700; border:1px solid rgba(255,255,255,.15) }
     footer .footer-trust .ft-trust-line{ font-size:.86rem; line-height:1.55; opacity:.92 }
-    footer .footer-trust .ft-trust-line b{ color:#FBBF24 }
     footer .footer-trust .ft-creds{ font-size:.74rem; opacity:.72; font-weight:500 }
     footer .footer-powered{ text-align:center; margin-top:14px; font-size:.78rem; opacity:.6 }
     footer .footer-powered a{ color:inherit }
@@ -2123,10 +2095,6 @@ async function loadFeatured(){
     if (!combined.length){ grid.innerHTML=''; empty.style.display='block'; return; }
     grid.innerHTML = combined.map(renderFeaturedCard).join('');
     grid.classList.add('stagger');
-    // Reveal "Show more" button when there are more than the initial-visible threshold
-    // Mobile shows 6, desktop shows 12 — use mobile threshold (6) so button is shown if either limit would apply
-    var moreWrap = document.getElementById('featuredShowMoreWrap');
-    if (moreWrap){ moreWrap.style.display = (combined.length > 6) ? '' : 'none'; }
   }catch(e){ console.error(e); grid.innerHTML = ''; empty.style.display='block'; }
 }
 

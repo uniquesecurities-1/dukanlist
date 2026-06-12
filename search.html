@@ -375,7 +375,7 @@
   <form class="search-bar" onsubmit="handleSearch(event)">
     <div class="field">
       <span class="ico">🔍</span>
-      <input id="q" type="text" placeholder="Doctor, carpenter, mechanic..." autocomplete="off">
+      <input id="q" type="text" placeholder="Search businesses, professionals, services..." autocomplete="off">
     </div>
     <div class="field">
       <span class="ico">📚</span>
@@ -1017,7 +1017,7 @@ function _renderResultsInner(){
   // Apply sort (relevance keeps server order)
   rows = applySort(rows);
 
-  countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>shop${rows.length===1?'':'s'} found</span><span data-i18n-hi>लिस्टिंग मिली</span>`;
+  countEl.innerHTML = `<b>${rows.length}</b> <span data-i18n-en>listing${rows.length===1?'':'s'} found</span><span data-i18n-hi>लिस्टिंग मिली</span>`;
   // Bind shortlist heart buttons added in this render pass
   try { if (typeof DukanShortlist !== 'undefined') setTimeout(() => DukanShortlist.bindAll(), 0); } catch(_){}
   // db/117 — log every search (esp. zero-result) for admin "Lost Searches"
