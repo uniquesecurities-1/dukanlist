@@ -1125,11 +1125,14 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               <div class="sh-pills" id="shFeaturePills"></div>
             </div>
             <div class="sh-row sh-share-row">
-              <div class="sh-row-label" data-i18n-en="Share this shop">Share this shop</div>
+              <div class="sh-row-label">
+                <span data-i18n-en>💌 Send to a friend</span><span data-i18n-hi>💌 दोस्त को भेजो</span>
+                <span style="font-weight:500;color:#94A3B8;font-size:.7rem;margin-left:5px">— viral way to help local shops</span>
+              </div>
               <div class="sh-pills" id="shSharePills">
-                <a id="shShareWa" target="_blank" rel="noopener" class="sh-share-btn sh-wa">💬 WhatsApp</a>
+                <button type="button" id="shSendFriendBtn" class="sh-share-btn sh-wa" style="cursor:pointer;font-family:inherit;border:0">💬 <span data-i18n-en>Send via WhatsApp</span><span data-i18n-hi>WhatsApp पर भेजो</span></button>
                 <a id="shShareFb" target="_blank" rel="noopener" class="sh-share-btn sh-fb">📘 Facebook</a>
-                <button class="sh-share-btn sh-copy" onclick="copyShopUrl()">🔗 Copy link</button>
+                <button class="sh-share-btn sh-copy" onclick="copyShopUrl()">🔗 <span data-i18n-en>Copy link</span><span data-i18n-hi>लिंक copy</span></button>
               </div>
             </div>
           </div>
@@ -3136,21 +3139,46 @@ async function toggleFav(){
   setTimeout(() => t.remove(), 2000);
 }
 
+// Build a friend-to-friend share message — conversational, with credibility hooks
+function buildFriendShareText(){
+  if (!BIZ) return '';
+  const name = BIZ.name || 'this shop';
+  const area = (BIZ.geo_localities && BIZ.geo_localities.name) || '';
+  const city = (BIZ.geo_cities && BIZ.geo_cities.name) || BIZ.city_name || '';
+  const loc  = [area, city].filter(Boolean).join(', ');
+  const cat  = (BIZ.categories && BIZ.categories.name) || BIZ.category_name || '';
+  const rating = (BIZ.rating_avg > 0 && BIZ.rating_count > 0)
+    ? '⭐ ' + Number(BIZ.rating_avg).toFixed(1) + ' (' + BIZ.rating_count + ' reviews)'
+    : '';
+  const verified = (BIZ.verified_score >= 3) ? '✓ Verified' : '';
+  const credParts = [verified, rating].filter(Boolean).join(' · ');
+  const url = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
+
+  let msg = 'Yeh shop dekho! Maine DukanList par dhundi —\n\n';
+  msg += '*' + name + '*' + (loc ? ' (' + loc + ')' : '') + '\n';
+  if (cat) msg += '🏷️ ' + cat + '\n';
+  if (credParts) msg += credParts + '\n';
+  msg += '\n' + url + '\n\n';
+  msg += 'Photos, hours, direct WhatsApp/Call — sab yahi se. 👇';
+  return msg;
+}
+
 function shareBiz(){
   if (!BIZ) return;
-  const meta = {
-    slug: BIZ.slug, id: BIZ.id, name: BIZ.name,
-    city: BIZ.city_name || BIZ.city, category: BIZ.primary_category_name || BIZ.category_name
-  };
-  if (typeof DukanShare !== 'undefined'){
-    // Native share on mobile (gives OS share sheet incl. WhatsApp), WhatsApp fallback on desktop.
-    DukanShare.native(null, meta);
+  const text = buildFriendShareText();
+  const url  = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
+  if (navigator.share){
+    navigator.share({ title: BIZ.name, text: text, url: url }).catch(() => {});
   } else {
-    // Library failed to load — minimal WhatsApp fallback
-    const url = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
-    const text = `Check out *${BIZ.name}* on DukanList\n\n${url}`;
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
   }
+  logLead('share');
+}
+
+function sendShopToFriend(){
+  if (!BIZ) return;
+  const text = buildFriendShareText();
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
   logLead('share');
 }
 
@@ -3412,8 +3440,15 @@ function renderShopHighlights(b){
   }
 
   const url = window.location.href;
-  const shareText = encodeURIComponent('Check out '+(b.name||'this shop')+' on DukanList \u2014 ' + url);
-  document.getElementById('shShareWa').href = 'https://wa.me/?text=' + shareText;
+  const friendShareText = (typeof buildFriendShareText === 'function') ? buildFriendShareText() : 'Check out ' + (b.name || 'this shop') + ' on DukanList\n\n' + url;
+  const shareText = encodeURIComponent(friendShareText);
+  const _sendFriendBtn = document.getElementById('shSendFriendBtn');
+  if (_sendFriendBtn){
+    _sendFriendBtn.addEventListener('click', function(){
+      try { if (typeof sendShopToFriend === 'function') sendShopToFriend(); else window.open('https://wa.me/?text=' + shareText, '_blank', 'noopener'); }
+      catch(_){ window.open('https://wa.me/?text=' + shareText, '_blank', 'noopener'); }
+    });
+  }
   document.getElementById('shShareFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
 
   // Wire the right-column share card too

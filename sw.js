@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.6.0';  // bumped — Customer Decision Speed: "Why this shop?" auto-summary pills (Verified/Rating/Open/Area/Year) on shop pages + Customer Activity social proof ("5 customers called today") + Photo auto-carousel (3.5s cycle, pause-on-tap) + richer WhatsApp pre-fill with shop name + area context.
+const VERSION    = 'dukan-v2.7.0';  // bumped — Viral Growth Bundle C: Share search results button (native + WhatsApp + clipboard) + Recently-viewed strip on search page + Friend-style WhatsApp share (rich copy: rating, verified, area, photos+hours pitch) + 'Send to a friend' button on shop pages.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

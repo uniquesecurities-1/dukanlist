@@ -460,9 +460,16 @@
     </aside>
 
     <div class="search-main">
+
+  <div id="searchRecentSlot" style="margin-bottom:18px"></div>
+
   <div class="result-head">
     <div class="result-count" id="countDisp"></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button type="button" id="shareSearchBtn" title="Share these results" style="background:#fff;color:#475569;border:1px solid #E2E8F0;padding:6px 12px;border-radius:99px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">
+        <span style="font-size:1rem">🔗</span>
+        <span data-i18n-en>Share results</span><span data-i18n-hi>लिंक share</span>
+      </button>
       <label for="sortSel" style="font-size:.78rem;color:var(--muted);font-weight:600">
         <span data-i18n-en>Sort:</span><span data-i18n-hi>क्रम:</span>
       </label>
@@ -524,6 +531,7 @@
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/shortlist.js" defer></script>
+<script src="/assets/js/recently-viewed.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
 <script src="/assets/js/geo.js"></script>
 <script>
@@ -1521,5 +1529,66 @@ window.addEventListener('popstate', runSearch);
 <script src="/assets/js/city-persist.js"></script>
 
 <script src="/assets/js/error-reporter.js" defer></script>
+
+<script>
+// === VIRAL: Recently-viewed strip + Share search results ===
+(function(){
+  'use strict';
+  function renderSearchRecent(){
+    if (typeof DukanRecent === 'undefined') { setTimeout(renderSearchRecent, 300); return; }
+    try {
+      var slot = document.getElementById('searchRecentSlot');
+      if (!slot) return;
+      var items = DukanRecent.load();
+      if (!items || items.length < 2) { slot.style.display = 'none'; return; }
+      DukanRecent.render('searchRecentSlot');
+    } catch(e){ console.warn('Recent strip:', e); }
+  }
+  function buildShareMsg(){
+    var p = new URLSearchParams(location.search);
+    var q = (p.get('q') || '').trim();
+    var cat = (p.get('cat') || '').trim();
+    var city = (p.get('city') || '').trim();
+    var area = (p.get('area') || p.get('locality') || '').trim();
+    var catLabel = '';
+    var catOpt = document.querySelector('#catSel option[value="' + cat + '"]');
+    if (catOpt) catLabel = catOpt.textContent.replace(/^.*?\s/, '');
+    var cityLabel = '';
+    var cityOpt = document.querySelector('#citySel option[value="' + city + '"]');
+    if (cityOpt) cityLabel = cityOpt.textContent.replace(/^.*?\s/, '');
+    var areaLabel = area ? area.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }) : '';
+    var title = q || catLabel || 'Shops';
+    var locParts = [];
+    if (areaLabel) locParts.push(areaLabel);
+    if (cityLabel) locParts.push(cityLabel);
+    var locStr = locParts.join(', ');
+    return '🔎 ' + title + (locStr ? ' in ' + locStr : '') + ' — DukanList par dekho:\n\n'
+         + location.href + '\n\n'
+         + '✨ Verified shops · photos · direct call/WhatsApp\n'
+         + '_Shared via dukanlist.com_';
+  }
+  function bindShareBtn(){
+    var btn = document.getElementById('shareSearchBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async function(){
+      var msg = buildShareMsg();
+      if (navigator.share){
+        try { await navigator.share({ title: 'DukanList search', text: msg, url: location.href }); return; }
+        catch(_){}
+      }
+      try { await navigator.clipboard.writeText(msg); } catch(_){}
+      var t = document.createElement('div');
+      t.textContent = '✓ Link copied — share kahi bhi';
+      t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:11px 22px;border-radius:99px;font-size:.86rem;font-weight:700;z-index:99999;box-shadow:0 10px 30px rgba(15,23,42,.35)';
+      document.body.appendChild(t);
+      setTimeout(function(){ try { t.remove(); } catch(_){} }, 2400);
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    });
+  }
+  function init(){ renderSearchRecent(); bindShareBtn(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
 </body>
 </html>
