@@ -1376,13 +1376,13 @@ function dismissFestBanner(){
       </a>
 
       <!-- ===== OLDER UPDATES — hidden by default, revealed via "Show more" ===== -->
-      <a href="/browse.html?cat=construction-material" data-wn-extra="1" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FED7AA !important;background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(234,88,12,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <a href="/browse.html?cat=construction-material" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FED7AA !important;background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(234,88,12,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#F97316,#92400E);color:#fff">🧱</div><span class="wn-badge new" style="background:linear-gradient(135deg,#F97316,#EA580C);color:#fff">FRESH</span></div>
         <h3><span data-i18n-en>Paint, Hardware, Chuna &amp; More</span><span data-i18n-hi>पेंट, हार्डवेयर, चूना &amp; अधिक</span></h3>
         <p><span data-i18n-en>Building &amp; Construction Material parent with 13 sub-categories — paint, cement, sariya, tiles, plywood, pipes, electrical hardware, doors-windows. Find any construction shop fast.</span><span data-i18n-hi>निर्माण सामग्री में 13 उप-श्रेणियाँ — पेंट, सीमेंट, सरिया, टाइल्स, प्लाइवुड, पाइप, इलेक्ट्रिकल हार्डवेयर।</span></p>
       </a>
 
-      <a href="/puchobhai" class="wn-card" data-wn-extra="1" style="text-decoration:none;color:inherit;display:block;border-color:#A7F3D0 !important;background:linear-gradient(135deg,#ECFDF5 0%,#F0FDF4 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(16,185,129,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <a href="/puchobhai" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#A7F3D0 !important;background:linear-gradient(135deg,#ECFDF5 0%,#F0FDF4 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(16,185,129,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff">🏪</div><span class="wn-badge new" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff">NEW</span></div>
         <h3><span data-i18n-en>Tag Any Shop in Pucho Bhai</span><span data-i18n-hi>Pucho Bhai में किसी भी दुकान को tag करें</span></h3>
         <p><span data-i18n-en>Replying to a question? Now search &amp; tag ANY shop from DukanList — not just your own. Helps the asker contact directly.</span><span data-i18n-hi>जवाब देते समय DukanList की कोई भी दुकान खोज कर tag करें — सिर्फ अपनी ही नहीं।</span></p>
@@ -1457,8 +1457,8 @@ function dismissFestBanner(){
     </div>
     <div id="wnToggleWrap" style="text-align:center;margin-top:22px">
       <button type="button" id="wnToggleBtn" onclick="toggleWhatsNew()" style="background:#fff;color:#4338CA;border:1.5px solid #C7D2FE;padding:10px 22px;border-radius:99px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.18s;box-shadow:0 1px 3px rgba(67,56,202,.08)" onmouseover="this.style.background='#EEF2FF';this.style.borderColor='#A5B4FC'" onmouseout="this.style.background='#fff';this.style.borderColor='#C7D2FE'">
-        <span data-i18n-en id="wnToggleLabelEn">Show 13 older updates ▾</span>
-        <span data-i18n-hi id="wnToggleLabelHi">13 पुराने अपडेट दिखाएँ ▾</span>
+        <span data-i18n-en id="wnToggleLabelEn">Show 11 older updates ▾</span>
+        <span data-i18n-hi id="wnToggleLabelHi">11 पुराने अपडेट दिखाएँ ▾</span>
       </button>
     </div>
     <script>
@@ -1468,8 +1468,8 @@ function dismissFestBanner(){
         var expanded = grid.classList.toggle('wn-expanded');
         var lbl1 = document.getElementById('wnToggleLabelEn');
         var lbl2 = document.getElementById('wnToggleLabelHi');
-        if (lbl1) lbl1.textContent = expanded ? 'Show fewer ▴' : 'Show 13 older updates ▾';
-        if (lbl2) lbl2.textContent = expanded ? 'कम दिखाएँ ▴' : '13 पुराने अपडेट दिखाएँ ▾';
+        if (lbl1) lbl1.textContent = expanded ? 'Show fewer ▴' : 'Show 11 older updates ▾';
+        if (lbl2) lbl2.textContent = expanded ? 'कम दिखाएँ ▴' : '11 पुराने अपडेट दिखाएँ ▾';
         if (expanded){
           var first = grid.querySelector('[data-wn-extra="1"]');
           if (first) first.scrollIntoView({behavior:'smooth', block:'start'});
@@ -1477,9 +1477,10 @@ function dismissFestBanner(){
       }
     </script>
     <style>
-      /* Hide older updates by default; show all when grid has .wn-expanded class */
-      #wnGrid [data-wn-extra="1"]{ display:none }
-      #wnGrid.wn-expanded [data-wn-extra="1"]{ display:block }
+      /* Hide older updates by default; show all when grid has .wn-expanded class.
+         Use !important so we override the inline style="display:block" on <a> card variants. */
+      #wnGrid [data-wn-extra="1"]{ display:none !important }
+      #wnGrid.wn-expanded [data-wn-extra="1"]{ display:block !important }
       .wn-card{ background:#fff; border:1px solid #E0E7FF; border-radius:16px; padding:18px; transition:.2s }
       .wn-card .wn-head{ display:flex; gap:10px; align-items:center; margin-bottom:8px }
       .wn-card .wn-ico{ width:38px; height:38px; border-radius:10px; display:grid; place-items:center; font-size:18px; flex-shrink:0 }

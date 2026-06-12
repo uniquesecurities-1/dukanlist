@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.23';  // 3-fold update — (1) Featured grid back to mobile=4 / desktop=8 (removed Show More button — existing 'View All Listings' CTA below handles overflow). (2) Footer cleaned of all third-party brand cross-promotion — removed Unique Securities trust pills, AMFI ARN, SEBI-Authorised Person line. Footer now only mentions DigiMutual Goals Pvt. Ltd. as platform operator with neutral 'free local discovery platform for verified businesses, professionals and service providers' line. (3) Inclusive professional wording — replaced 'Shop / दुकान' with 'Business / Listing / व्यवसाय / लिस्टिंग' across hero, CTAs, register button, verification copy, search placeholders, counter text. Doctors, lawyers, clinics, hospitals, offices, showrooms no longer feel excluded by shop-centric language. Category names like 'Mobile Shop' kept intact (those are specific category labels).
+const VERSION    = 'dukan-v2.9.24';  // FIX — What's New section was showing 9 cards instead of 6 because <a class="wn-card" style="...display:block..."> inline styles were overriding the #wnGrid [data-wn-extra="1"]{ display:none } rule. Added !important. Also changed default visible count from 6 → 8 for clean 2-row grid on desktop (4+4) — items 7 (Construction Material/Paint/Hardware) and 8 (Tag Any Shop in Pucho Bhai) un-tagged from wn-extra so they're visible by default. Show More button label updated to '11 older updates'.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
