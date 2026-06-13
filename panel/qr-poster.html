@@ -191,6 +191,7 @@
       <div class="qrp-tips">
         <b>💡 <span data-i18n-en>Print &amp; Display Tips</span><span data-i18n-hi>प्रिंट और लगाने के टिप्स</span></b>
         <ul>
+          <li style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;list-style:none;margin-left:-18px;margin-bottom:8px"><span data-i18n-en>✨ <b>Evergreen design</b> — no rating numbers that change over time. Print once and it stays accurate for years.</span><span data-i18n-hi>✨ <b>हमेशा सही रहेगा</b> — कोई बदलते review count नहीं। एक बार print करें, सालों चलेगा।</span></li>
           <li><span data-i18n-en><b>A4 Poster:</b> Best for shop window. Print on glossy paper for durability.</span><span data-i18n-hi><b>A4 पोस्टर:</b> दुकान की खिड़की के लिए। glossy paper पर print करें।</span></li>
           <li><span data-i18n-en><b>A5 Counter Card:</b> Keep at billing counter. Customers see while paying.</span><span data-i18n-hi><b>A5 काउंटर कार्ड:</b> billing counter पर रखें।</span></li>
           <li><span data-i18n-en><b>Square Format:</b> Share on WhatsApp Status or Instagram Story.</span><span data-i18n-hi><b>स्क्वायर:</b> WhatsApp Status या Instagram Story पर शेयर करें।</span></li>
@@ -255,7 +256,7 @@ async function loadBiz(){
   // Simple fields-only query — avoids foreign-key relationship resolution
   // which can fail if PostgREST metadata is out of date.
   var res = await c.from('businesses')
-    .select('id, slug, name, name_hi, mobile, address_line1, address_line2, pincode, rating_avg, rating_count, verified_score, category_id, sub_category_id, city_id')
+    .select('id, slug, name, name_hi, mobile, address_line1, address_line2, pincode, verified_score, established_year, category_id, sub_category_id, city_id')
     .eq('id', bizId).maybeSingle();
   if (res.error || !res.data){
     document.getElementById('loading').innerHTML = '⚠ Could not load business info: ' + (res.error?.message || 'unknown error');
@@ -448,12 +449,15 @@ function drawSaffron(ctx, w, h){
       ctx.fillText(msg, w/2, qrY + qrSize + 130);
     }
 
-    // Ratings if any
-    if (MY_BIZ.rating_avg > 0){
-      var rating = '⭐ ' + Number(MY_BIZ.rating_avg).toFixed(1) + ' / 5.0 · ' + (MY_BIZ.rating_count || 0) + ' Reviews';
+    // Timeless trust signal — established year (does NOT change, no need to reprint)
+    if (MY_BIZ.established_year){
+      var years = new Date().getFullYear() - MY_BIZ.established_year;
+      var establishedTxt = years >= 1
+        ? ('★ Trusted Since ' + MY_BIZ.established_year + ' · ' + years + '+ years in business')
+        : '★ Established ' + MY_BIZ.established_year;
       ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
       ctx.fillStyle = '#92400E';
-      ctx.fillText(rating, w/2, qrY + qrSize + 175);
+      ctx.fillText(establishedTxt, w/2, qrY + qrSize + 175);
     }
   }
 
@@ -540,6 +544,13 @@ function drawDark(ctx, w, h){
       ctx.fillStyle = '#fff';
       ctx.fillText(msg, w/2, qrY + qrSize + 130);
     }
+
+    // Timeless established year (no dynamic numbers)
+    if (MY_BIZ.established_year){
+      ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
+      ctx.fillStyle = '#FBBF24';
+      ctx.fillText('★ Trusted Since ' + MY_BIZ.established_year, w/2, qrY + qrSize + 180);
+    }
   }
 
   // Footer
@@ -592,6 +603,13 @@ function drawCream(ctx, w, h){
       ctx.font = '500 italic ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
       ctx.fillStyle = '#E55100';
       ctx.fillText('"' + msg + '"', w/2, qrY + qrSize + 115);
+    }
+
+    // Timeless established year
+    if (MY_BIZ.established_year){
+      ctx.font = '600 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
+      ctx.fillStyle = '#92400E';
+      ctx.fillText('Trusted Since ' + MY_BIZ.established_year, w/2, qrY + qrSize + 160);
     }
   }
 
