@@ -149,7 +149,8 @@
 
       <!-- Size selector -->
       <div class="qrp-sizes">
-        <button class="qrp-size-btn active" data-size="a4" onclick="setSize('a4')">A4 Poster (Window)</button>
+        <button class="qrp-size-btn active" data-size="a4-2up" onclick="setSize('a4-2up')">✂️ A4 — 2 Posters/Page (50% saving)</button>
+        <button class="qrp-size-btn" data-size="a4" onclick="setSize('a4')">A4 Poster (single, big)</button>
         <button class="qrp-size-btn" data-size="a5" onclick="setSize('a5')">A5 Counter Card</button>
         <button class="qrp-size-btn" data-size="square" onclick="setSize('square')">📱 Square (WhatsApp)</button>
       </div>
@@ -191,8 +192,10 @@
       <div class="qrp-tips">
         <b>💡 <span data-i18n-en>Print &amp; Display Tips</span><span data-i18n-hi>प्रिंट और लगाने के टिप्स</span></b>
         <ul>
+          <li style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:8px 10px;list-style:none;margin-left:-18px;margin-bottom:8px"><span data-i18n-en>💰 <b>2-up mode (default)</b> — gets you 2 posters per A4 page. Cut along the dashed line. Saves 50% paper + ink cost.</span><span data-i18n-hi>💰 <b>2-up mode (default)</b> — एक A4 page से 2 पोस्टर मिलेंगे। डॉटेड लाइन पर काटें। 50% page + ink बचेगा।</span></li>
           <li style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;list-style:none;margin-left:-18px;margin-bottom:8px"><span data-i18n-en>✨ <b>Evergreen design</b> — no rating numbers that change over time. Print once and it stays accurate for years.</span><span data-i18n-hi>✨ <b>हमेशा सही रहेगा</b> — कोई बदलते review count नहीं। एक बार print करें, सालों चलेगा।</span></li>
-          <li><span data-i18n-en><b>A4 Poster:</b> Best for shop window. Print on glossy paper for durability.</span><span data-i18n-hi><b>A4 पोस्टर:</b> दुकान की खिड़की के लिए। glossy paper पर print करें।</span></li>
+          <li><span data-i18n-en><b>White-background design</b> uses minimal ink — your cartridge lasts longer.</span><span data-i18n-hi><b>सफेद backgroun</b> कम ink use करता है — cartridge ज्यादा चलेगा।</span></li>
+          <li><span data-i18n-en><b>A4 - 2 per page:</b> Best balance of size + economy. Counter + door display from 1 print.</span><span data-i18n-hi><b>A4 - 2 per page:</b> Best size + सस्ता। एक print से counter + दरवाजे दोनों जगह।</span></li>
           <li><span data-i18n-en><b>A5 Counter Card:</b> Keep at billing counter. Customers see while paying.</span><span data-i18n-hi><b>A5 काउंटर कार्ड:</b> billing counter पर रखें।</span></li>
           <li><span data-i18n-en><b>Square Format:</b> Share on WhatsApp Status or Instagram Story.</span><span data-i18n-hi><b>स्क्वायर:</b> WhatsApp Status या Instagram Story पर शेयर करें।</span></li>
           <li><span data-i18n-en><b>Laminate</b> the printed sheet to make it weather-proof and last 6+ months outdoors.</span><span data-i18n-hi>print करने के बाद <b>लैमिनेट</b> करें — 6+ महीने चलेगा।</span></li>
@@ -228,7 +231,7 @@ function setLang(lang){
 var MY_BIZ = null;
 var PROFILE_URL = '';
 var CURRENT_TPL = 'saffron';
-var CURRENT_SIZE = 'a4';
+var CURRENT_SIZE = 'a4-2up';  // default: economical 2-per-page
 var QR_DATA = null;
 
 // === LOAD BUSINESS ===
@@ -344,22 +347,71 @@ function setSize(size){
 function onCustomMsgChange(){ renderPoster(); }
 
 // === MAIN RENDER ===
+// SAFE_MARGIN: white padding around content. Even if printer misaligns by ~5mm,
+// the actual poster content stays intact. 60px @ 150dpi ≈ 10mm safety border.
+var SAFE_MARGIN = 60;
+
 function renderPoster(){
   var canvas = document.getElementById('posterCanvas');
   var ctx = canvas.getContext('2d');
-  // Set canvas dimensions based on size
   var w, h;
-  if (CURRENT_SIZE === 'a4'){      w = 1240; h = 1754; }   // A4 @ 150dpi
-  else if (CURRENT_SIZE === 'a5'){ w = 1240; h = 876;  }   // A5 @ 150dpi
-  else {                            w = 1080; h = 1080; }   // Square
+  if (CURRENT_SIZE === 'a4'){          w = 1240; h = 1754; }   // A4 single
+  else if (CURRENT_SIZE === 'a4-2up'){ w = 1240; h = 1754; }   // A4 with 2 posters
+  else if (CURRENT_SIZE === 'a5'){     w = 1240; h = 876;  }   // A5
+  else {                                w = 1080; h = 1080; }   // Square
   canvas.width = w; canvas.height = h;
 
-  // Render by template
-  if (CURRENT_TPL === 'saffron')      drawSaffron(ctx, w, h);
-  else if (CURRENT_TPL === 'dark')    drawDark(ctx, w, h);
-  else if (CURRENT_TPL === 'cream')   drawCream(ctx, w, h);
+  // Clear with white background (cuts ink when blank space gets printed)
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, w, h);
+
+  if (CURRENT_SIZE === 'a4-2up'){
+    // ============================================================
+    // 2-UP MODE: render two identical A5-sized posters on one A4
+    // Top half + cut line + Bottom half = 50% paper/ink saving
+    // ============================================================
+    var halfH = h / 2;
+    var posterH = halfH - 20; // tiny gap for cut line
+
+    // Top poster
+    drawTemplate(ctx, 0, 0, w, posterH);
+
+    // Cut line in the middle
+    ctx.save();
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([12, 8]);
+    ctx.beginPath();
+    ctx.moveTo(40, halfH);
+    ctx.lineTo(w - 40, halfH);
+    ctx.stroke();
+    ctx.restore();
+    // Scissor icon
+    ctx.font = '700 18px Manrope, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign = 'center';
+    ctx.fillText('✂  cut here / यहाँ काटें  ✂', w/2, halfH - 6);
+
+    // Bottom poster (offset by halfH+20)
+    ctx.save();
+    ctx.translate(0, halfH + 20);
+    drawTemplate(ctx, 0, 0, w, posterH);
+    ctx.restore();
+  } else {
+    drawTemplate(ctx, 0, 0, w, h);
+  }
+}
+
+// Render a single template into the given sub-region (x, y, w, h)
+function drawTemplate(ctx, ox, oy, w, h){
+  ctx.save();
+  ctx.translate(ox, oy);
+  if (CURRENT_TPL === 'saffron')       drawSaffron(ctx, w, h);
+  else if (CURRENT_TPL === 'dark')     drawDark(ctx, w, h);
+  else if (CURRENT_TPL === 'cream')    drawCream(ctx, w, h);
   else if (CURRENT_TPL === 'festival') drawFestival(ctx, w, h);
-  else if (CURRENT_TPL === 'bw')      drawBW(ctx, w, h);
+  else if (CURRENT_TPL === 'bw')       drawBW(ctx, w, h);
+  ctx.restore();
 }
 
 // === HELPER: draw rounded rect ===
@@ -381,132 +433,132 @@ function getCustomMsg(){
   return (document.getElementById('customMsg').value || '').trim();
 }
 
-// === TEMPLATE 1: SAFFRON CLASSIC (auto-layout, evergreen) ===
+// === TEMPLATE 1: SAFFRON CLASSIC (ink-saving, auto-layout) ===
+// Design rationale: small businesses print posters on inkjet/laser printers.
+// Solid color backgrounds waste 60-70% ink. We use a white background with
+// SAFFRON ACCENT STRIPS at top + footer only — gives the brand identity
+// without burning expensive cartridge ink. Saves the owner ~₹15-25 per print.
 function drawSaffron(ctx, w, h){
-  // Background — saffron gradient
-  var bg = ctx.createLinearGradient(0, 0, 0, h);
+  // White background — printer-friendly, ink-efficient
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, w, h);
+
+  // SAFE MARGIN — content stays inside this padded area
+  var sm = (typeof SAFE_MARGIN !== 'undefined') ? SAFE_MARGIN : 40;
+  var contentTop = sm;
+  var contentBottom = h - sm;
+  var contentLeft = sm;
+  var contentRight = w - sm;
+  var cw = contentRight - contentLeft;
+
+  // ========================================
+  // TOP ACCENT STRIP (saffron, minimal ink)
+  // ========================================
+  var stripH = 36;
+  var bg = ctx.createLinearGradient(contentLeft, 0, contentRight, 0);
   bg.addColorStop(0, '#FF6B1A');
   bg.addColorStop(1, '#E55100');
   ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-
-  var pad = w * 0.06;
-
-  // White inner card
-  roundRect(ctx, pad, pad, w - 2*pad, h - 2*pad, 30);
-  ctx.fillStyle = '#FFFBF5';
+  roundRect(ctx, contentLeft, contentTop, cw, stripH, 8);
   ctx.fill();
 
+  var pad = w * 0.06;
   ctx.textAlign = 'center';
   var msg = getCustomMsg();
   var hasEst = !!MY_BIZ.established_year;
   var hasMsg = !!msg;
 
   // ========================================
-  // HEADER REGION (top-down)
+  // HEADER REGION
   // ========================================
-  var headerTop = pad + 60;
+  var headerTop = contentTop + stripH + 40;
 
-  // 1) Verified pill
+  // Verified pill
   ctx.fillStyle = '#10B981';
-  roundRect(ctx, w/2 - 240, headerTop, 480, 56, 28);
+  roundRect(ctx, w/2 - 230, headerTop, 460, 50, 25);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.font = '900 28px Manrope, sans-serif';
-  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, headerTop + 38);
+  ctx.font = '900 24px Manrope, sans-serif';
+  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, headerTop + 34);
 
-  // 2) Shop name — measure to determine 1 or 2 lines
-  var nameStartY = headerTop + 130;
-  var nameFontSize = Math.floor(w*0.06);
+  // Shop name (1 or 2 lines)
+  var nameStartY = headerTop + 110;
+  var nameFontSize = Math.floor(w*0.058);
   ctx.font = '900 ' + nameFontSize + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
   var shopName = (MY_BIZ.name || 'Your Business').toUpperCase();
-  var nameMaxWidth = w - 4*pad;
+  var nameMaxWidth = cw - 60;
   var nameWidth = ctx.measureText(shopName).width;
   var nameLines = (nameWidth <= nameMaxWidth) ? 1 : 2;
   var lineHeight = nameFontSize * 1.1;
   wrapText(ctx, shopName, w/2, nameStartY, nameMaxWidth, lineHeight);
 
-  // 3) Category line — positioned below shop name (handles 1/2 line names)
-  var categoryY = nameStartY + (nameLines === 1 ? 60 : lineHeight + 50);
+  // Category line
+  var categoryY = nameStartY + (nameLines === 1 ? 55 : lineHeight + 45);
   if (MY_BIZ.category_name){
-    ctx.font = '700 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
+    ctx.font = '700 ' + Math.floor(w*0.026) + 'px Manrope, sans-serif';
     ctx.fillStyle = '#92400E';
     var catText = MY_BIZ.category_icon + ' ' + MY_BIZ.category_name +
                   (MY_BIZ.city_name ? ' · 📍 ' + MY_BIZ.city_name : '');
     ctx.fillText(catText, w/2, categoryY);
   }
-  var headerEnd = categoryY + (MY_BIZ.category_name ? 50 : 20);
+  var headerEnd = categoryY + (MY_BIZ.category_name ? 40 : 15);
 
   // ========================================
-  // FOOTER REGION (bottom-up, anchored at bottom)
+  // BOTTOM ACCENT STRIP + COMPACT FOOTER
   // ========================================
-  var footerH = 100;
-  var footerY = h - pad - footerH;
-
-  // Footer banner — DukanList branding
-  ctx.fillStyle = '#0F172A';
-  roundRect(ctx, pad + 30, footerY, w - 2*pad - 60, footerH, 18);
+  var footerStripH = 28;
+  var footerStripY = contentBottom - footerStripH;
+  bg = ctx.createLinearGradient(contentLeft, 0, contentRight, 0);
+  bg.addColorStop(0, '#FF6B1A');
+  bg.addColorStop(1, '#E55100');
+  ctx.fillStyle = bg;
+  roundRect(ctx, contentLeft, footerStripY, cw, footerStripH, 6);
   ctx.fill();
-  ctx.fillStyle = '#FBBF24';
-  ctx.font = '900 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
-  ctx.fillText('DukanList — Bharat\'s Local Directory', w/2, footerY + 40);
-  ctx.fillStyle = '#94A3B8';
-  ctx.font = '600 ' + Math.floor(w*0.02) + 'px Manrope, sans-serif';
-  ctx.fillText('dukanlist.com · Verified Listings · Free for Everyone', w/2, footerY + 70);
+  ctx.fillStyle = '#fff';
+  ctx.font = '800 ' + Math.floor(w*0.018) + 'px Manrope, sans-serif';
+  ctx.fillText('DukanList — Bharat\'s Verified Local Directory · dukanlist.com', w/2, footerStripY + 19);
 
-  // Trust/info lines stacked bottom-up above footer
-  var lineGap = 50;
-  var nextLineY = footerY - 35;
+  // Stack trust lines bottom-up above the footer strip
+  var lineGap = 42;
+  var nextLineY = footerStripY - 30;
 
   if (hasEst){
     var years = new Date().getFullYear() - MY_BIZ.established_year;
     var establishedTxt = years >= 1
       ? '★ Trusted Since ' + MY_BIZ.established_year + ' · ' + years + '+ years in business'
       : '★ Established ' + MY_BIZ.established_year;
-    ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
+    ctx.font = '700 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
     ctx.fillStyle = '#92400E';
     ctx.fillText(establishedTxt, w/2, nextLineY);
     nextLineY -= lineGap;
   }
-
   if (hasMsg){
-    ctx.font = '600 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
+    ctx.font = '600 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
     ctx.fillStyle = '#E55100';
     ctx.fillText(msg, w/2, nextLineY);
     nextLineY -= lineGap;
   }
 
-  // Scan instruction (always shown, sits above other trust lines)
-  ctx.font = '800 ' + Math.floor(w*0.032) + 'px Manrope, sans-serif';
+  ctx.font = '800 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
   ctx.fillText('📱 SCAN TO VIEW PROFILE', w/2, nextLineY);
-  var bottomContentTop = nextLineY - Math.floor(w*0.032) - 30;
+  var bottomContentTop = nextLineY - Math.floor(w*0.028) - 25;
 
   // ========================================
-  // MIDDLE REGION: QR code (fills the gap)
+  // MIDDLE REGION: QR (auto-sized to fill)
   // ========================================
   if (QR_DATA){
-    // Available vertical & horizontal space
-    var availH = bottomContentTop - headerEnd - 60; // 30 padding above and below
-    var availW = w * 0.72;
-    // QR size — fits in available area, clamped 400-820px
+    var availH = bottomContentTop - headerEnd - 40;
+    var availW = cw * 0.85;
     var qrSize = Math.min(availH, availW);
-    qrSize = Math.max(400, Math.min(820, qrSize));
+    qrSize = Math.max(380, Math.min(820, qrSize));
     var qrX = (w - qrSize) / 2;
-    // Center vertically in the available middle space
-    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
-
-    // White shadow card
-    ctx.fillStyle = '#fff';
-    ctx.shadowColor = 'rgba(0,0,0,0.15)';
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 6;
-    roundRect(ctx, qrX - 30, qrY - 30, qrSize + 60, qrSize + 60, 24);
-    ctx.fill();
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 20;
+    // Subtle border, no shadow (ink saving)
+    ctx.strokeStyle = '#FED7AA';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24);
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
   }
 }
@@ -901,7 +953,7 @@ function downloadPDF(){
   var imgData = canvas.toDataURL('image/png', 0.95);
   var orient = (canvas.width > canvas.height) ? 'l' : 'p';
   var fmt;
-  if (CURRENT_SIZE === 'a4') fmt = 'a4';
+  if (CURRENT_SIZE === 'a4' || CURRENT_SIZE === 'a4-2up') fmt = 'a4';
   else if (CURRENT_SIZE === 'a5') fmt = 'a5';
   else fmt = [210, 210]; // Square 210mm
   var pdf = new window.jspdf.jsPDF({ orientation: orient, unit: 'mm', format: fmt });
