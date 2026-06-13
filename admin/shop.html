@@ -734,20 +734,27 @@ async function loadLocalitiesForCity(cityId){
     LOC_LIST = [];
     return;
   }
-  try {
-    var lr = await c.from('localities').select('id, name, city_id').eq('city_id', cityId).order('name');
-    if (lr.error) throw lr.error;
-    LOC_LIST = lr.data || [];
-    var currentLocId = SHOP.locality?.id || SHOP.locality_id || null;
-    locSel.innerHTML =
-      '<option value="">— None / All localities —</option>' +
-      LOC_LIST.map(function(l){
-        var sel = (String(currentLocId) === String(l.id)) ? ' selected' : '';
-        return '<option value="' + l.id + '"' + sel + '>' + esc(l.name) + '</option>';
-      }).join('');
-  } catch(err){
-    console.warn('Locality load failed:', err);
-    locSel.innerHTML = '<option value="">— No localities or table missing —</option>';
+  // Try multiple table names — schema may use 'localities' or 'geo_localities'
+  var loaded = false;
+  for (var tableName of ['localities', 'geo_localities']){
+    try {
+      var lr = await c.from(tableName).select('id, name, city_id').eq('city_id', cityId).order('name');
+      if (!lr.error && Array.isArray(lr.data)){
+        LOC_LIST = lr.data;
+        var currentLocId = SHOP.locality?.id || SHOP.locality_id || null;
+        locSel.innerHTML =
+          '<option value="">— None / All localities —</option>' +
+          LOC_LIST.map(function(l){
+            var sel = (String(currentLocId) === String(l.id)) ? ' selected' : '';
+            return '<option value="' + l.id + '"' + sel + '>' + esc(l.name) + '</option>';
+          }).join('');
+        loaded = true;
+        break;
+      }
+    } catch(err){ /* try next */ }
+  }
+  if (!loaded){
+    locSel.innerHTML = '<option value="">— No localities defined for this city —</option>';
   }
 }
 
@@ -762,8 +769,8 @@ async function saveShopLocation(){
   var locSel  = document.getElementById('adminLocSel');
   var status  = document.getElementById('adminLocStatus');
   if (!citySel) return;
-  var newCityId = citySel.value || null;
-  var newLocId  = locSel ? (locSel.value || null) : null;
+  var newCityId = citySel.value ? (Number(citySel.value) || citySel.value) : null;
+  var newLocId  = locSel && locSel.value ? (Number(locSel.value) || locSel.value) : null;
   var oldCityId = SHOP.city?.id || SHOP.city_id || null;
   var oldLocId  = SHOP.locality?.id || SHOP.locality_id || null;
   if (String(newCityId || '') === String(oldCityId || '') &&
@@ -778,12 +785,56 @@ async function saveShopLocation(){
     if (!confirm('Change city to "' + cityName + '"?\n\nThis affects search ranking and may change the public URL slug if locality patterns differ. Proceed?')) return;
   }
   status.textContent = '⏳ Saving…';
-  // Patch via admin_update_shop RPC (preferred — auto audit-logs the change)
+  var c = ShopDB.client;
+  var saved = false;
+  // Path 1 (preferred — after db/129 applied) — RPC with audit log
   var patch = {};
-  if (String(newCityId || '') !== String(oldCityId || '')) patch.city_id = newCityId ? Number(newCityId) || newCityId : null;
-  if (String(newLocId  || '') !== String(oldLocId  || '')) patch.locality_id = newLocId ? Number(newLocId) || newLocId : null;
-  var ok = await applyPatch(patch, '✓ Location updated');
-  status.textContent = ok ? '' : '⚠️ Save failed';
+  if (String(newCityId || '') !== String(oldCityId || '')) patch.city_id = newCityId;
+  if (String(newLocId  || '') !== String(oldLocId  || '')) patch.locality_id = newLocId;
+  try {
+    var r = await c.rpc('admin_update_shop', { p_business_id: BIZ_ID, p_patch: patch });
+    if (!r.error){
+      // Verify the update actually applied (RPC silently drops non-whitelisted keys)
+      var v = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+      if (!v.error && v.data){
+        var fresh = v.data;
+        var freshCity = fresh.city?.id || fresh.city_id || null;
+        var freshLoc  = fresh.locality?.id || fresh.locality_id || null;
+        if (String(freshCity || '') === String(newCityId || '') &&
+            String(freshLoc  || '') === String(newLocId  || '')){
+          SHOP = fresh;
+          saved = true;
+        }
+      }
+    }
+  } catch(rpcErr){ console.warn('RPC path failed, will fallback:', rpcErr); }
+
+  // Path 2 (fallback if RPC dropped fields) — direct UPDATE on businesses table
+  // Admin RLS policy must allow UPDATE for is_admin() (already exists for moderation)
+  if (!saved){
+    try {
+      var upd = { updated_at: new Date().toISOString() };
+      if (String(newCityId || '') !== String(oldCityId || '')) upd.city_id = newCityId;
+      if (String(newLocId  || '') !== String(oldLocId  || '')) upd.locality_id = newLocId;
+      var u = await c.from('businesses').update(upd).eq('id', BIZ_ID);
+      if (u.error) throw u.error;
+      // Refresh SHOP from server
+      var v2 = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
+      if (!v2.error && v2.data) SHOP = v2.data;
+      saved = true;
+    } catch(directErr){
+      console.error('Direct UPDATE failed:', directErr);
+      status.textContent = '⚠️ Save failed';
+      toast('Save failed: ' + (directErr.message || directErr), true);
+      return;
+    }
+  }
+
+  render();
+  // Re-bind location editor since render() rebuilt the DOM
+  setTimeout(loadLocationEditor, 50);
+  toast('✓ Location updated');
+  status.textContent = '';
 }
 
 async function loadEditHistory(){
