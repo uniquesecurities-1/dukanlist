@@ -252,17 +252,41 @@ async function loadBiz(){
     return;
   }
 
+  // Simple fields-only query — avoids foreign-key relationship resolution
+  // which can fail if PostgREST metadata is out of date.
   var res = await c.from('businesses')
-    .select('id, slug, name, name_hi, mobile, address_line1, address_line2, pincode, rating_avg, rating_count, verified_score, categories(name, icon), geo_cities(name)')
+    .select('id, slug, name, name_hi, mobile, address_line1, address_line2, pincode, rating_avg, rating_count, verified_score, category_id, sub_category_id, city_id')
     .eq('id', bizId).maybeSingle();
   if (res.error || !res.data){
-    document.getElementById('loading').innerHTML = '⚠ Could not load business info.';
+    document.getElementById('loading').innerHTML = '⚠ Could not load business info: ' + (res.error?.message || 'unknown error');
     return;
   }
   MY_BIZ = res.data;
-  MY_BIZ.category_name = MY_BIZ.categories ? MY_BIZ.categories.name : '';
-  MY_BIZ.category_icon = MY_BIZ.categories ? MY_BIZ.categories.icon : '🏪';
-  MY_BIZ.city_name = MY_BIZ.geo_cities ? MY_BIZ.geo_cities.name : '';
+  MY_BIZ.category_name = '';
+  MY_BIZ.category_icon = '🏪';
+  MY_BIZ.city_name = '';
+
+  // Fetch category info separately (best-effort, doesn't block render)
+  var catId = MY_BIZ.sub_category_id || MY_BIZ.category_id;
+  if (catId){
+    try {
+      var cr = await c.from('categories').select('name, icon').eq('id', catId).maybeSingle();
+      if (!cr.error && cr.data){
+        MY_BIZ.category_name = cr.data.name || '';
+        MY_BIZ.category_icon = cr.data.icon || '🏪';
+      }
+    } catch(_){ /* non-fatal */ }
+  }
+
+  // Fetch city name separately
+  if (MY_BIZ.city_id){
+    try {
+      var gr = await c.from('geo_cities').select('name').eq('id', MY_BIZ.city_id).maybeSingle();
+      if (!gr.error && gr.data){
+        MY_BIZ.city_name = gr.data.name || '';
+      }
+    } catch(_){ /* non-fatal */ }
+  }
   PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
 
   document.getElementById('loading').style.display = 'none';
