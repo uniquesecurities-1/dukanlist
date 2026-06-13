@@ -8,14 +8,14 @@
 <meta name="description" id="metaDesc" content="">
 <meta property="og:type" content="business.business">
 <meta property="og:site_name" content="DukanList">
-<meta property="og:title" id="ogTitle" content="DukanList — Every Shop, One Identity">
-<meta property="og:description" id="ogDesc" content="Discover this shop on DukanList — Bharat ka local listings directory.">
+<meta property="og:title" id="ogTitle" content="DukanList — Every Business, One Identity">
+<meta property="og:description" id="ogDesc" content="Discover this business on DukanList — Bharat ka local listings directory.">
 <meta property="og:image" id="ogImage" content="https://dukanlist.com/assets/og-default.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" id="twTitle" content="DukanList — Every Shop, One Identity">
-<meta name="twitter:description" id="twDesc" content="Discover this shop on DukanList.">
+<meta name="twitter:title" id="twTitle" content="DukanList — Every Business, One Identity">
+<meta name="twitter:description" id="twDesc" content="Discover this business on DukanList.">
 <meta name="twitter:image" id="twImage" content="https://dukanlist.com/assets/og-default.png">
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
@@ -113,7 +113,7 @@
 .social-pill.li{ border-color:#BAE6FD; color:#0369A1; background:#F0F9FF }
 .social-pill.web{ border-color:#D9F99D; color:#3F6212; background:#F7FEE7 }
 
-/* Owner / dealing-person badge — under shop name */
+/* Owner / dealing-person badge — under business name */
 .owner-credit{ display:flex; align-items:center; gap:10px; margin:6px 0 10px; padding:9px 12px; background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%); border:1px solid #FDE68A; border-radius:10px; font-family:'Manrope',sans-serif }
 .owner-credit .oc-avatar{ width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff; display:grid; place-items:center; font-weight:900; font-size:14px; flex-shrink:0 }
 .owner-credit .oc-info{ min-width:0; flex:1 }
@@ -243,7 +243,7 @@ html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif; 
 }
 .biz-rating-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; background:linear-gradient(135deg,#FFFBEB,#FFF7ED); border:1px solid #FED7AA; border-radius:11px }
 
-/* "Why this shop?" — fast-scan verdict pills */
+/* "Why this business?" — fast-scan verdict pills */
 .why-shop-row{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 12px; padding:10px 12px; background:linear-gradient(135deg,#F0F9FF 0%,#E0F2FE 100%); border:1px solid #BAE6FD; border-radius:11px }
 .why-shop-row .wts-pill{ display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:99px; font-size:.78rem; font-weight:700; background:#fff; border:1px solid rgba(15,23,42,.06); color:#0F172A; box-shadow:0 1px 2px rgba(15,23,42,.04); white-space:nowrap }
 .why-shop-row .wts-pill b{ font-weight:800 }
@@ -631,7 +631,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .dt-pill.rating-clickable:hover{ background:#FEF3C7; transform:translateY(-1px); box-shadow:0 4px 12px rgba(245,158,11,.18) }
 .dt-pill .dt-ico{ font-size:.85rem }
 
-/* === Mobile business hero polish — shop name prominent + compact strip === */
+/* === Mobile business hero polish — business name prominent + compact strip === */
 .biz-hero-top-bar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:18px }
 .biz-hero-top-bar .biz-back{ margin-bottom:0 !important; flex-shrink:0 }
 .biz-hero-top-bar .detail-trust-strip{ padding:0; flex:1; margin:0; gap:6px }
@@ -1088,7 +1088,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <div id="notFound" style="display:none;text-align:center;padding:60px 20px">
   <div style="font-size:3.5rem;margin-bottom:10px">🔍</div>
   <h2 style="font-family:'Manrope',sans-serif;font-weight:900;color:var(--ink);margin-bottom:8px">Business not found</h2>
-  <p style="color:var(--muted);margin-bottom:18px">This shop may have been removed or the link is incorrect.</p>
+  <p style="color:var(--muted);margin-bottom:18px">This business may have been removed or the link is incorrect.</p>
   <a href="/browse.html" class="btn btn-pri">← Browse Categories</a>
 </div>
 
@@ -1106,7 +1106,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <a href="javascript:history.back()" class="biz-back">← <span data-i18n-en>Back</span><span data-i18n-hi>वापस</span></a>
         <div class="detail-trust-strip" id="detailTrustStrip"></div>
       </div>
-      <!-- Mobile-only prominent shop name (desktop keeps H1 inside meta-card) -->
+      <!-- Mobile-only prominent business name (desktop keeps H1 inside meta-card) -->
       <h1 class="biz-hero-name-mobile" id="bizNameMobile"></h1>
       <div class="biz-top">
         <div class="gallery">
@@ -1127,7 +1127,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             <div class="sh-row sh-share-row">
               <div class="sh-row-label">
                 <span data-i18n-en>💌 Share with a friend</span><span data-i18n-hi>💌 मित्र को साझा करें</span>
-                <span style="font-weight:500;color:#94A3B8;font-size:.7rem;margin-left:5px">— help your contacts discover trusted local shops</span>
+                <span style="font-weight:500;color:#94A3B8;font-size:.7rem;margin-left:5px">— help your contacts discover trusted local businesses</span>
               </div>
               <div class="sh-pills" id="shSharePills">
                 <button type="button" id="shSendFriendBtn" class="sh-share-btn sh-wa" style="cursor:pointer;font-family:inherit;border:0">💬 <span data-i18n-en>Share via WhatsApp</span><span data-i18n-hi>WhatsApp पर साझा करें</span></button>
@@ -1160,7 +1160,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="owner-credit" id="ownerCredit" style="display:none"></div>
           <div class="biz-title-hi" id="bizNameHi" style="display:none"></div>
 
-          <!-- "Why this shop?" — auto-summary verdict pill row -->
+          <!-- "Why this business?" — auto-summary verdict pill row -->
           <div id="whyThisShop" class="why-shop-row" style="display:none"></div>
           <!-- Customer activity social proof — "5 customers called today" -->
           <div id="customerActivity" class="cust-activity-row" style="display:none"></div>
@@ -1245,7 +1245,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="rev-clean-empty">
             <div class="rce-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
             <div class="rce-title" data-i18n-en="Be the first to share your experience" data-i18n-hi="अपना अनुभव सबसे पहले शेयर करें">Be the first to share your experience</div>
-            <div class="rce-sub" data-i18n-en="Honest reviews help your neighbourhood discover trusted shops" data-i18n-hi="ईमानदार reviews पड़ोसियों को भरोसेमंद दुकानें खोजने में मदद करते हैं">Honest reviews help your neighbourhood discover trusted shops</div>
+            <div class="rce-sub" data-i18n-en="Honest reviews help your neighbourhood discover trusted shops" data-i18n-hi="ईमानदार reviews पड़ोसियों को भरोसेमंद व्यवसाय खोजने में मदद करते हैं">Honest reviews help your neighbourhood discover trusted shops</div>
           </div>
         </div>
         <button class="btn-write-review" onclick="openReviewModal()">
@@ -1298,7 +1298,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
       <!-- Social Media row (auto-hides if no links) -->
       <div class="card-pill" id="socialCardWrap" style="margin-top:18px;display:none">
-        <h3 style="font-size:1rem">🌐 <span data-i18n-en>Follow this shop</span><span data-i18n-hi>दुकान को follow करें</span></h3>
+        <h3 style="font-size:1rem">🌐 <span data-i18n-en>Follow this business</span><span data-i18n-hi>दुकान को follow करें</span></h3>
         <div id="socialRow" class="social-row" style="border-top:none;padding-top:6px;margin-top:0"></div>
       </div>
 
@@ -1378,11 +1378,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         .rc-card.share .rc-actions{ grid-template-columns:1fr 1fr }
       </style>
 
-      <!-- 1. Share this shop (compact) -->
+      <!-- 1. Share this business (compact) -->
       <div class="rc-card share">
         <div class="rc-head">
           <div class="rc-ico">📣</div>
-          <div class="rc-ttl"><span data-i18n-en>Share this shop</span><span data-i18n-hi>दुकान share करें</span></div>
+          <div class="rc-ttl"><span data-i18n-en>Share this business</span><span data-i18n-hi>दुकान share करें</span></div>
         </div>
         <div class="rc-sub"><span data-i18n-en>Help a local owner get more customers</span><span data-i18n-hi>स्थानीय मालिक को नए ग्राहक दिलाएं</span></div>
         <div class="rc-actions">
@@ -1395,7 +1395,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
       <div class="rc-card owner">
         <div class="rc-head">
           <div class="rc-ico">🏪</div>
-          <div class="rc-ttl"><span data-i18n-en>Own a shop? List it FREE</span><span data-i18n-hi>दुकान है? FREE list करें</span></div>
+          <div class="rc-ttl"><span data-i18n-en>Own a business? List it FREE</span><span data-i18n-hi>दुकान है? FREE list करें</span></div>
         </div>
         <div class="rc-sub"><span data-i18n-en>Verified by team · Forever free · Sirsa · Bathinda · Mansa · Muktsar customers daily</span><span data-i18n-hi>टीम वेरिफाइड · हमेशा फ्री · रोज़ Sirsa · Bathinda · Mansa · Muktsar customers</span></div>
         <div class="rc-actions" style="grid-template-columns:1fr">
@@ -1541,7 +1541,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <div class="modal-card" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeQAModal()" aria-label="Close">×</button>
     <h3 style="font-family:'Manrope',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:6px"><span data-i18n-en>Ask a public question</span><span data-i18n-hi>सार्वजनिक सवाल पूछें</span></h3>
-    <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;line-height:1.5"><span data-i18n-en>Your question will be visible to everyone. The shop owner will answer publicly. Don\'t share personal info.</span><span data-i18n-hi>आपका सवाल सबको दिखेगा। मालिक जवाब सबके सामने देगा। निजी जानकारी न लिखें।</span></p>
+    <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;line-height:1.5"><span data-i18n-en>Your question will be visible to everyone. The business owner will answer publicly. Don\'t share personal info.</span><span data-i18n-hi>आपका सवाल सबको दिखेगा। मालिक जवाब सबके सामने देगा। निजी जानकारी न लिखें।</span></p>
     <div style="margin-bottom:12px">
       <label style="display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px"><span data-i18n-en>Your name (optional)</span><span data-i18n-hi>आपका नाम (वैकल्पिक)</span></label>
       <input id="qaAskerName" type="text" maxlength="60" placeholder="e.g., Ramesh" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.92rem;font-family:inherit">
@@ -2058,9 +2058,9 @@ function render(){
     }
   } catch(_){}
 
-  // CTAs — WhatsApp message includes shop name + area so owner gets useful context
+  // CTAs — WhatsApp message includes business name + area so owner gets useful context
   const wa = (b.whatsapp || b.mobile).replace(/[^\d]/g,'');
-  const _shopRef = b.name || 'your shop';
+  const _shopRef = b.name || 'your business';
   const _areaRef = (b.geo_localities && b.geo_localities.name)
     || (b.geo_cities && b.geo_cities.name)
     || '';
@@ -2085,11 +2085,11 @@ function render(){
   document.getElementById('ctaDir').href = `https://www.google.com/maps/search/?api=1&query=${mapsQ}`;
   document.getElementById('ctaDir').addEventListener('click', () => logLead('direction'));
 
-  // Review-boost: if customer previously contacted this shop, schedule a soft prompt
+  // Review-boost: if customer previously contacted this business, schedule a soft prompt
   try { if (window.DukanReviewBoost) DukanReviewBoost.maybePrompt({ slug: b.slug, name: b.name, id: b.id }); } catch(_){}
 
-  // "Why this shop?" — fast verdict pills for quick customer decision
-  try { renderWhyThisShop(b); } catch(e){ console.warn('Why this shop:', e); }
+  // "Why this business?" — fast verdict pills for quick customer decision
+  try { renderWhyThisShop(b); } catch(e){ console.warn('Why this business:', e); }
 
   // Customer activity — "5 customers called today" social proof
   try { loadCustomerActivity(b.id); } catch(e){ console.warn('Cust activity:', e); }
@@ -2100,13 +2100,13 @@ function render(){
   // MMT-style stat strip — rating breakdown + shop highlights
   renderMmtStatStrip(b);
 
-  // MMT-style Similar shops
+  // MMT-style Similar businesses
   loadSimilarShops(b);
 
-  // Check if current user has favorited this shop (heart icon state)
+  // Check if current user has favorited this business (heart icon state)
   checkFavState();
 
-  // Breadcrumbs (Home > City > Category > Shop name)
+  // Breadcrumbs (Home > City > Category > Business name)
   try {
     if (window.DukanCrumbs){
       const cityName = (b.geo_cities && b.geo_cities.name) || '';
@@ -2389,7 +2389,7 @@ function getDistance(bizLat, bizLng){
 }
 
 // =============================================================
-// "Why this shop?" — auto-generated verdict pill row
+// "Why this business?" — auto-generated verdict pill row
 // =============================================================
 // Quick-scan summary so customer can decide in 3 seconds.
 // All data is already loaded — no extra fetches.
@@ -2490,7 +2490,7 @@ async function loadCustomerActivity(bizId){
     }
     // Fallback: combined if neither individual hits threshold but total does
     if (pills.length === 0 && total >= 3){
-      pills.push('<span class="ca-pill"><span class="ca-dot"></span>🔥 <b>' + total + ' customers</b> contacted this shop in last 24h</span>');
+      pills.push('<span class="ca-pill"><span class="ca-dot"></span>🔥 <b>' + total + ' customers</b> contacted this business in last 24h</span>');
     }
 
     if (pills.length === 0){ host.style.display = 'none'; return; }
@@ -2671,7 +2671,7 @@ async function loadSimilarShops(b){
       '/search.html?cat=' + encodeURIComponent(b.categories?.slug || '') + (b.city_id ? '&city=' + b.city_id : '');
 
     sec.style.display = '';
-  } catch (e) { console.warn('Similar shops:', e); }
+  } catch (e) { console.warn('Similar businesses:', e); }
 }
 
 function renderHours(h){
@@ -2929,7 +2929,7 @@ async function logLead(action){
   // Business Detail v3: schedule review prompt for call + whatsapp clicks
   if (action === 'call' || action === 'whatsapp'){
     scheduleReviewPrompt();
-    // Lead Push: fire instant browser push to shop owner (fire-and-forget)
+    // Lead Push: fire instant browser push to business owner (fire-and-forget)
     try {
       fetch('/api/lead-push', {
         method: 'POST',
@@ -2967,7 +2967,7 @@ function scheduleReviewPrompt(){
 function openReviewPrompt(){
   const overlay = document.getElementById('reviewPromptOverlay');
   if (!overlay) return;
-  // Populate shop name
+  // Populate business name
   const nameEl = document.getElementById('rpShopName');
   if (nameEl && BIZ && BIZ.name) nameEl.textContent = BIZ.name;
   const nameHiEl = document.getElementById('rpShopNameHi');
@@ -3171,7 +3171,7 @@ async function toggleFav(){
 // Build a friend-to-friend share message — conversational, with credibility hooks
 function buildFriendShareText(){
   if (!BIZ) return '';
-  const name = BIZ.name || 'this shop';
+  const name = BIZ.name || 'this business';
   const area = (BIZ.geo_localities && BIZ.geo_localities.name) || '';
   const city = (BIZ.geo_cities && BIZ.geo_cities.name) || BIZ.city_name || '';
   const loc  = [area, city].filter(Boolean).join(', ');
@@ -3183,7 +3183,7 @@ function buildFriendShareText(){
   const credParts = [verified, rating].filter(Boolean).join(' · ');
   const url = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
 
-  let msg = 'Thought you would find this shop useful — I came across it on DukanList:\n\n';
+  let msg = 'Thought you would find this business useful — I came across it on DukanList:\n\n';
   msg += '*' + name + '*' + (loc ? ' (' + loc + ')' : '') + '\n';
   if (cat) msg += '🏷️ ' + cat + '\n';
   if (credParts) msg += credParts + '\n';
@@ -3302,7 +3302,7 @@ async function submitReview(){
     if (loadingRow) loadingRow.remove();
     btn.disabled = false; btn.innerHTML = '<span>Submit ✓</span>';
     const msg = (e.message || '').includes('duplicate') || (e.message || '').includes('unique')
-      ? 'You have already reviewed this shop from this number.'
+      ? 'You have already reviewed this business from this number.'
       : (e.message || 'Could not submit. Try again.');
     errEl.textContent = msg; errEl.style.display = 'block';
   }
@@ -3441,7 +3441,7 @@ function renderShopHighlights(b){
     + '</div>'
   ).join('');
 
-  // Payment methods — STRUCTURED (shopkeeper-controlled). No regex inference.
+  // Payment methods — STRUCTURED (owner-controlled). No regex inference.
   const pmIcons = {
     'cash':'\ud83d\udcb5 Cash',
     'upi':'\ud83d\udcf1 UPI',
@@ -3461,7 +3461,7 @@ function renderShopHighlights(b){
     }
   }
 
-  // Special features — STRUCTURED (shopkeeper-curated array). No regex split.
+  // Special features — STRUCTURED (owner-curated array). No regex split.
   if (Array.isArray(b.special_features) && b.special_features.length){
     document.getElementById('shFeatureRow').style.display = '';
     document.getElementById('shFeaturePills').innerHTML = b.special_features.slice(0,6).map(f =>
@@ -3469,7 +3469,7 @@ function renderShopHighlights(b){
   }
 
   const url = window.location.href;
-  const friendShareText = (typeof buildFriendShareText === 'function') ? buildFriendShareText() : 'Check out ' + (b.name || 'this shop') + ' on DukanList\n\n' + url;
+  const friendShareText = (typeof buildFriendShareText === 'function') ? buildFriendShareText() : 'Check out ' + (b.name || 'this business') + ' on DukanList\n\n' + url;
   const shareText = encodeURIComponent(friendShareText);
   const _sendFriendBtn = document.getElementById('shSendFriendBtn');
   if (_sendFriendBtn){
@@ -3590,7 +3590,7 @@ async function submitQA(){
       p_asker_phone: phone
     });
     if (error) throw error;
-    okEl.textContent = '✓ Question posted! Shop owner will reply soon.';
+    okEl.textContent = '✓ Question posted! Business owner will reply soon.';
     okEl.style.display = '';
     document.getElementById('qaQuestionText').value = '';
     setTimeout(() => { closeQAModal(); loadShopQA(bizId); }, 1500);
@@ -3631,7 +3631,7 @@ function copyShopUrl(){
     <div id="rpForm">
       <div class="rp-emoji">⭐</div>
       <div class="rp-title" id="rpTitle"><span data-i18n-en>Did you reach <span id="rpShopName">them</span>?</span><span data-i18n-hi>क्या आप <span id="rpShopNameHi">उनसे</span> मिल पाए?</span></div>
-      <div class="rp-sub"><span data-i18n-en>Your review helps other customers and the shop owner.</span><span data-i18n-hi>आपका रिव्यू दूसरे ग्राहकों और व्यवसायी दोनों के काम आता है।</span></div>
+      <div class="rp-sub"><span data-i18n-en>Your review helps other customers and the business owner.</span><span data-i18n-hi>आपका रिव्यू दूसरे ग्राहकों और व्यवसायी दोनों के काम आता है।</span></div>
       <div class="rp-stars" id="rpStars" role="radiogroup" aria-label="Rate 1 to 5 stars">
         <span class="rp-star" data-rating="1" role="radio" aria-label="1 star">★</span>
         <span class="rp-star" data-rating="2" role="radio" aria-label="2 stars">★</span>
@@ -3679,11 +3679,11 @@ function copyShopUrl(){
 
 <!-- STICKY BOTTOM ACTION BAR (mobile only) -->
 <div id="stickyActionBar" aria-label="Quick actions" style="display:none">
-  <a id="sabCall" class="sab-btn sab-call" aria-label="Call this shop">
+  <a id="sabCall" class="sab-btn sab-call" aria-label="Call this business">
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     <span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span>
   </a>
-  <a id="sabWa" class="sab-btn sab-wa" target="_blank" rel="noopener" aria-label="WhatsApp this shop">
+  <a id="sabWa" class="sab-btn sab-wa" target="_blank" rel="noopener" aria-label="WhatsApp this business">
     <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.8 5.5 2.2 7.9L.3 31.6l7.9-2.1c2.3 1.3 4.9 1.9 7.7 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.3c-2.4 0-4.8-.7-6.9-1.9l-.5-.3-4.7 1.3 1.3-4.6-.3-.5c-1.3-2.1-2-4.5-2-7 0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9c.1 7.1-5.7 13-12.7 13z"/></svg>
     <span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span>
   </a>

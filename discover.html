@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0F172A">
-<title>Discover Shops — DukanList</title>
-<meta name="description" content="Swipe through local shops, restaurants, and services in your city. TikTok-style discovery for Bharat.">
+<title>Discover Listings — DukanList</title>
+<meta name="description" content="Swipe through local businesses, restaurants, and services in your city. TikTok-style discovery for Bharat.">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -174,7 +174,7 @@
     50%     { box-shadow:0 4px 22px rgba(239,68,68,.8) }
   }
 
-  /* (2) Social Proof STRIP — above shop name */
+  /* (2) Social Proof STRIP — above business name */
   .social-proof{
     display:inline-flex; align-items:center; gap:6px;
     background:linear-gradient(90deg,rgba(239,68,68,.30),rgba(245,158,11,.20));
@@ -776,7 +776,7 @@
 <div id="loadingScreen" class="center">
   <div>
     <div class="spinner"></div>
-    <div style="color:#cbd5e1;font-weight:700">Loading shops near you…</div>
+    <div style="color:#cbd5e1;font-weight:700">Loading businesses near you…</div>
   </div>
 </div>
 
@@ -857,7 +857,7 @@ function getLovedSet(){ try { return new Set(JSON.parse(localStorage.getItem('dl
 function markLoved(id){ try { var s = getLovedSet(); s.add(id); localStorage.setItem('dl_loved', JSON.stringify(Array.from(s))); } catch(_){} }
 function unmarkLoved(id){ try { var s = getLovedSet(); s.delete(id); localStorage.setItem('dl_loved', JSON.stringify(Array.from(s))); } catch(_){} }
 
-// FULL-SCREEN celebration when user likes a shop — big 🔥 + LOVED + confetti
+// FULL-SCREEN celebration when user likes a business — big 🔥 + LOVED + confetti
 function showFullScreenLove(){
   var overlay = document.createElement('div');
   overlay.className = 'love-celebration';
@@ -958,7 +958,7 @@ async function bumpLove(btn){
       countEl.style.animation = 'none'; void countEl.offsetWidth; countEl.style.animation = '';
     }
     markLoved(bizId);
-    showToast('🔥 Loved! Share to grow this shop');
+    showToast('🔥 Loved! Share to grow this business');
   }
 
   // Server: toggle
@@ -1396,7 +1396,7 @@ function renderFiltered(){
         (addrShort && addrShort!==city ? '<div class="addr">📌 '+esc(addrShort)+'</div>' : '')+
       '</div>'+
       '<div class="actions">'+
-        // VIRAL: public Love button with live count — shopkeepers compete for likes
+        // VIRAL: public Love button with live count — business owners compete for likes
         '<div class="act love" data-id="'+esc(b.id)+'" data-count="'+(b.likes_count||0)+'">'+
           '<span class="love-emoji">🔥</span>'+
           '<span class="love-count">'+(b.likes_count||0)+'</span>'+
@@ -1674,7 +1674,7 @@ function maybeShowSocialToast(cardEl){
     var action = actions[Math.floor(Math.random() * actions.length)];
     var t = document.getElementById('spToast');
     if (!t) return;
-    t.innerHTML = '<span class="em">'+action.split(' ')[0]+'</span> ' + name + ' from ' + city + ' just ' + action.split(' ')[1] + ' a shop';
+    t.innerHTML = '<span class="em">'+action.split(' ')[0]+'</span> ' + name + ' from ' + city + ' just ' + action.split(' ')[1] + ' a business';
     t.classList.add('show');
     setTimeout(function(){ t.classList.remove('show'); }, 3200);
   }, 1200);
@@ -1709,7 +1709,7 @@ function acceptNotifSheet(){
         if (p === 'granted'){
           showToast('🔔 You\'re subscribed! We\'ll notify you of new shops.');
           new Notification('DukanList', {
-            body: 'You\'re all set! We\'ll notify you of trending shops in your area.',
+            body: 'You\'re all set! We\'ll notify you of trending businesses in your area.',
             icon: '/assets/icons/icon-192.png'
           });
         } else {

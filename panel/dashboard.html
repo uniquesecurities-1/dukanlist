@@ -77,7 +77,7 @@
         Welcome to DukanList!
       </h2>
       <p style="color:#64748B;font-size:.95rem;line-height:1.5;max-width:380px;margin:0 auto">
-        Your shop is now visible to customers across <b style="color:#0F172A">Sirsa, Bathinda, Mansa &amp; Muktsar</b>.
+        Your business is now visible to customers across <b style="color:#0F172A">Sirsa, Bathinda, Mansa &amp; Muktsar</b>.
       </p>
     </div>
 
@@ -91,7 +91,7 @@
     <a href="/panel/photos.html" style="display:flex;gap:14px;align-items:center;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:13px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:all .15s" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#F97316'" onmouseout="this.style.transform='';this.style.borderColor='#FED7AA'">
       <div style="background:#fff;border:2px solid #F97316;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;color:#C2410C;flex-shrink:0">1</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">📸 Add 3+ shop photos</div>
+        <div style="font-weight:800;color:#0F172A;font-size:.98rem;line-height:1.2">📸 Add 3+ business photos</div>
         <div style="font-size:.8rem;color:#78350F;margin-top:3px">Shops with photos get 3× more calls. Real photos beat stock images every time.</div>
       </div>
       <div style="background:#F97316;color:#fff;font-weight:800;padding:7px 11px;border-radius:9px;font-size:.78rem;flex-shrink:0">Add →</div>
@@ -660,7 +660,7 @@
         <span class="trend-arrow flat" id="aajTrend">— 0%</span>
       </div>
       <div class="aaj-sub">
-        <span data-i18n-en>people viewed your shop today</span>
+        <span data-i18n-en>people viewed your business today</span>
         <span data-i18n-hi>लोगों ने आज आपकी listing देखी</span>
       </div>
       <div class="aaj-chips">
@@ -870,7 +870,7 @@
         <a href="/panel/qr-code.html" class="qa" style="background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border-color:#7DD3FC">
           <span class="ico">📱</span>
           <div>
-            <div class="name" style="color:#0C4A6E"><span data-i18n-en>Shop QR Code</span><span data-i18n-hi>शॉप QR कोड</span></div>
+            <div class="name" style="color:#0C4A6E"><span data-i18n-en>Shop QR Code</span><span data-i18n-hi>व्यवसाय QR कोड</span></div>
             <div class="desc" style="color:#0C4A6E;opacity:.8"><span data-i18n-en>Print & display at counter</span><span data-i18n-hi>प्रिंट करके लगाएं</span></div>
           </div>
         </a>
@@ -988,7 +988,7 @@
     <!-- Walk-In Counter widget — tap to log a real customer visit -->
     <div class="side-widget" id="walkInWidget" style="background:linear-gradient(135deg,#FDF2F8,#FBCFE8);border-color:#EC4899">
       <div class="side-widget-title" style="color:#9D174D">🚶 <span data-i18n-en>Walk-In Counter</span><span data-i18n-hi>दुकान आए ग्राहक</span></div>
-      <div style="font-size:.78rem;color:#9D174D;margin-bottom:10px;line-height:1.45"><span data-i18n-en>Tap every time a customer visits in person. Shows live count on your shop page = trust + social proof.</span><span data-i18n-hi>हर ग्राहक के आते ही एक tap। आपकी shop page पर live count दिखेगा = trust।</span></div>
+      <div style="font-size:.78rem;color:#9D174D;margin-bottom:10px;line-height:1.45"><span data-i18n-en>Tap every time a customer visits in person. Shows live count on your business page = trust + social proof.</span><span data-i18n-hi>हर ग्राहक के आते ही एक tap। आपकी business page पर live count दिखेगा = trust।</span></div>
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
         <div style="flex:1">
           <div style="font-size:.66rem;color:#9D174D;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Today</div>
@@ -1073,7 +1073,7 @@
       <div class="mini-pulse-stats">
         <div class="mini-pulse-stat">
           <div class="mini-pulse-num" id="dashPsShops">—</div>
-          <div class="mini-pulse-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>शॉप्स</span></div>
+          <div class="mini-pulse-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>व्यवसाय्स</span></div>
         </div>
         <div class="mini-pulse-stat">
           <div class="mini-pulse-num" id="dashPsCities">—</div>
@@ -1102,7 +1102,7 @@
 <script src="/assets/js/og-card-generator.js"></script>
 <script src="/assets/js/completeness.js"></script>
 <script src="/assets/js/push.js"></script>
-<script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanPush) DukanPush.attachButton('enableNotifBtn', { audience: 'shopkeeper' }); });</script>
+<script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanPush) DukanPush.attachButton('enableNotifBtn', { audience: 'owner' }); });</script>
 <script>
 // Lead notifications widget (loads independently — doesn't block dashboard if RPC missing)
 window.addEventListener('DOMContentLoaded', () => {
@@ -1242,7 +1242,7 @@ async function loadDashboard(){
     const metaMobile = (user.user_metadata && user.user_metadata.mobile)
       ? String(user.user_metadata.mobile).replace(/\D/g,'').slice(-10) : '';
     const userEmail = user.email || '';
-    const waMsg = encodeURIComponent('Hello DukanList team, I registered with email ' + userEmail + ' but my account shows "No business linked". Kindly help me link my shop.');
+    const waMsg = encodeURIComponent('Hello DukanList team, I registered with email ' + userEmail + ' but my account shows "No business linked". Kindly help me link my business.');
     const waUrl = 'https://wa.me/919541223377?text=' + waMsg;
 
     function escapeHtmlSafe(s){
@@ -1259,7 +1259,7 @@ async function loadDashboard(){
       +     '<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.22);display:grid;place-items:center;font-size:1.9rem;flex-shrink:0;animation:bouncePop .8s cubic-bezier(.4,1.6,.5,1) .15s both">&#127881;</div>'
       +     '<div style="flex:1;min-width:0">'
       +       '<div style="font-size:1.35rem;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,0.15)">Email Verified Successfully!</div>'
-      +       '<div style="font-size:.92rem;opacity:.95;line-height:1.5;font-weight:500">Welcome to DukanList, ' + escapeHtmlSafe((userEmail.split("@")[0] || "shopkeeper")) + '! Your account is now active. One last step — connect your shop below.</div>'
+      +       '<div style="font-size:.92rem;opacity:.95;line-height:1.5;font-weight:500">Welcome to DukanList, ' + escapeHtmlSafe((userEmail.split("@")[0] || "owner")) + '! Your account is now active. One last step — connect your business below.</div>'
       +     '</div>'
       +   '</div>'
       + '</div>'
@@ -1269,7 +1269,7 @@ async function loadDashboard(){
       +   '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">'
       +     '<div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#DBEAFE,#BFDBFE);display:grid;place-items:center;font-size:1.3rem;flex-shrink:0">&#128279;</div>'
       +     '<div style="flex:1;min-width:0">'
-      +       '<div style="font-size:1.1rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:3px">Connect Your Shop</div>'
+      +       '<div style="font-size:1.1rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:3px">Connect Your Business</div>'
       +       '<div style="font-size:.86rem;color:#475569;line-height:1.5">Link your existing listing using the mobile number you registered with, or create a new shop.</div>'
       +     '</div>'
       +   '</div>'
@@ -1288,7 +1288,7 @@ async function loadDashboard(){
       +   '</div>'
       +   '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
       +     '<input id="linkMobile" type="tel" inputmode="numeric" maxlength="10" value="' + escapeHtmlSafe(metaMobile) + '" placeholder="10-digit mobile" style="flex:1;min-width:160px;padding:12px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:15px;font-family:inherit;font-weight:600;letter-spacing:.05em">'
-      +     '<button onclick="tryLinkByMobile()" id="linkBtn" style="background:linear-gradient(135deg,#FF6B1A,#F97316);color:#fff;border:0;padding:12px 22px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,26,0.3);font-family:inherit;white-space:nowrap">&#128279; Link my shop</button>'
+      +     '<button onclick="tryLinkByMobile()" id="linkBtn" style="background:linear-gradient(135deg,#FF6B1A,#F97316);color:#fff;border:0;padding:12px 22px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,26,0.3);font-family:inherit;white-space:nowrap">&#128279; Link my business</button>'
       +   '</div>'
       +   '<div id="linkErr" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#FEE2E2;color:#991B1B;font-size:.85rem;line-height:1.5;border:1px solid #FCA5A5"></div>'
       +   '<div id="linkOk" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#D1FAE5;color:#065F46;font-size:.85rem;line-height:1.5;border:1px solid #6EE7B7"></div>'
@@ -1346,7 +1346,7 @@ async function loadDashboard(){
             '&bull; The shop has not been registered yet<br>' +
             '<br><b>Need help?</b> <a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp us with your email and mobile</a> &mdash; we will link it manually.';
           er.style.display = 'block';
-          btn.disabled = false; btn.textContent = '🔗 Link my shop';
+          btn.disabled = false; btn.textContent = '🔗 Link my business';
           return;
         }
 
@@ -1355,15 +1355,15 @@ async function loadDashboard(){
             '<b>&#9888; Multiple shops found on this mobile</b><br>' +
             'For safety, admin will link the correct one manually. Shops found:<br>' +
             '<small>' + matches.map(x => '&bull; ' + x.name).join('<br>') + '</small><br><br>' +
-            '<a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp admin to confirm your shop</a>';
+            '<a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp admin to confirm your business</a>';
           er.style.display = 'block';
-          btn.disabled = false; btn.textContent = '🔗 Link my shop';
+          btn.disabled = false; btn.textContent = '🔗 Link my business';
           return;
         }
 
-        const shopName = matches[0].name || 'this shop';
-        if (!confirm('Link this account to "' + shopName + '"?\n\nThis will become your shop dashboard. Confirm ONLY if this is YOUR shop.')){
-          btn.disabled = false; btn.textContent = '🔗 Link my shop';
+        const shopName = matches[0].name || 'this business';
+        if (!confirm('Link this account to "' + shopName + '"?\n\nThis will become your business dashboard. Confirm ONLY if this is YOUR shop.')){
+          btn.disabled = false; btn.textContent = '🔗 Link my business';
           return;
         }
       } catch(e){
@@ -1374,7 +1374,7 @@ async function loadDashboard(){
       if (rr.error){
         er.innerHTML = '<b>&#10060; Could not link</b><br>' + escapeHtmlSafe(rr.error.message || 'Unknown error') + '<br><br><a href="' + waUrl + '" target="_blank" style="color:#1E3A8A;font-weight:800;text-decoration:underline">WhatsApp us for manual help</a>';
         er.style.display = 'block';
-        btn.disabled = false; btn.textContent = '🔗 Link my shop';
+        btn.disabled = false; btn.textContent = '🔗 Link my business';
         return;
       }
 
@@ -1714,7 +1714,7 @@ function renderVerificationCta(biz, c){
       + '<div style="width:44px;height:44px;border-radius:50%;background:#F59E0B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⏳</div>'
       + '<div style="flex:1;min-width:0">'
       + '<div style="font-weight:800;color:#92400E;font-size:.98rem;margin-bottom:2px">Verification Request Received</div>'
-      + '<div style="color:#78350F;font-size:.83rem;line-height:1.45">Requested ' + dayLabel + '. DukanList admin team will contact you within 3-7 business days for a physical visit. Make sure your shop is reachable on the mobile number you provided.</div>'
+      + '<div style="color:#78350F;font-size:.83rem;line-height:1.45">Requested ' + dayLabel + '. DukanList admin team will contact you within 3-7 business days for a physical visit. Make sure your business is reachable on the mobile number you provided.</div>'
       + '</div></div>';
     return;
   }
@@ -1724,7 +1724,7 @@ function renderVerificationCta(biz, c){
     + '<div style="width:52px;height:52px;border-radius:50%;background:#3B82F6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">✓</div>'
     + '<div style="flex:1;min-width:200px">'
     + '<div style="font-weight:800;color:#1E3A8A;font-size:1rem;margin-bottom:3px">Get the Blue Verified Badge</div>'
-    + '<div style="color:#1E40AF;font-size:.83rem;line-height:1.45">DukanList team aapke shop par physical visit karke verification kar sakti hai. Verified shops ko search me higher rank, customer trust aur leads jyada milte hai. <b>Bilkul Free.</b></div>'
+    + '<div style="color:#1E40AF;font-size:.83rem;line-height:1.45">DukanList team aapke shop par physical visit karke verification kar sakti hai. Verified businesses ko search me higher rank, customer trust aur leads jyada milte hai. <b>Bilkul Free.</b></div>'
     + '</div>'
     + '<button id="btnRequestVerify" style="background:#1D4ED8;color:#fff;border:none;padding:11px 22px;border-radius:99px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(29,78,216,.25);flex-shrink:0">Request Verification Visit</button>'
     + '</div>';
@@ -1735,7 +1735,7 @@ function renderVerificationCta(biz, c){
       btn.disabled = true;
       btn.textContent = 'Sending request...';
       try{
-        const { data, error } = await c.rpc('shopkeeper_request_verification');
+        const { data, error } = await c.rpc('owner_request_verification');
         if (error){
           alert('Error: ' + (error.message || 'Could not submit request. Please try again.'));
           btn.disabled = false; btn.textContent = 'Request Verification Visit'; return;
@@ -1828,7 +1828,7 @@ function renderTierRoadmap(b){
   if (!result.nextTier){
     host.innerHTML = '<div class="tier-roadmap tier-complete">'
       + '<h3>\u{1F3C6} ' + L('Top Tier Reached!', 'सर्वोच्च टीयर हासिल!') + '</h3>'
-      + '<div class="tr-current">' + L('Your shop is at', 'आपकी दुकान') + ' ' + currentLabel + '. '
+      + '<div class="tr-current">' + L('Your business is at', 'आपका व्यवसाय') + ' ' + currentLabel + '. '
       + L('Keep delighting customers — high ratings retain this status automatically.', 'ग्राहकों को खुश रखते रहें — अच्छी रेटिंग से यह स्तर बना रहेगा।') + '</div>'
       + '</div>';
     return;
@@ -1893,7 +1893,7 @@ function renderSmartActions(b){
   if (!hasUSP){
     actions.push({
       icon: '\u{2728}',
-      title: 'Write your shop\'s USP',
+      title: 'Write your business\'s USP',
       sub: 'A one-line pitch that makes you stand out',
       href: '/panel/profile.html#usp',
       cta: 'Add USP'
@@ -1948,8 +1948,8 @@ function renderSmartActions(b){
     actions.push({
       icon: '\u{1F6E1}',
       title: 'Get DukanList verified',
-      sub: 'Verified shops appear higher in search',
-      href: 'https://wa.me/919541223377?text=' + encodeURIComponent('Please verify my shop: ' + (b.name || '')),
+      sub: 'Verified businesses appear higher in search',
+      href: 'https://wa.me/919541223377?text=' + encodeURIComponent('Please verify my business: ' + (b.name || '')),
       cta: 'Request verify',
       external: true
     });
@@ -2011,7 +2011,7 @@ function openShareStatsModal(){
   const leads   = Number(b.lead_count) || 0;
   const rating  = Number(b.rating_avg) || 0;
   const reviews = Number(b.rating_count) || 0;
-  const shopName = b.name || 'My Shop';
+  const shopName = b.name || 'My Business';
   // Truncate long names
   const displayName = shopName.length > 26 ? shopName.slice(0, 23) + '...' : shopName;
 
@@ -2045,7 +2045,7 @@ function openShareStatsModal(){
       <text x="0" y="100" font-family="Manrope, sans-serif" font-size="96" font-weight="900" fill="#F59E0B" letter-spacing="-3">${rating > 0 ? '⭐' + rating.toFixed(1) : '—'}</text>
       <text x="0" y="135" font-family="Inter, sans-serif" font-size="20" fill="#64748b">${reviews} review${reviews === 1 ? '' : 's'}</text>
     </g>
-    <text x="60" y="595" font-family="Manrope, sans-serif" font-size="26" font-weight="700" fill="#fff" opacity="0.9">🇮🇳 List your shop free → dukanlist.com</text>
+    <text x="60" y="595" font-family="Manrope, sans-serif" font-size="26" font-weight="700" fill="#fff" opacity="0.9">🇮🇳 List your business free → dukanlist.com</text>
   </svg>`;
 
   // Display in modal
@@ -2208,7 +2208,7 @@ const DAILY_TIPS = [
   { icon: '📸', en: 'Shops with 5+ photos get <b>3x more calls</b>', hi: '5+ photos wali dukane <b>3x zyada calls</b> paati hain', sub: 'Photos tab me jaake upload karein' },
   { icon: '⭐', en: '<b>Reply karne wale owners</b> ko 2x repeat customers milte hain', hi: '<b>Reply karne wale owners</b> ko 2x repeat customers milte hain', sub: 'Reviews me reply karna mat bhulein' },
   { icon: '🎁', en: 'Weekly <b>deals/offers</b> launch karne wale shops me 40% zyada calls aate hain', hi: 'Weekly <b>deals/offers</b> launch karne wale shops me 40% zyada calls aate hain', sub: 'Deals tab pe ek offer banayein abhi' },
-  { icon: '⏰', en: 'Shop hours <b>accurate update</b> rakhein — customer galat time pe call na kare', hi: 'Shop hours <b>accurate</b> rakhein — galat time pe call na ho', sub: 'Profile tab me hours check karein' },
+  { icon: '⏰', en: 'Business hours <b>accurate update</b> rakhein — customer galat time pe call na kare', hi: 'Business hours <b>accurate</b> rakhein — galat time pe call na ho', sub: 'Profile tab me hours check karein' },
   { icon: '📍', en: 'Address + landmark <b>clearly likhein</b> — customer easily pohunche', hi: 'Address + landmark <b>clearly likhein</b> — customer easily pohunche', sub: 'Profile tab me address update karein' },
   { icon: '✅', en: 'Verified Bronze tier paane ke liye <b>3 photos + WhatsApp</b> add karein', hi: 'Verified Bronze tier ke liye <b>3 photos + WhatsApp</b> chahiye', sub: 'Trust badhega — customer zyada call karenge' },
   { icon: '🔔', en: '<b>Push notifications enable</b> karein — instant lead alerts', hi: '<b>Push notifications enable</b> karein — instant lead alerts', sub: 'Customer ke click karte hi notification milegi' },
@@ -2362,7 +2362,7 @@ function renderDashActivity(){
 
   // Fallback if no items
   if (!items.length) {
-    items.push({ icon: '🌅', text: lang === 'hi' ? 'Naya din shuru hua — apni dukaan ko grow karein!' : 'New day — grow your shop today!', time: lang === 'hi' ? 'Aaj' : 'Today' });
+    items.push({ icon: '🌅', text: lang === 'hi' ? 'Naya din shuru hua — apni dukaan ko grow karein!' : 'New day — grow your business today!', time: lang === 'hi' ? 'Aaj' : 'Today' });
   }
 
   feed.innerHTML = items.slice(0, 6).map(i => 
@@ -2532,9 +2532,9 @@ async function renderLoyaltyCard(businessId, supaClient){
 // =====================================================
 // Profile Completeness Meter — prominent top-of-dashboard card
 // -----------------------------------------------------
-// Scores ONLY fields the shopkeeper actually controls from the panel.
+// Scores ONLY fields the businesskeeper actually controls from the panel.
 // Identity fields (name, mobile, email, whatsapp, address) are locked
-// at registration and NOT scored — every shop would get those points
+// at registration and NOT scored — every business would get those points
 // for free, which dilutes the meter's motivational value.
 //
 // Tiers: 0–39 Beginner, 40–59 Basic, 60–79 Good, 80–94 Excellent,
@@ -2545,7 +2545,7 @@ function renderProfileCompleteness(b){
   const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
 
   const checks = [
-    { en:'Upload 3+ shop photos',    hi:'3+ फोटो अपलोड करें',     pts:20, href:'/panel/photos.html#upload',
+    { en:'Upload 3+ business photos',    hi:'3+ फोटो अपलोड करें',     pts:20, href:'/panel/photos.html#upload',
       ok: (Array.isArray(b.photos) ? b.photos.length : 0) >= 3,
       partial: (Array.isArray(b.photos) ? b.photos.length : 0) >= 1 ? 10 : 0 },
     { en:'Write your USP / tagline (English)', hi:'USP / टैगलाइन (English)', pts:12, href:'/panel/profile.html#usp',
@@ -2705,7 +2705,7 @@ function renderQuickWins(b){
       en: 'Set business hours',
       hi: 'खुलने का समय सेट करें',
       payoffEn: 'Show up in <b>"Open Now"</b> search filter — customers searching right now will see you.',
-      payoffHi: '<b>"अभी खुले"</b> फ़िल्टर में आपकी दुकान दिखेगी — अभी खोज रहे ग्राहकों तक पहुँच होगी।',
+      payoffHi: '<b>"अभी खुले"</b> फ़िल्टर में आपका व्यवसाय दिखेगी — अभी खोज रहे ग्राहकों तक पहुँच होगी।',
       href: '/panel/profile.html#hours',
       ctaEn: 'Set Hours →', ctaHi: 'समय निर्धारित करें →'
     });
@@ -2731,7 +2731,7 @@ function renderQuickWins(b){
       en: 'Add an About section',
       hi: '"हमारे बारे में" जोड़ें',
       payoffEn: 'Customers compare 3 shops before calling. Strong About = <b>higher pick rate</b>.',
-      payoffHi: 'ग्राहक कॉल करने से पहले 3 दुकानें तुलना करते हैं। मज़बूत About से <b>चयन दर बढ़ती है</b>।',
+      payoffHi: 'ग्राहक कॉल करने से पहले 3 व्यवसाय तुलना करते हैं। मज़बूत About से <b>चयन दर बढ़ती है</b>।',
       href: '/panel/profile.html#about',
       ctaEn: 'Add About →', ctaHi: 'जोड़ें →'
     });
@@ -2842,7 +2842,7 @@ function renderWhatsAppTemplate(b){
     completeness.parentNode.insertBefore(host, completeness.nextSibling);
   }
 
-  const shopName = b.name || 'our shop';
+  const shopName = b.name || 'our business';
   const cityName = (b.geo_cities && b.geo_cities.name) || '';
   const ownerName = b.owner_name || '';
   const shopUrl = 'https://dukanlist.com/business?slug=' + encodeURIComponent(b.slug || '');
@@ -2956,7 +2956,7 @@ async function loadRankingBattle(b){
   const c = ShopDB.client;
   if (!c) return;
 
-  // Get this shop's primary category + city
+  // Get this business's primary category + city
   const catId = b.sub_category_id || b.category_id;
   const cityId = b.city_id;
   if (!catId || !cityId) return;
@@ -3106,7 +3106,7 @@ function shareReferralWhatsApp(){
   const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
   const message = lang === 'hi'
     ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Aaj hi karein: ' + link
-    : 'Namaste! List your shop on DukanList — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Register today: ' + link;
+    : 'Namaste! List your business on DukanList — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Register today: ' + link;
   window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
 }
 

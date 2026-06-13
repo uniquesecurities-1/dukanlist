@@ -86,7 +86,7 @@
 <div class="page">
 
   <div class="fav-hero">
-    <h1>♥ <span data-i18n-en>My Favorite Shops</span><span data-i18n-hi>मेरी पसंदीदा दुकानें</span></h1>
+    <h1>♥ <span data-i18n-en>My Favorite Shops</span><span data-i18n-hi>मेरी पसंदीदा व्यवसाय</span></h1>
     <p><span data-i18n-en>Quick access to shops you've saved.</span><span data-i18n-hi>आपके द्वारा सहेजी गई दुकानों तक त्वरित पहुँच।</span></p>
   </div>
 
@@ -99,9 +99,9 @@
   <div id="empty" class="empty" style="display:none">
     <div class="ico">♡</div>
     <h2><span data-i18n-en>No favorites yet</span><span data-i18n-hi>अभी कोई पसंदीदा नहीं</span></h2>
-    <p><span data-i18n-en>Browse shops and tap the ♡ heart to save them here for one-tap access later.</span><span data-i18n-hi>दुकानें ब्राउज़ करें और ♡ हार्ट दबाकर यहाँ सहेजें।</span></p>
+    <p><span data-i18n-en>Browse shops and tap the ♡ heart to save them here for one-tap access later.</span><span data-i18n-hi>व्यवसाय ब्राउज़ करें और ♡ हार्ट दबाकर यहाँ सहेजें।</span></p>
     <a href="/browse.html" class="btn-go">
-      <span data-i18n-en>Browse Shops →</span><span data-i18n-hi>दुकानें देखें →</span>
+      <span data-i18n-en>Browse Shops →</span><span data-i18n-hi>व्यवसाय देखें →</span>
     </a>
   </div>
 
@@ -197,7 +197,7 @@ function timeAgo(iso){
 }
 
 async function unfav(bizId, btn){
-  if (!confirm('Remove this shop from favorites?')) return;
+  if (!confirm('Remove this business from favorites?')) return;
   const c = ShopDB.client;
   btn.disabled = true; btn.textContent = '⏳';
   const r = await c.rpc('toggle_favorite', { p_business_id: bizId });

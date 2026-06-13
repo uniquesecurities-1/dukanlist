@@ -30,7 +30,7 @@
 
 <div class="page-narrow">
   <h1 class="title">🪪 <span class="grad">Claim</span> Your Account</h1>
-  <p class="subtitle">Already registered your shop on DukanList but never set up a login? Set it up now in 30 seconds.</p>
+  <p class="subtitle">Already registered your business on DukanList but never set up a login? Set it up now in 30 seconds.</p>
 
   <div class="card">
     <div id="formBlock">
@@ -133,7 +133,7 @@ async function handleClaim(){
     email,
     password,
     options: {
-      data: { mobile, role: 'shopkeeper' },
+      data: { mobile, role: 'owner' },
       emailRedirectTo: window.location.origin + '/panel/login.html'
     }
   });
@@ -150,7 +150,7 @@ async function handleClaim(){
 
   // Step 2: If session exists (no email confirmation required), claim now
   if (signUpRes.data.session){
-    btn.innerHTML = '<span>⏳ Linking your shop...</span>';
+    btn.innerHTML = '<span>⏳ Linking your business...</span>';
     try {
       await c.rpc('claim_business_by_phone', { p_mobile: mobile });
       // Success — redirect to dashboard
@@ -168,7 +168,7 @@ async function handleClaim(){
     btn.disabled = false; btn.innerHTML = '<span>Create Login & Claim Shop →</span>';
     document.getElementById('formBlock').style.display = 'none';
     document.getElementById('successBlock').style.display = '';
-    document.getElementById('successMsg').innerHTML = 'Login created. Please <b>check your email</b> to confirm your address, then <a href="/panel/login.html">login</a> to claim your shop.';
+    document.getElementById('successMsg').innerHTML = 'Login created. Please <b>check your email</b> to confirm your address, then <a href="/panel/login.html">login</a> to claim your business.';
   }
 }
 

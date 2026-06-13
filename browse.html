@@ -259,7 +259,7 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
 
   <div class="stats-bar" id="statsBar" style="display:none">
     <div class="stat"><div class="num" id="stTotalCats">—</div><div class="lbl" data-i18n-en>Categories</div><div class="lbl" data-i18n-hi>श्रेणियाँ</div></div>
-    <div class="stat"><div class="num" id="stTotalShops">—</div><div class="lbl" data-i18n-en>Active Listings</div><div class="lbl" data-i18n-hi>दुकानें</div></div>
+    <div class="stat"><div class="num" id="stTotalShops">—</div><div class="lbl" data-i18n-en>Active Listings</div><div class="lbl" data-i18n-hi>व्यवसाय</div></div>
     <div class="stat"><div class="num" id="stTotalCities">—</div><div class="lbl" data-i18n-en>Cities</div><div class="lbl" data-i18n-hi>शहर</div></div>
     <div class="stat"><div class="num" id="stTotalStates">—</div><div class="lbl" data-i18n-en>States</div><div class="lbl" data-i18n-hi>राज्य</div></div>
   </div>
@@ -396,7 +396,7 @@ function renderParentCard(p, lang){
 
   // Shop-count badge (only if non-zero) — visual highlight of category activity
   const shopBadge = totalShops > 0
-    ? `<span class="p-shop-badge" title="${totalShops} ${lang==='hi'?'दुकानें':'active shops'}">🏪 ${totalShops}</span>`
+    ? `<span class="p-shop-badge" title="${totalShops} ${lang==='hi'?'व्यवसाय':'active shops'}">🏪 ${totalShops}</span>`
     : '';
   return `
     <div class="parent-card" style="--p-color:${color}; --p-tint:${tint}">

@@ -235,7 +235,7 @@
     <div class="an-card">
       <div class="an-card-head">
         <h3>⏰ <span data-i18n-en>Peak Hours</span><span data-i18n-hi>व्यस्त समय</span></h3>
-        <span class="meta-sub"><span data-i18n-en>When customers visit your shop</span><span data-i18n-hi>ग्राहक कब आते हैं</span></span>
+        <span class="meta-sub"><span data-i18n-en>When customers visit your business</span><span data-i18n-hi>ग्राहक कब आते हैं</span></span>
       </div>
       <div class="chart-wrap"><canvas id="peakChart"></canvas></div>
       <div id="peakInsight" style="margin-top:10px;font-size:.85rem;color:var(--muted);text-align:center;font-weight:600"></div>
@@ -366,7 +366,7 @@ async function loadAnalytics(days){
       owners = fb.data;
     }
     if (!owners || !owners.length){
-      showError('No business found for this account. <a href="/register.html">Register your shop →</a>');
+      showError('No business found for this account. <a href="/register.html">Register your business →</a>');
       return;
     }
     MY_BIZ_ID = owners[0].business_id;
@@ -536,7 +536,7 @@ function renderTips(d, biz){
     tips.push({ ico:'💡', en:'WhatsApp leads are 2x your calls — make sure replies are quick (< 30 min).', hi:'WhatsApp लीड कॉल से 2x — 30 मिनट में जवाब दें।' });
   }
   if (s.direction > leads / 3 && leads > 5){
-    tips.push({ ico:'📍', en:'Many people seek directions — physical visits coming! Be ready at the shop.', hi:'लोग रास्ता ढूँढ रहे हैं — दुकान पर तैयार रहें।' });
+    tips.push({ ico:'📍', en:'Many people seek directions — physical visits coming! Be ready at the business.', hi:'लोग रास्ता ढूँढ रहे हैं — दुकान पर तैयार रहें।' });
   }
 
   if (!tips.length){ document.getElementById('tipsCard').style.display = 'none'; return; }

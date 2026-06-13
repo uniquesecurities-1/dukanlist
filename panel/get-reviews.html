@@ -306,8 +306,8 @@
       <span data-i18n-hi>और रिव्यू लाएँ</span>
     </h1>
     <p>
-      <span data-i18n-en>The fastest way to grow your shop's trust. Ask happy customers in one tap — via WhatsApp, QR code, or a printable counter card.</span>
-      <span data-i18n-hi>अपनी दुकान का भरोसा बढ़ाने का सबसे तेज़ तरीका। एक टैप में खुश ग्राहकों से रिव्यू माँगें।</span>
+      <span data-i18n-en>The fastest way to grow your business's trust. Ask happy customers in one tap — via WhatsApp, QR code, or a printable counter card.</span>
+      <span data-i18n-hi>अपना व्यवसाय का भरोसा बढ़ाने का सबसे तेज़ तरीका। एक टैप में खुश ग्राहकों से रिव्यू माँगें।</span>
     </p>
     <div class="stars">⭐ ⭐ ⭐ ⭐ ⭐</div>
   </div>
@@ -428,7 +428,7 @@
     <div class="gr-card" style="text-align:center">
       <h2 style="justify-content:center"><span class="h2-icon" style="background:#DBEAFE;color:#2563EB">🔳</span>
         <span data-i18n-en>Shop QR Code</span>
-        <span data-i18n-hi>शॉप QR कोड</span>
+        <span data-i18n-hi>व्यवसाय QR कोड</span>
       </h2>
       <p class="sub">
         <span data-i18n-en>Customers scan with their phone camera and land on your review page. Print, laminate, and stick at your counter.</span>
@@ -461,7 +461,7 @@
         <h3 data-i18n-hi>हमें रेट करें</h3>
         <div class="name" id="ccName">—</div>
         <div class="stars-row">⭐ ⭐ ⭐ ⭐ ⭐</div>
-        <div class="tag" id="ccTag" data-i18n-en>Loved your visit? Scan this QR and leave us 5 stars in 10 seconds. Your review helps our shop grow.</div>
+        <div class="tag" id="ccTag" data-i18n-en>Loved your visit? Scan this QR and leave us 5 stars in 10 seconds. Your review helps our business grow.</div>
         <div class="tag" data-i18n-hi style="display:none">अच्छा अनुभव रहा? QR स्कैन करें और 10 सेकंड में 5 स्टार दें।</div>
         <div class="cc-qr" id="ccQrBox"></div>
         <div class="cc-cta">
@@ -511,7 +511,7 @@ let SHOP_URL = '';     // review-prompt URL
 let SHOP_URL_BASE = ''; // base profile URL
 
 function defaultMsg(){
-  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our shop';
+  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our business';
   // SHOP-FIRST message: sender (shop) highlighted, DukanList minimised to just URL
   return 'Namaste 🙏\n\n' +
          'Thank you for choosing *' + name + '*. It was great serving you!\n\n' +
@@ -540,7 +540,7 @@ async function loadBiz(){
     if (fb.data && fb.data.length) bizId = fb.data[0].business_id;
   }
   if (!bizId){
-    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your business →</a>';
     return;
   }
 
@@ -548,7 +548,7 @@ async function loadBiz(){
     .select('id, slug, name, name_hi, rating_avg, rating_count, photos').eq('id', bizId).maybeSingle();
   if (error || !biz){
     console.error('[get-reviews] biz fetch err', error);
-    document.getElementById('loading').innerHTML = '⚠ Could not load your shop. <a href="/panel/dashboard.html" style="color:#FF6B1A;font-weight:700;text-decoration:underline">Go to Dashboard</a>';
+    document.getElementById('loading').innerHTML = '⚠ Could not load your business. <a href="/panel/dashboard.html" style="color:#FF6B1A;font-weight:700;text-decoration:underline">Go to Dashboard</a>';
     return;
   }
 
@@ -563,7 +563,7 @@ async function loadBiz(){
   document.getElementById('statRating').textContent = biz.rating_avg ? (Number(biz.rating_avg).toFixed(1) + '★') : '—';
   document.getElementById('statCount').textContent  = biz.rating_count || 0;
 
-  // No-photo tip: best preview cards need at least 1 shop photo
+  // No-photo tip: best preview cards need at least 1 business photo
   var noPhoto = !biz.photos || !biz.photos.length;
   if (noPhoto){
     var heroCard = document.querySelector('.gr-card');
@@ -573,8 +573,8 @@ async function loadBiz(){
       tip.style.cssText = 'margin-bottom:12px;padding:12px 14px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1.5px solid #F59E0B;border-radius:12px;display:flex;gap:10px;align-items:flex-start';
       tip.innerHTML = '<div style="font-size:1.3rem">💡</div>' +
         '<div style="flex:1;min-width:0">' +
-          '<div style="font-weight:800;color:#92400E;font-size:.92rem;margin-bottom:3px">For the best WhatsApp preview, add a shop photo</div>' +
-          '<div style="font-size:.82rem;color:#92400E;opacity:.88;line-height:1.45">Right now we show a clean branded card with your shop name. With a photo, customers see your actual shop. <a href="/panel/photos.html" style="color:#7C2D12;font-weight:800;text-decoration:underline">Upload now &rarr;</a></div>' +
+          '<div style="font-weight:800;color:#92400E;font-size:.92rem;margin-bottom:3px">For the best WhatsApp preview, add a business photo</div>' +
+          '<div style="font-size:.82rem;color:#92400E;opacity:.88;line-height:1.45">Right now we show a clean branded card with your business name. With a photo, customers see your actual shop. <a href="/panel/photos.html" style="color:#7C2D12;font-weight:800;text-decoration:underline">Upload now &rarr;</a></div>' +
         '</div>';
       heroCard.parentNode.insertBefore(tip, heroCard);
     }
@@ -602,7 +602,7 @@ async function loadBiz(){
   renderQR('qrBox', SHOP_URL, 8, 4);
   renderQR('ccQrBox', SHOP_URL, 6, 3);
   document.getElementById('qrUrl').textContent = SHOP_URL;
-  document.getElementById('ccName').textContent = biz.name || 'Your Shop';
+  document.getElementById('ccName').textContent = biz.name || 'Your Business';
 
   // Show content
   document.getElementById('loading').style.display = 'none';
@@ -701,7 +701,7 @@ function downloadQR(){
   ctx.fillStyle = '#0B1220';
   ctx.font = 'bold 28px Manrope, Inter, Arial, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Shop';
+  const name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Business';
   let display = name; const maxW = canvas.width - 40;
   if (ctx.measureText(display).width > maxW){
     while (display.length > 6 && ctx.measureText(display + '…').width > maxW) display = display.slice(0,-1);
@@ -716,9 +716,9 @@ function downloadQR(){
   }, 'image/png');
 }
 function downloadCardPNG(){
-  // Re-use QR download with shop name caption is good enough for now
+  // Re-use QR download with business name caption is good enough for now
   downloadQR();
-  toast('Saved QR with shop name. Use Print button for full card.');
+  toast('Saved QR with business name. Use Print button for full card.');
 }
 function triggerDownload(href, filename){
   const a = document.createElement('a');
@@ -755,7 +755,7 @@ function openShareApp(kind){
   } else if (kind === 'sms'){
     url = 'sms:?body=' + enc;
   } else if (kind === 'email'){
-    var subj = encodeURIComponent('Quick favour — rate ' + ((MY_BIZ && MY_BIZ.name) || 'our shop') + ' on DukanList?');
+    var subj = encodeURIComponent('Quick favour — rate ' + ((MY_BIZ && MY_BIZ.name) || 'our business') + ' on DukanList?');
     url = 'mailto:?subject=' + subj + '&body=' + enc;
   } else if (kind === 'native'){
     if (navigator.share){

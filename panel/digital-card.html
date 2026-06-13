@@ -333,7 +333,7 @@ async function init(){
   if (!bizId){
     var ownRes = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
     if (ownRes.error || !ownRes.data || !ownRes.data.length){
-      showErr('No business linked to this account. Complete registration or link your shop from the dashboard.');
+      showErr('No business linked to this account. Complete registration or link your business from the dashboard.');
       return;
     }
     bizId = ownRes.data[0].business_id;

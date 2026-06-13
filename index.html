@@ -26,19 +26,19 @@
 
 <!-- Google Search Console verification -->
 <meta name="google-site-verification" content="XTQXqHhamGML1UVBlDglwaeKIkNkR5biCKwe5EvQdm0">
-<meta name="description" content="Discover every local shop, doctor, financial advisor, mechanic, mutual fund distributor, insurance agent, manufacturer and agri business in your city — 195+ categories across 12 segments. Free for owners. Verified for customers. From Mandi Dabwali.">
+<meta name="description" content="Discover every local business, doctor, financial advisor, mechanic, mutual fund distributor, insurance agent, manufacturer and agri business in your city — 195+ categories across 12 segments. Free for owners. Verified for customers. From Mandi Dabwali.">
 <meta name="keywords" content="local business directory India, mutual fund distributor Mandi Dabwali, stock broker, insurance advisor, doctor, mechanic, financial services, Haryana businesses, dukan registration, Bharat directory">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DukanList">
-<meta property="og:title" content="DukanList — Every Local Name in your city · Shop, Doctor, School, NGO & more">
+<meta property="og:title" content="DukanList — Every Local Name in your city · Business, Doctor, School, NGO & more">
 <meta property="og:description" content="FREE local directory for Sirsa · Bathinda · Mansa · Muktsar · Mandi Dabwali. 200+ categories. Pucho Bhai community Q&amp;A. WhatsApp + Call ready. Zero cost for owners.">
 <meta property="og:url" content="https://dukanlist.com">
 <meta property="og:image" content="https://dukanlist.com/assets/og-default.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="DukanList — Every Local Name in your city · Shop, Doctor, School, NGO & more">
+<meta name="twitter:title" content="DukanList — Every Local Name in your city · Business, Doctor, School, NGO & more">
 <meta name="twitter:description" content="FREE local directory · Sirsa · Bathinda · Mansa · Muktsar · Mandi Dabwali · 200+ categories · Pucho Bhai community Q&amp;A">
 <meta name="twitter:image" content="https://dukanlist.com/assets/og-default.png">
 <link rel="canonical" href="https://dukanlist.com/">
@@ -119,10 +119,10 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Is DukanList free for shopkeepers?",
+      "name": "Is DukanList free for business owners?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, DukanList is 100% FREE for shopkeepers. You can register your business, add photos, manage reviews, and get customer leads — all without any cost. No hidden charges, no commission."
+        "text": "Yes, DukanList is 100% FREE for business owners. You can register your business, add photos, manage reviews, and get customer leads — all without any cost. No hidden charges, no commission."
       }
     },
     {
@@ -135,15 +135,15 @@
     },
     {
       "@type": "Question",
-      "name": "How does DukanList verify shops?",
+      "name": "How does DukanList verify businesses?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Every shop is verified across 4 signals: mobile number (OTP), address (pincode-locality match), at least 1 photo, and optional community visit. Verified shops get Bronze, Silver, or Gold trust badges visible to customers."
+        "text": "Every business is verified across 4 signals: mobile number (OTP), address (pincode-locality match), at least 1 photo, and optional community visit. Verified businesses get Bronze, Silver, or Gold trust badges visible to customers."
       }
     },
     {
       "@type": "Question",
-      "name": "How do customers find shops on DukanList?",
+      "name": "How do customers find businesses on DukanList?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Customers can browse 195+ categories, search by name or service, filter by city/locality, swipe through the TikTok-style Discover feed, or ask the Pucho Bhai community for recommendations. One tap to call, WhatsApp, or get directions."
@@ -154,7 +154,7 @@
       "name": "Can I add my business in Hindi?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. DukanList supports both English and Hindi. Shop names auto-transliterate to Hindi, and you can write the description in either language. The site UI also switches between EN and हिं with one tap."
+        "text": "Yes. DukanList supports both English and Hindi. Business names auto-transliterate to Hindi, and you can write the description in either language. The site UI also switches between EN and हिं with one tap."
       }
     }
   ]
@@ -731,7 +731,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
 <!-- ===== STICKY MINI SEARCH (mobile only, shows on scroll past hero) ===== -->
 <div id="stickyMiniSearch" role="search" aria-label="Quick search">
   <span class="sm-icon">🔍</span>
-  <input type="text" id="stickyMiniInput" placeholder="Search shops, services…" autocomplete="off" data-ph-en="Search shops, services…" data-ph-hi="दुकान, सेवा…">
+  <input type="text" id="stickyMiniInput" placeholder="Search businesses, services…" autocomplete="off" data-ph-en="Search businesses, services…" data-ph-hi="दुकान, सेवा…">
   <button type="button" id="stickyMiniBtn" data-i18n-en="Go" data-i18n-hi="खोजें">Go</button>
 </div>
 
@@ -747,16 +747,16 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   // Indian festival calendar — auto-theme homepage banner.
   // Dates: fixed-cal festivals exact, variable festivals locked to 2026 then refresh yearly.
   const F = [
-    { name_en:'Happy New Year!',         name_hi:'नया साल मुबारक!',     month:12, day:31, span:1, theme:'newyear', emoji:'🎆', msg_en:'New Year — start fresh with local shops you can trust', msg_hi:'नया साल — भरोसेमंद local shops से नई शुरुआत' },
-    { name_en:'Happy New Year!',         name_hi:'नया साल मुबारक!',     month:1,  day:1,  span:3, theme:'newyear', emoji:'🎆', msg_en:'New Year — start fresh with local shops you can trust', msg_hi:'नया साल — भरोसेमंद local shops से नई शुरुआत' },
-    { name_en:'Lohri Greetings',         name_hi:'लोहड़ी की शुभकामनाएं', month:1,  day:13, span:1, theme:'lohri',   emoji:'🔥', msg_en:'Lohri — celebrate with local Punjabi sweets & gajak shops', msg_hi:'लोहड़ी — local मिठाई और गजक shops से आनंद उठाएं' },
+    { name_en:'Happy New Year!',         name_hi:'नया साल मुबारक!',     month:12, day:31, span:1, theme:'newyear', emoji:'🎆', msg_en:'New Year — start fresh with local businesses you can trust', msg_hi:'नया साल — भरोसेमंद local businesses से नई शुरुआत' },
+    { name_en:'Happy New Year!',         name_hi:'नया साल मुबारक!',     month:1,  day:1,  span:3, theme:'newyear', emoji:'🎆', msg_en:'New Year — start fresh with local businesses you can trust', msg_hi:'नया साल — भरोसेमंद local businesses से नई शुरुआत' },
+    { name_en:'Lohri Greetings',         name_hi:'लोहड़ी की शुभकामनाएं', month:1,  day:13, span:1, theme:'lohri',   emoji:'🔥', msg_en:'Lohri — celebrate with local Punjabi sweets & gajak businesses', msg_hi:'लोहड़ी — local मिठाई और गजक businesses से आनंद उठाएं' },
     { name_en:'Happy Republic Day',      name_hi:'गणतंत्र दिवस मुबारक', month:1,  day:26, span:1, theme:'india',   emoji:'🇮🇳', msg_en:'Republic Day — supporting Bharat\'s local owners',  msg_hi:'गणतंत्र दिवस — भारत के local मालिकों का साथ' },
-    { name_en:'Happy Holi',              name_hi:'होली मुबारक',         month:3,  day:5,  span:2, theme:'holi',    emoji:'🎨', msg_en:'Holi — colors, sweets, and good vibes at local shops',     msg_hi:'होली — रंग, मिठाई और local खुशियाँ' },
-    { name_en:'Baisakhi Greetings',      name_hi:'बैसाखी की शुभकामनाएं',month:4,  day:13, span:2, theme:'lohri',   emoji:'🌾', msg_en:'Baisakhi — harvest season, support local farmers & agri shops', msg_hi:'बैसाखी — फसल का मौसम, local farmers की सहायता' },
+    { name_en:'Happy Holi',              name_hi:'होली मुबारक',         month:3,  day:5,  span:2, theme:'holi',    emoji:'🎨', msg_en:'Holi — colors, sweets, and good vibes at local businesses',     msg_hi:'होली — रंग, मिठाई और local खुशियाँ' },
+    { name_en:'Baisakhi Greetings',      name_hi:'बैसाखी की शुभकामनाएं',month:4,  day:13, span:2, theme:'lohri',   emoji:'🌾', msg_en:'Baisakhi — harvest season, support local farmers & agri businesses', msg_hi:'बैसाखी — फसल का मौसम, local farmers की सहायता' },
     { name_en:'Happy Independence Day',  name_hi:'स्वतंत्रता दिवस मुबारक',month:8,day:15, span:1, theme:'india',   emoji:'🇮🇳', msg_en:'Vande Mataram — celebrating with Bharat\'s local businesses', msg_hi:'वंदे मातरम् — local business के साथ जश्न' },
-    { name_en:'Happy Diwali',            name_hi:'दिवाली मुबारक',       month:11, day:8,  span:4, theme:'diwali',  emoji:'🪔', msg_en:'Diwali — light up your home with gifts from local shops',  msg_hi:'दिवाली — local shops से दीये जलाएं' },
+    { name_en:'Happy Diwali',            name_hi:'दिवाली मुबारक',       month:11, day:8,  span:4, theme:'diwali',  emoji:'🪔', msg_en:'Diwali — light up your home with gifts from local businesses',  msg_hi:'दिवाली — local businesses से दीये जलाएं' },
     { name_en:'Gurpurab Greetings',      name_hi:'गुरपुरब की शुभकामनाएं',month:11, day:24, span:1, theme:'sikh',   emoji:'🪯', msg_en:'Gurpurab — Vaheguru ji ki Fateh',                          msg_hi:'गुरपुरब — वाहेगुरु जी की फतेह' },
-    { name_en:'Merry Christmas',         name_hi:'क्रिसमस मुबारक',      month:12, day:25, span:2, theme:'xmas',    emoji:'🎄', msg_en:'Christmas — find gifts at local local shops',    msg_hi:'क्रिसमस — local local shops से तोहफे लें' }
+    { name_en:'Merry Christmas',         name_hi:'क्रिसमस मुबारक',      month:12, day:25, span:2, theme:'xmas',    emoji:'🎄', msg_en:'Christmas — find gifts at local local businesses',    msg_hi:'क्रिसमस — local local businesses से तोहफे लें' }
   ];
   const THEMES = {
     newyear:'linear-gradient(135deg,#0F172A 0%,#7C3AED 50%,#F59E0B 100%)',
@@ -784,7 +784,7 @@ footer .copy{ font-size:.78rem; color:rgba(255,255,255,.5); padding-top:18px; bo
   document.getElementById('festMsg').innerHTML =
     '<b>' + (lang === 'hi' ? match.name_hi : match.name_en) + '</b> · ' +
     (lang === 'hi' ? match.msg_hi : match.msg_en);
-  const ctaText = lang === 'hi' ? 'Local shops देखें →' : 'Browse local shops →';
+  const ctaText = lang === 'hi' ? 'Local businesses देखें →' : 'Browse local businesses →';
   document.getElementById('festCta').textContent = ctaText;
   banner.style.display = '';
   // Save match key for dismiss
@@ -843,7 +843,7 @@ function dismissFestBanner(){
       <span data-i18n-hi>सिरसा · बठिंडा · मानसा · मुक्तसर में <span class="grad">कुछ भी local</span> खोजें</span>
     </h1>
     <p class="hero-sub">
-      <span data-i18n-en>Doctor · CA · Mechanic · School · NGO · Shop · Clinic · Office — verified · free · one tap to call</span>
+      <span data-i18n-en>Doctor · CA · Clinic · Hospital · School · Office · Showroom · Shop · NGO — verified · free · one tap to call</span>
       <span data-i18n-hi>डॉक्टर, CA, मिस्त्री, स्कूल, NGO, दुकान · वेरिफाइड · फ्री · एक टैप पर कॉल</span>
     </p>
 
@@ -1124,7 +1124,7 @@ function dismissFestBanner(){
   <div style="display:flex;flex-wrap:wrap;gap:8px">
     <a href="/search.html?cat=doctor,dentist,ayurveda,homeopathy,hospital,physiotherapist,eye-care,gynecologist,pediatrician" class="trend-chip">🏥 <span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></a>
     <a href="/search.html?cat=pharmacy" class="trend-chip">💊 <span data-i18n-en>Pharmacy</span><span data-i18n-hi>दवाई</span></a>
-    <a href="/search.html?cat=agri-business" class="trend-chip">🌾 <span data-i18n-en>Agri Shops</span><span data-i18n-hi>कृषि शॉप</span></a>
+    <a href="/search.html?cat=agri-business" class="trend-chip">🌾 <span data-i18n-en>Agri Listings</span><span data-i18n-hi>कृषि लिस्टिंग</span></a>
     <a href="/search.html?cat=tractor-parts,spare-parts" class="trend-chip">🚜 <span data-i18n-en>Tractor Parts</span><span data-i18n-hi>ट्रैक्टर पार्ट्स</span></a>
     <a href="/search.html?cat=car-service,two-wheeler-service,tyre-shop,spare-parts,cycle-shop,puncture-shop,tractor-parts,battery-shop" class="trend-chip">🔧 <span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span></a>
     <a href="/search.html?cat=electrician" class="trend-chip">⚡ <span data-i18n-en>Electrician</span><span data-i18n-hi>बिजली मिस्त्री</span></a>
@@ -1332,7 +1332,7 @@ function dismissFestBanner(){
       <span data-i18n-hi>DukanList पर नया-नया</span>
     </h2>
     <p>
-      <span data-i18n-en>We're shipping new features every week to help local shops grow. Here's what just dropped.</span>
+      <span data-i18n-en>We're shipping new features every week to help local businesses grow. Here's what just dropped.</span>
       <span data-i18n-hi>हर हफ़्ते नए फ़ीचर्स — स्थानीय मालिकों के लिए।</span>
     </p>
   </div>
@@ -1341,26 +1341,26 @@ function dismissFestBanner(){
 
       <a href="/discover.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#F0ABFC !important;background:linear-gradient(135deg,#FAF5FF 0%,#FCE7F3 100%);position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(192,38,211,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff">🎬</div><span class="wn-badge new" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;animation:pulseGlow 2.4s ease-in-out infinite">JUST DROPPED</span></div>
-        <h3><span data-i18n-en>Discover Feed — TikTok-Style Shops</span><span data-i18n-hi>Discover फ़ीड — TikTok जैसा अनुभव</span></h3>
-        <p><span data-i18n-en>Swipe up through Sirsa-Bathinda shops one by one — full-screen photos, ratings, instant Call &amp; WhatsApp buttons. Built for thumbs.</span><span data-i18n-hi>Sirsa-Bathinda की दुकानें एक-एक करके swipe करें — full-screen photos, rating, सीधे Call &amp; WhatsApp। मोबाइल के लिए बनाया।</span></p>
+        <h3><span data-i18n-en>Discover Feed — TikTok-Style Discovery</span><span data-i18n-hi>Discover फ़ीड — TikTok जैसा अनुभव</span></h3>
+        <p><span data-i18n-en>Swipe up through Sirsa-Bathinda businesss one by one — full-screen photos, ratings, instant Call &amp; WhatsApp buttons. Built for thumbs.</span><span data-i18n-hi>Sirsa-Bathinda की दुकानें एक-एक करके swipe करें — full-screen photos, rating, सीधे Call &amp; WhatsApp। मोबाइल के लिए बनाया।</span></p>
       </a>
 
       <a href="/panel/dashboard.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FBCFE8 !important;background:linear-gradient(135deg,#FDF2F8 0%,#FCE7F3 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(236,72,153,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#EC4899,#BE185D);color:#fff">🚶</div><span class="wn-badge new" style="background:linear-gradient(135deg,#EC4899,#BE185D);color:#fff">FOR OWNERS</span></div>
         <h3><span data-i18n-en>Live Walk-In Counter</span><span data-i18n-hi>लाइव ग्राहक काउंटर</span></h3>
-        <p><span data-i18n-en>One-tap "+1 Customer Aaya" button on your dashboard. Live count appears on your shop page → instant social proof for new visitors.</span><span data-i18n-hi>Dashboard पर एक-tap "+1 ग्राहक आया" बटन। आपकी दुकान page पर live count दिखेगा → नए ग्राहकों के लिए social proof।</span></p>
+        <p><span data-i18n-en>One-tap "+1 Customer Aaya" button on your dashboard. Live count appears on your business page → instant social proof for new visitors.</span><span data-i18n-hi>Dashboard पर एक-tap "+1 ग्राहक आया" बटन। आपका व्यवसाय page पर live count दिखेगा → नए ग्राहकों के लिए social proof।</span></p>
       </a>
 
       <a href="/discover.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FDE68A !important;background:linear-gradient(135deg,#FFFBEB 0%,#FEF9C3 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(245,158,11,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff">⭐</div><span class="wn-badge new" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff">WEEKLY</span></div>
-        <h3><span data-i18n-en>Shop of the Week Spotlight</span><span data-i18n-hi>हफ़्ते की शॉप</span></h3>
-        <p><span data-i18n-en>Every week we hand-pick one outstanding shop and feature it on Discover + homepage banner. Free reward for top-quality listings.</span><span data-i18n-hi>हर हफ़्ते एक बेहतरीन दुकान चुनी जाती है — Discover &amp; homepage पर feature होती है। Top quality listings के लिए मुफ़्त इनाम।</span></p>
+        <h3><span data-i18n-en>Listing of the Week Spotlight</span><span data-i18n-hi>हफ़्ते की लिस्टिंग</span></h3>
+        <p><span data-i18n-en>Every week we hand-pick one outstanding business and feature it on Discover + homepage banner. Free reward for top-quality listings.</span><span data-i18n-hi>हर हफ़्ते एक बेहतरीन दुकान चुनी जाती है — Discover &amp; homepage पर feature होती है। Top quality listings के लिए मुफ़्त इनाम।</span></p>
       </a>
 
       <a href="/panel/poster-studio.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FCD34D !important;background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(245,158,11,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#0A0A0A,#404040);color:#FBBF24">✨</div><span class="wn-badge new" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#78350F">PREMIUM</span></div>
         <h3><span data-i18n-en>Premium Poster Studio v2</span><span data-i18n-hi>प्रीमियम पोस्टर स्टूडियो v2</span></h3>
-        <p><span data-i18n-en>Apple-class business card layout. Upload shop photo, custom address saves, auto QR code, dukanlist.com watermark. 30+ templates, one-tap WhatsApp share.</span><span data-i18n-hi>Apple-grade business card design। दुकान की फोटो डालें, पता save रहेगा, QR code automatic, watermark आता है। 30+ template, WhatsApp share एक tap में।</span></p>
+        <p><span data-i18n-en>Apple-class business card layout. Upload business photo, custom address saves, auto QR code, dukanlist.com watermark. 30+ templates, one-tap WhatsApp share.</span><span data-i18n-hi>Apple-grade business card design। दुकान की फोटो डालें, पता save रहेगा, QR code automatic, watermark आता है। 30+ template, WhatsApp share एक tap में।</span></p>
       </a>
 
       <a href="/panel/digital-card.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#C7D2FE !important;background:linear-gradient(135deg,#EEF2FF 0%,#E0E7FF 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(67,56,202,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1372,20 +1372,20 @@ function dismissFestBanner(){
       <a href="/browse.html?cat=readymade-garments" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#E9D5FF !important;background:linear-gradient(135deg,#FAF5FF 0%,#F3E8FF 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(168,85,247,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#A855F7,#7C3AED);color:#fff">🧥</div><span class="wn-badge new" style="background:linear-gradient(135deg,#A855F7,#7C3AED);color:#fff">NEW</span></div>
         <h3><span data-i18n-en>Readymade Garments</span><span data-i18n-hi>रेडीमेड कपड़े</span></h3>
-        <p><span data-i18n-en>New Retail subcategory — ready-to-wear shops for kids, men, women apparel, jeans, t-shirts, dresses. Separate from custom tailoring.</span><span data-i18n-hi>Retail में नई sub-category — kids, men, women के ready-to-wear कपड़े, jeans, t-shirts, dresses। Tailoring से अलग।</span></p>
+        <p><span data-i18n-en>New Retail subcategory — ready-to-wear businesses for kids, men, women apparel, jeans, t-shirts, dresses. Separate from custom tailoring.</span><span data-i18n-hi>Retail में नई sub-category — kids, men, women के ready-to-wear कपड़े, jeans, t-shirts, dresses। Tailoring से अलग।</span></p>
       </a>
 
       <!-- ===== OLDER UPDATES — hidden by default, revealed via "Show more" ===== -->
       <a href="/browse.html?cat=construction-material" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#FED7AA !important;background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(234,88,12,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#F97316,#92400E);color:#fff">🧱</div><span class="wn-badge new" style="background:linear-gradient(135deg,#F97316,#EA580C);color:#fff">FRESH</span></div>
         <h3><span data-i18n-en>Paint, Hardware, Chuna &amp; More</span><span data-i18n-hi>पेंट, हार्डवेयर, चूना &amp; अधिक</span></h3>
-        <p><span data-i18n-en>Building &amp; Construction Material parent with 13 sub-categories — paint, cement, sariya, tiles, plywood, pipes, electrical hardware, doors-windows. Find any construction shop fast.</span><span data-i18n-hi>निर्माण सामग्री में 13 उप-श्रेणियाँ — पेंट, सीमेंट, सरिया, टाइल्स, प्लाइवुड, पाइप, इलेक्ट्रिकल हार्डवेयर।</span></p>
+        <p><span data-i18n-en>Building &amp; Construction Material parent with 13 sub-categories — paint, cement, sariya, tiles, plywood, pipes, electrical hardware, doors-windows. Find any construction business fast.</span><span data-i18n-hi>निर्माण सामग्री में 13 उप-श्रेणियाँ — पेंट, सीमेंट, सरिया, टाइल्स, प्लाइवुड, पाइप, इलेक्ट्रिकल हार्डवेयर।</span></p>
       </a>
 
       <a href="/puchobhai" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#A7F3D0 !important;background:linear-gradient(135deg,#ECFDF5 0%,#F0FDF4 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(16,185,129,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff">🏪</div><span class="wn-badge new" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff">NEW</span></div>
-        <h3><span data-i18n-en>Tag Any Shop in Pucho Bhai</span><span data-i18n-hi>Pucho Bhai में किसी भी दुकान को tag करें</span></h3>
-        <p><span data-i18n-en>Replying to a question? Now search &amp; tag ANY shop from DukanList — not just your own. Helps the asker contact directly.</span><span data-i18n-hi>जवाब देते समय DukanList की कोई भी दुकान खोज कर tag करें — सिर्फ अपनी ही नहीं।</span></p>
+        <h3><span data-i18n-en>Tag Any Business in Pucho Bhai</span><span data-i18n-hi>Pucho Bhai में किसी भी व्यवसाय को tag करें</span></h3>
+        <p><span data-i18n-en>Replying to a question? Now search &amp; tag ANY business from DukanList — not just your own. Helps the asker contact directly.</span><span data-i18n-hi>जवाब देते समय DukanList का कोई भी व्यवसाय खोज कर tag करें — सिर्फ अपनी ही नहीं।</span></p>
       </a>
 
       <div class="wn-card" data-wn-extra="1" style="border-color:#DBEAFE !important;background:linear-gradient(135deg,#EFF6FF 0%,#F0F9FF 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(37,99,235,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1403,7 +1403,7 @@ function dismissFestBanner(){
       <a href="/puchobhai" class="wn-card" data-wn-extra="1" style="text-decoration:none;color:inherit;display:block;border-color:#DDD6FE !important;background:linear-gradient(135deg,#FAF5FF 0%,#FFF1F2 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(124,58,237,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff">💬</div><span class="wn-badge new" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff">LAUNCHED</span></div>
         <h3><span data-i18n-en>Pucho Bhai — Community Q&amp;A</span><span data-i18n-hi>पूछो भाई — कम्युनिटी Q&amp;A</span></h3>
-        <p><span data-i18n-en>Your city's local Q&amp;A board. Ask anything, locals reply — best shops, services, hidden gems. No login needed!</span><span data-i18n-hi>अपने शहर का लोकल Q&amp;A बोर्ड। पूछिए कुछ भी, लोकल लोग जवाब देंगे। बिना लॉगिन!</span></p>
+        <p><span data-i18n-en>Your city's local Q&amp;A board. Ask anything, locals reply — best businesses, services, hidden gems. No login needed!</span><span data-i18n-hi>अपने शहर का लोकल Q&amp;A बोर्ड। पूछिए कुछ भी, लोकल लोग जवाब देंगे। बिना लॉगिन!</span></p>
       </a>
 
       <div class="wn-card" data-wn-extra="1" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1420,14 +1420,14 @@ function dismissFestBanner(){
 
       <div class="wn-card" data-wn-extra="1" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#A7F3D0,#10B981)">❓</div><span class="wn-badge new">NEW</span></div>
-        <h3><span data-i18n-en>Public Q&amp;A on Shop Pages</span><span data-i18n-hi>दुकान पेज पर सवाल-जवाब</span></h3>
+        <h3><span data-i18n-en>Public Q&amp;A on Listing Pages</span><span data-i18n-hi>लिस्टिंग पेज पर सवाल-जवाब</span></h3>
         <p><span data-i18n-en>Customers ask, owners answer — all visible publicly. Builds trust, helps SEO.</span><span data-i18n-hi>ग्राहक सवाल पूछें, मालिक जवाब दें — सबको दिखेगा। भरोसा बढ़ेगा।</span></p>
       </div>
 
       <div class="wn-card" data-wn-extra="1" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#FCA5A5,#EF4444)">🔥</div><span class="wn-badge new">NEW</span></div>
         <h3><span data-i18n-en>Live Activity Ticker</span><span data-i18n-hi>लाइव एक्टिविटी टिकर</span></h3>
-        <p><span data-i18n-en>Bottom strip shows real-time shop registrations + new reviews. See DukanList growing live.</span><span data-i18n-hi>नीचे लाइव टिकर — नई दुकानें + रिव्यू real-time दिखेंगे।</span></p>
+        <p><span data-i18n-en>Bottom strip shows real-time business registrations + new reviews. See DukanList growing live.</span><span data-i18n-hi>नीचे लाइव टिकर — नई दुकानें + रिव्यू real-time दिखेंगे।</span></p>
       </div>
 
       <div class="wn-card" data-wn-extra="1" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1445,7 +1445,7 @@ function dismissFestBanner(){
       <div class="wn-card" data-wn-extra="1" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#FBCFE8,#EC4899)">📋</div><span class="wn-badge new">NEW</span></div>
         <h3><span data-i18n-en>Profile Strength Wizard</span><span data-i18n-hi>प्रोफ़ाइल मज़बूती</span></h3>
-        <p><span data-i18n-en>14-point checklist — see exactly what's missing in your shop profile. Score 0-100 + 'Add this →' CTAs.</span><span data-i18n-hi>14 चीज़ें check — क्या missing है तुरंत पता। स्कोर 0-100 + सीधे CTA।</span></p>
+        <p><span data-i18n-en>14-point checklist — see exactly what's missing in your business profile. Score 0-100 + 'Add this →' CTAs.</span><span data-i18n-hi>14 चीज़ें check — क्या missing है तुरंत पता। स्कोर 0-100 + सीधे CTA।</span></p>
       </div>
 
       <div class="wn-card" data-wn-extra="1" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 24px rgba(67,56,202,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1544,7 +1544,7 @@ function dismissFestBanner(){
   </div>
 </section>
 
-<!-- ===== TOP 5 SHOPS OF THE MONTH (leaderboard) ===== -->
+<!-- ===== TOP 5 LISTINGS OF THE MONTH (leaderboard) ===== -->
 <section id="top10Section" style="background:#FFFBEB;padding:50px 0;display:none">
   <div class="section-head reveal">
     <span class="eyebrow" style="color:#92400E">🏆 <span data-i18n-en>Top 5 of the Month</span><span data-i18n-hi>महीने के टॉप 5</span></span>
@@ -1556,10 +1556,10 @@ function dismissFestBanner(){
   </div>
 </section>
 
-<!-- ===== FEATURED SHOP OF THE WEEK ===== -->
+<!-- ===== FEATURED LISTING OF THE WEEK ===== -->
 <section id="fsotw" style="background:linear-gradient(180deg,#FFF7ED 0%,#FFFFFF 100%);padding:50px 0;display:none">
   <style>
-    /* Featured Shop of the Week — responsive */
+    /* Featured Listing of the Week — responsive */
     .fsotw-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:0; min-height:320px }
     .fsotw-grid.fsotw-no-photo{ grid-template-columns: 1fr }
     .fsotw-photo{ background:#f8fafc; min-height:260px; max-height:420px; overflow:hidden }
@@ -1586,7 +1586,7 @@ function dismissFestBanner(){
   <div class="section-head reveal">
     <span class="eyebrow" style="color:#E55100">⭐ <span data-i18n-en>Spotlight of the Week</span><span data-i18n-hi>हफ़्ते का स्पॉटलाइट</span></span>
     <h2><span data-i18n-en id="fsotwH2">Spotlight on a local legend</span><span data-i18n-hi>स्थानीय legend पर रोशनी</span></h2>
-    <p><span data-i18n-en>Hand-picked weekly. Top-rated, photo-rich, customer-loved shops from our directory.</span><span data-i18n-hi>हर हफ़्ते हाथ से चुना — टॉप rated, photo-rich, customer-loved shops।</span></p>
+    <p><span data-i18n-en>Hand-picked weekly. Top-rated, photo-rich, customer-loved businesses from our directory.</span><span data-i18n-hi>हर हफ़्ते हाथ से चुना — टॉप rated, photo-rich, customer-loved businesses।</span></p>
   </div>
   <div class="cats-wrap" style="max-width:920px;margin:0 auto;padding:0 16px">
     <div id="fsotwCard" style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 12px 36px rgba(15,23,42,0.08);border:1px solid #FED7AA"></div>
@@ -1597,7 +1597,7 @@ function dismissFestBanner(){
 <section id="custTest" style="background:linear-gradient(180deg,#F0FDF4 0%,#FFFFFF 100%);padding:50px 0;display:none">
   <div class="section-head reveal">
     <span class="eyebrow" style="color:#15803D">💬 <span data-i18n-en>Real Customer Voices</span><span data-i18n-hi>असली ग्राहक की आवाज़</span></span>
-    <h2><span data-i18n-en>5-star reviews from local shoppers</span><span data-i18n-hi>स्थानीय ग्राहकों के 5-star रिव्यू</span></h2>
+    <h2><span data-i18n-en>5-star reviews from local customers</span><span data-i18n-hi>स्थानीय customers के 5-star रिव्यू</span></h2>
     <p><span data-i18n-en>Real reviews from real customers across our directory.</span><span data-i18n-hi>हमारे directory के असली रिव्यू।</span></p>
   </div>
   <div class="cats-wrap" style="max-width:1180px;margin:0 auto;padding:0 16px">
@@ -1610,7 +1610,7 @@ function dismissFestBanner(){
   <div class="section-head reveal">
     <span class="eyebrow" style="color:#E55100">🎁 Today's Offers</span>
     <h2><span data-i18n-en>Live deals near you</span><span data-i18n-hi>आज के ऑफर्स</span></h2>
-    <p class="sub"><span data-i18n-en>Limited-time discounts from local shops. Tap to view.</span><span data-i18n-hi>स्थानीय दुकानों से सीमित समय के ऑफर्स।</span></p>
+    <p class="sub"><span data-i18n-en>Limited-time discounts from local businesses. Tap to view.</span><span data-i18n-hi>स्थानीय दुकानों से सीमित समय के ऑफर्स।</span></p>
   </div>
   <div class="cats-wrap">
     <div id="dealsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"></div>
@@ -1692,7 +1692,7 @@ function dismissFestBanner(){
       <div class="n">1</div>
       <h3>
         <span data-i18n-en>🏪 List Your Business</span>
-        <span data-i18n-hi>🏪 अपनी दुकान रजिस्टर करें</span>
+        <span data-i18n-hi>🏪 अपना व्यवसाय रजिस्टर करें</span>
       </h3>
       <p>
         <span data-i18n-en>Free signup via mobile OTP in 2 minutes. Add your business name, category, photos and your USP.</span>
@@ -2270,8 +2270,8 @@ if (window.DukanPTR){
         <span data-i18n-en>Pick your area</span><span data-i18n-hi>अपना इलाका चुनें</span>
       </h2>
       <p style="font-size:.86rem;color:#64748b;line-height:1.5">
-        <span data-i18n-en>Get shops and services near you. You can change this anytime.</span>
-        <span data-i18n-hi>अपने पास की shops देखें। कभी भी बदल सकते हैं।</span>
+        <span data-i18n-en>Get businesses and services near you. You can change this anytime.</span>
+        <span data-i18n-hi>आस-पास के व्यवसाय देखें। कभी भी बदल सकते हैं।</span>
       </p>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">
@@ -2321,7 +2321,7 @@ if (window.DukanPTR){
   window.openLocalityPicker = showLocalityModal;
 })();
 
-// ============= FEATURED SHOP OF THE WEEK + TESTIMONIALS (loads after main render) =============
+// ============= FEATURED LISTING OF THE WEEK + TESTIMONIALS (loads after main render) =============
 (function(){
   async function loadTop10(){
     try {
@@ -2548,7 +2548,7 @@ if (window.DukanPTR){
 </div>
 <script>
 (function(){
-  // Live Activity Ticker — auto-pulls recent shop registrations, reviews, leads.
+  // Live Activity Ticker — auto-pulls recent business registrations, reviews, leads.
   // Bottom strip, auto-rotates every 5s.
   const ticker = document.getElementById('actTicker');
   if (!ticker) return;
@@ -2606,7 +2606,7 @@ if (window.DukanPTR){
       // Static fallback (so ticker is never empty)
       events.push(
         { en: '🏪 Sirsa · Bathinda · Mansa · Muktsar ka apna local directory — join FREE', hi: '🏪 Sirsa · Bathinda · Mansa · Muktsar का local directory — FREE जुड़ें' },
-        { en: '💬 Customers daily WhatsApp local shops directly', hi: '💬 Customers रोज़ local shops से WhatsApp पर बात करते हैं' }
+        { en: '💬 Customers daily WhatsApp local businesses directly', hi: '💬 Customers रोज़ local businesses से WhatsApp पर बात करते हैं' }
       );
     }
 

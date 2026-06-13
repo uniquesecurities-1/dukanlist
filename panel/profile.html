@@ -150,16 +150,16 @@
       </div>
       <div class="form-group">
         <label>
-          <span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span>
+          <span data-i18n-en>Business Name (English)</span><span data-i18n-hi>व्यवसाय का नाम (English)</span>
           <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em">🔒 LOCKED</span>
         </label>
         <input id="bizName" class="input" type="text" maxlength="80" readonly style="background:#F8FAFC;color:#475569;cursor:not-allowed">
         <div style="font-size:.74rem;color:#64748B;margin-top:4px">
-          To change the shop name, please contact admin on WhatsApp.
+          To change the business name, please contact admin on WhatsApp.
         </div>
       </div>
       <div class="form-group">
-        <label><span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>दुकान का नाम (हिंदी)</span></label>
+        <label><span data-i18n-en>Business Name (Hindi)</span><span data-i18n-hi>व्यवसाय का नाम (हिंदी)</span></label>
         <input id="bizNameHi" class="input" type="text" maxlength="80" placeholder="Will auto-fill from English — edit if conversion looks wrong">
       </div>
       <div class="form-group">
@@ -280,7 +280,7 @@
       </div>
     </div>
 
-    <!-- ===== TRUST SIGNALS (structured fields shown on shop page) ===== -->
+    <!-- ===== TRUST SIGNALS (structured fields shown on business page) ===== -->
     <div class="card" style="margin-top:18px">
       <div class="card-title">
         ✨ <span data-i18n-en>Shop Trust Signals</span><span data-i18n-hi>विश्वास के संकेत</span>
@@ -296,7 +296,7 @@
           <input id="establishedYear" class="input keep-en" type="number" min="1900" max="2030" placeholder="e.g., 2018">
         </div>
         <div class="form-group" style="display:flex;align-items:flex-end">
-          <small style="color:var(--muted);font-size:.78rem"><span data-i18n-en>Shows as "Since YYYY · N years serving" on shop page</span><span data-i18n-hi>"Since YYYY · N years serving" के रूप में दिखेगा</span></small>
+          <small style="color:var(--muted);font-size:.78rem"><span data-i18n-en>Shows as "Since YYYY · N years serving" on business page</span><span data-i18n-hi>"Since YYYY · N years serving" के रूप में दिखेगा</span></small>
         </div>
       </div>
 
@@ -316,7 +316,7 @@
       <div class="form-group">
         <label><span data-i18n-en>Special features (up to 6, comma-separated)</span><span data-i18n-hi>खासियत (max 6, comma से अलग करें)</span></label>
         <input id="specialFeatures" class="input" type="text" placeholder="Free home delivery, Bulk discount, Loyalty card, EMI available">
-        <small style="color:var(--muted);font-size:.78rem;margin-top:6px;display:block"><span data-i18n-en>Each feature appears as a green pill on your shop page.</span><span data-i18n-hi>हर खासियत एक हरी पिल के रूप में दिखेगी।</span></small>
+        <small style="color:var(--muted);font-size:.78rem;margin-top:6px;display:block"><span data-i18n-en>Each feature appears as a green pill on your business page.</span><span data-i18n-hi>हर खासियत एक हरी पिल के रूप में दिखेगी।</span></small>
       </div>
     </div>
 
@@ -419,7 +419,7 @@
         <span style="font-weight:500;color:var(--muted);font-size:.78rem;margin-left:6px">(optional)</span>
       </div>
       <div style="font-size:.82rem;color:var(--muted);margin-bottom:10px;line-height:1.5">
-        <span data-i18n-en>Paste your shop's public URLs. They appear as small icons on your business page — customers can follow you.</span>
+        <span data-i18n-en>Paste your business's public URLs. They appear as small icons on your business page — customers can follow you.</span>
         <span data-i18n-hi>अपनी dukan के public link paste करें। Business page पर chhoti icons दिखेंगी — customer follow कर सकते हैं।</span>
       </div>
       <div class="form-group">
@@ -612,7 +612,7 @@ async function loadProfile(){
     owners = fb.data;
   }
   if (!owners || !owners.length){
-    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your business →</a>';
     return;
   }
 
@@ -957,7 +957,7 @@ async function saveProfile(){
   const okEl = document.getElementById('saveOk');
   errEl.style.display = okEl.style.display = 'none';
 
-  // Shop name and email are LOCKED for owner edits — only admin can change.
+  // Business name and email are LOCKED for owner edits — only admin can change.
   // Read them from DB state (not the readonly fields) so the payload below
   // never carries an owner-side change to these protected fields.
   const owner = document.getElementById('ownerName').value.trim();
@@ -983,7 +983,7 @@ async function saveProfile(){
   const specialFeatures = document.getElementById('specialFeatures').value
     .split(',').map(s => s.trim()).filter(s => s.length > 0 && s.length < 60).slice(0, 6);
 
-  // Shop name, email, mobile (whatsapp) and address are deliberately NOT
+  // Business name, email, mobile (whatsapp) and address are deliberately NOT
   // in this payload — they are identity fields that only admin can
   // change. The backend RPC also rejects these fields when sent by a
   // non-admin owner.
@@ -1132,7 +1132,7 @@ function profilePublicUrl(){
 }
 
 function defaultAskMessage(){
-  const shopName = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our shop';
+  const shopName = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'our business';
   const base = profilePublicUrl();
   // profilePublicUrl already has a query (?slug=...). Use & to add review=1.
   const sep = base.indexOf('?') >= 0 ? '&' : '?';
@@ -1213,7 +1213,7 @@ window.addEventListener('DOMContentLoaded', () => {
       clearInterval(seedTimer);
     } else if (++tries > 40){
       clearInterval(seedTimer); // give up after ~8s
-      seedAskMessage(); // seed with fallback shop name
+      seedAskMessage(); // seed with fallback business name
     }
   }, 200);
 });

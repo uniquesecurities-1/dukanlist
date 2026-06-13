@@ -227,14 +227,14 @@ e.g. FLAT 30% OFF" maxlength="80"></textarea>
         <button type="button" data-fmt="card"><span class="fmt-ico">▬</span> Card</button>
       </div>
     </div>
-    <!-- Optional: brand the poster with shop name + phone (always editable) -->
+    <!-- Optional: brand the poster with business name + phone (always editable) -->
     <div id="brandToggleWrap" style="margin-bottom:12px">
       <label class="brand-toggle">
         <input type="checkbox" id="brandChk" checked>
-        <span>Stamp my shop name + phone on the poster</span>
+        <span>Stamp my business name + phone on the poster</span>
       </label>
       <div id="brandFields" class="brand-fields">
-        <input type="text" id="brandName" class="brand-input" placeholder="Shop name" maxlength="40">
+        <input type="text" id="brandName" class="brand-input" placeholder="Business name" maxlength="40">
         <input type="text" id="brandPhone" class="brand-input" placeholder="📞 +91 9876543210" maxlength="20">
       </div>
     </div>
@@ -276,7 +276,7 @@ const STATE = {
   styleId: 'saffron-pop',// default style
   category: null,        // currently selected category
   format: 'square',      // 'square' (1080x1080) | 'story' (1080x1920) | 'card' (1200x630)
-  brand: true,           // include shop name + phone at the bottom
+  brand: true,           // include business name + phone at the bottom
   biz: null              // { name, mobile } — loaded from logged-in shop on boot
 };
 
@@ -376,7 +376,7 @@ function drawSubtitle(ctx, sub, x, y, opts){
   }
 }
 
-// Draws a small shop-brand footer at bottom-center — shop name + phone
+// Draws a small shop-brand footer at bottom-center — business name + phone
 function drawShopFooter(ctx, w, h, biz, opts){
   if (!biz || !biz.name) return;
   const phoneStr = biz.mobile ? '📞 ' + biz.mobile : '';
@@ -909,7 +909,7 @@ document.getElementById('brandChk').addEventListener('change', (e) => {
   renderMain();
 });
 
-// Manual shop name + phone editors
+// Manual business name + phone editors
 function _syncBiz(){
   const name = (document.getElementById('brandName').value || '').trim();
   const mobile = (document.getElementById('brandPhone').value || '').trim();
@@ -924,7 +924,7 @@ function _syncBiz(){
 document.getElementById('brandName').addEventListener('input', _syncBiz);
 document.getElementById('brandPhone').addEventListener('input', _syncBiz);
 
-// === Load shop info (BIZ data) — prefills the manual inputs if logged in ===
+// === Load business info (BIZ data) — prefills the manual inputs if logged in ===
 async function loadShopInfo(){
   try {
     // Also restore from localStorage so the user's previous entries persist
@@ -959,7 +959,7 @@ async function loadShopInfo(){
     if (!phoneEl.value && phoneFmt){ phoneEl.value = phoneFmt; }
     STATE.biz = { name: nameEl.value, mobile: phoneEl.value };
     renderMain();
-  } catch(e){ console.warn('Shop info load:', e); }
+  } catch(e){ console.warn('Business info load:', e); }
 }
 
 // === Festival auto-detect ===

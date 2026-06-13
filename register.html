@@ -477,15 +477,15 @@
 {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  "name": "How to register your shop on DukanList",
-  "description": "List your shop, business or practice on DukanList in 4 simple steps — completely free. Reach customers in Sirsa, Bathinda, Mansa, Muktsar, and Mandi Dabwali.",
+  "name": "How to register your business on DukanList",
+  "description": "List your business, business or practice on DukanList in 4 simple steps — completely free. Reach customers in Sirsa, Bathinda, Mansa, Muktsar, and Mandi Dabwali.",
   "image": "https://dukanlist.com/assets/og-default.png",
   "totalTime": "PT5M",
   "estimatedCost": { "@type": "MonetaryAmount", "currency": "INR", "value": "0" },
   "supply": [
     { "@type": "HowToSupply", "name": "10-digit mobile number" },
-    { "@type": "HowToSupply", "name": "Shop name and address" },
-    { "@type": "HowToSupply", "name": "At least 1 shop photo (recommended)" }
+    { "@type": "HowToSupply", "name": "Business name and address" },
+    { "@type": "HowToSupply", "name": "At least 1 business photo (recommended)" }
   ],
   "tool": [
     { "@type": "HowToTool", "name": "Smartphone with internet" }
@@ -495,7 +495,7 @@
       "@type": "HowToStep",
       "position": 1,
       "name": "Enter your basics",
-      "text": "Add your shop name, owner name, mobile number, and email. Auto-transliterates to Hindi if you prefer.",
+      "text": "Add your business name, owner name, mobile number, and email. Auto-transliterates to Hindi if you prefer.",
       "url": "https://dukanlist.com/register.html#step-1"
     },
     {
@@ -578,15 +578,15 @@
       <span data-i18n-hi>📱 आपका संपर्क</span>
     </div>
     <div class="card-sub">
-      <span data-i18n-en>We'll verify your shop via WhatsApp after submission — no OTP needed!</span>
+      <span data-i18n-en>We'll verify your business via WhatsApp after submission — no OTP needed!</span>
       <span data-i18n-hi>सबमिट करने के बाद हम WhatsApp पर वेरिफाई करेंगे — कोई OTP नहीं!</span>
     </div>
 
     <div class="alert info" style="margin-bottom:14px">
       <span class="a-icon">💡</span>
       <div>
-        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 95412 23377</b>. We'll personally verify your shop and activate it within 24 hours.</span>
-        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 95412 23377</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपकी दुकान को व्यक्तिगत रूप से सत्यापित करके 24 घंटे में सक्रिय कर देंगे।</span>
+        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 95412 23377</b>. We'll personally verify your business and activate it within 24 hours.</span>
+        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 95412 23377</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपका व्यवसाय को व्यक्तिगत रूप से सत्यापित करके 24 घंटे में सक्रिय कर देंगे।</span>
       </div>
     </div>
 
@@ -633,8 +633,8 @@
       <span data-i18n-hi>🏪 दुकान की जानकारी</span>
     </div>
     <div class="card-sub">
-      <span data-i18n-en>Tell us about your shop.</span>
-      <span data-i18n-hi>अपनी दुकान के बारे में बताएं।</span>
+      <span data-i18n-en>Tell us about your business.</span>
+      <span data-i18n-hi>अपना व्यवसाय के बारे में बताएं।</span>
     </div>
 
     <!-- ===== MULTI-CATEGORY SELECTOR ===== -->
@@ -673,7 +673,7 @@
     </div>
 
     <div class="form-group">
-      <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span><span class="req">*</span></label>
+      <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>व्यवसाय का नाम (English)</span><span class="req">*</span></label>
       <input id="bizName" class="input" type="text" placeholder="e.g. Sharma Carpentry Works" maxlength="80" oninput="scheduleHindiAutoFill();updateCharCount(this,'bizNameCount',80)"><div id="bizNameCount" class="char-counter" style="text-align:right;font-size:.74rem;color:#94a3b8;font-weight:600;margin-top:4px">0 / 80</div>
       <div class="help">
         <span data-i18n-en>Display name customers will see. Hindi version below will fill automatically.</span>
@@ -682,7 +682,7 @@
     </div>
     <div class="form-group">
       <label>
-        <span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>दुकान का नाम (हिंदी)</span>
+        <span data-i18n-en>Shop Name (Hindi)</span><span data-i18n-hi>व्यवसाय का नाम (हिंदी)</span>
         <span class="opt">(auto-filled — edit if wrong)</span>
         <span id="hindiAutoStatus" style="font-size:11px;color:#0EA5E9;font-weight:600;margin-left:6px"></span>
       </label>
@@ -725,7 +725,7 @@
     </div>
     <!-- WhatsApp + Shop Email fields removed (2026-06-02).
          Earlier these were optional fields, but they caused confusion:
-         shopkeepers would either repeat their mobile or leave them blank.
+         business owners would either repeat their mobile or leave them blank.
          Backend defaults whatsapp = mobile automatically; the login email
          in Step 4 is the single email source.
          Keeping the hidden input below so existing JS references (
@@ -784,7 +784,7 @@
       <!-- Locality dropdown — RE-ENABLED 2026-06-11 with strong nudge.
            Local area search ("Meena Bazaar mein doctor") is how people
            ACTUALLY look for shops. Optional but the help text below
-           strongly nudges shopkeepers to fill it for 3x more views. -->
+           strongly nudges business owners to fill it for 3x more views. -->
       <div class="form-group" id="localityWrap" style="display:none">
         <label>
           <span data-i18n-en>🎯 Area / Market</span><span data-i18n-hi>🎯 क्षेत्र / बाज़ार</span>
@@ -865,14 +865,14 @@
       <div id="uspHiCount" class="char-counter" style="text-align:right;font-size:.74rem;color:#94a3b8;font-weight:600;margin-top:4px">0 / 280</div>
     </div>
 
-    <!-- ===== LOGIN CREDENTIALS — needed to manage your shop ===== -->
+    <!-- ===== LOGIN CREDENTIALS — needed to manage your business ===== -->
     <div style="margin:18px 0;padding:16px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1.5px solid #3B82F6;border-radius:12px">
       <div style="font-weight:800;color:#1E40AF;font-size:1rem;margin-bottom:6px">
         🔐 <span data-i18n-en>Create your login</span><span data-i18n-hi>अपना लॉगिन बनाएँ</span>
       </div>
       <div style="font-size:.85rem;color:#1E3A8A;line-height:1.5;margin-bottom:14px">
-        <span data-i18n-en>You'll use this email + password to manage your shop, add photos, reply to reviews.</span>
-        <span data-i18n-hi>इस ईमेल + पासवर्ड से आप अपनी दुकान manage कर पाएंगे, फोटो डाल पाएंगे, reviews का जवाब दे पाएंगे।</span>
+        <span data-i18n-en>You'll use this email + password to manage your business, add photos, reply to reviews.</span>
+        <span data-i18n-hi>इस ईमेल + पासवर्ड से आप अपना व्यवसाय manage कर पाएंगे, फोटो डाल पाएंगे, reviews का जवाब दे पाएंगे।</span>
       </div>
 
       <div class="form-group">
@@ -902,7 +902,7 @@
     <div class="alert info">
       <span class="a-icon">📸</span>
       <div>
-        <span data-i18n-en class="block"><b>Photo upload</b> in next step after registration. Minimum 1 shop photo activates your listing.</span>
+        <span data-i18n-en class="block"><b>Photo upload</b> in next step after registration. Minimum 1 business photo activates your listing.</span>
         <span data-i18n-hi class="block"><b>फोटो अपलोड</b> रजिस्ट्रेशन के बाद अगले स्टेप में। कम से कम 1 दुकान फोटो से आपकी लिस्टिंग चालू होगी।</span>
       </div>
     </div>
@@ -937,8 +937,8 @@
       <span data-i18n-hi>रजिस्ट्रेशन प्राप्त हुआ!</span>
     </div>
     <p style="color:var(--muted);margin-bottom:14px;line-height:1.6">
-      <span data-i18n-en class="block">Your shop is in our review queue. <b style="color:var(--ink)">One last step</b> — WhatsApp us to activate within 24 hours.</span>
-      <span data-i18n-hi class="block">आपकी दुकान review queue में है। <b style="color:var(--ink)">एक आखिरी कदम</b> — WhatsApp करके 24 घंटे में चालू करवाएं।</span>
+      <span data-i18n-en class="block">Your business is in our review queue. <b style="color:var(--ink)">One last step</b> — WhatsApp us to activate within 24 hours.</span>
+      <span data-i18n-hi class="block">आपका व्यवसाय review queue में है। <b style="color:var(--ink)">एक आखिरी कदम</b> — WhatsApp करके 24 घंटे में चालू करवाएं।</span>
     </p>
 
     <!-- Pending Status Pill -->
@@ -1443,7 +1443,7 @@ function handleStep2(){
   var ownerRole = roleSelEl ? roleSelEl.value : '';
   if (ownerRole === 'Other' && roleCustEl) ownerRole = (roleCustEl.value || '').trim();
   STATE.data.ownerRole = ownerRole;
-  if (name.length < 3)  return showErr(errEl, 'Shop name must be at least 3 characters');
+  if (name.length < 3)  return showErr(errEl, 'Business name must be at least 3 characters');
   if (owner.length < 3) return showErr(errEl, 'Owner name required');
 
   STATE.data.categoryIds        = CAT_STATE.selected.slice();
@@ -1762,7 +1762,7 @@ async function handleSubmit(){
   // Proper email validation — was loginEmail.indexOf('@') === -1 which
   // accepted strings like "a@b", "@", "foo@.". Now uses RFC-friendly regex.
   if (!loginEmail || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(loginEmail)){
-    return showErr(errEl, 'Please enter a valid email address (e.g. you@gmail.com) — needed to manage your shop later.');
+    return showErr(errEl, 'Please enter a valid email address (e.g. you@gmail.com) — needed to manage your business later.');
   }
   if (loginPassword.length < 8){
     return showErr(errEl, 'Password must be at least 8 characters — pick a strong one.');
@@ -1886,7 +1886,7 @@ async function handleSubmit(){
       email: STATE.data.loginEmail,
       password: STATE.data.loginPassword,
       options: {
-        data: { mobile: STATE.phone, business_id: data, role: 'shopkeeper' },
+        data: { mobile: STATE.phone, business_id: data, role: 'business owner' },
         emailRedirectTo: window.location.origin + '/panel/login.html'
       }
     });
@@ -1922,7 +1922,7 @@ async function handleSubmit(){
         : 'Network issue. Your listing was saved. Press Submit again to create your login.';
     }
     errEl.innerHTML = '<strong>⚠️ ' + friendly + '</strong>'
-      + '<br><small style="opacity:.85">Shop registration ID: ' + (data || '').slice(0,8)
+      + '<br><small style="opacity:.85">Business registration ID: ' + (data || '').slice(0,8)
       + ' — please contact admin if this persists.</small>';
     errEl.style.display = 'block';
     // Persist the registration id so admin can rescue if needed
@@ -1938,7 +1938,7 @@ async function handleSubmit(){
   const shopName = STATE.data.name;
   const ownerPhone = STATE.phoneDisplay;
   const verifyMsg =
-    '🏪 New shop registration on DukanList!\n\n' +
+    '🏪 New business registration on DukanList!\n\n' +
     'Shop Name: ' + shopName + '\n' +
     'Owner: ' + STATE.data.ownerName + '\n' +
     'Mobile: +91 ' + ownerPhone + '\n' +
@@ -2319,12 +2319,12 @@ function escapeHTML(s){
 }
 
 // ============================================================
-// Hindi auto-fill for shop name using Google Input Tools API
+// Hindi auto-fill for business name using Google Input Tools API
 // ------------------------------------------------------------
 // Free public endpoint (used by Google's own services) that returns
 // the most likely Devanagari transliteration of a Roman-script word.
 // We debounce 600ms after the user stops typing, and skip if the
-// shopkeeper has manually edited the Hindi field.
+// business owner has manually edited the Hindi field.
 // ============================================================
 let _hindiAutoTimer = null;
 let _hindiManuallyEdited = false;

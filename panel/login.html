@@ -411,14 +411,14 @@
       <span data-i18n-en>No account yet?</span>
       <span data-i18n-hi>अकाउंट नहीं है?</span>
       <a href="/register.html" style="font-weight:700">
-        <span data-i18n-en>Register your shop</span>
+        <span data-i18n-en>Register your business</span>
         <span data-i18n-hi>दुकान रजिस्टर करें</span>
       </a>
     </div>
   </div>
 
   <p style="text-align:center;margin-top:16px;font-size:.78rem;color:var(--muted)">
-    <span data-i18n-en>Already registered your shop but no login yet? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">Claim your account</a></span>
+    <span data-i18n-en>Already registered your business but no login yet? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">Claim your account</a></span>
     <span data-i18n-hi>दुकान रजिस्टर है लेकिन लॉगिन नहीं? <a href="/panel/claim-account.html" style="color:var(--saffron-deep);font-weight:700">अपना अकाउंट क्लेम करें</a></span>
   </p>
   </div><!-- /.login-col -->
@@ -501,7 +501,7 @@
     <div class="pulse-grid">
       <div class="pulse-stat">
         <div class="pulse-stat-num" id="psShops">—</div>
-        <div class="pulse-stat-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>दुकानें</span></div>
+        <div class="pulse-stat-lbl"><span data-i18n-en>Shops</span><span data-i18n-hi>व्यवसाय</span></div>
       </div>
       <div class="pulse-stat">
         <div class="pulse-stat-num" id="psCities">—</div>
@@ -526,7 +526,7 @@
       </div>
     </div>
 
-    <!-- Shopkeeper Testimonial Rotator -->
+    <!-- Owner Testimonial Rotator -->
     <div class="testimonial-strip" id="testimonialStrip">
       <div class="testimonial-quote" id="testQuote">Loading testimonials...</div>
       <div class="testimonial-author" id="testAuthor">—</div>
@@ -534,7 +534,7 @@
 
     <div class="pulse-cta">
       <span data-i18n-en>Aapki dukaan abhi tak online nahi?</span>
-      <span data-i18n-hi>आपकी दुकान अभी तक ऑनलाइन नहीं?</span>
+      <span data-i18n-hi>आपका व्यवसाय अभी तक ऑनलाइन नहीं?</span>
       <br>
       <a href="/register.html">
         <span data-i18n-en>Register FREE →</span>
@@ -551,8 +551,8 @@
       <span data-i18n-hi>✨ Login ke baad aapko ye dikhega</span>
     </div>
     <h2>
-      <span data-i18n-en>Your Personal Shop Dashboard</span>
-      <span data-i18n-hi>Aapki Personal Shop Dashboard</span>
+      <span data-i18n-en>Your Personal Business Dashboard</span>
+      <span data-i18n-hi>Aapki Personal Business Dashboard</span>
     </h2>
     <p>
       <span data-i18n-en>Stats, leads, deals, reviews — sab ek jagah</span>
@@ -643,8 +643,8 @@
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFAQ(this)"><span><span data-i18n-en>Naya account kaise banayein?</span><span data-i18n-hi>नया account कैसे बनायें?</span></span><span class="faq-q-icon">+</span></div>
       <div class="faq-a">
-        <span data-i18n-en>Bilkul FREE hai. <a href="/register.html">Register Your Shop</a> button click karein. 4 simple steps me 2 minute me complete — shop name, address, photos, email/password. Bas.</span>
-        <span data-i18n-hi>बिल्कुल FREE है। <a href="/register.html">Register Your Shop</a> button click करें। 4 steps में 2 minute में complete।</span>
+        <span data-i18n-en>Bilkul FREE hai. <a href="/register.html">Register Your Business</a> button click karein. 4 simple steps me 2 minute me complete — business name, address, photos, email/password. Bas.</span>
+        <span data-i18n-hi>बिल्कुल FREE है। <a href="/register.html">Register Your Business</a> button click करें। 4 steps में 2 minute में complete।</span>
       </div>
     </div>
     <div class="faq-item">
@@ -711,7 +711,7 @@ function animateCount(id, target){
   requestAnimationFrame(step);
 }
 
-// Realistic activity ticker — no real shop names exposed (privacy-friendly)
+// Realistic activity ticker — no real business names exposed (privacy-friendly)
 const ACTIVITY_TEMPLATES = [
   { icon: '🏪', enText: 'New listing registered in <b>{city}</b>',                       hiText: 'नई लिस्टिंग रजिस्टर हुई <b>{city}</b> में' },
   { icon: '⭐', enText: 'Customer left a <b>5-star review</b> for a {cat}',           hiText: '<b>5-स्टार रिव्यू</b> मिला एक {cat} को' },
@@ -1021,7 +1021,7 @@ async function handleLogin(){
     }
   } catch(_){ /* if RPC errors, fall through to dashboard which has its own checks */ }
 
-  // No business linked yet — allow login (dashboard will show 'Link your shop' UI)
+  // No business linked yet — allow login (dashboard will show 'Link your business' UI)
   if (bizStatus && bizStatus !== 'active' && bizStatus !== 'pending_review'){
     try { await c.auth.signOut(); } catch(_){}
     btn.disabled = false; btn.innerHTML = '<span>Login →</span>';
@@ -1157,9 +1157,9 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 <script>
-// ============= Shopkeeper Testimonial Rotator =============
+// ============= Owner Testimonial Rotator =============
 const TESTIMONIALS = [
-  { quote_en: "Pehle padosi customer hi aate the. Ab Sirsa · Bathinda · Mansa · Muktsar se calls aate hain. Bas DukanList par list kar diya tha.", quote_hi: "पहले पड़ोसी customer आते थे। अब Sirsa · Bathinda · Mansa · Muktsar से calls आते हैं। बस DukanList पर list कर दिया था।", author_en: "Mechanic shop owner, Mandi Dabwali", author_hi: "Mechanic shop owner, मंडी डबवाली" },
+  { quote_en: "Pehle padosi customer hi aate the. Ab Sirsa · Bathinda · Mansa · Muktsar se calls aate hain. Bas DukanList par list kar diya tha.", quote_hi: "पहले पड़ोसी customer आते थे। अब Sirsa · Bathinda · Mansa · Muktsar से calls आते हैं। बस DukanList पर list कर दिया था।", author_en: "Mechanic business owner, Mandi Dabwali", author_hi: "Mechanic business owner, मंडी डबवाली" },
   { quote_en: "30% se 50% revenue badh gaya 2 mahine me. WhatsApp pe direct customers aane lage.", quote_hi: "30% से 50% revenue बढ़ा 2 महीने में। WhatsApp पर direct customers आने लगे।", author_en: "Salon owner, Sirsa", author_hi: "Salon owner, सिरसा" },
   { quote_en: "Bohot simple hai — bas 5 photos upload kiye, customer khud dhundh kar aaye.", quote_hi: "बहुत simple है — बस 5 photos upload किए, customers खुद ढूँढ़कर आए।", author_en: "Sweets shop, Bathinda", author_hi: "Sweets shop, बठिंडा" },
   { quote_en: "Pehle paid directories pe ₹15,000/saal lagta tha. DukanList par 100% free aur usse zyada calls aate hain.", quote_hi: "पहले paid directories पर ₹15,000/साल लगता था। DukanList पर FREE है और ज़्यादा calls।", author_en: "Mobile repair shop, Kalanwali", author_hi: "Mobile repair shop, कलनवाली" },

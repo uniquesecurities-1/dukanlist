@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#FF6B1A">
-<title>Your Shop QR Code — dukanlist.com</title>
+<title>Your Business QR Code — dukanlist.com</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
@@ -89,10 +89,10 @@
 
   <h1 class="title">
     <span data-i18n-en>Your <span class="grad">Shop QR</span> Code</span>
-    <span data-i18n-hi>आपका <span class="grad">शॉप QR</span> कोड</span>
+    <span data-i18n-hi>आपका <span class="grad">व्यवसाय QR</span> कोड</span>
   </h1>
   <p class="subtitle no-print">
-    <span data-i18n-en>Print this QR and display at your shop. Customers scan with their phone camera to view your profile.</span>
+    <span data-i18n-en>Print this QR and display at your business. Customers scan with their phone camera to view your profile.</span>
     <span data-i18n-hi>इस QR को प्रिंट करें और दुकान पर लगाएं।</span>
   </p>
 
@@ -172,19 +172,19 @@ async function loadBiz(){
     if (fb.data && fb.data.length) bizId = fb.data[0].business_id;
   }
   if (!bizId){
-    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your shop →</a>';
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your business →</a>';
     return;
   }
 
   var res = await c.from('businesses').select('id, slug, name').eq('id', bizId).maybeSingle();
   if (res.error || !res.data){
-    document.getElementById('loading').innerHTML = '⚠ Could not load your shop.';
+    document.getElementById('loading').innerHTML = '⚠ Could not load your business.';
     return;
   }
   MY_BIZ = res.data;
   PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
 
-  document.getElementById('qrShopName').textContent = MY_BIZ.name || 'Your Shop';
+  document.getElementById('qrShopName').textContent = MY_BIZ.name || 'Your Business';
   document.getElementById('qrUrl').textContent = PROFILE_URL;
   renderQR(PROFILE_URL);
 
@@ -270,7 +270,7 @@ function downloadQR(){
   ctx.font = 'bold 28px Manrope, Inter, Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  var name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Shop';
+  var name = (MY_BIZ && MY_BIZ.name) ? MY_BIZ.name : 'Your Business';
   var display = name;
   var maxW = canvas.width - 40;
   if (ctx.measureText(display).width > maxW){
