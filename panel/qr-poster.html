@@ -381,50 +381,123 @@ function getCustomMsg(){
   return (document.getElementById('customMsg').value || '').trim();
 }
 
-// === TEMPLATE 1: SAFFRON CLASSIC ===
+// === TEMPLATE 1: SAFFRON CLASSIC (auto-layout, evergreen) ===
 function drawSaffron(ctx, w, h){
-  // Saffron gradient BG
+  // Background — saffron gradient
   var bg = ctx.createLinearGradient(0, 0, 0, h);
   bg.addColorStop(0, '#FF6B1A');
   bg.addColorStop(1, '#E55100');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
-  // White inner card
   var pad = w * 0.06;
+
+  // White inner card
   roundRect(ctx, pad, pad, w - 2*pad, h - 2*pad, 30);
   ctx.fillStyle = '#FFFBF5';
   ctx.fill();
 
-  // Top banner "VERIFIED LISTING"
-  var bx = w/2, by = pad + 70;
+  ctx.textAlign = 'center';
+  var msg = getCustomMsg();
+  var hasEst = !!MY_BIZ.established_year;
+  var hasMsg = !!msg;
+
+  // ========================================
+  // HEADER REGION (top-down)
+  // ========================================
+  var headerTop = pad + 60;
+
+  // 1) Verified pill
   ctx.fillStyle = '#10B981';
-  roundRect(ctx, bx - 240, by - 28, 480, 56, 28);
+  roundRect(ctx, w/2 - 240, headerTop, 480, 56, 28);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
   ctx.font = '900 28px Manrope, sans-serif';
-  ctx.fillText('✓ VERIFIED ON DUKANLIST', bx, by + 10);
+  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, headerTop + 38);
 
-  // Shop name
+  // 2) Shop name — measure to determine 1 or 2 lines
+  var nameStartY = headerTop + 130;
+  var nameFontSize = Math.floor(w*0.06);
+  ctx.font = '900 ' + nameFontSize + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
-  ctx.textAlign = 'center';
-  ctx.font = '900 ' + Math.floor(w*0.06) + 'px Manrope, sans-serif';
-  wrapText(ctx, (MY_BIZ.name || 'Your Business').toUpperCase(), w/2, by + 110, w - 4*pad, w*0.075);
+  var shopName = (MY_BIZ.name || 'Your Business').toUpperCase();
+  var nameMaxWidth = w - 4*pad;
+  var nameWidth = ctx.measureText(shopName).width;
+  var nameLines = (nameWidth <= nameMaxWidth) ? 1 : 2;
+  var lineHeight = nameFontSize * 1.1;
+  wrapText(ctx, shopName, w/2, nameStartY, nameMaxWidth, lineHeight);
 
-  // Category + city
+  // 3) Category line — positioned below shop name (handles 1/2 line names)
+  var categoryY = nameStartY + (nameLines === 1 ? 60 : lineHeight + 50);
   if (MY_BIZ.category_name){
     ctx.font = '700 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
     ctx.fillStyle = '#92400E';
-    ctx.fillText(MY_BIZ.category_icon + ' ' + MY_BIZ.category_name + (MY_BIZ.city_name ? ' · 📍 ' + MY_BIZ.city_name : ''), w/2, by + 180);
+    var catText = MY_BIZ.category_icon + ' ' + MY_BIZ.category_name +
+                  (MY_BIZ.city_name ? ' · 📍 ' + MY_BIZ.city_name : '');
+    ctx.fillText(catText, w/2, categoryY);
+  }
+  var headerEnd = categoryY + (MY_BIZ.category_name ? 50 : 20);
+
+  // ========================================
+  // FOOTER REGION (bottom-up, anchored at bottom)
+  // ========================================
+  var footerH = 100;
+  var footerY = h - pad - footerH;
+
+  // Footer banner — DukanList branding
+  ctx.fillStyle = '#0F172A';
+  roundRect(ctx, pad + 30, footerY, w - 2*pad - 60, footerH, 18);
+  ctx.fill();
+  ctx.fillStyle = '#FBBF24';
+  ctx.font = '900 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
+  ctx.fillText('DukanList — Bharat\'s Local Directory', w/2, footerY + 40);
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '600 ' + Math.floor(w*0.02) + 'px Manrope, sans-serif';
+  ctx.fillText('dukanlist.com · Verified Listings · Free for Everyone', w/2, footerY + 70);
+
+  // Trust/info lines stacked bottom-up above footer
+  var lineGap = 50;
+  var nextLineY = footerY - 35;
+
+  if (hasEst){
+    var years = new Date().getFullYear() - MY_BIZ.established_year;
+    var establishedTxt = years >= 1
+      ? '★ Trusted Since ' + MY_BIZ.established_year + ' · ' + years + '+ years in business'
+      : '★ Established ' + MY_BIZ.established_year;
+    ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#92400E';
+    ctx.fillText(establishedTxt, w/2, nextLineY);
+    nextLineY -= lineGap;
   }
 
-  // QR code centered
+  if (hasMsg){
+    ctx.font = '600 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#E55100';
+    ctx.fillText(msg, w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+
+  // Scan instruction (always shown, sits above other trust lines)
+  ctx.font = '800 ' + Math.floor(w*0.032) + 'px Manrope, sans-serif';
+  ctx.fillStyle = '#0F172A';
+  ctx.fillText('📱 SCAN TO VIEW PROFILE', w/2, nextLineY);
+  var bottomContentTop = nextLineY - Math.floor(w*0.032) - 30;
+
+  // ========================================
+  // MIDDLE REGION: QR code (fills the gap)
+  // ========================================
   if (QR_DATA){
-    var qrSize = Math.min(w * 0.55, h * 0.42);
+    // Available vertical & horizontal space
+    var availH = bottomContentTop - headerEnd - 60; // 30 padding above and below
+    var availW = w * 0.72;
+    // QR size — fits in available area, clamped 400-820px
+    var qrSize = Math.min(availH, availW);
+    qrSize = Math.max(400, Math.min(820, qrSize));
     var qrX = (w - qrSize) / 2;
-    var qrY = by + 220;
-    // White card with shadow
+    // Center vertically in the available middle space
+    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
+
+    // White shadow card
     ctx.fillStyle = '#fff';
     ctx.shadowColor = 'rgba(0,0,0,0.15)';
     ctx.shadowBlur = 20;
@@ -435,49 +508,11 @@ function drawSaffron(ctx, w, h){
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
-
-    // "Scan with phone camera"
-    ctx.font = '800 ' + Math.floor(w*0.032) + 'px Manrope, sans-serif';
-    ctx.fillStyle = '#0F172A';
-    ctx.fillText('📱 SCAN TO VIEW PROFILE', w/2, qrY + qrSize + 80);
-
-    // Custom message
-    var msg = getCustomMsg();
-    if (msg){
-      ctx.font = '600 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#E55100';
-      ctx.fillText(msg, w/2, qrY + qrSize + 130);
-    }
-
-    // Timeless trust signal — established year (does NOT change, no need to reprint)
-    if (MY_BIZ.established_year){
-      var years = new Date().getFullYear() - MY_BIZ.established_year;
-      var establishedTxt = years >= 1
-        ? ('★ Trusted Since ' + MY_BIZ.established_year + ' · ' + years + '+ years in business')
-        : '★ Established ' + MY_BIZ.established_year;
-      ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#92400E';
-      ctx.fillText(establishedTxt, w/2, qrY + qrSize + 175);
-    }
   }
-
-  // Footer ribbon
-  var fy = h - pad - 100;
-  ctx.fillStyle = '#0F172A';
-  roundRect(ctx, pad + 30, fy, w - 2*pad - 60, 90, 18);
-  ctx.fill();
-  ctx.fillStyle = '#FBBF24';
-  ctx.font = '900 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('DukanList — Bharat\'s Local Directory', w/2, fy + 40);
-  ctx.fillStyle = '#94A3B8';
-  ctx.font = '600 ' + Math.floor(w*0.02) + 'px Manrope, sans-serif';
-  ctx.fillText('dukanlist.com · Verified Listings · Free for Everyone', w/2, fy + 70);
 }
 
-// === TEMPLATE 2: PREMIUM DARK ===
+// === TEMPLATE 2: PREMIUM DARK (auto-layout) ===
 function drawDark(ctx, w, h){
-  // Dark gradient BG
   var bg = ctx.createLinearGradient(0, 0, w, h);
   bg.addColorStop(0, '#0F172A');
   bg.addColorStop(1, '#1E293B');
@@ -485,6 +520,7 @@ function drawDark(ctx, w, h){
   ctx.fillRect(0, 0, w, h);
 
   var pad = w * 0.06;
+  ctx.textAlign = 'center';
 
   // Gold accent corners
   ctx.fillStyle = '#FBBF24';
@@ -497,34 +533,76 @@ function drawDark(ctx, w, h){
   ctx.fillRect(w - pad - 80, h - pad - 8, 80, 8);
   ctx.fillRect(w - pad - 8, h - pad - 80, 8, 80);
 
+  // === HEADER REGION ===
+  var headerTop = pad + 80;
+
   // Verified pill
-  var by = pad + 90;
   ctx.fillStyle = '#10B981';
-  roundRect(ctx, w/2 - 240, by - 28, 480, 56, 28);
+  roundRect(ctx, w/2 - 240, headerTop, 480, 56, 28);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
   ctx.font = '900 26px Manrope, sans-serif';
-  ctx.fillText('✓ VERIFIED LISTING', w/2, by + 9);
+  ctx.fillText('✓ VERIFIED LISTING', w/2, headerTop + 36);
 
-  // Shop name in gold
+  // Shop name — measure for 1/2 lines
+  var nameStartY = headerTop + 140;
+  var nameFontSize = Math.floor(w*0.06);
+  ctx.font = '900 ' + nameFontSize + 'px Manrope, sans-serif';
   ctx.fillStyle = '#FBBF24';
-  ctx.textAlign = 'center';
-  ctx.font = '900 ' + Math.floor(w*0.06) + 'px Manrope, sans-serif';
-  wrapText(ctx, (MY_BIZ.name || 'Your Business').toUpperCase(), w/2, by + 130, w - 4*pad, w*0.075);
+  var shopName = (MY_BIZ.name || 'Your Business').toUpperCase();
+  var nameMaxWidth = w - 4*pad;
+  var nameWidth = ctx.measureText(shopName).width;
+  var nameLines = (nameWidth <= nameMaxWidth) ? 1 : 2;
+  var lineHeight = nameFontSize * 1.1;
+  wrapText(ctx, shopName, w/2, nameStartY, nameMaxWidth, lineHeight);
 
-  // Category subtle
+  var categoryY = nameStartY + (nameLines === 1 ? 60 : lineHeight + 50);
   if (MY_BIZ.category_name){
     ctx.font = '600 ' + Math.floor(w*0.026) + 'px Manrope, sans-serif';
     ctx.fillStyle = '#94A3B8';
-    ctx.fillText(MY_BIZ.category_icon + ' ' + MY_BIZ.category_name + (MY_BIZ.city_name ? ' · ' + MY_BIZ.city_name : ''), w/2, by + 200);
+    ctx.fillText(MY_BIZ.category_icon + ' ' + MY_BIZ.category_name + (MY_BIZ.city_name ? ' · ' + MY_BIZ.city_name : ''), w/2, categoryY);
+  }
+  var headerEnd = categoryY + (MY_BIZ.category_name ? 50 : 20);
+
+  // === FOOTER REGION (anchored bottom) ===
+  var footerY = h - pad - 50;
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '700 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
+  ctx.fillText('DukanList · dukanlist.com', w/2, footerY);
+
+  var msg = getCustomMsg();
+  var hasEst = !!MY_BIZ.established_year;
+  var hasMsg = !!msg;
+  var lineGap = 50;
+  var nextLineY = footerY - 65;
+
+  if (hasEst){
+    ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#FBBF24';
+    ctx.fillText('★ Trusted Since ' + MY_BIZ.established_year, w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+  if (hasMsg){
+    ctx.font = '600 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(msg, w/2, nextLineY);
+    nextLineY -= lineGap;
   }
 
-  // QR with gold border
+  ctx.font = '800 ' + Math.floor(w*0.03) + 'px Manrope, sans-serif';
+  ctx.fillStyle = '#FBBF24';
+  ctx.fillText('📱 SCAN WITH YOUR PHONE', w/2, nextLineY);
+  var bottomContentTop = nextLineY - Math.floor(w*0.03) - 30;
+
+  // === MIDDLE: QR with gold border ===
   if (QR_DATA){
-    var qrSize = Math.min(w * 0.55, h * 0.42);
+    var availH = bottomContentTop - headerEnd - 60;
+    var availW = w * 0.72;
+    var qrSize = Math.min(availH, availW);
+    qrSize = Math.max(400, Math.min(820, qrSize));
     var qrX = (w - qrSize) / 2;
-    var qrY = by + 250;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
+    // Gold border ring
     ctx.fillStyle = '#FBBF24';
     roundRect(ctx, qrX - 26, qrY - 26, qrSize + 52, qrSize + 52, 18);
     ctx.fill();
@@ -532,98 +610,95 @@ function drawDark(ctx, w, h){
     roundRect(ctx, qrX - 16, qrY - 16, qrSize + 32, qrSize + 32, 14);
     ctx.fill();
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
-
-    // Scan instruction
-    ctx.font = '800 ' + Math.floor(w*0.03) + 'px Manrope, sans-serif';
-    ctx.fillStyle = '#FBBF24';
-    ctx.fillText('📱 SCAN WITH YOUR PHONE', w/2, qrY + qrSize + 80);
-
-    var msg = getCustomMsg();
-    if (msg){
-      ctx.font = '600 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#fff';
-      ctx.fillText(msg, w/2, qrY + qrSize + 130);
-    }
-
-    // Timeless established year (no dynamic numbers)
-    if (MY_BIZ.established_year){
-      ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#FBBF24';
-      ctx.fillText('★ Trusted Since ' + MY_BIZ.established_year, w/2, qrY + qrSize + 180);
-    }
   }
-
-  // Footer
-  ctx.fillStyle = '#94A3B8';
-  ctx.font = '700 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('DukanList · dukanlist.com', w/2, h - pad - 50);
 }
 
-// === TEMPLATE 3: CREAM MINIMAL ===
+// === TEMPLATE 3: CREAM MINIMAL (auto-layout) ===
 function drawCream(ctx, w, h){
   ctx.fillStyle = '#FFFBF5';
   ctx.fillRect(0, 0, w, h);
 
   var pad = w * 0.07;
+  ctx.textAlign = 'center';
 
-  // Top thin saffron line
+  // Top saffron line
   ctx.fillStyle = '#FF6B1A';
   ctx.fillRect(pad, pad, w - 2*pad, 4);
 
-  // "VERIFIED" small label
+  // === HEADER REGION ===
+  var headerTop = pad + 60;
+
   ctx.fillStyle = '#10B981';
-  ctx.textAlign = 'center';
   ctx.font = '900 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
-  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, pad + 60);
+  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, headerTop);
 
-  // Shop name very large
+  var nameStartY = headerTop + 90;
+  var nameFontSize = Math.floor(w*0.068);
+  ctx.font = '900 ' + nameFontSize + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
-  ctx.font = '900 ' + Math.floor(w*0.068) + 'px Manrope, sans-serif';
-  wrapText(ctx, MY_BIZ.name || 'Your Business', w/2, pad + 150, w - 4*pad, w*0.082);
+  var shopName = MY_BIZ.name || 'Your Business';
+  var nameMaxWidth = w - 4*pad;
+  var nameWidth = ctx.measureText(shopName).width;
+  var nameLines = (nameWidth <= nameMaxWidth) ? 1 : 2;
+  var lineHeight = nameFontSize * 1.1;
+  wrapText(ctx, shopName, w/2, nameStartY, nameMaxWidth, lineHeight);
 
+  var categoryY = nameStartY + (nameLines === 1 ? 70 : lineHeight + 60);
   if (MY_BIZ.category_name){
     ctx.font = '500 ' + Math.floor(w*0.026) + 'px Manrope, sans-serif';
     ctx.fillStyle = '#64748B';
-    ctx.fillText(MY_BIZ.category_icon + ' ' + MY_BIZ.category_name + (MY_BIZ.city_name ? ' · ' + MY_BIZ.city_name : ''), w/2, pad + 240);
+    ctx.fillText(MY_BIZ.category_icon + ' ' + MY_BIZ.category_name + (MY_BIZ.city_name ? ' · ' + MY_BIZ.city_name : ''), w/2, categoryY);
   }
+  var headerEnd = categoryY + (MY_BIZ.category_name ? 50 : 20);
 
-  if (QR_DATA){
-    var qrSize = Math.min(w * 0.5, h * 0.4);
-    var qrX = (w - qrSize) / 2;
-    var qrY = pad + 320;
-    ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
-
-    ctx.font = '700 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
-    ctx.fillStyle = '#0F172A';
-    ctx.fillText('Scan to view our verified profile', w/2, qrY + qrSize + 70);
-
-    var msg = getCustomMsg();
-    if (msg){
-      ctx.font = '500 italic ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#E55100';
-      ctx.fillText('"' + msg + '"', w/2, qrY + qrSize + 115);
-    }
-
-    // Timeless established year
-    if (MY_BIZ.established_year){
-      ctx.font = '600 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#92400E';
-      ctx.fillText('Trusted Since ' + MY_BIZ.established_year, w/2, qrY + qrSize + 160);
-    }
-  }
-
-  // Bottom thin line + URL
+  // === FOOTER REGION ===
+  // Bottom thin saffron line
   ctx.fillStyle = '#FF6B1A';
   ctx.fillRect(pad, h - pad - 4, w - 2*pad, 4);
+
+  var footerY = h - pad - 25;
   ctx.fillStyle = '#64748B';
   ctx.font = '600 ' + Math.floor(w*0.02) + 'px Manrope, sans-serif';
-  ctx.fillText('dukanlist.com · Bharat\'s Local Directory · Free for Everyone', w/2, h - pad - 30);
+  ctx.fillText('dukanlist.com · Bharat\'s Local Directory · Free for Everyone', w/2, footerY);
+
+  var msg = getCustomMsg();
+  var hasEst = !!MY_BIZ.established_year;
+  var hasMsg = !!msg;
+  var lineGap = 50;
+  var nextLineY = footerY - 50;
+
+  if (hasEst){
+    ctx.font = '600 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#92400E';
+    ctx.fillText('Trusted Since ' + MY_BIZ.established_year, w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+  if (hasMsg){
+    ctx.font = '500 italic ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#E55100';
+    ctx.fillText('"' + msg + '"', w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+
+  ctx.font = '700 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
+  ctx.fillStyle = '#0F172A';
+  ctx.fillText('Scan to view our verified profile', w/2, nextLineY);
+  var bottomContentTop = nextLineY - Math.floor(w*0.028) - 30;
+
+  // === MIDDLE: QR ===
+  if (QR_DATA){
+    var availH = bottomContentTop - headerEnd - 60;
+    var availW = w * 0.7;
+    var qrSize = Math.min(availH, availW);
+    qrSize = Math.max(400, Math.min(800, qrSize));
+    var qrX = (w - qrSize) / 2;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
+    ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
+  }
 }
 
-// === TEMPLATE 4: FESTIVAL ===
+// === TEMPLATE 4: FESTIVAL (auto-layout) ===
 function drawFestival(ctx, w, h){
-  // Festive gradient
   var bg = ctx.createRadialGradient(w/2, 0, 0, w/2, h, w);
   bg.addColorStop(0, '#FBBF24');
   bg.addColorStop(0.4, '#FF6B1A');
@@ -632,101 +707,154 @@ function drawFestival(ctx, w, h){
   ctx.fillRect(0, 0, w, h);
 
   var pad = w * 0.05;
+  ctx.textAlign = 'center';
 
-  // White card
+  // White card with extra top padding for emoji band
   ctx.fillStyle = '#fff';
   roundRect(ctx, pad, pad + 80, w - 2*pad, h - 2*pad - 80, 40);
   ctx.fill();
 
-  // Top diya emoji band
+  // Diya emoji band
   ctx.font = '90px serif';
-  ctx.textAlign = 'center';
   ctx.fillStyle = '#FBBF24';
   ctx.fillText('🪔 ✨ 🎊 ✨ 🪔', w/2, pad + 70);
 
-  // Festive greeting
+  // === HEADER REGION ===
+  var headerTop = pad + 180;
+
   ctx.fillStyle = '#7C3AED';
-  ctx.textAlign = 'center';
   ctx.font = '900 ' + Math.floor(w*0.04) + 'px Manrope, sans-serif';
-  ctx.fillText('FESTIVE OFFERS', w/2, pad + 180);
+  ctx.fillText('FESTIVE OFFERS', w/2, headerTop);
 
-  // Shop name
+  var nameStartY = headerTop + 90;
+  var nameFontSize = Math.floor(w*0.055);
+  ctx.font = '900 ' + nameFontSize + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
-  ctx.font = '900 ' + Math.floor(w*0.055) + 'px Manrope, sans-serif';
-  wrapText(ctx, MY_BIZ.name || 'Your Business', w/2, pad + 270, w - 4*pad, w*0.07);
+  var shopName = MY_BIZ.name || 'Your Business';
+  var nameMaxWidth = w - 4*pad;
+  var nameWidth = ctx.measureText(shopName).width;
+  var nameLines = (nameWidth <= nameMaxWidth) ? 1 : 2;
+  var lineHeight = nameFontSize * 1.1;
+  wrapText(ctx, shopName, w/2, nameStartY, nameMaxWidth, lineHeight);
 
+  var headerEnd = nameStartY + (nameLines === 1 ? 30 : lineHeight + 20);
+
+  // === FOOTER REGION ===
+  var footerY = h - pad - 30;
+  ctx.fillStyle = '#64748B';
+  ctx.font = '600 ' + Math.floor(w*0.02) + 'px Manrope, sans-serif';
+  ctx.fillText('DukanList · dukanlist.com', w/2, footerY);
+
+  var msg = getCustomMsg();
+  var hasEst = !!MY_BIZ.established_year;
+  var hasMsg = !!msg;
+  var lineGap = 50;
+  var nextLineY = footerY - 55;
+
+  if (hasEst){
+    ctx.font = '700 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#7C3AED';
+    ctx.fillText('★ Trusted Since ' + MY_BIZ.established_year, w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+  if (hasMsg){
+    ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
+    ctx.fillStyle = '#FF6B1A';
+    ctx.fillText(msg, w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+
+  ctx.font = '800 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
+  ctx.fillStyle = '#7C3AED';
+  ctx.fillText('📱 SCAN FOR EXCLUSIVE DEALS', w/2, nextLineY);
+  var bottomContentTop = nextLineY - Math.floor(w*0.028) - 30;
+
+  // === MIDDLE: QR with festive bg ===
   if (QR_DATA){
-    var qrSize = Math.min(w * 0.5, h * 0.4);
+    var availH = bottomContentTop - headerEnd - 60;
+    var availW = w * 0.7;
+    var qrSize = Math.min(availH, availW);
+    qrSize = Math.max(400, Math.min(800, qrSize));
     var qrX = (w - qrSize) / 2;
-    var qrY = pad + 360;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
     ctx.fillStyle = '#FFFBEB';
     roundRect(ctx, qrX - 20, qrY - 20, qrSize + 40, qrSize + 40, 16);
     ctx.fill();
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
-
-    ctx.font = '800 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
-    ctx.fillStyle = '#7C3AED';
-    ctx.fillText('📱 SCAN FOR EXCLUSIVE DEALS', w/2, qrY + qrSize + 70);
-
-    var msg = getCustomMsg();
-    if (msg){
-      ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
-      ctx.fillStyle = '#FF6B1A';
-      ctx.fillText(msg, w/2, qrY + qrSize + 120);
-    }
   }
-
-  // Footer
-  ctx.fillStyle = '#64748B';
-  ctx.font = '600 ' + Math.floor(w*0.02) + 'px Manrope, sans-serif';
-  ctx.fillText('DukanList · dukanlist.com', w/2, h - pad - 30);
 }
 
-// === TEMPLATE 5: BLACK & WHITE PRINT ===
+// === TEMPLATE 5: BLACK & WHITE PRINT (auto-layout) ===
 function drawBW(ctx, w, h){
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, w, h);
   var pad = w * 0.07;
+  ctx.textAlign = 'center';
 
-  // Black border
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 8;
   ctx.strokeRect(pad, pad, w - 2*pad, h - 2*pad);
 
-  // Verified
+  // === HEADER ===
+  var headerTop = pad + 80;
   ctx.fillStyle = '#000';
-  ctx.textAlign = 'center';
   ctx.font = '900 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
-  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, pad + 80);
+  ctx.fillText('✓ VERIFIED ON DUKANLIST', w/2, headerTop);
 
-  // Shop name
-  ctx.font = '900 ' + Math.floor(w*0.07) + 'px Manrope, sans-serif';
-  wrapText(ctx, (MY_BIZ.name || 'Your Business').toUpperCase(), w/2, pad + 170, w - 4*pad, w*0.085);
+  var nameStartY = headerTop + 90;
+  var nameFontSize = Math.floor(w*0.07);
+  ctx.font = '900 ' + nameFontSize + 'px Manrope, sans-serif';
+  var shopName = (MY_BIZ.name || 'Your Business').toUpperCase();
+  var nameMaxWidth = w - 4*pad;
+  var nameWidth = ctx.measureText(shopName).width;
+  var nameLines = (nameWidth <= nameMaxWidth) ? 1 : 2;
+  var lineHeight = nameFontSize * 1.1;
+  wrapText(ctx, shopName, w/2, nameStartY, nameMaxWidth, lineHeight);
 
+  var categoryY = nameStartY + (nameLines === 1 ? 60 : lineHeight + 50);
   if (MY_BIZ.category_name){
     ctx.font = '600 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
-    ctx.fillText(MY_BIZ.category_name + (MY_BIZ.city_name ? ' · ' + MY_BIZ.city_name : ''), w/2, pad + 260);
+    ctx.fillText(MY_BIZ.category_name + (MY_BIZ.city_name ? ' · ' + MY_BIZ.city_name : ''), w/2, categoryY);
+  }
+  var headerEnd = categoryY + (MY_BIZ.category_name ? 50 : 20);
+
+  // === FOOTER ===
+  var footerY = h - pad - 40;
+  ctx.font = '700 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
+  ctx.fillText('dukanlist.com', w/2, footerY);
+
+  var msg = getCustomMsg();
+  var hasEst = !!MY_BIZ.established_year;
+  var hasMsg = !!msg;
+  var lineGap = 50;
+  var nextLineY = footerY - 55;
+
+  if (hasEst){
+    ctx.font = '700 ' + Math.floor(w*0.024) + 'px Manrope, sans-serif';
+    ctx.fillText('Trusted Since ' + MY_BIZ.established_year, w/2, nextLineY);
+    nextLineY -= lineGap;
+  }
+  if (hasMsg){
+    ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
+    ctx.fillText(msg, w/2, nextLineY);
+    nextLineY -= lineGap;
   }
 
+  ctx.font = '800 ' + Math.floor(w*0.03) + 'px Manrope, sans-serif';
+  ctx.fillText('SCAN WITH YOUR PHONE', w/2, nextLineY);
+  var bottomContentTop = nextLineY - Math.floor(w*0.03) - 30;
+
+  // === MIDDLE: QR with black border ===
   if (QR_DATA){
-    var qrSize = Math.min(w * 0.55, h * 0.42);
+    var availH = bottomContentTop - headerEnd - 60;
+    var availW = w * 0.7;
+    var qrSize = Math.min(availH, availW);
+    qrSize = Math.max(400, Math.min(820, qrSize));
     var qrX = (w - qrSize) / 2;
-    var qrY = pad + 340;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
     ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
-
-    ctx.font = '800 ' + Math.floor(w*0.03) + 'px Manrope, sans-serif';
-    ctx.fillText('SCAN WITH YOUR PHONE', w/2, qrY + qrSize + 80);
-
-    var msg = getCustomMsg();
-    if (msg){
-      ctx.font = '700 ' + Math.floor(w*0.025) + 'px Manrope, sans-serif';
-      ctx.fillText(msg, w/2, qrY + qrSize + 130);
-    }
   }
-
-  ctx.font = '700 ' + Math.floor(w*0.022) + 'px Manrope, sans-serif';
-  ctx.fillText('dukanlist.com', w/2, h - pad - 40);
 }
 
 // === HELPER: wrap text ===
