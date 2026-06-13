@@ -138,6 +138,12 @@
 
     <div id="posterContent" style="display:none">
 
+      <!-- Mode selector — what does QR point to -->
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap">
+        <button class="qrp-size-btn active" data-mode="profile" onclick="setMode('profile')" style="background:#FF6B1A;color:#fff;border-color:transparent">👁️ Scan to View Profile</button>
+        <button class="qrp-size-btn" data-mode="review" onclick="setMode('review')">⭐ Scan to Rate Us</button>
+      </div>
+
       <!-- Template selector -->
       <div class="qrp-templates">
         <button class="qrp-tpl-btn active" data-tpl="saffron" onclick="setTemplate('saffron')">🎨 Saffron Classic</button>
@@ -230,9 +236,31 @@ function setLang(lang){
 // State
 var MY_BIZ = null;
 var PROFILE_URL = '';
+var REVIEW_URL = '';
 var CURRENT_TPL = 'saffron';
 var CURRENT_SIZE = 'a4-2up';  // default: economical 2-per-page
+var CURRENT_MODE = 'profile'; // 'profile' or 'review'
 var QR_DATA = null;
+
+function setMode(m){
+  CURRENT_MODE = m;
+  document.querySelectorAll('[data-mode]').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode === m);
+    // restyle active mode
+    if (b.dataset.mode === m){
+      b.style.background = '#FF6B1A';
+      b.style.color = '#fff';
+      b.style.borderColor = 'transparent';
+    } else {
+      b.style.background = '#fff';
+      b.style.color = '#475569';
+      b.style.borderColor = '#E2E8F0';
+    }
+  });
+  // Rebuild QR for new URL
+  renderQRToDataURL();
+  renderPoster();
+}
 
 // === LOAD BUSINESS ===
 async function loadBiz(){
@@ -292,6 +320,13 @@ async function loadBiz(){
     } catch(_){ /* non-fatal */ }
   }
   PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
+  REVIEW_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id) + '&review=1&src=qr-poster';
+
+  // Honor ?mode= URL param to deep-link from get-reviews page
+  try {
+    var urlMode = new URLSearchParams(location.search).get('mode');
+    if (urlMode === 'review') CURRENT_MODE = 'review';
+  } catch(_){}
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('posterContent').style.display = '';
@@ -303,8 +338,9 @@ async function loadBiz(){
 
 function renderQRToDataURL(){
   if (typeof qrcode !== 'function') return;
+  var urlForQR = (CURRENT_MODE === 'review') ? REVIEW_URL : PROFILE_URL;
   var qr = qrcode(0, 'H'); // High error correction for print durability
-  qr.addData(PROFILE_URL);
+  qr.addData(urlForQR);
   qr.make();
   // Build a canvas of fixed size 600x600 with white quiet zone
   var cell = 12;
@@ -542,7 +578,7 @@ function drawSaffron(ctx, w, h){
 
   ctx.font = '800 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
-  ctx.fillText('📱 SCAN TO VIEW PROFILE', w/2, nextLineY);
+  ctx.fillText(CURRENT_MODE === 'review' ? '⭐ SCAN TO RATE US' : '📱 SCAN TO VIEW PROFILE', w/2, nextLineY);
   var bottomContentTop = nextLineY - Math.floor(w*0.028) - 25;
 
   // ========================================
@@ -552,13 +588,15 @@ function drawSaffron(ctx, w, h){
     var availH = bottomContentTop - headerEnd - 40;
     var availW = cw * 0.85;
     var qrSize = Math.min(availH, availW);
-    qrSize = Math.max(380, Math.min(820, qrSize));
+    // Don't force a minimum — let small canvases (like 2-up half-height) shrink the QR
+    qrSize = Math.min(820, qrSize);
+    if (qrSize < 200) qrSize = 200; // absolute floor for scan-ability
     var qrX = (w - qrSize) / 2;
-    var qrY = headerEnd + (availH - qrSize) / 2 + 20;
-    // Subtle border, no shadow (ink saving)
+    var qrY = headerEnd + (availH - qrSize) / 2 + 10;
+    // Thin border well inside safe-zone
     ctx.strokeStyle = '#FED7AA';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
   }
 }
@@ -643,7 +681,7 @@ function drawDark(ctx, w, h){
 
   ctx.font = '800 ' + Math.floor(w*0.03) + 'px Manrope, sans-serif';
   ctx.fillStyle = '#FBBF24';
-  ctx.fillText('📱 SCAN WITH YOUR PHONE', w/2, nextLineY);
+  ctx.fillText(CURRENT_MODE === 'review' ? '⭐ SCAN TO RATE US' : '📱 SCAN WITH YOUR PHONE', w/2, nextLineY);
   var bottomContentTop = nextLineY - Math.floor(w*0.03) - 30;
 
   // === MIDDLE: QR with gold border ===
@@ -651,9 +689,10 @@ function drawDark(ctx, w, h){
     var availH = bottomContentTop - headerEnd - 60;
     var availW = w * 0.72;
     var qrSize = Math.min(availH, availW);
-    qrSize = Math.max(400, Math.min(820, qrSize));
+    qrSize = Math.min(820, qrSize);
+    if (qrSize < 200) qrSize = 200;
     var qrX = (w - qrSize) / 2;
-    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 15;
     // Gold border ring
     ctx.fillStyle = '#FBBF24';
     roundRect(ctx, qrX - 26, qrY - 26, qrSize + 52, qrSize + 52, 18);
@@ -734,7 +773,7 @@ function drawCream(ctx, w, h){
 
   ctx.font = '700 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
   ctx.fillStyle = '#0F172A';
-  ctx.fillText('Scan to view our verified profile', w/2, nextLineY);
+  ctx.fillText(CURRENT_MODE === 'review' ? 'Scan to rate us on DukanList' : 'Scan to view our verified profile', w/2, nextLineY);
   var bottomContentTop = nextLineY - Math.floor(w*0.028) - 30;
 
   // === MIDDLE: QR ===
@@ -742,9 +781,10 @@ function drawCream(ctx, w, h){
     var availH = bottomContentTop - headerEnd - 60;
     var availW = w * 0.7;
     var qrSize = Math.min(availH, availW);
-    qrSize = Math.max(400, Math.min(800, qrSize));
+    qrSize = Math.min(800, qrSize);
+    if (qrSize < 200) qrSize = 200;
     var qrX = (w - qrSize) / 2;
-    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 15;
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
   }
 }
@@ -818,7 +858,7 @@ function drawFestival(ctx, w, h){
 
   ctx.font = '800 ' + Math.floor(w*0.028) + 'px Manrope, sans-serif';
   ctx.fillStyle = '#7C3AED';
-  ctx.fillText('📱 SCAN FOR EXCLUSIVE DEALS', w/2, nextLineY);
+  ctx.fillText(CURRENT_MODE === 'review' ? '⭐ SCAN TO REVIEW US' : '📱 SCAN FOR EXCLUSIVE DEALS', w/2, nextLineY);
   var bottomContentTop = nextLineY - Math.floor(w*0.028) - 30;
 
   // === MIDDLE: QR with festive bg ===
@@ -826,9 +866,10 @@ function drawFestival(ctx, w, h){
     var availH = bottomContentTop - headerEnd - 60;
     var availW = w * 0.7;
     var qrSize = Math.min(availH, availW);
-    qrSize = Math.max(400, Math.min(800, qrSize));
+    qrSize = Math.min(800, qrSize);
+    if (qrSize < 200) qrSize = 200;
     var qrX = (w - qrSize) / 2;
-    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
+    var qrY = headerEnd + (availH - qrSize) / 2 + 15;
     ctx.fillStyle = '#FFFBEB';
     roundRect(ctx, qrX - 20, qrY - 20, qrSize + 40, qrSize + 40, 16);
     ctx.fill();
@@ -893,7 +934,7 @@ function drawBW(ctx, w, h){
   }
 
   ctx.font = '800 ' + Math.floor(w*0.03) + 'px Manrope, sans-serif';
-  ctx.fillText('SCAN WITH YOUR PHONE', w/2, nextLineY);
+  ctx.fillText(CURRENT_MODE === 'review' ? 'SCAN TO RATE US' : 'SCAN WITH YOUR PHONE', w/2, nextLineY);
   var bottomContentTop = nextLineY - Math.floor(w*0.03) - 30;
 
   // === MIDDLE: QR with black border ===
@@ -901,10 +942,11 @@ function drawBW(ctx, w, h){
     var availH = bottomContentTop - headerEnd - 60;
     var availW = w * 0.7;
     var qrSize = Math.min(availH, availW);
-    qrSize = Math.max(400, Math.min(820, qrSize));
+    qrSize = Math.min(820, qrSize);
+    if (qrSize < 200) qrSize = 200;
     var qrX = (w - qrSize) / 2;
-    var qrY = headerEnd + (availH - qrSize) / 2 + 30;
-    ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+    var qrY = headerEnd + (availH - qrSize) / 2 + 15;
+    ctx.strokeRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
     ctx.drawImage(QR_DATA, qrX, qrY, qrSize, qrSize);
   }
 }
