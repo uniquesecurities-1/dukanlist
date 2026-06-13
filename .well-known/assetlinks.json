@@ -1,12 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.dukanlist.app",
-      "sha256_cert_fingerprints": [
-        "REPLACE_WITH_YOUR_SHA256_FINGERPRINT_FROM_PLAY_CONSOLE"
-      ]
-    }
-  }
-]
+[{
+   "relation": ["delegate_permission/common.handle_all_urls"],
+   "target": {
+     "namespace": "android_app",
+     "package_name": "com.dukanlist.twa",
+     "sha256_cert_fingerprints": ["E1:E6:74:15:FC:3F:EC:AC:A1:48:74:B8:FB:51:2C:D4:8D:0B:2E:F8:47:C1:B8:26:95:96:77:7A:65:B5:2B:D9"]
+   }
+ }]
