@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.27';  // APK READY — assetlinks.json updated with real SHA-256 fingerprint from PWABuilder-generated TWA package. Package name corrected from com.dukanlist.app → com.dukanlist.twa (PWABuilder default suffix). Fingerprint: E1:E6:74:15:FC:3F:EC:AC:A1:48:74:B8:FB:51:2C:D4:8D:0B:2E:F8:47:C1:B8:26:95:96:77:7A:65:B5:2B:D9. After this deploy, installing the DukanList.apk on Android will show full-screen TWA experience (no browser address bar) because Google's Digital Asset Links verification will succeed against this domain.
+const VERSION    = 'dukan-v2.9.28';  // FIX — User reported vague 'One or more fields exceed maximum length' error during registration without knowing WHICH field. Now: (a) added FIELD_LENGTH_LIMITS registry covering 9 fields with EN+HI labels + max chars, (b) validateFieldLengths() runs BEFORE the RPC submit — if any field over limit, user gets specific message: '"USP / Tagline (English)" is too long — 312 characters (max 280). Please shorten it.' + focus + scroll to field + red box-shadow highlight, (c) showFriendlyErr enhanced to handle PostgreSQL 22001 'value too long' errors with limit extraction + helpful column hint, also added check_constraint and not-null error handling, (d) live character counters added under USP English, USP Hindi, and Business Name inputs — gray → amber at 90% → red at 100% so users see length building up.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 

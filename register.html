@@ -674,7 +674,7 @@
 
     <div class="form-group">
       <label><span data-i18n-en>Shop Name (English)</span><span data-i18n-hi>दुकान का नाम (English)</span><span class="req">*</span></label>
-      <input id="bizName" class="input" type="text" placeholder="e.g. Sharma Carpentry Works" maxlength="80" oninput="scheduleHindiAutoFill()">
+      <input id="bizName" class="input" type="text" placeholder="e.g. Sharma Carpentry Works" maxlength="80" oninput="scheduleHindiAutoFill();updateCharCount(this,'bizNameCount',80)"><div id="bizNameCount" class="char-counter" style="text-align:right;font-size:.74rem;color:#94a3b8;font-weight:600;margin-top:4px">0 / 80</div>
       <div class="help">
         <span data-i18n-en>Display name customers will see. Hindi version below will fill automatically.</span>
         <span data-i18n-hi>यही नाम ग्राहक देखेंगे। नीचे हिंदी अपने आप भर जाएगा।</span>
@@ -829,7 +829,8 @@
       <!-- ===== SUPERSONIC USP PICKER — universal, common-man friendly ===== -->
       <div id="simpleUspPicker" class="su-picker"></div>
 
-      <textarea id="usp" class="textarea" maxlength="280" placeholder="Pick 3-5 from above ↑ or type your own"></textarea>
+      <textarea id="usp" class="textarea" maxlength="280" placeholder="Pick 3-5 from above ↑ or type your own" oninput="updateCharCount(this, 'uspCount', 280)"></textarea>
+      <div id="uspCount" class="char-counter" style="text-align:right;font-size:.74rem;color:#94a3b8;font-weight:600;margin-top:4px">0 / 280</div>
       <div class="help">
         <span data-i18n-en>Pick from above ↑ OR write your own. Max 280 characters.</span>
         <span data-i18n-hi>ऊपर से चुनें ↑ या खुद लिखें। ज़्यादा से ज़्यादा 280 अक्षर।</span>
@@ -860,7 +861,8 @@
 
     <div class="form-group">
       <label><span data-i18n-en>USP in Hindi</span><span data-i18n-hi>USP हिंदी में</span><span class="opt">(optional)</span></label>
-      <textarea id="uspHi" class="textarea" maxlength="280" placeholder="25+ साल का अनुभव। फ्री होम मेजरमेंट। कस्टम डिज़ाइन।"></textarea>
+      <textarea id="uspHi" class="textarea" maxlength="280" placeholder="25+ साल का अनुभव। फ्री होम मेजरमेंट। कस्टम डिज़ाइन।" oninput="updateCharCount(this, 'uspHiCount', 280)"></textarea>
+      <div id="uspHiCount" class="char-counter" style="text-align:right;font-size:.74rem;color:#94a3b8;font-weight:600;margin-top:4px">0 / 280</div>
     </div>
 
     <!-- ===== LOGIN CREDENTIALS — needed to manage your shop ===== -->
@@ -1661,6 +1663,15 @@ function showFriendlyErr(el, err, retryFn){
     friendly = 'This email or mobile is already registered. Please log in or use a different email.';
   } else if (/captcha|turnstile/i.test(raw)){
     friendly = 'CAPTCHA verification failed. Please refresh the page and try again.';
+  } else if (/value too long|22001|character varying/i.test(raw)){
+    // Try to extract the column name + limit from PostgreSQL error
+    const colMatch = raw.match(/character varying\((\d+)\)/);
+    const limit = colMatch ? colMatch[1] : '';
+    friendly = '⚠️ One or more fields exceed server limit' + (limit ? ` (${limit} characters)` : '') + '. Common culprits: USP (max 280), Business Name (max 80), Address (max 120). Please shorten the longest field and retry.';
+  } else if (/check constraint|chk_/i.test(raw)){
+    friendly = 'A value failed validation. Please check Email format, Pincode (6 digits), Mobile (10 digits), and any custom role/category text.';
+  } else if (/null value|not.?null/i.test(raw)){
+    friendly = 'A required field is empty. Please go back and fill all required fields (marked with *).';
   }
   el.innerHTML = '';
   el.textContent = friendly;
@@ -1689,6 +1700,38 @@ function showFriendlyErr(el, err, retryFn){
 // ============================================================
 // STEP 4 — USP + final submit (calls register_business_v2)
 // ============================================================
+
+// Field limit registry — matches what frontend allows + matches DB constraints.
+// Used by validateFieldLengths() to give user the EXACT field name + count
+// instead of a generic "exceeds maximum length" error.
+const FIELD_LENGTH_LIMITS = [
+  { id: 'bizName',         label: 'Business Name',                 hi: 'व्यवसाय का नाम',         max: 80  },
+  { id: 'bizNameHi',       label: 'Business Name (Hindi)',         hi: 'व्यवसाय नाम (हिंदी)',    max: 80  },
+  { id: 'ownerName',       label: 'Owner Name',                    hi: 'मालिक का नाम',           max: 60  },
+  { id: 'ownerRoleCustom', label: 'Custom Owner Role',             hi: 'मालिक का कस्टम पद',      max: 60  },
+  { id: 'addr1',           label: 'Address Line 1 (Shop No.)',     hi: 'पता पंक्ति 1',          max: 120 },
+  { id: 'addr2',           label: 'Address Line 2 (Landmark)',     hi: 'पता पंक्ति 2',          max: 120 },
+  { id: 'usp',             label: 'USP / Tagline (English)',       hi: 'USP / टैगलाइन',          max: 280 },
+  { id: 'uspHi',           label: 'USP / Tagline (Hindi)',         hi: 'USP / टैगलाइन (हिंदी)', max: 280 },
+  { id: 'loginEmail',      label: 'Login Email',                   hi: 'लॉगिन ईमेल',             max: 254 }
+];
+
+function validateFieldLengths(){
+  const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+  for (const f of FIELD_LENGTH_LIMITS){
+    const el = document.getElementById(f.id);
+    if (!el) continue;
+    // Skip hidden / disabled fields
+    if (el.offsetParent === null && el.id !== 'ownerRoleCustom') continue;
+    const val = (el.value || '').trim();
+    if (val.length > f.max){
+      const fieldName = (lang === 'hi') ? f.hi : f.label;
+      return { field: f, current: val.length, fieldName: fieldName };
+    }
+  }
+  return null;
+}
+
 async function handleSubmit(){
   // T&C acceptance gate
   const tcEl = document.getElementById('tcAccept');
@@ -1729,6 +1772,26 @@ async function handleSubmit(){
 
   STATE.data.usp   = usp;
   STATE.data.uspHi = document.getElementById('uspHi').value.trim();
+
+  // Pre-flight: validate every field length BEFORE making RPC call.
+  // Previously a too-long field gave a vague server error; now we tell the user
+  // EXACTLY which field, current length, and the allowed limit.
+  const lenErr = validateFieldLengths();
+  if (lenErr){
+    const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
+    const msg = (lang === 'hi')
+      ? `"${lenErr.fieldName}" बहुत लंबा है — ${lenErr.current} अक्षर हैं, ${lenErr.field.max} तक रखें। कृपया छोटा करें।`
+      : `"${lenErr.fieldName}" is too long — ${lenErr.current} characters (max ${lenErr.field.max}). Please shorten it.`;
+    showErr(errEl, msg);
+    const el = document.getElementById(lenErr.field.id);
+    if (el){
+      el.focus();
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      el.style.boxShadow = '0 0 0 3px rgba(239,68,68,.4)';
+      setTimeout(() => { try { el.style.boxShadow = ''; } catch(_){} }, 4000);
+    }
+    return;
+  }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.innerHTML = '<span>⏳ Verifying...</span>';
