@@ -2820,6 +2820,14 @@ async function loadReviews(bizId){
         </div>
         <div id="replyErr_${r.id}" style="display:none;margin-top:8px;color:#DC2626;font-size:12px"></div>
       </div>
+      <div style="margin-left:46px;margin-top:8px;display:flex;justify-content:flex-end">
+        <button type="button" onclick="reportReview('${r.id}', this)" title="Report this review"
+                style="background:transparent;border:0;color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s"
+                onmouseover="this.style.background='#FEF2F2';this.style.color='#DC2626'"
+                onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+          🚩 <span data-i18n-en>Report</span><span data-i18n-hi>रिपोर्ट</span>
+        </button>
+      </div>
     </div>`;
   }).join('');
   const listEl = document.getElementById('reviewsList');
@@ -3732,6 +3740,52 @@ function copyShopUrl(){
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initStickyActionBar);
   else initStickyActionBar();
 })();
+
+// =============================================================
+// REPORT REVIEW — UGC moderation (Play Store compliance)
+// =============================================================
+async function reportReview(reviewId, btnEl){
+  if (!confirm("Report this review as inappropriate, spam, or fake?\n\nAn admin will be notified. Thank you for helping keep DukanList trustworthy.")) return;
+  try {
+    if (btnEl){ btnEl.disabled = true; btnEl.innerHTML = '⏳ Reporting...'; }
+    const c = (typeof ShopDB !== 'undefined') && ShopDB.client;
+    if (!c){ throw new Error('Backend not available'); }
+    let ok = false;
+    // Try multiple RPCs in priority order — admin moderation pipeline expects 'flag_review' or similar
+    for (const rpc of ['flag_review_public', 'report_review', 'flag_review']){
+      try {
+        const r = await c.rpc(rpc, { p_review_id: reviewId });
+        if (!r.error){ ok = true; break; }
+      } catch(_){}
+    }
+    // Fallback: direct insert into review_flags table if RPC missing
+    if (!ok){
+      try {
+        const res = await c.from('review_flags').insert({ review_id: reviewId, reason: 'inappropriate' });
+        if (!res.error) ok = true;
+      } catch(_){}
+    }
+    if (btnEl){
+      btnEl.disabled = false;
+      if (ok){
+        btnEl.innerHTML = '✓ Reported';
+        btnEl.style.color = '#059669';
+        btnEl.style.background = '#F0FDF4';
+      } else {
+        btnEl.innerHTML = '🚩 Report';
+      }
+    }
+    if (ok){
+      alert("Thank you. Our team will review this within 24 hours.\n\nIf urgent, WhatsApp us at +91 9541223377.");
+    } else {
+      alert("Could not report right now. Please WhatsApp us at +91 9541223377 with the review details.");
+    }
+  } catch(e){
+    if (btnEl){ btnEl.disabled = false; btnEl.innerHTML = '🚩 Report'; }
+    alert("Could not report right now. Please WhatsApp us at +91 9541223377 with the review details.\n\n" + (e.message || ''));
+  }
+}
+
 </script>
 </body>
 </html>
