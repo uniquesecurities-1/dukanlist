@@ -225,6 +225,7 @@ async function init(){
   render();
   loadEditHistory();
   setTimeout(loadCategoryEditor, 100);
+  setTimeout(loadLocationEditor, 100);
   setTimeout(loadReviewsForAdmin, 100);
 }
 
@@ -348,6 +349,30 @@ function render(){
             + '<button type="submit" class="btn pri">💾 Save Changes</button>'
           + '</div>'
         + '</form>'
+      + '</div>'
+
+      // === Location editor (city + locality) ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📍 Location <span class="subtle">change city or locality assignment</span></h2>'
+        + '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:10px 12px;border-radius:6px;font-size:12px;color:#78350F;line-height:1.5;margin-bottom:14px">⚠️ Changing city affects search ranking and the public URL. Only update when shop has genuinely moved or was assigned the wrong city at registration.</div>'
+        + '<div class="grid-2">'
+          + '<div class="field"><label>City</label>'
+            + '<select id="adminCitySel" onchange="onAdminCityChange()" style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;cursor:pointer">'
+              + '<option value="">— Loading cities… —</option>'
+            + '</select>'
+            + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">Current: <b>' + esc(s.city?.name || '— none —') + '</b></small>'
+          + '</div>'
+          + '<div class="field"><label>Locality / Area <span style="color:#94a3b8;font-weight:500;font-size:11px">(optional)</span></label>'
+            + '<select id="adminLocSel" style="width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;cursor:pointer">'
+              + '<option value="">— None / All localities —</option>'
+            + '</select>'
+            + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">Current: <b>' + esc(s.locality?.name || '— none —') + '</b></small>'
+          + '</div>'
+        + '</div>'
+        + '<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:14px">'
+          + '<span id="adminLocStatus" style="font-size:12px;color:#64748b"></span>'
+          + '<button type="button" class="btn pri" onclick="saveShopLocation()">💾 Save Location</button>'
+        + '</div>'
       + '</div>'
 
       // === Category editor (multi-select with primary) ===
@@ -667,6 +692,98 @@ async function saveShop(e){
 async function saveNotes(){
   var v = document.getElementById('notesField').value;
   await applyPatch({ admin_notes: v }, '✓ Note saved');
+}
+
+// ====== Location Editor (admin — city + locality) ======
+var CITY_LIST = [];      // [{ id, name }]
+var LOC_LIST  = [];      // [{ id, name, city_id }]
+
+async function loadLocationEditor(){
+  var c = ShopDB.client;
+  var citySel = document.getElementById('adminCitySel');
+  var locSel  = document.getElementById('adminLocSel');
+  if (!citySel) return;
+  try {
+    var cr = await c.from('geo_cities').select('id, name').order('name');
+    if (cr.error) throw cr.error;
+    CITY_LIST = cr.data || [];
+    var currentCityId = SHOP.city?.id || SHOP.city_id || null;
+    citySel.innerHTML =
+      '<option value="">— Select a city —</option>' +
+      CITY_LIST.map(function(c){
+        var sel = (String(currentCityId) === String(c.id)) ? ' selected' : '';
+        return '<option value="' + c.id + '"' + sel + '>' + esc(c.name) + '</option>';
+      }).join('');
+    // Localities fetched on demand when city changes (faster init)
+    if (currentCityId){
+      await loadLocalitiesForCity(currentCityId);
+    }
+  } catch(err){
+    console.warn('loadLocationEditor failed:', err);
+    citySel.innerHTML = '<option value="">Failed to load cities</option>';
+  }
+}
+
+async function loadLocalitiesForCity(cityId){
+  var c = ShopDB.client;
+  var locSel = document.getElementById('adminLocSel');
+  if (!locSel) return;
+  locSel.innerHTML = '<option value="">— Loading localities… —</option>';
+  if (!cityId){
+    locSel.innerHTML = '<option value="">— None / All localities —</option>';
+    LOC_LIST = [];
+    return;
+  }
+  try {
+    var lr = await c.from('localities').select('id, name, city_id').eq('city_id', cityId).order('name');
+    if (lr.error) throw lr.error;
+    LOC_LIST = lr.data || [];
+    var currentLocId = SHOP.locality?.id || SHOP.locality_id || null;
+    locSel.innerHTML =
+      '<option value="">— None / All localities —</option>' +
+      LOC_LIST.map(function(l){
+        var sel = (String(currentLocId) === String(l.id)) ? ' selected' : '';
+        return '<option value="' + l.id + '"' + sel + '>' + esc(l.name) + '</option>';
+      }).join('');
+  } catch(err){
+    console.warn('Locality load failed:', err);
+    locSel.innerHTML = '<option value="">— No localities or table missing —</option>';
+  }
+}
+
+function onAdminCityChange(){
+  var citySel = document.getElementById('adminCitySel');
+  var newCityId = citySel ? citySel.value : '';
+  loadLocalitiesForCity(newCityId || null);
+}
+
+async function saveShopLocation(){
+  var citySel = document.getElementById('adminCitySel');
+  var locSel  = document.getElementById('adminLocSel');
+  var status  = document.getElementById('adminLocStatus');
+  if (!citySel) return;
+  var newCityId = citySel.value || null;
+  var newLocId  = locSel ? (locSel.value || null) : null;
+  var oldCityId = SHOP.city?.id || SHOP.city_id || null;
+  var oldLocId  = SHOP.locality?.id || SHOP.locality_id || null;
+  if (String(newCityId || '') === String(oldCityId || '') &&
+      String(newLocId  || '') === String(oldLocId  || '')){
+    toast('Nothing changed');
+    return;
+  }
+  if (!newCityId){
+    if (!confirm('Clear city assignment for this listing?\n\nThe shop will no longer appear in city-based searches. Proceed?')) return;
+  } else {
+    var cityName = (CITY_LIST.find(function(c){return String(c.id)===String(newCityId);}) || {}).name || 'selected city';
+    if (!confirm('Change city to "' + cityName + '"?\n\nThis affects search ranking and may change the public URL slug if locality patterns differ. Proceed?')) return;
+  }
+  status.textContent = '⏳ Saving…';
+  // Patch via admin_update_shop RPC (preferred — auto audit-logs the change)
+  var patch = {};
+  if (String(newCityId || '') !== String(oldCityId || '')) patch.city_id = newCityId ? Number(newCityId) || newCityId : null;
+  if (String(newLocId  || '') !== String(oldLocId  || '')) patch.locality_id = newLocId ? Number(newLocId) || newLocId : null;
+  var ok = await applyPatch(patch, '✓ Location updated');
+  status.textContent = ok ? '' : '⚠️ Save failed';
 }
 
 async function loadEditHistory(){
