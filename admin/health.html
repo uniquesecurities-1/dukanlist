@@ -138,14 +138,18 @@ table.checks td.expected,table.checks td.actual{font-family:ui-monospace,Menlo,C
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
 <script>
-// === Supabase client init ===
-// We name our client `sb` (NOT `supabase`) because the CDN SDK script already
-// declares a top-level `window.supabase` global, and `const supabase = ...`
-// would collide and throw SyntaxError.
-const SUPABASE_URL = 'https://qazuyygrpqopwygxmvwq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// === Supabase client init via shared ShopDB ===
+// IMPORTANT: All admin pages share auth state by using the same Supabase client
+// from /assets/js/supabase-init.js, which sets storageKey: 'dukanlist_auth'.
+// Creating a separate client here (with default storage key) caused this page
+// to see null session even when other admin pages worked fine for the same user.
+if (!window.ShopDB || !window.ShopDB.client){
+  document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif"><h2>ShopDB not loaded</h2><p>/assets/js/supabase-init.js must load before this script.</p></div>';
+  throw new Error('ShopDB missing');
+}
+const sb = window.ShopDB.client;
 window.sb = sb;  // expose so the auto-injected error monitor can find the client
 
 // === Auth gate — copies the bulletproof pattern from admin/dashboard.html ===
