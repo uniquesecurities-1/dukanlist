@@ -163,11 +163,14 @@ function logout(){
 }
 
 // Build a per-issue WhatsApp nudge message — modern visual hierarchy, inclusive language.
-// CRITICAL: Uses ONLY BMP-plane Unicode symbols (3-byte UTF-8). Avoids supplementary-
-// plane emojis (U+1F000+ range like 🙏 📷 🕐 📝 📍 etc.) because some Android device
-// fonts cannot render those code points and show � (replacement character) instead.
-// The symbols below — ★ ✦ ✎ ◆ ⭐ ⏰ ✨ ✔ ⚡ ⚑ ☞ — are part of the universal BMP set
-// guaranteed to render on every WhatsApp installation including older devices.
+// CRITICAL: Uses ONLY text-default BMP-plane Unicode symbols (3-byte UTF-8). We avoid:
+//   1. Supplementary-plane emojis (U+1F000+ like 🙏 📷 🕐 etc.) — 4-byte UTF-8 that some
+//      device fonts can't render.
+//   2. BMP symbols with Unicode property Emoji_Presentation=Yes (like ✨ ⭐ ⏰ ⚡ ✔) — these
+//      have a BMP code point but the OS routes them to the emoji font, which on older
+//      devices is missing them and falls back to � replacement character.
+// The symbols below — ✦ ❖ ◐ ★ ☆ ✎ ◆ ⚑ ► ☞ ✓ — all have Emoji_Presentation=No (or aren't
+// emojis at all) so the OS uses the regular text font, which has these glyphs universally.
 function buildNudgeMessage(shop, issues){
   const name = shop.name || 'your business';
   const owner = shop.owner_name ? (shop.owner_name + ' ji') : 'there';
@@ -176,7 +179,7 @@ function buildNudgeMessage(shop, issues){
   const divider = '━━━━━━━━━━━━━━━━━━';
 
   const lines = [];
-  lines.push('✨ *Namaste ' + owner + '*');
+  lines.push('✦ *Namaste ' + owner + '*');
   lines.push('');
   lines.push('Your listing *' + name + '* is live on DukanList ✓');
   lines.push('');
@@ -186,17 +189,17 @@ function buildNudgeMessage(shop, issues){
 
   if (issues.includes('photos')){
     lines.push('');
-    lines.push('⭐ *Photos*');
+    lines.push('❖ *Photos*');
     lines.push('Listings with photos get *5× more views*. Upload 3+ photos of your business to activate full visibility.');
   }
   if (issues.includes('hours')){
     lines.push('');
-    lines.push('⏰ *Business Hours*');
+    lines.push('◐ *Business Hours*');
     lines.push('Required to appear in the *"Open Now"* filter — one of the most-used customer filters.');
   }
   if (issues.includes('usp')){
     lines.push('');
-    lines.push('✦ *USP / Tagline*');
+    lines.push('★ *USP / Tagline*');
     lines.push('A one-line description of what makes your business special. Increases featured chances.');
   }
   if (issues.includes('about')){
@@ -211,7 +214,7 @@ function buildNudgeMessage(shop, issues){
   }
   if (issues.includes('year')){
     lines.push('');
-    lines.push('★ *Established Year*');
+    lines.push('☆ *Established Year*');
     lines.push('Adds a *"Since 2010"* credibility badge that customers look for when comparing listings.');
   }
   if (issues.includes('address')){
@@ -237,10 +240,10 @@ function buildNudgeMessage(shop, issues){
   lines.push('');
   lines.push(divider);
   lines.push('');
-  lines.push('⚡ Each missing detail takes *under a minute* to fill.');
+  lines.push('► Each missing detail takes *under a minute* to fill.');
   lines.push('Reply here if you need any help.');
   lines.push('');
-  lines.push('✔ *DukanList Team*');
+  lines.push('✓ *DukanList Team*');
   lines.push('Powered by DigiMutual Goals Pvt. Ltd.');
   return lines.join('\n');
 }
@@ -343,7 +346,7 @@ function render(){
 
   const root = document.getElementById('root');
   if (list.length === 0){
-    root.innerHTML = '<div class="empty"><div class="empty-emoji">✔</div><b>Nothing to fix here.</b><div style="margin-top:6px">All active shops in this filter look healthy.</div></div>';
+    root.innerHTML = '<div class="empty"><div class="empty-emoji">✓</div><b>Nothing to fix here.</b><div style="margin-top:6px">All active shops in this filter look healthy.</div></div>';
     return;
   }
 
