@@ -1,16 +1,13 @@
 /* ============================================================
-   image-opt.js — Supabase Storage image optimization helper
+   image-opt.js — Image optimization helper
    ============================================================
-   Wraps Supabase Storage URLs with image transformation params:
-     - format=webp (30-50% smaller than JPEG)
-     - width=400 (typical card display)
-     - quality=75 (good balance)
-     - resize=cover
+   STATUS: Transformation DISABLED by default (Supabase Image Transformation
+   requires Pro plan — until enabled, we return original URLs to avoid 404s).
 
-   Non-Supabase URLs pass through unchanged (idempotent + safe).
-   Auto-replaces /storage/v1/object/public/ with /storage/v1/render/image/public/
+   To enable later (after Supabase Pro upgrade or other CDN setup):
+     DukanImg.enableTransform = true;
 
-   Usage:
+   Usage stays the same in calling code:
      <img src="${DukanImg.opt(b.photos[0], {width:400, quality:75})}" ...>
    ============================================================ */
 (function (global) {
@@ -23,46 +20,37 @@
   }
 
   function supportsWebP() {
-    // Modern browser feature detection (cached)
     if (typeof global.__dlWebPSupport !== 'undefined') return global.__dlWebPSupport;
-    var canvas = document.createElement('canvas');
-    canvas.width = canvas.height = 1;
-    var support = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-    global.__dlWebPSupport = support;
-    return support;
+    try {
+      var canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+      var support = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+      global.__dlWebPSupport = support;
+      return support;
+    } catch(_) { return false; }
   }
 
   /**
-   * Optimize a Supabase Storage URL for delivery.
-   * @param {string} url - Original image URL
-   * @param {object} opts - { width, height, quality, format, resize }
-   * @returns {string} Optimized URL or original URL if not Supabase
+   * Optimize image URL — returns original URL by default.
+   * Set DukanImg.enableTransform = true to activate Supabase image transforms.
    */
   function opt(url, opts) {
     if (!url) return url;
-    opts = opts || {};
-    // Pass through non-Supabase URLs unchanged
+    // SAFE PATH: return original URL unchanged
+    if (!global.DukanImg || !global.DukanImg.enableTransform) return url;
+    // Transformation path (only when explicitly enabled)
     if (!isSupabaseStorage(url)) return url;
-
-    // Convert object endpoint → render endpoint
+    opts = opts || {};
     var renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-
-    // Build query params
     var params = [];
-    var width = opts.width || 400;
-    var quality = opts.quality || 75;
-    var format = opts.format || (supportsWebP() ? 'webp' : 'origin');
-    var resize = opts.resize || 'cover';
-
-    params.push('width=' + width);
+    params.push('width=' + (opts.width || 400));
     if (opts.height) params.push('height=' + opts.height);
-    params.push('quality=' + quality);
-    params.push('resize=' + resize);
-    if (format !== 'origin') params.push('format=' + format);
-
+    params.push('quality=' + (opts.quality || 75));
+    params.push('resize=' + (opts.resize || 'cover'));
+    if (supportsWebP()) params.push('format=webp');
     var separator = renderUrl.indexOf('?') !== -1 ? '&' : '?';
     return renderUrl + separator + params.join('&');
   }
 
-  global.DukanImg = { opt: opt, supportsWebP: supportsWebP };
+  global.DukanImg = { opt: opt, supportsWebP: supportsWebP, enableTransform: false };
 })(window);
