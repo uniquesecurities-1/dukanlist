@@ -65,7 +65,7 @@ function gradFor(name){
 
 async function fetchBusiness(field, value){
   const url = SUPABASE_URL + '/rest/v1/businesses' +
-    '?select=name,slug,id,rating_avg,rating_count,geo_cities(name),geo_localities(name)' +
+    '?select=name,slug,id,rating_avg,rating_count,owner_name,owner_role,geo_cities(name),geo_localities(name)' +
     '&' + field + '=eq.' + encodeURIComponent(value) +
     '&status=eq.active' +
     '&limit=1';
@@ -92,6 +92,13 @@ function buildSvg(biz, opts){
   const ratingAvg = Number(biz.rating_avg) || 0;
   const ratingCount = Number(biz.rating_count) || 0;
   const hasRating = !opts.noStars && ratingCount > 0 && ratingAvg > 0;
+
+  // Owner identity (dignity line): "Owner: Rajesh Sharma" or "Founder: ..." etc.
+  const ownerName = (biz.owner_name || '').trim();
+  const ownerRoleRaw = (biz.owner_role || '').trim();
+  const ownerRole = ownerRoleRaw || 'Owner';
+  const ownerLine = ownerName ? (ownerRole + ': ' + ownerName) : '';
+  const displayOwner = truncate(ownerLine, 46);
 
   const displayName = truncate(name, 38);
   const displayPlace = truncate(place, 50);
@@ -152,6 +159,8 @@ function buildSvg(biz, opts){
 '  <text x="80" y="' + (320 + (fontSize > 100 ? 0 : 12)) + '" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="' + fontSize + '" font-weight="900" fill="#ffffff" letter-spacing="-2">' + xmlEscape(displayName) + '</text>\n' +
 '  <!-- Location subtitle -->\n' +
 '  ' + (displayPlace ? '<text x="80" y="390" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="32" font-weight="600" fill="rgba(255,255,255,0.92)">📍 ' + xmlEscape(displayPlace) + '</text>' : '') + '\n' +
+'  <!-- Owner attribution line (dignity) -->\n' +
+'  ' + (displayOwner ? '<text x="80" y="' + (displayPlace ? 428 : 390) + '" font-family="ui-rounded,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-size="26" font-weight="600" fill="rgba(255,255,255,0.85)">👤 ' + xmlEscape(displayOwner) + '</text>' : '') + '\n' +
 '  <!-- Stars row -->\n' +
 '  ' + stars + '\n' +
 '  <!-- Rating text -->\n' +
