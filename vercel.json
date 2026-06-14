@@ -24,6 +24,10 @@
       "destination": "/api/sitemap"
     },
     {
+      "source": "/favicon.ico",
+      "destination": "/assets/icons/logo.svg"
+    },
+    {
       "source": "/share",
       "destination": "/api/share"
     },
