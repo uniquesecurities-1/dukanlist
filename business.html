@@ -3273,12 +3273,15 @@ async function toggleFav(){
 // from DB instead of generic label emoji (avoids Unicode rendering issues).
 function buildFriendShareText(){
   if (!BIZ) return '';
+  // CRITICAL: Uses ONLY text-default BMP symbols. Avoids supplementary-plane
+  // emojis (owner/location/rating icons and DB category icons) because some
+  // Android device fonts cannot render those code points and show the U+FFFD
+  // replacement character instead. Same approach as buildNudgeMessage().
   const name = BIZ.name || 'this business';
   const area = (BIZ.geo_localities && BIZ.geo_localities.name) || '';
   const city = (BIZ.geo_cities && BIZ.geo_cities.name) || BIZ.city_name || '';
   const loc  = [area, city].filter(Boolean).join(', ');
   const cat  = (BIZ.categories && BIZ.categories.name) || BIZ.category_name || '';
-  const catIcon = (BIZ.categories && BIZ.categories.icon) || '';
   const ownerName = BIZ.owner_name || '';
   const ownerRole = BIZ.owner_role || '';  // e.g. 'Owner', 'Founder', 'Partner', 'Director'
   // Pick a friendly label — fall back to "Owner" if role not set
@@ -3286,7 +3289,7 @@ function buildFriendShareText(){
     ? ownerRole.trim()
     : 'Owner';
   const rating = (BIZ.rating_avg > 0 && BIZ.rating_count > 0)
-    ? '⭐ ' + Number(BIZ.rating_avg).toFixed(1) + ' (' + BIZ.rating_count + ' reviews)'
+    ? '★ ' + Number(BIZ.rating_avg).toFixed(1) + ' (' + BIZ.rating_count + ' reviews)'
     : '';
   const verified = (BIZ.verified_score >= 3) ? '✓ Verified on DukanList' : '';
   const credParts = [verified, rating].filter(Boolean).join(' · ');
@@ -3296,15 +3299,15 @@ function buildFriendShareText(){
   msg += '*' + name + '*\n';
   // Owner line (key trust signal)
   if (ownerName) {
-    msg += '👤 ' + roleLabel + ': ' + ownerName + '\n';
+    msg += '✦ ' + roleLabel + ': ' + ownerName + '\n';
   }
-  // Category line (uses actual category icon from DB — Unicode-safe)
+  // Category line
   if (cat) {
-    msg += (catIcon ? catIcon + ' ' : '') + cat + '\n';
+    msg += '► ' + cat + '\n';
   }
   // Location line
   if (loc) {
-    msg += '📍 ' + loc + '\n';
+    msg += '◆ ' + loc + '\n';
   }
   if (credParts) msg += credParts + '\n';
   msg += '\n' + url + '\n\n';
