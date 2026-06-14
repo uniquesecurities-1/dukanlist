@@ -181,22 +181,49 @@
       <span data-i18n-hi>Doctor optical सुझाते हैं, hospital pharmacy सुझाता है, coaching वाले stationer सुझाते हैं। ग्राहक आपके निर्णय पर भरोसा करता है → सुझाए गए व्यवसाय पर भी। <b>अधिकतम 8 सुझाव।</b></span>
     </div>
 
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:6px;background:#F1F5F9;padding:5px;border-radius:12px;margin-bottom:18px">
+      <button class="tab-switch-btn active" data-tab="outgoing" onclick="switchTab('outgoing')" id="tabOutgoing"
+              style="flex:1;background:#fff;border:0;padding:11px 14px;border-radius:9px;font-weight:800;font-size:.86rem;color:#0F172A;cursor:pointer;font-family:inherit;box-shadow:0 2px 6px rgba(15,23,42,.08);transition:.15s">
+        🤝 <span data-i18n-en>Who I Recommend</span><span data-i18n-hi>मैं सुझाव देता हूँ</span>
+      </button>
+      <button class="tab-switch-btn" data-tab="incoming" onclick="switchTab('incoming')" id="tabIncoming"
+              style="flex:1;background:transparent;border:0;padding:11px 14px;border-radius:9px;font-weight:700;font-size:.86rem;color:#64748B;cursor:pointer;font-family:inherit;transition:.15s">
+        📨 <span data-i18n-en>Who Recommends Me</span><span data-i18n-hi>मुझे सुझाते हैं</span>
+        <span id="incomingCount" style="background:#10B981;color:#fff;font-size:.7rem;padding:1px 7px;border-radius:99px;margin-left:4px;font-weight:800;display:none"></span>
+      </button>
+    </div>
+
     <div id="loading" style="text-align:center;padding:40px 0;color:#64748B">⏳ Loading…</div>
 
     <div id="content" style="display:none">
 
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <span id="recCounter" class="rec-counter">0 / 8</span>
-        <a id="viewPublicLink" target="_blank" style="font-size:.82rem;color:#FF6B1A;font-weight:700;text-decoration:none">
-          🔗 <span data-i18n-en>See on public listing</span><span data-i18n-hi>public listing पर देखें</span> →
-        </a>
+      <!-- ============ TAB: OUTGOING (Who I Recommend) ============ -->
+      <div id="paneOutgoing">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <span id="recCounter" class="rec-counter">0 / 8</span>
+          <a id="viewPublicLink" target="_blank" style="font-size:.82rem;color:#FF6B1A;font-weight:700;text-decoration:none">
+            🔗 <span data-i18n-en>See on public listing</span><span data-i18n-hi>public listing पर देखें</span> →
+          </a>
+        </div>
+
+        <div id="recList" class="rec-list"></div>
+
+        <button id="addBtn" class="rec-add-btn" onclick="openAddModal()">
+          ➕ <span data-i18n-en>Recommend a Business</span><span data-i18n-hi>एक व्यवसाय सुझाएँ</span>
+        </button>
       </div>
 
-      <div id="recList" class="rec-list"></div>
+      <!-- ============ TAB: INCOMING (Who Recommends Me) ============ -->
+      <div id="paneIncoming" style="display:none">
+        <div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #86EFAC;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:.86rem;line-height:1.55;color:#166534">
+          🛡️ <b><span data-i18n-en>Your control:</span><span data-i18n-hi>आपका नियंत्रण:</span></b>
+          <span data-i18n-en>If a business you don't trust adds you as their trusted partner, you can hide that recommendation from your public profile. Hidden recommendations also disappear from the recommender's public list — trust must be mutual.</span>
+          <span data-i18n-hi>अगर कोई व्यवसाय जिस पर आप भरोसा नहीं करते, आपको trusted partner जोड़ ले — तो आप उसे अपनी public profile से छिपा सकते हैं। छिपाए गए सुझाव recommender की public list से भी हट जाते हैं।</span>
+        </div>
 
-      <button id="addBtn" class="rec-add-btn" onclick="openAddModal()">
-        ➕ <span data-i18n-en>Recommend a Business</span><span data-i18n-hi>एक व्यवसाय सुझाएँ</span>
-      </button>
+        <div id="incomingList" class="rec-list"></div>
+      </div>
     </div>
 
   </div>
@@ -349,6 +376,108 @@ function renderRecommendations(){
       '<button class="rc-remove" onclick="removeRec(\'' + r.id + '\')">✕ Remove</button>' +
     '</div>';
   }).join('');
+}
+
+var CURRENT_TAB = 'outgoing';
+var INCOMING_RECS = [];
+
+function switchTab(tab){
+  CURRENT_TAB = tab;
+  document.querySelectorAll('.tab-switch-btn').forEach(function(b){
+    var active = b.dataset.tab === tab;
+    b.classList.toggle('active', active);
+    if (active){
+      b.style.background = '#fff';
+      b.style.color = '#0F172A';
+      b.style.fontWeight = '800';
+      b.style.boxShadow = '0 2px 6px rgba(15,23,42,.08)';
+    } else {
+      b.style.background = 'transparent';
+      b.style.color = '#64748B';
+      b.style.fontWeight = '700';
+      b.style.boxShadow = 'none';
+    }
+  });
+  document.getElementById('paneOutgoing').style.display = (tab === 'outgoing') ? '' : 'none';
+  document.getElementById('paneIncoming').style.display = (tab === 'incoming') ? '' : 'none';
+  if (tab === 'incoming' && INCOMING_RECS.length === 0){
+    loadIncoming();
+  }
+}
+
+async function loadIncoming(){
+  var c = ShopDB.client;
+  var listEl = document.getElementById('incomingList');
+  listEl.innerHTML = '<div class="rec-empty"><div class="em-ico">⏳</div><div class="em-text">Loading...</div></div>';
+  var r = await c.rpc('get_my_incoming_recommendations');
+  INCOMING_RECS = (r && !r.error && Array.isArray(r.data)) ? r.data : [];
+  renderIncoming();
+}
+
+function renderIncoming(){
+  var listEl = document.getElementById('incomingList');
+  var countEl = document.getElementById('incomingCount');
+
+  // Show count badge in tab button
+  var visibleCount = INCOMING_RECS.filter(function(r){ return !r.recipient_hidden; }).length;
+  if (visibleCount > 0){
+    countEl.textContent = visibleCount;
+    countEl.style.display = '';
+  } else {
+    countEl.style.display = 'none';
+  }
+
+  if (!INCOMING_RECS.length){
+    listEl.innerHTML =
+      '<div class="rec-empty">' +
+        '<div class="em-ico">📨</div>' +
+        '<div class="em-text"><span data-i18n-en>No one has recommended you yet — your reputation will bring partners soon!</span><span data-i18n-hi>अभी किसी ने सुझाव नहीं दिया — जल्दी ही साझेदार आपको खोजेंगे!</span></div>' +
+      '</div>';
+    return;
+  }
+
+  listEl.innerHTML = INCOMING_RECS.map(function(r){
+    var meta = (r.recommender_cat || '') + (r.recommender_city ? ' · 📍 ' + r.recommender_city : '');
+    var verifiedBadge = (r.recommender_verified_score >= 1)
+      ? '<span style="background:#10B981;color:#fff;font-size:.62rem;font-weight:800;padding:1px 6px;border-radius:99px;margin-left:5px">✓ Verified</span>'
+      : '';
+    var labelHtml = r.relationship_label
+      ? '<div class="rc-label">' + esc(r.relationship_label) + '</div>'
+      : '';
+    var hiddenClass = r.recipient_hidden ? 'style="opacity:.55;background:#F8FAFC"' : '';
+    var actionBtn = r.recipient_hidden
+      ? '<button class="rc-remove" style="border-color:#86EFAC;color:#15803D" onclick="toggleHideIncoming(\'' + r.id + '\', false)">👁️ Show on my profile</button>'
+      : '<button class="rc-remove" onclick="toggleHideIncoming(\'' + r.id + '\', true)">🚫 Hide from my profile</button>';
+
+    return '<div class="rec-card" ' + hiddenClass + '>' +
+      '<div class="rc-emoji">' + esc(r.recommender_icon || '🏪') + '</div>' +
+      '<div class="rc-info">' +
+        '<div class="rc-name">' +
+          '<a href="/business.html?slug=' + encodeURIComponent(r.recommender_slug) + '" target="_blank" style="color:inherit;text-decoration:none">' + esc(r.recommender_name) + '</a>' +
+          verifiedBadge +
+        '</div>' +
+        '<div class="rc-meta">' + esc(meta) + '</div>' +
+        labelHtml +
+        (r.recipient_hidden ? '<div style="margin-top:4px;font-size:.7rem;color:#DC2626;font-weight:700">🚫 Hidden from your public profile</div>' : '') +
+      '</div>' +
+      actionBtn +
+    '</div>';
+  }).join('');
+}
+
+async function toggleHideIncoming(recId, shouldHide){
+  var label = shouldHide
+    ? 'Hide this recommendation from your public profile?\n\nIt will disappear from both your page AND the recommender\'s page. They will not be notified.'
+    : 'Show this recommendation on your public profile again?';
+  if (!confirm(label)) return;
+  try {
+    var c = ShopDB.client;
+    var r = await c.rpc('set_incoming_recommendation_hidden', { p_id: recId, p_hidden: shouldHide });
+    if (r.error) throw r.error;
+    await loadIncoming();
+  } catch(e){
+    alert('Could not update: ' + (e.message || e));
+  }
 }
 
 // ========= MODAL =========
