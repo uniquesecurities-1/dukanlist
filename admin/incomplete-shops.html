@@ -162,52 +162,82 @@ function logout(){
   else location.href = '/admin/login.html';
 }
 
-// Build a per-issue WhatsApp nudge message — professional, brief, actionable
+// Build a per-issue WhatsApp nudge message — modern visual hierarchy, inclusive language.
+// Uses safe Unicode + WhatsApp-supported formatting (*bold*, line dividers).
 function buildNudgeMessage(shop, issues){
-  const name = shop.name || 'your shop';
+  const name = shop.name || 'your business';
   const owner = shop.owner_name ? (shop.owner_name + ' ji') : 'there';
   const profileUrl = 'https://dukanlist.com/business?slug=' + (shop.slug || '');
   const panelUrl   = 'https://dukanlist.com/panel/dashboard.html';
+  const divider = '━━━━━━━━━━━━━━━━━━';
 
   const lines = [];
-  lines.push('Namaste ' + owner + ',');
+  lines.push('🙏 *Namaste ' + owner + '*');
   lines.push('');
-  lines.push('This is the DukanList team. Your listing — *' + name + '* — is live, but a few important details are missing that would meaningfully boost your customer reach:');
+  lines.push('Your listing *' + name + '* is live on DukanList ✓');
   lines.push('');
+  lines.push('But a few quick updates would *significantly boost* customer reach:');
+  lines.push('');
+  lines.push(divider);
 
   if (issues.includes('photos')){
-    lines.push('• 📷  *Photos* — listings with photos receive 5× more views. Upload 3+ shop photos to activate full visibility.');
+    lines.push('');
+    lines.push('📷 *Photos*');
+    lines.push('Listings with photos get *5× more views*. Upload 3+ photos of your business to activate full visibility.');
   }
   if (issues.includes('hours')){
-    lines.push('• 🕐  *Business hours* — required to appear in the "Open Now" filter, which is one of the most-used customer filters.');
+    lines.push('');
+    lines.push('🕐 *Business Hours*');
+    lines.push('Required to appear in the *"Open Now"* filter — one of the most-used customer filters.');
   }
   if (issues.includes('usp')){
-    lines.push('• ✨  *USP / tagline* — a one-line description of what makes your shop special. Increases your chance of being featured.');
+    lines.push('');
+    lines.push('✨ *USP / Tagline*');
+    lines.push('A one-line description of what makes your business special. Increases featured chances.');
   }
   if (issues.includes('about')){
-    lines.push('• 📝  *About section* — helps customers compare you against other shops in your category before deciding to call.');
+    lines.push('');
+    lines.push('📝 *About Section*');
+    lines.push('Helps customers compare you with others in your category before deciding to call.');
   }
   if (issues.includes('locality')){
-    lines.push('• 📍  *Area / locality* — without this, your shop is missing from hyperlocal area pages like /area/mandi-dabwali/meena-bazaar.');
+    lines.push('');
+    lines.push('📍 *Area / Locality*');
+    lines.push('Without this, your business is missing from hyperlocal area pages (like /area/mandi-dabwali/...).');
   }
   if (issues.includes('year')){
-    lines.push('• 📅  *Established year* — adds a "Since 2010" credibility badge that customers look for when comparing shops.');
+    lines.push('');
+    lines.push('📅 *Established Year*');
+    lines.push('Adds a *"Since 2010"* credibility badge that customers look for when comparing listings.');
   }
   if (issues.includes('address')){
-    lines.push('• 🚩  *Address detail* — your address line looks incomplete. Please add the street/landmark/area so customers can actually reach your shop.');
+    lines.push('');
+    lines.push('🚩 *Address Detail*');
+    lines.push('Your address looks incomplete. Add the street/landmark/area so customers can actually reach you.');
   }
   if (issues.includes('pincode')){
-    lines.push('• 🔢  *Pincode* — your pincode is missing or does not match your city. Please update so the listing appears in correct local searches.');
+    lines.push('');
+    lines.push('🔢 *Pincode*');
+    lines.push('Missing or does not match your city. Update so the listing appears in correct local searches.');
   }
 
   lines.push('');
-  lines.push('Quick links:');
-  lines.push('Your listing: ' + profileUrl);
-  lines.push('Owner panel: ' + panelUrl);
+  lines.push(divider);
   lines.push('');
-  lines.push('Each missing detail takes under a minute to fill. Let us know if you need any help.');
+  lines.push('🔗 *Quick Links*');
+  lines.push('Your listing:');
+  lines.push(profileUrl);
   lines.push('');
-  lines.push('— DukanList Team');
+  lines.push('Owner panel:');
+  lines.push(panelUrl);
+  lines.push('');
+  lines.push(divider);
+  lines.push('');
+  lines.push('💡 Each missing detail takes *under a minute* to fill.');
+  lines.push('Reply here if you need any help.');
+  lines.push('');
+  lines.push('🛡️ *DukanList Team*');
+  lines.push('Powered by DigiMutual Goals Pvt. Ltd.');
   return lines.join('\n');
 }
 

@@ -184,8 +184,8 @@ function renderNotFound(){
 '<html><head>\n' +
 '<meta charset="UTF-8">\n' +
 '<title>Shop not found — DukanList</title>\n' +
-'<meta property="og:title" content="DukanList — Every Shop, One Identity">\n' +
-'<meta property="og:description" content="Bharat ka local shop directory.">\n' +
+'<meta property="og:title" content="DukanList — Every Local Name, One Identity">\n' +
+'<meta property="og:description" content="Bharat ka local business directory — doctors, clinics, offices, shops, services, professionals.">\n' +
 '<meta property="og:image" content="' + DEFAULT_OG_IMAGE + '">\n' +
 '<meta http-equiv="refresh" content="0; url=' + SITE_ORIGIN + '/">\n' +
 '<script>window.location.replace(' + JSON.stringify(SITE_ORIGIN + '/') + ');</script>\n' +
