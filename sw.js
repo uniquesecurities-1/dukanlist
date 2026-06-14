@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.42';  // REFERRAL NETWORK PHASE 2 — reciprocal trust badge + recipient control. (a) db/131 SQL: adds recipient_hidden BOOLEAN to business_recommendations, recreates 2 RPCs to exclude hidden, adds get_my_incoming_recommendations + set_incoming_recommendation_hidden. (b) business.html: NEW green 'Recommended By' card showing endorsers with verified badge + city + relationship label. (c) panel/recommendations.html: TWO TABS — Who I Recommend (outgoing) + Who Recommends Me (incoming with Hide/Show buttons). Hidden recs disappear from both sides — trust is mutual.
+const VERSION    = 'dukan-v2.9.43';  // HOMEPAGE POLISH — Core Web Vitals improvements. (1) Added width=400 height=250 + aspect-ratio:16/10 to 2 dynamic featured-card images that were missing dimensions — prevents Cumulative Layout Shift (CLS). All 5 imgs now have explicit dimensions. (2) Added performance preload hints in <head>: link rel=preload for /assets/icons/logo.svg (fetchpriority=high), 2 Manrope font weights (woff2), DNS-prefetch + preconnect for fonts.googleapis.com and fonts.gstatic.com — saves ~200-400ms perceived load time. (3) Minified 12 inline scripts using terser — JS reduced from 51.2 KB to 39.4 KB (23% smaller). Total index.html size: 173 KB → 161 KB. Comments stripped, conditionals optimized, dead code removed. Mangle disabled to preserve inline event handler references. console.warn/error preserved for production debugging.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
