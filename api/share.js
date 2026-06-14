@@ -105,7 +105,14 @@ function renderHtml(biz, targetUrl, isReview){
 
   // ----- IMAGE preference
   // For review-prompt shares: PREFER shop's own photo (no DukanList branding).
-  // Standard shares: use generated OG card if available, else photo, else default.
+  // Standard shares: use shop's first photo, else static branded PNG default.
+  //
+  // CRITICAL: WhatsApp's preview crawler does NOT render SVG og:image — only
+  // PNG and JPEG. Earlier versions of this file pointed at /api/og-card (SVG)
+  // as the fallback; the result was a blank preview for businesses without
+  // uploaded photos. We now use a static PNG (assets/og-default.png) so the
+  // preview ALWAYS shows something. The dynamic /api/og-card endpoint is
+  // still useful for direct embeds and pages, but is not WhatsApp-safe as og:image.
   let image = DEFAULT_OG_IMAGE;
   let imageType = 'image/png';
   const hasShopPhoto = biz.photos && Array.isArray(biz.photos) && biz.photos.length && typeof biz.photos[0] === 'string';
@@ -115,28 +122,23 @@ function renderHtml(biz, targetUrl, isReview){
       image = biz.photos[0];
       imageType = 'image/jpeg';
     } else {
-      // Fallback: dynamic shop-branded card with shop name + city + stars
-      // (NEVER falls back to DukanList default for review shares)
-      image = SITE_ORIGIN + '/api/og-card?slug=' + encodeURIComponent(biz.slug || '');
-      imageType = 'image/svg+xml';
+      // Fallback to static PNG — WhatsApp can render it. (SVG card not used.)
+      image = DEFAULT_OG_IMAGE;
+      imageType = 'image/png';
     }
   } else {
     // STANDARD SHARE — fallback chain:
-    //  1. Custom og_image_url (shopkeeper-set)
-    //  2. Shop's own first photo
-    //  3. Dynamic shop-branded SVG card (NOT the generic DukanList default)
-    // The generic DEFAULT_OG_IMAGE is only used as the absolute last resort
-    // for pages where biz lookup completely fails.
+    //  1. Custom og_image_url (shopkeeper-set, can be SVG/PNG/JPEG)
+    //  2. Shop's own first photo (JPEG)
+    //  3. Static branded PNG default (guaranteed to render in WhatsApp)
     if (biz.og_image_url && typeof biz.og_image_url === 'string'){
       image = biz.og_image_url;
     } else if (hasShopPhoto){
       image = biz.photos[0];
       imageType = 'image/jpeg';
     } else {
-      // Dynamic shop-branded card: gradient + initial badge + shop name + city + rating
-      // "LOCAL · VERIFIED" pill instead of "RATE US", and "Tap to view photos, hours, contact →" CTA
-      image = SITE_ORIGIN + '/api/og-card?slug=' + encodeURIComponent(biz.slug || '') + '&mode=share';
-      imageType = 'image/svg+xml';
+      image = DEFAULT_OG_IMAGE;
+      imageType = 'image/png';
     }
   }
 
