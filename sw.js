@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.47';  // CACHE BUST — user reported photos working on PC but not mobile. Root cause: browser HTTP cache (not SW) was serving stale image-opt.js with the broken Supabase render endpoint URL. SW already bypasses /assets/js/ for caching but browser caches independently. Fix: added ?v=20260615-fix query string to BOTH image-opt.js and homepage.js src tags in index.html — browser treats as new URLs and fetches fresh. Mobile will now pick up the updated image-opt.js (which has transform disabled by default) on next page load.
+const VERSION    = 'dukan-v2.9.48';  // MOBILE FOOTER COMPACT — user reported footer too bulky on mobile (large heading + 2-line quote + 4-line trust block = ~40% of viewport on tier-2 phones). Added aggressive @media max-width:560px overrides: footer padding 34px→22px, heading 1.05rem→0.92rem with tighter line-height, paragraph 0.85rem→0.78rem with line-height 1.55→1.45 and removed line breaks (collapse to single inline run), links row font 0.9rem→0.78rem with reduced gaps, trust block padding 14px→10px with smaller text, powered-by 0.78rem→0.7rem, copy line 0.78rem→0.7rem. Net: footer height reduced ~40% on mobile, no content removed.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
