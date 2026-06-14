@@ -153,37 +153,72 @@ function withTimeout(promise, ms, label){
   return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error(label + ' timeout')), ms))]);
 }
 
+// FAIL-SOFT auth gate — instead of auto-redirecting, show what's happening
+// on the page itself. This is for diagnosing the redirect issue. We will
+// re-enable hard redirects once the cause is confirmed.
+function showDiagnostic(title, html){
+  document.querySelector('.container').innerHTML =
+    '<div style="background:#fff;border:1px solid #FCA5A5;border-radius:16px;padding:30px;margin:20px 0">' +
+    '<h2 style="color:#DC2626;margin:0 0 14px">' + title + '</h2>' + html +
+    '<p style="margin-top:20px;font-size:13px;color:#64748B">If everything below shows green, the page should work — but it isn\'t. Tell Claude what you see here.</p>' +
+    '<div style="margin-top:20px"><a href="/admin/dashboard.html" class="btn btn-primary" style="text-decoration:none">← Back to Dashboard</a> <button class="btn btn-secondary" onclick="location.reload()">↻ Retry</button></div>' +
+    '</div>';
+}
+
 (async () => {
-  // 1. Session check, with getUser fallback (fresh loads sometimes return null first try)
+  console.log('[health] === Auth diagnostic starting ===');
+  const status = { session: '?', user: '?', is_admin: '?', error: null };
+
+  // 1. Session check
   try {
     const sess = await withTimeout(sb.auth.getSession(), 6000, 'session');
+    status.session = (sess && sess.data && sess.data.session) ? 'YES (' + sess.data.session.user.email + ')' : 'NO';
+    console.log('[health] getSession:', sess);
     if (!sess || !sess.data || !sess.data.session){
       const u = await withTimeout(sb.auth.getUser(), 6000, 'getUser');
+      status.user = (u && u.data && u.data.user) ? 'YES (' + u.data.user.email + ')' : 'NO';
+      console.log('[health] getUser:', u);
       if (!u || !u.data || !u.data.user){
-        window.location.href = '/admin/login.html';
+        showDiagnostic('Not signed in', '<p>No session and no user found via getUser().</p><ul><li>getSession() → null session</li><li>getUser() → null user</li></ul><p><a href="/admin/login.html">Sign in</a></p>');
         return;
       }
+    } else {
+      status.user = 'YES (session has user)';
     }
   } catch(e){
-    document.body.innerHTML = '<div style="padding:40px;text-align:center"><h2>Auth check timed out</h2><p>' + esc(e.message) + '</p><p><a href="javascript:location.reload()">Retry</a> &nbsp;·&nbsp; <a href="/admin/login.html">Re-login</a></p></div>';
+    status.error = e.message;
+    showDiagnostic('Auth step timed out', '<p>' + esc(e.message) + '</p>');
     return;
   }
 
-  // 2. is_admin check — uses the long-existing RPC (NOT admin_health_check
-  //    which requires db/136, creating a chicken-and-egg lockout).
+  // 2. is_admin check
   try {
     const ia = await withTimeout(sb.rpc('is_admin'), 6000, 'is_admin');
-    if (ia.error || !ia.data){
-      alert('Not authorized — admin access required');
-      await sb.auth.signOut();
-      window.location.href = '/admin/login.html';
+    console.log('[health] is_admin RPC result:', ia);
+    if (ia.error){
+      status.is_admin = 'ERROR: ' + ia.error.message;
+      showDiagnostic('is_admin RPC error',
+        '<p>The is_admin RPC returned an error:</p>' +
+        '<pre style="background:#F8FAFC;padding:12px;border-radius:8px">' + esc(JSON.stringify(ia.error, null, 2)) + '</pre>' +
+        '<p><b>Status so far:</b></p><pre>' + esc(JSON.stringify(status, null, 2)) + '</pre>');
+      return;
+    }
+    status.is_admin = (ia.data === true) ? 'TRUE' : 'FALSE (returned: ' + JSON.stringify(ia.data) + ')';
+    if (ia.data !== true){
+      showDiagnostic('is_admin returned FALSE',
+        '<p>The is_admin RPC ran successfully but returned <code>' + esc(JSON.stringify(ia.data)) + '</code> (expected <code>true</code>).</p>' +
+        '<p>This means your auth account is not flagged as an admin in the DB.</p>' +
+        '<p><b>Status so far:</b></p><pre style="background:#F8FAFC;padding:12px;border-radius:8px">' + esc(JSON.stringify(status, null, 2)) + '</pre>' +
+        '<p>Fix: in Supabase, add your user_id to the admins table (or whatever your admin grant mechanism is). Other admin pages should fail the same way — if dashboard works for you, something is page-specific.</p>');
       return;
     }
   } catch(e){
-    document.body.innerHTML = '<div style="padding:40px;text-align:center"><h2>Admin check failed</h2><p>' + esc(e.message) + '</p><p><a href="javascript:location.reload()">Retry</a></p></div>';
+    status.error = e.message;
+    showDiagnostic('is_admin step timed out', '<p>' + esc(e.message) + '</p><pre>' + esc(JSON.stringify(status, null, 2)) + '</pre>');
     return;
   }
 
+  console.log('[health] === Auth OK, loading dashboard ===', status);
   refreshAll();
 })();
 
