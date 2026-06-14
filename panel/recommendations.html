@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<meta name="theme-color" content="#FF6B1A">
+<title>Trusted Partners — Recommended Businesses · DukanList</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260528">
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+<style>
+.rec-wrap{ max-width:900px; margin:0 auto; padding:0 14px 60px }
+.rec-head{ text-align:center; margin-bottom:24px }
+.rec-head h1{ font-family:'Manrope',sans-serif; font-size:1.7rem; font-weight:900; letter-spacing:-.025em; color:#0F172A; margin-bottom:6px }
+.rec-head p{ color:#64748B; font-size:.95rem; line-height:1.55; max-width:600px; margin:0 auto }
+
+.rec-info{
+  background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+  border:1.5px solid #FBBF24;
+  border-radius:14px; padding:16px 18px;
+  margin-bottom:20px; font-size:.88rem; line-height:1.6; color:#78350F;
+}
+.rec-info b{ font-weight:900 }
+
+.rec-counter{
+  display:inline-block; background:#fff; border:1.5px solid #E2E8F0;
+  border-radius:99px; padding:6px 14px; font-size:.82rem; font-weight:800;
+  color:#475569; margin-bottom:16px;
+}
+.rec-counter.full{ background:#FEF2F2; color:#DC2626; border-color:#FCA5A5 }
+
+.rec-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:20px }
+.rec-card{
+  background:#fff; border:1px solid rgba(15,23,42,.06);
+  border-radius:14px; padding:14px 16px;
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px;
+  align-items:center;
+  box-shadow:0 2px 6px rgba(15,23,42,.04);
+  transition:.15s;
+}
+.rec-card:hover{ border-color:#FF6B1A; box-shadow:0 8px 22px rgba(255,107,26,.08) }
+.rec-card .rc-emoji{ font-size:1.8rem; flex-shrink:0 }
+.rec-card .rc-info{ min-width:0 }
+.rec-card .rc-name{ font-weight:800; font-size:.98rem; color:#0F172A; line-height:1.25; margin-bottom:3px }
+.rec-card .rc-meta{ font-size:.78rem; color:#64748B; line-height:1.4 }
+.rec-card .rc-label{
+  display:inline-block; background:#FFF8F0; color:#9A3412;
+  padding:2px 9px; border-radius:99px; font-size:.7rem; font-weight:700;
+  margin-top:4px; max-width:100%; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.rec-card .rc-remove{
+  background:transparent; border:1px solid #FECACA; color:#DC2626;
+  padding:6px 12px; border-radius:8px; font-weight:700; font-size:.8rem;
+  cursor:pointer; font-family:inherit; transition:.15s;
+}
+.rec-card .rc-remove:hover{ background:#DC2626; color:#fff; border-color:transparent }
+
+.rec-empty{
+  text-align:center; padding:36px 20px;
+  background:#F8FAFC; border:1.5px dashed #CBD5E1;
+  border-radius:14px; color:#64748B;
+}
+.rec-empty .em-ico{ font-size:2.5rem; margin-bottom:8px; opacity:.6 }
+.rec-empty .em-text{ font-size:.92rem; font-weight:700; color:#475569 }
+
+.rec-add-btn{
+  background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff;
+  border:0; padding:14px 24px; border-radius:12px;
+  font-size:1rem; font-weight:800; cursor:pointer; font-family:inherit;
+  box-shadow:0 6px 18px rgba(255,107,26,.32);
+  transition:.18s; width:100%;
+}
+.rec-add-btn:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 10px 26px rgba(255,107,26,.42) }
+.rec-add-btn:disabled{ opacity:.5; cursor:not-allowed; background:#94a3b8; box-shadow:none }
+
+/* Add Recommendation Modal */
+.rec-modal-bg{
+  position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.7);
+  backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center;
+  padding:14px;
+}
+.rec-modal-bg.open{ display:flex }
+.rec-modal{
+  background:#fff; border-radius:18px; max-width:520px; width:100%;
+  max-height:90vh; overflow-y:auto; padding:20px; box-shadow:0 30px 80px rgba(0,0,0,.4);
+}
+.rec-modal h2{ font-size:1.2rem; font-weight:900; margin-bottom:6px; color:#0F172A }
+.rec-modal .rm-sub{ font-size:.84rem; color:#64748B; margin-bottom:14px; line-height:1.5 }
+.rec-modal .rm-search{
+  width:100%; padding:11px 14px; border:1.5px solid #E2E8F0; border-radius:10px;
+  font-family:inherit; font-size:.95rem; transition:.15s; margin-bottom:8px;
+}
+.rec-modal .rm-search:focus{ outline:none; border-color:#FF6B1A; box-shadow:0 0 0 3px rgba(255,107,26,.12) }
+.rec-modal .rm-hint{ font-size:.78rem; color:#94A3B8; margin-bottom:14px }
+.rec-modal .rm-results{ max-height:260px; overflow-y:auto; border:1px solid #E2E8F0; border-radius:10px; margin-bottom:14px }
+.rec-modal .rm-result{
+  padding:10px 12px; cursor:pointer; border-bottom:1px solid #F1F5F9;
+  display:flex; gap:10px; align-items:center; transition:.12s;
+}
+.rec-modal .rm-result:hover{ background:#FFF8F0 }
+.rec-modal .rm-result.selected{ background:#FFF8F0; border-left:3px solid #FF6B1A; padding-left:9px }
+.rec-modal .rm-result-emoji{ font-size:1.4rem }
+.rec-modal .rm-result-info{ flex:1; min-width:0 }
+.rec-modal .rm-result-name{ font-size:.92rem; font-weight:800; color:#0F172A; line-height:1.25 }
+.rec-modal .rm-result-meta{ font-size:.74rem; color:#64748B; margin-top:2px }
+.rec-modal .rm-empty{ text-align:center; padding:24px; color:#94A3B8; font-size:.84rem }
+
+.rec-modal label{ display:block; font-size:.86rem; font-weight:800; color:#0F172A; margin-bottom:6px }
+.rec-modal .rm-label-input{
+  width:100%; padding:10px 12px; border:1.5px solid #E2E8F0; border-radius:8px;
+  font-family:inherit; font-size:.9rem;
+}
+.rec-modal .rm-quick-labels{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px }
+.rec-modal .rm-quick-label{
+  background:#F1F5F9; color:#475569; border:0; padding:5px 11px;
+  border-radius:99px; font-size:.75rem; font-weight:600; cursor:pointer;
+  font-family:inherit; transition:.12s;
+}
+.rec-modal .rm-quick-label:hover{ background:#FFEDD5; color:#9A3412 }
+
+.rec-modal .rm-actions{ display:flex; gap:10px; margin-top:18px }
+.rec-modal .rm-cancel{
+  flex:1; background:#F1F5F9; color:#0F172A; border:0;
+  padding:12px; border-radius:10px; font-weight:800; cursor:pointer;
+  font-family:inherit; font-size:.92rem;
+}
+.rec-modal .rm-save{
+  flex:1; background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff;
+  border:0; padding:12px; border-radius:10px; font-weight:800; cursor:pointer;
+  font-family:inherit; font-size:.92rem; transition:.15s;
+}
+.rec-modal .rm-save:disabled{ opacity:.4; cursor:not-allowed; background:#94a3b8 }
+.rec-modal .rm-error{
+  background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B;
+  padding:10px 12px; border-radius:8px; font-size:.84rem; margin-top:10px;
+  display:none;
+}
+.rec-modal .rm-error.show{ display:block }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none"><span>Dukan<em>List</em></span></a>
+    <nav class="nav-links">
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="langBtnEn">EN</button>
+        <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
+      </div>
+      <a href="/panel/dashboard.html"><span data-i18n-en>Dashboard</span><span data-i18n-hi>डैशबोर्ड</span></a>
+      <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
+      <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <div class="rec-wrap">
+
+    <a href="/panel/dashboard.html" class="btn btn-ghost" style="margin-bottom:12px">
+      ← <span data-i18n-en>Back to Dashboard</span><span data-i18n-hi>डैशबोर्ड पर वापस</span>
+    </a>
+
+    <div class="rec-head">
+      <h1>
+        🤝 <span data-i18n-en>Trusted Partners</span><span data-i18n-hi>विश्वसनीय साझेदार</span>
+      </h1>
+      <p>
+        <span data-i18n-en>Recommend businesses you trust. They appear on your public listing so customers know who you vouch for. Builds local trust networks.</span>
+        <span data-i18n-hi>आप जिन व्यवसायों पर भरोसा करते हैं उन्हें सुझाएँ। आपकी public listing पर दिखेंगे — स्थानीय भरोसे का network बनेगा।</span>
+      </p>
+    </div>
+
+    <div class="rec-info">
+      💡 <b><span data-i18n-en>How it works:</span><span data-i18n-hi>कैसे काम करता है:</span></b>
+      <span data-i18n-en>A doctor recommends an optical shop, a hospital recommends a pharmacy, a coaching center recommends a stationer. Customer trusts your judgement → trusts the recommended business too. <b>You can recommend up to 8 businesses.</b></span>
+      <span data-i18n-hi>Doctor optical सुझाते हैं, hospital pharmacy सुझाता है, coaching वाले stationer सुझाते हैं। ग्राहक आपके निर्णय पर भरोसा करता है → सुझाए गए व्यवसाय पर भी। <b>अधिकतम 8 सुझाव।</b></span>
+    </div>
+
+    <div id="loading" style="text-align:center;padding:40px 0;color:#64748B">⏳ Loading…</div>
+
+    <div id="content" style="display:none">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <span id="recCounter" class="rec-counter">0 / 8</span>
+        <a id="viewPublicLink" target="_blank" style="font-size:.82rem;color:#FF6B1A;font-weight:700;text-decoration:none">
+          🔗 <span data-i18n-en>See on public listing</span><span data-i18n-hi>public listing पर देखें</span> →
+        </a>
+      </div>
+
+      <div id="recList" class="rec-list"></div>
+
+      <button id="addBtn" class="rec-add-btn" onclick="openAddModal()">
+        ➕ <span data-i18n-en>Recommend a Business</span><span data-i18n-hi>एक व्यवसाय सुझाएँ</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== ADD RECOMMENDATION MODAL ====== -->
+<div class="rec-modal-bg" id="addModal" onclick="if(event.target===this)closeAddModal()">
+  <div class="rec-modal">
+    <h2>🤝 <span data-i18n-en>Recommend a Business</span><span data-i18n-hi>व्यवसाय सुझाएँ</span></h2>
+    <p class="rm-sub">
+      <span data-i18n-en>Search by name. Only verified businesses on DukanList can be recommended.</span>
+      <span data-i18n-hi>नाम से खोजें। केवल DukanList पर मौजूद व्यवसाय सुझाए जा सकते हैं।</span>
+    </p>
+
+    <label><span data-i18n-en>🔍 Search business name</span><span data-i18n-hi>🔍 व्यवसाय का नाम खोजें</span></label>
+    <input id="searchInput" type="text" class="rm-search" placeholder="e.g. Sharma Optical, Bansal Pharmacy..." oninput="onSearchInput(this.value)" autocomplete="off">
+    <div class="rm-hint">
+      <span data-i18n-en>Type at least 2 characters</span><span data-i18n-hi>कम से कम 2 अक्षर लिखें</span>
+    </div>
+
+    <div id="searchResults" class="rm-results" style="display:none"></div>
+
+    <div id="afterSelect" style="display:none">
+      <label><span data-i18n-en>📝 Relationship (optional)</span><span data-i18n-hi>📝 रिश्ता (वैकल्पिक)</span></label>
+      <input id="labelInput" type="text" class="rm-label-input" maxlength="50" placeholder="E.g. For glasses, Trusted lab, Our supplier...">
+      <div class="rm-quick-labels">
+        <button type="button" class="rm-quick-label" onclick="quickLabel('Trusted partner')">Trusted partner</button>
+        <button type="button" class="rm-quick-label" onclick="quickLabel('Our preferred supplier')">Our preferred supplier</button>
+        <button type="button" class="rm-quick-label" onclick="quickLabel('We refer customers here')">We refer customers here</button>
+        <button type="button" class="rm-quick-label" onclick="quickLabel('Local neighbor we trust')">Local neighbor we trust</button>
+      </div>
+    </div>
+
+    <div id="rmError" class="rm-error"></div>
+
+    <div class="rm-actions">
+      <button type="button" class="rm-cancel" onclick="closeAddModal()">
+        <span data-i18n-en>Cancel</span><span data-i18n-hi>रद्द करें</span>
+      </button>
+      <button type="button" id="saveBtn" class="rm-save" disabled onclick="saveRecommendation()">
+        ✓ <span data-i18n-en>Add Recommendation</span><span data-i18n-hi>सुझाव जोड़ें</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer class="site">
+  © 2026 DigiMutual Goals Pvt. Ltd. · dukanlist.com
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/nav.js" defer></script>
+<script>
+function setLang(lang){
+  if (lang!=='en'&&lang!=='hi') lang='en';
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang',lang);
+  localStorage.setItem('shop_lang',lang);
+  var en=document.getElementById('langBtnEn'); var hi=document.getElementById('langBtnHi');
+  if (en) en.classList.toggle('active',lang==='en');
+  if (hi) hi.classList.toggle('active',lang==='hi');
+}
+
+var MY_BIZ = null;
+var MY_RECS = [];
+var SELECTED = null; // pending business in modal
+var searchTimer = null;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+
+async function loadBiz(){
+  var user = await ShopDB.requireAuth();
+  if (!user) return;
+  var c = ShopDB.client;
+  var bizId = null;
+  try {
+    var safe = await c.rpc('get_my_business_safe');
+    if (!safe.error && safe.data && safe.data.length){
+      bizId = safe.data[0].business_id;
+    }
+  } catch(_){}
+  if (!bizId){
+    var fb = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+    if (fb.data && fb.data.length) bizId = fb.data[0].business_id;
+  }
+  if (!bizId){
+    document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">List your business →</a>';
+    return;
+  }
+  var res = await c.from('businesses').select('id, slug, name').eq('id', bizId).maybeSingle();
+  if (res.error || !res.data){
+    document.getElementById('loading').innerHTML = '⚠ Could not load business.';
+    return;
+  }
+  MY_BIZ = res.data;
+  document.getElementById('viewPublicLink').href = '/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
+  await loadRecommendations();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = '';
+}
+
+async function loadRecommendations(){
+  var c = ShopDB.client;
+  var r = await c.rpc('get_my_recommendations');
+  MY_RECS = (r && !r.error && Array.isArray(r.data)) ? r.data : [];
+  renderRecommendations();
+}
+
+function renderRecommendations(){
+  var listEl = document.getElementById('recList');
+  var counterEl = document.getElementById('recCounter');
+  counterEl.textContent = MY_RECS.length + ' / 8';
+  counterEl.classList.toggle('full', MY_RECS.length >= 8);
+
+  var addBtn = document.getElementById('addBtn');
+  if (MY_RECS.length >= 8){
+    addBtn.disabled = true;
+    addBtn.innerHTML = '⚠ <span data-i18n-en>Limit reached (8/8)</span><span data-i18n-hi>सीमा पूरी (8/8)</span>';
+  } else {
+    addBtn.disabled = false;
+    addBtn.innerHTML = '➕ <span data-i18n-en>Recommend a Business</span><span data-i18n-hi>एक व्यवसाय सुझाएँ</span>';
+  }
+
+  if (!MY_RECS.length){
+    listEl.innerHTML =
+      '<div class="rec-empty">' +
+        '<div class="em-ico">🤝</div>' +
+        '<div class="em-text"><span data-i18n-en>No recommendations yet — start with the first one!</span><span data-i18n-hi>अभी कोई सुझाव नहीं — पहला जोड़ें!</span></div>' +
+      '</div>';
+    return;
+  }
+
+  listEl.innerHTML = MY_RECS.map(function(r){
+    var meta = r.recommended_cat ? esc(r.recommended_cat) : '';
+    if (r.recommended_city){
+      if (meta) meta += ' · ';
+      meta += '📍 ' + esc(r.recommended_city);
+    }
+    var labelHtml = r.relationship_label ? '<div class="rc-label">' + esc(r.relationship_label) + '</div>' : '';
+    return '<div class="rec-card">' +
+      '<div class="rc-emoji">' + esc(r.recommended_icon || '🏪') + '</div>' +
+      '<div class="rc-info">' +
+        '<div class="rc-name">' +
+          '<a href="/business.html?slug=' + encodeURIComponent(r.recommended_slug) + '" target="_blank" style="color:inherit;text-decoration:none">' + esc(r.recommended_name) + '</a>' +
+        '</div>' +
+        '<div class="rc-meta">' + meta + '</div>' +
+        labelHtml +
+      '</div>' +
+      '<button class="rc-remove" onclick="removeRec(\'' + r.id + '\')">✕ Remove</button>' +
+    '</div>';
+  }).join('');
+}
+
+// ========= MODAL =========
+function openAddModal(){
+  if (MY_RECS.length >= 8){ alert('Maximum 8 recommendations. Remove one first.'); return; }
+  document.getElementById('addModal').classList.add('open');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('labelInput').value = '';
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('afterSelect').style.display = 'none';
+  document.getElementById('rmError').classList.remove('show');
+  document.getElementById('saveBtn').disabled = true;
+  SELECTED = null;
+  setTimeout(function(){ document.getElementById('searchInput').focus(); }, 100);
+}
+
+function closeAddModal(){
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function onSearchInput(q){
+  if (searchTimer) clearTimeout(searchTimer);
+  q = (q || '').trim();
+  if (q.length < 2){
+    document.getElementById('searchResults').style.display = 'none';
+    return;
+  }
+  searchTimer = setTimeout(function(){ doSearch(q); }, 250);
+}
+
+async function doSearch(q){
+  var c = ShopDB.client;
+  var resultsEl = document.getElementById('searchResults');
+  resultsEl.style.display = '';
+  resultsEl.innerHTML = '<div class="rm-empty">⏳ Searching…</div>';
+  try {
+    var r = await c.rpc('search_businesses_for_recommendation', { p_query: q });
+    if (r.error) throw r.error;
+    var rows = r.data || [];
+    // Filter out already-recommended
+    var existingIds = new Set(MY_RECS.map(function(x){ return x.recommended_id; }));
+    rows = rows.filter(function(b){ return !existingIds.has(b.id); });
+    if (!rows.length){
+      resultsEl.innerHTML = '<div class="rm-empty">No matching businesses found.</div>';
+      return;
+    }
+    resultsEl.innerHTML = rows.map(function(b){
+      return '<div class="rm-result" onclick="selectBiz(\'' + b.id + '\', this)" data-name="' + esc(b.name) + '" data-slug="' + esc(b.slug) + '">' +
+        '<div class="rm-result-emoji">' + esc(b.cat_icon || '🏪') + '</div>' +
+        '<div class="rm-result-info">' +
+          '<div class="rm-result-name">' + esc(b.name) + '</div>' +
+          '<div class="rm-result-meta">' + esc(b.cat_name || '') + (b.city_name ? ' · 📍 ' + esc(b.city_name) : '') + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  } catch(e){
+    resultsEl.innerHTML = '<div class="rm-empty">⚠ Search failed: ' + esc(e.message || e) + '</div>';
+  }
+}
+
+function selectBiz(id, el){
+  document.querySelectorAll('.rm-result').forEach(function(r){ r.classList.remove('selected'); });
+  el.classList.add('selected');
+  SELECTED = { id: id, name: el.dataset.name, slug: el.dataset.slug };
+  document.getElementById('afterSelect').style.display = '';
+  document.getElementById('saveBtn').disabled = false;
+  setTimeout(function(){ document.getElementById('labelInput').focus(); }, 80);
+}
+
+function quickLabel(txt){
+  document.getElementById('labelInput').value = txt;
+}
+
+async function saveRecommendation(){
+  if (!SELECTED) return;
+  var btn = document.getElementById('saveBtn');
+  var err = document.getElementById('rmError');
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Saving…';
+  var label = (document.getElementById('labelInput').value || '').trim();
+  try {
+    var c = ShopDB.client;
+    var r = await c.rpc('add_recommendation', {
+      p_recommended_business_id: SELECTED.id,
+      p_relationship_label: label || null
+    });
+    if (r.error) throw r.error;
+    await loadRecommendations();
+    closeAddModal();
+  } catch(e){
+    err.textContent = '⚠ ' + (e.message || 'Could not save recommendation');
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '✓ Add Recommendation';
+  }
+}
+
+async function removeRec(recId){
+  if (!confirm('Remove this recommendation?')) return;
+  try {
+    var c = ShopDB.client;
+    var r = await c.rpc('remove_recommendation', { p_id: recId });
+    if (r.error) throw r.error;
+    await loadRecommendations();
+  } catch(e){
+    alert('Could not remove: ' + (e.message || e));
+  }
+}
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){
+    var m = document.getElementById('addModal');
+    if (m && m.classList.contains('open')) closeAddModal();
+  }
+});
+
+setLang(localStorage.getItem('shop_lang') || 'en');
+window.addEventListener('DOMContentLoaded', loadBiz);
+</script>
+
+</body>
+</html>

@@ -1253,6 +1253,18 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         </button>
       </div>
 
+      <!-- ★ Trusted Partners — businesses THIS shop recommends ★ -->
+      <div class="card-pill" id="recsAnchor" style="display:none;margin-top:18px">
+        <h3>🤝 <span data-i18n-en>Trusted Partners</span><span data-i18n-hi>विश्वसनीय साझेदार</span>
+          <span style="font-weight:500;color:var(--muted);font-size:.74rem;margin-left:auto" id="recsByLine"></span>
+        </h3>
+        <div id="recsList" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+        <div style="font-size:.74rem;color:#94A3B8;margin-top:10px;text-align:center;line-height:1.5;padding:8px 0 0;border-top:1px dashed #E2E8F0">
+          <span data-i18n-en>These are businesses this owner personally vouches for.</span>
+          <span data-i18n-hi>ये वो व्यवसाय हैं जिनकी यह owner व्यक्तिगत रूप से सिफारिश करते हैं।</span>
+        </div>
+      </div>
+
       <!-- Visit Guide card (fills left column space) -->
       <div class="card-pill visit-guide-card" style="margin-top:18px">
         <h3 style="font-size:1rem">🧭 <span data-i18n-en>Before you visit / call</span><span data-i18n-hi>जाने / call करने से पहले</span></h3>
@@ -1684,6 +1696,7 @@ async function loadBusiness(){
   // Load all categories (multi-cat badges), reviews and deals in parallel
   loadCategoryBadges(BIZ.id);
   loadReviews(BIZ.id);
+  loadRecommendations(BIZ.slug);
   // Render the Hot Reviews This Week widget once reviews land
   setTimeout(() => {
     try {
@@ -2767,6 +2780,45 @@ async function checkIsBizOwner(bizId){
     const q = await c.from('business_owners').select('business_id').eq('business_id', bizId).eq('auth_user_id', u.data.user.id).maybeSingle();
     return !q.error && !!q.data;
   } catch(_){ return false; }
+}
+
+async function loadRecommendations(slug){
+  if (!slug) return;
+  const c = ShopDB.client;
+  if (!c) return;
+  try {
+    const r = await c.rpc('get_recommendations_for_business', { p_business_slug: slug });
+    if (r.error || !r.data || !r.data.length) return;
+    const rows = r.data;
+    const card = document.getElementById('recsAnchor');
+    const list = document.getElementById('recsList');
+    const byLine = document.getElementById('recsByLine');
+    if (!card || !list) return;
+    byLine.textContent = rows.length + ' partner' + (rows.length === 1 ? '' : 's');
+    list.innerHTML = rows.map(function(r){
+      const photoBlock = r.recommended_photo
+        ? '<img src="' + escapeHTML(r.recommended_photo) + '" loading="lazy" style="width:54px;height:54px;object-fit:cover;border-radius:10px;flex-shrink:0">'
+        : '<div style="width:54px;height:54px;border-radius:10px;background:#F1F5F9;display:grid;place-items:center;font-size:1.5rem;flex-shrink:0">' + escapeHTML(r.recommended_icon || '🏪') + '</div>';
+      const meta = (r.recommended_cat || '') + (r.recommended_city ? ' · 📍 ' + r.recommended_city : '');
+      const rating = (Number(r.recommended_rating) || 0);
+      const ratingHtml = rating > 0
+        ? '<span style="color:#F59E0B;font-weight:800">⭐ ' + rating.toFixed(1) + '</span>'
+        : '';
+      const labelHtml = r.relationship_label
+        ? '<div style="margin-top:5px;display:inline-block;background:#FFF8F0;color:#9A3412;padding:3px 10px;border-radius:99px;font-size:.74rem;font-weight:700">' + escapeHTML(r.relationship_label) + '</div>'
+        : '';
+      return '<a href="/business.html?slug=' + encodeURIComponent(r.recommended_slug) + '" style="display:flex;gap:11px;align-items:center;padding:11px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#FF6B1A\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 8px 22px rgba(255,107,26,.10)\'" onmouseout="this.style.borderColor=\'#E2E8F0\';this.style.transform=\'\';this.style.boxShadow=\'\'">' +
+        photoBlock +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:800;font-size:.94rem;color:#0F172A;line-height:1.25">' + escapeHTML(r.recommended_name) + '</div>' +
+          '<div style="font-size:.76rem;color:#64748B;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">' + escapeHTML(meta) + (ratingHtml ? ' · ' + ratingHtml : '') + '</div>' +
+          labelHtml +
+        '</div>' +
+        '<span style="color:#FF6B1A;font-weight:800;font-size:1.2rem;flex-shrink:0">→</span>' +
+      '</a>';
+    }).join('');
+    card.style.display = '';
+  } catch(e){ console.warn('loadRecommendations failed:', e); }
 }
 
 async function loadReviews(bizId){
