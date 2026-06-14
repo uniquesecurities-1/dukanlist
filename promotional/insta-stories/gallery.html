@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>DukanList — Instagram Story Gallery</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', system-ui, sans-serif;
+    background: #0F172A;
+    color: #fff;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .page-header {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-size: 36px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FF6B1A, #FBBF24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    color: #94A3B8;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .help-card {
+    max-width: 800px;
+    margin: 30px auto;
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 24px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .help-card h2 {
+    color: #FBBF24;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .help-card ol { padding-left: 20px; }
+  .help-card li { margin-bottom: 8px; }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .slide-card {
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform .15s;
+  }
+  .slide-card:hover { transform: translateY(-3px); }
+  .slide-label {
+    padding: 16px 20px;
+    background: #FF6B1A;
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: .5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .slide-label .num {
+    background: rgba(0,0,0,0.25);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+  /* THIS is the crucial part: render SVG at exact 1080x1920 but visually scaled */
+  .slide-canvas {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+    background: #000;
+  }
+  .slide-canvas svg, .slide-canvas .svg-host {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .slide-actions {
+    padding: 16px;
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-download {
+    background: linear-gradient(135deg, #FF6B1A, #EA580C);
+    color: #fff;
+  }
+  .btn-open {
+    background: #334155;
+    color: #fff;
+  }
+  .download-all {
+    display: block;
+    max-width: 600px;
+    margin: 40px auto 20px;
+    padding: 18px;
+    background: linear-gradient(135deg, #FF6B1A, #EA580C);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+    letter-spacing: .5px;
+  }
+  .download-all:active { transform: scale(.98); }
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #10B981;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    transition: transform .3s;
+    z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>DukanList — Instagram Story Gallery</h1>
+  <p>6 ready-to-post slides. Click "Download PNG" on each card to save 1080×1920 image for Instagram Story upload.</p>
+</div>
+
+<div class="help-card">
+  <h2>★ कैसे use karein:</h2>
+  <ol>
+    <li>Har slide ka "<b>Download PNG</b>" button click kariye — 1080×1920 image aapke Downloads folder mein save ho jaayegi.</li>
+    <li>Saari slides ek saath chahiye to "<b>Download All</b>" use kariye (browser pop-up allow kariye).</li>
+    <li>Instagram app open kariye → Story → Gallery se PNG select kariye → post kariye.</li>
+    <li>Har slide ke saath caption file mein ek matching Hindi caption mila hai — wo bhi copy karke use kariye.</li>
+  </ol>
+</div>
+
+<button class="download-all" onclick="downloadAll()">★ Download All 6 Slides as PNG</button>
+
+<div class="gallery" id="gallery"></div>
+
+<div id="toast" class="toast">Downloaded!</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const SLIDES = [
+  { num: 1, file: 'slide-1-hook.svg',          name: 'Hook — 100% Free' },
+  { num: 2, file: 'slide-2-business-card.svg', name: 'Digital Business Card' },
+  { num: 3, file: 'slide-3-qr-poster.svg',     name: 'QR Poster Generator' },
+  { num: 4, file: 'slide-4-cross-business.svg', name: 'Trusted Partner Network' },
+  { num: 5, file: 'slide-5-spotlight.svg',     name: 'Spotlight of the Week' },
+  { num: 6, file: 'slide-6-cta.svg',           name: 'Call to Action' },
+];
+
+const gallery = document.getElementById('gallery');
+const toast = document.getElementById('toast');
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+async function loadSvg(file){
+  const r = await fetch(file);
+  return r.text();
+}
+
+async function svgToPng(svgString, slideNum, fileName){
+  // Create a hidden 1080x1920 container, inject the SVG, rasterize via canvas
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-10000px;top:0;width:1080px;height:1920px;';
+  container.innerHTML = svgString;
+  const svg = container.querySelector('svg');
+  if (svg){
+    svg.setAttribute('width', '1080');
+    svg.setAttribute('height', '1920');
+  }
+  document.body.appendChild(container);
+
+  // Use native SVG-to-canvas via Image
+  try {
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#FF6B1A';
+    ctx.fillRect(0, 0, 1080, 1920);
+    ctx.drawImage(img, 0, 0, 1080, 1920);
+    URL.revokeObjectURL(url);
+
+    canvas.toBlob((blob) => {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    }, 'image/png', 1.0);
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+async function downloadSlide(idx){
+  const s = SLIDES[idx];
+  const svg = await loadSvg(s.file);
+  await svgToPng(svg, s.num, `dukanlist-story-${s.num}-${s.name.toLowerCase().replace(/\s+/g, '-')}.png`);
+  showToast(`Slide ${s.num} downloaded`);
+}
+
+async function downloadAll(){
+  showToast('Downloading all 6 slides...');
+  for (let i = 0; i < SLIDES.length; i++){
+    await downloadSlide(i);
+    await new Promise(r => setTimeout(r, 400));
+  }
+  showToast('All 6 slides downloaded!');
+}
+
+async function buildGallery(){
+  for (let i = 0; i < SLIDES.length; i++){
+    const s = SLIDES[i];
+    const svg = await loadSvg(s.file);
+    const card = document.createElement('div');
+    card.className = 'slide-card';
+    card.innerHTML = `
+      <div class="slide-label">
+        <span>${s.name}</span>
+        <span class="num">Slide ${s.num}</span>
+      </div>
+      <div class="slide-canvas">${svg}</div>
+      <div class="slide-actions">
+        <button class="btn btn-download" data-i="${i}">★ Download PNG</button>
+        <a class="btn btn-open" href="${s.file}" target="_blank" style="text-align:center;text-decoration:none;line-height:24px;">Open SVG</a>
+      </div>
+    `;
+    gallery.appendChild(card);
+  }
+  gallery.addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-download')){
+      downloadSlide(parseInt(e.target.dataset.i, 10));
+    }
+  });
+}
+
+buildGallery();
+</script>
+
+</body>
+</html>

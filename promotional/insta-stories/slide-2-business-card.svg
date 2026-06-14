@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920" font-family="'Nirmala UI','Mangal','Noto Sans Devanagari',Arial,sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF6B1A"/>
+      <stop offset="55%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+    <radialGradient id="bloom" cx="80%" cy="-5%" r="80%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.30)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <radialGradient id="bloom2" cx="-10%" cy="105%" r="70%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bgGrad)"/>
+  <rect width="1080" height="1920" fill="url(#bloom)"/>
+  <rect width="1080" height="1920" fill="url(#bloom2)"/>
+  <!-- decorative circles -->
+  <circle cx="980" cy="180" r="140" fill="rgba(255,255,255,0.10)"/>
+  <circle cx="120" cy="1700" r="180" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="900" cy="1800" r="60" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Top brand pill -->
+  <rect x="340" y="80" width="400" height="80" rx="40" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>
+  <text x="540" y="135" font-size="36" font-weight="900" fill="#ffffff" letter-spacing="6" text-anchor="middle">DUKANLIST</text>
+
+  <!-- Feature number tag -->
+  <rect x="80" y="260" width="200" height="80" rx="40" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>
+  <text x="180" y="318" font-size="36" font-weight="900" fill="#ffffff" text-anchor="middle">FEATURE 1</text>
+
+  <!-- Heading -->
+  <text x="540" y="460" font-size="48" font-weight="700" fill="#FBBF24" text-anchor="middle">★</text>
+  <text x="540" y="560" font-size="82" font-weight="900" fill="#ffffff" text-anchor="middle">सुंदर डिजिटल</text>
+  <text x="540" y="660" font-size="82" font-weight="900" fill="#ffffff" text-anchor="middle">पहचान</text>
+
+  <!-- Mock business card visual -->
+  <rect x="200" y="780" width="680" height="700" rx="30" fill="rgba(255,255,255,0.95)" stroke="rgba(0,0,0,0.10)" stroke-width="2"/>
+
+  <!-- Card content (mock) -->
+  <circle cx="320" cy="900" r="60" fill="#FF6B1A"/>
+  <text x="320" y="922" font-size="56" font-weight="900" fill="#ffffff" text-anchor="middle">G</text>
+  <text x="420" y="888" font-size="44" font-weight="900" fill="#0F172A">GARG MEDICOSE</text>
+  <text x="420" y="935" font-size="28" font-weight="600" fill="#475569">Medical Store / Pharmacy</text>
+
+  <line x1="240" y1="980" x2="840" y2="980" stroke="#E2E8F0" stroke-width="2"/>
+
+  <text x="240" y="1050" font-size="30" font-weight="600" fill="#0F172A">✦  Proprietor: NITIN GARG</text>
+  <text x="240" y="1110" font-size="30" font-weight="600" fill="#0F172A">◆  Chotala Road, Mandi Dabwali</text>
+  <text x="240" y="1170" font-size="30" font-weight="600" fill="#0F172A">►  Call · WhatsApp · Map · Reviews</text>
+  <text x="240" y="1230" font-size="30" font-weight="600" fill="#0F172A">★  4.8 (24 reviews)</text>
+
+  <!-- Verified badge -->
+  <rect x="240" y="1290" width="320" height="60" rx="30" fill="#10B981"/>
+  <text x="400" y="1332" font-size="28" font-weight="800" fill="#ffffff" text-anchor="middle">✓ Verified on DukanList</text>
+
+  <!-- Photo / hours hint -->
+  <rect x="240" y="1380" width="600" height="60" rx="12" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
+  <text x="540" y="1422" font-size="26" font-weight="700" fill="#9A3412" text-anchor="middle">Photos · Hours · USP · Direct Contact</text>
+
+  <!-- Below-card tagline -->
+  <text x="540" y="1620" font-size="42" font-weight="700" fill="#ffffff" text-anchor="middle">सब कुछ — एक ही पेज पर</text>
+  <text x="540" y="1690" font-size="36" font-weight="600" fill="rgba(255,255,255,0.90)" text-anchor="middle">केवल DukanList पर</text>
+
+  <!-- Bottom website -->
+  <text x="540" y="1820" font-size="34" font-weight="700" fill="rgba(255,255,255,0.95)" text-anchor="middle" letter-spacing="3">dukanlist.com</text>
+  <text x="540" y="1870" font-size="22" font-weight="500" fill="rgba(255,255,255,0.70)" text-anchor="middle" letter-spacing="2">Powered by DigiMutual Goals Pvt. Ltd.</text>
+</svg>

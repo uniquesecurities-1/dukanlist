@@ -1,7 +1,7 @@
 {
-  "version": "3.5",
-  "updated": "2026-06-11",
-  "note": "v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
+  "version": "3.6",
+  "updated": "2026-06-14",
+  "note": "v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
   "parents": [
     {
       "slug": "healthcare",
@@ -362,6 +362,12 @@
           "name": "Fridge / Washing Machine Repair",
           "name_hi": "फ्रिज / वॉशिंग मशीन रिपेयर",
           "icon": "🧺"
+        },
+        {
+          "slug": "mobile-repair",
+          "name": "Mobile Repair",
+          "name_hi": "मोबाइल रिपेयर",
+          "icon": "🔧"
         }
       ]
     },
@@ -983,6 +989,30 @@
           "name": "Gift Shop / Flower Bouquet",
           "name_hi": "गिफ्ट / फूल बुके",
           "icon": "🎁"
+        },
+        {
+          "slug": "laptop-computer-sale",
+          "name": "Laptops / Computers Sale",
+          "name_hi": "लैपटॉप / कंप्यूटर बिक्री",
+          "icon": "💻"
+        },
+        {
+          "slug": "laptop-computer-accessories",
+          "name": "Laptop / Computer Accessories",
+          "name_hi": "लैपटॉप / कंप्यूटर एक्सेसरीज",
+          "icon": "🖱️"
+        },
+        {
+          "slug": "mobile-accessories",
+          "name": "Mobile Accessories",
+          "name_hi": "मोबाइल एक्सेसरीज",
+          "icon": "🎧"
+        },
+        {
+          "slug": "lottery-centre",
+          "name": "Lottery Centre",
+          "name_hi": "लॉटरी सेंटर",
+          "icon": "🎟️"
         }
       ]
     },

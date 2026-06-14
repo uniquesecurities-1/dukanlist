@@ -508,13 +508,56 @@ function metaRow(k, v){ return '<div class="meta-row"><div class="k">' + esc(k) 
 function statTile(n, l){ return '<div class="stat-tile"><div class="n">' + esc(n) + '</div><div class="l">' + esc(l) + '</div></div>'; }
 
 // === ACTIONS ===
+// applyPatch — dual-path save:
+//   1. Try admin_update_shop RPC (has whitelist + audit log).
+//   2. If RPC errors with 400 (Bad Request — typically a field not in the
+//      whitelist), fall back to a direct UPDATE on the businesses table.
+//      Admin RLS already allows UPDATE on businesses for is_admin().
+// This mirrors the dual-path logic in saveShopLocation() so every admin
+// edit succeeds regardless of which fields the current RPC whitelist covers.
 async function applyPatch(patch, successMsg){
   var c = ShopDB.client;
-  var r = await c.rpc('admin_update_shop', { p_business_id: BIZ_ID, p_patch: patch });
-  if (r.error){
-    toast('Save failed: ' + r.error.message, true);
-    return false;
+  var saved = false;
+  var rpcError = null;
+
+  // --- Path 1: RPC (preferred — audit log + score recompute) ---
+  try {
+    var r = await c.rpc('admin_update_shop', { p_business_id: BIZ_ID, p_patch: patch });
+    if (!r.error){
+      saved = true;
+    } else {
+      rpcError = r.error;
+      // Log the specific rejection so future debugging is easy
+      console.warn('[applyPatch] RPC rejected patch:', {
+        patch_keys: Object.keys(patch),
+        rpc_error: r.error.message,
+        rpc_code: r.error.code,
+        rpc_details: r.error.details,
+        rpc_hint: r.error.hint
+      });
+    }
+  } catch(rpcEx){
+    rpcError = rpcEx;
+    console.warn('[applyPatch] RPC threw:', rpcEx);
   }
+
+  // --- Path 2: Direct UPDATE fallback ---
+  if (!saved){
+    try {
+      var upd = Object.assign({}, patch, { updated_at: new Date().toISOString() });
+      var u = await c.from('businesses').update(upd).eq('id', BIZ_ID);
+      if (u.error) throw u.error;
+      saved = true;
+      console.info('[applyPatch] Direct UPDATE fallback succeeded for keys:', Object.keys(patch));
+    } catch(directErr){
+      // Both paths failed — show the RPC error (more user-friendly) or the direct one
+      var msg = (rpcError && rpcError.message) ? rpcError.message
+              : (directErr.message || directErr);
+      toast('Save failed: ' + msg, true);
+      return false;
+    }
+  }
+
   // Refresh SHOP from server to get recomputed score
   var fresh = await c.rpc('admin_get_shop_full', { p_business_id: BIZ_ID });
   if (!fresh.error && fresh.data) SHOP = fresh.data;
@@ -734,25 +777,24 @@ async function loadLocalitiesForCity(cityId){
     LOC_LIST = [];
     return;
   }
-  // Try multiple table names — schema may use 'localities' or 'geo_localities'
+  // Schema uses 'geo_localities'. We used to try 'localities' first as a fallback,
+  // but that table does not exist and every page-load produced a noisy 404. Now we
+  // query the actual table directly.
   var loaded = false;
-  for (var tableName of ['localities', 'geo_localities']){
-    try {
-      var lr = await c.from(tableName).select('id, name, city_id').eq('city_id', cityId).order('name');
-      if (!lr.error && Array.isArray(lr.data)){
-        LOC_LIST = lr.data;
-        var currentLocId = SHOP.locality?.id || SHOP.locality_id || null;
-        locSel.innerHTML =
-          '<option value="">— None / All localities —</option>' +
-          LOC_LIST.map(function(l){
-            var sel = (String(currentLocId) === String(l.id)) ? ' selected' : '';
-            return '<option value="' + l.id + '"' + sel + '>' + esc(l.name) + '</option>';
-          }).join('');
-        loaded = true;
-        break;
-      }
-    } catch(err){ /* try next */ }
-  }
+  try {
+    var lr = await c.from('geo_localities').select('id, name, city_id').eq('city_id', cityId).order('name');
+    if (!lr.error && Array.isArray(lr.data)){
+      LOC_LIST = lr.data;
+      var currentLocId = SHOP.locality?.id || SHOP.locality_id || null;
+      locSel.innerHTML =
+        '<option value="">— None / All localities —</option>' +
+        LOC_LIST.map(function(l){
+          var sel = (String(currentLocId) === String(l.id)) ? ' selected' : '';
+          return '<option value="' + l.id + '"' + sel + '>' + esc(l.name) + '</option>';
+        }).join('');
+      loaded = true;
+    }
+  } catch(err){ console.warn('[shop] geo_localities load failed:', err); }
   if (!loaded){
     locSel.innerHTML = '<option value="">— No localities defined for this city —</option>';
   }

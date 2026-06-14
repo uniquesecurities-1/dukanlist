@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920" font-family="'Nirmala UI','Mangal','Noto Sans Devanagari',Arial,sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF6B1A"/>
+      <stop offset="55%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+    <radialGradient id="bloom" cx="80%" cy="-5%" r="80%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.30)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <radialGradient id="bloom2" cx="-10%" cy="105%" r="70%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bgGrad)"/>
+  <rect width="1080" height="1920" fill="url(#bloom)"/>
+  <rect width="1080" height="1920" fill="url(#bloom2)"/>
+  <!-- decorative circles -->
+  <circle cx="980" cy="180" r="140" fill="rgba(255,255,255,0.10)"/>
+  <circle cx="120" cy="1700" r="180" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="900" cy="1800" r="60" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Top brand pill -->
+  <rect x="340" y="80" width="400" height="80" rx="40" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>
+  <text x="540" y="135" font-size="36" font-weight="900" fill="#ffffff" letter-spacing="6" text-anchor="middle">DUKANLIST</text>
+
+  <!-- Feature number tag -->
+  <rect x="80" y="260" width="200" height="80" rx="40" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>
+  <text x="180" y="318" font-size="36" font-weight="900" fill="#ffffff" text-anchor="middle">FEATURE 3</text>
+
+  <!-- Heading -->
+  <text x="540" y="460" font-size="48" font-weight="700" fill="#FBBF24" text-anchor="middle">◆</text>
+  <text x="540" y="560" font-size="74" font-weight="900" fill="#ffffff" text-anchor="middle">Trusted Partner</text>
+  <text x="540" y="650" font-size="74" font-weight="900" fill="#ffffff" text-anchor="middle">Network</text>
+
+  <!-- Two business cards connected by arrow -->
+  <!-- Card 1 -->
+  <rect x="120" y="800" width="380" height="220" rx="20" fill="rgba(255,255,255,0.95)" stroke="rgba(0,0,0,0.10)" stroke-width="2"/>
+  <circle cx="200" cy="890" r="40" fill="#3B82F6"/>
+  <text x="200" y="905" font-size="40" font-weight="900" fill="#ffffff" text-anchor="middle">D</text>
+  <text x="260" y="880" font-size="26" font-weight="800" fill="#0F172A">Dr. Sharma</text>
+  <text x="260" y="912" font-size="20" font-weight="600" fill="#64748B">Eye Specialist</text>
+  <line x1="150" y1="940" x2="470" y2="940" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="150" y="980" font-size="22" font-weight="700" fill="#10B981">★ Recommends:</text>
+  <text x="150" y="1005" font-size="20" font-weight="600" fill="#475569">► Singh Optical</text>
+
+  <!-- Arrow connecting -->
+  <line x1="500" y1="910" x2="580" y2="910" stroke="#FBBF24" stroke-width="6"/>
+  <polygon points="575,895 605,910 575,925" fill="#FBBF24"/>
+
+  <!-- Card 2 -->
+  <rect x="580" y="800" width="380" height="220" rx="20" fill="rgba(255,255,255,0.95)" stroke="rgba(0,0,0,0.10)" stroke-width="2"/>
+  <circle cx="660" cy="890" r="40" fill="#8B5CF6"/>
+  <text x="660" y="905" font-size="40" font-weight="900" fill="#ffffff" text-anchor="middle">S</text>
+  <text x="720" y="880" font-size="26" font-weight="800" fill="#0F172A">Singh Optical</text>
+  <text x="720" y="912" font-size="20" font-weight="600" fill="#64748B">Optical Store</text>
+  <line x1="610" y1="940" x2="930" y2="940" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="610" y="980" font-size="22" font-weight="700" fill="#10B981">★ Recommended by:</text>
+  <text x="610" y="1005" font-size="20" font-weight="600" fill="#475569">► Dr. Sharma</text>
+
+  <!-- Effect description -->
+  <rect x="100" y="1100" width="880" height="380" rx="30" fill="rgba(0,0,0,0.20)" stroke="rgba(255,255,255,0.30)" stroke-width="3"/>
+  <text x="540" y="1180" font-size="44" font-weight="900" fill="#FBBF24" text-anchor="middle">"Doctor-Optical Effect"</text>
+  <text x="540" y="1260" font-size="34" font-weight="600" fill="#ffffff" text-anchor="middle">आप जिन व्यवसायों पर भरोसा</text>
+  <text x="540" y="1310" font-size="34" font-weight="600" fill="#ffffff" text-anchor="middle">करते हैं — उन्हें अपने</text>
+  <text x="540" y="1360" font-size="34" font-weight="600" fill="#ffffff" text-anchor="middle">प्रोफाइल पर दिखाइए</text>
+  <text x="540" y="1430" font-size="30" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle">एक नया भरोसे का रेफरल नेटवर्क</text>
+
+  <!-- Tagline -->
+  <text x="540" y="1610" font-size="38" font-weight="700" fill="#ffffff" text-anchor="middle">मुफ्त · अनलिमिटेड · आपके नियंत्रण में</text>
+
+  <!-- Bottom website -->
+  <text x="540" y="1820" font-size="34" font-weight="700" fill="rgba(255,255,255,0.95)" text-anchor="middle" letter-spacing="3">dukanlist.com</text>
+  <text x="540" y="1870" font-size="22" font-weight="500" fill="rgba(255,255,255,0.70)" text-anchor="middle" letter-spacing="2">Powered by DigiMutual Goals Pvt. Ltd.</text>
+</svg>

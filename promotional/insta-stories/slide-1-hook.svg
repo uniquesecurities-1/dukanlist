@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920" font-family="'Nirmala UI','Mangal','Noto Sans Devanagari',Arial,sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF6B1A"/>
+      <stop offset="55%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+    <radialGradient id="bloom" cx="80%" cy="-5%" r="80%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.30)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <radialGradient id="bloom2" cx="-10%" cy="105%" r="70%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bgGrad)"/>
+  <rect width="1080" height="1920" fill="url(#bloom)"/>
+  <rect width="1080" height="1920" fill="url(#bloom2)"/>
+  <!-- decorative circles -->
+  <circle cx="980" cy="180" r="140" fill="rgba(255,255,255,0.10)"/>
+  <circle cx="120" cy="1700" r="180" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="900" cy="1800" r="60" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Top brand pill -->
+  <rect x="340" y="80" width="400" height="80" rx="40" fill="rgba(255,255,255,0.20)" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>
+  <text x="540" y="135" font-size="36" font-weight="900" fill="#ffffff" letter-spacing="6" text-anchor="middle">DUKANLIST</text>
+
+  <!-- Top emoji-free marker -->
+  <text x="540" y="380" font-size="100" font-weight="700" fill="rgba(255,255,255,0.95)" text-anchor="middle">✦</text>
+
+  <!-- Headline -->
+  <text x="540" y="540" font-size="58" font-weight="700" fill="#ffffff" text-anchor="middle">डबवाली के व्यापारियों के लिए</text>
+
+  <!-- Main message: 3 lines, very large -->
+  <text x="540" y="720" font-size="78" font-weight="900" fill="#ffffff" text-anchor="middle">एक ऐसा मंच जो</text>
+  <text x="540" y="850" font-size="140" font-weight="900" fill="#FBBF24" text-anchor="middle">100% मुफ्त</text>
+  <text x="540" y="960" font-size="78" font-weight="900" fill="#ffffff" text-anchor="middle">आपके लिए है</text>
+
+  <!-- Divider -->
+  <line x1="280" y1="1080" x2="800" y2="1080" stroke="rgba(255,255,255,0.40)" stroke-width="3"/>
+
+  <!-- Subtext bullets -->
+  <text x="540" y="1180" font-size="42" font-weight="600" fill="rgba(255,255,255,0.95)" text-anchor="middle">सुंदर डिजिटल पहचान</text>
+  <text x="540" y="1250" font-size="42" font-weight="600" fill="rgba(255,255,255,0.95)" text-anchor="middle">ग्राहक तक सीधी पहुंच</text>
+  <text x="540" y="1320" font-size="42" font-weight="600" fill="rgba(255,255,255,0.95)" text-anchor="middle">मुफ्त प्रमोशन</text>
+
+  <!-- Big CTA box -->
+  <rect x="180" y="1450" width="720" height="180" rx="90" fill="rgba(0,0,0,0.20)" stroke="rgba(255,255,255,0.50)" stroke-width="4"/>
+  <text x="540" y="1535" font-size="48" font-weight="900" fill="#ffffff" text-anchor="middle">देखिए, यह क्या है</text>
+  <text x="540" y="1595" font-size="32" font-weight="500" fill="rgba(255,255,255,0.85)" text-anchor="middle">अगली slide में पूरी कहानी</text>
+
+  <!-- Bottom website -->
+  <text x="540" y="1820" font-size="34" font-weight="700" fill="rgba(255,255,255,0.95)" text-anchor="middle" letter-spacing="3">dukanlist.com</text>
+  <text x="540" y="1870" font-size="22" font-weight="500" fill="rgba(255,255,255,0.70)" text-anchor="middle" letter-spacing="2">Powered by DigiMutual Goals Pvt. Ltd.</text>
+</svg>
