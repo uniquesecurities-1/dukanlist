@@ -930,37 +930,106 @@
   </div>
 
   <!-- ================================ SUCCESS — Pending Review + WhatsApp Verify ================================ -->
-  <div class="card" id="successCard" style="margin-top:18px;display:none;text-align:center">
-    <div style="font-size:4rem;margin-bottom:8px">✅</div>
-    <div class="card-title" style="font-size:1.5rem">
-      <span data-i18n-en>Registration Received!</span>
-      <span data-i18n-hi>रजिस्ट्रेशन प्राप्त हुआ!</span>
-    </div>
-    <p style="color:var(--muted);margin-bottom:14px;line-height:1.6">
-      <span data-i18n-en class="block">Your business is in our review queue. <b style="color:var(--ink)">One last step</b> — WhatsApp us to activate within 24 hours.</span>
-      <span data-i18n-hi class="block">आपका व्यवसाय review queue में है। <b style="color:var(--ink)">एक आखिरी कदम</b> — WhatsApp करके 24 घंटे में चालू करवाएं।</span>
-    </p>
-
-    <!-- Pending Status Pill -->
-    <div style="display:inline-block;background:#FEF3C7;color:#92400E;padding:6px 14px;border-radius:99px;font-weight:800;font-size:.85rem;margin-bottom:16px">
-      ⏳ <span data-i18n-en>Pending Verification</span><span data-i18n-hi>वेरिफिकेशन बाकी है</span>
+  <div class="card" id="successCard" style="margin-top:18px;display:none">
+    <!-- Centered headline -->
+    <div style="text-align:center">
+      <div style="font-size:4rem;margin-bottom:8px">✅</div>
+      <div class="card-title" style="font-size:1.5rem">
+        <span data-i18n-en>Registration Received!</span>
+        <span data-i18n-hi>रजिस्ट्रेशन प्राप्त हुआ!</span>
+      </div>
+      <p style="color:var(--muted);margin:4px 0 18px;line-height:1.55;font-size:.95rem">
+        <span data-i18n-en>Bas <b style="color:var(--ink)">2 chhote steps</b> aur — phir aapki listing live ho jaayegi.</span>
+        <span data-i18n-hi>बस <b style="color:var(--ink)">2 छोटे steps</b> और — फिर आपकी listing live हो जाएगी।</span>
+      </p>
     </div>
 
-    <!-- Spam-folder note (prominent so users don't miss confirmation email) -->
-    <div style="background:#FFFBEB;border:1px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;text-align:left;line-height:1.55">
-      <div style="font-weight:800;color:#92400E;margin-bottom:6px;font-size:.92rem">
-        📧 <span data-i18n-en>Confirmation email sent</span><span data-i18n-hi>कन्फर्मेशन ईमेल भेज दी है</span>
-      </div>
-      <div style="font-size:.85rem;color:#5A6573">
-        <span data-i18n-en>Check your <b>INBOX</b> and <b>SPAM / Junk folder</b> for an email from <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:.8rem">noreply@dukanlist.com</code> — click the verification link to activate login. New senders often land in Spam initially.</span>
-        <span data-i18n-hi>अपना <b>INBOX</b> और <b>SPAM/जंक</b> फोल्डर दोनों जाँचें — <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:.8rem">noreply@dukanlist.com</code> से एक ईमेल आएगी। वेरिफिकेशन लिंक पर क्लिक करते ही लॉगिन चालू हो जाएगा। नए senders अक्सर शुरुआत में Spam में चले जाते हैं।</span>
-      </div>
-      <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #FED7AA;font-size:.83rem;text-align:center">
-        <a id="resendVerifyLink" href="/panel/resend-verification.html" style="color:#1E3A8A;font-weight:700;text-decoration:none">📧 Didn't receive email? Resend →</a>
+    <!-- 3-STEP PROGRESS TIMELINE -->
+    <div style="background:#F8FAFC;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:20px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;position:relative">
+        <!-- Connector line BG -->
+        <div style="position:absolute;top:18px;left:8%;right:8%;height:3px;background:#E2E8F0;z-index:0"></div>
+        <!-- Connector line PROGRESS (1 of 3 done) -->
+        <div style="position:absolute;top:18px;left:8%;width:0%;height:3px;background:#10B981;z-index:1;transition:width .5s"></div>
+
+        <!-- Step 1: DONE -->
+        <div style="position:relative;z-index:2;flex:1;text-align:center">
+          <div style="width:36px;height:36px;border-radius:50%;background:#10B981;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:6px">✓</div>
+          <div style="font-size:11px;font-weight:800;color:#10B981;letter-spacing:.5px">
+            <span data-i18n-en>FORM FILLED</span>
+            <span data-i18n-hi>FORM भर गया</span>
+          </div>
+        </div>
+
+        <!-- Step 2: CURRENT (email verify) -->
+        <div style="position:relative;z-index:2;flex:1;text-align:center">
+          <div style="width:36px;height:36px;border-radius:50%;background:#FF6B1A;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:6px;box-shadow:0 0 0 5px rgba(255,107,26,.18);animation:pulse 1.8s infinite">2</div>
+          <div style="font-size:11px;font-weight:800;color:#EA580C;letter-spacing:.5px">
+            <span data-i18n-en>VERIFY EMAIL</span>
+            <span data-i18n-hi>EMAIL VERIFY</span>
+          </div>
+        </div>
+
+        <!-- Step 3: PENDING (WhatsApp activation) -->
+        <div style="position:relative;z-index:2;flex:1;text-align:center">
+          <div style="width:36px;height:36px;border-radius:50%;background:#fff;color:#94A3B8;border:3px solid #E2E8F0;display:inline-flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:6px">3</div>
+          <div style="font-size:11px;font-weight:800;color:#94A3B8;letter-spacing:.5px">
+            <span data-i18n-en>ACTIVATION</span>
+            <span data-i18n-hi>ACTIVATION</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- BIG WhatsApp CTA -->
+    <!-- STEP 2 — EMAIL VERIFY (PRIMARY ACTION) -->
+    <div style="background:linear-gradient(135deg,#FFF7ED,#FFFBEB);border:2px solid #FB923C;border-radius:14px;padding:18px;margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px">
+        <div style="flex-shrink:0;width:44px;height:44px;background:#FF6B1A;color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px">📧</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:800;color:#9A3412;letter-spacing:.5px;margin-bottom:2px">
+            STEP 2 / 3
+          </div>
+          <div style="font-size:1.1rem;font-weight:900;color:var(--ink);line-height:1.3">
+            <span data-i18n-en>Apna email verify karein — abhi</span>
+            <span data-i18n-hi>अपनी ईमेल verify करें — अभी</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:.88rem;color:#5A6573;line-height:1.55;margin-bottom:12px">
+        <span data-i18n-en>Humne aapko ek email bhej di hai with subject <b>"Confirm your DukanList account"</b>. Inbox aur <b>Spam folder dono check karein</b> — link par tap karke aap login active kar lo. 2 minute ka kaam.</span>
+        <span data-i18n-hi>हमने आपको एक ईमेल भेजी है: <b>"Confirm your DukanList account"</b>। <b>Inbox और Spam folder दोनों चेक करें</b> — लिंक पर tap करके login active कर लो। 2 मिनट का काम।</span>
+      </div>
+      <div style="background:#fff;border:1px dashed #FED7AA;border-radius:10px;padding:10px 12px;font-size:.82rem;color:#5A6573;margin-bottom:12px">
+        <span data-i18n-en>📬 Sender: <code style="background:#FEF3C7;padding:1px 6px;border-radius:4px;font-size:.78rem;color:#9A3412;font-weight:700">noreply@dukanlist.com</code></span>
+        <span data-i18n-hi>📬 भेजने वाला: <code style="background:#FEF3C7;padding:1px 6px;border-radius:4px;font-size:.78rem;color:#9A3412;font-weight:700">noreply@dukanlist.com</code></span>
+      </div>
+      <div style="text-align:center;font-size:.83rem">
+        <a id="resendVerifyLink" href="/panel/resend-verification.html" style="color:#EA580C;font-weight:800;text-decoration:none;border-bottom:2px solid #FFEDD5;padding-bottom:1px">
+          <span data-i18n-en>📧 Email nahi mili? Resend karein →</span>
+          <span data-i18n-hi>📧 ईमेल नहीं मिली? Resend करें →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- STEP 3 — WhatsApp activation (SECONDARY) -->
+    <div style="background:#F8FAFC;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+        <div style="flex-shrink:0;width:38px;height:38px;background:#25D366;color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">💬</div>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.5px;margin-bottom:2px">
+            STEP 3 / 3
+          </div>
+          <div style="font-size:1rem;font-weight:800;color:var(--ink);line-height:1.3">
+            <span data-i18n-en>WhatsApp activation request bhejein</span>
+            <span data-i18n-hi>WhatsApp activation request भेजें</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:.85rem;color:#5A6573;line-height:1.55;margin-bottom:12px">
+        <span data-i18n-en>Email verify hone ke baad, niche button tap karke humein WhatsApp pe message bhejein. Hum 24 ghante mein aapki listing public kar denge.</span>
+        <span data-i18n-hi>Email verify होने के बाद, नीचे button tap करके हमें WhatsApp पे message भेजें। हम 24 घंटे में आपकी listing public कर देंगे।</span>
+      </div>
+
     <a id="successWaBtn" href="#" target="_blank" rel="noopener" class="btn btn-block" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-size:1.05rem;padding:18px 24px;border-radius:14px;font-weight:800;box-shadow:0 8px 24px rgba(37,211,102,.4);margin-bottom:10px">
       <span style="display:inline-flex;align-items:center;gap:10px;justify-content:center">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
@@ -1887,7 +1956,7 @@ async function handleSubmit(){
       password: STATE.data.loginPassword,
       options: {
         data: { mobile: STATE.phone, business_id: data, role: 'business owner' },
-        emailRedirectTo: window.location.origin + '/panel/login.html'
+        emailRedirectTo: window.location.origin + '/panel/email-verified.html'
       }
     });
     if (signUpRes.error){

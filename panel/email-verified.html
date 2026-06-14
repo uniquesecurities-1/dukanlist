@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Verified — DukanList</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Admin error monitor (auto-injected) -->
+<script src="/assets/js/admin-error-monitor.js"></script>
+<style>
+*,*:before,*:after{box-sizing:border-box}
+:root{
+  --orange:#FF6B1A; --orange-dark:#EA580C; --orange-light:#FFEDD5;
+  --green:#10B981; --green-bg:#ECFDF5; --green-border:#A7F3D0;
+  --amber:#F59E0B; --amber-bg:#FFFBEB;
+  --ink:#0F172A; --muted:#64748B;
+  --line:#E2E8F0; --line-soft:#F1F5F9;
+  --bg:#FFFBF5;
+}
+body{
+  margin:0;
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+  background:linear-gradient(135deg,#FFFBF5 0%,#FFF7ED 100%);
+  color:var(--ink);
+  min-height:100vh;
+}
+header.brand-bar{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+header.brand-bar .logo{
+  font-weight:900;
+  font-size:18px;
+  color:var(--orange-dark);
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+header.brand-bar .right a{
+  font-size:13px;
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:600;
+  padding:6px 12px;
+}
+
+.container{max-width:680px;margin:0 auto;padding:40px 20px 80px}
+
+/* HERO success */
+.hero{
+  text-align:center;
+  margin-bottom:36px;
+  animation:fadeUp 0.6s ease-out;
+}
+.hero .check-circle{
+  width:120px; height:120px;
+  background:linear-gradient(135deg,#10B981,#059669);
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:24px;
+  box-shadow:0 12px 32px rgba(16,185,129,.32);
+  position:relative;
+  animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.hero .check-circle svg{width:60px;height:60px;color:#fff}
+.hero h1{
+  font-size:32px;
+  font-weight:900;
+  margin:0 0 10px;
+  letter-spacing:-.02em;
+  line-height:1.15;
+}
+.hero p.sub{
+  font-size:17px;
+  color:var(--muted);
+  margin:0;
+  line-height:1.5;
+  max-width:480px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* PROGRESS timeline */
+.timeline{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:24px;
+  box-shadow:0 4px 12px rgba(15,23,42,.04);
+}
+.timeline-title{
+  font-size:13px;
+  font-weight:800;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  margin-bottom:18px;
+  text-align:center;
+}
+.steps{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  position:relative;
+}
+.steps:before{
+  content:"";
+  position:absolute;
+  top:18px;
+  left:18px;
+  right:18px;
+  height:3px;
+  background:var(--line);
+  z-index:0;
+}
+.steps:after{
+  content:"";
+  position:absolute;
+  top:18px;
+  left:18px;
+  width:calc((100% - 36px) * 2 / 3);
+  height:3px;
+  background:linear-gradient(90deg,#10B981,#10B981 50%,#FF6B1A);
+  z-index:1;
+}
+.step{
+  position:relative;
+  z-index:2;
+  flex:1;
+  text-align:center;
+}
+.step .dot{
+  width:38px; height:38px;
+  border-radius:50%;
+  background:#fff;
+  border:3px solid var(--line);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color:var(--muted);
+  margin-bottom:8px;
+  font-size:14px;
+}
+.step.done .dot{background:#10B981;border-color:#10B981;color:#fff}
+.step.current .dot{background:#10B981;border-color:#10B981;color:#fff;box-shadow:0 0 0 6px rgba(16,185,129,.18)}
+.step.pending .dot{background:#fff;border-color:var(--amber);color:var(--amber)}
+.step .label{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3;padding:0 4px}
+.step.pending .label{color:var(--muted)}
+
+/* WHAT YOU UNLOCKED */
+.unlocked{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:24px;
+  box-shadow:0 4px 12px rgba(15,23,42,.04);
+}
+.unlocked h2{
+  font-size:15px;
+  font-weight:800;
+  color:var(--ink);
+  margin:0 0 14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.unlocked ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.unlocked li{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+  color:var(--ink);
+  font-weight:600;
+}
+.unlocked li:before{
+  content:"✓";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px; height:22px;
+  background:var(--green-bg);
+  color:var(--green);
+  border-radius:50%;
+  font-weight:900;
+  font-size:12px;
+  flex-shrink:0;
+}
+@media(max-width:540px){
+  .unlocked ul{grid-template-columns:1fr}
+  .hero h1{font-size:26px}
+  .hero p.sub{font-size:15px}
+  .hero .check-circle{width:96px;height:96px}
+  .hero .check-circle svg{width:48px;height:48px}
+}
+
+/* CTA buttons */
+.cta-stack{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:16px 24px;
+  border-radius:14px;
+  font-weight:800;
+  font-size:16px;
+  text-decoration:none;
+  cursor:pointer;
+  border:none;
+  transition:transform .12s, box-shadow .15s;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--orange),var(--orange-dark));
+  color:#fff;
+  box-shadow:0 8px 24px rgba(255,107,26,.32);
+}
+.btn-primary:hover{box-shadow:0 12px 32px rgba(255,107,26,.42)}
+.btn-secondary{
+  background:#fff;
+  color:var(--ink);
+  border:2px solid var(--line);
+}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange-dark)}
+
+/* PENDING activation note (if status === 'pending') */
+.pending-note{
+  background:var(--amber-bg);
+  border:1px solid #FED7AA;
+  border-radius:14px;
+  padding:18px 20px;
+  font-size:14px;
+  color:#92400E;
+  line-height:1.55;
+  margin-bottom:24px;
+}
+.pending-note .pn-title{font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+
+/* AUTO-REDIRECT toast */
+.redirect-info{
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+  margin-top:14px;
+}
+.redirect-info b{color:var(--ink);font-weight:700}
+
+/* Footer */
+footer.foot{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:40px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+}
+
+/* Confetti background */
+.confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;overflow:hidden}
+.confetti span{
+  position:absolute;
+  width:10px; height:10px;
+  background:var(--orange);
+  opacity:0;
+  animation:fall 4s ease-out forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(-100px) rotate(0);opacity:0}
+  10%{opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{
+  from{transform:scale(0) rotate(-180deg);opacity:0}
+  to{transform:scale(1) rotate(0);opacity:1}
+}
+</style>
+</head>
+<body>
+
+<header class="brand-bar">
+  <a href="/" class="logo">🛡 DukanList</a>
+  <div class="right">
+    <a href="/panel/login.html">Login</a>
+  </div>
+</header>
+
+<div class="confetti" id="confetti"></div>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="check-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <h1 id="heroTitle">Email verified — aap live ho!</h1>
+    <p class="sub" id="heroSub">
+      Aapka DukanList account ab fully active hai. Ab aap apni listing manage kar sakte hain — photos, hours, USP — sab kuch.
+    </p>
+  </div>
+
+  <!-- PROGRESS TIMELINE -->
+  <div class="timeline">
+    <div class="timeline-title">Aapka journey</div>
+    <div class="steps">
+      <div class="step done">
+        <div class="dot">✓</div>
+        <div class="label">Registered</div>
+      </div>
+      <div class="step current">
+        <div class="dot">✓</div>
+        <div class="label">Email Verified</div>
+      </div>
+      <div class="step pending" id="step3">
+        <div class="dot">3</div>
+        <div class="label">Activation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENDING ACTIVATION NOTE (only shown if status is still pending) -->
+  <div class="pending-note" id="pendingNote" style="display:none">
+    <div class="pn-title">⏳ Aakhri kadam — WhatsApp activation</div>
+    Aapki listing public hone ke liye humein verify karna hai (~24 ghante).
+    Pehle se WhatsApp message bheja hua hai? Bas wait kariye. Nahi bheja?
+    <a href="#" id="whatsappActivateLink" style="color:#92400E;font-weight:800;text-decoration:underline">WhatsApp se message bhejiye →</a>
+  </div>
+
+  <!-- WHAT YOU UNLOCKED -->
+  <div class="unlocked">
+    <h2>★ Aap ne kya unlock kiya:</h2>
+    <ul>
+      <li>Owner Dashboard access</li>
+      <li>Listing edit + update</li>
+      <li>Photos upload (5x more views)</li>
+      <li>Business hours setup</li>
+      <li>Get Reviews QR poster</li>
+      <li>Customer leads tracking</li>
+      <li>Cross-business trusted network</li>
+      <li>Trusted-badge eligibility</li>
+    </ul>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-stack">
+    <a href="/panel/dashboard.html" class="btn btn-primary" id="ctaPrimary">
+      → Open my Dashboard
+    </a>
+    <a href="/panel/profile.html" class="btn btn-secondary">
+      Complete your business profile
+    </a>
+  </div>
+
+  <div class="redirect-info" id="redirectInfo" style="display:none">
+    Auto-redirecting in <b id="countdown">5</b> seconds…
+    <a href="#" onclick="cancelRedirect();return false" style="color:var(--orange);font-weight:700;margin-left:8px">Cancel</a>
+  </div>
+
+  <footer class="foot">
+    DukanList · Powered by DigiMutual Goals Pvt. Ltd.<br>
+    Mandi Dabwali · Sirsa · Haryana
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+// === Detect freshly-verified session ===
+// Supabase email confirmation redirects here with a hash fragment containing
+// the access_token. Supabase JS auto-parses it. We then:
+//  1. Show celebratory hero
+//  2. Look up the user's business to determine if status is still 'pending'
+//  3. Customize the next-step accordingly (dashboard vs WhatsApp activation)
+//  4. Auto-redirect to dashboard after 5 seconds (cancellable)
+
+const sb = window.ShopDB && window.ShopDB.client;
+let autoRedirectTimer = null;
+
+(async () => {
+  if (!sb){
+    console.warn('[email-verified] Supabase client not ready');
+    return;
+  }
+
+  // Wait briefly for Supabase to parse the URL hash
+  await new Promise(r => setTimeout(r, 600));
+
+  // Get the current user (should be present after email confirmation)
+  let user = null;
+  try {
+    const { data } = await sb.auth.getUser();
+    user = data && data.user;
+  } catch(e){
+    console.warn('[email-verified] getUser failed:', e);
+  }
+
+  if (!user){
+    // Edge case: no session (link expired or visited directly).
+    // Show a friendlier copy + login button.
+    document.getElementById('heroTitle').textContent = 'Email verification complete!';
+    document.getElementById('heroSub').innerHTML =
+      'Aap apne email se verify ho gaye hain. Ab <b>login</b> kar ke apne dashboard tak pahuncho.';
+    document.getElementById('ctaPrimary').textContent = '→ Login Now';
+    document.getElementById('ctaPrimary').href = '/panel/login.html';
+    return;
+  }
+
+  // Check if user's business is still pending activation
+  try {
+    const { data: ownerships } = await sb
+      .from('business_owners')
+      .select('business_id, businesses!inner(id,name,status,mobile,owner_name,slug)')
+      .eq('auth_user_id', user.id)
+      .limit(1);
+
+    if (ownerships && ownerships.length > 0){
+      const biz = ownerships[0].businesses;
+      // Customize hero with their business name
+      document.getElementById('heroTitle').textContent =
+        biz.name + ' — email verified ✓';
+
+      if (biz.status === 'pending'){
+        // Show the WhatsApp activation note
+        const note = document.getElementById('pendingNote');
+        note.style.display = '';
+        const ADMIN_WA = '919541223377';
+        const msg =
+          '🏪 DukanList — please activate my listing\n\n' +
+          'Shop: ' + biz.name + '\n' +
+          'Owner: ' + (biz.owner_name || '') + '\n' +
+          'Mobile: +91 ' + (biz.mobile || '') + '\n' +
+          'Email just verified ✓\n\n' +
+          'Please verify and activate. Thank you!';
+        document.getElementById('whatsappActivateLink').href =
+          'https://wa.me/' + ADMIN_WA + '?text=' + encodeURIComponent(msg);
+
+        // Mark step 3 as in-progress, not pending
+        const s3 = document.getElementById('step3');
+        s3.className = 'step pending';
+
+        // For pending listings, don't auto-redirect — let them read the WhatsApp note
+      } else if (biz.status === 'active'){
+        // Fully activated! Show celebration + auto-redirect
+        document.getElementById('step3').className = 'step done';
+        document.getElementById('step3').querySelector('.dot').textContent = '✓';
+        document.getElementById('step3').querySelector('.label').textContent = 'Active';
+        startAutoRedirect();
+      } else if (biz.status === 'banned' || biz.status === 'removed'){
+        // Edge case: shouldn't happen normally
+        document.getElementById('pendingNote').style.display = '';
+        document.getElementById('pendingNote').innerHTML =
+          '<div class="pn-title">⚠ Listing status: ' + biz.status + '</div>' +
+          'Please contact support: +91 9541223377';
+      } else {
+        // Unknown status — fall back to normal flow
+        startAutoRedirect();
+      }
+    } else {
+      // No business owned — user might be a fresh signup who hasn't linked yet
+      startAutoRedirect();
+    }
+  } catch(e){
+    console.warn('[email-verified] biz lookup failed:', e);
+    startAutoRedirect();
+  }
+
+  // Fire confetti! 🎉
+  fireConfetti();
+})();
+
+function startAutoRedirect(){
+  const info = document.getElementById('redirectInfo');
+  info.style.display = '';
+  let n = 5;
+  document.getElementById('countdown').textContent = n;
+  autoRedirectTimer = setInterval(() => {
+    n--;
+    document.getElementById('countdown').textContent = n;
+    if (n <= 0){
+      clearInterval(autoRedirectTimer);
+      window.location.href = '/panel/dashboard.html';
+    }
+  }, 1000);
+}
+
+function cancelRedirect(){
+  if (autoRedirectTimer){
+    clearInterval(autoRedirectTimer);
+    autoRedirectTimer = null;
+  }
+  document.getElementById('redirectInfo').innerHTML =
+    '<span style="color:var(--green);font-weight:700">✓ Auto-redirect cancelled — explore at your pace</span>';
+}
+
+function fireConfetti(){
+  const colors = ['#FF6B1A','#10B981','#FBBF24','#3B82F6','#EC4899','#8B5CF6'];
+  const c = document.getElementById('confetti');
+  for (let i = 0; i < 60; i++){
+    const span = document.createElement('span');
+    span.style.left = (Math.random() * 100) + 'vw';
+    span.style.background = colors[Math.floor(Math.random() * colors.length)];
+    span.style.animationDelay = (Math.random() * 2) + 's';
+    span.style.animationDuration = (3 + Math.random() * 2) + 's';
+    if (Math.random() > 0.5) span.style.borderRadius = '50%';
+    c.appendChild(span);
+  }
+  // Clean up after animation
+  setTimeout(() => { c.innerHTML = ''; }, 6500);
+}
+</script>
+
+</body>
+</html>
