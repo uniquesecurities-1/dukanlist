@@ -200,18 +200,23 @@
   // === Supabase init ===
   const SUPABASE_URL = 'https://qazuyygrpqopwygxmvwq.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  window.supabase = supabase;
+  // NOTE: Supabase SDK script (loaded above) declares `window.supabase` as the
+  // namespace with .createClient(). We must NOT name our local variable `supabase`
+  // because const-redeclaration would throw a SyntaxError that kills the whole script.
+  // So we use `sb` for the client, and expose it at window.sb (the error monitor
+  // looks for window.supabase first, then window.sb, so it finds us either way).
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.sb = sb;  // expose client to admin-error-monitor.js
 
   // === Auth gate — only admins ===
   (async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     if (!session){
       location.href = '/admin/login?next=/admin/health';
       return;
     }
     // Try a small admin-only RPC to confirm; if rejected, redirect
-    const probe = await supabase.rpc('admin_health_check');
+    const probe = await sb.rpc('admin_health_check');
     if (probe.error){
       if ((probe.error.message || '').includes('not authorized')){
         alert('Admin access required.');
@@ -225,7 +230,7 @@
 
   // === Render: stats + checks ===
   async function loadHealth(){
-    const r = await supabase.rpc('admin_health_check');
+    const r = await sb.rpc('admin_health_check');
     if (r.error){ alert('Health check failed: ' + r.error.message); return; }
     const d = r.data || {};
     document.getElementById('lastUpdate').textContent = new Date(d.generated_at || Date.now()).toLocaleString('en-IN');
@@ -293,7 +298,7 @@
   async function loadErrors(){
     const onlyUnresolved = document.getElementById('onlyUnresolved').checked;
     const filter = document.getElementById('pageFilter').value.trim();
-    const r = await supabase.rpc('admin_recent_errors', {
+    const r = await sb.rpc('admin_recent_errors', {
       p_limit: 50,
       p_only_unresolved: onlyUnresolved,
       p_page_filter: filter || null
@@ -331,7 +336,7 @@
   }
 
   async function resolveError(id){
-    const r = await supabase.rpc('admin_resolve_error', { p_error_id: id });
+    const r = await sb.rpc('admin_resolve_error', { p_error_id: id });
     if (r.error){ alert('Failed: ' + r.error.message); return; }
     loadErrors();
   }
@@ -359,7 +364,7 @@
     // Need a real shop id for tests that take one
     let sampleShopId = null;
     if (RPC_TESTS.some(t => typeof t.args === 'string' && t.args.startsWith('auto-shop'))){
-      const r = await supabase.from('businesses').select('id').limit(1).maybeSingle();
+      const r = await sb.from('businesses').select('id').limit(1).maybeSingle();
       sampleShopId = r.data ? r.data.id : null;
     }
 
@@ -372,7 +377,7 @@
 
       const card = document.getElementById('rpc-' + i);
       try {
-        const r = await supabase.rpc(t.name, args);
+        const r = await sb.rpc(t.name, args);
         if (r.error){
           card.className = 'rpc-card fail';
           card.querySelector('.result').innerHTML = '<b>FAIL</b><br>' + esc(r.error.message);
