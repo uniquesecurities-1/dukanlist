@@ -3268,7 +3268,9 @@ async function toggleFav(){
   setTimeout(() => t.remove(), 2000);
 }
 
-// Build a friend-to-friend share message — conversational, with credibility hooks
+// Build a friend-to-friend share message — conversational, with credibility hooks.
+// Now includes owner name (personal trust signal) and uses category icon
+// from DB instead of generic label emoji (avoids Unicode rendering issues).
 function buildFriendShareText(){
   if (!BIZ) return '';
   const name = BIZ.name || 'this business';
@@ -3276,16 +3278,34 @@ function buildFriendShareText(){
   const city = (BIZ.geo_cities && BIZ.geo_cities.name) || BIZ.city_name || '';
   const loc  = [area, city].filter(Boolean).join(', ');
   const cat  = (BIZ.categories && BIZ.categories.name) || BIZ.category_name || '';
+  const catIcon = (BIZ.categories && BIZ.categories.icon) || '';
+  const ownerName = BIZ.owner_name || '';
+  const ownerRole = BIZ.owner_role || '';  // e.g. 'Owner', 'Founder', 'Partner', 'Director'
+  // Pick a friendly label — fall back to "Owner" if role not set
+  const roleLabel = ownerRole && ownerRole.trim()
+    ? ownerRole.trim()
+    : 'Owner';
   const rating = (BIZ.rating_avg > 0 && BIZ.rating_count > 0)
     ? '⭐ ' + Number(BIZ.rating_avg).toFixed(1) + ' (' + BIZ.rating_count + ' reviews)'
     : '';
-  const verified = (BIZ.verified_score >= 3) ? '✓ Verified' : '';
+  const verified = (BIZ.verified_score >= 3) ? '✓ Verified on DukanList' : '';
   const credParts = [verified, rating].filter(Boolean).join(' · ');
   const url = 'https://dukanlist.com/share?slug=' + encodeURIComponent(BIZ.slug || '');
 
   let msg = 'Thought you would find this business useful — I came across it on DukanList:\n\n';
-  msg += '*' + name + '*' + (loc ? ' (' + loc + ')' : '') + '\n';
-  if (cat) msg += '🏷️ ' + cat + '\n';
+  msg += '*' + name + '*\n';
+  // Owner line (key trust signal)
+  if (ownerName) {
+    msg += '👤 ' + roleLabel + ': ' + ownerName + '\n';
+  }
+  // Category line (uses actual category icon from DB — Unicode-safe)
+  if (cat) {
+    msg += (catIcon ? catIcon + ' ' : '') + cat + '\n';
+  }
+  // Location line
+  if (loc) {
+    msg += '📍 ' + loc + '\n';
+  }
   if (credParts) msg += credParts + '\n';
   msg += '\n' + url + '\n\n';
   msg += 'Photos, hours, ratings, and direct call/WhatsApp — all on one page.';
