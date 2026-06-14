@@ -5,7 +5,7 @@
      - fetch   : network-first, fallback to cache
      - skip    : /admin/*, /panel/*, supabase API, POSTs, non-GET
    ============================================================ */
-const VERSION    = 'dukan-v2.9.46';  // SPOTLIGHT OF THE WEEK — genuinely weekly. User caught: 'Featured this week' card was showing all-time top rated shop (Walatirams 44 reviews) which never changes — section was misleading. Fix: created db/132 SQL with get_spotlight_of_week() RPC implementing 3-tier algorithm: Tier 1 = shop with most NEW reviews in last 7 days (min 2 new reviews, avg >= 4.0), Tier 2 = most new reviews last 30 days (min 3), Tier 3 = recently active (90 days) with best rating. homepage.js loadFSOTW now calls RPC first, falls back to admin-featured shop, then to old logic. Badge dynamically shows 'Buzz this week · 5 new reviews' / 'Buzz this month · 8 new reviews' instead of static 'Featured this week'. Real weekly rotation. Mandi Dabwali will show different shops as customer review activity shifts week to week. User must run db/132 in Supabase SQL Editor.
+const VERSION    = 'dukan-v2.9.47';  // CACHE BUST — user reported photos working on PC but not mobile. Root cause: browser HTTP cache (not SW) was serving stale image-opt.js with the broken Supabase render endpoint URL. SW already bypasses /assets/js/ for caching but browser caches independently. Fix: added ?v=20260615-fix query string to BOTH image-opt.js and homepage.js src tags in index.html — browser treats as new URLs and fetches fresh. Mobile will now pick up the updated image-opt.js (which has transform disabled by default) on next page load.
 const STATIC_CACHE = 'dukan-static-' + VERSION;
 const RUNTIME_CACHE = 'dukan-runtime-' + VERSION;
 
