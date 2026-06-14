@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Health Dashboard — DukanList</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Error monitor — captures errors on THIS page too -->
+<script src="/assets/js/admin-error-monitor.js"></script>
+
+<style>
+  *,*:before,*:after { box-sizing: border-box; }
+  :root {
+    --orange:#FF6B1A; --orange-dark:#EA580C;
+    --green:#10B981; --green-bg:#ECFDF5; --green-border:#A7F3D0;
+    --amber:#F59E0B; --amber-bg:#FFFBEB; --amber-border:#FDE68A;
+    --red:#DC2626;   --red-bg:#FEF2F2;   --red-border:#FECACA;
+    --ink:#0F172A;   --muted:#64748B;
+    --line:#E2E8F0;  --line-2:#F1F5F9;
+  }
+  body {
+    margin:0; font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    background:#F8FAFC; color:var(--ink);
+  }
+  header.admin-nav {
+    background:#0F172A; color:#fff; padding:14px 20px;
+    display:flex; align-items:center; gap:20px;
+  }
+  header.admin-nav .brand { font-weight:900; font-size:20px; display:flex; gap:8px; align-items:center;}
+  header.admin-nav .pill { background:rgba(255,255,255,0.15); padding:3px 10px; border-radius:8px; font-size:12px; letter-spacing:1px; }
+  header.admin-nav nav { display:flex; gap:14px; margin-left:auto; }
+  header.admin-nav nav a { color:#CBD5E1; text-decoration:none; font-weight:600; font-size:14px; padding:6px 10px; border-radius:6px; }
+  header.admin-nav nav a:hover { background:rgba(255,255,255,0.10); color:#fff; }
+  header.admin-nav nav a.active { background:var(--orange); color:#fff; }
+
+  .container { max-width:1280px; margin:0 auto; padding:30px 24px; }
+  h1 { font-size:28px; font-weight:900; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:24px; }
+
+  /* Stats grid */
+  .stats-grid {
+    display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    margin-bottom:28px;
+  }
+  .stat-card {
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:18px;
+  }
+  .stat-card .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+  .stat-card .value { font-size:32px; font-weight:900; margin-top:6px; color:var(--ink); }
+  .stat-card .delta { font-size:12px; color:var(--muted); margin-top:4px; }
+  .stat-card.warn .value { color:var(--amber); }
+  .stat-card.fail .value { color:var(--red); }
+
+  /* Sections */
+  section { background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px; margin-bottom:22px; }
+  section h2 {
+    margin:0 0 14px; font-size:18px; font-weight:800; display:flex; align-items:center; gap:10px;
+  }
+  section h2 .badge { font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; }
+  .b-ok   { background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+  .b-warn { background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber-border); }
+  .b-fail { background:var(--red-bg);   color:var(--red);   border:1px solid var(--red-border); }
+
+  /* Checks table */
+  table.checks { width:100%; border-collapse:collapse; }
+  table.checks th, table.checks td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line-2); font-size:14px; }
+  table.checks th { font-weight:700; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.5px; }
+  table.checks tr:last-child td { border-bottom:0; }
+  table.checks td.status-cell { font-weight:700; }
+  table.checks td.expected, table.checks td.actual { font-family: ui-monospace,Menlo,Consolas,monospace; font-size:13px; }
+  .row-ok   { background:transparent; }
+  .row-warn { background:#FFFBEB80; }
+  .row-fail { background:#FEF2F280; }
+  .status-pill { display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:800; letter-spacing:.5px; }
+  .status-ok   { background:var(--green-bg); color:var(--green); }
+  .status-warn { background:var(--amber-bg); color:var(--amber); }
+  .status-fail { background:var(--red-bg);   color:var(--red); }
+
+  /* Errors list */
+  .err-row {
+    display:grid; grid-template-columns:160px 1fr auto; gap:14px;
+    padding:12px 14px; border-bottom:1px solid var(--line-2); align-items:start;
+  }
+  .err-row:last-child { border-bottom:0; }
+  .err-row .meta { font-size:11px; color:var(--muted); }
+  .err-row .meta .page { font-family: ui-monospace,Menlo,Consolas,monospace; color:var(--ink); font-weight:600; font-size:12px; }
+  .err-row .msg { font-size:13px; color:var(--ink); }
+  .err-row .msg .type { display:inline-block; font-size:10px; font-weight:800; padding:1px 6px; border-radius:4px; background:#F1F5F9; color:var(--muted); letter-spacing:.5px; margin-right:6px; }
+  .err-row .msg pre { font-family: ui-monospace,Menlo,Consolas,monospace; font-size:11px; background:#F8FAFC; padding:8px; border-radius:6px; margin-top:6px; overflow-x:auto; color:var(--muted); max-height:120px; }
+  .err-row button { background:var(--green); color:#fff; border:0; padding:6px 12px; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;}
+  .err-row button:hover { opacity:.9; }
+  .err-row button.resolved { background:#94A3B8; cursor:default; }
+
+  /* RPC self-test */
+  .rpc-grid { display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+  .rpc-card {
+    border:1px solid var(--line); border-radius:12px; padding:14px;
+    font-size:13px; background:#FAFBFC;
+  }
+  .rpc-card .name { font-family: ui-monospace,Menlo,Consolas,monospace; font-weight:700; color:var(--ink); font-size:13px; }
+  .rpc-card .desc { color:var(--muted); margin:4px 0 8px; font-size:12px; }
+  .rpc-card .result { font-size:12px; }
+  .rpc-card.ok   { border-color:var(--green-border); background:var(--green-bg); }
+  .rpc-card.fail { border-color:var(--red-border);   background:var(--red-bg); }
+  .rpc-card.running { border-color:var(--amber-border); background:var(--amber-bg); }
+
+  .btn { display:inline-block; padding:10px 16px; border-radius:10px; border:0; font-weight:800; cursor:pointer; }
+  .btn-primary { background:var(--orange); color:#fff; }
+  .btn-primary:hover { background:var(--orange-dark); }
+  .btn-secondary { background:#F1F5F9; color:var(--ink); border:1px solid var(--line); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+
+  .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  .toolbar label { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+
+  .empty { text-align:center; padding:30px; color:var(--muted); }
+
+  .last-update { font-size:12px; color:var(--muted); }
+  .updated-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--green); margin-right:6px; vertical-align:middle; }
+</style>
+</head>
+<body>
+
+<header class="admin-nav">
+  <div class="brand">🛡 DukanList <span class="pill">ADMIN</span></div>
+  <nav>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/moderation">Moderation</a>
+    <a href="/admin/incomplete-shops">Incomplete</a>
+    <a href="/admin/health" class="active">Health</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>Admin Health Dashboard</h1>
+  <div class="sub">DB invariants, captured errors, RPC self-test, and system stats — your control tower.</div>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="refreshAll()">↻ Refresh All</button>
+    <button class="btn btn-secondary" onclick="runRpcSelfTest()">▶ Run RPC Self-Test</button>
+    <button class="btn btn-secondary" onclick="testError()">★ Trigger Test Error</button>
+    <div style="margin-left:auto" class="last-update">
+      <span class="updated-dot"></span><span id="lastUpdate">never</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <!-- DB Invariants -->
+  <section>
+    <h2>
+      DB Invariants & Data Integrity
+      <span class="badge b-ok" id="checksOverall">loading…</span>
+    </h2>
+    <table class="checks" id="checksTable">
+      <thead>
+        <tr>
+          <th style="width:120px">Category</th>
+          <th>Check</th>
+          <th style="width:90px">Status</th>
+          <th style="width:90px">Expected</th>
+          <th style="width:90px">Actual</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- Recent Errors -->
+  <section>
+    <h2>
+      Recent Client Errors
+      <span class="badge b-ok" id="errorsOverall">loading…</span>
+    </h2>
+    <div class="toolbar">
+      <label><input type="checkbox" id="onlyUnresolved" checked> Only unresolved</label>
+      <label>Page filter: <input id="pageFilter" placeholder="/admin/" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;"></label>
+      <button class="btn btn-secondary" onclick="loadErrors()">Apply</button>
+    </div>
+    <div id="errorsList"><div class="empty">Loading…</div></div>
+  </section>
+
+  <!-- RPC Self-Test -->
+  <section>
+    <h2>RPC Self-Test</h2>
+    <div class="sub" style="margin-bottom:14px">Click "Run RPC Self-Test" above. Each card calls a critical RPC with a safe payload to confirm it's reachable + not throwing.</div>
+    <div class="rpc-grid" id="rpcGrid"></div>
+  </section>
+</div>
+
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // === Supabase init ===
+  const SUPABASE_URL = 'https://qazuyygrpqopwygxmvwq.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.supabase = supabase;
+
+  // === Auth gate — only admins ===
+  (async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session){
+      location.href = '/admin/login?next=/admin/health';
+      return;
+    }
+    // Try a small admin-only RPC to confirm; if rejected, redirect
+    const probe = await supabase.rpc('admin_health_check');
+    if (probe.error){
+      if ((probe.error.message || '').includes('not authorized')){
+        alert('Admin access required.');
+        location.href = '/';
+        return;
+      }
+      // Other errors — let main UI surface them
+    }
+    refreshAll();
+  })();
+
+  // === Render: stats + checks ===
+  async function loadHealth(){
+    const r = await supabase.rpc('admin_health_check');
+    if (r.error){ alert('Health check failed: ' + r.error.message); return; }
+    const d = r.data || {};
+    document.getElementById('lastUpdate').textContent = new Date(d.generated_at || Date.now()).toLocaleString('en-IN');
+
+    // Stats grid
+    const stats = d.stats || {};
+    const cards = [
+      ['Total Shops',          stats.total_shops,        ''],
+      ['Active',               stats.active_shops,       ''],
+      ['Pending',               stats.pending_shops,      stats.pending_shops > 0 ? 'needs review' : ''],
+      ['Banned',                stats.banned_shops,       ''],
+      ['Total Owners',         stats.total_owners,       ''],
+      ['Added (24h)',          stats.shops_added_24h,    ''],
+      ['Added (7d)',           stats.shops_added_7d,     ''],
+      ['Categories',           stats.total_categories,   ''],
+      ['Cities',               stats.total_cities,       ''],
+      ['Localities',           stats.total_localities,   ''],
+      ['Errors (24h)',         stats.errors_last_24h,    stats.errors_last_24h > 0 ? (stats.errors_unresolved + ' unresolved') : 'clean'],
+    ];
+    document.getElementById('statsGrid').innerHTML = cards.map(([label, val, delta]) => {
+      const cls = (label === 'Errors (24h)' && val > 0) ? 'warn' : (label === 'Pending' && val > 0) ? 'warn' : '';
+      return `<div class="stat-card ${cls}">
+        <div class="label">${label}</div>
+        <div class="value">${val != null ? val : '—'}</div>
+        ${delta ? `<div class="delta">${delta}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    // Checks table
+    const checks = d.checks || [];
+    const failCount = checks.filter(c => c.status === 'fail').length;
+    const warnCount = checks.filter(c => c.status === 'warn').length;
+    const overall = document.getElementById('checksOverall');
+    if (failCount > 0){
+      overall.className = 'badge b-fail';
+      overall.textContent = `${failCount} failing`;
+    } else if (warnCount > 0){
+      overall.className = 'badge b-warn';
+      overall.textContent = `${warnCount} warn`;
+    } else {
+      overall.className = 'badge b-ok';
+      overall.textContent = 'all clear';
+    }
+    const tbody = document.querySelector('#checksTable tbody');
+    if (!checks.length){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">No checks returned</td></tr>';
+    } else {
+      // Sort: fail → warn → ok
+      const order = { fail: 0, warn: 1, ok: 2 };
+      checks.sort((a,b) => (order[a.status] - order[b.status]));
+      tbody.innerHTML = checks.map(c => `
+        <tr class="row-${c.status}">
+          <td>${esc(c.category)}</td>
+          <td>${esc(c.name)}</td>
+          <td class="status-cell"><span class="status-pill status-${c.status}">${c.status.toUpperCase()}</span></td>
+          <td class="expected">${esc(c.expected)}</td>
+          <td class="actual">${esc(c.actual)}</td>
+          <td>${esc(c.message)}</td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // === Render: recent errors ===
+  async function loadErrors(){
+    const onlyUnresolved = document.getElementById('onlyUnresolved').checked;
+    const filter = document.getElementById('pageFilter').value.trim();
+    const r = await supabase.rpc('admin_recent_errors', {
+      p_limit: 50,
+      p_only_unresolved: onlyUnresolved,
+      p_page_filter: filter || null
+    });
+    if (r.error){
+      document.getElementById('errorsList').innerHTML = '<div class="empty" style="color:var(--red)">Failed: ' + esc(r.error.message) + '</div>';
+      return;
+    }
+    const errs = r.data || [];
+    const overall = document.getElementById('errorsOverall');
+    if (errs.length === 0){
+      overall.className = 'badge b-ok'; overall.textContent = 'no errors';
+      document.getElementById('errorsList').innerHTML = '<div class="empty">No errors found ★</div>';
+      return;
+    } else if (errs.length < 5){
+      overall.className = 'badge b-warn'; overall.textContent = errs.length + ' to review';
+    } else {
+      overall.className = 'badge b-fail'; overall.textContent = errs.length + ' to review';
+    }
+    document.getElementById('errorsList').innerHTML = errs.map(e => `
+      <div class="err-row" data-id="${e.id}">
+        <div class="meta">
+          <div>${new Date(e.created_at).toLocaleString('en-IN')}</div>
+          <div class="page">${esc(e.page || '')}</div>
+          <div style="margin-top:4px">${esc(e.user_email || '—')}</div>
+        </div>
+        <div class="msg">
+          <span class="type">${esc((e.error_type || '?').toUpperCase())}</span>${esc(e.error_message || '')}
+          ${e.error_stack ? `<pre>${esc(e.error_stack)}</pre>` : ''}
+          ${e.payload ? `<pre>${esc(JSON.stringify(e.payload, null, 2))}</pre>` : ''}
+        </div>
+        <div>${e.resolved ? '<button class="resolved" disabled>★ Resolved</button>' : `<button onclick="resolveError(${e.id})">Mark Resolved</button>`}</div>
+      </div>
+    `).join('');
+  }
+
+  async function resolveError(id){
+    const r = await supabase.rpc('admin_resolve_error', { p_error_id: id });
+    if (r.error){ alert('Failed: ' + r.error.message); return; }
+    loadErrors();
+  }
+
+  // === RPC Self-Test ===
+  const RPC_TESTS = [
+    { name: 'admin_health_check',         desc: 'Returns invariants + stats',                         args: {}, safe: true },
+    { name: 'admin_get_shop_full',        desc: 'Fetch one shop (uses random first business id)',     args: 'auto-shop', safe: true },
+    { name: 'admin_recent_errors',        desc: 'Recent error log',                                   args: { p_limit: 1 }, safe: true },
+    { name: 'admin_update_shop',          desc: 'Whitelist + array-cast sanity (empty patch)',        args: 'auto-shop-patch', safe: true },
+    { name: 'get_spotlight_of_week',      desc: 'Weekly spotlight picker',                            args: {}, safe: true },
+    { name: 'get_my_recommendations',     desc: 'Cross-business recommendations I sent',              args: {}, safe: true },
+  ];
+
+  async function runRpcSelfTest(){
+    const grid = document.getElementById('rpcGrid');
+    grid.innerHTML = RPC_TESTS.map((t,i) => `
+      <div class="rpc-card running" id="rpc-${i}">
+        <div class="name">${esc(t.name)}</div>
+        <div class="desc">${esc(t.desc)}</div>
+        <div class="result">⏳ running…</div>
+      </div>
+    `).join('');
+
+    // Need a real shop id for tests that take one
+    let sampleShopId = null;
+    if (RPC_TESTS.some(t => typeof t.args === 'string' && t.args.startsWith('auto-shop'))){
+      const r = await supabase.from('businesses').select('id').limit(1).maybeSingle();
+      sampleShopId = r.data ? r.data.id : null;
+    }
+
+    for (let i = 0; i < RPC_TESTS.length; i++){
+      const t = RPC_TESTS[i];
+      let args = t.args;
+      if (args === 'auto-shop' && sampleShopId)        args = { p_business_id: sampleShopId };
+      else if (args === 'auto-shop-patch' && sampleShopId) args = { p_business_id: sampleShopId, p_patch: {} };
+      else if (typeof args === 'string')                args = {};
+
+      const card = document.getElementById('rpc-' + i);
+      try {
+        const r = await supabase.rpc(t.name, args);
+        if (r.error){
+          card.className = 'rpc-card fail';
+          card.querySelector('.result').innerHTML = '<b>FAIL</b><br>' + esc(r.error.message);
+        } else {
+          card.className = 'rpc-card ok';
+          const summary = (Array.isArray(r.data) ? r.data.length + ' rows' : (typeof r.data === 'object' ? 'returned object' : String(r.data)));
+          card.querySelector('.result').innerHTML = '<b>★ OK</b><br>' + esc(summary);
+        }
+      } catch(e){
+        card.className = 'rpc-card fail';
+        card.querySelector('.result').innerHTML = '<b>THREW</b><br>' + esc(e.message || e);
+      }
+    }
+  }
+
+  // === Test error trigger ===
+  function testError(){
+    setTimeout(() => {
+      throw new Error('Test error from health dashboard at ' + new Date().toISOString());
+    }, 50);
+    setTimeout(loadErrors, 2000);
+  }
+
+  // === Util ===
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function refreshAll(){
+    loadHealth();
+    loadErrors();
+  }
+</script>
+
+</body>
+</html>
