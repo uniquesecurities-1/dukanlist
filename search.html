@@ -97,7 +97,46 @@
 .result-count b{ color:var(--ink); font-weight:600 }
 
 /* ===== Result cards (Apple-grade) ===== */
-.biz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px }
+.biz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px }
+
+/* === Compact card for shops without photos (saves ~180px height per card) === */
+.biz-card.no-photo .biz-photo{
+  aspect-ratio:auto; height:48px;
+  background:linear-gradient(135deg,#FFF7ED,#FED7AA);
+  display:flex; align-items:center; justify-content:flex-start;
+  padding:0 14px; gap:8px;
+}
+.biz-card.no-photo .biz-photo .ph-fb{
+  width:auto; height:auto; font-size:1.5rem; opacity:1;
+  display:inline-flex; align-items:center;
+}
+.biz-card.no-photo .biz-photo .ph-label{
+  font-size:.74rem; font-weight:700; color:#9A3412;
+  letter-spacing:.04em; text-transform:uppercase;
+}
+.biz-card.no-photo .biz-photo .verify,
+.biz-card.no-photo .biz-photo .open-live,
+.biz-card.no-photo .biz-photo .open-dot,
+.biz-card.no-photo .biz-photo .ribbon,
+.biz-card.no-photo .biz-photo .featured-ribbon{
+  position:static; margin-left:auto;
+  padding:4px 10px; font-size:.68rem;
+  backdrop-filter:none;
+}
+.biz-card.no-photo .biz-info{ padding:14px 16px 16px }
+
+/* === Load-more button === */
+.load-more-wrap{ text-align:center; padding:24px 0 8px; grid-column:1/-1 }
+.load-more-btn{
+  background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff;
+  border:none; border-radius:99px; padding:14px 32px;
+  font-size:.96rem; font-weight:700; cursor:pointer;
+  box-shadow:0 6px 20px rgba(251,146,60,.25);
+  transition:transform .15s ease, box-shadow .15s ease;
+  font-family:inherit;
+}
+.load-more-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 28px rgba(251,146,60,.32) }
+.load-more-btn .lm-count{ opacity:.85; font-weight:500; margin-left:6px }
 .biz-card{
   background:#fff;
   border:1px solid rgba(15,23,42,.04);
@@ -560,6 +599,8 @@ function setSortOptionsLang(lang){
 
 let CATEGORIES = [], CITIES = [];
 let LAST_RESULTS = [];        // last unfiltered result-set (for client-side filters)
+let VISIBLE_COUNT = 15;       // pagination — first batch size; "Load more" doubles this
+const PAGE_SIZE = 15;         // batch size for incremental render
 let OPEN_NOW = false;          // active toggle state
 let RATING_FILTER = false;     // ⭐ 4.0+
 let VERIFIED_FILTER = false;   // ✓ Verified
@@ -873,6 +914,7 @@ async function runSearch(){
   }
 
   LAST_RESULTS = Array.isArray(data) ? data : [];
+  VISIBLE_COUNT = PAGE_SIZE;  // reset pagination on new search
   renderResults();
 }
 
@@ -1034,7 +1076,13 @@ function _renderResultsInner(){
   } else {
     hint.textContent = '';
   }
-  resEl.innerHTML = `<div class="biz-grid stagger">${rows.map(renderCard).join('')}</div>`;
+  // Pagination — show first VISIBLE_COUNT, with "Load more" if any remain
+  const visibleRows = rows.slice(0, VISIBLE_COUNT);
+  const remaining = Math.max(0, rows.length - visibleRows.length);
+  const loadMoreHTML = remaining > 0
+    ? `<div class="load-more-wrap"><button class="load-more-btn" type="button" onclick="loadMoreResults()">📋 <span data-i18n-en>Show ${Math.min(PAGE_SIZE, remaining)} more</span><span data-i18n-hi>${Math.min(PAGE_SIZE, remaining)} aur dikhao</span><span class="lm-count"> · ${remaining} ${remaining === 1 ? 'left' : 'left'}</span></button></div>`
+    : '';
+  resEl.innerHTML = `<div class="biz-grid stagger">${visibleRows.map(renderCard).join('')}${loadMoreHTML}</div>`;
   renderActiveFilters();
   // Hide Recently Viewed when we have actual search results — declutters the page
   try {
@@ -1049,11 +1097,22 @@ function _renderResultsInner(){
   } catch(_){}
 }
 
+// Load-more handler — expands VISIBLE_COUNT and re-renders the grid in place
+function loadMoreResults(){
+  VISIBLE_COUNT += PAGE_SIZE;
+  // Smooth-scroll preservation: remember scroll position, re-render, restore
+  const scrollY = window.scrollY;
+  renderResults();
+  window.scrollTo(0, scrollY);
+}
+window.loadMoreResults = loadMoreResults;  // ensure global for onclick
+
 function renderCard(b){
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
   const photoHTML = photo
     ? `<img src="${photo}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
-    : `<div class="ph-fb">${b.category_icon || '🏪'}</div>`;
+    : `<div class="ph-fb">${b.category_icon || '🏪'}</div><span class="ph-label">${escapeHTML(b.category_name || 'Shop')}</span>`;
+  const noPhotoClass = photo ? '' : ' no-photo';
   const verified = (typeof DukanTier !== 'undefined') ? DukanTier.badge(b) : (b.verified_visit === true ? '<span class="verify">✓ Verified</span>' : '');
   const featuredRibbon = b.is_featured ? '<span class="featured-ribbon">★ FEATURED</span>' : '';
   // Open-Now LIVE badge — pulsing green dot + "closes in X" when open
@@ -1110,7 +1169,7 @@ function renderCard(b){
       + '</div>'
     : '';
   return `
-    <article class="biz-card">
+    <article class="biz-card${noPhotoClass}">
       ${heartHTML}
       <a class="biz-card-link" href="/business.html?slug=${b.slug}" aria-label="${escapeHTML(b.name)}"></a>
       <div class="biz-photo">${photoHTML}${openBadge}${ribbon || featuredRibbon}${verified}</div>
