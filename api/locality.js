@@ -189,7 +189,7 @@ function renderPage(opts){
   const catName  = cat.name;
   const url = `${ORIGIN}/local/${cityName.toLowerCase().replace(/ /g,'-')}/${cat.slug}`;
   const title = `${catName} in ${cityName} — Top ${shops.length}+ Verified Shops · DukanList`;
-  const desc  = `Find the best ${catName.toLowerCase()} in ${cityName}. ${shops.length} verified local shops with reviews, ratings, contact details. Free customer reviews. Updated daily on DukanList — Bharat ka local shop directory.`;
+  const desc  = `Find the best ${catName.toLowerCase()} in ${cityName}. ${shops.length} verified local shops with reviews, ratings, contact details. Real reviews from local people. Updated daily on DukanList — Bharat ka local shop directory.`;
 
   // Schema.org ItemList for SEO
   const itemListSchema = {
