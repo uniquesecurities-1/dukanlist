@@ -89,7 +89,7 @@
     <nav class="nav-links">
       <a href="/browse.html"><span data-i18n-en>Browse</span><span data-i18n-hi>श्रेणियाँ</span></a>
       <a href="/search.html"><span data-i18n-en>Search</span><span data-i18n-hi>खोज</span></a>
-      <a href="/register.html" class="nav-cta"><span data-i18n-en>+ Add Shop</span><span data-i18n-hi>+ दुकान जोड़ें</span></a>
+      <a href="/register.html" class="nav-cta"><span data-i18n-en>+ Add Business</span><span data-i18n-hi>+ Business जोड़ें</span></a>
     </nav>
   </div>
 </header>
@@ -135,7 +135,7 @@ async function init(){
   const ids = idsRaw.split(',').map(s => s.trim()).filter(Boolean);
 
   if (ids.length < 2){
-    root.innerHTML = '<div class="cmp-error">' + L('Need exactly 2 shop IDs in the URL (?ids=A,B). Pick 2 shops from the <a href="/search.html">search page</a> to compare them.', 'URL में 2 दुकानों की IDs चाहिए (?ids=A,B). तुलना के लिए <a href="/search.html">खोज पेज</a> से 2 दुकानें चुनें।') + '</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('Need exactly 2 listing IDs in the URL (?ids=A,B). Pick 2 listings from the <a href="/search.html">search page</a> to compare them.', 'URL में 2 listings की IDs चाहिए (?ids=A,B). तुलना के लिए <a href="/search.html">खोज पेज</a> से 2 listings चुनें।') + '</div>';
     return;
   }
   if (ids.length > 2) ids.length = 2;
@@ -156,7 +156,7 @@ async function init(){
     return;
   }
   if (!data || data.length < 2){
-    root.innerHTML = '<div class="cmp-error">' + L('One or both shops not found. They may have been removed.', 'एक या दोनों दुकानें नहीं मिलीं। शायद हटा दी गई हैं।') + '</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('One or both listings not found. They may have been removed.', 'एक या दोनों listings नहीं मिलीं। शायद हटा दी गई हैं।') + '</div>';
     return;
   }
 
@@ -165,7 +165,7 @@ async function init(){
   data.forEach(s => { shopsById[String(s.id)] = s; });
   const shops = ids.map(id => shopsById[String(id)]).filter(Boolean);
   if (shops.length < 2){
-    root.innerHTML = '<div class="cmp-error">' + L('Could not load both shops.', 'दोनों दुकानें लोड नहीं हो सकीं।') + '</div>';
+    root.innerHTML = '<div class="cmp-error">' + L('Could not load both listings.', 'दोनों listings लोड नहीं हो सकीं।') + '</div>';
     return;
   }
 
