@@ -38,6 +38,9 @@
       mobile:      String(biz.mobile || '').replace(/\D/g,'').slice(-10),
       whatsapp:    String(biz.whatsapp || biz.mobile || '').replace(/\D/g,'').slice(-10),
       verified:    !!(biz.verified_visit || biz.verified_score >= 1),
+      // Professional listing flags — used to suppress rating display per regulator's rules
+      is_professional_listing: biz.is_professional_listing === true,
+      professional_tier:       biz.professional_tier || null,
       ts:          Date.now()
     });
     save(items);
@@ -94,7 +97,13 @@
       </style>
       <div class="rv-list">
         ${items.slice(0, (opts.max || 4)).map(b => {
-          const rateStr = b.rating_avg > 0 ? '<span class="rv-rate">⭐ ' + Number(b.rating_avg).toFixed(1) + '</span>' : '';
+          // Strict pro listings: NO rating display anywhere on the platform
+          // (NMC/ICAI/BCI Code of Ethics prohibits rating/testimonial display).
+          // Show small 🛡 'Professional' chip instead so visitor still knows it's a pro.
+          const isProfStrict = b.is_professional_listing === true && b.professional_tier === 'strict';
+          const rateStr = isProfStrict
+            ? '<span style="color:#0EA5E9;font-weight:800;font-size:.7rem">🛡 Professional</span>'
+            : (b.rating_avg > 0 ? '<span class="rv-rate">⭐ ' + Number(b.rating_avg).toFixed(1) + '</span>' : '');
           const catStr  = b.category ? '<span class="rv-cat">' + (b.category_icon ? esc(b.category_icon) + ' ' : '') + esc(b.category) + '</span>' : '';
           const verify  = b.verified ? '<span class="rv-verify">✓ Verified</span>' : '';
           const cityStr = b.city ? esc(b.city) : '';
