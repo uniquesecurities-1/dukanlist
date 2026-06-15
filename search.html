@@ -137,6 +137,87 @@
 }
 .load-more-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 28px rgba(251,146,60,.32) }
 .load-more-btn .lm-count{ opacity:.85; font-weight:500; margin-left:6px }
+
+/* ============================================================
+   Density toggle — Grid (default) vs Compact (tight 1-col rows)
+============================================================ */
+.density-toggle{ display:inline-flex; background:#F1F5F9; border-radius:10px; padding:3px; gap:0; margin-left:6px }
+.dt-btn{ border:none; background:transparent; padding:7px 11px; font-size:.84rem; font-weight:700; color:var(--ink-2); cursor:pointer; border-radius:8px; font-family:inherit; transition:.15s }
+.dt-btn:hover{ color:var(--ink) }
+.dt-btn.active{ background:#fff; color:var(--saffron-deep); box-shadow:0 2px 6px rgba(15,23,42,.08) }
+
+/* Compact view: single column, tight rows */
+.biz-grid.compact{ grid-template-columns:1fr; gap:8px }
+.biz-grid.compact .biz-card{
+  flex-direction:row; align-items:stretch;
+  border-radius:14px; min-height:auto;
+}
+.biz-grid.compact .biz-card:hover{ transform:translateX(2px); box-shadow:0 8px 24px rgba(15,23,42,.06) }
+.biz-grid.compact .biz-photo{
+  aspect-ratio:auto; width:84px; min-width:84px; height:auto; flex-shrink:0;
+  border-right:1px solid rgba(15,23,42,.05);
+}
+.biz-grid.compact .biz-photo img{ width:100%; height:100%; object-fit:cover }
+.biz-grid.compact .biz-card.no-photo .biz-photo{
+  width:48px; min-width:48px; padding:0;
+  justify-content:center; flex-direction:column; gap:0;
+}
+.biz-grid.compact .biz-card.no-photo .biz-photo .ph-fb{ font-size:1.4rem }
+.biz-grid.compact .biz-card.no-photo .biz-photo .ph-label{ display:none }
+.biz-grid.compact .biz-info{ padding:10px 14px; gap:2px; min-width:0; }
+.biz-grid.compact .biz-cat{ font-size:.7rem; margin-bottom:0 }
+.biz-grid.compact .biz-name{ font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.biz-grid.compact .biz-usp{ font-size:.78rem; -webkit-line-clamp:1; line-clamp:1 }
+.biz-grid.compact .biz-meta{ margin-top:4px; padding-top:6px; font-size:.74rem; gap:6px }
+.biz-grid.compact .biz-actions{ display:none }    /* hide big WhatsApp/Call in compact — they're in expanded view */
+.biz-grid.compact .ribbon, .biz-grid.compact .featured-ribbon{ font-size:.62rem; padding:2px 6px }
+.biz-grid.compact .open-live, .biz-grid.compact .open-dot{ font-size:.62rem }
+.biz-grid.compact .verify{ font-size:.62rem; padding:2px 6px; top:6px; right:6px }
+
+@media (max-width:560px){
+  .biz-grid.compact .biz-photo{ width:64px; min-width:64px }
+  .biz-grid.compact .biz-card.no-photo .biz-photo{ width:42px; min-width:42px }
+}
+
+/* ============================================================
+   Owner CTA banner — "Upload photo to stand out"
+============================================================ */
+.owner-cta{
+  display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg,#FFF7ED,#FFEDD5);
+  border:1px solid #FDBA74; border-radius:14px;
+  padding:14px 18px; margin:0 0 18px;
+  position:relative;
+}
+.owner-cta .cta-icon{
+  font-size:1.6rem; flex-shrink:0;
+  width:42px; height:42px; border-radius:10px;
+  background:#fff; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(251,146,60,.18);
+}
+.owner-cta .cta-text{ flex:1; font-size:.84rem; color:#7C2D12; line-height:1.4 }
+.owner-cta .cta-text b{ display:block; font-size:.92rem; color:#9A3412; margin-bottom:2px; font-weight:700 }
+.owner-cta .cta-btn{
+  background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff;
+  padding:9px 16px; border-radius:99px;
+  font-size:.82rem; font-weight:700; text-decoration:none;
+  white-space:nowrap; flex-shrink:0;
+  box-shadow:0 4px 12px rgba(251,146,60,.25);
+  transition:.15s;
+}
+.owner-cta .cta-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(251,146,60,.32); text-decoration:none }
+.owner-cta .cta-dismiss{
+  position:absolute; top:6px; right:8px;
+  background:transparent; border:none; cursor:pointer;
+  font-size:1.1rem; color:#9A3412; opacity:.55;
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.owner-cta .cta-dismiss:hover{ opacity:1; background:rgba(154,52,18,.08) }
+@media (max-width:560px){
+  .owner-cta{ flex-wrap:wrap; padding:12px 14px; gap:10px }
+  .owner-cta .cta-btn{ width:100%; text-align:center }
+}
 .biz-card{
   background:#fff;
   border:1px solid rgba(15,23,42,.04);
@@ -525,6 +606,10 @@
         <button id="viewListBtn" class="vt-btn active" onclick="setView('list')" aria-pressed="true">📋 List</button>
         <button id="viewMapBtn"  class="vt-btn" onclick="setView('map')"  aria-pressed="false">🗺️ Map</button>
       </div>
+      <div class="density-toggle" role="tablist" aria-label="Density toggle">
+        <button id="densityGridBtn"    class="dt-btn active" onclick="setDensity('grid')"    aria-pressed="true"  title="Card view">▦ Grid</button>
+        <button id="densityCompactBtn" class="dt-btn"        onclick="setDensity('compact')" aria-pressed="false" title="Compact rows">≡ Compact</button>
+      </div>
     </div>
   </div>
 
@@ -535,6 +620,19 @@
       <iframe id="mapIframe" src="" loading="lazy" style="width:100%;height:100%;border:0;display:block" title="Sirsa · Bathinda · Mansa · Muktsar-Mansa-Muktsar regional map"></iframe>
     </div>
   </div>
+  <div id="ownerPhotoCta" class="owner-cta" style="display:none">
+    <span class="cta-icon">📸</span>
+    <div class="cta-text">
+      <b><span data-i18n-en>Owner ho? Photo upload karke listing aage badhao</span><span data-i18n-hi>दुकान के मालिक हैं? फोटो अपलोड करें</span></b>
+      <span data-i18n-en>Photo wali listings ko 3x zyada clicks milte hain — sirf 2 minute ka kaam.</span>
+      <span data-i18n-hi>फोटो वाली listings पर 3 गुना ज़्यादा clicks आते हैं — सिर्फ 2 मिनट का काम।</span>
+    </div>
+    <a class="cta-btn" href="/panel/dashboard.html">
+      <span data-i18n-en>Open Owner Panel →</span><span data-i18n-hi>Owner Panel खोलें →</span>
+    </a>
+    <button class="cta-dismiss" type="button" onclick="dismissOwnerCta()" aria-label="Dismiss">×</button>
+  </div>
+
   <div id="results">
     <div class="biz-grid">
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
@@ -601,6 +699,30 @@ let CATEGORIES = [], CITIES = [];
 let LAST_RESULTS = [];        // last unfiltered result-set (for client-side filters)
 let VISIBLE_COUNT = 15;       // pagination — first batch size; "Load more" doubles this
 const PAGE_SIZE = 15;         // batch size for incremental render
+
+// Density mode — 'grid' (default cards) or 'compact' (single-column tight rows)
+let DENSITY = 'grid';
+try { const saved = localStorage.getItem('dukan_search_density'); if (saved === 'compact' || saved === 'grid') DENSITY = saved; } catch(_){}
+
+function setDensity(mode){
+  if (mode !== 'grid' && mode !== 'compact') return;
+  DENSITY = mode;
+  try { localStorage.setItem('dukan_search_density', mode); } catch(_){}
+  document.getElementById('densityGridBtn')?.classList.toggle('active', mode === 'grid');
+  document.getElementById('densityCompactBtn')?.classList.toggle('active', mode === 'compact');
+  document.getElementById('densityGridBtn')?.setAttribute('aria-pressed', mode === 'grid' ? 'true' : 'false');
+  document.getElementById('densityCompactBtn')?.setAttribute('aria-pressed', mode === 'compact' ? 'true' : 'false');
+  renderResults();
+}
+window.setDensity = setDensity;
+
+// Owner CTA — dismissible, persists in localStorage
+function dismissOwnerCta(){
+  const el = document.getElementById('ownerPhotoCta');
+  if (el) el.style.display = 'none';
+  try { localStorage.setItem('dukan_owner_cta_dismissed_v1', '1'); } catch(_){}
+}
+window.dismissOwnerCta = dismissOwnerCta;
 let OPEN_NOW = false;          // active toggle state
 let RATING_FILTER = false;     // ⭐ 4.0+
 let VERIFIED_FILTER = false;   // ✓ Verified
@@ -647,6 +769,16 @@ function applySort(rows){
       break;
     case 'relevance':
     default:
+      // Photo-first as tiebreaker within relevance — pushes empty-card shops
+      // to the bottom so visually-rich results dominate above the fold,
+      // AND gives owners motivation to upload (the Owner CTA banner reinforces).
+      // Modern Array.prototype.sort is stable, so server's relevance order is
+      // preserved within each photo-group.
+      sorted.sort((a, b) => {
+        const ap = (a.photos && a.photos.length) ? 1 : 0;
+        const bp = (b.photos && b.photos.length) ? 1 : 0;
+        return bp - ap;
+      });
       break;
   }
   return sorted;
@@ -919,6 +1051,12 @@ async function runSearch(){
 }
 
 function renderResults(){
+  // One-time density UI sync from localStorage (idempotent)
+  if (!renderResults._densityInit){
+    document.getElementById('densityGridBtn')?.classList.toggle('active', DENSITY === 'grid');
+    document.getElementById('densityCompactBtn')?.classList.toggle('active', DENSITY === 'compact');
+    renderResults._densityInit = true;
+  }
   // Sync map view if active
   // Map view uses iframe — no per-result re-render needed
   return _renderResultsInner();
@@ -1082,7 +1220,20 @@ function _renderResultsInner(){
   const loadMoreHTML = remaining > 0
     ? `<div class="load-more-wrap"><button class="load-more-btn" type="button" onclick="loadMoreResults()">📋 <span data-i18n-en>Show ${Math.min(PAGE_SIZE, remaining)} more</span><span data-i18n-hi>${Math.min(PAGE_SIZE, remaining)} aur dikhao</span><span class="lm-count"> · ${remaining} ${remaining === 1 ? 'left' : 'left'}</span></button></div>`
     : '';
-  resEl.innerHTML = `<div class="biz-grid stagger">${visibleRows.map(renderCard).join('')}${loadMoreHTML}</div>`;
+  // Owner CTA visibility: show only if 2+ no-photo shops AND not dismissed
+  try {
+    const noPhotoCount = rows.filter(r => !(r.photos && r.photos.length)).length;
+    let dismissed = false;
+    try { dismissed = localStorage.getItem('dukan_owner_cta_dismissed_v1') === '1'; } catch(_){}
+    const ctaEl = document.getElementById('ownerPhotoCta');
+    if (ctaEl){
+      ctaEl.style.display = (noPhotoCount >= 2 && !dismissed) ? '' : 'none';
+    }
+  } catch(_){}
+
+  // Compact vs grid layout — DENSITY drives the class
+  const gridClass = DENSITY === 'compact' ? 'biz-grid compact' : 'biz-grid stagger';
+  resEl.innerHTML = `<div class="${gridClass}">${visibleRows.map(renderCard).join('')}${loadMoreHTML}</div>`;
   renderActiveFilters();
   // Hide Recently Viewed when we have actual search results — declutters the page
   try {
