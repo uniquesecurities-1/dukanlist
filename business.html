@@ -1474,8 +1474,10 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         .rc-card.share .rc-actions{ grid-template-columns:1fr 1fr }
       </style>
 
-      <!-- 1. Share this business (compact) -->
-      <div class="rc-card share">
+      <!-- 1. Share this business (compact) -- HIDDEN in strict professional mode (CSS hide list)
+           Reason: "Help a local owner get more customers" is solicitation copy, prohibited
+           for ICAI/NMC/BCI/ICSI/ICMAI strict-tier listings. Visible for partial tier & normal. -->
+      <div class="rc-card share" data-hide-in-strict="1">
         <div class="rc-head">
           <div class="rc-ico">📣</div>
           <div class="rc-ttl"><span data-i18n-en>Share this business</span><span data-i18n-hi>दुकान share करें</span></div>
