@@ -482,7 +482,7 @@
   z-index:3;
 }
 /* When both open-dot and featured-ribbon present, featured wins top-left, open-dot moves right */
-.biz-photo .featured-ribbon ~ .open-dot{ left:auto; right:8px }
+/* Old sibling rule replaced — see :has() rules below */
 .biz-photo .open-dot.open{ background:rgba(5,150,105,.95); color:#fff }
 .biz-photo .open-dot.closed{ background:rgba(107,114,128,.92); color:#fff }
 .biz-photo .open-dot .d{ width:6px; height:6px; border-radius:50%; background:#fff }
@@ -500,7 +500,7 @@
   animation:liveBadgePulse 2.2s ease-in-out infinite;
   z-index:3;
 }
-.biz-photo .featured-ribbon ~ .open-live{ left:auto; right:8px }
+/* Old sibling rule replaced — see :has() rules below */
 .biz-photo .open-live .ol-dot{
   width:7px; height:7px; border-radius:50%; background:#fff;
   box-shadow:0 0 0 0 rgba(255,255,255,.85);
@@ -522,6 +522,20 @@
   .biz-photo .open-live .ol-sub{ display:none }
   .biz-photo .open-live{ font-size:.6rem; padding:3px 8px }
   .biz-photo .open-live b{ font-size:.6rem }
+}
+
+/* === Badge stacking — when a corner ribbon (Top Rated / Featured / New) exists,
+   push the LIVE Open / Closed badge BELOW it so they don't overlap.
+   Uses :has() because openBadge renders BEFORE .ribbon in the DOM, so the old
+   .featured-ribbon ~ .open-live sibling selector never matched. Modern browsers
+   (Chrome 105+, Safari 15.4+, Firefox 121+) all support :has(). === */
+.biz-photo:has(.ribbon) .open-live,
+.biz-photo:has(.featured-ribbon) .open-live{
+  top:44px; /* ribbon's bottom edge sits around y=40 — give a 4px gap */
+}
+.biz-photo:has(.ribbon) .open-dot,
+.biz-photo:has(.featured-ribbon) .open-dot{
+  top:44px;
 }
 </style>
 
