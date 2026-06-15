@@ -893,6 +893,59 @@ function buildVerifyWaLink(b){
   return 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
 }
 
+
+// ============================================================
+// Professional Listings decorator — fetches is_professional_listing
+// + prof_verified_at for the visible biz IDs after main load and
+// injects a 🛡 badge into the card. Helps admin spot listings that
+// need professional verification before approving.
+// ============================================================
+let PRO_FLAGS = {}; // biz_id -> { tier, verified }
+async function decoratePendingProListings(){
+  try {
+    const ids = Array.from(document.querySelectorAll('.biz-card[data-biz-id]'))
+      .map(c => c.dataset.bizId).filter(Boolean);
+    if (ids.length === 0) return;
+    const c = C || (typeof ShopDB !== 'undefined' && ShopDB.client);
+    if (!c) return;
+    const { data, error } = await c.from('businesses')
+      .select('id, is_professional_listing, professional_tier, prof_verified_at')
+      .in('id', ids);
+    if (error || !data) return;
+    data.forEach(b => {
+      if (!b.is_professional_listing) return;
+      PRO_FLAGS[b.id] = { tier: b.professional_tier, verified: !!b.prof_verified_at };
+      const card = document.querySelector('.biz-card[data-biz-id="' + b.id + '"]');
+      if (!card) return;
+      // Don't double-inject
+      if (card.querySelector('.pro-badge')) return;
+      const tier = b.professional_tier || 'strict';
+      const tierColor = tier === 'strict' ? '#991B1B' : '#92400E';
+      const tierBg    = tier === 'strict' ? '#FEE2E2' : '#FEF3C7';
+      const verifyTxt = b.prof_verified_at ? '✓ verified' : '⏳ NEEDS PRO VERIFY';
+      const verifyBg  = b.prof_verified_at ? '#D1FAE5' : '#FED7AA';
+      const verifyFg  = b.prof_verified_at ? '#065F46' : '#9A3412';
+      const badge = document.createElement('div');
+      badge.className = 'pro-badge';
+      badge.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;padding:8px 10px;background:#F0F9FF;border:1px dashed #7DD3FC;border-radius:8px;font-size:11.5px;align-items:center';
+      badge.innerHTML =
+        '<span style="font-size:14px">🛡️</span>' +
+        '<span style="font-weight:800;color:#075985">Professional listing</span>' +
+        '<span style="background:' + tierBg + ';color:' + tierColor + ';padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.04em">' + tier.toUpperCase() + '</span>' +
+        '<span style="background:' + verifyBg + ';color:' + verifyFg + ';padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.04em">' + verifyTxt + '</span>' +
+        (b.prof_verified_at ? '' :
+          ' <a href="/admin/professional-verify.html" style="color:#0284C7;font-weight:700;text-decoration:underline;margin-left:auto">Open Pro Queue →</a>');
+      // Insert badge after the biz-header
+      const header = card.querySelector('.biz-header');
+      if (header && header.nextSibling){
+        header.parentNode.insertBefore(badge, header.nextSibling);
+      } else {
+        card.insertBefore(badge, card.firstChild);
+      }
+    });
+  } catch(e){ console.warn('decoratePendingProListings failed:', e); }
+}
+
 function bizCard(b, kind){
   const statusCls = 'status-' + (b.status || 'pending');
   return `
@@ -1209,6 +1262,29 @@ async function logout(){
 }
 </script>
 
-<script src="/assets/js/admin-auto-logout.js"></script>
+<script src="/assets/js/admin-auto-logout.js">
+
+// MutationObserver — auto-decorate any newly-injected .biz-card
+(function setupProBadgeObserver(){
+  if (window.__proBadgeObserverSetup) return;
+  window.__proBadgeObserverSetup = true;
+  const obs = new MutationObserver(muts => {
+    let anyCard = false;
+    for (const m of muts){
+      for (const node of m.addedNodes){
+        if (node.nodeType !== 1) continue;
+        if (node.classList && node.classList.contains('biz-card')) { anyCard = true; break; }
+        if (node.querySelector && node.querySelector('.biz-card')) { anyCard = true; break; }
+      }
+      if (anyCard) break;
+    }
+    if (anyCard) setTimeout(decoratePendingProListings, 80);
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
+  // Initial sweep
+  setTimeout(decoratePendingProListings, 300);
+})();
+
+</script>
 </body>
 </html>

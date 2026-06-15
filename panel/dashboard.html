@@ -1182,6 +1182,80 @@ function setLang(lang){
 
 let MY_BUSINESS = null;
 
+
+// ============================================================
+// Professional Mode banner — informs owner that their listing
+// runs in compliance mode (no reviews/ratings/Top Rated/Featured).
+// Fetches is_professional_listing + verification status for their biz.
+// ============================================================
+async function checkProfessionalMode(){
+  try {
+    const c = ShopDB.client;
+    if (!c) return;
+    const { data: { user } } = await c.auth.getUser();
+    if (!user) return;
+    // Find the owner's primary biz
+    let bizId = null;
+    try {
+      const ow = await c.rpc('get_my_business_safe');
+      if (ow.data && ow.data.length) bizId = ow.data[0].business_id;
+    } catch(_){}
+    if (!bizId){
+      const ow2 = await c.from('business_owners').select('business_id').eq('auth_user_id', user.id).limit(1);
+      if (ow2.data && ow2.data.length) bizId = ow2.data[0].business_id;
+    }
+    if (!bizId) return;
+
+    const { data: biz } = await c.from('businesses')
+      .select('id, name, is_professional_listing, professional_tier, prof_verified_at, prof_verification_notes, membership_authority')
+      .eq('id', bizId)
+      .maybeSingle();
+    if (!biz || !biz.is_professional_listing) return;
+
+    // Inject banner at top of dashboard main area
+    const tier = biz.professional_tier || 'strict';
+    const verified = !!biz.prof_verified_at;
+    const auth = biz.membership_authority || 'regulator';
+
+    let bg, accent, ico, title, body;
+    if (verified){
+      bg = 'linear-gradient(135deg,#ECFDF5,#D1FAE5)';
+      accent = '#065F46';
+      ico = '🛡️';
+      title = 'Professional Mode — Verified ✓';
+      body = (tier === 'strict'
+        ? 'Your listing runs in <b>compliance mode</b> per ' + auth + ' rules — reviews, ratings, Top Rated badges, and Featured promotion are disabled (regulator does not permit advertising). Customers see your membership number, qualification, and areas of practice instead.'
+        : 'Your listing runs with <b>regulatory disclaimers</b> per ' + auth + ' rules — Top Rated and Featured promotion are disabled, but reviews and ratings remain visible.');
+    } else {
+      bg = 'linear-gradient(135deg,#FEF3C7,#FDE68A)';
+      accent = '#78350F';
+      ico = '⏳';
+      title = 'Professional Mode — Pending Verification';
+      body = 'Your listing has been auto-flagged as a regulated profession. Our admin team will verify your membership number with ' + auth + ' shortly (usually within 24-48 hours). Until then your listing is in <b>compliance mode</b> — no reviews, ratings, or promotional features.';
+    }
+
+    // Find dashboard root (try multiple selectors)
+    const root = document.querySelector('main') || document.querySelector('.dashboard-main') || document.body;
+    if (!root) return;
+    if (document.getElementById('proModeBanner')) return; // idempotent
+    const banner = document.createElement('div');
+    banner.id = 'proModeBanner';
+    banner.style.cssText = 'background:' + bg + ';border:1px solid ' + accent + '33;border-radius:14px;padding:16px 20px;margin:14px auto;max-width:1180px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 2px 8px rgba(15,23,42,.04)';
+    banner.innerHTML =
+      '<div style="font-size:1.8rem;flex-shrink:0">' + ico + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-weight:800;color:' + accent + ';font-size:1rem;margin-bottom:4px">' + title + '</div>' +
+        '<div style="font-size:.85rem;color:' + accent + ';opacity:.92;line-height:1.55">' + body + '</div>' +
+      '</div>';
+    // Insert at top of main content
+    if (root.firstChild){
+      root.insertBefore(banner, root.firstChild);
+    } else {
+      root.appendChild(banner);
+    }
+  } catch(e){ console.warn('checkProfessionalMode error:', e); }
+}
+
 async function loadDashboard(){
   const user = await ShopDB.requireAuth();
   if (!user) return;
@@ -1872,7 +1946,7 @@ function shareProfile(e){
 
 window.addEventListener('DOMContentLoaded', () => {
   setLang(localStorage.getItem('shop_lang') || 'en');
-  loadDashboard();
+  loadDashboard().then(() => { try { checkProfessionalMode(); } catch(e) { console.warn('pro mode check failed', e); } });
 });
 
 function renderSmartActions(b){

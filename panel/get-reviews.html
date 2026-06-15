@@ -577,11 +577,55 @@ async function loadBiz(){
   }
 
   const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, name_hi, rating_avg, rating_count, photos').eq('id', bizId).maybeSingle();
+    .select('id, slug, name, name_hi, rating_avg, rating_count, photos, is_professional_listing, professional_tier, membership_authority').eq('id', bizId).maybeSingle();
   if (error || !biz){
     console.error('[get-reviews] biz fetch err', error);
     document.getElementById('loading').innerHTML = '⚠ Could not load your business. <a href="/panel/dashboard.html" style="color:#FF6B1A;font-weight:700;text-decoration:underline">Go to Dashboard</a>';
     return;
+  }
+
+  // ============================================================
+  // COMPLIANCE BLOCK — Strict pro listings cannot solicit reviews.
+  // ICAI/NMC/BCI/ICSI/ICMAI explicitly prohibit professionals from
+  // soliciting client reviews/testimonials. This entire tool is
+  // disabled for strict-tier listings. Partial tier (MFD/SEBI/IRDAI)
+  // can use it with care since they're permitted limited promotion.
+  // ============================================================
+  if (biz.is_professional_listing === true && biz.professional_tier === 'strict'){
+    const auth = biz.membership_authority || 'your professional regulator';
+    document.getElementById('loading').innerHTML =
+      '<div style="background:linear-gradient(135deg,#FEE2E2,#FECACA);border:1.5px solid #EF4444;border-radius:14px;padding:24px;text-align:left;max-width:680px;margin:24px auto">' +
+        '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">' +
+          '<div style="font-size:2rem;flex-shrink:0">🛡️</div>' +
+          '<div>' +
+            '<div style="font-size:1.15rem;font-weight:800;color:#991B1B;margin-bottom:6px">Review-soliciting tool disabled</div>' +
+            '<div style="font-size:.92rem;color:#7F1D1D;line-height:1.55">' +
+              'Per <b>' + auth + ' Code of Ethics</b>, professionals are prohibited from soliciting client reviews, testimonials, or ratings. This tool — which generates WhatsApp links and posters asking clients for reviews — would violate your regulator\'s advertising rules.' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="background:#fff;border-radius:10px;padding:14px;font-size:.85rem;color:#475569;line-height:1.55">' +
+          '<b style="color:#0F172A">What you CAN do instead:</b><br>' +
+          '• Share your <a href="/business.html?slug=' + encodeURIComponent(biz.slug) + '" style="color:#0EA5E9;font-weight:700">listing link</a> as factual information (not as a review request)<br>' +
+          '• Update your <a href="/panel/profile.html" style="color:#0EA5E9;font-weight:700">profile</a> with practice areas, qualifications, office hours<br>' +
+          '• Respond to organic public Q&A on your listing (where allowed)' +
+        '</div>' +
+        '<div style="text-align:center;margin-top:14px">' +
+          '<a href="/panel/dashboard.html" style="display:inline-block;background:#1E3A8A;color:#fff;padding:10px 22px;border-radius:99px;font-weight:700;text-decoration:none;font-size:.88rem">← Back to Dashboard</a>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('loading').style.display = '';
+    // Hide all other UI of the page
+    document.querySelectorAll('.gr-card, .gr-section, #stats, #toolbar').forEach(el => { if (el) el.style.display = 'none'; });
+    return;
+  }
+
+  // PARTIAL tier — add a soft caution banner but allow the tool
+  if (biz.is_professional_listing === true && biz.professional_tier === 'partial'){
+    const cautionBanner = document.createElement('div');
+    cautionBanner.style.cssText = 'background:#FEF3C7;border-left:4px solid #F59E0B;color:#78350F;padding:12px 16px;border-radius:8px;margin:14px auto;max-width:680px;font-size:.85rem;line-height:1.55';
+    cautionBanner.innerHTML = '<b>Regulatory caution:</b> As a ' + (biz.membership_authority || 'regulated') + '-registered listing, requests for reviews must avoid implying performance / return guarantees. Use the templates below as-is; do not modify to add promises.';
+    document.body.insertBefore(cautionBanner, document.body.firstChild);
   }
 
   MY_BIZ = biz;

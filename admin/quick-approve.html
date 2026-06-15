@@ -168,7 +168,7 @@ async function loadAll(){
 
   // DIRECT QUERY — no RPC, no scope filter, just raw data
   let q = C.from('businesses')
-    .select('id, name, owner_name, mobile, whatsapp, status, pincode, city_id, created_at, geo_cities(name)')
+    .select('id, name, owner_name, mobile, whatsapp, status, pincode, city_id, created_at, is_professional_listing, professional_tier, prof_verified_at, geo_cities(name)')
     .order('created_at', { ascending: false });
   if (status) q = q.eq('status', status);
 
@@ -212,11 +212,22 @@ function row(b){
   const waMsg = encodeURIComponent('Namaste ' + (b.owner_name || '') + ' ji! DukanList se verify call.');
   const waLink = 'https://wa.me/' + fullWa + '?text=' + waMsg;
 
+  // Professional listing badge — surfaced inline so admin sees BEFORE approving
+  let proBadge = '';
+  if (b.is_professional_listing){
+    const tier = b.professional_tier || 'strict';
+    const tierClr = tier === 'strict' ? '#991B1B;background:#FEE2E2' : '#92400E;background:#FEF3C7';
+    const verifyTxt = b.prof_verified_at
+      ? '<span style="color:#065F46;background:#D1FAE5;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:800;margin-left:4px">✓ verified</span>'
+      : '<a href="/admin/professional-verify.html" style="color:#9A3412;background:#FED7AA;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:800;margin-left:4px;text-decoration:none">⏳ verify pro →</a>';
+    proBadge = '<br><span style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;font-size:10.5px"><span>🛡️</span><span style="color:' + tierClr + ';padding:1px 7px;border-radius:99px;font-weight:800;letter-spacing:.04em">' + tier.toUpperCase() + '</span>' + verifyTxt + '</span>';
+  }
+
   return `
     <tr id="row-${b.id}">
       <td>
         <b>${escapeHtml(b.name || '?')}</b><br>
-        <span style="color:#64748b;font-size:12px">👤 ${escapeHtml(b.owner_name || '—')}</span>
+        <span style="color:#64748b;font-size:12px">👤 ${escapeHtml(b.owner_name || '—')}</span>${proBadge}
       </td>
       <td><code style="font-size:12px">${escapeHtml(b.mobile || '—')}</code></td>
       <td>${escapeHtml(city)}<br><small style="color:#94a3b8">${escapeHtml(b.pincode || '')}</small></td>

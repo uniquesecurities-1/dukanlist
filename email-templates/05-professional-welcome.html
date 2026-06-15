@@ -1,0 +1,119 @@
+<!--
+  Supabase Auth Email Template: Professional Listing Welcome
+  Paste into: Supabase Dashboard → Authentication → Email Templates → custom template (or send via a hook after registration)
+  Subject (paste in Subject field): Your DukanList Professional Listing — Pending Verification ⏳
+  Variables: {{ .Email }}  {{ .SiteURL }}  {{ .ConfirmationURL }} (optional)
+
+  WHEN TO SEND:
+  - After successful register_business_public + submit_professional_info for a category
+    flagged as professional (strict OR partial tier).
+  - Replaces the standard welcome email for these owners.
+
+  PURPOSE:
+  - Sets expectation: 24-48hr admin verification of ICAI/NMC/BCI/etc. membership number.
+  - Records timestamp of disclaimer acceptance (legal evidentiary value).
+  - Explains compliance-mode UI quirks ("why are my reviews not showing?") upfront.
+
+  WIRING (not done automatically — requires a small Postgres trigger or app code):
+  - In a future migration, add a trigger on businesses AFTER UPDATE OF prof_verified_at
+    that sends this template via Supabase's email function.
+  - For now, this template is a manual fallback admin can paste into Supabase Auth
+    settings if they want to override the welcome flow for pros.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your DukanList Professional Listing</title>
+</head>
+<body style="margin:0;padding:0;background:#F0F9FF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0F172A">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#F0F9FF;padding:32px 16px">
+    <tr><td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 6px 28px rgba(15,23,42,0.08)">
+
+        <!-- Top accent bar -->
+        <tr><td style="height:6px;background:linear-gradient(90deg,#0EA5E9 0%,#0284C7 50%,#0EA5E9 100%)"></td></tr>
+
+        <tr><td style="padding:36px 36px 8px">
+
+          <!-- Brand -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+            <td>
+              <div style="display:inline-block;width:44px;height:44px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:11px;text-align:center;line-height:44px;font-size:22px;color:#fff;font-weight:800;vertical-align:middle">🛡️</div>
+              <span style="font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-0.5px;margin-left:10px;vertical-align:middle">Dukan<span style="color:#0EA5E9">List</span></span>
+            </td>
+          </tr></table>
+
+          <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.5px;color:#075985;margin:24px 0 6px;line-height:1.25">
+            Your Professional Listing is&nbsp;Pending Verification
+          </h1>
+
+          <p style="font-size:15px;line-height:1.55;color:#475569;margin:0 0 18px">
+            Welcome to DukanList. We&rsquo;ve received your registration and noted that your category is a <strong>regulated profession</strong>. Per your regulator&rsquo;s Code of Ethics, your listing runs in a special <strong>Compliance Mode</strong> — different from regular business listings.
+          </p>
+        </td></tr>
+
+        <!-- Status card -->
+        <tr><td style="padding:0 36px">
+          <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-left:4px solid #F59E0B;padding:18px 20px;border-radius:10px;margin-bottom:18px">
+            <div style="font-size:13px;font-weight:800;color:#78350F;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">⏳ Verification Pending</div>
+            <div style="font-size:14px;color:#78350F;line-height:1.6">
+              Our admin team will verify your membership number with your regulator&rsquo;s public lookup tool within <strong>24-48 hours</strong>. You&rsquo;ll receive a follow-up email once verified.
+            </div>
+          </div>
+        </td></tr>
+
+        <!-- Why compliance mode looks different -->
+        <tr><td style="padding:8px 36px 8px">
+          <h2 style="font-size:18px;font-weight:800;color:#0F172A;margin:18px 0 10px">What&rsquo;s different about your listing?</h2>
+          <ul style="font-size:14px;line-height:1.7;color:#334155;margin:0 0 14px;padding-left:22px">
+            <li><strong>No customer ratings or reviews</strong> — your regulator prohibits soliciting/displaying client testimonials.</li>
+            <li><strong>No &ldquo;Top Rated&rdquo; / &ldquo;Featured&rdquo; badges</strong> — paid or promotional placement is not permitted.</li>
+            <li><strong>No USP / marketing copy</strong> — replaced with a structured &ldquo;Areas of Practice&rdquo; section.</li>
+            <li><strong>Compliance disclaimer footer</strong> — auto-appended per your regulator (ICAI / NMC / BCI / etc.).</li>
+            <li><strong>Membership number displayed</strong> — visible to clients alongside your qualification.</li>
+          </ul>
+        </td></tr>
+
+        <!-- What you can do -->
+        <tr><td style="padding:8px 36px 8px">
+          <h2 style="font-size:18px;font-weight:800;color:#0F172A;margin:18px 0 10px">What you can do</h2>
+          <ul style="font-size:14px;line-height:1.7;color:#334155;margin:0 0 14px;padding-left:22px">
+            <li>Update your <strong>Areas of Practice</strong>, office hours, and contact details from your <a href="{{ .SiteURL }}/panel/profile.html" style="color:#0284C7;font-weight:700;text-decoration:none">Profile page</a>.</li>
+            <li>Share your <strong>listing link</strong> as factual information (not as a solicitation).</li>
+            <li>Respond to organic public Q&amp;A on your listing (where your regulator permits).</li>
+          </ul>
+        </td></tr>
+
+        <!-- CTA -->
+        <tr><td style="padding:20px 36px 8px">
+          <a href="{{ .SiteURL }}/panel/dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:#fff;font-weight:800;padding:14px 28px;border-radius:99px;text-decoration:none;font-size:15px;box-shadow:0 6px 16px rgba(14,165,233,0.32)">
+            Open Owner Dashboard →
+          </a>
+        </td></tr>
+
+        <!-- Disclaimer record (legal evidentiary value) -->
+        <tr><td style="padding:24px 36px 8px">
+          <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;font-size:12.5px;color:#475569;line-height:1.55">
+            <strong style="color:#0F172A;display:block;margin-bottom:6px">For your records</strong>
+            By completing registration, you accepted DukanList&rsquo;s Professional Listing Compliance Disclaimer. The acceptance is timestamped in your business profile (visible to admin) for audit/regulatory review purposes.
+          </div>
+        </td></tr>
+
+        <!-- Help / Footer -->
+        <tr><td style="padding:24px 36px 28px;border-top:1px solid #F1F5F9;margin-top:18px">
+          <p style="font-size:13px;color:#64748b;line-height:1.55;margin:14px 0 8px">
+            Questions about compliance mode? Reply to this email or WhatsApp <a href="https://wa.me/919541223377" style="color:#0284C7;font-weight:700;text-decoration:none">+91 95412 23377</a>.
+          </p>
+          <p style="font-size:11.5px;color:#94a3b8;margin:14px 0 0">
+            DukanList — operated by DigiMutual Goals Pvt. Ltd. — Mandi Dabwali, Haryana<br>
+            DukanList is a local business directory and does not provide professional, legal, medical, or investment advice.
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
