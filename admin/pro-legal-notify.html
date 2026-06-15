@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Legal-Update Notify (Professionals) — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📨</text></svg>">
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600}
+  .nav a:hover{background:rgba(255,255,255,0.1);color:white}
+  .nav a.active{background:#1E3A8A;color:white}
+  .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
+  .logout:hover{background:rgba(255,255,255,0.1);color:white}
+
+  .main{max-width:1180px;margin:24px auto;padding:0 20px}
+  .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
+  .page-sub{font-size:14px;color:#64748b;margin-bottom:20px}
+
+  .info-banner{background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border:1px solid #7DD3FC;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:#0369A1;font-weight:500;line-height:1.55}
+  .info-banner b{color:#075985;font-weight:800}
+
+  .template-card{background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:18px 20px;margin-bottom:18px}
+  .template-card h3{font-size:14px;font-weight:800;color:#0F172A;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .template-tabs{display:inline-flex;background:#F1F5F9;border-radius:9px;padding:3px;gap:0;margin-bottom:12px}
+  .tt-btn{border:none;background:transparent;padding:7px 14px;font-size:13px;font-weight:700;color:#475569;cursor:pointer;border-radius:7px;font-family:inherit;transition:.15s}
+  .tt-btn.active{background:#fff;color:#1E3A8A;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+  textarea#msgPreview{width:100%;min-height:120px;font-family:inherit;font-size:13px;padding:10px 14px;border:1.5px solid #E2E8F0;border-radius:10px;color:#0F172A;line-height:1.55;resize:vertical}
+  textarea#msgPreview:focus{outline:none;border-color:#1E3A8A}
+
+  .stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .stat{background:#fff;border:1px solid #E2E8F0;padding:10px 16px;border-radius:10px;font-size:13px}
+  .stat .n{font-size:20px;font-weight:800;color:#1E3A8A;line-height:1}
+  .stat .l{font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.05em;margin-top:2px}
+
+  .filter-tabs{display:inline-flex;background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:3px;gap:0;margin-bottom:14px}
+  .ft-btn{border:none;background:transparent;padding:8px 16px;font-size:13px;font-weight:700;color:#475569;cursor:pointer;border-radius:8px;font-family:inherit}
+  .ft-btn.active{background:#1E3A8A;color:#fff}
+  .ft-btn .count{background:rgba(255,255,255,.18);padding:1px 7px;border-radius:99px;margin-left:5px;font-size:11px}
+  .ft-btn:not(.active) .count{background:#E2E8F0;color:#475569}
+
+  table{width:100%;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;border-collapse:collapse;font-size:13px}
+  th{background:#F8FAFC;color:#475569;font-weight:800;padding:11px 14px;text-align:left;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase}
+  td{padding:11px 14px;border-top:1px solid #F1F5F9;vertical-align:top}
+  tr.sent{background:#F0FDF4}
+  tr.sent td{color:#475569}
+  td .name{font-weight:800;color:#0F172A}
+  td .meta{font-size:11.5px;color:#64748b;margin-top:2px}
+  .tier-pill{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+  .tier-strict{background:#FEE2E2;color:#991B1B}
+  .tier-partial{background:#FEF3C7;color:#92400E}
+  .wa-btn{display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;padding:7px 14px;border-radius:8px;font-weight:700;text-decoration:none;font-size:12.5px;border:none;cursor:pointer;font-family:inherit;transition:.15s}
+  .wa-btn:hover{background:#128C7E;transform:translateY(-1px)}
+  .wa-btn:disabled{opacity:.5;cursor:not-allowed}
+  .mark-btn{background:#1E3A8A;color:#fff;border:none;padding:6px 12px;border-radius:7px;font-weight:700;font-size:11.5px;cursor:pointer;font-family:inherit;margin-left:6px}
+  .mark-btn:hover{background:#1E40AF}
+  .mark-btn.undo{background:#94a3b8}
+  .empty-state{background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:60px 20px;text-align:center;color:#94a3b8}
+  .empty-state .ico{font-size:48px;margin-bottom:10px}
+  .err{background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:12px 16px;border-radius:10px}
+
+  .bulk-row{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+  .bulk-btn{background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-weight:800;cursor:pointer;font-family:inherit;font-size:13px}
+  .bulk-btn:hover{background:#128C7E}
+  .bulk-btn:disabled{opacity:.4;cursor:not-allowed}
+  .clear-btn{background:transparent;color:#94a3b8;border:1px solid #E2E8F0;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .clear-btn:hover{color:#991B1B;border-color:#FCA5A5}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span>📨</span>
+    <span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav class="nav">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/professional-verify.html">🛡 Professional</a>
+    <a href="/admin/pro-legal-notify.html" class="active">📨 Legal Notify</a>
+    <a href="/admin/broadcast.html">📢 Broadcast</a>
+    <a href="/" target="_blank">🌐 Public Site</a>
+    <span class="logout" onclick="logout()">⎋ Logout</span>
+  </nav>
+</header>
+
+<main class="main">
+  <h1 class="page-title">📨 Legal-Update Notification — Professional Listings</h1>
+  <p class="page-sub">One-tap WhatsApp notification for existing professional listings about the Privacy + Terms updates (15-Jun-2026 revision adding the Professional Listings compliance section).</p>
+
+  <div class="info-banner">
+    <b>How it works:</b> Each row below shows one professional listing with a pre-filled WhatsApp deep-link. Tap <b>📞 WhatsApp</b> → WhatsApp opens with the message ready → tap Send. After sending, tap <b>Mark Sent</b> to log it (stored in your browser only — clears on cache reset). The "Sent" filter helps you track progress without double-messaging.
+  </div>
+
+  <!-- Message template selector -->
+  <div class="template-card">
+    <h3>📝 Message Template (preview / edit)</h3>
+    <div class="template-tabs">
+      <button class="tt-btn active" data-tpl="hinglish" onclick="setTemplate('hinglish')">Hinglish (recommended)</button>
+      <button class="tt-btn" data-tpl="english" onclick="setTemplate('english')">English (formal)</button>
+      <button class="tt-btn" data-tpl="hindi" onclick="setTemplate('hindi')">Hindi (Devanagari)</button>
+    </div>
+    <textarea id="msgPreview" oninput="onMsgEdit()" placeholder="Message text…"></textarea>
+    <div style="font-size:11.5px;color:#94a3b8;margin-top:8px;line-height:1.5">
+      <b>Variables:</b> <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px">{name}</code> = business name, <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px">{owner}</code> = owner first-name. Auto-replaced per shop.
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- Filter tabs -->
+  <div class="bulk-row">
+    <div class="filter-tabs">
+      <button class="ft-btn active" data-filter="all" onclick="setFilter('all')">All <span class="count" id="cntAll">0</span></button>
+      <button class="ft-btn" data-filter="pending" onclick="setFilter('pending')">📬 Not yet sent <span class="count" id="cntPending">0</span></button>
+      <button class="ft-btn" data-filter="sent" onclick="setFilter('sent')">✓ Sent <span class="count" id="cntSent">0</span></button>
+    </div>
+    <button class="clear-btn" onclick="resetSent()">🗑 Clear "sent" tracking</button>
+  </div>
+
+  <div id="resultBox">
+    <div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px">Loading listings…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+// ============================================================
+// State
+// ============================================================
+let ALL_LISTINGS = [];     // all pro listings
+let FILTER = 'all';        // all | pending | sent
+let SENT_STORAGE_KEY = 'dukan_legal_notify_sent_2026_06_15';
+let SENT = new Set();      // biz ids that admin marked as sent
+
+// Load sent set from localStorage
+try {
+  const raw = localStorage.getItem(SENT_STORAGE_KEY);
+  if (raw) SENT = new Set(JSON.parse(raw));
+} catch(_){}
+
+// ============================================================
+// Message templates (3 variants)
+// ============================================================
+const TEMPLATES = {
+  hinglish: 'Namaste {owner} ji,\n\nDukanList ne aaj Privacy Policy aur Terms of Service update ki hain — Professional Listings ke liye naya compliance section add kiya hai (jo ICAI/NMC/BCI/AMFI/SEBI/IRDAI rules ke saath aligned hai).\n\nAapki listing "{name}" pe koi action nahi karna — sirf inform kar rahe hain. Padh sakte ho:\n\n• Privacy: https://dukanlist.com/privacy.html\n• Terms: https://dukanlist.com/terms.html\n\nKoi sawaal ho to is number par WhatsApp kar dena.\n\nThanks,\nTeam DukanList',
+  english:  'Hello {owner},\n\nDukanList has updated its Privacy Policy and Terms of Service today to add a new Professional Listings compliance section, aligned with ICAI/NMC/BCI/AMFI/SEBI/IRDAI rules.\n\nNo action needed from you for "{name}" — this is informational. You can review the updated documents here:\n\n• Privacy: https://dukanlist.com/privacy.html\n• Terms: https://dukanlist.com/terms.html\n\nReply on this number if you have any questions.\n\nThanks,\nTeam DukanList',
+  hindi:    'नमस्ते {owner} जी,\n\nDukanList ने आज Privacy Policy और Terms of Service update की हैं — Professional Listings के लिए नया compliance section जोड़ा है (जो ICAI/NMC/BCI/AMFI/SEBI/IRDAI नियमों के साथ aligned है)।\n\nआपकी listing "{name}" पर कोई action नहीं करना — सिर्फ inform कर रहे हैं। पढ़ सकते हैं:\n\n• Privacy: https://dukanlist.com/privacy.html\n• Terms: https://dukanlist.com/terms.html\n\nकोई सवाल हो तो इसी number पर WhatsApp कर दें।\n\nधन्यवाद,\nTeam DukanList'
+};
+let CURRENT_TPL = 'hinglish';
+let CURRENT_MSG = TEMPLATES.hinglish;
+
+function setTemplate(tpl){
+  CURRENT_TPL = tpl;
+  CURRENT_MSG = TEMPLATES[tpl] || TEMPLATES.hinglish;
+  document.getElementById('msgPreview').value = CURRENT_MSG;
+  document.querySelectorAll('.tt-btn').forEach(b => b.classList.toggle('active', b.dataset.tpl === tpl));
+  renderList();
+}
+function onMsgEdit(){
+  CURRENT_MSG = document.getElementById('msgPreview').value;
+  renderList(); // rebuild WA links with new message
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+function esc(s){
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function firstName(fullName){
+  if (!fullName) return 'Sir';
+  return String(fullName).trim().split(/\s+/)[0] || 'Sir';
+}
+function buildWaLink(biz){
+  const wa = (biz.whatsapp || biz.mobile || '').replace(/\D/g, '');
+  const ten = wa.length === 12 && wa.startsWith('91') ? wa.slice(2) : (wa.length === 10 ? wa : wa.slice(-10));
+  if (ten.length !== 10) return '';
+  const msg = CURRENT_MSG
+    .replace(/\{owner\}/g, firstName(biz.owner_name))
+    .replace(/\{name\}/g, biz.name || 'your listing');
+  return 'https://wa.me/91' + ten + '?text=' + encodeURIComponent(msg);
+}
+
+function persistSent(){
+  try { localStorage.setItem(SENT_STORAGE_KEY, JSON.stringify(Array.from(SENT))); } catch(_){}
+}
+
+function markSent(id, el){
+  SENT.add(id);
+  persistSent();
+  renderList();
+}
+function unmarkSent(id){
+  SENT.delete(id);
+  persistSent();
+  renderList();
+}
+function resetSent(){
+  if (!confirm('Clear all "sent" tracking? You will see every shop as pending again. (No data deleted server-side.)')) return;
+  SENT.clear();
+  persistSent();
+  renderList();
+}
+function setFilter(f){
+  FILTER = f;
+  document.querySelectorAll('.ft-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  renderList();
+}
+
+// ============================================================
+// Load + render
+// ============================================================
+async function loadListings(){
+  const c = ShopDB && ShopDB.client;
+  if (!c){ document.getElementById('resultBox').innerHTML = '<div class="err">Backend not configured.</div>'; return; }
+
+  const { data, error } = await c.from('businesses')
+    .select('id, slug, name, owner_name, mobile, whatsapp, status, professional_tier, prof_verified_at, geo_cities(name)')
+    .eq('is_professional_listing', true)
+    .order('created_at', { ascending: false });
+
+  if (error){
+    document.getElementById('resultBox').innerHTML = '<div class="err">Load failed: ' + esc(error.message) + '</div>';
+    return;
+  }
+  ALL_LISTINGS = data || [];
+  renderList();
+}
+
+function renderList(){
+  const box = document.getElementById('resultBox');
+
+  // Filter
+  let visible = ALL_LISTINGS.slice();
+  const cntAll = visible.length;
+  const cntSent = visible.filter(b => SENT.has(b.id)).length;
+  const cntPending = cntAll - cntSent;
+
+  if (FILTER === 'pending') visible = visible.filter(b => !SENT.has(b.id));
+  else if (FILTER === 'sent') visible = visible.filter(b => SENT.has(b.id));
+
+  // Stats + filter pill counts
+  const strict = ALL_LISTINGS.filter(b => b.professional_tier === 'strict').length;
+  const partial = ALL_LISTINGS.filter(b => b.professional_tier === 'partial').length;
+  document.getElementById('statsRow').innerHTML =
+    '<div class="stat"><div class="n">' + cntAll + '</div><div class="l">Total Pro Listings</div></div>' +
+    '<div class="stat"><div class="n">' + strict + '</div><div class="l">Strict Tier</div></div>' +
+    '<div class="stat"><div class="n">' + partial + '</div><div class="l">Partial Tier</div></div>' +
+    '<div class="stat"><div class="n" style="color:#15803D">' + cntSent + '</div><div class="l">Already Notified</div></div>' +
+    '<div class="stat"><div class="n" style="color:#92400E">' + cntPending + '</div><div class="l">Still To Notify</div></div>';
+
+  document.getElementById('cntAll').textContent = cntAll;
+  document.getElementById('cntPending').textContent = cntPending;
+  document.getElementById('cntSent').textContent = cntSent;
+
+  if (visible.length === 0){
+    box.innerHTML = '<div class="empty-state"><div class="ico">' + (FILTER === 'sent' ? '📭' : '✅') + '</div><b>' +
+      (FILTER === 'sent' ? 'No listings marked sent yet' : FILTER === 'pending' ? 'All caught up — every pro listing notified!' : 'No professional listings yet') +
+      '</b></div>';
+    return;
+  }
+
+  let rows = visible.map(b => {
+    const isSent = SENT.has(b.id);
+    const tier = b.professional_tier || 'strict';
+    const wa = buildWaLink(b);
+    const city = (b.geo_cities && b.geo_cities.name) || '';
+    return '<tr class="' + (isSent ? 'sent' : '') + '">' +
+      '<td>' +
+        '<div class="name">' + esc(b.name) + '</div>' +
+        '<div class="meta">' + esc(b.owner_name || '—') + ' · ' + esc(city) + ' · status: ' + esc(b.status) + '</div>' +
+      '</td>' +
+      '<td>' + esc((b.whatsapp || b.mobile || '').replace(/\D/g,'').slice(-10)) + '</td>' +
+      '<td><span class="tier-pill tier-' + tier + '">' + tier.toUpperCase() + '</span></td>' +
+      '<td style="white-space:nowrap">' +
+        (wa
+          ? '<a class="wa-btn" href="' + wa + '" target="_blank" rel="noopener" onclick="setTimeout(function(){ if(confirm(\'Mark as sent?\')) markSent(\'' + b.id + '\'); }, 1500)">💬 WhatsApp</a>'
+          : '<span style="color:#94a3b8;font-size:11.5px">No phone</span>'
+        ) +
+        (isSent
+          ? '<button class="mark-btn undo" onclick="unmarkSent(\'' + b.id + '\')">↶ Undo Sent</button>'
+          : '<button class="mark-btn" onclick="markSent(\'' + b.id + '\')">Mark Sent</button>'
+        ) +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  box.innerHTML =
+    '<table>' +
+      '<thead><tr><th>Business / Owner</th><th>WhatsApp</th><th>Tier</th><th style="text-align:right">Action</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>';
+}
+
+async function logout(){
+  try { await ShopDB.client.auth.signOut(); } catch(_){}
+  location.href = '/admin/login.html';
+}
+
+// ============================================================
+// Boot
+// ============================================================
+(async function(){
+  const c = ShopDB && ShopDB.client;
+  if (!c){ document.getElementById('resultBox').innerHTML = '<div class="err">Backend not configured.</div>'; return; }
+  const { data: { user } } = await c.auth.getUser();
+  if (!user){ location.href = '/admin/login.html?from=' + encodeURIComponent(location.pathname); return; }
+
+  // Init template area
+  document.getElementById('msgPreview').value = TEMPLATES[CURRENT_TPL];
+  CURRENT_MSG = TEMPLATES[CURRENT_TPL];
+
+  loadListings();
+})();
+</script>
+
+</body>
+</html>
