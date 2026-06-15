@@ -186,18 +186,39 @@
 .biz-grid.compact .biz-name{ font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
 .biz-grid.compact .biz-usp{ font-size:.78rem; -webkit-line-clamp:1; line-clamp:1 }
 .biz-grid.compact .biz-meta{ margin-top:4px; padding-top:6px; font-size:.74rem; gap:6px }
-.biz-grid.compact .biz-actions{ display:none }    /* hide big WhatsApp/Call in compact — they're in expanded view */
-.biz-grid.compact .ribbon, .biz-grid.compact .featured-ribbon{ font-size:.62rem; padding:2px 6px }
-.biz-grid.compact .open-live{
-  font-size:.58rem; padding:2px 7px 2px 6px; gap:4px;
-  top:4px; left:4px;
-  box-shadow:0 2px 6px rgba(16,185,129,.35);
+.biz-grid.compact .biz-actions{ display:none }    /* hide big WhatsApp/Call in compact */
+
+/* Hide all photo-overlay badges in compact mode — the 96×96 thumb is too small
+   for them to coexist without burying the photo. Same info reappears as tiny
+   inline pills (.compact-tags) in the text area next to the business name. */
+.biz-grid.compact .biz-photo .ribbon,
+.biz-grid.compact .biz-photo .featured-ribbon,
+.biz-grid.compact .biz-photo .verify,
+.biz-grid.compact .biz-photo .open-live,
+.biz-grid.compact .biz-photo .open-dot,
+.biz-grid.compact .card-heart-slot{ display:none !important }
+
+/* Inline status pills next to business name in compact mode */
+.biz-grid.compact .compact-tags{
+  display:inline-flex; gap:5px; flex-wrap:wrap;
+  margin-left:8px; vertical-align:middle;
 }
-.biz-grid.compact .open-live b{ font-size:.58rem }
-.biz-grid.compact .open-live .ol-sub{ display:none }
-.biz-grid.compact .open-live .ol-dot{ width:5px; height:5px }
-.biz-grid.compact .open-dot{ font-size:.62rem }
-.biz-grid.compact .verify{ font-size:.62rem; padding:2px 6px; top:6px; right:6px }
+.biz-grid.compact .compact-tags .ct{
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:.65rem; font-weight:700; letter-spacing:.02em;
+  padding:2px 7px; border-radius:99px;
+  white-space:nowrap;
+}
+.biz-grid.compact .compact-tags .ct.open{ background:#D1FAE5; color:#065F46 }
+.biz-grid.compact .compact-tags .ct.closed{ background:#FEE2E2; color:#991B1B }
+.biz-grid.compact .compact-tags .ct.top{ background:#EDE9FE; color:#5B21B6 }
+.biz-grid.compact .compact-tags .ct.new{ background:#D1FAE5; color:#065F46 }
+.biz-grid.compact .compact-tags .ct.featured{ background:#FEF3C7; color:#92400E }
+.biz-grid.compact .compact-tags .ct.verified{ background:#DBEAFE; color:#1E40AF }
+.biz-grid.compact .biz-name{ display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px }
+
+/* Grid mode default — overlays handle the badging, hide inline tags to avoid duplication */
+.biz-grid:not(.compact) .compact-tags{ display:none }
 
 @media (max-width:560px){
   .biz-grid.compact .biz-card{ min-height:76px }
@@ -1372,6 +1393,30 @@ function renderCard(b){
         + DukanShortlist.heartBtn({ slug:b.slug, name:b.name, photos:b.photos, geo_cities:{name:b.city_name}, categories:{name:b.category_name, icon:b.category_icon} }, { size:'sm' })
       + '</div>'
     : '';
+  // Compact-mode inline status pills — same info as photo overlays but tiny inline.
+  // CSS shows these only when .biz-grid has .compact class so grid mode shows overlays.
+  let compactTags = '';
+  if (b.hours_json && typeof getOpenStatus === 'function'){
+    const stCompact = getOpenStatus(b.hours_json);
+    if (stCompact){
+      compactTags += stCompact.isOpen
+        ? '<span class="ct open">🟢 Open</span>'
+        : '<span class="ct closed">⚫ Closed</span>';
+    }
+  }
+  if (b.is_featured){ compactTags += '<span class="ct featured">★ Featured</span>'; }
+  else if (Number(b.rating_avg) >= 4.5 && Number(b.rating_count) >= 5){ compactTags += '<span class="ct top">🏆 Top</span>'; }
+  else if (b.created_at){
+    const ageHrsC = (Date.now() - new Date(b.created_at).getTime()) / 3600000;
+    if (ageHrsC < 24 * 14){ compactTags += '<span class="ct new">✨ New</span>'; }
+  }
+  if (typeof DukanTier !== 'undefined' && DukanTier.tier){
+    try { const tC = DukanTier.tier(b); if (tC && tC.label){ compactTags += '<span class="ct verified">✓ ' + escapeHTML(tC.label) + '</span>'; } } catch(_){}
+  } else if (b.verified_visit === true){
+    compactTags += '<span class="ct verified">✓ Verified</span>';
+  }
+  const compactTagsHTML = compactTags ? '<span class="compact-tags">' + compactTags + '</span>' : '';
+
   return `
     <article class="biz-card${noPhotoClass}">
       ${heartHTML}
@@ -1379,7 +1424,7 @@ function renderCard(b){
       <div class="biz-photo">${photoHTML}${openBadge}${ribbon || featuredRibbon}${verified}</div>
       <div class="biz-info">
         <div class="biz-cat">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
-        <div class="biz-name">${escapeHTML(b.name)}</div>
+        <div class="biz-name">${escapeHTML(b.name)}${compactTagsHTML}</div>
         <div class="biz-usp">${escapeHTML(b.usp_text || '')}</div>
         <div class="biz-meta">
           ${rating}
