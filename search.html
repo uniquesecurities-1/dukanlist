@@ -171,7 +171,15 @@
 .biz-grid.compact .biz-meta{ margin-top:4px; padding-top:6px; font-size:.74rem; gap:6px }
 .biz-grid.compact .biz-actions{ display:none }    /* hide big WhatsApp/Call in compact — they're in expanded view */
 .biz-grid.compact .ribbon, .biz-grid.compact .featured-ribbon{ font-size:.62rem; padding:2px 6px }
-.biz-grid.compact .open-live, .biz-grid.compact .open-dot{ font-size:.62rem }
+.biz-grid.compact .open-live{
+  font-size:.58rem; padding:2px 7px 2px 6px; gap:4px;
+  top:4px; left:4px;
+  box-shadow:0 2px 6px rgba(16,185,129,.35);
+}
+.biz-grid.compact .open-live b{ font-size:.58rem }
+.biz-grid.compact .open-live .ol-sub{ display:none }
+.biz-grid.compact .open-live .ol-dot{ width:5px; height:5px }
+.biz-grid.compact .open-dot{ font-size:.62rem }
 .biz-grid.compact .verify{ font-size:.62rem; padding:2px 6px; top:6px; right:6px }
 
 @media (max-width:560px){
@@ -429,9 +437,10 @@
 /* ===== LIVE Open badge — pulsing green for hyper-fresh urgency ===== */
 .biz-photo .open-live{
   position:absolute; top:8px; left:8px;
-  display:inline-flex; align-items:center; gap:6px;
-  padding:4px 11px 4px 10px; border-radius:99px;
-  font-size:.66rem; font-weight:700; letter-spacing:.02em;
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px 3px 9px; border-radius:99px;
+  font-size:.62rem; font-weight:700; letter-spacing:.02em;
+  max-width:calc(100% - 16px); overflow:hidden;
   background:linear-gradient(135deg,#10B981,#059669); color:#fff;
   backdrop-filter:blur(8px);
   box-shadow:0 3px 10px rgba(16,185,129,.4);
@@ -455,9 +464,11 @@
   70%{ box-shadow:0 0 0 9px rgba(255,255,255,0) }
   100%{ box-shadow:0 0 0 0 rgba(255,255,255,0) }
 }
-/* Mobile: hide the "closes in X" sub-text — too tight on cards */
+/* Mobile / narrow cards: hide the "closes in X" sub-text — too tight on cards */
 @media (max-width:560px){
   .biz-photo .open-live .ol-sub{ display:none }
+  .biz-photo .open-live{ font-size:.6rem; padding:3px 8px }
+  .biz-photo .open-live b{ font-size:.6rem }
 }
 </style>
 
@@ -623,8 +634,8 @@
   <div id="ownerPhotoCta" class="owner-cta" style="display:none">
     <span class="cta-icon">📸</span>
     <div class="cta-text">
-      <b><span data-i18n-en>Owner ho? Photo upload karke listing aage badhao</span><span data-i18n-hi>दुकान के मालिक हैं? फोटो अपलोड करें</span></b>
-      <span data-i18n-en>Photo wali listings ko 3x zyada clicks milte hain — sirf 2 minute ka kaam.</span>
+      <b><span data-i18n-en>Are you an owner? Add photos to stand out</span><span data-i18n-hi>दुकान के मालिक हैं? फोटो अपलोड करें</span></b>
+      <span data-i18n-en>Listings with photos get 3× more clicks — takes just 2 minutes.</span>
       <span data-i18n-hi>फोटो वाली listings पर 3 गुना ज़्यादा clicks आते हैं — सिर्फ 2 मिनट का काम।</span>
     </div>
     <a class="cta-btn" href="/panel/dashboard.html">
