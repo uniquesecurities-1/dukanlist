@@ -1,7 +1,7 @@
 {
-  "version": "3.7",
+  "version": "3.8",
   "updated": "2026-06-15",
-  "note": "v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
+  "note": "v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
   "parents": [
     {
       "slug": "healthcare",
@@ -75,6 +75,90 @@
           "name": "Hearing Aid / Mobility Aids",
           "name_hi": "श्रवण यंत्र / सहायक उपकरण",
           "icon": "🦽"
+        },
+        {
+          "slug": "nursing-home",
+          "name": "Nursing Home",
+          "name_hi": "नर्सिंग होम",
+          "icon": "🏥"
+        },
+        {
+          "slug": "gynecologist",
+          "name": "Gynecologist / Women's Health",
+          "name_hi": "स्त्री रोग विशेषज्ञ (गायनी)",
+          "icon": "🤰"
+        },
+        {
+          "slug": "pediatrician",
+          "name": "Pediatrician / Child Specialist",
+          "name_hi": "बाल रोग विशेषज्ञ",
+          "icon": "👶"
+        },
+        {
+          "slug": "orthopedic",
+          "name": "Orthopedic / Bone & Joint",
+          "name_hi": "हड्डी रोग विशेषज्ञ (ऑर्थो)",
+          "icon": "🦴"
+        },
+        {
+          "slug": "cardiologist",
+          "name": "Cardiologist / Heart Specialist",
+          "name_hi": "हृदय रोग विशेषज्ञ",
+          "icon": "❤️"
+        },
+        {
+          "slug": "dermatologist",
+          "name": "Dermatologist / Skin Specialist",
+          "name_hi": "त्वचा रोग विशेषज्ञ",
+          "icon": "✨"
+        },
+        {
+          "slug": "ent-specialist",
+          "name": "ENT Specialist (Ear/Nose/Throat)",
+          "name_hi": "कान-नाक-गला विशेषज्ञ",
+          "icon": "👂"
+        },
+        {
+          "slug": "surgeon-general",
+          "name": "General Surgeon",
+          "name_hi": "जनरल सर्जन",
+          "icon": "🔪"
+        },
+        {
+          "slug": "urologist",
+          "name": "Urologist / Kidney Specialist",
+          "name_hi": "मूत्र रोग विशेषज्ञ",
+          "icon": "💧"
+        },
+        {
+          "slug": "neurologist",
+          "name": "Neurologist / Brain & Nerve",
+          "name_hi": "न्यूरोलॉजिस्ट",
+          "icon": "🧠"
+        },
+        {
+          "slug": "psychiatrist",
+          "name": "Psychiatrist",
+          "name_hi": "मनोचिकित्सक",
+          "icon": "💭"
+        },
+        {
+          "slug": "diabetes-specialist",
+          "name": "Diabetologist / Diabetes Center",
+          "name_hi": "मधुमेह विशेषज्ञ",
+          "icon": "🩸"
+        },
+        {
+          "slug": "radiology-xray",
+          "name": "X-Ray / Radiology Center",
+          "name_hi": "एक्स-रे / रेडियोलॉजी सेंटर",
+          "icon": "☢️"
+        },
+        {
+          "slug": "ultrasound-sonography",
+          "name": "Ultrasound / Sonography Center",
+          "name_hi": "अल्ट्रासाउंड / सोनोग्राफी",
+          "icon": "🔊"
         }
       ]
     },

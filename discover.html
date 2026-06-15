@@ -1144,13 +1144,24 @@ function isOpenNow(hours){
   } catch(_){ return null; }
 }
 
+// Returns ALL category ids a business belongs to: primary + sub + business_categories join.
+// Multi-cat aware so shops with secondary categories appear under every relevant chip.
+function getBizCats(b){
+  var ids = {};
+  if (b.category_id) ids[b.category_id] = 1;
+  if (b.sub_category_id) ids[b.sub_category_id] = 1;
+  var extra = (STATE.bcByBiz && STATE.bcByBiz[b.id]) || [];
+  for (var i=0; i<extra.length; i++) ids[extra[i]] = 1;
+  return Object.keys(ids);
+}
+
 // Build filter chips from data
 function buildChips(allRows, catMap, activeFilter){
   var byCat = {};
   allRows.forEach(function(b){
-    var k = b.sub_category_id || b.category_id;
-    if (!k) return;
-    byCat[k] = (byCat[k] || 0) + 1;
+    var allCats = getBizCats(b);
+    if (allCats.length === 0) return;
+    allCats.forEach(function(k){ byCat[k] = (byCat[k] || 0) + 1; });
   });
   var sorted = Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; }).slice(0, 12);
   var chips = '<div class="chip '+(!activeFilter?'active':'')+'" data-cat="all">🌟 All</div>';
@@ -1162,7 +1173,7 @@ function buildChips(allRows, catMap, activeFilter){
   return chips;
 }
 
-var STATE = { allRows: [], catMap: {}, cityMap: {}, filter: null, cityFilter: null };
+var STATE = { allRows: [], catMap: {}, cityMap: {}, filter: null, cityFilter: null, bcByBiz: {} };
 
 // City picker — opens overlay, lets user pick a city to filter without reloading
 function openCityPicker(){
@@ -1225,9 +1236,28 @@ async function init(){
     // Shuffle for variety
     rows = rows.sort(function(){ return Math.random() - 0.5; });
 
-    // Look up city + cat names in batch
+    // Fetch business_categories (multi-cat join) for these businesses.
+    // Builds STATE.bcByBiz = { businessId: [catId,...] } used by getBizCats().
+    try {
+      var bizIds = rows.map(function(r){ return r.id; }).filter(Boolean);
+      if (bizIds.length){
+        var bcRes = await c.from('business_categories').select('business_id, category_id').in('business_id', bizIds);
+        (bcRes.data || []).forEach(function(r){
+          (STATE.bcByBiz[r.business_id] = STATE.bcByBiz[r.business_id] || []).push(r.category_id);
+        });
+      }
+    } catch(_){ /* multi-cat optional — degrade gracefully */ }
+
+    // Look up city + cat names in batch (now includes multi-cat ids)
     var cityIds = Array.from(new Set(rows.map(function(r){return r.city_id}).filter(Boolean)));
-    var catIds  = Array.from(new Set(rows.map(function(r){return r.sub_category_id || r.category_id}).filter(Boolean)));
+    var catIdSet = {};
+    rows.forEach(function(r){
+      if (r.category_id) catIdSet[r.category_id] = 1;
+      if (r.sub_category_id) catIdSet[r.sub_category_id] = 1;
+      var extra = STATE.bcByBiz[r.id] || [];
+      for (var i=0;i<extra.length;i++) catIdSet[extra[i]] = 1;
+    });
+    var catIds = Object.keys(catIdSet);
     if (cityIds.length){
       var cr = await c.from('geo_cities').select('id,name').in('id', cityIds);
       (cr.data||[]).forEach(function(x){ STATE.cityMap[x.id] = x.name; });
@@ -1252,8 +1282,11 @@ function renderFiltered(){
   if (STATE.filter){
     var fStr = String(STATE.filter);
     rows = rows.filter(function(b){
-      var k = b.sub_category_id || b.category_id;
-      return k != null && String(k) === fStr;
+      var allCats = getBizCats(b);
+      for (var i=0; i<allCats.length; i++){
+        if (String(allCats[i]) === fStr) return true;
+      }
+      return false;
     });
   }
   if (STATE.cityFilter){
