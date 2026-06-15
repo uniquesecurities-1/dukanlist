@@ -1192,6 +1192,32 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<script>
+// ============================================================
+// updateCharCount — used by oninput= attributes on multiple inputs
+// (bizName, usp, uspHi) to show "X / max" character counter below
+// each field. Was previously called but never defined → ReferenceError
+// flooding the monitoring dashboard (38 errors, 14 users).
+// ============================================================
+function updateCharCount(inputEl, counterId, max){
+  try {
+    if (!inputEl) return;
+    var counter = document.getElementById(counterId);
+    if (!counter) return;
+    var len = (inputEl.value || '').length;
+    counter.textContent = len + ' / ' + max;
+    // Visual feedback when approaching limit
+    if (len >= max) {
+      counter.style.color = '#DC2626'; // red
+    } else if (len >= max * 0.85) {
+      counter.style.color = '#F59E0B'; // amber
+    } else {
+      counter.style.color = '#94a3b8'; // default gray
+    }
+  } catch(_){}
+}
+window.updateCharCount = updateCharCount;
+</script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/geo.js"></script>
 <script src="/assets/js/templates.js"></script>

@@ -3951,6 +3951,27 @@ function fmtAgo(iso){
   return new Date(iso).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
 }
 function escapeHTML(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// prefillQA — used by quick-question chips (.qce-chip onclick) to pre-fill
+// the QA modal textarea with a suggested question. Was called but never
+// defined → ReferenceError flooding monitoring dashboard.
+function prefillQA(questionText){
+  try {
+    openQAModal();
+    // Find the textarea inside the QA modal (id likely qaQuestionInput or similar)
+    setTimeout(function(){
+      var ta = document.getElementById('qaQuestionInput')
+            || document.getElementById('qaInput')
+            || document.querySelector('#qaModal textarea');
+      if (ta){
+        ta.value = questionText || '';
+        try { ta.focus(); } catch(_){}
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }, 50);
+  } catch(e){ console.warn('prefillQA failed:', e); }
+}
+window.prefillQA = prefillQA;
+
 function openQAModal(){
   const m = document.getElementById('qaModal');
   if (m) m.classList.add('active');

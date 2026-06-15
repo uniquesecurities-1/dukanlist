@@ -556,9 +556,9 @@ let PEAK_CHART = null;
 
 async function loadPeakHours(){
   const c = ShopDB.client;
-  if (!c || !BIZ_ID) return;
+  if (!c || !MY_BIZ_ID) return;
   try {
-    const { data, error } = await c.rpc('owner_peak_hours', { p_business_id: BIZ_ID, p_days: 30 });
+    const { data, error } = await c.rpc('owner_peak_hours', { p_business_id: MY_BIZ_ID, p_days: 30 });
     if (error){
       const insight = document.getElementById('peakInsight');
       if (insight) insight.textContent = 'Run db/44-owner-peak-hours.sql to enable this chart';
