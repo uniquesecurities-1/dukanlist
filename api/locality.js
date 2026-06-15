@@ -49,27 +49,45 @@ async function findCategory(catSlug){
 }
 
 async function fetchShops(cityId, catId, catIsParent){
-  // For a parent: match either category_id OR any sub of this parent
-  let q;
+  // Build list of category IDs to search.
+  // For a parent: include all child sub-cat IDs too.
+  let categoryIds = [catId];
   if (catIsParent){
-    // Get all sub-cat IDs
     const subs = await sb('categories?select=id&parent_id=eq.' + catId);
-    const subIds = (subs || []).map(s => s.id);
-    const idsForOr = [catId].concat(subIds).join(',');
-    q = 'businesses?select=id,slug,name,name_hi,mobile,whatsapp,address_line1,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,geo_cities(name)'
-      + '&status=eq.active'
-      + '&city_id=eq.' + cityId
-      + '&or=(category_id.in.(' + idsForOr + '),sub_category_id.in.(' + idsForOr + '))'
-      + '&order=featured.desc.nullslast,verified_score.desc.nullslast,rating_avg.desc.nullslast'
-      + '&limit=40';
-  } else {
-    q = 'businesses?select=id,slug,name,name_hi,mobile,whatsapp,address_line1,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,geo_cities(name)'
-      + '&status=eq.active'
-      + '&city_id=eq.' + cityId
-      + '&or=(category_id.eq.' + catId + ',sub_category_id.eq.' + catId + ')'
-      + '&order=featured.desc.nullslast,verified_score.desc.nullslast,rating_avg.desc.nullslast'
-      + '&limit=40';
+    categoryIds = categoryIds.concat((subs || []).map(s => s.id));
   }
+  const catIdsStr = categoryIds.join(',');
+
+  // CRITICAL: DukanList supports multi-category via business_categories join table.
+  // A shop's PRIMARY category sits on businesses.category_id, but additional
+  // categories live in business_categories(business_id, category_id). If we only
+  // query the primary, we miss businesses like Unique Securities where stock-broker
+  // is added as a secondary category (their primary is mutual-fund-distributor).
+  //
+  // Step 1: get all business_ids that have ANY of our target categories linked
+  //         in business_categories.
+  const bcRows = await sb('business_categories?select=business_id&category_id=in.(' + catIdsStr + ')');
+  const linkedIds = Array.from(new Set((bcRows || []).map(r => r.business_id))).filter(Boolean);
+
+  // Step 2: query businesses where EITHER:
+  //   (a) primary category_id matches, OR
+  //   (b) sub_category_id matches, OR
+  //   (c) id is in the multi-category linked list (business_categories).
+  const orClauses = [
+    'category_id.in.(' + catIdsStr + ')',
+    'sub_category_id.in.(' + catIdsStr + ')'
+  ];
+  if (linkedIds.length > 0){
+    orClauses.push('id.in.(' + linkedIds.join(',') + ')');
+  }
+
+  const q = 'businesses?select=id,slug,name,name_hi,mobile,whatsapp,address_line1,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,geo_cities(name)'
+    + '&status=eq.active'
+    + '&city_id=eq.' + cityId
+    + '&or=(' + orClauses.join(',') + ')'
+    + '&order=featured.desc.nullslast,verified_score.desc.nullslast,rating_avg.desc.nullslast'
+    + '&limit=40';
+
   return (await sb(q)) || [];
 }
 
