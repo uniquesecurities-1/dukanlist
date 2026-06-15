@@ -1358,13 +1358,25 @@ function loadMoreResults(){
 window.loadMoreResults = loadMoreResults;  // ensure global for onclick
 
 function renderCard(b){
+  // === Professional listing flags drive what's hidden ===
+  // Strict: hide rating, Top Rated, Featured, USP-as-promo — show membership badge instead.
+  // Partial: keep rating + reviews but suppress promotional badges (Top Rated, Featured).
+  const isProfStrict  = b.is_professional_listing === true && b.professional_tier === 'strict';
+  const isProfPartial = b.is_professional_listing === true && b.professional_tier === 'partial';
+  const isProf = isProfStrict || isProfPartial;
+  const profClass = isProfStrict ? ' prof-strict-card' : (isProfPartial ? ' prof-partial-card' : '');
+
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
   const photoHTML = photo
     ? `<img src="${photo}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
     : `<div class="ph-fb">${b.category_icon || '🏪'}</div><span class="ph-label">${escapeHTML(b.category_name || 'Business')}</span>`;
   const noPhotoClass = photo ? '' : ' no-photo';
-  const verified = (typeof DukanTier !== 'undefined') ? DukanTier.badge(b) : (b.verified_visit === true ? '<span class="verify">✓ Verified</span>' : '');
-  const featuredRibbon = b.is_featured ? '<span class="featured-ribbon">★ FEATURED</span>' : '';
+  // Verified badge: hide tier badge in strict mode (replaced with profession badge below)
+  const verified = isProfStrict
+    ? ''
+    : ((typeof DukanTier !== 'undefined') ? DukanTier.badge(b) : (b.verified_visit === true ? '<span class="verify">✓ Verified</span>' : ''));
+  // Featured ribbon: hide in any professional mode (paid promotion not allowed for regulated professionals)
+  const featuredRibbon = (isProf || !b.is_featured) ? '' : '<span class="featured-ribbon">★ FEATURED</span>';
   // Open-Now LIVE badge — pulsing green dot + "closes in X" when open
   let openBadge = '';
   if (b.hours_json && typeof getOpenStatus === 'function'){
@@ -1383,7 +1395,14 @@ function renderCard(b){
       }
     }
   }
-  const rating = b.rating_avg > 0 ? `<span class="rating">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>` : '<span style="color:var(--muted)">No reviews yet</span>';
+  // Strict mode: hide rating display entirely (no ratings allowed for CAs/Doctors/Lawyers per their regulator)
+  // Partial mode: keep rating
+  // Default: existing behaviour
+  const rating = isProfStrict
+    ? '<span style="color:var(--saffron-deep);font-weight:700;font-size:.78rem">🛡️ Professional Listing</span>'
+    : (b.rating_avg > 0
+        ? `<span class="rating">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>`
+        : '<span style="color:var(--muted)">No reviews yet</span>');
 
   // Quick-action CTAs — WhatsApp + Call
   const rawWa  = String(b.whatsapp || b.mobile || '').replace(/\D/g, '');
@@ -1406,11 +1425,19 @@ function renderCard(b){
 
   // Search v2: enhanced ribbons
   let ribbon = '';
-  if (b.is_featured) ribbon = '<span class="ribbon featured">★ Featured</span>';
-  else if (Number(b.rating_avg) >= 4.5 && Number(b.rating_count) >= 5) ribbon = '<span class="ribbon top">\u{1F3C6} Top Rated</span>';
-  else if (b.created_at){
-    const ageHrs = (Date.now() - new Date(b.created_at).getTime()) / 3600000;
-    if (ageHrs < 24 * 14) ribbon = '<span class="ribbon new">✨ New</span>';
+  // Professional mode (strict OR partial): no promotional ribbons — these are
+  // marketing devices that regulators (ICAI/NMC/BCI/etc.) prohibit. Keep only
+  // for non-regulated listings.
+  if (!isProf){
+    if (b.is_featured) ribbon = '<span class="ribbon featured">★ Featured</span>';
+    else if (Number(b.rating_avg) >= 4.5 && Number(b.rating_count) >= 5) ribbon = '<span class="ribbon top">\u{1F3C6} Top Rated</span>';
+    else if (b.created_at){
+      const ageHrs = (Date.now() - new Date(b.created_at).getTime()) / 3600000;
+      if (ageHrs < 24 * 14) ribbon = '<span class="ribbon new">✨ New</span>';
+    }
+  } else {
+    // Show a quiet "PRO" indicator on professional listings (informational, not promotional)
+    ribbon = '<span class="ribbon" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);font-size:.6rem;letter-spacing:.05em">🛡️ ' + (isProfStrict ? 'PROFESSIONAL' : 'REGULATED') + '</span>';
   }
   // Shortlist heart — sits top-right above photo, with z-index above card link
   const heartHTML = (typeof DukanShortlist !== 'undefined')
@@ -1443,7 +1470,7 @@ function renderCard(b){
   const compactTagsHTML = compactTags ? '<span class="compact-tags">' + compactTags + '</span>' : '';
 
   return `
-    <article class="biz-card${noPhotoClass}">
+    <article class="biz-card${noPhotoClass}${profClass}">
       ${heartHTML}
       <a class="biz-card-link" href="/business.html?slug=${b.slug}" aria-label="${escapeHTML(b.name)}"></a>
       <div class="biz-photo">${photoHTML}${openBadge}${ribbon || featuredRibbon}${verified}</div>

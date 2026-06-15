@@ -918,6 +918,79 @@
       </label>
     </div>
 
+    <!-- ================================ PROFESSIONAL PANEL (auto-shown for CA/Doctor/Lawyer/MFD/etc.) ================================ -->
+    <div id="professionalPanel" style="display:none;background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border:1.5px solid #7DD3FC;border-radius:14px;padding:18px 20px;margin:18px 0">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:1.4rem">🛡️</span>
+        <div>
+          <div style="font-weight:800;color:#075985;font-size:1rem">
+            <span data-i18n-en>Professional Information Required</span>
+            <span data-i18n-hi>पेशेवर जानकारी आवश्यक</span>
+          </div>
+          <div style="font-size:.78rem;color:#0369A1;font-weight:600">
+            <span data-i18n-en>Your category is regulated — please complete the fields below for compliant listing.</span>
+            <span data-i18n-hi>आपकी category regulated है — कृपया अनुपालन के लिए नीचे की fields भरें।</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#FEF3C7;border-left:4px solid #F59E0B;color:#78350F;font-size:.78rem;line-height:1.55;padding:10px 14px;border-radius:8px;margin:10px 0;font-weight:500">
+        <b style="color:#92400E">📋 Important:</b>
+        <span data-i18n-en>Per ICAI / NMC / BCI / ICSI / ICMAI / AMFI / SEBI / IRDAI rules, certain professions cannot advertise. Your listing will be displayed in informational format only (no ratings, no Top Rated badges, no promotional content). Membership credentials will be verified by our admin.</span>
+        <span data-i18n-hi>ICAI / NMC / BCI / ICSI / ICMAI / AMFI / SEBI / IRDAI नियमों के अनुसार, कुछ professions advertise नहीं कर सकते। आपकी listing सिर्फ informational format में दिखेगी।</span>
+      </div>
+
+      <div class="form-group">
+        <label><span data-i18n-en>Membership / Registration No.</span><span data-i18n-hi>सदस्यता / पंजीकरण संख्या</span><span class="req">*</span></label>
+        <input id="profMembershipNo" class="input" type="text" placeholder="e.g. 123456 (CA) / 456789 (MCI) / DL/12345/2010 (Bar)" maxlength="40">
+        <div class="help" id="profMembershipHint">
+          <span data-i18n-en>Your official membership number from the regulator (ICAI / NMC / BCI / ICSI / ICMAI / AMFI / SEBI / IRDAI).</span>
+          <span data-i18n-hi>आपका official membership number जो regulator से मिला है।</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><span data-i18n-en>Qualification</span><span data-i18n-hi>योग्यता</span><span class="req">*</span></label>
+        <select id="profQualification" class="input">
+          <option value="">-- Select --</option>
+          <option value="CA">CA (Chartered Accountant)</option>
+          <option value="CS">CS (Company Secretary)</option>
+          <option value="CMA">CMA (Cost Accountant)</option>
+          <option value="MBBS">MBBS (Doctor)</option>
+          <option value="MD">MD</option>
+          <option value="MS">MS</option>
+          <option value="BDS">BDS (Dentist)</option>
+          <option value="MDS">MDS</option>
+          <option value="BAMS">BAMS (Ayurvedic)</option>
+          <option value="BHMS">BHMS (Homeopathy)</option>
+          <option value="BPT">BPT (Physiotherapy)</option>
+          <option value="LLB">LLB (Lawyer/Advocate)</option>
+          <option value="LLM">LLM</option>
+          <option value="MFD">Mutual Fund Distributor (AMFI ARN)</option>
+          <option value="AP">Authorized Person (SEBI)</option>
+          <option value="IRDAI">IRDAI Insurance Advisor</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><span data-i18n-en>Areas of Practice / Specialization</span><span data-i18n-hi>विशेषज्ञता के क्षेत्र</span></label>
+        <input id="profPracticeAreas" class="input" type="text" placeholder="e.g. Tax, Audit, GST (CA) — comma separated" maxlength="200">
+        <div class="help">
+          <span data-i18n-en>Comma-separated list. E.g., for CA: "Tax, Audit, GST, Company Law". For doctor: "Cardiology, Internal Medicine". Max 200 chars.</span>
+          <span data-i18n-hi>Comma से अलग। CA के लिए: "Tax, Audit, GST"। डॉक्टर के लिए: "Cardiology, Internal Medicine"। अधिकतम 200 अक्षर।</span>
+        </div>
+      </div>
+
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.84rem;color:#0F172A;line-height:1.5;padding:10px;background:#fff;border:1px solid #BAE6FD;border-radius:10px;margin-top:12px">
+        <input type="checkbox" id="profDisclaimerAccept" style="margin-top:3px;flex-shrink:0;width:18px;height:18px;cursor:pointer;accent-color:#0EA5E9">
+        <span>
+          <span data-i18n-en>I confirm that the membership number above is accurate and that my listing will be displayed in informational/compliance mode (no reviews, ratings, or promotional badges) per my regulator's Code of Conduct. I understand my listing requires admin verification before going live.</span>
+          <span data-i18n-hi>मैं पुष्टि करता हूँ कि ऊपर दिया गया membership number सही है और मेरी listing informational/compliance mode में दिखेगी (कोई reviews/ratings/promotional badges नहीं) मेरे regulator के Code of Conduct के अनुसार। मुझे पता है कि listing को live होने से पहले admin verification चाहिए।</span>
+        </span>
+      </label>
+    </div>
+
     <div class="alert error" id="step4Err" style="display:none"></div>
     <div class="btn-row">
       <button class="btn btn-sec" onclick="goToStep(3)"><span data-i18n-en>← Back</span><span data-i18n-hi>← पीछे</span></button>
@@ -1174,6 +1247,9 @@ function goToStep(n){
   document.getElementById('stepNameHi').textContent = STEP_NAMES_HI[n];
   window.scrollTo({top:0, behavior:'smooth'});
 
+  // When entering Step 4 — also check if any selected category is professional
+  // and show the compliance panel if so.
+  showProfessionalPanelIfNeeded();
   // When entering Step 4 — render USP templates for the selected primary category
   if (n === 4) {
     renderUspTemplates();
@@ -1767,6 +1843,63 @@ function showFriendlyErr(el, err, retryFn){
 }
 
 // ============================================================
+// ============================================================
+// PROFESSIONAL LISTING HELPERS (compliance mode for CA/Doctor/Lawyer/MFD/etc.)
+// ============================================================
+async function showProfessionalPanelIfNeeded(){
+  const panel = document.getElementById('professionalPanel');
+  if (!panel) return;
+  try {
+    const c = ShopDB && ShopDB.client;
+    if (!c) return;
+    const catIds = (STATE.data.categoryIds || []).filter(Number.isInteger);
+    if (catIds.length === 0){ panel.style.display = 'none'; return; }
+    // Look up which selected categories have professional_tier set
+    const { data, error } = await c.from('categories')
+      .select('id, slug, professional_tier')
+      .in('id', catIds);
+    if (error){ console.warn('Pro panel check failed:', error); return; }
+    const profCats = (data || []).filter(r => r.professional_tier);
+    if (profCats.length === 0){ panel.style.display = 'none'; STATE.data.profTier = null; return; }
+    // Strict wins over partial if multiple selected
+    const strict = profCats.find(c => c.professional_tier === 'strict');
+    STATE.data.profTier = strict ? 'strict' : 'partial';
+    STATE.data.profCategorySlug = (strict || profCats[0]).slug;
+    panel.style.display = '';
+    // Tier indicator on the panel head
+    const head = panel.querySelector('div[style*="font-weight:800;color:#075985"]');
+    if (head){
+      head.innerHTML = (STATE.data.profTier === 'strict'
+        ? '<span data-i18n-en>Professional Information Required</span><span data-i18n-hi>पेशेवर जानकारी आवश्यक</span>'
+        : '<span data-i18n-en>Regulatory Compliance Information</span><span data-i18n-hi>नियामक अनुपालन जानकारी</span>');
+    }
+  } catch(e){ console.warn('Pro panel error:', e); }
+}
+
+function collectProfessionalData(){
+  // Only collect if panel is visible (i.e., professional category selected)
+  const panel = document.getElementById('professionalPanel');
+  if (!panel || panel.style.display === 'none') return null;
+  const membershipNo = (document.getElementById('profMembershipNo').value || '').trim();
+  const qualification = (document.getElementById('profQualification').value || '').trim();
+  const practiceAreasRaw = (document.getElementById('profPracticeAreas').value || '').trim();
+  const accepted = document.getElementById('profDisclaimerAccept').checked;
+  const practiceAreas = practiceAreasRaw
+    ? practiceAreasRaw.split(',').map(s => s.trim()).filter(Boolean).slice(0, 8)
+    : [];
+  return { membershipNo, qualification, practiceAreas, accepted, profTier: STATE.data.profTier };
+}
+
+function validateProfessionalData(){
+  const data = collectProfessionalData();
+  if (!data) return { ok: true }; // Not professional — no validation needed
+  if (!data.membershipNo) return { ok: false, msg: 'Membership / Registration number is required for professional listings.' };
+  if (data.membershipNo.length < 4) return { ok: false, msg: 'Membership number looks too short. Please verify.' };
+  if (!data.qualification) return { ok: false, msg: 'Please select your qualification.' };
+  if (!data.accepted) return { ok: false, msg: 'Please accept the compliance disclaimer to proceed.' };
+  return { ok: true, data };
+}
+
 // STEP 4 — USP + final submit (calls register_business_v2)
 // ============================================================
 
@@ -1883,6 +2016,16 @@ async function handleSubmit(){
     btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>'; return;
   }
 
+  // ============================================================
+  // PROFESSIONAL LISTING VALIDATION — block submit if compliance fields missing
+  // ============================================================
+  const profCheck = validateProfessionalData();
+  if (!profCheck.ok){
+    showErr(errEl, profCheck.msg);
+    btn.disabled = false; btn.innerHTML = '<span>Submit Registration ✓</span>'; return;
+  }
+  const profData = profCheck.data || null;
+
   // Sanity: ensure all selected IDs are real DB ids (positive ints).
   const badIds = STATE.data.categoryIds.filter(id => !Number.isInteger(id) || id <= 0);
   if (badIds.length){
@@ -1962,6 +2105,18 @@ async function handleSubmit(){
     if (signUpRes.error){
       authError = signUpRes.error.message || 'Could not create login';
     } else if (signUpRes.data && signUpRes.data.session){
+      // Persist professional data via dedicated RPC (after biz exists with slug)
+      if (profData){
+        try {
+          await c.rpc('submit_professional_info', {
+            p_owner_mobile         : STATE.phone,
+            p_membership_no        : profData.membershipNo,
+            p_qualification        : profData.qualification,
+            p_practice_areas       : profData.practiceAreas,
+            p_disclaimer_accepted  : profData.accepted
+          });
+        } catch(e){ console.warn('submit_professional_info failed (will be set during admin verification):', e); }
+      }
       try { await c.rpc('claim_business_by_phone', { p_mobile: STATE.phone }); }
       catch(claimErr){ console.warn('Auto-claim failed (non-fatal):', claimErr); }
     }

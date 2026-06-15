@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Professional Verification — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f1f5f9;color:#0F172A;min-height:100vh}
+  .topbar{background:#0F172A;color:#f1f5f9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .badge{font-size:10px;font-weight:700;background:#1E3A8A;color:white;padding:2px 7px;border-radius:5px;letter-spacing:0.5px}
+  .nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .nav a{color:#cbd5e1;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:600}
+  .nav a:hover{background:rgba(255,255,255,0.1);color:white}
+  .nav a.active{background:#1E3A8A;color:white}
+  .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
+  .logout:hover{background:rgba(255,255,255,0.1);color:white}
+
+  .main{max-width:1200px;margin:24px auto;padding:0 20px}
+  .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
+  .page-sub{font-size:14px;color:#64748b;margin-bottom:20px}
+
+  .info-banner{background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border:1px solid #7DD3FC;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:#0369A1;font-weight:500;line-height:1.55}
+  .info-banner b{color:#075985;font-weight:800}
+
+  .queue-stats{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .stat-pill{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 16px;font-size:13px}
+  .stat-pill .n{font-size:20px;font-weight:800;color:#1E3A8A;line-height:1}
+  .stat-pill .l{font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.05em;margin-top:2px}
+
+  .prof-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+  .prof-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  .prof-name{font-size:18px;font-weight:800;color:#0F172A}
+  .prof-meta{font-size:12px;color:#64748b;margin-top:3px}
+  .tier-tag{font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+  .tier-strict{background:#FEE2E2;color:#991B1B}
+  .tier-partial{background:#FEF3C7;color:#92400E}
+
+  .prof-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:12px 0;padding:12px;background:#F8FAFC;border-radius:10px}
+  .prof-field{font-size:13px}
+  .prof-field .lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.05em;margin-bottom:3px}
+  .prof-field .val{color:#0F172A;font-weight:700;word-break:break-word}
+  .prof-field .val .verify-link{display:inline-block;margin-left:8px;font-size:11px;color:#0EA5E9;text-decoration:underline;font-weight:600}
+  .prof-field .val .verify-link:hover{color:#075985}
+
+  .practice-areas{margin-top:10px}
+  .practice-areas .area{display:inline-block;background:#EDE9FE;color:#5B21B6;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;margin:0 5px 5px 0}
+
+  .disclaimer-row{font-size:12px;color:#475569;padding:8px 12px;background:#F1F5F9;border-radius:8px;margin-top:8px}
+  .disclaimer-row.accepted{background:#D1FAE5;color:#065F46}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0}
+  .btn{padding:10px 18px;border-radius:9px;border:none;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .btn-approve{background:#10B981;color:#fff}
+  .btn-approve:hover:not(:disabled){background:#059669;transform:translateY(-1px)}
+  .btn-reject{background:#EF4444;color:#fff}
+  .btn-reject:hover:not(:disabled){background:#DC2626;transform:translateY(-1px)}
+  .btn-view{background:#fff;border:1px solid #E2E8F0;color:#475569}
+  .btn-view:hover{background:#F1F5F9;color:#0F172A}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .empty-state{text-align:center;padding:60px 20px;color:#94a3b8}
+  .empty-state .ico{font-size:48px;margin-bottom:12px}
+  .empty-state h2{font-size:18px;color:#475569;margin-bottom:6px}
+  .empty-state p{font-size:14px}
+
+  .loading{text-align:center;padding:40px;color:#94a3b8;font-size:14px}
+  .err{background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:12px 16px;border-radius:10px;margin:14px 0;font-size:14px}
+
+  /* Reject notes modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:14px;padding:24px;max-width:480px;width:100%;box-shadow:0 25px 70px rgba(0,0,0,.3)}
+  .modal h3{font-size:18px;font-weight:800;margin-bottom:6px}
+  .modal p{font-size:13px;color:#64748b;margin-bottom:14px}
+  .modal textarea{width:100%;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;min-height:90px;resize:vertical}
+  .modal textarea:focus{outline:none;border-color:#1E3A8A}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span>🛡️</span>
+    <span>Dukan<em style="font-style:normal;color:#1E3A8A">List</em></span>
+    <span class="badge">ADMIN</span>
+  </div>
+  <nav class="nav">
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/moderation">⚖️ Moderation</a>
+    <a href="/admin/professional-verify.html" class="active">🛡 Professional</a>
+    <a href="/admin/health.html" style="background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;border-radius:8px">🛡 Health</a>
+    <a href="/admin/incomplete-shops.html">🩹 Incomplete</a>
+    <a href="/" target="_blank">🌐 Public Site</a>
+    <span class="logout" onclick="logout()">⎋ Logout</span>
+  </nav>
+</header>
+
+<main class="main">
+  <h1 class="page-title">🛡️ Professional Verification Queue</h1>
+  <p class="page-sub">Verify CA / Doctor / Lawyer / MFD / Stock Broker / Insurance membership numbers using public regulator lookups.</p>
+
+  <div class="info-banner">
+    <b>How to verify:</b> Click the lookup link next to each membership number → opens the regulator's public verification page. Match the name, status (active), and date of registration. Approve if matches; reject if not (provide reason in notes).
+  </div>
+
+  <div class="queue-stats" id="queueStats"></div>
+
+  <div id="resultBox">
+    <div class="loading">Loading queue…</div>
+  </div>
+</main>
+
+<!-- Reject notes modal -->
+<div class="modal-bg" id="rejectModal">
+  <div class="modal">
+    <h3>Reject professional verification?</h3>
+    <p>This will revert the listing to regular mode (with reviews/ratings enabled). Membership data is retained.</p>
+    <textarea id="rejectNotes" placeholder="Reason for rejection (visible to owner, optional but recommended)"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-view" onclick="closeRejectModal()">Cancel</button>
+      <button class="btn btn-reject" onclick="confirmReject()">Confirm Reject</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+let CURRENT_REJECT_ID = null;
+
+// ============================================================
+// Authority → public lookup URL mapping
+// ============================================================
+const LOOKUP_URLS = {
+  ICAI:  'https://www.icai.org/post/member-tracer',
+  NMC:   'https://www.nmc.org.in/information-desk/indian-medical-register/',
+  BCI:   'https://www.barcouncilofindia.org/info/state-bar-councils',
+  ICSI:  'https://www.icsi.edu/member/',
+  ICMAI: 'https://icmai.in/icmai/Member/StatusofMembers.php',
+  AMFI:  'https://www.amfiindia.com/locate-your-nearest-mutual-fund-distributor-details',
+  SEBI:  'https://www.sebi.gov.in/intermediaries.html',
+  IRDAI: 'https://www.irdai.gov.in/intermediaries-list'
+};
+
+function lookupLink(authority, membershipNo){
+  const url = LOOKUP_URLS[authority];
+  if (!url) return '';
+  return ` <a class="verify-link" href="${url}" target="_blank" rel="noopener">🔗 Verify on ${authority}</a>`;
+}
+
+function esc(s){
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showError(msg){
+  document.getElementById('resultBox').innerHTML = '<div class="err">' + esc(msg) + '</div>';
+}
+
+async function loadQueue(){
+  const c = ShopDB && ShopDB.client;
+  if (!c){ showError('Backend not configured.'); return; }
+
+  const { data, error } = await c.rpc('admin_list_pending_professionals');
+  if (error){
+    showError('Failed to load queue: ' + error.message);
+    return;
+  }
+
+  const rows = data || [];
+  // Stats
+  const strict = rows.filter(r => r.professional_tier === 'strict').length;
+  const partial = rows.filter(r => r.professional_tier === 'partial').length;
+  document.getElementById('queueStats').innerHTML =
+    '<div class="stat-pill"><div class="n">' + rows.length + '</div><div class="l">Total Pending</div></div>' +
+    '<div class="stat-pill"><div class="n">' + strict + '</div><div class="l">Strict Tier</div></div>' +
+    '<div class="stat-pill"><div class="n">' + partial + '</div><div class="l">Partial Tier</div></div>';
+
+  if (rows.length === 0){
+    document.getElementById('resultBox').innerHTML =
+      '<div class="empty-state">' +
+        '<div class="ico">✅</div>' +
+        '<h2>Queue is empty</h2>' +
+        '<p>No pending professional verifications.</p>' +
+      '</div>';
+    return;
+  }
+
+  const html = rows.map(renderCard).join('');
+  document.getElementById('resultBox').innerHTML = html;
+}
+
+function renderCard(b){
+  const tierClass = 'tier-' + (b.professional_tier || 'strict');
+  const tierLabel = (b.professional_tier || 'strict').toUpperCase();
+
+  const fields = [];
+  if (b.professional_qualification){
+    fields.push({lbl:'Qualification', val: esc(b.professional_qualification)});
+  }
+  if (b.membership_no){
+    fields.push({lbl: (b.membership_authority || 'Membership') + ' No.',
+                 val: esc(b.membership_no) + lookupLink(b.membership_authority, b.membership_no)});
+  }
+  fields.push({lbl:'Mobile', val: esc(b.mobile || '')});
+  fields.push({lbl:'City', val: esc(b.city_name || '')});
+  if (b.primary_category_name){
+    fields.push({lbl:'Category', val: esc(b.primary_category_name)});
+  }
+  fields.push({lbl:'Owner', val: esc(b.owner_name || '')});
+
+  const fieldsHTML = fields.map(f =>
+    '<div class="prof-field"><div class="lbl">' + esc(f.lbl) + '</div><div class="val">' + f.val + '</div></div>'
+  ).join('');
+
+  const areasHTML = (Array.isArray(b.practice_areas) && b.practice_areas.length)
+    ? '<div class="practice-areas"><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:6px">Areas of Practice</div>' +
+      b.practice_areas.map(a => '<span class="area">' + esc(a) + '</span>').join('') +
+      '</div>'
+    : '';
+
+  const acceptedHTML = b.disclaimer_accepted_at
+    ? '<div class="disclaimer-row accepted">✓ Owner accepted compliance disclaimer on ' + new Date(b.disclaimer_accepted_at).toLocaleString() + '</div>'
+    : '<div class="disclaimer-row">⏳ Owner has not yet accepted compliance disclaimer (registered ' + new Date(b.created_at).toLocaleDateString() + ')</div>';
+
+  return '<div class="prof-card">' +
+    '<div class="prof-card-head">' +
+      '<div>' +
+        '<div class="prof-name">' + esc(b.name) + '</div>' +
+        '<div class="prof-meta">slug: ' + esc(b.slug) + ' · status: ' + esc(b.status) + '</div>' +
+      '</div>' +
+      '<span class="tier-tag ' + tierClass + '">' + tierLabel + '</span>' +
+    '</div>' +
+    '<div class="prof-fields">' + fieldsHTML + '</div>' +
+    areasHTML +
+    acceptedHTML +
+    '<div class="actions">' +
+      '<a class="btn btn-view" href="/business.html?slug=' + esc(b.slug) + '" target="_blank">👁 View Public</a>' +
+      '<a class="btn btn-view" href="/admin/shop.html?id=' + esc(b.id) + '" target="_blank">⚙ Open in Admin</a>' +
+      '<div style="flex:1"></div>' +
+      '<button class="btn btn-reject" onclick="rejectListing(\'' + esc(b.id) + '\', \'' + esc(b.name) + '\')">✕ Reject</button>' +
+      '<button class="btn btn-approve" onclick="approveListing(\'' + esc(b.id) + '\', \'' + esc(b.name) + '\')">✓ Approve</button>' +
+    '</div>' +
+  '</div>';
+}
+
+async function approveListing(bizId, bizName){
+  if (!confirm('Approve "' + bizName + '" as a verified professional listing?\n\nThis will mark them with the ✓ Verified badge on their listing.')) return;
+  const c = ShopDB.client;
+  const notes = prompt('Optional notes for the approval (visible to admins only):', '');
+  const { error } = await c.rpc('admin_verify_professional', {
+    p_business_id: bizId,
+    p_approve: true,
+    p_notes: notes || null
+  });
+  if (error){ alert('Approval failed: ' + error.message); return; }
+  loadQueue();
+}
+
+function rejectListing(bizId, bizName){
+  CURRENT_REJECT_ID = bizId;
+  document.getElementById('rejectNotes').value = '';
+  document.getElementById('rejectModal').classList.add('show');
+}
+
+function closeRejectModal(){
+  document.getElementById('rejectModal').classList.remove('show');
+  CURRENT_REJECT_ID = null;
+}
+
+async function confirmReject(){
+  if (!CURRENT_REJECT_ID) return;
+  const notes = document.getElementById('rejectNotes').value.trim();
+  const c = ShopDB.client;
+  const { error } = await c.rpc('admin_verify_professional', {
+    p_business_id: CURRENT_REJECT_ID,
+    p_approve: false,
+    p_notes: notes || null
+  });
+  if (error){ alert('Rejection failed: ' + error.message); return; }
+  closeRejectModal();
+  loadQueue();
+}
+
+async function logout(){
+  try { await ShopDB.client.auth.signOut(); } catch(_){}
+  location.href = '/admin/login.html';
+}
+
+// Boot
+(async function(){
+  const c = ShopDB && ShopDB.client;
+  if (!c){ showError('Backend not configured.'); return; }
+  // Auth check
+  const { data: { user } } = await c.auth.getUser();
+  if (!user){ location.href = '/admin/login.html?from=' + encodeURIComponent(location.pathname); return; }
+  loadQueue();
+})();
+</script>
+</body>
+</html>

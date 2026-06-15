@@ -241,6 +241,70 @@ html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif; 
   font-weight:700; font-family:'Noto Sans Devanagari',sans-serif;
   margin-bottom:12px; letter-spacing:-.005em;
 }
+/* ============================================================
+   PROFESSIONAL LISTING MODE — Compliance with ICAI/NMC/BCI/ICSI/ICMAI/AMFI/SEBI/IRDAI rules
+   When body has .prof-strict class: hide reviews, ratings, Top Rated, Featured, Compare,
+   USP text. Show membership + qualification + practice areas + disclaimer.
+   When body has .prof-partial class: keep reviews/ratings but hide promotional badges,
+   show disclaimer modal/banner.
+============================================================ */
+body.prof-strict #reviewsAnchor,
+body.prof-strict .biz-rating-row,
+body.prof-strict #bizRating,
+body.prof-strict .biz-usp,
+body.prof-strict #uspBox,
+body.prof-strict [data-hide-in-strict]{ display:none !important }
+
+body.prof-partial [data-hide-in-partial]{ display:none !important }
+body.prof-partial #reviewsAnchor::before{
+  content: attr(data-partial-disclaimer);
+  display:block;
+  background:#FEF3C7; border:1px solid #F59E0B; color:#78350F;
+  padding:10px 14px; border-radius:10px;
+  font-size:.82rem; font-weight:600; line-height:1.5;
+  margin-bottom:14px;
+}
+
+/* Professional info card — shown for both strict and partial tiers */
+.prof-card{
+  background:linear-gradient(135deg,#F0F9FF,#E0F2FE);
+  border:1px solid #7DD3FC; border-radius:14px;
+  padding:18px 22px; margin:0 0 18px;
+}
+.prof-card .prof-card-head{
+  display:flex; align-items:center; gap:10px; margin-bottom:12px;
+  font-size:.86rem; font-weight:800; color:#075985;
+  letter-spacing:.02em; text-transform:uppercase;
+}
+.prof-card .prof-card-head .prof-tier-badge{
+  background:#0284C7; color:#fff; padding:3px 10px; border-radius:99px;
+  font-size:.66rem; font-weight:800; letter-spacing:.04em;
+}
+.prof-card .prof-row{ display:grid; grid-template-columns:auto 1fr; gap:8px 14px; font-size:.88rem; margin-bottom:6px }
+.prof-card .prof-row dt{ color:#0369A1; font-weight:700; min-width:120px }
+.prof-card .prof-row dd{ color:#0F172A; margin:0; font-weight:600 }
+.prof-card .prof-areas{ margin-top:12px; padding-top:12px; border-top:1px solid rgba(2,132,199,.18) }
+.prof-card .prof-areas-label{ font-size:.78rem; font-weight:800; color:#075985; margin-bottom:8px; letter-spacing:.02em; text-transform:uppercase }
+.prof-card .prof-area-pill{
+  display:inline-block; background:#fff; border:1px solid #BAE6FD;
+  color:#075985; padding:4px 11px; border-radius:99px;
+  font-size:.78rem; font-weight:700; margin:0 5px 5px 0;
+}
+
+/* Compliance disclaimer footer — full-width, dignified */
+.prof-disclaimer{
+  background:#FEFCE8; border:1px solid #FCD34D; border-left:4px solid #F59E0B;
+  color:#78350F; font-size:.78rem; line-height:1.55; font-weight:500;
+  padding:14px 18px; border-radius:10px; margin:20px 0;
+}
+.prof-disclaimer b{ color:#92400E; font-weight:800; display:block; margin-bottom:5px; font-size:.82rem }
+
+/* Unverified state — yellow caution */
+.prof-card.unverified{ background:linear-gradient(135deg,#FEFCE8,#FEF3C7); border-color:#F59E0B }
+.prof-card.unverified .prof-card-head{ color:#92400E }
+.prof-card.unverified .prof-card-head .prof-tier-badge{ background:#F59E0B; color:#fff }
+.prof-card.unverified .prof-row dt{ color:#92400E }
+
 .biz-rating-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; background:linear-gradient(135deg,#FFFBEB,#FFF7ED); border:1px solid #FED7AA; border-radius:11px }
 
 /* "Why this business?" — fast-scan verdict pills */
@@ -1678,6 +1742,8 @@ async function loadBusiness(){
       verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
       rating_avg, rating_count, view_count,
       category_id, sub_category_id,
+      is_professional_listing, professional_tier, membership_no, membership_authority,
+      professional_qualification, practice_areas, prof_verified_at,
       geo_cities(name, name_hi),
       geo_localities(name, name_hi, slug)
     `)
@@ -1911,9 +1977,128 @@ function injectSchemaOrg(b){
   } catch(e){ /* schema is bonus, never break page */ }
 }
 
+
+// ============================================================
+// Professional Listing Helpers — disclaimer text + render card
+// ============================================================
+function profDisclaimerText(authority, lang){
+  authority = (authority || '').toUpperCase();
+  const D = {
+    'ICAI': {
+      en: 'This listing is informational only. The Chartered Accountant is bound by ICAI Code of Ethics and Standards of Professional Conduct. CAs do not solicit clients or professional work; details shown are for identification and contact purposes.',
+      hi: 'यह लिस्टिंग केवल सूचना के लिए है। चार्टर्ड अकाउंटेंट ICAI Code of Ethics से बाध्य हैं और client solicitation नहीं करते। यहां दी गई जानकारी केवल पहचान और संपर्क के लिए है।'
+    },
+    'NMC': {
+      en: 'This listing is informational only. The medical practitioner is bound by the National Medical Commission (NMC) Code of Ethics 2002. Details shown are for identification and patient contact purposes; this is not medical advertisement.',
+      hi: 'यह लिस्टिंग केवल सूचना के लिए है। डॉक्टर NMC Code of Ethics 2002 से बाध्य हैं। यह medical advertisement नहीं है।'
+    },
+    'BCI': {
+      en: 'This listing is informational only. The Advocate is bound by Bar Council of India Rules, Chapter II, Section IV (Rule 36 — prohibition on advertising/soliciting). Details shown are for identification and contact only.',
+      hi: 'यह लिस्टिंग केवल सूचना के लिए है। Advocate BCI Rules Rule 36 से बाध्य हैं — advertising/soliciting prohibited है। केवल पहचान और संपर्क के लिए विवरण।'
+    },
+    'ICSI': {
+      en: 'This listing is informational only. The Company Secretary is bound by ICSI Code of Conduct which restricts advertising/soliciting. Details are for identification and contact purposes only.',
+      hi: 'यह लिस्टिंग केवल सूचना के लिए है। Company Secretary ICSI Code of Conduct से बाध्य हैं।'
+    },
+    'ICMAI': {
+      en: 'This listing is informational only. The Cost Accountant is bound by ICMAI Code of Conduct which restricts advertising/soliciting. Details are for identification and contact purposes only.',
+      hi: 'यह लिस्टिंग केवल सूचना के लिए है। Cost Accountant ICMAI Code of Conduct से बाध्य हैं।'
+    },
+    'AMFI': {
+      en: 'Mutual fund investments are subject to market risks. Read all scheme-related documents carefully. ARN displayed is the distributor\'s AMFI registration. This is not investment advice or a solicitation to invest in any specific scheme.',
+      hi: 'म्यूचुअल फंड निवेश market risks के अधीन हैं। सभी scheme documents ध्यान से पढ़ें। ARN distributor की AMFI registration है। यह investment advice नहीं है।'
+    },
+    'SEBI': {
+      en: 'Stock market investments are subject to market risks. SEBI Registration shown is the Authorized Person\'s registration under their parent stock broker. This listing does not constitute investment advice or solicitation. Trades execute through the parent broker per SEBI guidelines.',
+      hi: 'Stock market investments market risks के अधीन हैं। SEBI Reg authorized person की parent broker के तहत registration है। यह investment advice नहीं है।'
+    },
+    'IRDAI': {
+      en: 'Insurance is a subject matter of solicitation. The IRDAI Registration displayed is the advisor\'s authorization. Read policy documents and terms carefully before any purchase decision. This listing is informational and not insurance advice.',
+      hi: 'बीमा एक solicitation का विषय है। IRDAI Reg advisor की authorization है। Policy documents ध्यान से पढ़ें।'
+    }
+  };
+  const d = D[authority] || D['ICAI'];
+  return (lang === 'hi' ? d.hi : d.en);
+}
+
+function authorityFromQualification(qual){
+  qual = (qual || '').toUpperCase();
+  if (qual === 'CA' || qual === 'ACA' || qual === 'FCA') return 'ICAI';
+  if (qual === 'CS' || qual === 'ACS' || qual === 'FCS') return 'ICSI';
+  if (qual === 'CMA' || qual === 'ACMA' || qual === 'FCMA') return 'ICMAI';
+  if (qual === 'LLB' || qual === 'LLM' || qual === 'ADVOCATE') return 'BCI';
+  if (qual.startsWith('MBBS') || qual.startsWith('MD') || qual.startsWith('MS') || qual === 'BDS' || qual === 'MDS') return 'NMC';
+  return null;
+}
+
+function renderProfessionalCard(b, lang){
+  if (!b.is_professional_listing) return '';
+
+  const tier = b.professional_tier || 'strict';
+  const tierLabel = (tier === 'strict') ? (lang === 'hi' ? 'पेशेवर सूची' : 'Professional Listing')
+                                         : (lang === 'hi' ? 'नियामक के अधीन' : 'Regulated Service');
+  const auth = (b.membership_authority || authorityFromQualification(b.professional_qualification) || 'ICAI');
+  const verified = !!b.prof_verified_at;
+  const unverifiedClass = verified ? '' : ' unverified';
+
+  let rows = '';
+  if (b.professional_qualification){
+    rows += '<div class="prof-row"><dt>' + (lang==='hi'?'योग्यता':'Qualification') + '</dt><dd>' + escapeHTML(b.professional_qualification) + '</dd></div>';
+  }
+  if (b.membership_no){
+    const label = ({
+      'ICAI':  'ICAI Membership No.',
+      'NMC':   'NMC / State Council Reg.',
+      'BCI':   'Bar Council Enrolment No.',
+      'ICSI':  'ICSI Membership No.',
+      'ICMAI': 'ICMAI Membership No.',
+      'AMFI':  'AMFI ARN',
+      'SEBI':  'SEBI Reg. (AP)',
+      'IRDAI': 'IRDAI Reg.',
+    }[auth]) || 'Registration No.';
+    rows += '<div class="prof-row"><dt>' + label + '</dt><dd>' + escapeHTML(b.membership_no);
+    if (verified) rows += ' <span style="display:inline-flex;align-items:center;gap:3px;background:#D1FAE5;color:#065F46;padding:1px 7px;border-radius:99px;font-size:.7rem;font-weight:800;margin-left:6px">✓ Verified</span>';
+    rows += '</dd></div>';
+  }
+  if (b.established_year){
+    rows += '<div class="prof-row"><dt>' + (lang==='hi'?'अभ्यास से':'Practicing since') + '</dt><dd>' + b.established_year + '</dd></div>';
+  }
+
+  let areas = '';
+  if (Array.isArray(b.practice_areas) && b.practice_areas.length){
+    areas = '<div class="prof-areas">' +
+            '<div class="prof-areas-label">' + (lang==='hi'?'अभ्यास के क्षेत्र':'Areas of Practice') + '</div>' +
+            b.practice_areas.map(a => '<span class="prof-area-pill">' + escapeHTML(a) + '</span>').join('') +
+            '</div>';
+  }
+
+  const disclaimerEn = lang === 'hi' ? 'कानूनी और नियामक अनुपालन' : 'Regulatory & Compliance Notice';
+  const disclaimerText = profDisclaimerText(auth, lang);
+
+  return '<div class="prof-card' + unverifiedClass + '">' +
+         '<div class="prof-card-head">' +
+           '<span>' + (verified ? '🛡️' : '⏳') + ' ' + escapeHTML(tierLabel) + '</span>' +
+           '<span class="prof-tier-badge">' + tier.toUpperCase() + '</span>' +
+         '</div>' +
+         '<dl style="margin:0">' + rows + '</dl>' +
+         areas +
+         '</div>' +
+         '<div class="prof-disclaimer">' +
+           '<b>' + disclaimerEn + '</b>' +
+           disclaimerText +
+         '</div>';
+}
+
 function render(){
   const b = BIZ;
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
+
+  // === Professional Listing mode setup ===
+  // Sets body class based on tier so CSS hides/shows correct elements.
+  // Builds the compliance card HTML which is later injected before usp box.
+  document.body.classList.remove('prof-strict', 'prof-partial');
+  if (b.is_professional_listing && b.professional_tier === 'strict')  document.body.classList.add('prof-strict');
+  if (b.is_professional_listing && b.professional_tier === 'partial') document.body.classList.add('prof-partial');
 
   // Meta tags
   document.title = `${b.name} — ${b.categories?.name || 'Local Business'} in ${b.geo_cities?.name || ''} | dukanlist.com`;
@@ -2050,6 +2235,25 @@ function render(){
   document.getElementById('verifRow').innerHTML = verifs.map(v => `<span class="verify-pill">${v}</span>`).join('');
 
   // USP
+  // Inject Professional Listing card (compliance info + practice areas + disclaimer)
+  // It renders only when b.is_professional_listing is true; safe no-op otherwise.
+  try {
+    const profHTML = renderProfessionalCard(b, lang);
+    if (profHTML){
+      let profSlot = document.getElementById('professionalCardSlot');
+      if (!profSlot){
+        profSlot = document.createElement('div');
+        profSlot.id = 'professionalCardSlot';
+        // Insert just after the biz-rating-row (or just before reviews if rating-row hidden)
+        const ratingRow = document.querySelector('.biz-rating-row');
+        const reviewsCard = document.getElementById('reviewsAnchor');
+        const anchor = ratingRow || reviewsCard;
+        if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(profSlot, anchor);
+      }
+      profSlot.innerHTML = profHTML;
+    }
+  } catch(e){ console.warn('Professional card render failed:', e); }
+
   if (b.usp_text){
     const uspText = (lang === 'hi' && b.usp_hi) ? b.usp_hi : b.usp_text;
     document.getElementById('uspBox').textContent = uspText;
