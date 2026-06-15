@@ -677,8 +677,72 @@ async function convertHeicToJpeg(file){
   throw err;
 }
 
+// ============================================================
+// WATERMARK — subtle "DukanList.com" bottom-right on every owner photo.
+// Anti-scraping + brand reinforcement. Sized proportionally so it stays
+// readable on a phone-cropped 480px-wide image AND a full 1600px banner.
+// ============================================================
+function drawDukanListWatermark(ctx, w, h){
+  try {
+    // Size: ~3% of the longer edge, clamped to a sensible range
+    var longEdge = Math.max(w, h);
+    var fontSize = Math.max(13, Math.min(28, Math.round(longEdge * 0.028)));
+    var padX = Math.round(longEdge * 0.018);    // right padding
+    var padY = Math.round(longEdge * 0.018);    // bottom padding
+    var text = 'DukanList.com';
+
+    ctx.save();
+    ctx.font = '700 ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'right';
+
+    // Measure for a soft semi-transparent pill behind text so it stays
+    // legible over both light and dark photos.
+    var metrics = ctx.measureText(text);
+    var textW = Math.ceil(metrics.width);
+    var pillH = Math.round(fontSize * 1.6);
+    var pillW = textW + Math.round(fontSize * 1.4);
+    var pillX = w - padX - pillW;
+    var pillY = h - padY - pillH;
+
+    // Pill background (dark, semi-transparent — never shouts)
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
+    var r = Math.round(fontSize * 0.4);  // corner radius
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function'){
+      ctx.roundRect(pillX, pillY, pillW, pillH, r);
+    } else {
+      // Fallback for older browsers without roundRect
+      ctx.moveTo(pillX + r, pillY);
+      ctx.lineTo(pillX + pillW - r, pillY);
+      ctx.quadraticCurveTo(pillX + pillW, pillY, pillX + pillW, pillY + r);
+      ctx.lineTo(pillX + pillW, pillY + pillH - r);
+      ctx.quadraticCurveTo(pillX + pillW, pillY + pillH, pillX + pillW - r, pillY + pillH);
+      ctx.lineTo(pillX + r, pillY + pillH);
+      ctx.quadraticCurveTo(pillX, pillY + pillH, pillX, pillY + pillH - r);
+      ctx.lineTo(pillX, pillY + r);
+      ctx.quadraticCurveTo(pillX, pillY, pillX + r, pillY);
+      ctx.closePath();
+    }
+    ctx.fill();
+
+    // Text on top — white, slight shadow for crispness
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 1;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    // textAlign='right' means x is the right edge of the text
+    var textX = pillX + pillW - Math.round(fontSize * 0.7);
+    var textY = pillY + pillH - Math.round(fontSize * 0.3);
+    ctx.fillText(text, textX, textY);
+    ctx.restore();
+  } catch(_){ /* never fail upload because watermark drawing errored */ }
+}
+
 // Client-side image compression to <2MB
 // ALWAYS converts through canvas → outputs JPEG (handles iPhone HEIC → JPG natively in Safari)
+// Also stamps a subtle "DukanList.com" watermark in the bottom-right corner.
 async function compressImage(file, maxBytes, forceConvert){
   if (!forceConvert && file.size <= maxBytes && /^image\/(jpeg|jpg|png|webp)$/i.test(file.type)) return file;
   return new Promise((resolve, reject) => {
@@ -703,6 +767,8 @@ async function compressImage(file, maxBytes, forceConvert){
         ctx.fillRect(0, 0, width, height);
         try { ctx.drawImage(img, 0, 0, width, height); }
         catch(drawErr){ resolve(file); return; }
+        // Stamp watermark AFTER the photo is drawn so it sits on top of the image
+        drawDukanListWatermark(ctx, width, height);
         let q = 0.85;
         let attempts = 0;
         function tryQuality(){

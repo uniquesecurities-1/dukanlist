@@ -66,6 +66,9 @@
     <button class="chip" data-filter="recent" onclick="setFilter('recent')">📅 Last 7 days</button>
     <button class="chip" data-filter="low" onclick="setFilter('low')">⚠️ Low (1-2★)</button>
     <button class="chip" data-filter="flagged" onclick="setFilter('flagged')">🚩 Flagged</button>
+    <button class="chip" data-filter="pending" onclick="setFilter('pending')" style="background:#FEF3C7;color:#92400E">
+      🛑 Spam Hold <span id="pendingCountBadge" style="background:#DC2626;color:#fff;border-radius:99px;padding:1px 8px;margin-left:4px;font-size:10px;display:none">0</span>
+    </button>
   </div>
 
   <div id="list"><div style="padding:40px;text-align:center;color:#94a3b8">Loading reviews…</div></div>
@@ -107,6 +110,23 @@ async function init(){
   const { data: isAdm } = await c.rpc('is_admin');
   if (!isAdm) { alert('Admin access required'); location.href='/'; return; }
   loadReviews();
+  refreshPendingBadge();
+}
+
+// Refresh the red badge on the "Spam Hold" chip showing current pending count
+async function refreshPendingBadge(){
+  try {
+    const { data: cnt, error } = await c.rpc('admin_pending_reviews_count');
+    if (error) return;
+    const badge = document.getElementById('pendingCountBadge');
+    if (!badge) return;
+    if (cnt && cnt > 0){
+      badge.textContent = cnt;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch(_){ /* silent — RPC not deployed yet */ }
 }
 
 function setFilter(f){
@@ -117,6 +137,10 @@ function setFilter(f){
 
 async function loadReviews(){
   document.getElementById('list').innerHTML = '<div style="padding:40px;text-align:center;color:#94a3b8">Loading…</div>';
+  // Pending queue uses a dedicated RPC so we can show hash_recent_count + approve/reject buttons
+  if (CURRENT_FILTER === 'pending'){
+    return loadPendingReviews();
+  }
   try {
     const { data, error } = await c.rpc('admin_list_all_reviews', {
       p_limit: 100, p_offset: 0, p_filter: CURRENT_FILTER, p_min_rating: null
@@ -128,6 +152,79 @@ async function loadReviews(){
     document.getElementById('err').style.display = 'block';
     document.getElementById('list').innerHTML = '';
   }
+}
+
+// Pending (rate-limited) reviews — held when same phone submitted 5+ in 24h
+async function loadPendingReviews(){
+  try {
+    const { data, error } = await c.rpc('admin_pending_reviews', { p_limit: 100, p_offset: 0 });
+    if (error) throw error;
+    renderPending(data || []);
+  } catch(e){
+    document.getElementById('err').textContent = 'Failed to load held reviews: ' + e.message + ' (deploy db/156)';
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('list').innerHTML = '';
+  }
+}
+
+function renderPending(rows){
+  document.getElementById('err').style.display = 'none';
+  if (!rows.length){
+    document.getElementById('list').innerHTML =
+      '<div style="padding:40px;text-align:center;color:#94a3b8">'
+      + '✅ No held reviews. Everything\'s clean.'
+      + '</div>';
+    return;
+  }
+  document.getElementById('list').innerHTML = rows.map(r => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const spamRisk = (r.hash_recent_count >= 8)
+      ? '<span style="background:#7F1D1D;color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:800;margin-left:8px">🚨 HIGH RISK</span>'
+      : (r.hash_recent_count >= 5)
+        ? '<span style="background:#F59E0B;color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:800;margin-left:8px">⚠ ' + r.hash_recent_count + ' in 24h</span>'
+        : '';
+    const hashShort = (r.customer_phone_hash || '').slice(0,12) + '…';
+    return '<div class="rev-card" style="border-left:4px solid #F59E0B">'
+      + '<div class="rev-head">'
+        + '<div>'
+          + '<a class="rev-shop" href="/admin/shop.html?id=' + esc(r.business_id) + '" target="_blank">🏪 ' + esc(r.business_name) + '</a>'
+          + spamRisk
+        + '</div>'
+        + '<span class="rev-time">' + timeAgo(r.created_at) + '</span>'
+      + '</div>'
+      + '<div><span class="stars">' + stars + '</span>'
+        + '<span class="customer">' + esc(r.customer_name || 'Anonymous') + '</span>'
+        + '<span style="color:#94a3b8;font-size:10px;margin-left:8px;font-family:monospace" title="' + esc(r.customer_phone_hash) + '">hash:' + hashShort + '</span>'
+      + '</div>'
+      + '<div class="rev-text">' + esc(r.text || '(empty)') + '</div>'
+      + '<div class="rev-actions">'
+        + '<button style="background:#10B981;color:#fff" onclick="approvePending(\'' + esc(r.review_id) + '\')">✓ Approve</button>'
+        + '<button style="background:#EF4444;color:#fff" onclick="rejectPending(\'' + esc(r.review_id) + '\')">✗ Reject (spam)</button>'
+        + '<a href="/admin/shop.html?id=' + esc(r.business_id) + '" target="_blank" style="background:#F1F5F9;color:#475569;text-decoration:none;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700">View Shop →</a>'
+      + '</div>'
+    + '</div>';
+  }).join('');
+}
+
+async function approvePending(id){
+  try {
+    const { error } = await c.rpc('admin_approve_pending_review', { p_review_id: id });
+    if (error) throw error;
+    toast('✓ Approved — now live');
+    loadPendingReviews();
+    refreshPendingBadge();
+  } catch(e){ alert('Approve failed: ' + e.message); }
+}
+
+async function rejectPending(id){
+  if (!confirm('Reject this review as spam? It will not be shown publicly.')) return;
+  try {
+    const { error } = await c.rpc('admin_reject_pending_review', { p_review_id: id });
+    if (error) throw error;
+    toast('✓ Rejected');
+    loadPendingReviews();
+    refreshPendingBadge();
+  } catch(e){ alert('Reject failed: ' + e.message); }
 }
 
 function render(rows){
