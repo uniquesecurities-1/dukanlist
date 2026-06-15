@@ -134,6 +134,7 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script>
 let CURRENT_REJECT_ID = null;
+let QUEUE_BY_ID = {}; // id -> row data, populated on every loadQueue render
 
 // ============================================================
 // Authority → public lookup URL mapping
@@ -177,6 +178,11 @@ async function loadQueue(){
   }
 
   const rows = data || [];
+  // Build id -> row lookup so onclick handlers can fetch the name safely
+  // (avoids escaping issues with apostrophes in business names like "Dr Sachdeva's")
+  QUEUE_BY_ID = {};
+  rows.forEach(r => { QUEUE_BY_ID[r.id] = r; });
+
   // Stats
   const strict = rows.filter(r => r.professional_tier === 'strict').length;
   const partial = rows.filter(r => r.professional_tier === 'partial').length;
@@ -247,13 +253,15 @@ function renderCard(b){
       '<a class="btn btn-view" href="/business.html?slug=' + esc(b.slug) + '" target="_blank">👁 View Public</a>' +
       '<a class="btn btn-view" href="/admin/shop.html?id=' + esc(b.id) + '" target="_blank">⚙ Open in Admin</a>' +
       '<div style="flex:1"></div>' +
-      '<button class="btn btn-reject" onclick="rejectListing(\'' + esc(b.id) + '\', \'' + esc(b.name) + '\')">✕ Reject</button>' +
-      '<button class="btn btn-approve" onclick="approveListing(\'' + esc(b.id) + '\', \'' + esc(b.name) + '\')">✓ Approve</button>' +
+      '<button class="btn btn-reject" onclick="rejectListing(\'' + esc(b.id) + '\')">✕ Reject</button>' +
+      '<button class="btn btn-approve" onclick="approveListing(\'' + esc(b.id) + '\')">✓ Approve</button>' +
     '</div>' +
   '</div>';
 }
 
-async function approveListing(bizId, bizName){
+async function approveListing(bizId){
+  const biz = QUEUE_BY_ID[bizId] || {};
+  const bizName = biz.name || 'this listing';
   if (!confirm('Approve "' + bizName + '" as a verified professional listing?\n\nThis will mark them with the ✓ Verified badge on their listing.')) return;
   const c = ShopDB.client;
   const notes = prompt('Optional notes for the approval (visible to admins only):', '');
@@ -266,7 +274,7 @@ async function approveListing(bizId, bizName){
   loadQueue();
 }
 
-function rejectListing(bizId, bizName){
+function rejectListing(bizId){
   CURRENT_REJECT_ID = bizId;
   document.getElementById('rejectNotes').value = '';
   document.getElementById('rejectModal').classList.add('show');
