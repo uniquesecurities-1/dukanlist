@@ -1491,7 +1491,11 @@ async function loadCategoriesIntoSelect(){
         parent_id: p.id,
         parent_slug: p.slug,
         parent_name: p.name,
-        parent_icon: p.icon || ''
+        parent_icon: p.icon || '',
+        // NEW: also store keywords + description so the filter can match against
+        // synonyms like "Chartered Accountant" → ca, "Advocate" → lawyer, etc.
+        keywords: s.keywords || '',
+        description: s.description || ''
       };
       const opt = document.createElement('option');
       opt.value = String(s.id);
@@ -2494,8 +2498,57 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+// Common professional / business term synonyms — if user types one of these,
+// the filter ALSO matches the mapped slug's category. Lowercase keys, value
+// is a space-separated list of synonym terms.
+const CAT_SEARCH_SYNONYMS = {
+  // Chartered Accountant
+  'ca': 'chartered accountant accounting accounts auditor audit',
+  'chartered accountant': 'ca tax gst itr audit accounting',
+  'chartered': 'ca chartered accountant',
+  // Lawyer / Advocate
+  'advocate': 'lawyer vakeel attorney barrister legal counsel',
+  'lawyer': 'advocate vakeel attorney barrister legal counsel',
+  'vakeel': 'advocate lawyer legal',
+  // Company Secretary
+  'cs': 'company secretary ICSI',
+  'company secretary': 'cs ICSI',
+  // Cost Accountant
+  'cma': 'cost accountant ICMAI',
+  'cost accountant': 'cma ICMAI',
+  // Doctor specialties
+  'gyne': 'gynecologist obstetrician women maternity',
+  'gynaecologist': 'gynecologist obstetrician women',
+  'paediatrician': 'pediatrician child specialist',
+  'child specialist': 'pediatrician',
+  'heart': 'cardiologist cardiac',
+  'skin': 'dermatologist',
+  'ent': 'ear nose throat',
+  // MFD / Stock Broker / Insurance
+  'mfd': 'mutual fund distributor amfi',
+  'mutual fund': 'mfd mutual fund distributor amfi',
+  'broker': 'stock broker sub broker authorized person',
+  'sub broker': 'stock broker authorized person',
+  'insurance': 'lic policy bima',
+  'lic': 'insurance life',
+  'bima': 'insurance',
+  // Common shortcuts
+  'medical store': 'pharmacy chemist',
+  'chemist': 'pharmacy medical store',
+  'kirana': 'grocery general store',
+  'salon': 'beauty parlour barber unisex',
+  'parlour': 'salon beauty',
+  'mistri': 'mechanic carpenter plumber'
+};
+
 function filterCategories(query){
-  const q = (query || '').toLowerCase().trim();
+  let q = (query || '').toLowerCase().trim();
+  // If query matches a known synonym, EXPAND query to include its mapped terms.
+  // This makes the haystack-match strategy below find the mapped categories
+  // even when the literal user-typed string isn't in the category's name.
+  if (CAT_SEARCH_SYNONYMS[q]){
+    q = q + ' ' + CAT_SEARCH_SYNONYMS[q];
+  }
   renderCatTiles(q);
 }
 
@@ -2510,11 +2563,17 @@ function renderCatTiles(query){
     return;
   }
 
-  // Filter by query (matches name, name_hi, slug, parent_name, keywords, description)
+  // Filter by query (matches name, name_hi, slug, parent_name, keywords, description).
+  // Query may have multiple words (when expanded by synonym map). Match if ANY
+  // token is found in the haystack — gives generous semantic matching for
+  // abbreviations like "CA" → finds "Chartered Accountant" via keywords.
   const filtered = query
     ? allCats.filter(c => {
         const hay = ((c.name || '') + ' ' + (c.name_hi || '') + ' ' + (c.slug || '') + ' ' + (c.parent_name || '') + ' ' + (c.keywords || '') + ' ' + (c.description || '')).toLowerCase();
-        return hay.indexOf(query) !== -1;
+        const tokens = query.split(/\s+/).filter(t => t.length >= 2);
+        if (tokens.length <= 1) return hay.indexOf(query) !== -1;
+        // Multi-token (synonym-expanded): match if ANY token hits the hay
+        return tokens.some(t => hay.indexOf(t) !== -1);
       })
     : allCats;
 

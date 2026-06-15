@@ -1,7 +1,7 @@
 {
-  "version": "3.8",
+  "version": "3.9",
   "updated": "2026-06-15",
-  "note": "v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
+  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
   "parents": [
     {
       "slug": "healthcare",
@@ -14,19 +14,22 @@
           "slug": "doctor",
           "name": "Doctors & Clinics",
           "name_hi": "डॉक्टर एवं क्लिनिक",
-          "icon": "🩺"
+          "icon": "🩺",
+          "keywords": "physician clinic general practitioner gp"
         },
         {
           "slug": "pharmacy",
           "name": "Medical Store / Pharmacy",
           "name_hi": "मेडिकल स्टोर",
-          "icon": "💊"
+          "icon": "💊",
+          "keywords": "medical store chemist medicine drug store"
         },
         {
           "slug": "dentist",
           "name": "Dentist / Dental Clinic",
           "name_hi": "डेंटिस्ट / दांत डॉक्टर",
-          "icon": "🦷"
+          "icon": "🦷",
+          "keywords": "dental clinic teeth dental implant orthodontist"
         },
         {
           "slug": "pathology-lab",
@@ -86,37 +89,43 @@
           "slug": "gynecologist",
           "name": "Gynecologist / Women's Health",
           "name_hi": "स्त्री रोग विशेषज्ञ (गायनी)",
-          "icon": "🤰"
+          "icon": "🤰",
+          "keywords": "gynaecologist obstetrician women maternity pregnancy"
         },
         {
           "slug": "pediatrician",
           "name": "Pediatrician / Child Specialist",
           "name_hi": "बाल रोग विशेषज्ञ",
-          "icon": "👶"
+          "icon": "👶",
+          "keywords": "child specialist paediatrician baby kids"
         },
         {
           "slug": "orthopedic",
           "name": "Orthopedic / Bone & Joint",
           "name_hi": "हड्डी रोग विशेषज्ञ (ऑर्थो)",
-          "icon": "🦴"
+          "icon": "🦴",
+          "keywords": "orthopaedic bone joint joint replacement"
         },
         {
           "slug": "cardiologist",
           "name": "Cardiologist / Heart Specialist",
           "name_hi": "हृदय रोग विशेषज्ञ",
-          "icon": "❤️"
+          "icon": "❤️",
+          "keywords": "heart cardiac specialist"
         },
         {
           "slug": "dermatologist",
           "name": "Dermatologist / Skin Specialist",
           "name_hi": "त्वचा रोग विशेषज्ञ",
-          "icon": "✨"
+          "icon": "✨",
+          "keywords": "skin specialist hair cosmetic"
         },
         {
           "slug": "ent-specialist",
           "name": "ENT Specialist (Ear/Nose/Throat)",
           "name_hi": "कान-नाक-गला विशेषज्ञ",
-          "icon": "👂"
+          "icon": "👂",
+          "keywords": "ear nose throat"
         },
         {
           "slug": "surgeon-general",
@@ -173,31 +182,36 @@
           "slug": "mutual-fund-distributor",
           "name": "Mutual Fund Distributor",
           "name_hi": "म्यूचुअल फंड डिस्ट्रीब्यूटर",
-          "icon": "📊"
+          "icon": "📊",
+          "keywords": "mfd amfi mutual fund mf sip investment"
         },
         {
           "slug": "stock-broker",
           "name": "Stock Broker / Sub-Broker",
           "name_hi": "स्टॉक ब्रोकर / सब ब्रोकर",
-          "icon": "📈"
+          "icon": "📈",
+          "keywords": "broker sub broker authorized person ap sebi shares trading"
         },
         {
           "slug": "ca",
           "name": "CA / Tax Consultants",
           "name_hi": "CA / टैक्स कंसल्टेंट",
-          "icon": "🧮"
+          "icon": "🧮",
+          "keywords": "chartered accountant accounting accounts audit gst itr tax consultant"
         },
         {
           "slug": "tax-consultant",
           "name": "Tax Consultant (ITR / GST)",
           "name_hi": "टैक्स कंसल्टेंट",
-          "icon": "🧾"
+          "icon": "🧾",
+          "keywords": "tax itr gst income tax accountant audit"
         },
         {
           "slug": "financial-advisor",
           "name": "Financial Advisor / Planner",
           "name_hi": "फाइनेंशियल एडवाइजर",
-          "icon": "💼"
+          "icon": "💼",
+          "keywords": "financial planner advisor wealth management investment"
         },
         {
           "slug": "loan-agent",
@@ -218,19 +232,22 @@
           "slug": "insurance-life",
           "name": "Insurance Advisor — Life",
           "name_hi": "जीवन बीमा सलाहकार",
-          "icon": "❤️"
+          "icon": "❤️",
+          "keywords": "life insurance lic bima term policy"
         },
         {
           "slug": "insurance-health",
           "name": "Insurance Advisor — Health",
           "name_hi": "स्वास्थ्य बीमा सलाहकार",
-          "icon": "🏥"
+          "icon": "🏥",
+          "keywords": "health insurance mediclaim hospitalisation"
         },
         {
           "slug": "insurance-general",
           "name": "Insurance Advisor — General",
           "name_hi": "सामान्य बीमा सलाहकार",
-          "icon": "🚙"
+          "icon": "🚙",
+          "keywords": "general insurance motor vehicle home property"
         }
       ]
     },
@@ -245,19 +262,22 @@
           "slug": "carpenter",
           "name": "Carpenter (Lakdi-Mistri)",
           "name_hi": "बढ़ई / लकड़ी का मिस्त्री",
-          "icon": "🔨"
+          "icon": "🔨",
+          "keywords": "lakdi mistri wood furniture"
         },
         {
           "slug": "plumber",
           "name": "Plumber",
           "name_hi": "प्लंबर / नलसाज़",
-          "icon": "🚰"
+          "icon": "🚰",
+          "keywords": "nalsaaz plumbing water sewage geyser"
         },
         {
           "slug": "electrician",
           "name": "Electrician",
           "name_hi": "इलेक्ट्रीशियन",
-          "icon": "⚡"
+          "icon": "⚡",
+          "keywords": "bijli wiring electrical repair"
         },
         {
           "slug": "painter",
@@ -478,19 +498,22 @@
           "slug": "mechanic-2w",
           "name": "Mechanic — 2 Wheeler",
           "name_hi": "मैकेनिक — दोपहिया",
-          "icon": "🏍️"
+          "icon": "🏍️",
+          "keywords": "two wheeler bike scooter motorcycle repair garage"
         },
         {
           "slug": "mechanic-4w",
           "name": "Mechanic — 4 Wheeler",
           "name_hi": "मैकेनिक — चारपहिया",
-          "icon": "🚙"
+          "icon": "🚙",
+          "keywords": "four wheeler car mechanic garage repair"
         },
         {
           "slug": "car-service",
           "name": "Car Service Station",
           "name_hi": "कार सर्विस सेंटर",
-          "icon": "🔧"
+          "icon": "🔧",
+          "keywords": "car service station servicing washing detailing"
         },
         {
           "slug": "tyre-shop",
@@ -727,7 +750,8 @@
           "slug": "kirana-grocery",
           "name": "Kirana / Grocery Store",
           "name_hi": "किराना स्टोर",
-          "icon": "🛒"
+          "icon": "🛒",
+          "keywords": "kirana grocery general store provision daily needs"
         },
         {
           "slug": "catering-service",
@@ -1326,7 +1350,8 @@
           "slug": "tuition-coaching",
           "name": "Tuition / Coaching Center",
           "name_hi": "ट्यूशन / कोचिंग",
-          "icon": "✏️"
+          "icon": "✏️",
+          "keywords": "tuition tutor coaching home tuition"
         },
         {
           "slug": "music-dance",
@@ -1374,7 +1399,8 @@
           "slug": "coaching-institute",
           "name": "Coaching Institute",
           "name_hi": "कोचिंग संस्थान",
-          "icon": "📘"
+          "icon": "📘",
+          "keywords": "coaching institute classes preparation iit neet"
         },
         {
           "slug": "skill-vocational",
