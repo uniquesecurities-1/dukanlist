@@ -66,6 +66,42 @@
     const items = load().filter(b => !opts.excludeSlug || b.slug !== opts.excludeSlug);
     if (!items.length){ slot.style.display = 'none'; return; }
 
+    // ============================================================
+    // Legacy-data backfill (v2.9.97)
+    // Entries saved BEFORE v2.9.95 don't have is_professional_listing /
+    // professional_tier captured → strict pros still show ⭐ rating.
+    // On render, identify any such entries and fetch their current pro
+    // status from DB, merge into localStorage, and re-render once.
+    // ============================================================
+    try {
+      const idsNeedingPro = items.filter(b =>
+        b.id && (b.is_professional_listing === undefined || b.professional_tier === undefined)
+      ).map(b => b.id);
+      if (idsNeedingPro.length && typeof ShopDB !== 'undefined' && ShopDB && ShopDB.client){
+        ShopDB.client.from('businesses')
+          .select('id, is_professional_listing, professional_tier')
+          .in('id', idsNeedingPro)
+          .then(function(res){
+            if (res.error || !res.data || !res.data.length) return;
+            const fresh = load();
+            let changed = false;
+            res.data.forEach(function(r){
+              const x = fresh.find(function(it){ return it.id === r.id; });
+              if (x){
+                x.is_professional_listing = r.is_professional_listing === true;
+                x.professional_tier = r.professional_tier || null;
+                changed = true;
+              }
+            });
+            if (changed){
+              save(fresh);
+              // Re-render now that the rating display can correctly suppress strict pros
+              DukanRecent.render(slotId, opts);
+            }
+          });
+      }
+    } catch(_){}
+
     slot.style.display = '';
     slot.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
