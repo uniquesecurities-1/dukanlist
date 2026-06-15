@@ -107,7 +107,7 @@ function renderPage(opts){
         "telephone": s.mobile || undefined,
         "address": { "@type": "PostalAddress", "addressLocality": cityName, "streetAddress": localityName },
         "aggregateRating": s.rating_count > 0
-          ? { "@type": "AggregateRating", "ratingValue": s.rating_avg, "reviewCount": s.rating_count }
+          ? ((s.is_professional_listing === true && s.professional_tier === 'strict') ? undefined : { "@type": "AggregateRating", "ratingValue": s.rating_avg, "reviewCount": s.rating_count })
           : undefined
       }
     }))

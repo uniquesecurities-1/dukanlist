@@ -231,6 +231,7 @@ async function init(){
   setTimeout(loadCategoryEditor, 100);
   setTimeout(loadLocationEditor, 100);
   setTimeout(loadReviewsForAdmin, 100);
+  setTimeout(loadProfessionalEditor, 100);
 }
 
 function render(){
@@ -395,6 +396,9 @@ function render(){
           + '<span id="catStatus" style="font-size:12px;color:#64748b"></span>'
           + '<button type="button" class="btn pri" onclick="saveShopCategories()">💾 Save Categories</button>'
         + '</div>'
+
+      // === Professional Listing fieldset (auto-shown when biz is in a pro category) ===
+      + '<div id="proFieldsetSlot"></div>'
       + '</div>'
 
       // === Photos preview ===
@@ -910,6 +914,140 @@ async function loadEditHistory(){
       + '<div class="eh-vals"><span class="o">' + esc(e.old_value || '—') + '</span><span class="n">' + esc(e.new_value || '—') + '</span></div>'
       + '</div>';
   }).join('');
+}
+
+// ====== Professional Listing Editor (admin) — db/150 ======
+async function loadProfessionalEditor(){
+  var c = ShopDB.client;
+  var slot = document.getElementById('proFieldsetSlot');
+  if (!slot) return;
+
+  try {
+    var r = await c.rpc('admin_get_shop_pro_fields', { p_business_id: BIZ_ID });
+    if (r.error){
+      console.warn('Pro fields fetch failed:', r.error);
+      slot.innerHTML = '';
+      return;
+    }
+    var pro = r.data || {};
+
+    // If listing is NOT flagged as professional, show a small "Enable" toggle
+    // so admin can manually flag a missed one (rare edge case)
+    if (!pro.is_professional_listing){
+      slot.innerHTML =
+        '<div class="card" style="margin-top:14px;border:1.5px dashed #CBD5E1">'
+          + '<h2>🛡️ Professional Listing <span class="subtle">not flagged — only enable for regulated professions</span></h2>'
+          + '<div style="display:flex;gap:10px;align-items:center;font-size:13px;color:#475569">'
+            + '<button type="button" class="btn" onclick="adminFlagAsProfessional(\'strict\')" style="background:#FEE2E2;color:#991B1B;border:none;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit">Flag as STRICT (CA/Doctor/Lawyer)</button>'
+            + '<button type="button" class="btn" onclick="adminFlagAsProfessional(\'partial\')" style="background:#FEF3C7;color:#92400E;border:none;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit">Flag as PARTIAL (MFD/Broker/Insurance)</button>'
+            + '<span style="color:#94a3b8;font-size:11.5px">Auto-flag trigger does this on new INSERTs (db/149) — use only for legacy fix.</span>'
+          + '</div>'
+        + '</div>';
+      return;
+    }
+
+    var tier = pro.professional_tier || 'strict';
+    var tierClass = tier === 'strict' ? '#FEE2E2;color:#991B1B' : '#FEF3C7;color:#92400E';
+    var verified = !!pro.prof_verified_at;
+    var disc = pro.disclaimer_accepted_at ? new Date(pro.disclaimer_accepted_at).toLocaleString('en-IN') : '—';
+    var verAt = pro.prof_verified_at ? new Date(pro.prof_verified_at).toLocaleString('en-IN') : '—';
+    var areasStr = Array.isArray(pro.practice_areas) ? pro.practice_areas.join(', ') : '';
+
+    slot.innerHTML =
+      '<div class="card" style="margin-top:14px;border:1.5px solid #7DD3FC;background:linear-gradient(180deg,#F0F9FF 0%,#fff 70%)">'
+        + '<h2 style="display:flex;align-items:center;gap:10px">🛡️ Professional Listing '
+        + '<span class="pill" style="background:' + tierClass + ';padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.04em">' + esc(tier.toUpperCase()) + '</span>'
+        + (verified ? ' <span class="pill" style="background:#D1FAE5;color:#065F46;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800">✓ VERIFIED</span>' : ' <span class="pill" style="background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800">⏳ PENDING VERIFY</span>')
+        + '</h2>'
+
+        + '<div style="background:#FEF3C7;border-left:4px solid #F59E0B;color:#78350F;padding:10px 14px;border-radius:8px;font-size:12.5px;line-height:1.5;margin-bottom:14px">'
+          + '<b>Compliance mode active.</b> This listing has reviews/ratings/Top-Rated badges/Featured promotion all suppressed per ICAI/NMC/BCI/AMFI/SEBI/IRDAI rules. '
+          + 'Verify membership via <a href="/admin/professional-verify.html" style="color:#9A3412;text-decoration:underline;font-weight:700">Professional Verify queue</a> for full approval.'
+        + '</div>'
+
+        + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;font-size:13px">'
+          + '<div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:3px">Tier</div>'
+            + '<select id="proTier" class="input" style="width:100%">'
+              + '<option value="strict"' + (tier==='strict'?' selected':'') + '>STRICT (CA/Doctor/Lawyer)</option>'
+              + '<option value="partial"' + (tier==='partial'?' selected':'') + '>PARTIAL (MFD/Broker/Insurance)</option>'
+            + '</select></div>'
+          + '<div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:3px">Authority</div>'
+            + '<select id="proAuthority" class="input" style="width:100%">'
+              + '<option value="">— select —</option>'
+              + ['ICAI','NMC','BCI','ICSI','ICMAI','AMFI','SEBI','IRDAI'].map(function(a){
+                return '<option value="' + a + '"' + (pro.membership_authority===a?' selected':'') + '>' + a + '</option>';
+              }).join('')
+            + '</select></div>'
+
+          + '<div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:3px">Membership / Registration No.</div>'
+            + '<input type="text" id="proMembershipNo" class="input" value="' + esc(pro.membership_no || '') + '" placeholder="ICAI No / MCI Reg / BAR No / ARN" maxlength="40" style="width:100%"></div>'
+
+          + '<div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:3px">Qualification</div>'
+            + '<input type="text" id="proQualification" class="input" value="' + esc(pro.professional_qualification || '') + '" placeholder="CA / MBBS / LLB / etc." maxlength="40" style="width:100%"></div>'
+
+          + '<div style="grid-column:1/-1"><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:3px">Areas of Practice (comma-separated)</div>'
+            + '<input type="text" id="proPracticeAreas" class="input" value="' + esc(areasStr) + '" placeholder="Tax, Audit, GST" maxlength="200" style="width:100%"></div>'
+
+          + '<div style="grid-column:1/-1"><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;margin-bottom:3px">Verification Notes (admin-only, audit trail)</div>'
+            + '<textarea id="proNotes" class="input" rows="2" placeholder="ICAI Member Tracer confirmed on YYYY-MM-DD" style="width:100%;font-family:inherit;resize:vertical">' + esc(pro.prof_verification_notes || '') + '</textarea></div>'
+        + '</div>'
+
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;font-size:11.5px;color:#64748b">'
+          + '<div><b>Disclaimer accepted:</b> ' + esc(disc) + '</div>'
+          + '<div><b>Verified at:</b> ' + esc(verAt) + '</div>'
+        + '</div>'
+
+        + '<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0">'
+          + '<span id="proStatus" style="font-size:12px;color:#64748b"></span>'
+          + '<button type="button" class="btn pri" onclick="saveProfessionalFields()">💾 Save Professional Fields</button>'
+        + '</div>'
+      + '</div>';
+  } catch(e){
+    console.warn('Pro editor error:', e);
+    slot.innerHTML = '';
+  }
+}
+
+async function adminFlagAsProfessional(tier){
+  if (!confirm('Flag this listing as professional (' + tier.toUpperCase() + ' tier)?\n\nThis will hide ratings/reviews/Top Rated badges on the public listing.')) return;
+  var c = ShopDB.client;
+  var r = await c.rpc('admin_update_shop', {
+    p_business_id: BIZ_ID,
+    p_patch: { is_professional_listing: true, professional_tier: tier }
+  });
+  if (r.error){ alert('Flag failed: ' + r.error.message); return; }
+  loadProfessionalEditor();
+}
+
+async function saveProfessionalFields(){
+  var statusEl = document.getElementById('proStatus');
+  if (statusEl) statusEl.textContent = 'Saving…';
+  var c = ShopDB.client;
+  var tier = document.getElementById('proTier').value || null;
+  var authority = document.getElementById('proAuthority').value || null;
+  var membershipNo = (document.getElementById('proMembershipNo').value || '').trim();
+  var qualification = (document.getElementById('proQualification').value || '').trim();
+  var areasRaw = (document.getElementById('proPracticeAreas').value || '').trim();
+  var notes = (document.getElementById('proNotes').value || '').trim();
+  var areas = areasRaw ? areasRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean).slice(0, 12) : [];
+
+  var patch = {
+    professional_tier: tier,
+    membership_authority: authority,
+    membership_no: membershipNo || null,
+    professional_qualification: qualification || null,
+    practice_areas: areas,
+    prof_verification_notes: notes || null
+  };
+
+  var r = await c.rpc('admin_update_shop', { p_business_id: BIZ_ID, p_patch: patch });
+  if (r.error){
+    if (statusEl) statusEl.textContent = '';
+    alert('Save failed: ' + r.error.message);
+    return;
+  }
+  if (statusEl) statusEl.textContent = '✓ Saved';
+  setTimeout(function(){ if (statusEl) statusEl.textContent = ''; }, 2200);
 }
 
 // ====== Category Editor (admin) ======

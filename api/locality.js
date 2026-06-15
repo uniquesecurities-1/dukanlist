@@ -143,7 +143,7 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
     orClauses.push('id.in.(' + linkedIds.join(',') + ')');
   }
 
-  const q = 'businesses?select=id,slug,name,name_hi,mobile,whatsapp,address_line1,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,geo_cities(name)'
+  const q = 'businesses?select=id,slug,name,name_hi,mobile,whatsapp,address_line1,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name)'
     + '&status=eq.active'
     + '&city_id=eq.' + cityId
     + '&or=(' + orClauses.join(',') + ')'
@@ -156,9 +156,14 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
 function renderShopCard(b){
   const cityName = b.geo_cities && b.geo_cities.name ? b.geo_cities.name : '';
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
-  const rating = b.rating_avg > 0
-    ? `<span style="color:#0F172A;font-weight:700">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:#64748b">(${b.rating_count || 0})</span></span>`
-    : '<span style="color:#94a3b8">No reviews yet</span>';
+  // Professional listing flags drive what's hidden (per ICAI/NMC/BCI etc. rules)
+  const isProfStrict  = b.is_professional_listing === true && b.professional_tier === 'strict';
+  const isProfPartial = b.is_professional_listing === true && b.professional_tier === 'partial';
+  const rating = isProfStrict
+    ? '<span style="color:#0EA5E9;font-weight:700">🛡 Professional Listing</span>'
+    : (b.rating_avg > 0
+        ? `<span style="color:#0F172A;font-weight:700">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:#64748b">(${b.rating_count || 0})</span></span>`
+        : '<span style="color:#94a3b8">No reviews yet</span>');
   const since = b.established_year && b.established_year > 1900
     ? `<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">Since ${b.established_year}</span>`
     : '';
@@ -204,7 +209,7 @@ function renderPage(opts){
         "url": `${ORIGIN}/business.html?slug=${s.slug}`,
         "telephone": s.mobile || undefined,
         "address": { "@type": "PostalAddress", "addressLocality": cityName, "postalCode": s.pincode },
-        "aggregateRating": s.rating_count > 0 ? { "@type": "AggregateRating", "ratingValue": s.rating_avg, "reviewCount": s.rating_count } : undefined
+        "aggregateRating": (s.rating_count > 0 && !(s.is_professional_listing === true && s.professional_tier === 'strict')) ? { "@type": "AggregateRating", "ratingValue": s.rating_avg, "reviewCount": s.rating_count } : undefined
       }
     }))
   };
