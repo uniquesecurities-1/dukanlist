@@ -3156,15 +3156,177 @@ async function loadRecommendations(slug){
   } catch(e){ console.warn('loadRecommendations failed:', e); }
 }
 
+
+// ============================================================
+// CUSTOMER REVIEW MANAGEMENT — Edit + Delete (db/152)
+// Customer can update their review (max 3, 30-day cooldown, history
+// preserved) or soft-delete it. Identity via phone stored in localStorage
+// at submit time. All ops go through update_my_review / delete_my_review
+// RPCs which re-hash phone server-side and verify ownership.
+// ============================================================
+
+function getMyPhoneForBiz(){
+  try {
+    const m = JSON.parse(localStorage.getItem('dukan_review_phones_v1') || '{}');
+    return BIZ && BIZ.id ? (m[BIZ.id] || null) : null;
+  } catch(_){ return null; }
+}
+
+function toggleOriginal(rid){
+  const el = document.getElementById('orig_' + rid);
+  if (!el) return;
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
+
+function openMyReviewEdit(rid, currentRating, currentText, updateCount){
+  const updatesLeft = Math.max(0, 3 - (updateCount || 0));
+  if (updatesLeft === 0){
+    alert('You have already updated this review 3 times — that is the maximum.');
+    return;
+  }
+
+  // Build inline edit modal — appended to body to avoid stacking issues
+  if (document.getElementById('myReviewEditModal')) return;
+  const modal = document.createElement('div');
+  modal.id = 'myReviewEditModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;box-shadow:0 25px 70px rgba(0,0,0,.3)">
+      <h3 style="margin:0 0 6px;font-size:18px;font-weight:800;color:#0F172A">Update your review</h3>
+      <p style="margin:0 0 16px;font-size:13px;color:#64748B;line-height:1.5">Your original review will be preserved and shown alongside the update for transparency. You have <b>${updatesLeft}</b> update${updatesLeft === 1 ? '' : 's'} remaining.</p>
+
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:6px">New rating</label>
+        <div id="myReviewEditStars" style="display:flex;gap:6px;font-size:1.8rem;cursor:pointer">
+          ${[1,2,3,4,5].map(n => `<span data-r="${n}" onclick="setMyReviewEditRating(${n})" style="opacity:${n <= currentRating ? '1' : '.3'};transition:.15s">⭐</span>`).join('')}
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:6px">Updated review text (optional)</label>
+        <textarea id="myReviewEditText" rows="4" maxlength="600" style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-family:inherit;font-size:14px;resize:vertical;line-height:1.5">${escapeHTML(currentText || '')}</textarea>
+      </div>
+
+      <div id="myReviewEditErr" style="display:none;color:#DC2626;font-size:13px;margin-bottom:10px"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button onclick="closeMyReviewEdit()" style="background:transparent;border:1px solid #E2E8F0;color:#475569;padding:9px 18px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>
+        <button id="myReviewEditSaveBtn" onclick="saveMyReviewEdit('${rid}')" style="background:#1E3A8A;color:#fff;border:0;padding:9px 22px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">Save update</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.dataset.currentRating = String(currentRating);
+}
+
+function setMyReviewEditRating(n){
+  const modal = document.getElementById('myReviewEditModal');
+  if (!modal) return;
+  modal.dataset.currentRating = String(n);
+  modal.querySelectorAll('#myReviewEditStars span').forEach(s => {
+    s.style.opacity = (Number(s.dataset.r) <= n) ? '1' : '.3';
+  });
+}
+
+function closeMyReviewEdit(){
+  const m = document.getElementById('myReviewEditModal');
+  if (m) m.remove();
+}
+
+async function saveMyReviewEdit(rid){
+  const modal = document.getElementById('myReviewEditModal');
+  if (!modal) return;
+  const rating = Number(modal.dataset.currentRating || 0);
+  const text = (document.getElementById('myReviewEditText').value || '').trim();
+  const errEl = document.getElementById('myReviewEditErr');
+  const saveBtn = document.getElementById('myReviewEditSaveBtn');
+
+  if (rating < 1 || rating > 5){
+    errEl.style.display = 'block'; errEl.textContent = 'Please pick a rating (1-5 stars).';
+    return;
+  }
+
+  const phone = getMyPhoneForBiz();
+  if (!phone){
+    errEl.style.display = 'block'; errEl.textContent = 'Could not verify your identity. Did you clear browser data?';
+    return;
+  }
+
+  saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+  const c = ShopDB.client;
+  const r = await c.rpc('update_my_review', {
+    p_phone: phone,
+    p_review_id: rid,
+    p_new_rating: rating,
+    p_new_text: text || null
+  });
+  if (r.error){
+    saveBtn.disabled = false; saveBtn.textContent = 'Save update';
+    errEl.style.display = 'block'; errEl.textContent = r.error.message;
+    return;
+  }
+  closeMyReviewEdit();
+  // Reload reviews to show the update
+  if (BIZ && BIZ.id) loadReviews(BIZ.id);
+}
+
+async function confirmDeleteMyReview(rid){
+  if (!confirm('Delete your review permanently?\n\nYou can submit a new one later if you want. The original will be removed from public view.')) return;
+  const phone = getMyPhoneForBiz();
+  if (!phone){
+    alert('Could not verify your identity. Did you clear browser data?');
+    return;
+  }
+  const c = ShopDB.client;
+  const r = await c.rpc('delete_my_review', { p_phone: phone, p_review_id: rid });
+  if (r.error){
+    alert('Delete failed: ' + r.error.message);
+    return;
+  }
+  // Remove from localStorage too
+  try {
+    const m = JSON.parse(localStorage.getItem('dukan_review_phones_v1') || '{}');
+    if (BIZ && BIZ.id) delete m[BIZ.id];
+    localStorage.setItem('dukan_review_phones_v1', JSON.stringify(m));
+  } catch(_){}
+  if (BIZ && BIZ.id) loadReviews(BIZ.id);
+}
+
+window.openMyReviewEdit = openMyReviewEdit;
+window.setMyReviewEditRating = setMyReviewEditRating;
+window.closeMyReviewEdit = closeMyReviewEdit;
+window.saveMyReviewEdit = saveMyReviewEdit;
+window.confirmDeleteMyReview = confirmDeleteMyReview;
+window.toggleOriginal = toggleOriginal;
+
 async function loadReviews(bizId){
   const c = ShopDB.client; if (!c) return;
   IS_BIZ_OWNER = await checkIsBizOwner(bizId);
   const { data } = await c.from('reviews')
-    .select('id, customer_name, rating, text, owner_reply, owner_reply_at, created_at')
+    .select('id, customer_name, rating, text, owner_reply, owner_reply_at, created_at, original_rating, original_text, update_count, last_updated_at')
     .eq('business_id', bizId)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(50);
+  // ============================================================
+  // Identify which of these reviews belongs to the current viewer
+  // (based on phone saved in localStorage at submit time). RPC call
+  // returns IDs whose phone-hash matches — used to gate Edit/Delete UI.
+  // ============================================================
+  let MY_REVIEW_IDS = new Set();
+  try {
+    const storedRaw = localStorage.getItem('dukan_review_phones_v1') || '{}';
+    const storedMap = JSON.parse(storedRaw);
+    const myPhoneForBiz = storedMap[bizId];
+    if (myPhoneForBiz){
+      const ownR = await c.rpc('my_reviews_for_business', { p_phone: myPhoneForBiz, p_business_id: bizId });
+      if (ownR.data && ownR.data.length){
+        ownR.data.forEach(r => MY_REVIEW_IDS.add(r.review_id));
+        window._myReviewPhone_for_biz = myPhoneForBiz;
+      }
+    }
+  } catch(_){}
+  window._myReviewIds = MY_REVIEW_IDS;
   if (!data || !data.length) return;
   // Stash for review-boost widget
   try { window._latestReviews = data; } catch(_){}
@@ -3178,19 +3340,50 @@ async function loadReviews(bizId){
     const name = (r.customer_name || 'Anonymous').trim();
     const initial = name.charAt(0).toUpperCase() || '?';
     const replyDate = r.owner_reply_at ? new Date(r.owner_reply_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '';
+    const isMine = MY_REVIEW_IDS.has(r.id);
+    const updatedAgo = r.last_updated_at
+      ? (function(d){ const diff = (Date.now() - new Date(d).getTime()) / 1000;
+          if (diff < 3600) return Math.max(1, Math.floor(diff/60)) + ' min ago';
+          if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+          if (diff < 86400*30) return Math.floor(diff/86400) + 'd ago';
+          return new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+        })(r.last_updated_at)
+      : '';
+    const updatedTag = r.update_count > 0
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#FEF3C7;color:#78350F;padding:2px 8px;border-radius:99px;font-size:.66rem;font-weight:700;margin-left:6px" title="Edited by reviewer">✎ Updated ${updatedAgo}</span>`
+      : '';
+    const myBadge = isMine
+      ? '<span style="display:inline-block;background:#DBEAFE;color:#1E40AF;padding:2px 8px;border-radius:99px;font-size:.66rem;font-weight:800;letter-spacing:.04em;margin-left:6px">YOURS</span>'
+      : '';
+    const myActions = isMine ? `
+        <div style="margin-left:46px;margin-top:6px;display:flex;gap:6px;align-items:center;font-size:11px">
+          <button type="button" onclick="openMyReviewEdit('${r.id}', ${r.rating}, ${JSON.stringify(r.text||'').replace(/"/g,'&quot;')}, ${r.update_count||0})"
+                  style="background:#EFF6FF;color:#1E40AF;border:0;padding:5px 12px;border-radius:7px;font-weight:700;cursor:pointer">✎ Edit my review</button>
+          <button type="button" onclick="confirmDeleteMyReview('${r.id}')"
+                  style="background:#FEF2F2;color:#991B1B;border:0;padding:5px 12px;border-radius:7px;font-weight:700;cursor:pointer">🗑 Delete</button>
+          ${r.update_count > 0 && r.original_text ? `<button type="button" onclick="toggleOriginal('${r.id}')" style="background:transparent;color:#64748b;border:0;padding:5px 8px;font-weight:600;cursor:pointer;text-decoration:underline">View original</button>` : ''}
+        </div>
+        ${r.update_count > 0 && r.original_text ? `<div id="orig_${r.id}" style="display:none;margin-left:46px;margin-top:6px;padding:10px 12px;background:#F8FAFC;border-left:3px solid #94A3B8;border-radius:0 8px 8px 0;font-size:.84rem;color:#475569;line-height:1.5">
+          <div style="font-size:.68rem;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Original review · ${'⭐'.repeat(r.original_rating || 0)}</div>
+          <div style="font-style:italic">"${escapeHTML(r.original_text)}"</div>
+        </div>` : ''}
+    ` : '';
+
     return `<div class="review${_hide}" data-rid="${r.id}">
       <div class="r-head">
         <div class="r-avatar">${initial}</div>
         <div style="flex:1;min-width:0">
-          <div class="r-name">${escapeHTML(name)}</div>
+          <div class="r-name">${escapeHTML(name)}${myBadge}</div>
           <div class="r-meta">
             <span class="r-star">${stars}</span>
             <span>·</span>
             <span>${date}</span>
+            ${updatedTag}
           </div>
         </div>
       </div>
       ${r.text ? `<div class="r-text">${escapeHTML(r.text)}</div>` : ''}
+      ${myActions}
       ${r.owner_reply ? `<div class="r-reply" style="margin-left:46px;background:#FFF8F0;border-left:3px solid #FF6B1A;padding:10px 14px;border-radius:0 10px 10px 0;margin-top:8px">
         <div style="font-size:11px;color:#92400E;font-weight:700;margin-bottom:4px">🛡 OWNER REPLIED · ${replyDate}</div>
         <div style="color:#0F172A;line-height:1.55;font-size:.92rem">${escapeHTML(r.owner_reply)}</div>
@@ -3452,6 +3645,12 @@ async function submitReviewPrompt(){
       p_text: text || null
     });
     if (r.error) throw r.error;
+    // Remember this device's phone for THIS business (RP path)
+    try {
+      const m = JSON.parse(localStorage.getItem('dukan_review_phones_v1') || '{}');
+      m[BIZ.id] = (typeof phone !== 'undefined' ? phone : (typeof rpPhone !== 'undefined' ? rpPhone : null));
+      if (m[BIZ.id]) localStorage.setItem('dukan_review_phones_v1', JSON.stringify(m));
+    } catch(_){}
     // Mark as submitted — don't show again
     try { localStorage.setItem(rpKey(), String(Date.now())); } catch(_){}
     // Show success state
@@ -3689,6 +3888,12 @@ async function submitReview(){
       p_text         : text || null
     });
     if (error){ throw error; }
+    // Remember this device's phone for THIS business so we can show Edit/Delete on revisit
+    try {
+      const m = JSON.parse(localStorage.getItem('dukan_review_phones_v1') || '{}');
+      m[BIZ.id] = phone;
+      localStorage.setItem('dukan_review_phones_v1', JSON.stringify(m));
+    } catch(_){}
 
     if (loadingRow) loadingRow.remove();
     // Phase 3 (2026-06-05): Fire review push to owner
