@@ -17,6 +17,38 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
 
 const ORIGIN = 'https://dukanlist.com';
 
+// ============================================================
+// MEGA_SLUGS: user-friendly chip slugs that expand into a SET
+// of real category slugs. Mirrors CHIP_TO_SLUGS in
+// assets/js/homepage.js — keep both in sync if either changes.
+//
+// Reason: a "Doctors in Mandi Dabwali" pill should match shops
+// registered as dentist, ayurveda, hospital, gynecologist, etc.
+// — not just slug=doctor. Same for mechanic, grocery, salon, etc.
+//
+// When catSlug matches one of these keys, the page treats the
+// entire array as the target slug set (uses friendly display
+// name and merges results across all member categories).
+// Members that don't exist in the categories table are silently
+// dropped at resolution time — no error, just fewer ids.
+// ============================================================
+const MEGA_SLUGS = {
+  'doctor':   { slugs: ['doctor','dentist','ayurveda','homeopathy','hospital','physiotherapist','eye-care','gynecologist','pediatrician'],
+                name: 'Doctors & Clinics', name_hi: 'डॉक्टर एवं क्लिनिक', icon: '🩺' },
+  'mechanic': { slugs: ['mechanic-2w','mechanic-4w','car-service','tyre-shop','spare-parts','cycle-shop','puncture-shop','tractor-parts','battery-shop','car-ac-repair','denting-painting'],
+                name: 'Mechanic & Repair', name_hi: 'मैकेनिक एवं रिपेयर', icon: '🔧' },
+  'grocery':  { slugs: ['kirana-grocery','general-store','wholesale-dealer'],
+                name: 'Grocery / Kirana', name_hi: 'किराना / जनरल स्टोर', icon: '🛒' },
+  'salon':    { slugs: ['salon-beauty','unisex-salon','mens-salon','beauty-parlour','salon','spa'],
+                name: 'Salon & Beauty', name_hi: 'सैलून एवं ब्यूटी', icon: '💇' },
+  'tutor':    { slugs: ['tuition-coaching','coaching-institute','training-institute','skill-vocational','english-speaking','computer-classes','computer-class','art-craft-class'],
+                name: 'Tutors & Coaching', name_hi: 'ट्यूटर एवं कोचिंग', icon: '📚' },
+  'medical':  { slugs: ['pharmacy'],
+                name: 'Medical Store / Pharmacy', name_hi: 'मेडिकल स्टोर / फार्मेसी', icon: '💊' },
+  'bakery':   { slugs: ['bakery-cake'],
+                name: 'Bakery & Cake Shop', name_hi: 'बेकरी एवं केक शॉप', icon: '🧁' }
+};
+
 function esc(s){
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -44,17 +76,47 @@ async function findCity(citySlug){
 
 async function findCategory(catSlug){
   if (!catSlug) return null;
+
+  // Mega-slug path: resolve to all member sub-categories.
+  // Returns a synthetic "virtual category" with isMega=true so the
+  // handler / renderer / fetcher know to treat catIds as the union.
+  const mega = MEGA_SLUGS[catSlug];
+  if (mega){
+    const inList = mega.slugs.map(s => encodeURIComponent(s)).join(',');
+    const rows = await sb('categories?select=id,slug&active=eq.true&slug=in.(' + inList + ')');
+    const ids = (rows || []).map(r => r.id);
+    if (ids.length === 0) return null;
+    return {
+      id: ids[0],            // first member — used only as a fallback display id
+      ids: ids,              // ALL member ids — used by fetchShops
+      name: mega.name,
+      name_hi: mega.name_hi,
+      icon: mega.icon,
+      slug: catSlug,
+      parent_id: null,
+      isMega: true
+    };
+  }
+
+  // Normal single-slug path (unchanged).
   const rows = await sb('categories?select=id,name,name_hi,icon,parent_id,slug&active=eq.true&slug=eq.' + encodeURIComponent(catSlug));
   return rows && rows[0] ? rows[0] : null;
 }
 
-async function fetchShops(cityId, catId, catIsParent){
+async function fetchShops(cityId, catId, catIsParent, megaIds){
   // Build list of category IDs to search.
-  // For a parent: include all child sub-cat IDs too.
-  let categoryIds = [catId];
-  if (catIsParent){
-    const subs = await sb('categories?select=id&parent_id=eq.' + catId);
-    categoryIds = categoryIds.concat((subs || []).map(s => s.id));
+  // - megaIds (from MEGA_SLUGS resolution) → use that union directly
+  // - parent  → include all child sub-cat IDs too
+  // - leaf    → just the single category id
+  let categoryIds;
+  if (megaIds && megaIds.length > 0){
+    categoryIds = megaIds.slice();
+  } else {
+    categoryIds = [catId];
+    if (catIsParent){
+      const subs = await sb('categories?select=id&parent_id=eq.' + catId);
+      categoryIds = categoryIds.concat((subs || []).map(s => s.id));
+    }
   }
   const catIdsStr = categoryIds.join(',');
 
@@ -284,11 +346,15 @@ export default async function handler(req, res){
     }
 
     const isParent = cat.parent_id === null;
-    const shops = await fetchShops(city.id, cat.id, isParent);
+    const isMega = !!cat.isMega;
+    // Mega-slug: pass the resolved member-id list straight to fetchShops.
+    // Parent: include child sub-cats. Leaf: single category id.
+    const shops = await fetchShops(city.id, cat.id, isParent && !isMega, isMega ? cat.ids : null);
 
-    // For parents, also fetch sub-categories to surface as quick links
+    // For real parents (NOT mega), also fetch sub-categories to surface as quick links.
+    // Mega-slug pages don't surface a sub-cat strip — the mega already IS the union.
     let subCategories = null;
-    if (isParent){
+    if (isParent && !isMega){
       subCategories = await sb('categories?select=slug,name,icon&active=eq.true&parent_id=eq.' + cat.id + '&order=sort_order');
     }
 
