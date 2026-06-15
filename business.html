@@ -2254,7 +2254,11 @@ function render(){
   renderDetailTrustStrip(b);
 
   // Trust Tier badge (Bronze / Silver / Gold) — Power Features Pack
-  if (typeof DukanTier !== 'undefined'){
+  // Suppressed for strict professional listings — their Professional Card already
+  // shows the specific regulator verification (NMC/ICAI/BCI etc.), and the generic
+  // Bronze/Silver/Gold tier is unrelated to professional credentials.
+  const _isProfStrictTier = b.is_professional_listing === true && b.professional_tier === 'strict';
+  if (typeof DukanTier !== 'undefined' && !_isProfStrictTier){
     const tierHTML = DukanTier.badge(b);
     if (tierHTML){
       const nameEl = document.querySelector('.biz-name, h1.title, h1');
@@ -2698,8 +2702,14 @@ function renderWhyThisShop(b){
   if (!host) return;
   const pills = [];
 
+  // Strict professional listings: suppress generic DukanTier (Bronze/Silver/Gold)
+  // and rating pills here. Their own Professional Card already shows a dedicated
+  // "✓ Verified by team" line with the specific regulator (NMC/ICAI/etc.) that
+  // verified the membership number. Reviews/ratings are prohibited by regulator.
+  const isProfStrict = b.is_professional_listing === true && b.professional_tier === 'strict';
+
   // Verified (only if score >= 3 — i.e. mobile + address + photo all done)
-  if ((b.verified_score || 0) >= 3){
+  if ((b.verified_score || 0) >= 3 && !isProfStrict){
     const tier = (b.verified_score >= 5) ? 'GOLD' : (b.verified_score >= 4 ? 'SILVER' : 'BRONZE');
     pills.push({
       cls: 'verified',
@@ -2708,7 +2718,7 @@ function renderWhyThisShop(b){
   }
 
   // Rating
-  if (b.rating_count > 0 && b.rating_avg > 0){
+  if (b.rating_count > 0 && b.rating_avg > 0 && !isProfStrict){
     pills.push({
       cls: 'rating',
       html: '⭐ <b>' + Number(b.rating_avg).toFixed(1) + '</b> · ' + b.rating_count + ' review' + (b.rating_count === 1 ? '' : 's')
@@ -3263,14 +3273,16 @@ async function submitReply(reviewId){
 async function renderDetailTrustStrip(b){
   const host = document.getElementById('detailTrustStrip');
   if (!host) return;
+  // Strict pros: skip Verified/Featured/Rating pills here too — same reasoning as renderWhyThisShop
+  const isProfStrict = b.is_professional_listing === true && b.professional_tier === 'strict';
   const pills = [];
-  if (Number(b.verified_score) >= 3) pills.push({ ico: '✓', text: 'Verified', cls: 'verified' });
-  if (b.is_featured) pills.push({ ico: '★', text: 'Featured', cls: 'featured' });
+  if (Number(b.verified_score) >= 3 && !isProfStrict) pills.push({ ico: '✓', text: 'Verified', cls: 'verified' });
+  if (b.is_featured && !isProfStrict) pills.push({ ico: '★', text: 'Featured', cls: 'featured' });
   if (b.established_year){
     const yrs = new Date().getFullYear() - Number(b.established_year);
     if (yrs >= 1) pills.push({ ico: '\u{1F3DB}', text: yrs + (yrs === 1 ? ' year' : ' years') + ' established', cls: '' });
   }
-  if (Number(b.rating_avg) >= 4 && Number(b.rating_count) >= 5){
+  if (Number(b.rating_avg) >= 4 && Number(b.rating_count) >= 5 && !isProfStrict){
     pills.push({ ico: '⭐', text: Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ' review' + (Number(b.rating_count)===1?'':'s') + ')', cls: 'rating-clickable', href: '#reviewsAnchor' });
   }
   // Quick-replies signal — if owner has any review reply
