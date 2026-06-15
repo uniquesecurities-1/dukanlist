@@ -1904,7 +1904,9 @@ function injectSchemaOrg(b){
     "@id": url + "#business",
     "name": b.name,
     "url": url,
-    "description": b.usp_text || ('Local business — ' + (cat.name || '')),
+    "description": (b.is_professional_listing && b.professional_tier === 'strict')
+      ? ('Professional listing — ' + (cat.name || '') + ' in ' + (b.geo_cities?.name || ''))
+      : (b.usp_text || ('Local business — ' + (cat.name || ''))),
     "telephone": '+91' + (b.mobile || '').replace(/[^\d]/g, ''),
     "address": {
       "@type": "PostalAddress",
@@ -2159,7 +2161,10 @@ function render(){
 
   // Meta tags
   document.title = `${b.name} — ${b.categories?.name || 'Local Business'} in ${b.geo_cities?.name || ''} | dukanlist.com`;
-  const _desc = (b.usp_text || `${b.name} — ${b.categories?.name || ''} in ${b.geo_cities?.name || ''}`).slice(0,180);
+  const _desc = ((b.is_professional_listing && b.professional_tier === 'strict')
+    ? (`${b.name} — ${b.categories?.name || ''} in ${b.geo_cities?.name || ''} · Professional listing (informational only).`)
+    : (b.usp_text || `${b.name} — ${b.categories?.name || ''} in ${b.geo_cities?.name || ''}`)
+  ).slice(0,180);
   const _title = `${b.name}${b.geo_cities?.name ? ' — ' + b.geo_cities.name : ''} · DukanList`;
   const _img   = (Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string')
                    ? b.photos[0]
@@ -2199,7 +2204,11 @@ function render(){
         <div class="ph-fb-icon">${catIcon}</div>
         <div class="ph-fb-name">${escapeHTML(b.name)}</div>
         <div class="ph-fb-tag">${escapeHTML(catName)}</div>
-        <div class="ph-fb-quote">"${escapeHTML((b.usp_text || 'Trusted local business on DukanList').slice(0, 90))}"</div>
+        <div class="ph-fb-quote">"${escapeHTML(
+          (b.is_professional_listing && b.professional_tier === 'strict')
+            ? ((b.categories?.name || 'Local listing') + ' — informational listing')
+            : ((b.usp_text || 'Trusted local business on DukanList').slice(0, 90))
+        )}"</div>
       </div>`;
     thEl.style.display = 'none';
   }
@@ -2311,7 +2320,9 @@ function render(){
     }
   } catch(e){ console.warn('Professional card render failed:', e); }
 
-  if (b.usp_text){
+  // Strict pros: suppress USP injection entirely. Don't even set the element text —
+  // CSS hides it but this prevents data-leak via DOM inspection / external selectors.
+  if (b.usp_text && !(b.is_professional_listing && b.professional_tier === 'strict')){
     const uspText = (lang === 'hi' && b.usp_hi) ? b.usp_hi : b.usp_text;
     document.getElementById('uspBox').textContent = uspText;
     document.getElementById('uspBox').style.display = '';

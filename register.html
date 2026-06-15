@@ -1866,6 +1866,41 @@ async function showProfessionalPanelIfNeeded(){
     STATE.data.profTier = strict ? 'strict' : 'partial';
     STATE.data.profCategorySlug = (strict || profCats[0]).slug;
     panel.style.display = '';
+
+    // STRICT TIER: hide Step 4 USP textarea + picker entirely — owner enters Areas of Practice
+    // via the Pro Panel instead. This is enforced at DB level by db/151 too.
+    try {
+      const uspGroup = document.querySelector('#step4 .form-group:has(#usp)') || document.getElementById('usp')?.closest('.form-group');
+      const uspPicker = document.getElementById('simpleUspPicker');
+      const uspTemplateDetails = document.querySelector('#step4 details');
+      const uspHiGroup = document.getElementById('uspHi')?.closest('.form-group');
+      if (STATE.data.profTier === 'strict'){
+        if (uspGroup) uspGroup.style.display = 'none';
+        if (uspPicker) uspPicker.style.display = 'none';
+        if (uspTemplateDetails) uspTemplateDetails.style.display = 'none';
+        if (uspHiGroup) uspHiGroup.style.display = 'none';
+        // Make USP textarea optional / clear value so submit doesn't fail validation
+        const uspEl = document.getElementById('usp');
+        if (uspEl){ uspEl.value = ''; uspEl.removeAttribute('required'); }
+        const uspHiEl = document.getElementById('uspHi');
+        if (uspHiEl) uspHiEl.value = '';
+      } else {
+        // Partial tier — restore visibility but maybe show a caution chip
+        if (uspGroup) uspGroup.style.display = '';
+        if (uspPicker) uspPicker.style.display = '';
+        if (uspTemplateDetails) uspTemplateDetails.style.display = '';
+        if (uspHiGroup) uspHiGroup.style.display = '';
+        // Inject caution if not already there
+        if (uspGroup && !document.getElementById('partialUspCaution')){
+          const caution = document.createElement('div');
+          caution.id = 'partialUspCaution';
+          caution.style.cssText = 'background:#FEF3C7;border-left:4px solid #F59E0B;color:#78350F;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:.8rem;line-height:1.5';
+          caution.innerHTML = '<b>⚠ Regulatory note:</b> Avoid return promises, guaranteed-performance claims, or testimonial-style counts (e.g. "1000+ clients"). Stick to factual service descriptions.';
+          uspGroup.appendChild(caution);
+        }
+      }
+    } catch(e){ console.warn('USP gating failed:', e); }
+
     // Tier indicator on the panel head
     const head = panel.querySelector('div[style*="font-weight:800;color:#075985"]');
     if (head){
