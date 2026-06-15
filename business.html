@@ -2024,7 +2024,13 @@ function profDisclaimerText(authority, lang){
       hi: 'बीमा एक solicitation का विषय है। IRDAI Reg advisor की authorization है। Policy documents ध्यान से पढ़ें।'
     }
   };
-  const d = D[authority] || D['ICAI'];
+  // If no authority resolved, return a generic regulatory notice (no wrong attribution)
+  if (!authority || !D[authority]){
+    return (lang === 'hi'
+      ? 'यह लिस्टिंग केवल सूचना के लिए है। यह व्यवसाय regulated profession से सम्बंधित है और अपने नियामक के Code of Conduct के अधीन है।'
+      : 'This listing is informational only. This business operates under a regulated profession and is bound by its regulator\'s Code of Conduct. Details shown are for identification and contact purposes.');
+  }
+  const d = D[authority];
   return (lang === 'hi' ? d.hi : d.en);
 }
 
@@ -2035,6 +2041,37 @@ function authorityFromQualification(qual){
   if (qual === 'CMA' || qual === 'ACMA' || qual === 'FCMA') return 'ICMAI';
   if (qual === 'LLB' || qual === 'LLM' || qual === 'ADVOCATE') return 'BCI';
   if (qual.startsWith('MBBS') || qual.startsWith('MD') || qual.startsWith('MS') || qual === 'BDS' || qual === 'MDS') return 'NMC';
+  if (qual === 'BAMS' || qual === 'BHMS' || qual === 'BPT') return 'NMC';
+  if (qual === 'MFD') return 'AMFI';
+  if (qual === 'AP') return 'SEBI';
+  if (qual === 'IRDAI') return 'IRDAI';
+  return null;
+}
+
+// Map category slug -> regulator authority (used as fallback when membership_authority
+// hasn't been set yet — e.g. listing auto-flagged by db/145 backfill but admin hasn't
+// completed verification). Without this fallback, a dentist would erroneously show
+// the ICAI disclaimer (default fallback was 'ICAI').
+function authorityFromCategorySlug(slug){
+  slug = (slug || '').toLowerCase();
+  // ICAI (Chartered Accountants)
+  if (slug === 'ca' || slug === 'tax-consultant') return 'ICAI';
+  // NMC (Medical Council) — all medical specialties
+  if (['doctor','dentist','pediatrician','gynecologist','orthopedic','cardiologist',
+       'dermatologist','ent-specialist','surgeon-general','urologist','neurologist',
+       'psychiatrist','diabetes-specialist','physiotherapist','ayurveda','homeopathy',
+       'hospital','nursing-home','eye-care','pathology-lab','radiology-xray',
+       'ultrasound-sonography','veterinary'].indexOf(slug) !== -1) return 'NMC';
+  // BCI (Bar Council)
+  if (slug === 'advocate') return 'BCI';
+  // ICSI / ICMAI
+  if (slug === 'company-secretary') return 'ICSI';
+  if (slug === 'cost-accountant') return 'ICMAI';
+  // AMFI / SEBI / IRDAI
+  if (slug === 'mutual-fund-distributor') return 'AMFI';
+  if (slug === 'stock-broker') return 'SEBI';
+  if (slug === 'insurance-life' || slug === 'insurance-health' || slug === 'insurance-general') return 'IRDAI';
+  if (slug === 'financial-advisor') return 'SEBI';
   return null;
 }
 
@@ -2044,7 +2081,18 @@ function renderProfessionalCard(b, lang){
   const tier = b.professional_tier || 'strict';
   const tierLabel = (tier === 'strict') ? (lang === 'hi' ? 'पेशेवर सूची' : 'Professional Listing')
                                          : (lang === 'hi' ? 'नियामक के अधीन' : 'Regulated Service');
-  const auth = (b.membership_authority || authorityFromQualification(b.professional_qualification) || 'ICAI');
+  // Layered authority resolution:
+  // 1. Explicit membership_authority (set by submit_professional_info RPC or admin)
+  // 2. Inferred from owner-entered qualification (CA, MBBS, LLB, etc.)
+  // 3. Inferred from PRIMARY category slug (dentist → NMC, ca → ICAI, etc.)
+  // 4. Last-resort default — but unlike v1 (which always defaulted to 'ICAI'),
+  //    we leave it NULL if nothing matches, and the disclaimer falls back to a
+  //    generic "Regulatory authority" notice rather than a wrong one.
+  const catSlug = b.categories && b.categories.slug ? b.categories.slug : '';
+  const auth = b.membership_authority
+    || authorityFromQualification(b.professional_qualification)
+    || authorityFromCategorySlug(catSlug)
+    || null;
   const verified = !!b.prof_verified_at;
   const unverifiedClass = verified ? '' : ' unverified';
 

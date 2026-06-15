@@ -74,8 +74,10 @@
       <style>
         #${slotId} *{box-sizing:border-box}
         #${slotId} .rv-list{display:flex;flex-direction:column;gap:10px}
-        #${slotId} .rv-row{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:10px;text-decoration:none;color:inherit;transition:.15s;box-shadow:0 1px 3px rgba(15,23,42,.04);min-width:0}
-        #${slotId} .rv-row:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(15,23,42,.08);text-decoration:none}
+        #${slotId} .rv-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:10px;transition:.15s;box-shadow:0 1px 3px rgba(15,23,42,.04);min-width:0}
+        #${slotId} .rv-row:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(15,23,42,.08)}
+        #${slotId} .rv-clickable{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;text-decoration:none;color:inherit;min-width:0}
+        #${slotId} .rv-clickable:hover{text-decoration:none;color:inherit}
         #${slotId} .rv-thumb{width:72px;height:72px;border-radius:11px;background:linear-gradient(135deg,#F8FAFC,#E2E8F0);display:grid;place-items:center;font-size:1.8rem;overflow:hidden;flex-shrink:0}
         #${slotId} .rv-thumb img{width:100%;height:100%;object-fit:cover}
         #${slotId} .rv-mid{min-width:0;display:flex;flex-direction:column;gap:3px}
@@ -103,15 +105,21 @@
           const waBtn = (b.whatsapp && b.whatsapp.length === 10)
             ? `<a class="rv-btn wa" href="https://wa.me/91${b.whatsapp}?text=${waMsg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="WhatsApp ${esc(b.name)}" title="WhatsApp">💬</a>` : '';
           const actions = (callBtn || waBtn) ? '<div class="rv-actions">' + callBtn + waBtn + '</div>' : '';
-          return `<a class="rv-row" href="/business.html?slug=${encodeURIComponent(b.slug)}">
-            <div class="rv-thumb">${b.photo ? '<img src="'+esc(b.photo)+'" alt="" loading="lazy">' : (b.category_icon || '🏪')}</div>
-            <div class="rv-mid">
-              <div class="rv-name">${esc(b.name)}</div>
-              <div class="rv-line2">${catStr}${rateStr ? '<span>·</span>'+rateStr : ''}${verify ? '<span>·</span>'+verify : ''}</div>
-              <div class="rv-line2" style="font-size:.7rem">${cityStr ? '📍 ' + cityStr : ''}${cityStr && ago ? ' · ' : ''}${ago ? '🕒 ' + ago : ''}</div>
-            </div>
+          // NOTE: rv-row is a <div> wrapper (NOT an <a>) — nested anchors are auto-split
+          // by browsers, which was causing the Call/WhatsApp buttons to appear BELOW
+          // the card on a separate row with empty space (the bug shown in screenshot).
+          // The clickable area is now a separate inner <a class="rv-clickable">.
+          return `<div class="rv-row">
+            <a class="rv-clickable" href="/business.html?slug=${encodeURIComponent(b.slug)}">
+              <div class="rv-thumb">${b.photo ? '<img src="'+esc(b.photo)+'" alt="" loading="lazy">' : (b.category_icon || '🏪')}</div>
+              <div class="rv-mid">
+                <div class="rv-name">${esc(b.name)}</div>
+                <div class="rv-line2">${catStr}${rateStr ? '<span>·</span>'+rateStr : ''}${verify ? '<span>·</span>'+verify : ''}</div>
+                <div class="rv-line2" style="font-size:.7rem">${cityStr ? '📍 ' + cityStr : ''}${cityStr && ago ? ' · ' : ''}${ago ? '🕒 ' + ago : ''}</div>
+              </div>
+            </a>
             ${actions}
-          </a>`;
+          </div>`;
         }).join('')}
       </div>
     `;
