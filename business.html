@@ -253,7 +253,14 @@ body.prof-strict .biz-rating-row,
 body.prof-strict #bizRating,
 body.prof-strict .biz-usp,
 body.prof-strict #uspBox,
+body.prof-strict #mmtStatStrip,
+body.prof-strict #ratingBreakdown,
+body.prof-strict .sh-tile.rating,
+body.prof-strict .biz-rating,
 body.prof-strict [data-hide-in-strict]{ display:none !important }
+
+/* Hide promotional "Top rated" pill in highlights row even when other pills remain (partial mode) */
+body.prof-strict #mmtHighlights span:has(span:contains("Top rated")){ display:none !important }
 
 body.prof-partial [data-hide-in-partial]{ display:none !important }
 body.prof-partial #reviewsAnchor::before{
@@ -2847,8 +2854,12 @@ function renderMmtStatStrip(b){
     hl.push({icon:'⏳', label: years + '+ years experience', color:'#A16207'});
   }
   if (b.photos && b.photos.length >= 5) hl.push({icon:'🖼', label:b.photos.length + ' photos', color:'#7C3AED'});
-  if (b.rating_avg >= 4.5)     hl.push({icon:'⭐', label:'Top rated', color:'#B91C1C'});
-  if (b.featured)              hl.push({icon:'★', label:'Featured listing', color:'#B45309'});
+  // Skip rating-derived & featured highlights for STRICT professional listings (ICAI/NMC/BCI rules)
+  const isProfStrictHL = b.is_professional_listing === true && b.professional_tier === 'strict';
+  if (!isProfStrictHL){
+    if (b.rating_avg >= 4.5)     hl.push({icon:'⭐', label:'Top rated', color:'#B91C1C'});
+    if (b.featured)              hl.push({icon:'★', label:'Featured listing', color:'#B45309'});
+  }
 
   if (hl.length === 0) hl.push({icon:'✓', label:'Verified listing', color:'#1E40AF'});
 
@@ -3747,7 +3758,8 @@ function renderShopHighlights(b){
   }
 
   // Tile 3: Rating (real if reviews exist, else trust tier badge)
-  if (Number(b.rating_avg) > 0){
+  const isProfStrictTile = b.is_professional_listing === true && b.professional_tier === 'strict';
+  if (Number(b.rating_avg) > 0 && !isProfStrictTile){
     tiles.push({cls:'rating', emoji:'\u2b50', main: Number(b.rating_avg).toFixed(1)+' rating', sub:(b.rating_count||0)+' review'+((b.rating_count||0)===1?'':'s')});
   } else {
     const vs = Number(b.verified_score) || 0;
