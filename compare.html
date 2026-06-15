@@ -148,7 +148,7 @@ async function init(){
 
   // Fetch both shops
   const { data, error } = await c.from('businesses')
-    .select('id, slug, name, mobile, whatsapp, photos, rating_avg, rating_count, verified_score, is_featured, hours_json, payment_methods, special_features, established_year, address_line, pincode, services, usp_text, lat, lng')
+    .select('id, slug, name, mobile, whatsapp, photos, rating_avg, rating_count, verified_score, featured, featured_until, hours_json, payment_methods, special_features, established_year, address_line, pincode, services, usp_text, lat, lng, is_professional_listing, professional_tier')
     .in('id', ids);
 
   if (error){
@@ -197,7 +197,11 @@ function render(shops){
   }
 
   function featured(s){
-    return s.is_featured ? '<span class="cmp-pill good">⭐ ' + L('Featured','फीचर्ड') + '</span>' : '<span class="cmp-empty">' + L('No','नहीं') + '</span>';
+    // Use correct column name 'featured' + check expiry. Also suppress for strict pros.
+    const isProfStrict = s.is_professional_listing === true && s.professional_tier === 'strict';
+    if (isProfStrict) return '<span class="cmp-empty">—</span>';
+    const isLive = s.featured && (!s.featured_until || new Date(s.featured_until) > new Date());
+    return isLive ? '<span class="cmp-pill good">⭐ ' + L('Featured','फीचर्ड') + '</span>' : '<span class="cmp-empty">' + L('No','नहीं') + '</span>';
   }
 
   function payments(s){

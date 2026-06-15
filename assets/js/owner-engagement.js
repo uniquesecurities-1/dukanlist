@@ -161,6 +161,14 @@
   ];
 
   function pickTodaysQuickWin(biz){
+  // Strict pro listings — skip get-reviews / reply-reviews / write-usp nudges
+  try {
+    const b = (typeof MY_BIZ !== 'undefined' && MY_BIZ) || window._myBiz;
+    if (b && b.is_professional_listing === true && b.professional_tier === 'strict'){
+      QUICK_WINS = QUICK_WINS.filter(w => w.id !== 'reply-reviews' && w.id !== 'get-reviews' && w.id !== 'write-usp');
+    }
+  } catch(_){}
+
     let seen = {};
     try { seen = JSON.parse(localStorage.getItem('dl_owner_qw_seen') || '{}'); } catch(_){}
     // Filter applicable ones (where test returns true — i.e., shop needs this)

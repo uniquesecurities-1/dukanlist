@@ -42,7 +42,7 @@ function truncate(s, n){
 
 async function fetchBusiness(field, value){
   const url = SUPABASE_URL + '/rest/v1/businesses' +
-    '?select=name,slug,id,usp_text,about_text,photos,rating_avg,rating_count,mobile,owner_name,og_image_url,geo_cities(name),geo_localities(name)' +
+    '?select=name,slug,id,usp_text,about_text,photos,rating_avg,rating_count,mobile,owner_name,og_image_url,is_professional_listing,professional_tier,geo_cities(name),geo_localities(name)' +
     '&' + field + '=eq.' + encodeURIComponent(value) +
     '&status=eq.active' +
     '&limit=1';
@@ -64,8 +64,10 @@ function renderHtml(biz, targetUrl, isReview){
   const city = biz.geo_cities && biz.geo_cities.name ? biz.geo_cities.name : '';
   const locality = biz.geo_localities && biz.geo_localities.name ? biz.geo_localities.name : '';
   const place = [locality, city].filter(Boolean).join(', ');
-  const ratingAvg = Number(biz.rating_avg) || 0;
-  const ratingCount = Number(biz.rating_count) || 0;
+  // Strict pro listings: suppress rating numbers from OG/share-card meta per regulator rules
+  const isProfStrict = biz.is_professional_listing === true && biz.professional_tier === 'strict';
+  const ratingAvg = isProfStrict ? 0 : (Number(biz.rating_avg) || 0);
+  const ratingCount = isProfStrict ? 0 : (Number(biz.rating_count) || 0);
   const hasRating = ratingCount > 0 && ratingAvg > 0;
   const ratingStr = hasRating
     ? ('\u2b50 ' + ratingAvg.toFixed(1) + ' (' + ratingCount + ' review' + (ratingCount === 1 ? '' : 's') + ')')

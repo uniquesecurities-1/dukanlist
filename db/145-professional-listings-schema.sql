@@ -154,3 +154,10 @@ WHERE is_professional_listing = TRUE
 GROUP BY professional_tier;
 
 COMMIT;
+
+DO $$ BEGIN
+  RAISE NOTICE 'db/145 installed.';
+  RAISE NOTICE '  Schema extensions for professional listings — 8 cols on businesses + flag on categories';
+  RAISE NOTICE '  3 new sub-cats added (advocate, company-secretary, cost-accountant)';
+  RAISE NOTICE '  Backfill applied — existing listings in pro categories auto-flagged';
+END $$;

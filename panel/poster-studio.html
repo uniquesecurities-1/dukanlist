@@ -659,7 +659,7 @@
     if (!u || !u.data || !u.data.user) { location.href = '/panel/login.html'; return; }
     const own = await c.from('business_owners').select('business_id').eq('auth_user_id', u.data.user.id).limit(1).maybeSingle();
     if (!own || !own.data) { console.error('No business owner row found for user'); alert('No business linked to your account.\nGoing back to dashboard.'); location.href = '/panel/dashboard.html'; return; }
-    const b = await c.from('businesses').select('id, name, slug, mobile, whatsapp, photos, rating_avg, established_year, pincode, city_id, category_id, website_url').eq('id', own.data.business_id).maybeSingle();
+    const b = await c.from('businesses').select('id, name, slug, mobile, whatsapp, photos, rating_avg, established_year, pincode, city_id, category_id, website_url, is_professional_listing, professional_tier').eq('id', own.data.business_id).maybeSingle();
     if (!b || !b.data) { console.error('Business fetch returned no data:', b); alert('Business data could not be loaded'); return; }
     biz = b.data;
     // Get city name
@@ -683,7 +683,7 @@
     city: biz.city_name || '',
     category: biz.category_slug || '',
     established_year: biz.established_year || null,
-    rating: biz.rating_avg || 0,
+    rating: ((biz.is_professional_listing === true && biz.professional_tier === 'strict') ? 0 : (biz.rating_avg || 0)),
     address: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
     _autoAddress: (biz.pincode ? biz.pincode + ', ' : '') + (biz.city_name || ''),
     photo: (Array.isArray(biz.photos) && biz.photos[0]) || '',

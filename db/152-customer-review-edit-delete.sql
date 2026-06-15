@@ -30,6 +30,15 @@
 BEGIN;
 
 -- ============================================================
+-- PART 0: Ensure pgcrypto extension (needed by digest() in RPCs)
+-- ============================================================
+-- Without this, the RPC bodies create cleanly but FAIL at runtime
+-- with 'function digest(text, unknown) does not exist'. This is the
+-- most common reason for db/152 deploy failures on fresh Supabase
+-- projects. Safe to re-run; CREATE IF NOT EXISTS is idempotent.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- ============================================================
 -- PART 1: New columns on reviews table
 -- ============================================================
 ALTER TABLE reviews

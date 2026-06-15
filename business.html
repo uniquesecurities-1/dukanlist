@@ -2951,8 +2951,9 @@ async function loadSimilarShops(b){
     const catId = b.sub_category_id || b.category_id;
     if (!catId) return;
     const q = await c.from('businesses')
-      .select('id,slug,name,photos,rating_avg,rating_count,featured,geo_cities(name)')
+      .select('id,slug,name,photos,rating_avg,rating_count,featured,is_professional_listing,professional_tier,geo_cities(name)')
       .eq('status','active')
+      .or('professional_tier.is.null,professional_tier.neq.strict')
       .or('category_id.eq.' + catId + ',sub_category_id.eq.' + catId)
       .neq('id', b.id)
       .order('featured', { ascending: false, nullsFirst: false })

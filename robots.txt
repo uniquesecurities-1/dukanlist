@@ -26,3 +26,7 @@ Sitemap: https://dukanlist.com/sitemap.xml
 
 # Crawl-delay for politeness (1 second)
 Crawl-delay: 1
+
+# Professional listings landing pages (high-priority SEO targets)
+Allow: /welcome-pro.html
+Allow: /pro.html

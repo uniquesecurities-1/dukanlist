@@ -762,7 +762,7 @@ async function loadCard(){
   // separately if needed (faster + safer pattern, same as dashboard).
   // Pull all card data in one query. No FK joins (avoids 400 ambiguity).
   var query = c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, geo_cities(name)');
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, geo_cities(name), is_professional_listing, professional_tier');
   if (slug) query = query.eq('slug', slug);
   else      query = query.eq('id', id);
 
