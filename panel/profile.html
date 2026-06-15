@@ -217,6 +217,25 @@
           </div>
         </div>
       </div>
+
+      <!-- ===== Alternative mobile (owner-editable) ===== -->
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>
+            <span data-i18n-en>Alternative Mobile (optional)</span><span data-i18n-hi>वैकल्पिक मोबाइल (Optional)</span>
+            <span style="background:#DBEAFE;color:#1E40AF;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em">✓ EDITABLE</span>
+          </label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="altMobile" class="input keep-en" type="tel" maxlength="10" placeholder="10-digit number (spouse / landline / backup)" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" style="flex:1">
+            <button type="button" onclick="saveAltMobile()" id="altSaveBtn" style="background:#1E3A8A;color:#fff;border:0;padding:9px 18px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap">Save alt</button>
+          </div>
+          <div id="altMobileStatus" style="font-size:.78rem;margin-top:6px;display:none"></div>
+          <div style="font-size:.74rem;color:#64748B;margin-top:4px">
+            <span data-i18n-en>If customers can't reach you on your primary number, they'll see this as a backup. Spouse, family, shop landline — any number you trust. Leave empty to remove.</span>
+            <span data-i18n-hi>अगर customer आपके primary number पर नहीं पहुँच पाए, यह backup दिखेगा। पत्नी/परिवार/landline — कोई भी विश्वसनीय number। हटाने के लिए खाली छोड़ें।</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ===== CATEGORIES ===== -->
@@ -683,6 +702,9 @@ function populateFields(){
     })();
   document.getElementById('whatsapp').value = MY_BIZ.whatsapp || '';
   document.getElementById('email').value = MY_BIZ.email || '';
+  // Pre-fill alt_mobile if previously set
+  const altEl = document.getElementById('altMobile');
+  if (altEl) altEl.value = MY_BIZ.alt_mobile || '';
   document.getElementById('usp').value = MY_BIZ.usp_text || '';
   document.getElementById('uspHi').value = MY_BIZ.usp_hi || '';
   document.getElementById('aboutText').value = MY_BIZ.about_text || '';
@@ -953,6 +975,47 @@ function collectHours(){
   });
   return h;
 }
+
+// ============================================================
+// saveAltMobile — dedicated lightweight save for alt_mobile field
+// (uses update_my_alt_mobile RPC from db/155 with full validation).
+// ============================================================
+async function saveAltMobile(){
+  const input = document.getElementById('altMobile');
+  const btn = document.getElementById('altSaveBtn');
+  const statusEl = document.getElementById('altMobileStatus');
+  if (!input || !btn) return;
+
+  const val = (input.value || '').replace(/\D/g, '').slice(0, 10);
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  statusEl.style.display = 'none';
+
+  const c = ShopDB && ShopDB.client;
+  if (!c){
+    btn.disabled = false; btn.textContent = 'Save alt';
+    statusEl.style.color = '#DC2626'; statusEl.textContent = 'Backend not configured.';
+    statusEl.style.display = 'block';
+    return;
+  }
+
+  const r = await c.rpc('update_my_alt_mobile', { p_alt_mobile: val || null });
+  btn.disabled = false; btn.textContent = 'Save alt';
+
+  if (r.error){
+    statusEl.style.color = '#DC2626';
+    statusEl.textContent = '✗ ' + r.error.message;
+    statusEl.style.display = 'block';
+    return;
+  }
+
+  statusEl.style.color = '#065F46';
+  statusEl.textContent = val ? ('✓ Saved: ' + val) : '✓ Alternative number removed';
+  statusEl.style.display = 'block';
+  // Sync to local cache
+  if (typeof MY_BIZ !== 'undefined' && MY_BIZ) MY_BIZ.alt_mobile = val || null;
+  setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
+}
+window.saveAltMobile = saveAltMobile;
 
 async function saveProfile(){
   const errEl = document.getElementById('saveErr');

@@ -227,6 +227,13 @@ async function init(){
     return;
   }
   SHOP = r.data;
+  // Side-fetch alt_mobile (not yet in admin_get_shop_full output — db/86 hit
+  // the jsonb_build_object arg limit). One small extra query keeps the
+  // admin form fully populated without forcing a full RPC rewrite.
+  try {
+    var ar = await c.from('businesses').select('alt_mobile').eq('id', BIZ_ID).maybeSingle();
+    if (ar.data && ar.data.alt_mobile !== undefined) SHOP.alt_mobile = ar.data.alt_mobile;
+  } catch(_){}
   render();
   loadEditHistory();
   setTimeout(loadCategoryEditor, 100);
@@ -307,6 +314,10 @@ function render(){
           + '<div class="grid-2">'
             + field('text', 'owner_name', 'Owner Name', s.owner_name)
             + field('tel',  'whatsapp', 'WhatsApp (10 digit)', s.whatsapp)
+          + '</div>'
+          + '<div class="grid-2">'
+            + field('tel',  'alt_mobile', 'Alternative Mobile (optional)', s.alt_mobile)
+            + '<div></div>'
           + '</div>'
           + '<div class="grid-2">'
             // Single source of truth: auth.users.email. The public "shop
@@ -713,7 +724,7 @@ async function saveShop(e){
   e.preventDefault();
   var f = document.getElementById('editForm');
   var patch = {};
-  ['name','mobile','whatsapp','owner_name','usp_text','usp_hi','about_text','address_line1','address_line2','pincode'].forEach(function(k){
+  ['name','mobile','whatsapp','alt_mobile','owner_name','usp_text','usp_hi','about_text','address_line1','address_line2','pincode'].forEach(function(k){
     var v = f.querySelector('[name="' + k + '"]')?.value;
     if (v !== undefined && v !== SHOP[k]) patch[k] = v;
   });
