@@ -190,13 +190,24 @@
 
 /* Hide all photo-overlay badges in compact mode — the 96×96 thumb is too small
    for them to coexist without burying the photo. Same info reappears as tiny
-   inline pills (.compact-tags) in the text area next to the business name. */
+   inline pills (.compact-tags) in the text area next to the business name.
+   IMPORTANT: trust-tier is the actual class DukanTier.badge() outputs (not .verify),
+   so include both. Also covered: any tier-modifier classes. */
 .biz-grid.compact .biz-photo .ribbon,
 .biz-grid.compact .biz-photo .featured-ribbon,
 .biz-grid.compact .biz-photo .verify,
+.biz-grid.compact .biz-photo .trust-tier,
+.biz-grid.compact .biz-photo .trust-gold,
+.biz-grid.compact .biz-photo .trust-silver,
+.biz-grid.compact .biz-photo .trust-bronze,
 .biz-grid.compact .biz-photo .open-live,
 .biz-grid.compact .biz-photo .open-dot,
 .biz-grid.compact .card-heart-slot{ display:none !important }
+
+/* Belt-and-suspenders: trust-tier ANYWHERE inside compact card photo block — covers
+   any wrapper variants */
+.biz-grid.compact .biz-card .biz-photo span[class*="trust-"],
+.biz-grid.compact .biz-card .biz-photo [class*="tier-"]{ display:none !important }
 
 /* Inline status pills next to business name in compact mode */
 .biz-grid.compact .compact-tags{
