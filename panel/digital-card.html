@@ -341,7 +341,7 @@ async function init(){
     bizId = ownRes.data[0].business_id;
   }
   var bizRes = await c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, status, verified_score, sub_category_id, category_id')
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, status, verified_score, sub_category_id, category_id, is_professional_listing, professional_tier, membership_authority, prof_verified_at')
     .eq('id', bizId).maybeSingle();
   if (bizRes.error || !bizRes.data){
     showErr('Could not load your listing. Please refresh.');
@@ -357,6 +357,46 @@ async function init(){
   if (primaryCatId){
     var cat = await c.from('categories').select('name').eq('id', primaryCatId).maybeSingle();
     if (cat.data) BIZ.cat_name = cat.data.name;
+  }
+
+  // ==================== PRO-MODE INTRO TWEAK ====================
+  // For professional listings (CA/Doctor/Lawyer/MFD etc.) the default
+  // intro language ("viral karwao") is off-brand and may discourage
+  // adoption — it sounds like marketing claims, exactly what their
+  // regulator forbids. Replace it with a compliance-aware version
+  // and pin the medical/legal/finance theme automatically.
+  var isPro       = BIZ.is_professional_listing === true;
+  var isStrict    = isPro && (BIZ.professional_tier || '').toLowerCase() === 'strict';
+  var isPartial   = isPro && (BIZ.professional_tier || '').toLowerCase() === 'partial';
+  if (isPro){
+    var introEl = document.querySelector('.intro');
+    if (introEl){
+      var authShort = (BIZ.membership_authority || '').toUpperCase();
+      var authLabel = authShort
+        ? ('Card design follows ' + authShort + ' guidelines')
+        : 'Card design follows your regulator\'s guidelines';
+      var verifiedNote = BIZ.prof_verified_at
+        ? '<span style="display:inline-block;background:rgba(16,185,129,.22);color:#6EE7B7;font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:99px;margin-top:8px">✓ Membership verified</span>'
+        : '<span style="display:inline-block;background:rgba(245,158,11,.22);color:#FCD34D;font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:99px;margin-top:8px">⏳ Verification pending</span>';
+      var bodyText = isStrict
+        ? 'Your card highlights <b>membership number + qualification</b> instead of ratings/testimonials — exactly as ICAI / NMC / BCI Codes of Ethics require. Share confidently on WhatsApp; no compliance risk.'
+        : 'Your card includes <b>regulator details + a market-risk disclaimer</b> per AMFI / SEBI / IRDAI guidelines. Safe to share with clients.';
+      introEl.innerHTML =
+        '<h1>🛡 Your Professional Digital Card</h1>' +
+        '<p>' + bodyText + '</p>' +
+        '<p style="font-size:.78rem;color:rgba(255,255,255,.7);margin-top:8px">' +
+          authLabel +
+        '</p>' +
+        verifiedNote;
+    }
+    // For strict pros, lock to Medical/Legal/Finance — Vibrant Orange
+    // is too loud for a regulated profession. Just disable that chip.
+    var vibrantChip = document.querySelector('.theme-chip[data-theme="vibrant"]');
+    if (vibrantChip && isStrict){
+      vibrantChip.style.opacity = '0.4';
+      vibrantChip.style.pointerEvents = 'none';
+      vibrantChip.title = 'Not available for ' + (authShort || 'regulated') + ' listings';
+    }
   }
 
   // Auto-pick theme
