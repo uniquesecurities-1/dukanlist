@@ -2799,21 +2799,18 @@ async function loadCustomerActivity(bizId){
   try {
     const c = ShopDB.client;
     if (!c) return;
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    // Try counting from a leads/log_lead table
-    const { count: callCount } = await c.from('leads')
-      .select('id', { count: 'exact', head: true })
-      .eq('business_id', bizId)
-      .eq('action', 'call')
-      .gte('created_at', since);
-    const { count: waCount } = await c.from('leads')
-      .select('id', { count: 'exact', head: true })
-      .eq('business_id', bizId)
-      .in('action', ['whatsapp', 'wa'])
-      .gte('created_at', since);
+    // Use SECURITY DEFINER RPC (db/157). Previous code queried `leads`
+    // directly which was 2 problems: (a) actual table is `leads_log`
+    // (b) RLS blocks anon SELECT anyway. RPC aggregates server-side
+    // and returns only counts — privacy-preserving + console-clean.
+    const { data: act, error: actErr } = await c.rpc(
+      'public_customer_activity_24h',
+      { p_business_id: bizId }
+    );
+    if (actErr){ host.style.display = 'none'; return; }
 
-    const calls = Math.max(0, callCount || 0);
-    const wa    = Math.max(0, waCount    || 0);
+    const calls = Math.max(0, (act && act.calls)    || 0);
+    const wa    = Math.max(0, (act && act.whatsapp) || 0);
     const total = calls + wa;
 
     const pills = [];
