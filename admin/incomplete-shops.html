@@ -181,14 +181,25 @@ function buildNudgeMessage(shop, issues){
   const profileUrl = 'https://dukanlist.com/business?slug=' + (shop.slug || '');
   const panelUrl   = 'https://dukanlist.com/panel/dashboard.html';
   const divider = '━━━━━━━━━━━━━━━━━━';
+  const isStrictPro = shop.is_professional_listing === true && (shop.professional_tier || '').toLowerCase() === 'strict';
 
   const lines = [];
-  lines.push('✦ *Namaste ' + owner + '*');
-  lines.push('');
-  lines.push('Your listing *' + name + '* is live on DukanList ✓');
-  lines.push('');
-  lines.push('But a few quick updates would *significantly boost* customer reach:');
-  lines.push('');
+  if (isStrictPro){
+    // Compliance-aware salutation — no marketing language, no "boost customer reach"
+    lines.push('✦ *Namaste Dr/Adv ' + owner + '*');
+    lines.push('');
+    lines.push('Your professional listing *' + name + '* is live on DukanList ✓');
+    lines.push('');
+    lines.push('A few *operational details* are missing — these are factual updates only (not promotional):');
+    lines.push('');
+  } else {
+    lines.push('✦ *Namaste ' + owner + '*');
+    lines.push('');
+    lines.push('Your listing *' + name + '* is live on DukanList ✓');
+    lines.push('');
+    lines.push('But a few quick updates would *significantly boost* customer reach:');
+    lines.push('');
+  }
   lines.push(divider);
 
   if (issues.includes('photos')){
@@ -278,14 +289,27 @@ function _isBadPincode(b){
 
 function computeIssues(b){
   const issues = [];
+  // COMPLIANCE: Strict pros (CA/Doctor/Lawyer/CS/CMA) are FORBIDDEN by
+  // their regulators (ICAI/NMC/BCI/ICSI/ICMAI Code of Ethics) from
+  // adding USP / promotional About / "Since X years" credibility claims.
+  // Sending a WhatsApp nudge asking them to add these would TRIGGER a
+  // regulator violation. So for strict pros we suppress those issue
+  // types entirely — only flag operational/factual gaps.
+  const isStrictPro = b.is_professional_listing === true && (b.professional_tier || '').toLowerCase() === 'strict';
+
+  // Operational / factual — fine to nudge for any listing
   if (!(Array.isArray(b.photos) && b.photos.length))                                   issues.push('photos');
   if (!(b.hours_json && typeof b.hours_json === 'object' && Object.keys(b.hours_json).length)) issues.push('hours');
-  if (!(b.usp_text && b.usp_text.trim().length >= 10))                                  issues.push('usp');
-  if (!(b.about_text && b.about_text.trim().length >= 50))                              issues.push('about');
   if (!b.locality_id)                                                                   issues.push('locality');
-  if (!(b.established_year && b.established_year > 1900))                               issues.push('year');
   if (_isBadAddress(b.address_line1, b.address_line2))                                  issues.push('address');
   if (_isBadPincode(b))                                                                 issues.push('pincode');
+
+  // Promotional / marketing — SKIP for strict pros
+  if (!isStrictPro){
+    if (!(b.usp_text && b.usp_text.trim().length >= 10))                                  issues.push('usp');
+    if (!(b.about_text && b.about_text.trim().length >= 50))                              issues.push('about');
+    if (!(b.established_year && b.established_year > 1900))                               issues.push('year');
+  }
   return issues;
 }
 
@@ -304,7 +328,7 @@ async function loadShops(){
     }
 
     const { data, error } = await c.from('businesses')
-      .select('id, slug, name, owner_name, mobile, whatsapp, photos, hours_json, usp_text, about_text, address_line1, address_line2, pincode, locality_id, established_year, status, created_at, geo_cities(name, pincodes), geo_localities(name)')
+      .select('id, slug, name, owner_name, mobile, whatsapp, photos, hours_json, usp_text, about_text, address_line1, address_line2, pincode, locality_id, established_year, status, created_at, is_professional_listing, professional_tier, geo_cities(name, pincodes), geo_localities(name)')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(500);
@@ -361,16 +385,27 @@ function render(){
     const waHref = phone
       ? ('https://wa.me/91' + phone + '?text=' + encodeURIComponent(buildNudgeMessage(b, b._issues)))
       : null;
+    // Pro listing badge for admin visual context
+    const isPro       = b.is_professional_listing === true;
+    const isStrictPro = isPro && (b.professional_tier || '').toLowerCase() === 'strict';
+    const proBadge = isStrictPro
+      ? '<span style="background:#0EA5E9;color:#fff;font-size:.6rem;font-weight:900;padding:3px 8px;border-radius:5px;letter-spacing:.06em;margin-left:8px">🛡 STRICT PRO</span>'
+      : (isPro ? '<span style="background:#6366F1;color:#fff;font-size:.6rem;font-weight:900;padding:3px 8px;border-radius:5px;letter-spacing:.06em;margin-left:8px">🛡 PRO</span>' : '');
+    // Compliance reminder for strict pros — admin must NOT send promotional nudge
+    const proNote = isStrictPro
+      ? '<div style="background:#FEF3C7;border-left:3px solid #F59E0B;color:#92400E;font-size:.72rem;font-weight:600;padding:6px 10px;border-radius:5px;margin-top:6px">⚠ Strict pro listing — nudge will use compliance-safe template (operational facts only, no USP/About).</div>'
+      : '';
     return ''
       + '<div class="shop">'
       +   '<div class="shop-info">'
-      +     '<div class="shop-name"><a href="/admin/shop?id=' + esc(b.id) + '">' + esc(b.name || 'Untitled') + '</a></div>'
+      +     '<div class="shop-name"><a href="/admin/shop?id=' + esc(b.id) + '">' + esc(b.name || 'Untitled') + '</a>' + proBadge + '</div>'
       +     '<div class="shop-meta">'
       +       (b.owner_name ? '<span>👤 <b>' + esc(b.owner_name) + '</b></span>' : '')
       +       (cityName ? '<span>📍 ' + esc(cityName) + '</span>' : '')
       +       (phone ? '<span>📞 +91-' + esc(phone) + '</span>' : '')
       +     '</div>'
       +     '<div class="shop-issues">' + issueTags + '</div>'
+      +     proNote
       +   '</div>'
       +   '<div class="shop-actions">'
       +     (waHref ? '<a class="act wa" href="' + waHref + '" target="_blank" rel="noopener">💬 WhatsApp Nudge</a>' : '')
