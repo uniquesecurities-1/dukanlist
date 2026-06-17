@@ -2224,6 +2224,45 @@ function render(){
     document.getElementById('bizNameHi').style.display = '';
   }
 
+  // Owner credit — show proprietor/founder name + role. Customers trust
+  // listings where they can see the person behind the business; missing
+  // owner identity hurts conversion (especially for kirana/jewellers/
+  // bartan-shop style local trade where buying is relationship-driven).
+  // Pre-existing #ownerCredit div + .owner-credit CSS were defined but
+  // never wired — this fills the gap.
+  try {
+    const ocEl = document.getElementById('ownerCredit');
+    const ownerNm = (b.owner_name || '').trim();
+    if (ocEl && ownerNm){
+      // Pick a friendly prefix based on role (Dr / Adv / CA) so the
+      // display reads naturally — "Dr Pranav Sachdeva" instead of
+      // "Pranav Sachdeva — Doctor".
+      const role = (b.owner_role || '').trim();
+      let prefix = '';
+      let cleanRole = role;
+      const roleLower = role.toLowerCase();
+      if (/doctor/.test(roleLower) && !/^dr\b/i.test(ownerNm)) { prefix = 'Dr '; cleanRole = role; }
+      else if (/advocate/.test(roleLower) && !/^adv\b/i.test(ownerNm)) { prefix = 'Adv '; cleanRole = role; }
+      else if (/chartered accountant|\bca\b/.test(roleLower) && !/^ca\b/i.test(ownerNm)) { prefix = 'CA '; cleanRole = role; }
+
+      const displayName = prefix + ownerNm;
+      const initial = (ownerNm.charAt(0) || '?').toUpperCase();
+      // Bilingual role line (English + Hindi pass-through — role labels
+      // are stored verbatim from owner's selection, so we don't fight
+      // it with auto-translation)
+      const roleLine = cleanRole
+        ? `<div class="oc-role">${escapeHTML(cleanRole)}</div>`
+        : '';
+      ocEl.innerHTML =
+        `<div class="oc-avatar">${escapeHTML(initial)}</div>` +
+        `<div class="oc-info">` +
+          `<div class="oc-name">${escapeHTML(displayName)}</div>` +
+          roleLine +
+        `</div>`;
+      ocEl.style.display = '';
+    }
+  } catch(e){ console.warn('owner credit render:', e); }
+
   // Rating (grammar-aware + animated counter)
   const rEl = document.getElementById('bizRating');
   if (b.rating_avg > 0){
