@@ -46,8 +46,21 @@
     try { localStorage.setItem(KEY_CONTACTS, JSON.stringify(arr.slice(0, MAX_TRACKED))); } catch(_){}
   }
 
+  // Compliance gate — strict pros (Doctor/CA/Lawyer/CS/CMA) must never
+  // be tracked or prompted for reviews. The host page (business.html)
+  // sets body.prof-strict for any strict professional listing; we read
+  // that class as a defense-in-depth guard in case a future caller
+  // forgets to gate at the call site.
+  function isStrictProPage(){
+    try {
+      return document.body && document.body.classList &&
+             document.body.classList.contains('prof-strict');
+    } catch(_){ return false; }
+  }
+
   function trackContact(biz, action){
     if (!biz || !biz.slug) return;
+    if (isStrictProPage()) return;  // ← strict pro guard
     const arr = loadContacts();
     // Keep latest at front, dedupe by slug
     const i = arr.findIndex(x => x.slug === biz.slug);
@@ -152,6 +165,7 @@
 
   function maybePrompt(currentBiz){
     if (!currentBiz || !currentBiz.slug) return;
+    if (isStrictProPage()) return;  // ← strict pro guard (defense-in-depth)
     if (!shouldPrompt(currentBiz.slug)) return;
     // Soft delay so it doesn't surprise the user the instant page loads
     setTimeout(() => {

@@ -2372,7 +2372,10 @@ function render(){
   document.getElementById('ctaWa').href = `https://wa.me/${wa}?text=${waMsg}`;
   document.getElementById('ctaWa').addEventListener('click', () => {
     logLead('whatsapp');
-    try { if (window.DukanReviewBoost) DukanReviewBoost.trackContact(b, 'whatsapp'); } catch(_){}
+    // Skip contact-tracking for strict pros — feeds into maybePrompt
+    // later, which is forbidden by ICAI/NMC/BCI Code of Ethics.
+    var _proStrictWa = b.is_professional_listing === true && b.professional_tier === 'strict';
+    try { if (window.DukanReviewBoost && !_proStrictWa) DukanReviewBoost.trackContact(b, 'whatsapp'); } catch(_){}
   });
 
   // Normalize phone to 10-digit Indian, then prepend +91 E.164 format.
@@ -2381,7 +2384,8 @@ function render(){
   document.getElementById('ctaCall').href = 'tel:+91' + normIndianPhone(b.mobile);
   document.getElementById('ctaCall').addEventListener('click', () => {
     logLead('call');
-    try { if (window.DukanReviewBoost) DukanReviewBoost.trackContact(b, 'call'); } catch(_){}
+    var _proStrictCall = b.is_professional_listing === true && b.professional_tier === 'strict';
+    try { if (window.DukanReviewBoost && !_proStrictCall) DukanReviewBoost.trackContact(b, 'call'); } catch(_){}
   });
 
   // ============================================================
@@ -2414,8 +2418,17 @@ function render(){
   document.getElementById('ctaDir').href = `https://www.google.com/maps/search/?api=1&query=${mapsQ}`;
   document.getElementById('ctaDir').addEventListener('click', () => logLead('direction'));
 
-  // Review-boost: if customer previously contacted this business, schedule a soft prompt
-  try { if (window.DukanReviewBoost) DukanReviewBoost.maybePrompt({ slug: b.slug, name: b.name, id: b.id }); } catch(_){}
+  // Review-boost: if customer previously contacted this business, schedule a soft prompt.
+  // Skip entirely for strict pros (Doctor/CA/Lawyer/CS/CMA) — ICAI/NMC/BCI/ICSI/ICMAI
+  // Codes of Ethics prohibit soliciting reviews/testimonials from clients/patients.
+  // Even a legacy contact event tracked before this gate landed would otherwise
+  // cause this prompt to fire on subsequent visits.
+  var _proStrictPrompt = b.is_professional_listing === true && b.professional_tier === 'strict';
+  try {
+    if (window.DukanReviewBoost && !_proStrictPrompt) {
+      DukanReviewBoost.maybePrompt({ slug: b.slug, name: b.name, id: b.id });
+    }
+  } catch(_){}
 
   // "Why this business?" — fast verdict pills for quick customer decision
   try { renderWhyThisShop(b); } catch(e){ console.warn('Why this business:', e); }
