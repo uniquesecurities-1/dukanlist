@@ -2237,7 +2237,37 @@ function render(){
       // Pick a friendly prefix based on role (Dr / Adv / CA) so the
       // display reads naturally — "Dr Pranav Sachdeva" instead of
       // "Pranav Sachdeva — Doctor".
-      const role = (b.owner_role || '').trim();
+      let role = (b.owner_role || '').trim();
+      const _isProfStrictOwner = b.is_professional_listing === true && b.professional_tier === 'strict';
+      const _isProfAnyOwner    = b.is_professional_listing === true;
+
+      // SMART FALLBACK — many legacy listings have owner_name filled
+      // but owner_role left blank. Defaulting to something sensible
+      // is better than showing a nameless name pill. Logic:
+      //   - Strict pro → derive from membership_authority (Doctor / CA /
+      //     Advocate / Company Secretary / Cost Accountant)
+      //   - Partial pro → "Distributor / Agent" generic label
+      //   - Regular shop → "Proprietor / Owner" (most common in India)
+      if (!role){
+        if (_isProfStrictOwner){
+          const auth = (b.membership_authority || '').toUpperCase();
+          if (auth === 'ICAI')      role = 'Chartered Accountant';
+          else if (auth === 'NMC')   role = 'Doctor';
+          else if (auth === 'BCI')   role = 'Advocate';
+          else if (auth === 'ICSI')  role = 'Company Secretary';
+          else if (auth === 'ICMAI') role = 'Cost & Management Accountant';
+          else                       role = 'Regulated Professional';
+        } else if (_isProfAnyOwner){
+          const auth = (b.membership_authority || '').toUpperCase();
+          if (auth === 'AMFI')      role = 'Mutual Fund Distributor';
+          else if (auth === 'SEBI')  role = 'Authorised Person';
+          else if (auth === 'IRDAI') role = 'Insurance Agent';
+          else                       role = 'Authorised Distributor';
+        } else {
+          role = 'Proprietor / Owner';
+        }
+      }
+
       let prefix = '';
       let cleanRole = role;
       const roleLower = role.toLowerCase();
