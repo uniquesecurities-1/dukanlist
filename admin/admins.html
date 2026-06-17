@@ -145,6 +145,26 @@ Enter email + password. Account is created &amp; ready immediately.
 <option value="">+ Add a city</option>
 </select>
 </div>
+
+<!-- ============================================================
+     Page permissions (db/158) — visible for non-super admins.
+     Super admin checks the boxes for the pages this admin can see.
+     Hidden for the super_admin role (god mode by default).
+     ============================================================ -->
+<div class="form-group" id="permsScopeGroup" style="display:none">
+<label>🛡 Page Permissions <span style="text-transform:none;font-weight:600;color:#64748b">(what this admin can access)</span></label>
+<div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:9px;padding:12px;max-height:300px;overflow-y:auto">
+  <div style="display:flex;gap:6px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #cbd5e1">
+    <button type="button" class="btn-sm" style="background:#10B981;color:#fff" onclick="presetPerms('content')">📝 Content Mod preset</button>
+    <button type="button" class="btn-sm" style="background:#3B82F6;color:#fff" onclick="presetPerms('professional')">🛡 Professional preset</button>
+    <button type="button" class="btn-sm" style="background:#94A3B8;color:#fff" onclick="presetPerms('readonly')">👁 Read-only preset</button>
+    <button type="button" class="btn-sm" style="background:#EF4444;color:#fff" onclick="presetPerms('none')">✕ Clear all</button>
+  </div>
+  <div id="permsCheckboxGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:13px"></div>
+</div>
+<div style="font-size:11px;color:#64748b;font-weight:600;margin-top:6px">Dashboard is always granted. "Admins" + "Cleanup" are super-admin-only and cannot be granted.</div>
+</div>
+
 <div class="err" id="modalErr" style="display:none;margin-bottom:10px"></div>
 <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -273,6 +293,7 @@ function openEditModalRow(a){
   document.getElementById('m_role').value = a.role;
   document.getElementById('passwordGroup').style.display = 'none';
   MY_PICKED_CITIES = (a.assigned_city_ids || []).slice();
+  MY_PERMS = (a.permissions && typeof a.permissions === 'object') ? Object.assign({}, a.permissions) : {};
   document.getElementById('newUserHelp').style.display = 'none';
   document.getElementById('saveBtn').textContent = '💾 Save Changes';
   renderChips(); renderCityPicker(); onRoleChange();
@@ -291,6 +312,7 @@ function openAddModal(){
   document.getElementById('passwordGroup').style.display = '';
   document.getElementById('pwHint').textContent = '';
   MY_PICKED_CITIES = [];
+  MY_PERMS = {};  // new admin starts with zero permissions — super must grant explicitly
   document.getElementById('newUserHelp').style.display = '';
   document.getElementById('saveBtn').textContent = '🚀 Create Admin';
   renderChips(); renderCityPicker(); onRoleChange();
@@ -309,6 +331,7 @@ function openEditModal(jsonStr){
   document.getElementById('m_role').value = a.role;
   document.getElementById('passwordGroup').style.display = 'none';
   MY_PICKED_CITIES = (a.assigned_city_ids || []).slice();
+  MY_PERMS = (a.permissions && typeof a.permissions === 'object') ? Object.assign({}, a.permissions) : {};
   document.getElementById('newUserHelp').style.display = 'none';
   document.getElementById('saveBtn').textContent = '💾 Save Changes';
   renderChips(); renderCityPicker(); onRoleChange();
@@ -339,6 +362,82 @@ function onRoleChange(){
   var grp = document.getElementById('cityScopeGroup');
   if (role === 'city_moderator'){ grp.style.display = ''; }
   else { grp.style.display = 'none'; MY_PICKED_CITIES = []; renderChips(); }
+  // db/158 — show permissions checkbox grid for non-super admin roles
+  var permsGrp = document.getElementById('permsScopeGroup');
+  if (role === 'super_admin'){
+    permsGrp.style.display = 'none';
+  } else {
+    permsGrp.style.display = '';
+    renderPermsGrid();
+  }
+}
+
+// ============================================================
+// PAGE PERMISSIONS (db/158) — checkbox grid + preset buttons
+// ============================================================
+var MY_PERMS = {};  // current admin's permission map (key → bool)
+
+// Whitelist must match db/158 v_allowed_keys exactly.
+var PERM_KEYS = [
+  { key:'moderation',          label:'⚖️ Moderation' },
+  { key:'quick_approve',       label:'⚡ Quick Approve' },
+  { key:'incomplete_shops',    label:'🩹 Incomplete' },
+  { key:'duplicates',          label:'🧹 Duplicates' },
+  { key:'suspicious',          label:'🚨 Suspicious' },
+  { key:'verification',        label:'✅ Verification' },
+  { key:'reviews',             label:'⭐ Reviews' },
+  { key:'pucho_moderation',    label:'💬 Pucho Bhai' },
+  { key:'professional_verify', label:'🛡 Professional' },
+  { key:'pro_legal_notify',    label:'📨 Legal Notify' },
+  { key:'bulk_upload',         label:'📥 Bulk Add' },
+  { key:'featured',            label:'⭐ Featured' },
+  { key:'spotlight',           label:'🌟 Spotlight' },
+  { key:'deals',               label:'🎁 Deals' },
+  { key:'announcements',       label:'📣 News' },
+  { key:'broadcast',           label:'📡 Broadcast' },
+  { key:'categories',          label:'🏷️ Categories' },
+  { key:'cities',              label:'📍 Cities' },
+  { key:'activity',            label:'📋 Activity' },
+  { key:'health',              label:'🛡 Health' },
+  { key:'monitoring',          label:'📊 Monitoring' },
+  { key:'settings',            label:'⚙️ Settings' }
+];
+
+function renderPermsGrid(){
+  var host = document.getElementById('permsCheckboxGrid');
+  if (!host) return;
+  host.innerHTML = PERM_KEYS.map(function(p){
+    var checked = MY_PERMS[p.key] === true ? 'checked' : '';
+    return '<label style="display:flex;align-items:center;gap:7px;padding:6px 9px;background:#fff;border:1px solid #E2E8F0;border-radius:7px;cursor:pointer;font-weight:600">'
+         +   '<input type="checkbox" data-perm="' + p.key + '" ' + checked
+         +     ' onchange="MY_PERMS[this.dataset.perm]=this.checked" style="width:16px;height:16px;cursor:pointer">'
+         +   '<span>' + p.label + '</span>'
+         + '</label>';
+  }).join('');
+}
+
+function presetPerms(preset){
+  if (preset === 'content'){
+    // Content moderator — reviews, pucho-bhai, announcements, moderation
+    MY_PERMS = {
+      moderation:true, quick_approve:true, reviews:true,
+      pucho_moderation:true, announcements:true, broadcast:true,
+      activity:true
+    };
+  } else if (preset === 'professional'){
+    // Professional verification + legal notify
+    MY_PERMS = {
+      professional_verify:true, pro_legal_notify:true,
+      verification:true, activity:true
+    };
+  } else if (preset === 'readonly'){
+    // View-only — activity + health + monitoring
+    MY_PERMS = { activity:true, health:true, monitoring:true };
+  } else {
+    // 'none' or unknown → clear all
+    MY_PERMS = {};
+  }
+  renderPermsGrid();
 }
 
 function onCityPick(e){
@@ -428,6 +527,36 @@ async function saveAdmin(){
         throw new Error(msg);
       }
     }
+    // db/158 — save page permissions for non-super roles.
+    // For new admin, we just got their UID back from admin_list_admins refresh;
+    // but the cleanest path is: save the role first (above), then save permissions
+    // in a second RPC call. For new-create flow, we need to look up the new UID
+    // by email after the create call settles — admin_list_admins returns it.
+    if (role !== 'super_admin'){
+      try {
+        var targetUid = uid;
+        if (!targetUid){
+          // New-create: refetch admin list to find our just-created uid
+          var lr = await C.rpc('admin_list_admins');
+          if (lr.data){
+            var found = lr.data.find(function(x){ return (x.email||'').toLowerCase() === email; });
+            if (found) targetUid = found.auth_user_id;
+          }
+        }
+        if (targetUid){
+          var pr = await C.rpc('admin_set_admin_permissions', {
+            p_user_id:     targetUid,
+            p_permissions: MY_PERMS || {}
+          });
+          if (pr.error){
+            console.warn('Permissions save failed (non-fatal):', pr.error.message);
+          }
+        }
+      } catch(permErr){
+        console.warn('Permissions save error:', permErr);
+      }
+    }
+
     closeModal();
     toast(EDIT_MODE ? '✓ Admin updated' : '✓ Admin created — share password securely', 'success');
     await loadAdmins();

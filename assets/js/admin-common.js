@@ -109,7 +109,100 @@
           el.style.display = '';
         });
       }
+      // After we know role, also apply per-page permission gating to
+      // the nav items so a regular admin doesn't see (or click into)
+      // pages they're not allowed to access.
+      applyPermissionGatingToNav().catch(() => {});
     } catch(_){}
+  }
+
+  // ============================================================
+  // PERMISSION SYSTEM (db/158) — granular per-page access control
+  // ============================================================
+  // my_admin_permissions() returns the effective permission set.
+  // Super admins get every key=TRUE automatically. Regular admins
+  // get only what was granted via the Admins UI checkboxes.
+  let _permCache = null;
+  let _permFetching = null;
+
+  async function getPermissions(force){
+    if (_permCache && !force) return _permCache;
+    if (_permFetching) return _permFetching;
+    _permFetching = (async () => {
+      try {
+        if (!global.ShopDB || !ShopDB.client) return {};
+        const r = await ShopDB.client.rpc('my_admin_permissions');
+        const data = (r && r.data) || {};
+        _permCache = data;
+        return data;
+      } catch(_){
+        // RPC missing (db/158 not deployed) → silently fall back to
+        // "everything granted" so admins aren't locked out by a
+        // half-applied migration.
+        return { is_admin: true, is_super: true, _fallback: true };
+      } finally {
+        _permFetching = null;
+      }
+    })();
+    return _permFetching;
+  }
+
+  // Mapping from nav-slug → permission key. Slugs use dashes, keys
+  // use underscores (matching DB JSONB key shape).
+  const SLUG_TO_PERM_KEY = {
+    'dashboard':           null,                  // always granted
+    'moderation':          'moderation',
+    'bulk-upload':         'bulk_upload',
+    'announcements':       'announcements',
+    'featured':            'featured',
+    'deals':               'deals',
+    'activity':            'activity',
+    'suspicious':          'suspicious',
+    'pucho-moderation':    'pucho_moderation',
+    'reviews':             'reviews',
+    'categories':          'categories',
+    'cities':              'cities',
+    'settings':            'settings',
+    'professional-verify': 'professional_verify',
+    'pro-legal-notify':    'pro_legal_notify',
+    'health':              'health',
+    'monitoring':          'monitoring',
+    'duplicates':          'duplicates',
+    'incomplete-shops':    'incomplete_shops',
+    'broadcast':           'broadcast',
+    'spotlight':           'spotlight',
+    'verification':        'verification',
+    'quick-approve':       'quick_approve',
+    'admins':              null,                  // superAdminOnly already gates
+    'test-cleanup':        null                   // superAdminOnly already gates
+  };
+
+  async function applyPermissionGatingToNav(){
+    const perms = await getPermissions();
+    // Super admins bypass everything
+    if (perms.is_super || perms._fallback) return;
+
+    NAV_ITEMS.forEach(item => {
+      const permKey = SLUG_TO_PERM_KEY[item.slug];
+      if (permKey == null) return;  // always-on item
+      if (perms[permKey] === true) return;  // granted — leave visible
+      // Not granted — hide the nav link
+      const link = document.querySelector(`a[href="${item.href}"]`);
+      if (link) link.style.display = 'none';
+    });
+  }
+
+  // Page-level guard. Drop at top of any admin page's init() like:
+  //   await AdminCommon.requirePermission('moderation');
+  // Redirects to dashboard if the current user lacks the permission.
+  async function requirePermission(permKey){
+    const perms = await getPermissions();
+    if (perms.is_super || perms._fallback) return true;
+    if (perms[permKey] === true) return true;
+    // Denied — bounce to dashboard with a toast
+    toast('Access denied — your admin account does not have this permission.', true);
+    setTimeout(() => { location.href = '/admin/dashboard.html'; }, 1500);
+    return false;
   }
 
   function logout(){
@@ -243,6 +336,10 @@
     toast,
     spinner,
     logout,
-    escapeHtml
+    escapeHtml,
+    // db/158 permission helpers
+    getPermissions,
+    requirePermission,
+    applyPermissionGatingToNav
   };
 })(window);
