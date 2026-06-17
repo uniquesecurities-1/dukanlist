@@ -136,6 +136,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
+<!-- db/158 permission gate — hides nav items + redirects from this page
+     if current admin lacks 'pro_legal_notify' permission. -->
+<script src="/assets/js/admin-permission-gate.js"></script>
 <script>
 // ============================================================
 // State

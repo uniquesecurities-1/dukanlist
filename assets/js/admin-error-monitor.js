@@ -25,6 +25,21 @@
      flushed once the client appears.
 
    ============================================================ */
+// AUTO-INJECT the universal admin permission gate so every page that
+// already includes admin-error-monitor.js (24 pages — nearly all admin
+// pages) also gets nav-hiding + page-level guard for free. Idempotent
+// via a flag check.
+(function(){
+  if (window.__dukanGateInjected) return;
+  window.__dukanGateInjected = true;
+  // Skip on /admin/login.html — no gating needed (and no session yet)
+  if (location.pathname.indexOf('/admin/login') === 0) return;
+  var s = document.createElement('script');
+  s.src = '/assets/js/admin-permission-gate.js';
+  s.async = true;
+  (document.head || document.documentElement).appendChild(s);
+})();
+
 (function(){
   'use strict';
 
