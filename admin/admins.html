@@ -97,7 +97,7 @@ label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:6
 <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800">Active Admins</div>
 <button class="btn btn-primary" onclick="openAddModal()">+ Add Admin / City Manager</button>
 </div>
-<div id="adminsList" class="loader">Loading…</div>
+<div id="adminsList" class="loading">Loading…</div>
 </div>
 </main>
 <div class="modal-backdrop" id="adminModal" onclick="if(event.target===this)closeModal()">
@@ -177,13 +177,21 @@ async function init(){
 
 async function loadAdmins(){
   var host = document.getElementById('adminsList');
-  host.innerHTML = '<div class="loader">Loading admins…</div>';
+  // Use 'loading' (text-styled state) NOT 'loader' (which admin-premium.css
+  // turns into a 32×32 spinning circle and would shrink the entire admin
+  // grid into a rotating circle once cards render inside).
+  host.className = 'loading';
+  host.innerHTML = '<div style="display:inline-block;width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#F59E0B;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:10px;vertical-align:middle"></div>Loading admins…';
   var r = await C.rpc('admin_list_admins');
-  if (r.error){ host.innerHTML = '<div class="err">Failed: ' + escapeHtml(r.error.message) + '</div>'; return; }
+  if (r.error){ host.className = ''; host.innerHTML = '<div class="err">Failed: ' + escapeHtml(r.error.message) + '</div>'; return; }
   if (!r.data || !r.data.length){
+    host.className = '';
     host.innerHTML = '<div class="empty-card">👥 No admins yet. Click "+ Add Admin" to create one.</div>';
     return;
   }
+  // CRITICAL: strip the 'loading' class before rendering the grid — otherwise
+  // admin-premium.css's flex centering + padding would mis-align the cards.
+  host.className = '';
   host.innerHTML = '<div class="admin-grid">' + r.data.map(adminCard).join('') + '</div>';
 }
 
