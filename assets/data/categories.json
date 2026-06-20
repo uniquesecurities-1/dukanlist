@@ -1,5 +1,5 @@
 {
-  "version": "3.9",
+  "version": "4.0",
   "updated": "2026-06-15",
   "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
   "parents": [
@@ -788,15 +788,59 @@
       "subs": [
         {
           "slug": "clothes",
-          "name": "Clothes / Tailor",
-          "name_hi": "कपड़ा / दर्ज़ी",
-          "icon": "👔"
+          "name": "Clothes / Tailor / Garments",
+          "name_hi": "कपड़ा / दर्ज़ी / गारमेंट्स",
+          "icon": "👔",
+          "keywords": "cloth merchant,kapda dukaan,fabric dealer,garment,readymade,unstitched,semi stitched,tailor,darzi,ladies tailor,gents tailor,boutique,suit,saree,kurti,fashion"
+        },
+        {
+          "slug": "cloth-merchant",
+          "name": "Cloth Merchant (Fabric Shop)",
+          "name_hi": "कपड़ा मर्चेंट / कपड़े की दुकान",
+          "icon": "🧵",
+          "keywords": "cloth merchant,kapda merchant,fabric shop,fabric dealer,kapda dukaan,thaan,thaan kapda,suiting,shirting,cotton,polyester,silk,linen,plain fabric,printed fabric,kapde wala,kapda wholesaler"
+        },
+        {
+          "slug": "garments-unstitched",
+          "name": "Unstitched Suits & Garments",
+          "name_hi": "अनस्टिच्ड सूट / कपड़े",
+          "icon": "👗",
+          "keywords": "unstitched,unstitched suit,unstitched garments,suit piece,dress material,salwar kameez fabric,dupatta set,piece kapda,suit length material"
         },
         {
           "slug": "readymade-garments",
           "name": "Readymade Garments",
           "name_hi": "रेडीमेड कपड़े",
-          "icon": "🧥"
+          "icon": "🧥",
+          "keywords": "readymade,ready made,readymade garments,ready to wear,kids wear,mens wear,womens wear,jeans,t-shirt,shirt,dress,branded clothes,family store,garments shop"
+        },
+        {
+          "slug": "garments-semi-stitched",
+          "name": "Semi-Stitched Garments",
+          "name_hi": "सेमी-स्टिच्ड गारमेंट्स",
+          "icon": "🪡",
+          "keywords": "semi stitched,semi-stitched,semi stitched suit,semi stitched lehenga,kurti semi stitched,pre stitched,saree blouse piece,readymade with alteration"
+        },
+        {
+          "slug": "tailor-ladies",
+          "name": "Ladies Tailor",
+          "name_hi": "लेडीज़ टेलर",
+          "icon": "👚",
+          "keywords": "ladies tailor,female tailor,blouse stitching,kurti stitching,salwar suit stitching,lehenga stitching,anarkali,designer dress,boutique,ladies darzi,silai wali,women tailor,fall pico"
+        },
+        {
+          "slug": "tailor-gents",
+          "name": "Gents Tailor",
+          "name_hi": "जेंट्स टेलर",
+          "icon": "👔",
+          "keywords": "gents tailor,male tailor,pant stitching,shirt stitching,kurta pajama stitching,sherwani stitching,coat pant,blazer stitching,gents darzi,men tailor,wedding sherwani"
+        },
+        {
+          "slug": "tailor-unisex",
+          "name": "Tailor (Unisex / All Stitching)",
+          "name_hi": "टेलर (यूनिसेक्स)",
+          "icon": "✂️",
+          "keywords": "unisex tailor,general tailor,all stitching,tailor shop,darzi,silai master,alteration,repair tailor,simple stitching,village tailor"
         },
         {
           "slug": "jewellery",
@@ -869,12 +913,6 @@
           "name": "Men's Wear / Suiting",
           "name_hi": "पुरुष परिधान / सूटिंग",
           "icon": "👔"
-        },
-        {
-          "slug": "cloth-merchant",
-          "name": "Cloth Merchant / Fabric",
-          "name_hi": "कपड़ा व्यापारी",
-          "icon": "🧶"
         },
         {
           "slug": "undergarment",
@@ -1273,6 +1311,104 @@
           "name": "POP / False Ceiling Material",
           "name_hi": "POP / सीलिंग सामग्री",
           "icon": "🏠"
+        },
+        {
+          "slug": "pvc-sheet",
+          "name": "PVC Sheet / Plastic Sheet",
+          "name_hi": "PVC शीट / प्लास्टिक शीट",
+          "icon": "🟦",
+          "keywords": "pvc sheet,plastic sheet,pvc wall panel,pvc ceiling panel,pvc foam sheet,flex board,signboard pvc,plastic panel,pvc dealer,acp alternative"
+        },
+        {
+          "slug": "cement-sheet",
+          "name": "Cement Sheet / Asbestos Roofing",
+          "name_hi": "सीमेंट शीट / एसबेस्टस छत",
+          "icon": "🏚️",
+          "keywords": "cement sheet,asbestos sheet,fibre cement sheet,ac sheet,everest sheet,corrugated sheet,roof sheet,shed material,godown roof,industrial roof"
+        },
+        {
+          "slug": "profile-sheet",
+          "name": "Profile Sheet / Colour Coated Roofing",
+          "name_hi": "प्रोफाइल शीट / कलर कोटेड छत",
+          "icon": "🔶",
+          "keywords": "profile sheet,colour coated sheet,gi sheet,gp sheet,galvanized sheet,jsw sheet,tata sheet,jindal sheet,metal roofing,industrial roofing,ppgi"
+        },
+        {
+          "slug": "erw-pipe",
+          "name": "ERW Pipe / GI Pipe / Steel Pipe",
+          "name_hi": "ERW पाइप / GI पाइप",
+          "icon": "🚿",
+          "keywords": "erw pipe,gi pipe,ms pipe,steel pipe,square pipe,rectangular pipe,hollow section,tata pipe,jindal pipe,apl apollo,structural pipe,industrial pipe"
+        },
+        {
+          "slug": "ms-angle-channel",
+          "name": "MS Angle / Channel / Flat",
+          "name_hi": "MS एंगल / चैनल / फ्लैट",
+          "icon": "📐",
+          "keywords": "ms angle,iron angle,steel angle,ms channel,c channel,ms flat,flat bar,square bar,structural steel,gate angle,grill angle,fabrication material,sail steel,angle iron"
+        },
+        {
+          "slug": "gypsum-ceiling",
+          "name": "Gypsum Board / Down Ceiling",
+          "name_hi": "जिप्सम बोर्ड / डाउन सीलिंग",
+          "icon": "🏠",
+          "keywords": "gypsum board,gypsum,gyproc,saint gobain,drywall,gypsum partition,gypsum ceiling,down ceiling,gypsum false ceiling,plasterboard,ceiling channel,suspended ceiling,office ceiling"
+        },
+        {
+          "slug": "welding-fabrication",
+          "name": "Welding / Steel Fabrication",
+          "name_hi": "वेल्डिंग / स्टील फेब्रिकेशन",
+          "icon": "🔥",
+          "keywords": "welding,welder,welding shop,fabrication,fabricator,steel fabrication,iron fabrication,ms fabrication,ss fabrication,gate maker,grill maker,truss fabrication,shed fabrication,iron work"
+        },
+        {
+          "slug": "waterproofing",
+          "name": "Waterproofing Material & Service",
+          "name_hi": "वाटरप्रूफिंग",
+          "icon": "💧",
+          "keywords": "waterproofing,roof waterproofing,terrace waterproofing,basement waterproofing,dr fixit,asian smartcare,leak proofing,seepage treatment,leakage repair,chhat leakage,paani band"
+        },
+        {
+          "slug": "interior-designer",
+          "name": "Interior Designer / Decorator",
+          "name_hi": "इंटीरियर डिज़ाइनर",
+          "icon": "🛋️",
+          "keywords": "interior designer,interior decorator,home decor,office interior,shop interior,modular kitchen,false ceiling design,wallpaper,curtain shop,interior architect,home renovation"
+        },
+        {
+          "slug": "aluminium-fabrication",
+          "name": "Aluminium Fabrication / Windows",
+          "name_hi": "एल्युमिनियम फेब्रिकेशन",
+          "icon": "🪟",
+          "keywords": "aluminium fabrication,aluminium window,sliding window,upvc window,aluminium partition,aluminium section,jindal aluminium,glazing,aluminium gate,window fabricator,acp panel"
+        },
+        {
+          "slug": "glass-mirror-shop",
+          "name": "Glass / Mirror / Toughened Glass",
+          "name_hi": "शीशा / दर्पण / टफन ग्लास",
+          "icon": "🪞",
+          "keywords": "glass shop,kaanch,glass dealer,mirror shop,toughened glass,tempered glass,plain glass,frosted glass,decorative glass,glass partition,shower cubicle,saint gobain glass"
+        },
+        {
+          "slug": "borewell-tubewell",
+          "name": "Borewell / Tubewell Drilling",
+          "name_hi": "बोरवेल / ट्यूबवेल खुदाई",
+          "icon": "⛲",
+          "keywords": "borewell,boring,tubewell,water boring,deep boring,submersible pump,borewell drilling,rotary drilling,boring contractor,pani ka boring,khet boring"
+        },
+        {
+          "slug": "civil-contractor",
+          "name": "Civil / Construction Contractor",
+          "name_hi": "सिविल / निर्माण ठेकेदार",
+          "icon": "👷",
+          "keywords": "civil contractor,construction contractor,building contractor,rcc contractor,thekedar,makaan banane wala,house construction,turnkey,plastering contractor,brickwork,labour contractor,raj mistri,civil work,nirman thekedar,builder"
+        },
+        {
+          "slug": "architect-civil-engineer",
+          "name": "Architect / Civil Engineer",
+          "name_hi": "आर्किटेक्ट / सिविल इंजीनियर",
+          "icon": "📐",
+          "keywords": "architect,civil engineer,structural engineer,naksha,building plan,building design,3d elevation,vastu consultant,interior architect,construction consultant,floor plan,building approval"
         }
       ]
     },
