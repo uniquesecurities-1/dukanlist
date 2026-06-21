@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#D97706">
 <meta name="robots" content="noindex,nofollow">
-<title>Golden Pages Add — DukanList Admin</title>
+<title>Bulk Add Listings — DukanList Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥇</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -132,8 +132,8 @@
 <div class="container">
 
   <div class="hero">
-    <h1>🥇 Golden Pages Add</h1>
-    <p>Reference-based soft listings — 5 sec per shop. Lives only on /golden-pages.html (not main DukanList).</p>
+    <h1>🥇 Bulk Add Listings</h1>
+    <p>Add a single business or paste 100s at once. Choose target below — Golden Pages (soft-listed) or Main DukanList (live in search).</p>
   </div>
 
   <div class="stats">
@@ -148,6 +148,28 @@
     <div class="stat-tile">
       <div class="stat-val" id="statWeek">—</div>
       <div class="stat-lbl">Is Hafte</div>
+    </div>
+  </div>
+
+  <!-- TARGET TOGGLE — pick where new listings should appear -->
+  <div class="target-picker" style="background:#fff;border:1.5px solid #FDE68A;border-radius:14px;padding:12px 14px;margin-bottom:16px;box-shadow:0 4px 12px rgba(217,119,6,.08)">
+    <div style="font-size:.7rem;font-weight:900;color:#92400E;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">
+      📍 Publish to
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <label class="target-card" data-target="soft_listed" style="cursor:pointer;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #D97706;border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;gap:3px;transition:.15s">
+        <input type="radio" name="target_status" value="soft_listed" checked style="position:absolute;opacity:0;pointer-events:none">
+        <span style="font-weight:900;font-size:.92rem;color:#78350F">🥇 Golden Pages</span>
+        <span style="font-size:.72rem;font-weight:600;color:#92400E;line-height:1.3">Reference directory. Owners claim via WhatsApp.</span>
+      </label>
+      <label class="target-card" data-target="active" style="cursor:pointer;background:#fff;border:2px solid #E2E8F0;border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;gap:3px;transition:.15s">
+        <input type="radio" name="target_status" value="active" style="position:absolute;opacity:0;pointer-events:none">
+        <span style="font-weight:900;font-size:.92rem;color:#1E3A8A">🏪 Main DukanList</span>
+        <span style="font-size:.72rem;font-weight:600;color:#475569;line-height:1.3">Live in search &amp; browse. Owner can claim later via WhatsApp.</span>
+      </label>
+    </div>
+    <div id="targetWarn" style="display:none;margin-top:8px;padding:8px 10px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;font-size:.78rem;color:#991B1B;font-weight:700">
+      ⚠️ <b>Main DukanList</b> means listing goes live on search &amp; browse. Make sure the data is accurate — owners may discover and complain.
     </div>
   </div>
 
@@ -485,6 +507,33 @@ function wireTabs(){
       document.getElementById('tab-' + t.dataset.tab).classList.add('active');
     });
   });
+
+  // Target picker — toggle the highlighted card + show warning when 'active'
+  document.querySelectorAll('.target-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const target = card.dataset.target;
+      document.querySelectorAll('input[name="target_status"]').forEach(r => {
+        r.checked = (r.value === target);
+      });
+      // visual styles
+      document.querySelectorAll('.target-card').forEach(c => {
+        const isActive = c.dataset.target === target;
+        if (c.dataset.target === 'soft_listed'){
+          c.style.background = isActive ? 'linear-gradient(135deg,#FEF3C7,#FDE68A)' : '#fff';
+          c.style.borderColor = isActive ? '#D97706' : '#E2E8F0';
+        } else {
+          c.style.background = isActive ? 'linear-gradient(135deg,#DBEAFE,#BFDBFE)' : '#fff';
+          c.style.borderColor = isActive ? '#1E3A8A' : '#E2E8F0';
+        }
+      });
+      document.getElementById('targetWarn').style.display = (target === 'active') ? 'block' : 'none';
+    });
+  });
+}
+
+function getSelectedTarget(){
+  const r = document.querySelector('input[name="target_status"]:checked');
+  return (r && r.value) || 'soft_listed';
 }
 
 // ============================================================
@@ -810,7 +859,8 @@ async function submitSingle(saveAndNext){
       p_name_hi:                nameHi || null,
       p_owner_name:             ownerName || null,
       p_source:                 'reference',
-      p_notes:                  source || null
+      p_notes:                  source || null,
+      p_target_status:          getSelectedTarget()
     });
     if (error) throw error;
     if (!data || !data.success) throw new Error('Failed');
@@ -818,10 +868,12 @@ async function submitSingle(saveAndNext){
     refreshStats();
     loadRecentList();
 
+    const tgtLabel = (data.status === 'active') ? 'DukanList (live)' : 'Golden Pages';
+
     if (saveAndNext){
       // Save + clear ALL entry fields including categories. City + source kept
       // (city repeats per batch session, source is "Recommended by ..." style notes).
-      showToast('✓ Added: ' + name);
+      showToast('✓ Added to ' + tgtLabel + ': ' + name);
       document.getElementById('f_name').value = '';
       document.getElementById('f_name_hi').value = '';
       document.getElementById('f_owner_name').value = '';
@@ -829,11 +881,11 @@ async function submitSingle(saveAndNext){
       document.getElementById('f_mobile').value = '';
       clearAllCats();                    // reset multi-cat picker chips
       resetHindiAutoFill();              // re-enable auto-translate for next entry
-      // Keep city + source as they typically repeat per batch
+      // Keep city + source + target as they typically repeat per batch
       document.getElementById('f_name').focus();
     } else {
-      document.getElementById('singleOkName').textContent = '🏪 ' + name;
-      document.getElementById('singleOkUrl').textContent = data.gp_url || ('/golden-pages.html');
+      document.getElementById('singleOkName').textContent = '🏪 ' + name + '  →  ' + tgtLabel;
+      document.getElementById('singleOkUrl').textContent = data.public_url || data.gp_url || ('/golden-pages.html');
       document.getElementById('singleForm').style.display = 'none';
       document.getElementById('singleOk').classList.add('show');
     }
@@ -925,7 +977,8 @@ async function submitBulk(){
       p_names:          names,
       p_category_slug:  SELECTED_BCAT.slug,
       p_area:           area || null,
-      p_city_id:        SELECTED_BCITY_ID
+      p_city_id:        SELECTED_BCITY_ID,
+      p_target_status:  getSelectedTarget()
     });
     if (error) throw error;
     if (!data || !data.success) throw new Error('Bulk failed');
