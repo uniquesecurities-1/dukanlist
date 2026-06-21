@@ -467,26 +467,31 @@ function changePage(delta){
 // PROMOTE
 // ============================================================
 async function promote(id, name){
-  const target = prompt(
-    'Promote "' + name + '" to main DukanList?\n\n' +
-    'Type "pending" → enters admin moderation queue (recommended)\n' +
-    'Type "active" → publishes immediately (admin trusts data)\n' +
-    'Or cancel.',
-    'pending'
-  );
-  if (!target) return;
-  const cleaned = target.trim().toLowerCase();
-  if (cleaned !== 'pending' && cleaned !== 'active'){
-    showToast('Please type either "pending" or "active"', 'error');
-    return;
+  // One-click promote → goes to ACTIVE on main DukanList
+  // (Admin already vetted the data via GP. If admin wants to send through
+  // moderation instead, they can shift+click for the advanced dialog.)
+  const useActive = !window.event || !window.event.shiftKey;
+  let cleaned;
+
+  if (useActive){
+    if (!confirm('Promote "' + name + '" to MAIN DukanList NOW?\n\n• Listing goes live immediately in search & browse\n• Owner can still claim via WhatsApp\n• To send to moderation queue instead, hold Shift + click Promote\n\nProceed?')){
+      return;
+    }
+    cleaned = 'active';
+  } else {
+    if (!confirm('Send "' + name + '" to MODERATION QUEUE?\n\n• Admin must approve before going live\n• Use when data needs review')){
+      return;
+    }
+    cleaned = 'pending';
   }
+
   try {
     const { error } = await C.rpc('admin_gp_promote_to_full', {
       p_business_id:   id,
       p_target_status: cleaned
     });
     if (error) throw error;
-    showToast('✓ Promoted to ' + cleaned, 'success');
+    showToast('✓ Promoted to ' + (cleaned === 'active' ? 'DukanList (live)' : 'moderation queue'), 'success');
     loadList();
   } catch(e){
     showToast('⚠️ ' + (e.message || 'Failed'), 'error');

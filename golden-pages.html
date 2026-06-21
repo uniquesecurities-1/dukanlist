@@ -144,6 +144,8 @@
   .shop-actions .btn-claim:hover{background:linear-gradient(135deg,#128C7E,#075E54);transform:translateY(-1px)}
   .shop-actions .btn-notify{background:#fff;color:#D97706;border:1.5px solid #FCD34D}
   .shop-actions .btn-notify:hover{background:#FFFBEB}
+  .shop-actions .btn-flag{flex:0 0 auto;min-width:38px;padding:8px 10px;background:#fff;color:#94A3B8;border:1.5px solid #E2E8F0;font-size:.95rem}
+  .shop-actions .btn-flag:hover{background:#FEE2E2;border-color:#FCA5A5;color:#991B1B}
 
   /* Per-shop richer info */
   .shop-name-hi{font-size:.78rem;font-weight:600;color:#78350F;opacity:.85;margin-top:-2px;margin-bottom:4px;font-family:'Noto Sans Devanagari',sans-serif}
@@ -177,7 +179,7 @@
   .footer-cta{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #FCD34D;border-radius:16px;padding:24px 20px;margin-top:30px;text-align:center}
   .footer-cta h3{font-size:1.2rem;font-weight:900;color:#78350F;margin-bottom:8px;letter-spacing:-.01em}
   .footer-cta p{font-size:.92rem;color:#92400E;font-weight:600;margin-bottom:14px;line-height:1.5;max-width:540px;margin-left:auto;margin-right:auto}
-  .footer-cta a{display:inline-block;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;padding:11px 22px;border-radius:11px;font-weight:800;font-size:.9rem;text-decoration:none;box-shadow:0 6px 18px rgba(217,119,6,.32)}
+  .footer-cta a{display:inline-block;padding:11px 22px;border-radius:11px;font-weight:800;font-size:.9rem;text-decoration:none;box-shadow:0 4px 14px rgba(217,119,6,.18)}
 
   /* Notify modal */
   .modal-bd{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;animation:fadeIn .25s}
@@ -306,7 +308,7 @@
     <!-- Register strip -->
     <div class="hero-register-strip">
       <span>Don't see your business?</span>
-      <a href="/register.html">🏪 List Free →</a>
+      <a href="/golden-pages-self-add.html">+ Add yourself · free · 30 sec</a>
     </div>
   </div>
 </section>
@@ -336,8 +338,11 @@
 
   <div class="footer-cta">
     <h3>🏪 Don't see your business?</h3>
-    <p>Build your full DukanList profile — photos, hours, reviews, contact form, everything customers need. Free forever.</p>
-    <a href="/register.html">+ Register Your Shop</a>
+    <p><b>Add yourself to Golden Pages in 30 seconds</b> — free, no signup, no email needed. Or apply for a premium DukanList profile with photos, reviews & contact forms.</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
+      <a href="/golden-pages-self-add.html" style="background:linear-gradient(135deg,#D97706,#92400E);color:#fff">+ Add to Golden Pages</a>
+      <a href="/register.html" style="background:#fff;color:#92400E;border:1.5px solid #FCD34D">🏪 Premium DukanList</a>
+    </div>
   </div>
 </div>
 
@@ -351,6 +356,30 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeNotify()">Cancel</button>
       <button class="btn-send" onclick="submitNotify()">📤 Send Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Flag/Report modal -->
+<div class="modal-bd" id="flagBd" onclick="if(event.target===this)closeFlag()">
+  <div class="modal">
+    <h3>⚠️ Report this listing</h3>
+    <p class="modal-sub" id="flagSub">Help us keep Golden Pages clean. Tell us what's wrong with this listing.</p>
+    <label>What's the issue?</label>
+    <select id="flagReason" style="width:100%;padding:11px 13px;font-size:.92rem;border:1.5px solid #E2E8F0;border-radius:10px;background:#FAFAFA;color:#0F172A;font-family:inherit;outline:0;margin-bottom:10px">
+      <option value="">— Pick a reason —</option>
+      <option value="fake">🚫 Fake / not a real business</option>
+      <option value="wrong-info">📝 Wrong information (name, mobile, area)</option>
+      <option value="closed">🔒 Permanently closed</option>
+      <option value="duplicate">📑 Duplicate of another listing</option>
+      <option value="spam">📨 Spam / inappropriate</option>
+      <option value="other">❓ Other</option>
+    </select>
+    <label>Additional notes (optional)</label>
+    <textarea id="flagNotes" placeholder="Share details that help us verify..." maxlength="500"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeFlag()">Cancel</button>
+      <button class="btn-send" style="background:linear-gradient(135deg,#EF4444,#B91C1C)" onclick="submitFlag()">⚠️ Submit Report</button>
     </div>
   </div>
 </div>
@@ -586,6 +615,7 @@ function shopCardHtml(s){
            '<div class="shop-actions">' +
              '<a href="' + claimUrl + '" target="_blank" rel="noopener" class="btn btn-claim">💬 I\'m the owner</a>' +
              '<button class="btn btn-notify" data-act="notify">📞 Contact owner</button>' +
+             '<button class="btn btn-flag" data-act="flag" title="Report wrong / fake / closed">⚠️</button>' +
            '</div>' +
          '</div>';
 }
@@ -596,6 +626,18 @@ function wireShopButtons(){
       const card = btn.closest('.shop-card');
       CURRENT_NOTIFY_ID = card.getAttribute('data-id');
       document.getElementById('notifyBd').classList.add('show');
+    });
+  });
+  document.querySelectorAll('.shop-card .btn-flag').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.shop-card');
+      CURRENT_FLAG_ID = card.getAttribute('data-id');
+      CURRENT_FLAG_NAME = card.getAttribute('data-name') || 'this listing';
+      document.getElementById('flagSub').innerHTML =
+        'Reporting: <b>' + esc(CURRENT_FLAG_NAME) + '</b>. Our team reviews every report.';
+      document.getElementById('flagReason').value = '';
+      document.getElementById('flagNotes').value = '';
+      document.getElementById('flagBd').classList.add('show');
     });
   });
 }
@@ -655,6 +697,39 @@ async function submitNotify(){
     showToast('✓ Request sent — DukanList team will reach out');
   } catch(e){
     showToast('⚠️ Could not send. Please try again.');
+  }
+}
+
+// ============================================================
+// FLAG / REPORT
+// ============================================================
+let CURRENT_FLAG_ID = null;
+let CURRENT_FLAG_NAME = '';
+
+function closeFlag(){
+  document.getElementById('flagBd').classList.remove('show');
+}
+
+async function submitFlag(){
+  if (!CURRENT_FLAG_ID) return;
+  const reason = document.getElementById('flagReason').value;
+  if (!reason){
+    showToast('⚠️ Please pick a reason');
+    return;
+  }
+  const notes = document.getElementById('flagNotes').value.trim();
+  try {
+    const { error } = await C.rpc('gp_flag_listing', {
+      p_business_id: CURRENT_FLAG_ID,
+      p_reason:      reason,
+      p_notes:       notes || null,
+      p_ip_hash:     hashFingerprint()
+    });
+    if (error) throw error;
+    closeFlag();
+    showToast('✓ Reported — thanks, our team will review.');
+  } catch(e){
+    showToast('⚠️ Could not send report. Please try again.');
   }
 }
 
