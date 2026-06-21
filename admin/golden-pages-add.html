@@ -208,6 +208,12 @@
       </div>
 
       <div class="field">
+        <label>👤 Owner Name <span class="opt">(optional)</span></label>
+        <input type="text" id="f_owner_name" placeholder="e.g. Rajesh Singla" autocomplete="off">
+        <div class="hint">If you know the owner's name from reference, add it here. Helps personalisation when they claim.</div>
+      </div>
+
+      <div class="field">
         <label>📱 Mobile <span class="opt">(optional)</span></label>
         <input type="tel" id="f_mobile" placeholder="10-digit Indian number" inputmode="numeric" maxlength="10">
         <div class="hint">If you have it, add now — owners can claim faster later.</div>
@@ -683,6 +689,7 @@ async function submitSingle(saveAndNext){
   if (!SELECTED_CITY_ID) return showSingleErr('Pick a city');
 
   const nameHi = document.getElementById('f_name_hi').value.trim();
+  const ownerName = document.getElementById('f_owner_name').value.trim();
   const area = document.getElementById('f_area').value.trim();
   const mobileRaw = document.getElementById('f_mobile').value.trim();
   const mobile = mobileRaw ? mobileRaw.replace(/\D/g,'').slice(-10) : null;
@@ -708,6 +715,7 @@ async function submitSingle(saveAndNext){
       p_mobile:                 mobile || null,
       p_city_id:                SELECTED_CITY_ID,
       p_name_hi:                nameHi || null,
+      p_owner_name:             ownerName || null,
       p_source:                 'reference',
       p_notes:                  source || null
     });
@@ -722,6 +730,7 @@ async function submitSingle(saveAndNext){
       showToast('✓ Added: ' + name);
       document.getElementById('f_name').value = '';
       document.getElementById('f_name_hi').value = '';
+      document.getElementById('f_owner_name').value = '';
       document.getElementById('f_area').value = '';
       document.getElementById('f_mobile').value = '';
       // Keep source as it likely repeats per batch
@@ -786,6 +795,7 @@ function showSingleErr(msg){
 function resetSingleForm(){
   document.getElementById('f_name').value = '';
   document.getElementById('f_name_hi').value = '';
+  document.getElementById('f_owner_name').value = '';
   document.getElementById('f_area').value = '';
   document.getElementById('f_mobile').value = '';
   document.getElementById('f_source').value = '';
