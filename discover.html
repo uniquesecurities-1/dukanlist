@@ -875,8 +875,9 @@
   html[data-lang="hi"] body, html[data-lang="hi"] .card h2, html[data-lang="hi"] .card .meta{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
 </style>
 <script src="/assets/js/photo-fit.js" defer></script>
-<!-- "For You" smart ranking algorithm (privacy-first, localStorage only) -->
-<script src="/assets/js/discover-algo.js"></script>
+<!-- "For You" smart ranking algorithm + Daily Themes (privacy-first, localStorage only).
+     Version query busts SW cache so old algo (without getDailyTheme) isn't served. -->
+<script src="/assets/js/discover-algo.js?v=v3.5.0"></script>
 </head>
 <body>
 
@@ -1415,10 +1416,23 @@ async function init(){
 
     // Personalized ranking (For You feed) + today's theme boost
     if (window.DukanAlgo){
-      var theme = window.DukanAlgo.getDailyTheme();
+      // Defensive: getDailyTheme was added in v3.5.0. If user has the
+      // older algo cached, fall back gracefully without crashing.
+      var theme = null;
+      if (typeof window.DukanAlgo.getDailyTheme === 'function'){
+        try { theme = window.DukanAlgo.getDailyTheme(); } catch(_){ theme = null; }
+      }
       STATE.theme = theme;
-      STATE.themeCount = window.DukanAlgo.countMatching(rows, theme);
-      rows = window.DukanAlgo.rankShops(rows, { theme: theme });
+      if (theme && typeof window.DukanAlgo.countMatching === 'function'){
+        try { STATE.themeCount = window.DukanAlgo.countMatching(rows, theme); } catch(_){ STATE.themeCount = 0; }
+      }
+      // rankShops in older versions doesn't accept opts — pass it anyway, it's harmless
+      try {
+        rows = window.DukanAlgo.rankShops(rows, theme ? { theme: theme } : undefined);
+      } catch(rankErr){
+        console.warn('[discover] rankShops failed, falling back to random shuffle:', rankErr);
+        rows = rows.sort(function(){ return Math.random() - 0.5; });
+      }
     } else {
       rows = rows.sort(function(){ return Math.random() - 0.5; });
     }
@@ -1435,7 +1449,7 @@ async function init(){
 function renderFiltered(){
   var rows = STATE.allRows.slice();
   // Today's theme filter (Phase 2). Wins over category filter when active.
-  if (STATE.themeFilter && STATE.theme && window.DukanAlgo){
+  if (STATE.themeFilter && STATE.theme && window.DukanAlgo && typeof window.DukanAlgo.matchesTheme === 'function'){
     rows = rows.filter(function(b){ return window.DukanAlgo.matchesTheme(b, STATE.theme); });
   }
   // Type-safe filter: DOM data-cat attribute is always a string, but Supabase
