@@ -1850,16 +1850,16 @@ function openWhySheet(shopId, reasons, catIds){
       return '<li class="why-item">' + esc(r) + '</li>';
     }).join('');
   } else {
-    reasonHtml = '<li class="why-item">📌 Pure tier-3 me ye shop trending hai</li>';
+    reasonHtml = '<li class="why-item">📌 This shop is trending in your area</li>';
   }
 
   sheet.innerHTML = ''+
-    '<h3>🤔 Yeh shop aapko kyun dikha?</h3>'+
-    '<p class="why-sub">Personalized For You feed — sirf aapke phone par stored, server par nahi.</p>'+
+    '<h3>🤔 Why are you seeing this shop?</h3>'+
+    '<p class="why-sub">Personalized For You feed — stored only on your phone, never sent to our servers.</p>'+
     '<ul class="why-list">'+ reasonHtml +'</ul>'+
     '<div class="why-actions">'+
-      '<button class="why-btn-action why-btn-more" id="whyBtnMore">👍 Aur aise dikhao</button>'+
-      '<button class="why-btn-action why-btn-less" id="whyBtnLess">🚫 Yeh shop hide karo</button>'+
+      '<button class="why-btn-action why-btn-more" id="whyBtnMore">👍 Show more like this</button>'+
+      '<button class="why-btn-action why-btn-less" id="whyBtnLess">🚫 Hide this shop</button>'+
     '</div>'+
     '<button class="why-reset" id="whyResetBtn">Reset preferences (clear all learning)</button>';
 
@@ -1875,7 +1875,7 @@ function openWhySheet(shopId, reasons, catIds){
         try { window.DukanAlgo.boostCategory(cid); } catch(_){}
       });
     }
-    toastWhy('✓ Aise aur shops dikhayenge');
+    toastWhy('✓ We\'ll show more shops like this');
     closeWhySheet();
   });
 
@@ -1883,7 +1883,7 @@ function openWhySheet(shopId, reasons, catIds){
     if (window.DukanAlgo && shopId){
       try { window.DukanAlgo.hideShop(shopId); } catch(_){}
     }
-    toastWhy('✓ Yeh shop hide kar di');
+    toastWhy('✓ Shop hidden');
     closeWhySheet();
     // Hide the card from view immediately
     var card = document.querySelector('.card[data-id="' + shopId + '"]');
@@ -1896,11 +1896,11 @@ function openWhySheet(shopId, reasons, catIds){
   });
 
   btnReset.addEventListener('click', function(){
-    if (!confirm('Saari learning reset karein? Aapka For You feed default ho jayega.')) return;
+    if (!confirm('Reset all learning? Your For You feed will go back to default.')) return;
     if (window.DukanAlgo){
       try { window.DukanAlgo.resetProfile(); } catch(_){}
     }
-    toastWhy('✓ Preferences reset — refresh karo');
+    toastWhy('✓ Preferences reset — refresh to see');
     closeWhySheet();
   });
 }

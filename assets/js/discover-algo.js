@@ -232,7 +232,7 @@
         else if (km < 8)  proxScore = 0.5;
         else if (km < 20) proxScore = 0.25;
         else              proxScore = 0.1;
-        if (km < 2) reasons.push('📍 Aapse sirf ' + km.toFixed(1) + ' km dur');
+        if (km < 2) reasons.push('📍 Only ' + km.toFixed(1) + ' km from you');
       }
     } else {
       // No geo — fall back to "same city" check via STATE.cityFilter (if any)
@@ -262,7 +262,7 @@
     }
     catScore = Math.min(1, topCatBoost / 50);  // 50 affinity = max
     if (catScore > 0.5){
-      reasons.push('🎯 Aap is type ki shops dekh rahe the');
+      reasons.push('🎯 You\'ve been viewing this type of shop');
     }
     subScores.category = catScore;
 
@@ -277,7 +277,10 @@
       else                   recScore = 0.1;
       if (ageDays < 7 && shop.created_at){
         var newDays = (Date.now() - new Date(shop.created_at).getTime()) / 86400000;
-        if (newDays < 14) reasons.push('🆕 Yeh shop ' + Math.round(newDays) + ' din pehle join hui');
+        if (newDays < 14){
+          var dayLabel = Math.round(newDays) === 1 ? 'day' : 'days';
+          reasons.push('🆕 Joined ' + Math.round(newDays) + ' ' + dayLabel + ' ago');
+        }
       }
     }
     subScores.recent = recScore;
@@ -295,7 +298,7 @@
       reasons.push('⭐ Top rated (' + rating.toFixed(1) + '★)');
     }
     if (views >= 100){
-      reasons.push('🔥 ' + views + ' logon ne dekha');
+      reasons.push('🔥 ' + views + ' people viewed this');
     }
     subScores.engagement = engScore;
 
@@ -307,9 +310,11 @@
     if (todScore === 1.0){
       var bucket = timeOfDayBucket(catName, catSlug);
       if (bucket === 'food' || bucket === 'sweets'){
-        reasons.push('🍱 Abhi food time hai');
+        reasons.push('🍱 It\'s food time right now');
       } else if (bucket === 'service'){
-        reasons.push('🛠 Abhi service hours hain');
+        reasons.push('🛠 Service hours right now');
+      } else if (bucket === 'health'){
+        reasons.push('🏥 Clinic hours right now');
       }
     }
     subScores.time = todScore;
