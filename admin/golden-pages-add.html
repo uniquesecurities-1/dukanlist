@@ -180,14 +180,14 @@
 
       <div class="field">
         <label>🏢 Name *</label>
-        <input type="text" id="f_name" placeholder="e.g. Millennium School, Sharma Sweets, Dr Sachdeva Clinic" autocomplete="off">
+        <input type="text" id="f_name" placeholder="e.g. Millennium School, Sharma Sweets, Dr Sachdeva Clinic" autocomplete="off" oninput="scheduleHindiAutoFill()">
         <div class="hint">Shop, clinic, school, organisation — anything in town.</div>
       </div>
 
       <div class="field">
-        <label>🌐 Name in Hindi <span class="opt">(optional)</span></label>
-        <input type="text" id="f_name_hi" placeholder="मिलेनियम स्कूल" autocomplete="off">
-        <div class="hint">If the signboard uses Hindi / vernacular script.</div>
+        <label>🌐 Name in Hindi <span class="opt">(auto-filled)</span> <span id="hindiAutoStatus" style="font-size:.78rem;color:#059669;font-weight:700;margin-left:6px"></span></label>
+        <input type="text" id="f_name_hi" placeholder="मिलेनियम स्कूल" autocomplete="off" oninput="onHindiManualEdit()">
+        <div class="hint">Auto-transliterated from English name. Edit if wrong.</div>
       </div>
 
       <div class="field">
@@ -207,14 +207,14 @@
       </div>
 
       <div class="field">
-        <label>📍 Area / Landmark <span class="opt">(optional but recommended)</span></label>
-        <input type="text" id="f_area" placeholder="Malout Road, near Bus Stand" autocomplete="off">
-      </div>
-
-      <div class="field">
         <label>👤 Owner Name <span class="opt">(optional)</span></label>
         <input type="text" id="f_owner_name" placeholder="e.g. Rajesh Singla" autocomplete="off">
         <div class="hint">If you know the owner's name from reference, add it here. Helps personalisation when they claim.</div>
+      </div>
+
+      <div class="field">
+        <label>📍 Area / Landmark <span class="opt">(optional but recommended)</span></label>
+        <input type="text" id="f_area" placeholder="Malout Road, near Bus Stand" autocomplete="off">
       </div>
 
       <div class="field">
@@ -681,6 +681,95 @@ function clearBCat(){
 }
 
 // ============================================================
+// HINDI AUTO-FILL — Google Input Tools transliteration (ported
+// from register.html). Debounce 600ms after user stops typing
+// in English name; skip if Hindi field was manually edited.
+// ============================================================
+let _hindiAutoTimer = null;
+let _hindiManuallyEdited = false;
+let _lastTransliteratedSource = '';
+
+function onHindiManualEdit(){
+  const hi = (document.getElementById('f_name_hi') || {}).value || '';
+  if (hi && hi !== _lastTransliteratedSource) {
+    _hindiManuallyEdited = true;
+    const s = document.getElementById('hindiAutoStatus');
+    if (s) s.textContent = '';
+  }
+}
+
+function scheduleHindiAutoFill(){
+  if (_hindiAutoTimer) clearTimeout(_hindiAutoTimer);
+  const status = document.getElementById('hindiAutoStatus');
+  if (_hindiManuallyEdited) return;
+  if (status) status.textContent = '✏️ Typing…';
+  _hindiAutoTimer = setTimeout(runHindiAutoFill, 600);
+}
+
+async function runHindiAutoFill(){
+  const enEl = document.getElementById('f_name');
+  const hiEl = document.getElementById('f_name_hi');
+  const status = document.getElementById('hindiAutoStatus');
+  if (!enEl || !hiEl) return;
+
+  const en = (enEl.value || '').trim();
+  if (!en || en.length < 2) {
+    hiEl.value = '';
+    _lastTransliteratedSource = '';
+    if (status) status.textContent = '';
+    return;
+  }
+  if (_hindiManuallyEdited) return;
+
+  if (status) status.textContent = '⏳ Converting…';
+
+  try {
+    const tokens = en.split(/\s+/);
+    const out = await Promise.all(tokens.map(async (tok) => {
+      const m = tok.match(/^([^A-Za-z]*)([A-Za-z]+)([^A-Za-z]*)$/);
+      if (!m) return tok;
+      const [, pre, word, post] = m;
+      try {
+        const url = 'https://inputtools.google.com/request'
+          + '?text=' + encodeURIComponent(word.toLowerCase())
+          + '&itc=hi-t-i0-und&num=5&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage';
+        const r = await fetch(url);
+        if (!r.ok) return tok;
+        const j = await r.json();
+        if (Array.isArray(j) && j[0] === 'SUCCESS') {
+          const arr = j[1] && j[1][0] && j[1][0][1];
+          if (arr && arr.length) {
+            for (let i = 0; i < arr.length; i++) {
+              const candidate = arr[i];
+              if (candidate && /[ऀ-ॿ]/.test(candidate)) {
+                return pre + candidate + post;
+              }
+            }
+          }
+        }
+        return tok;
+      } catch(_){ return tok; }
+    }));
+    const hindiResult = out.join(' ');
+    if (!_hindiManuallyEdited) {
+      hiEl.value = hindiResult;
+      _lastTransliteratedSource = hindiResult;
+    }
+    if (status) status.textContent = '✓ Auto-filled';
+  } catch (e) {
+    if (status) status.textContent = '⚠️ Failed — type manually';
+  }
+}
+
+// Reset manual-edit flag when admin clears the form
+function resetHindiAutoFill(){
+  _hindiManuallyEdited = false;
+  _lastTransliteratedSource = '';
+  const s = document.getElementById('hindiAutoStatus');
+  if (s) s.textContent = '';
+}
+
+// ============================================================
 // SINGLE ADD — multi-cat + city + Hindi name
 // ============================================================
 async function submitSingle(saveAndNext){
@@ -737,6 +826,7 @@ async function submitSingle(saveAndNext){
       document.getElementById('f_owner_name').value = '';
       document.getElementById('f_area').value = '';
       document.getElementById('f_mobile').value = '';
+      resetHindiAutoFill();              // re-enable auto-translate for next entry
       // Keep source as it likely repeats per batch
       document.getElementById('f_name').focus();
     } else {
@@ -804,6 +894,7 @@ function resetSingleForm(){
   document.getElementById('f_mobile').value = '';
   document.getElementById('f_source').value = '';
   clearAllCats();
+  resetHindiAutoFill();
   document.getElementById('singleOk').classList.remove('show');
   document.getElementById('singleForm').style.display = '';
   document.getElementById('f_name').focus();
