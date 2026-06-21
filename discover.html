@@ -134,6 +134,72 @@
      HOT v2 — TikTok-style additions
      ============================================================ */
 
+  /* "Why am I seeing this?" floating button */
+  .why-btn{
+    position:absolute; top:env(safe-area-inset-top, 8px); right:14px;
+    margin-top:96px;  /* clear the top nav + chips row */
+    z-index:5;
+    background:rgba(0,0,0,.45); backdrop-filter:blur(10px);
+    color:#fff; border:1px solid rgba(255,255,255,.2);
+    padding:5px 10px; border-radius:99px;
+    font-size:11px; font-weight:700;
+    cursor:pointer; font-family:inherit;
+    transition:.15s;
+  }
+  .why-btn:hover{ background:rgba(0,0,0,.7); transform:scale(1.05) }
+  .why-btn:active{ transform:scale(.95) }
+
+  /* "Why" bottom sheet (modal-style explanation) */
+  .why-sheet-backdrop{
+    position:fixed; inset:0; z-index:1000;
+    background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+    display:none; align-items:flex-end; justify-content:center;
+    animation:whyFade .25s ease-out;
+  }
+  .why-sheet-backdrop.show{ display:flex }
+  @keyframes whyFade{ from{opacity:0} to{opacity:1} }
+  .why-sheet{
+    background:#fff; color:#0F172A; width:100%; max-width:520px;
+    border-radius:22px 22px 0 0; padding:24px 22px 28px;
+    animation:whySlide .3s cubic-bezier(.16,1,.3,1);
+    box-shadow:0 -20px 60px rgba(0,0,0,.25);
+  }
+  @keyframes whySlide{ from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .why-sheet h3{
+    font-size:1.15rem; font-weight:900; margin-bottom:6px;
+    color:#0F172A; letter-spacing:-.01em;
+  }
+  .why-sheet .why-sub{ font-size:.84rem; color:#64748B; font-weight:600; margin-bottom:18px }
+  .why-sheet .why-list{ list-style:none; padding:0; margin:0 0 18px }
+  .why-sheet .why-item{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:11px 14px; margin-bottom:8px;
+    background:#F1F5F9; border-radius:12px;
+    font-size:.92rem; font-weight:600; color:#0F172A;
+    line-height:1.4;
+  }
+  .why-sheet .why-actions{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;
+  }
+  .why-sheet .why-btn-action{
+    padding:13px; border-radius:11px; border:0; cursor:pointer;
+    font-family:inherit; font-weight:800; font-size:.88rem;
+    transition:.15s;
+  }
+  .why-sheet .why-btn-more{
+    background:linear-gradient(135deg,#10B981,#059669); color:#fff;
+    box-shadow:0 6px 14px rgba(16,185,129,.32);
+  }
+  .why-sheet .why-btn-less{
+    background:#FEE2E2; color:#991B1B; border:1.5px solid #FECACA;
+  }
+  .why-sheet .why-reset{
+    background:transparent; color:#64748B; border:0;
+    padding:10px; margin-top:8px; width:100%; cursor:pointer;
+    font-family:inherit; font-weight:700; font-size:.78rem;
+    text-decoration:underline;
+  }
+
   /* (1) Trending RIBBON — top-left corner of every card */
   .trend-ribbon{
     position:absolute; top:14px; left:-4px; z-index:4;
@@ -771,6 +837,8 @@
   html[data-lang="hi"] body, html[data-lang="hi"] .card h2, html[data-lang="hi"] .card .meta{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
 </style>
 <script src="/assets/js/photo-fit.js" defer></script>
+<!-- "For You" smart ranking algorithm (privacy-first, localStorage only) -->
+<script src="/assets/js/discover-algo.js"></script>
 </head>
 <body>
 
@@ -1218,6 +1286,21 @@ function setCity(cid){
 async function init(){
   // Sync DB favorites into localStorage on load (for logged-in users)
   syncFavsFromDb();
+
+  // Best-effort geolocation pickup for the proximity scorer.
+  // We DON'T prompt — only use what the browser already has cached.
+  // (Explicit request would feel intrusive on first Discover open.)
+  try {
+    if (navigator.geolocation && window.DukanAlgo && !window.DukanAlgo.getUserArea()){
+      navigator.geolocation.getCurrentPosition(
+        function(pos){
+          try { window.DukanAlgo.setUserArea(pos.coords.latitude, pos.coords.longitude); } catch(_){}
+        },
+        function(){ /* user denied — that's fine */ },
+        { timeout: 4000, maximumAge: 30 * 60 * 1000 }
+      );
+    }
+  } catch(_){}
   try {
     var c = ShopDB.client;
     // Pull a randomised mix of recent active shops
@@ -1233,8 +1316,10 @@ async function init(){
       document.getElementById('emptyScreen').style.display = '';
       return;
     }
-    // Shuffle for variety
-    rows = rows.sort(function(){ return Math.random() - 0.5; });
+    // PERSONALIZED RANK — algorithm-based, not random.
+    // Algo uses localStorage signals (categories viewed/liked, recency, time of day, proximity).
+    // For new users this is close to random thanks to the freshness factor.
+    // Done AFTER we've enriched rows with category info (in next block) — see post-enrich call below.
 
     // Fetch business_categories (multi-cat join) for these businesses.
     // Builds STATE.bcByBiz = { businessId: [catId,...] } used by getBizCats().
@@ -1263,9 +1348,29 @@ async function init(){
       (cr.data||[]).forEach(function(x){ STATE.cityMap[x.id] = x.name; });
     }
     if (catIds.length){
-      var kr = await c.from('categories').select('id,name,icon').in('id', catIds);
+      var kr = await c.from('categories').select('id,name,icon,slug').in('id', catIds);
       (kr.data||[]).forEach(function(x){ STATE.catMap[x.id] = x; });
     }
+
+    // Enrich each row with category names/slugs + multi-cat ids so the
+    // algorithm can score time-of-day relevance and category affinity.
+    rows.forEach(function(b){
+      var primaryCatId = b.sub_category_id || b.category_id;
+      var primaryCat = primaryCatId ? STATE.catMap[primaryCatId] : null;
+      b._category_name = primaryCat ? primaryCat.name : '';
+      b._category_slug = primaryCat ? primaryCat.slug : '';
+      b._all_category_ids = (STATE.bcByBiz[b.id] || []).concat([]);
+      if (b.category_id) b._all_category_ids.push(b.category_id);
+      if (b.sub_category_id) b._all_category_ids.push(b.sub_category_id);
+    });
+
+    // Personalized ranking (For You feed)
+    if (window.DukanAlgo){
+      rows = window.DukanAlgo.rankShops(rows);
+    } else {
+      rows = rows.sort(function(){ return Math.random() - 0.5; });
+    }
+
     STATE.allRows = rows;
     renderFiltered();
   } catch(e){
@@ -1407,11 +1512,20 @@ function renderFiltered(){
       proofText = '📍 Trending in ' + city;
     }
 
+    // Build data attribute for category ids (used by DukanAlgo.track on view/like/contact)
+    var allCatIds = (b._all_category_ids || []).join(',');
+
+    // Build "Why" tooltip data — algo reasons computed at rank time
+    var whyReasons = (b._algoReasons || []).slice(0, 4);
+    var whyData = whyReasons.length ? whyReasons.join('|||') : '';
+
     return ''+
-    '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'">'+
+    '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'" data-cats="'+esc(allCatIds)+'" data-why="'+esc(whyData)+'">'+
       '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
       '<div class="gradient-top"></div>'+
       '<div class="gradient"></div>'+
+      // "Why am I seeing this?" floating button (top-right, below the chips row)
+      (whyReasons.length ? '<button type="button" class="why-btn" aria-label="Why am I seeing this?">🤔 Why?</button>' : '')+
       (trendRibbons ? '<div class="trend-ribbon">'+trendRibbons+'</div>' : '')+
       '<div class="body">'+
         (proofText ? '<div class="social-proof"><span class="dot"></span><span>'+esc(proofText)+'</span></div>' : '')+
@@ -1616,6 +1730,77 @@ function renderFiltered(){
     cards.forEach(function(card){ card.classList.add('active'); });
   }
 
+  // ============================================================
+  // "For You" algorithm tracking — wire view/like/contact actions
+  // ============================================================
+  // VIEW tracking — record how long a card stayed in viewport
+  var _viewStartMs = {};   // { cardEl_idx: timestamp_when_became_visible }
+  if (window.DukanAlgo && 'IntersectionObserver' in window){
+    var trackObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var idx = parseInt(en.target.getAttribute('data-idx') || '0', 10);
+        var bid = en.target.getAttribute('data-id');
+        if (!bid) return;
+        if (en.intersectionRatio > 0.5){
+          // Card became active
+          _viewStartMs[idx] = Date.now();
+        } else if (_viewStartMs[idx]){
+          // Card left — compute time on card and track
+          var ms = Date.now() - _viewStartMs[idx];
+          delete _viewStartMs[idx];
+          var catsAttr = en.target.getAttribute('data-cats') || '';
+          var cats = catsAttr.split(',').filter(Boolean).map(function(x){ return parseInt(x,10); });
+          try {
+            window.DukanAlgo.track(ms < 3000 ? 'skip' : 'view', {
+              shop_id: bid,
+              category_ids: cats,
+              ms_on_card: ms
+            });
+          } catch(_){}
+        }
+      });
+    }, { root: feed, threshold: [0.5] });
+    cards.forEach(function(c){ trackObs.observe(c); });
+  }
+
+  // LIKE / CONTACT tracking wired on existing buttons
+  feed.querySelectorAll('.act.fav').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('.card');
+      if (!card || !window.DukanAlgo) return;
+      var bid = card.getAttribute('data-id');
+      var catsAttr = card.getAttribute('data-cats') || '';
+      var cats = catsAttr.split(',').filter(Boolean).map(function(x){ return parseInt(x,10); });
+      try { window.DukanAlgo.track('like', { shop_id: bid, category_ids: cats }); } catch(_){}
+    }, true);  // capture phase so it runs before the existing handler
+  });
+  feed.querySelectorAll('.act.call, .act.wa').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('.card');
+      if (!card || !window.DukanAlgo) return;
+      var bid = card.getAttribute('data-id');
+      var catsAttr = card.getAttribute('data-cats') || '';
+      var cats = catsAttr.split(',').filter(Boolean).map(function(x){ return parseInt(x,10); });
+      try { window.DukanAlgo.track('contact', { shop_id: bid, category_ids: cats }); } catch(_){}
+    });
+  });
+
+  // "Why am I seeing this?" button → open sheet
+  feed.querySelectorAll('.why-btn').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var card = btn.closest('.card');
+      if (!card) return;
+      var bid = card.getAttribute('data-id');
+      var rawReasons = card.getAttribute('data-why') || '';
+      var reasons = rawReasons.split('|||').filter(Boolean);
+      var catsAttr = card.getAttribute('data-cats') || '';
+      var cats = catsAttr.split(',').filter(Boolean).map(function(x){ return parseInt(x,10); });
+      openWhySheet(bid, reasons, cats);
+    });
+  });
+
   // HOT v2 Phase 2 — Wire reaction buttons
   feed.querySelectorAll('.reaction-row').forEach(function(row){
     var bid = row.getAttribute('data-bid');
@@ -1639,6 +1824,102 @@ function renderFiltered(){
       });
     });
   });
+}
+
+// ============================================================
+// "Why am I seeing this?" bottom sheet
+// ============================================================
+function openWhySheet(shopId, reasons, catIds){
+  // Build or reuse the sheet element
+  var bd = document.getElementById('whySheetBackdrop');
+  if (!bd){
+    bd = document.createElement('div');
+    bd.className = 'why-sheet-backdrop';
+    bd.id = 'whySheetBackdrop';
+    bd.innerHTML = '<div class="why-sheet" id="whySheet"></div>';
+    document.body.appendChild(bd);
+    bd.addEventListener('click', function(e){
+      if (e.target === bd) closeWhySheet();
+    });
+  }
+
+  var sheet = bd.querySelector('.why-sheet');
+  var reasonHtml = '';
+  if (reasons && reasons.length){
+    reasonHtml = reasons.map(function(r){
+      return '<li class="why-item">' + esc(r) + '</li>';
+    }).join('');
+  } else {
+    reasonHtml = '<li class="why-item">📌 Pure tier-3 me ye shop trending hai</li>';
+  }
+
+  sheet.innerHTML = ''+
+    '<h3>🤔 Yeh shop aapko kyun dikha?</h3>'+
+    '<p class="why-sub">Personalized For You feed — sirf aapke phone par stored, server par nahi.</p>'+
+    '<ul class="why-list">'+ reasonHtml +'</ul>'+
+    '<div class="why-actions">'+
+      '<button class="why-btn-action why-btn-more" id="whyBtnMore">👍 Aur aise dikhao</button>'+
+      '<button class="why-btn-action why-btn-less" id="whyBtnLess">🚫 Yeh shop hide karo</button>'+
+    '</div>'+
+    '<button class="why-reset" id="whyResetBtn">Reset preferences (clear all learning)</button>';
+
+  bd.classList.add('show');
+
+  var btnMore = sheet.querySelector('#whyBtnMore');
+  var btnLess = sheet.querySelector('#whyBtnLess');
+  var btnReset = sheet.querySelector('#whyResetBtn');
+
+  btnMore.addEventListener('click', function(){
+    if (window.DukanAlgo && catIds && catIds.length){
+      catIds.forEach(function(cid){
+        try { window.DukanAlgo.boostCategory(cid); } catch(_){}
+      });
+    }
+    toastWhy('✓ Aise aur shops dikhayenge');
+    closeWhySheet();
+  });
+
+  btnLess.addEventListener('click', function(){
+    if (window.DukanAlgo && shopId){
+      try { window.DukanAlgo.hideShop(shopId); } catch(_){}
+    }
+    toastWhy('✓ Yeh shop hide kar di');
+    closeWhySheet();
+    // Hide the card from view immediately
+    var card = document.querySelector('.card[data-id="' + shopId + '"]');
+    if (card){
+      card.style.transition = 'opacity .3s, transform .3s';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.9)';
+      setTimeout(function(){ card.style.display = 'none'; }, 350);
+    }
+  });
+
+  btnReset.addEventListener('click', function(){
+    if (!confirm('Saari learning reset karein? Aapka For You feed default ho jayega.')) return;
+    if (window.DukanAlgo){
+      try { window.DukanAlgo.resetProfile(); } catch(_){}
+    }
+    toastWhy('✓ Preferences reset — refresh karo');
+    closeWhySheet();
+  });
+}
+
+function closeWhySheet(){
+  var bd = document.getElementById('whySheetBackdrop');
+  if (bd) bd.classList.remove('show');
+}
+
+function toastWhy(msg){
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:11px 18px;border-radius:99px;font-size:.9rem;font-weight:700;z-index:2000;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .25s';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity = '1'; }, 10);
+  setTimeout(function(){
+    t.style.opacity = '0';
+    setTimeout(function(){ try { t.remove(); } catch(_){} }, 250);
+  }, 2200);
 }
 
 // ============================================================
