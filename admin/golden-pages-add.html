@@ -331,20 +331,43 @@ async function init(){
 }
 
 async function loadCities(){
+  // geo_cities does NOT have a `slug` column (per db/01 schema) — only id, name, name_hi.
+  // Query just existing columns so the request doesn't 400 silently.
   try {
-    const { data } = await C.from('geo_cities').select('id, name, slug').eq('active', true).limit(50);
-    CITY_LIST = data || [];
-  } catch(_){ CITY_LIST = []; }
+    const { data, error } = await C.from('geo_cities')
+      .select('id, name, name_hi')
+      .eq('active', true)
+      .limit(80);
+    if (error){
+      console.warn('[golden-pages-add] geo_cities query failed:', error);
+      CITY_LIST = [];
+    } else {
+      CITY_LIST = data || [];
+    }
+  } catch(e){
+    console.warn('[golden-pages-add] geo_cities exception:', e);
+    CITY_LIST = [];
+  }
 }
 
 function renderCityChips(targetId, onPick){
   const host = document.getElementById(targetId);
   if (!host) return;
   host.innerHTML = '';
+
+  // Build the chip list — for each preferred city, try to find a matching
+  // row in geo_cities by name (case-insensitive). If the table query failed
+  // entirely (CITY_LIST empty), show the chips ANYWAY in a disabled-looking
+  // state with a console hint so admin knows to seed cities.
   let pickedDefault = false;
-  DEFAULT_CITIES.forEach((dc, i) => {
-    const dbCity = CITY_LIST.find(c => (c.slug === dc.slug) || (c.name || '').toLowerCase() === dc.name.toLowerCase());
-    if (!dbCity) return;
+  let anyMatched = false;
+
+  DEFAULT_CITIES.forEach(dc => {
+    const dbCity = (CITY_LIST || []).find(c =>
+      (c.name || '').toLowerCase() === dc.name.toLowerCase()
+    );
+    if (!dbCity) return;  // skip if not in DB
+    anyMatched = true;
     const isFirst = !pickedDefault;
     if (isFirst){
       pickedDefault = true;
@@ -374,6 +397,42 @@ function renderCityChips(targetId, onPick){
     });
     host.appendChild(chip);
   });
+
+  // Additionally render any OTHER cities returned by DB (so Mansa/Muktsar
+  // or any custom city the admin added shows up too — not just hardcoded list)
+  (CITY_LIST || []).forEach(c => {
+    const alreadyShown = DEFAULT_CITIES.some(dc =>
+      dc.name.toLowerCase() === (c.name || '').toLowerCase()
+    );
+    if (alreadyShown) return;
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'city-chip';
+    chip.setAttribute('data-cid', c.id);
+    chip.textContent = c.name;
+    chip.style.cssText = 'background:#FFFBEB;color:#78350F;border:1.5px solid #FCD34D;padding:7px 13px;border-radius:99px;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;transition:.15s';
+    chip.addEventListener('click', () => {
+      host.querySelectorAll('.city-chip').forEach(x => {
+        x.classList.remove('active');
+        x.style.background = '#FFFBEB';
+        x.style.color = '#78350F';
+        x.style.borderColor = '#FCD34D';
+      });
+      chip.classList.add('active');
+      chip.style.background = 'linear-gradient(135deg,#D97706,#92400E)';
+      chip.style.color = '#fff';
+      chip.style.borderColor = 'transparent';
+      onPick(parseInt(chip.getAttribute('data-cid'), 10));
+    });
+    host.appendChild(chip);
+  });
+
+  // If nothing matched AT ALL, show a fallback warning so admin can debug
+  if (!anyMatched && (!CITY_LIST || !CITY_LIST.length)){
+    host.innerHTML = '<div style="background:#FEE2E2;border-left:3px solid #DC2626;color:#991B1B;padding:9px 12px;border-radius:8px;font-size:.82rem;font-weight:600;width:100%">' +
+      '⚠️ City list could not load. Check geo_cities table — open browser console for details.' +
+      '</div>';
+  }
 }
 
 async function refreshStats(){
