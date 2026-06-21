@@ -1814,7 +1814,7 @@ async function loadBusiness(){
     .from('businesses')
     .select(`
       id, slug, name, name_hi, owner_name, owner_role,
-      mobile, whatsapp, email, alt_mobile,
+      mobile, whatsapp, email, alt_mobile, mobile_verified_at,
       address_line1, address_line2, pincode, lat, lng,
       hours_json, usp_text, usp_hi, about_text, photos, video_url,
       services_json, faqs_json, status, claim_status, pre_listed_at,
@@ -3708,6 +3708,7 @@ async function renderDetailTrustStrip(b){
   const isProfStrict = b.is_professional_listing === true && b.professional_tier === 'strict';
   const pills = [];
   if (Number(b.verified_score) >= 3 && !isProfStrict) pills.push({ ico: '✓', text: 'Verified', cls: 'verified' });
+  if (b.verified_mobile && !isProfStrict) pills.push({ ico: '📞', text: 'Phone Verified', cls: 'verified' });
   if (b.is_featured && !isProfStrict) pills.push({ ico: '★', text: 'Featured', cls: 'featured' });
   if (b.established_year){
     const yrs = new Date().getFullYear() - Number(b.established_year);

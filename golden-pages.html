@@ -155,6 +155,7 @@
   .shop-info-row .lbl{color:#92400E;font-weight:800;opacity:.8}
   .shop-free-badge{display:inline-block;background:linear-gradient(135deg,#10B981,#059669);color:#fff;font-size:.62rem;font-weight:900;padding:2px 7px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase;float:right;margin-top:2px}
   .shop-verified-badge{display:inline-block;background:linear-gradient(135deg,#1E40AF,#1E1B4B);color:#fff;font-size:.62rem;font-weight:900;padding:2px 8px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase;float:right;margin-top:2px;margin-right:5px;box-shadow:0 1px 3px rgba(30,27,75,.3)}
+  .shop-phone-verified-badge{display:inline-block;background:linear-gradient(135deg,#0891B2,#0E7490);color:#fff;font-size:.62rem;font-weight:900;padding:2px 8px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase;float:right;margin-top:2px;margin-right:5px;box-shadow:0 1px 3px rgba(14,116,144,.3)}
 
   /* Trust banner */
   .trust-banner{background:linear-gradient(135deg,#ECFDF5 0%,#FEF3C7 100%);border:2px dashed #10B981;border-radius:14px;padding:14px 16px;margin:0 0 18px 0;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
@@ -592,9 +593,20 @@ function renderFlatList(shops, catSlug){
 function shopCardHtml(s){
   const claimUrl = buildClaimUrl(s.name, s.slug);
   const catLabel = (s.category_icon ? s.category_icon + ' ' : '') + (s.category_name || 'Listed');
-  const mobileBit = s.mobile_last4
-    ? '<span><span class="lbl">📱</span> XXXXXX-' + esc(s.mobile_last4) + '</span>'
-    : '';
+
+  // Mobile display logic:
+  //  - mobile_verified = TRUE → full number shown + "Phone Verified" badge + tel: link
+  //  - mobile_verified = FALSE → masked (XXXXXX-1234) + no badge
+  //  - no mobile at all → nothing shown
+  let mobileBit = '';
+  let phoneBadge = '';
+  if (s.mobile_full && s.mobile_verified){
+    mobileBit = '<span><span class="lbl">📱</span> <a href="tel:+91' + esc(s.mobile_full) + '" style="color:#1E40AF;text-decoration:none;font-weight:700">' + esc(s.mobile_full) + '</a></span>';
+    phoneBadge = '<span class="shop-phone-verified-badge" title="Phone number verified by DukanList team">✓ Phone Verified</span>';
+  } else if (s.mobile_last4){
+    mobileBit = '<span><span class="lbl">📱</span> XXXXXX-' + esc(s.mobile_last4) + '</span>';
+  }
+
   const ownerBit = s.owner_name
     ? '<span><span class="lbl">👤</span> ' + esc(s.owner_name) + '</span>'
     : '';
@@ -612,6 +624,7 @@ function shopCardHtml(s){
   return '<div class="shop-card" data-id="' + esc(s.id) + '" data-name="' + esc(s.name) + '">' +
            '<span class="shop-free-badge">✓ FREE</span>' +
            verifiedBadge +
+           phoneBadge +
            '<div class="shop-cat-pill">' + esc(catLabel) + '</div>' +
            '<div class="shop-name">🏪 ' + esc(s.name) + '</div>' +
            (s.name_hi ? '<div class="shop-name-hi">' + esc(s.name_hi) + '</div>' : '') +
