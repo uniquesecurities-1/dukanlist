@@ -264,9 +264,17 @@
         <input type="file" id="csvInput" accept=".csv" style="display:none">
       </div>
 
-      <button class="btn-sec" onclick="downloadCsvTemplate()" style="margin-bottom:12px">
-        ⬇️ Sample CSV Template Download Karo
-      </button>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn-sec" onclick="downloadCsvTemplate()" style="flex:1;min-width:140px;margin-bottom:0">
+          ⬇️ Sample CSV Download
+        </button>
+        <button class="btn-sec" onclick="openCategorySlugList()" style="flex:1;min-width:140px;margin-bottom:0;background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE">
+          📋 Valid Slugs Dekho
+        </button>
+      </div>
+      <div style="background:#FFFBEB;border-left:3px solid #F59E0B;color:#92400E;padding:9px 12px;border-radius:7px;font-size:.78rem;font-weight:600;margin-bottom:12px;line-height:1.5">
+        💡 <b>Tip:</b> CSV ke <code style="background:#fff;padding:1px 4px;border-radius:3px">category_slug</code> column me <b>exact slug</b> daalo (e.g. <code style="background:#fff;padding:1px 4px;border-radius:3px">gas-stove-shop</code> not "Gas Stove"). Validate karne ke liye preview me red/green badge dekho.
+      </div>
 
       <div id="csvPreviewWrap" style="display:none">
         <div class="csv-stat" id="csvStat"></div>
@@ -723,7 +731,21 @@ function parseCsvText(text){
     const obj = {};
     header.forEach((h, idx) => { obj[h] = (r[idx] || '').trim(); });
     return obj;
-  }).filter(r => r.shop_name && r.mobile);
+  }).filter(r => (r.shop_name || r.name) && (r.mobile || r.phone));
+
+  // Normalize aliases — admins commonly use 'name'/'phone'/'category' instead
+  // of the canonical 'shop_name'/'mobile'/'category_slug'. Accept both.
+  dataRows.forEach(r => {
+    if (!r.shop_name && r.name)          r.shop_name = r.name;
+    if (!r.shop_name && r.business)      r.shop_name = r.business;
+    if (!r.mobile    && r.phone)         r.mobile    = r.phone;
+    if (!r.mobile    && r.contact)       r.mobile    = r.contact;
+    if (!r.category_slug && r.category)  r.category_slug = r.category;
+    if (!r.category_slug && r.cat)       r.category_slug = r.cat;
+    if (!r.area      && r.address)       r.area      = r.address;
+    if (!r.area      && r.landmark)      r.area      = r.landmark;
+    if (!r.city      && r.town)          r.city      = r.town;
+  });
   return dataRows;
 }
 
@@ -736,20 +758,115 @@ function renderCsvPreview(rows){
     alert('CSV me valid rows nahi hain. Header check karo.');
     return;
   }
-  let valid = 0, invalid = 0;
-  rows.forEach(r => {
+
+  // Build a fast lookup of known category slugs
+  const validSlugs = new Set();
+  (ALL_CATEGORIES || []).forEach(c => validSlugs.add((c.slug || '').toLowerCase()));
+
+  // Per-row validation
+  let validCount = 0, invalidCount = 0;
+  const unknownCatRows = [];   // [{row_index, given_slug, suggestion}]
+  const missingCatRows = [];   // rows where category_slug is blank
+  const usedSlugs = new Set();
+
+  rows.forEach((r, i) => {
     const m = (r.mobile || '').replace(/\D/g,'').slice(-10);
-    if (/^[6789]\d{9}$/.test(m) && (r.shop_name || '').trim().length >= 2) valid++;
-    else invalid++;
+    const nameOk = (r.shop_name || '').trim().length >= 2;
+    const mobOk  = /^[6789]\d{9}$/.test(m);
+
+    if (nameOk && mobOk) validCount++;
+    else invalidCount++;
+
+    const slug = ((r.category_slug || '') + '').toLowerCase().trim();
+    if (!slug){
+      missingCatRows.push({ idx: i+1, name: r.shop_name });
+    } else if (!validSlugs.has(slug)){
+      // Try to find close match by substring or partial
+      let suggestion = null;
+      const slugWords = slug.replace(/[-_]/g,' ').split(/\s+/);
+      const candidates = [];
+      (ALL_CATEGORIES || []).forEach(c => {
+        const cs = (c.slug || '').toLowerCase();
+        const cn = (c.name || '').toLowerCase();
+        const ck = (c.keywords || '').toLowerCase();
+        let score = 0;
+        slugWords.forEach(w => {
+          if (w.length < 2) return;
+          if (cs.includes(w)) score += 3;
+          if (cn.includes(w)) score += 2;
+          if (ck.includes(w)) score += 1;
+        });
+        if (score > 0) candidates.push({ slug: c.slug, name: c.name, score: score });
+      });
+      candidates.sort((a,b) => b.score - a.score);
+      if (candidates.length) suggestion = candidates[0].slug;
+      unknownCatRows.push({ idx: i+1, name: r.shop_name, given: slug, suggestion: suggestion });
+    } else {
+      usedSlugs.add(slug);
+    }
   });
-  stat.innerHTML =
-    '<span>📋 Total: <b>' + rows.length + '</b></span>' +
-    '<span class="green">✓ Valid: <b>' + valid + '</b></span>' +
-    (invalid ? '<span class="red">✗ Invalid: <b>' + invalid + '</b></span>' : '');
-  // Preview first 5
-  prev.innerHTML = rows.slice(0,5).map((r,i) => {
-    return '<div>' + (i+1) + '. <b>' + esc(r.shop_name) + '</b> · ' + esc(r.mobile) + ' · ' + esc(r.area || '—') + '</div>';
-  }).join('') + (rows.length > 5 ? '<div style="color:#64748B;font-style:italic;margin-top:6px">...aur ' + (rows.length - 5) + ' rows</div>' : '');
+
+  // Top-level stats
+  let statHtml =
+    '<span>📋 Total rows: <b>' + rows.length + '</b></span>' +
+    '<span class="green">✓ Name+Mobile valid: <b>' + validCount + '</b></span>';
+  if (invalidCount){
+    statHtml += '<span class="red">✗ Invalid: <b>' + invalidCount + '</b></span>';
+  }
+  if (usedSlugs.size){
+    statHtml += '<span class="green">✓ Categories matched: <b>' + usedSlugs.size + '</b> unique</span>';
+  }
+  if (unknownCatRows.length){
+    statHtml += '<span class="red">⚠ Unknown categories: <b>' + unknownCatRows.length + '</b> rows</span>';
+  }
+  if (missingCatRows.length){
+    statHtml += '<span style="background:#FEF3C7;color:#92400E;padding:5px 10px;border-radius:6px">⚠ Missing category: <b>' + missingCatRows.length + '</b> rows (will go to "Others")</span>';
+  }
+  stat.innerHTML = statHtml;
+
+  // Preview rows
+  let html = '';
+  html += '<div style="font-weight:800;color:#0F172A;margin-bottom:8px;font-size:.85rem">First 8 rows:</div>';
+  html += rows.slice(0,8).map((r,i) => {
+    const slug = ((r.category_slug || '') + '').toLowerCase().trim();
+    let catBadge = '';
+    if (!slug){
+      catBadge = ' <span style="background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:4px;font-size:.7rem;font-weight:800">⚠ no category</span>';
+    } else if (!validSlugs.has(slug)){
+      catBadge = ' <span style="background:#FEE2E2;color:#991B1B;padding:1px 6px;border-radius:4px;font-size:.7rem;font-weight:800">✗ ' + esc(slug) + '</span>';
+    } else {
+      catBadge = ' <span style="background:#D1FAE5;color:#065F46;padding:1px 6px;border-radius:4px;font-size:.7rem;font-weight:800">✓ ' + esc(slug) + '</span>';
+    }
+    return '<div style="padding:3px 0">' + (i+1) + '. <b>' + esc(r.shop_name) + '</b> · ' + esc(r.mobile) + catBadge + '</div>';
+  }).join('');
+  if (rows.length > 8){
+    html += '<div style="color:#64748B;font-style:italic;margin-top:6px;font-size:.8rem">...aur ' + (rows.length - 8) + ' rows</div>';
+  }
+
+  // List unknown categories with suggestions
+  if (unknownCatRows.length){
+    html += '<div style="background:#FEE2E2;border-left:3px solid #DC2626;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:.82rem">';
+    html += '<b style="color:#991B1B">⚠ Unknown Categories Found</b><br>';
+    html += '<div style="margin-top:6px;color:#7F1D1D;line-height:1.5">';
+    const groupedUnknown = {};
+    unknownCatRows.forEach(u => {
+      if (!groupedUnknown[u.given]) groupedUnknown[u.given] = { count:0, suggestion: u.suggestion };
+      groupedUnknown[u.given].count++;
+    });
+    Object.keys(groupedUnknown).slice(0,10).forEach(slug => {
+      const g = groupedUnknown[slug];
+      html += '• <code>' + esc(slug) + '</code> (' + g.count + ' rows)';
+      if (g.suggestion){
+        html += ' → maybe meant <code style="background:#D1FAE5;color:#065F46;padding:1px 5px;border-radius:3px">' + esc(g.suggestion) + '</code>';
+      }
+      html += '<br>';
+    });
+    html += '</div>';
+    html += '<div style="margin-top:8px;font-size:.75rem;color:#991B1B"><b>Action:</b> CSV fix karo ya proceed karo (unknown rows "Others" me jayengi).</div>';
+    html += '</div>';
+  }
+
+  prev.innerHTML = html;
   wrap.style.display = '';
 }
 
@@ -820,12 +937,50 @@ function renderCsvResults(results){
 function downloadCsvTemplate(){
   const csv = 'shop_name,mobile,area,category_slug,city,source,consent,notes\n' +
               'Sharma Kirana,9876543210,Sirsa Road,kirana-grocery,mandi-dabwali,vyapar-mandal,verbal,Mandal Member #145\n' +
-              'Bharat Sweets,9988776655,Main Bazaar,sweet-shop,mandi-dabwali,personal-contact,verbal,Family friend\n';
+              'Bharat Sweets,9988776655,Main Bazaar,sweet-shop,mandi-dabwali,personal-contact,verbal,Family friend\n' +
+              'Suvidha Gas Service,9416216662,Near Jain Sabha,gas-stove-repair,mandi-dabwali,personal-contact,verbal,Gas mistri\n' +
+              'Sunflame Gas Centre,9416000001,Main Market,gas-stove-shop,mandi-dabwali,personal-contact,verbal,Stove dealer\n';
   const blob = new Blob([csv], { type:'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'dukanlist-shops-template.csv';
   a.click();
+}
+
+// Helper for admin: open a window listing all valid category slugs
+function openCategorySlugList(){
+  if (!ALL_CATEGORIES || !ALL_CATEGORIES.length){
+    alert('Categories abhi load nahi hui — page refresh karo aur try karo.');
+    return;
+  }
+  const lines = ALL_CATEGORIES.map(c =>
+    c.slug + '  →  ' + c.name + (c.parent_name ? ' (' + c.parent_name + ')' : '')
+  );
+  const win = window.open('', '_blank');
+  if (!win) return;
+  win.document.write('<!DOCTYPE html><html><head><title>Valid Category Slugs — DukanList</title>' +
+    '<style>body{font-family:monospace;background:#0F172A;color:#10B981;padding:20px;line-height:1.6;font-size:13px}' +
+    'h1{color:#FF6B1A;font-family:sans-serif;margin-bottom:14px;font-size:20px}' +
+    '.search{padding:10px 14px;background:#1E293B;color:#fff;border:1px solid #475569;border-radius:8px;width:100%;font-family:inherit;font-size:14px;margin-bottom:14px;outline:none}' +
+    '.search:focus{border-color:#FF6B1A}' +
+    'pre{white-space:pre-wrap;color:#cbd5e1}' +
+    '.hint{color:#94a3b8;font-size:12px;margin-bottom:14px;font-family:sans-serif}' +
+    '.match{color:#10B981;font-weight:700}' +
+    '</style></head><body>');
+  win.document.write('<h1>📋 ' + ALL_CATEGORIES.length + ' Valid Category Slugs</h1>');
+  win.document.write('<div class="hint">CSV ke category_slug column me ye exact slug daalo. Search karo:</div>');
+  win.document.write('<input type="text" class="search" id="searchInput" placeholder="🔍 Filter (e.g. gas, doctor, tailor)...">');
+  win.document.write('<pre id="catList">' + lines.join('\n') + '</pre>');
+  win.document.write('<script>' +
+    'const allLines = ' + JSON.stringify(lines) + ';' +
+    'document.getElementById("searchInput").addEventListener("input", e => {' +
+      'const q = e.target.value.toLowerCase().trim();' +
+      'const filtered = q ? allLines.filter(l => l.toLowerCase().includes(q)) : allLines;' +
+      'document.getElementById("catList").textContent = filtered.join("\\n") + (filtered.length ? "" : "\\n\\n(no matches)");' +
+    '});' +
+  '</' + 'script>');
+  win.document.write('</body></html>');
+  win.document.close();
 }
 
 function esc(s){
