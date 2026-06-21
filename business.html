@@ -119,6 +119,78 @@
 .owner-credit .oc-info{ min-width:0; flex:1 }
 .owner-credit .oc-name{ font-size:.95rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.2 }
 .owner-credit .oc-role{ font-size:.75rem; font-weight:700; color:#92400E; line-height:1.3; margin-top:1px }
+
+/* ============================================================
+   UNCLAIMED LISTING (db/163 Option B)
+   Banner with strong visual + locks contact CTAs via body class.
+   ============================================================ */
+.uc-banner{
+  border-radius:12px; padding:14px 16px; margin:10px 0 14px;
+  display:flex; flex-direction:column; gap:10px;
+  font-family:'Plus Jakarta Sans','Manrope',sans-serif;
+}
+.uc-banner-unclaimed{
+  background:linear-gradient(135deg,#FEF3C7 0%,#FED7AA 100%);
+  border:2px solid #F59E0B;
+  box-shadow:0 4px 14px rgba(245,158,11,.18);
+}
+.uc-banner-pending{
+  background:linear-gradient(135deg,#DBEAFE 0%,#BFDBFE 100%);
+  border:2px solid #3B82F6;
+  box-shadow:0 4px 14px rgba(59,130,246,.18);
+}
+.uc-banner .uc-row{ display:flex; align-items:flex-start; gap:12px }
+.uc-banner .uc-emoji{ font-size:1.8rem; line-height:1; flex-shrink:0 }
+.uc-banner .uc-text{ flex:1; min-width:0 }
+.uc-banner .uc-title{
+  font-size:.78rem; font-weight:900; letter-spacing:.06em;
+  color:#92400E; text-transform:uppercase; margin-bottom:3px;
+}
+.uc-banner-pending .uc-title{ color:#1E3A8A }
+.uc-banner .uc-sub{ font-size:.86rem; color:#0F172A; font-weight:600; line-height:1.4 }
+.uc-banner .uc-cta-row{ display:flex; gap:8px; flex-wrap:wrap }
+.uc-banner .uc-cta-owner, .uc-banner .uc-cta-cust{
+  flex:1; min-width:140px;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:11px 14px; border-radius:10px; font-size:.86rem; font-weight:800;
+  text-decoration:none; transition:.15s; font-family:inherit;
+}
+.uc-banner .uc-cta-owner{
+  background:linear-gradient(135deg,#10B981,#059669);
+  color:#fff; box-shadow:0 4px 12px rgba(16,185,129,.32);
+}
+.uc-banner .uc-cta-owner:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(16,185,129,.4) }
+.uc-banner .uc-cta-cust{
+  background:#fff; color:#0F172A;
+  border:1.5px solid #F59E0B;
+}
+.uc-banner .uc-cta-cust:hover{ background:#FFFBEB; transform:translateY(-1px) }
+
+/* Lock contact CTAs + sensitive info when listing not yet claim_verified */
+body.claim-locked #ctaCall,
+body.claim-locked #ctaWa,
+body.claim-locked .public-phone,
+body.claim-locked .public-whatsapp,
+body.claim-locked #altMobileChip,
+body.claim-locked #ctaDir,
+body.claim-locked #ctaShare,
+body.claim-locked #stickyCta,
+body.claim-locked .biz-cta-strip,
+body.claim-locked .floating-ctas,
+body.claim-locked .ph-fb-row,
+body.claim-locked .ony-row-actions,
+body.claim-locked #reviewsAnchor,
+body.claim-locked #publicLoyaltyBadge,
+body.claim-locked .biz-rating-row,
+body.claim-locked #bizRating,
+body.claim-locked #mmtStatStrip{
+  display:none !important;
+}
+/* Lock floating sticky cta bar too */
+body.claim-locked .sticky-cta-bar,
+body.claim-locked #stickyCtaBar{
+  display:none !important;
+}
 </style>
 <link rel="stylesheet" href="/assets/css/main.css?v=20260531">
 <style>
@@ -1745,7 +1817,7 @@ async function loadBusiness(){
       mobile, whatsapp, email, alt_mobile,
       address_line1, address_line2, pincode, lat, lng,
       hours_json, usp_text, usp_hi, about_text, photos, video_url,
-      services_json, faqs_json, status,
+      services_json, faqs_json, status, claim_status, pre_listed_at,
       established_year, payment_methods, special_features,
       facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url,
       verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
@@ -2213,6 +2285,21 @@ function render(){
     thEl.style.display = 'none';
   }
 
+  // ============================================================
+  // UNCLAIMED listing (db/163 Option B) — apply body class + inject
+  // a prominent banner. CSS gates contact buttons via .claim-unclaimed.
+  // ============================================================
+  const _isUnclaimed     = b.claim_status === 'unclaimed';
+  const _isClaimPending  = b.claim_status === 'claimed_pending';
+  if (_isUnclaimed){
+    document.body.classList.add('claim-unclaimed');
+    document.body.classList.add('claim-locked');
+  } else if (_isClaimPending){
+    // Email signed up but not yet verified — show "verification in progress"
+    document.body.classList.add('claim-pending');
+    document.body.classList.add('claim-locked');
+  }
+
   // Header
   document.getElementById('bizCatPill').innerHTML = `${b.categories?.icon || ''} ${escapeHTML(b.categories?.name || '')}`;
   document.getElementById('bizName').textContent = b.name;
@@ -2222,6 +2309,51 @@ function render(){
   if (b.name_hi){
     document.getElementById('bizNameHi').textContent = b.name_hi;
     document.getElementById('bizNameHi').style.display = '';
+  }
+
+  // Inject UNCLAIMED banner right after the business name
+  if (_isUnclaimed || _isClaimPending){
+    try {
+      const bizNameEl = document.getElementById('bizName');
+      const host = bizNameEl && bizNameEl.parentNode;
+      if (host && !document.getElementById('unclaimedBanner')){
+        const banner = document.createElement('div');
+        banner.id = 'unclaimedBanner';
+        const sName = b.name || 'Yeh dukaan';
+        const claimUrl = '/claim.html?token='; // owner must come via WhatsApp link
+        if (_isUnclaimed){
+          banner.className = 'uc-banner uc-banner-unclaimed';
+          banner.innerHTML =
+            '<div class="uc-row">' +
+              '<span class="uc-emoji">🔒</span>' +
+              '<div class="uc-text">' +
+                '<div class="uc-title"><span data-i18n-en>UNCLAIMED LISTING</span><span data-i18n-hi>UNCLAIMED · दावा नहीं किया</span></div>' +
+                '<div class="uc-sub"><span data-i18n-en>Owner ne abhi tak yeh dukaan claim nahi ki — contact details locked hain.</span><span data-i18n-hi>मालिक ने अभी तक इस दुकान को क्लेम नहीं किया — संपर्क लॉक है।</span></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="uc-cta-row">' +
+              '<a href="https://wa.me/919541223377?text=' + encodeURIComponent('Mein ' + sName + ' (' + (b.slug || '') + ') ka owner hu — claim link maango') + '" target="_blank" rel="noopener" class="uc-cta-owner">' +
+                '👋 <span data-i18n-en>Owner hain? Claim karo</span><span data-i18n-hi>Owner हैं? Claim करें</span>' +
+              '</a>' +
+              '<a href="https://wa.me/919541223377?text=' + encodeURIComponent('Mein ' + sName + ' ka customer hu — please owner ko bolo claim karne ke liye') + '" target="_blank" rel="noopener" class="uc-cta-cust">' +
+                '📢 <span data-i18n-en>Customer? Notify owner</span><span data-i18n-hi>Customer? Owner को कहो</span>' +
+              '</a>' +
+            '</div>';
+        } else {
+          // claim_pending — owner signed up but email not verified
+          banner.className = 'uc-banner uc-banner-pending';
+          banner.innerHTML =
+            '<div class="uc-row">' +
+              '<span class="uc-emoji">⏳</span>' +
+              '<div class="uc-text">' +
+                '<div class="uc-title"><span data-i18n-en>CLAIM IN PROGRESS</span><span data-i18n-hi>CLAIM PROGRESS · प्रगति में</span></div>' +
+                '<div class="uc-sub"><span data-i18n-en>Owner ne claim kar liya — email verify hone par contact details unlock honge.</span><span data-i18n-hi>मालिक ने क्लेम किया — ईमेल verify होने पर संपर्क खुलेगा।</span></div>' +
+              '</div>' +
+            '</div>';
+        }
+        host.insertBefore(banner, bizNameEl.nextSibling);
+      }
+    } catch(bannerErr){ console.warn('unclaimed banner:', bannerErr); }
   }
 
   // Owner credit — show proprietor/founder name + role. Customers trust

@@ -421,11 +421,25 @@ let autoRedirectTimer = null;
     return;
   }
 
+  // ============================================================
+  // Option B claim flow — auto-approve any pre-listed businesses
+  // owned by this user now that their email is verified.
+  // Idempotent: harmless to call for normal-flow signups.
+  // ============================================================
+  try {
+    const { data: autoApproveData } = await sb.rpc('auto_approve_after_email_verify');
+    if (autoApproveData && autoApproveData.success && autoApproveData.promoted_count > 0){
+      console.log('[email-verified] auto-approved ' + autoApproveData.promoted_count + ' pre-listed claim(s):', autoApproveData.business_names);
+    }
+  } catch(e){
+    console.warn('[email-verified] auto_approve_after_email_verify failed (non-fatal):', e);
+  }
+
   // Check if user's business is still pending activation
   try {
     const { data: ownerships } = await sb
       .from('business_owners')
-      .select('business_id, businesses!inner(id,name,status,mobile,owner_name,slug)')
+      .select('business_id, businesses!inner(id,name,status,mobile,owner_name,slug,claim_status,pre_listed_at)')
       .eq('auth_user_id', user.id)
       .limit(1);
 

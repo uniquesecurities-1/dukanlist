@@ -33,6 +33,12 @@
   .step.active{display:block;animation:fadeIn .35s ease-out}
   @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
+  /* Step indicator */
+  .progress-dots{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+  .dot{width:10px;height:10px;border-radius:50%;background:#E2E8F0;transition:.25s}
+  .dot.active{background:#FF6B1A;width:30px;border-radius:99px}
+  .dot.done{background:#10B981}
+
   /* Shop preview */
   .shop-preview{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #F59E0B;border-radius:16px;padding:20px;margin-bottom:20px;text-align:center}
   .shop-emoji{font-size:2.4rem;margin-bottom:6px}
@@ -46,7 +52,7 @@
 
   /* Buttons */
   .btn-grid{display:grid;gap:10px}
-  .btn-yes{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:0;padding:18px;border-radius:14px;font-weight:900;font-size:1.1rem;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(16,185,129,.32);transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-yes{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:0;padding:18px;border-radius:14px;font-weight:900;font-size:1.05rem;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(16,185,129,.32);transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
   .btn-yes:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(16,185,129,.4)}
   .btn-yes:disabled{opacity:.6;cursor:wait}
   .btn-no{background:transparent;color:#64748B;border:1.5px solid #E2E8F0;padding:14px;border-radius:14px;font-weight:700;font-size:.95rem;font-family:inherit;cursor:pointer;transition:.15s}
@@ -54,9 +60,24 @@
 
   .btn-primary{background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;border:0;padding:16px;border-radius:14px;font-weight:900;font-size:1.05rem;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,26,.32);transition:.2s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
   .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(255,107,26,.4)}
+  .btn-primary:disabled{opacity:.55;cursor:wait;transform:none}
+
+  /* Form fields */
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.78rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .field input{width:100%;padding:14px 16px;font-size:1rem;border:1.5px solid #E2E8F0;border-radius:12px;font-family:inherit;outline:0;background:#FAFAFA;transition:.15s;color:#0F172A}
+  .field input:focus{border-color:#FF6B1A;background:#fff;box-shadow:0 0 0 4px rgba(255,107,26,.12)}
+  .field input::placeholder{color:#94A3B8;font-weight:500}
+  .field .hint{font-size:.72rem;color:#94A3B8;margin-top:5px;font-weight:500;line-height:1.4}
+
+  .pwd-strip{display:flex;gap:3px;margin-top:5px}
+  .pwd-bar{flex:1;height:4px;border-radius:99px;background:#E2E8F0;transition:.15s}
+  .pwd-bar.weak{background:#EF4444}
+  .pwd-bar.medium{background:#F59E0B}
+  .pwd-bar.strong{background:#10B981}
 
   /* Trust badges */
-  .trust-row{display:flex;justify-content:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .trust-row{display:flex;justify-content:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
   .trust-pill{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;color:#1E3A8A;padding:6px 12px;border-radius:99px;font-size:.74rem;font-weight:800;border:1px solid #BFDBFE}
   .trust-pill .tp-ico{font-size:.9rem}
 
@@ -88,6 +109,15 @@
   @keyframes pulse{0%,100%{opacity:.6;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
   .working h2{font-size:1.2rem;font-weight:900;color:#0F172A;margin-bottom:6px}
   .working p{font-size:.9rem;color:#64748B;line-height:1.5}
+
+  /* Email-sent success step */
+  .email-sent{text-align:center;padding:14px 8px}
+  .email-sent .es-emoji{font-size:5rem;margin-bottom:14px}
+  .email-sent h2{font-size:1.5rem;font-weight:900;color:#0F172A;margin-bottom:8px;letter-spacing:-.02em}
+  .email-sent .es-email{display:inline-block;background:#FEF3C7;color:#92400E;padding:6px 14px;border-radius:99px;font-weight:800;font-size:.95rem;margin-bottom:14px;font-family:'Manrope',sans-serif}
+  .email-sent p{font-size:.95rem;color:#475569;line-height:1.5;margin-bottom:18px}
+  .email-sent .steps-list{background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;padding:14px 18px;text-align:left;margin-bottom:20px;font-size:.88rem;line-height:1.65;color:#0F172A}
+  .email-sent .steps-list b{color:#FF6B1A}
 </style>
 </head>
 <body>
@@ -100,6 +130,12 @@
   </div>
 
   <div class="card">
+
+    <div class="progress-dots">
+      <div class="dot active" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+      <div class="dot" id="dot3"></div>
+    </div>
 
     <!-- ================================================ -->
     <!-- STEP 0: LOADING -->
@@ -117,7 +153,7 @@
     <!-- ================================================ -->
     <div class="step" id="step-confirm">
       <h1 class="step-title">🏪 Yeh Dukaan Aapki Hai?</h1>
-      <p class="step-sub">Confirm karo to <b>1 click me</b> aapki dukaan verified ho jayegi.</p>
+      <p class="step-sub">Confirm karo to <b>2 minute me</b> aapki dukaan verified ho jayegi.</p>
 
       <div class="shop-preview">
         <div class="shop-emoji">🏪</div>
@@ -127,14 +163,14 @@
       </div>
 
       <div class="trust-row">
-        <span class="trust-pill"><span class="tp-ico">🔒</span> Secure Link</span>
+        <span class="trust-pill"><span class="tp-ico">🔒</span> Secure</span>
         <span class="trust-pill"><span class="tp-ico">🆓</span> 100% Free</span>
-        <span class="trust-pill"><span class="tp-ico">⚡</span> 30 Second</span>
+        <span class="trust-pill"><span class="tp-ico">⚡</span> Quick</span>
       </div>
 
       <div class="btn-grid">
-        <button class="btn-yes" id="confirmBtn" onclick="claimNow()">
-          ✅ Haan, Mein Owner Hu — Claim Karo
+        <button class="btn-yes" id="confirmBtn" onclick="goToSignup()">
+          ✅ Haan, Mein Owner Hu
         </button>
         <button class="btn-no" onclick="showNotMine()">
           🤔 Nahi, Yeh Meri Dukaan Nahi
@@ -142,33 +178,83 @@
       </div>
 
       <div class="help-box">
-        💡 <b>Free hai forever.</b> No app install, no email, no password.
-        Bas yeh button tap karo — aapki dukaan turant verified ho jayegi.
+        💡 <b>Aagey email + password set karna padega</b> taaki aap kabhi bhi
+        DukanList me wapas login kar sako. Forever free, no hidden charges.
       </div>
     </div>
 
     <!-- ================================================ -->
-    <!-- STEP 2: WORKING (calling API + redirecting) -->
+    <!-- STEP 2: EMAIL + PASSWORD FORM -->
     <!-- ================================================ -->
-    <div class="step" id="step-working">
-      <div class="working">
-        <div class="w-emoji">🔐</div>
-        <h2>Aapko sign-in kar raha hu...</h2>
-        <p>2-3 second me dashboard pe le jaaunga.</p>
+    <div class="step" id="step-signup">
+      <h1 class="step-title">📧 Apna Email Set Karo</h1>
+      <p class="step-sub">Aapki <b id="signupShopName">dukaan</b> ko claim karne ke liye email aur password set karo.</p>
+
+      <div class="err" id="signupErr"></div>
+
+      <div class="field">
+        <label>📧 Email Address *</label>
+        <input type="email" id="emailInput" placeholder="aap@example.com" autocomplete="email" inputmode="email">
+        <div class="hint">Aage iss email se login karoge. Verification link bhi yahin aayega.</div>
+      </div>
+
+      <div class="field">
+        <label>🔒 Password *</label>
+        <input type="password" id="passwordInput" placeholder="Minimum 8 characters" autocomplete="new-password">
+        <div class="pwd-strip">
+          <div class="pwd-bar" id="pb1"></div>
+          <div class="pwd-bar" id="pb2"></div>
+          <div class="pwd-bar" id="pb3"></div>
+          <div class="pwd-bar" id="pb4"></div>
+        </div>
+        <div class="hint" id="pwdHint">8+ characters · 1 capital · 1 number recommended</div>
+      </div>
+
+      <div class="field">
+        <label>👤 Aapka Naam (Owner)</label>
+        <input type="text" id="ownerNameInput" placeholder="Rajesh Singla" autocomplete="name">
+        <div class="hint">Customer ko dikhega "Owner: aapka naam"</div>
+      </div>
+
+      <button class="btn-primary" id="signupBtn" onclick="signupAndClaim()">
+        ✓ Claim Karo Aur Email Verify Karo
+      </button>
+
+      <div class="help-box">
+        🔐 <b>Privacy:</b> Aapka email sirf login ke liye use hoga.
+        Public profile me email dikhane ka option aapke paas hai (default off).
       </div>
     </div>
 
     <!-- ================================================ -->
-    <!-- STEP 3: ERROR (something went wrong but recoverable) -->
+    <!-- STEP 3: EMAIL SENT - VERIFY YOUR EMAIL -->
     <!-- ================================================ -->
-    <div class="step" id="step-error">
-      <div class="not-found">
-        <div class="nf-emoji">⚠️</div>
-        <h2>Kuch dikkat aayi</h2>
-        <p id="errorMsg">Phir try karo.</p>
-        <button class="btn-primary" onclick="location.reload()">
-          🔄 Phir Try Karo
-        </button>
+    <div class="step" id="step-email-sent">
+      <div class="email-sent">
+        <div class="es-emoji">📬</div>
+        <h2>Email Bhej Diya!</h2>
+        <div class="es-email" id="sentToEmail">aap@example.com</div>
+
+        <p>
+          Aapko ek <b>verification link</b> bheja gaya hai.
+          Click karte hi aapki dukaan <b>verified ✓</b> ho jayegi.
+        </p>
+
+        <div class="steps-list">
+          <b>1.</b> Apna email kholo (Gmail / Yahoo / etc.)<br>
+          <b>2.</b> "DukanList" se aayi email dhundo<br>
+          <b>3.</b> "<b>Verify Email</b>" button click karo<br>
+          <b>4.</b> Aap automatic dashboard pe pahunch jaoge
+        </p>
+
+        <a href="https://mail.google.com" target="_blank" class="btn-primary" style="margin-bottom:10px">
+          📧 Gmail Kholo
+        </a>
+
+        <p style="font-size:.78rem;color:#94A3B8;font-weight:600;margin-top:14px">
+          Email nahi mil rahi? <b>Spam folder</b> bhi check karo.<br>
+          Ya <a href="https://wa.me/919541223377?text=Email%20verification%20nahi%20aayi" target="_blank" style="color:#FF6B1A;font-weight:800">support se baat karo</a>.
+        </p>
       </div>
     </div>
 
@@ -220,7 +306,7 @@ let SHOP = null;
 // ============================================================
 async function init(){
   if (!C){
-    showStep('error', 'Page load nahi hua — internet check karo aur refresh karo.');
+    showStep('notfound');
     return;
   }
   if (!TOKEN || TOKEN.length < 16){
@@ -242,11 +328,11 @@ async function init(){
       return;
     }
 
-    // Populate confirm step
     document.getElementById('shopName').textContent = SHOP.name || 'Your Shop';
     const meta = [SHOP.category_name, SHOP.area, SHOP.city_name].filter(Boolean).join(' · ');
     document.getElementById('shopMeta').textContent = meta || '';
     document.getElementById('shopMobile').textContent = '📞 +91 ' + (SHOP.masked_mobile || 'XXXXXXXX');
+    document.getElementById('signupShopName').textContent = SHOP.name || 'dukaan';
 
     showStep('confirm');
   } catch(e){
@@ -255,67 +341,157 @@ async function init(){
   }
 }
 
-function showStep(name, errMsg){
+function showStep(name){
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('step-' + name);
   if (el) el.classList.add('active');
-  if (name === 'error' && errMsg){
-    document.getElementById('errorMsg').textContent = errMsg;
+
+  // Update progress dots
+  const dotMap = {
+    'loading':    [1, 0, 0],
+    'confirm':    [1, 0, 0],
+    'signup':     [2, 1, 0],
+    'email-sent': [2, 2, 1],
+    'already':    [0, 0, 0],
+    'notfound':   [0, 0, 0]
+  };
+  const dots = dotMap[name] || [1,0,0];
+  ['dot1','dot2','dot3'].forEach((id, i) => {
+    const d = document.getElementById(id);
+    d.classList.remove('active','done');
+    if (dots[i] === 1) d.classList.add('active');
+    else if (dots[i] === 2) d.classList.add('done');
+  });
+
+  if (name === 'signup'){
+    setTimeout(() => document.getElementById('emailInput').focus(), 200);
   }
 }
 
 // ============================================================
-// CLAIM NOW — single-click flow via server-side magic link
+// CONFIRM → SHOW SIGNUP FORM
 // ============================================================
-async function claimNow(){
-  const btn = document.getElementById('confirmBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Ek second...';
-
-  // Show working overlay
-  setTimeout(() => showStep('working'), 100);
-
-  try {
-    const resp = await fetch('/api/claim-via-link', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: TOKEN })
-    });
-
-    const body = await resp.json().catch(() => ({}));
-
-    if (!resp.ok){
-      if (body.already_claimed){
-        showStep('already');
-        return;
-      }
-      const msg = body.error || ('Server error (' + resp.status + ')');
-      showStep('error', msg);
-      return;
-    }
-
-    if (!body.success || !body.magicLink){
-      showStep('error', 'Sign-in link generate nahi hua. Phir try karo.');
-      return;
-    }
-
-    // Navigate to the magic link — Supabase will set session and
-    // redirect to /claim-success.html?ct=TOKEN
-    location.href = body.magicLink;
-
-  } catch(e){
-    console.error('claim failed:', e);
-    showStep('error', 'Internet ya server problem. Phir try karo.');
-  }
+function goToSignup(){
+  showStep('signup');
 }
 
-// ============================================================
-// "NOT MINE" path
-// ============================================================
 function showNotMine(){
   const sName = SHOP ? SHOP.name : 'this shop';
   const msg = 'Mereko ek listing aayi hai DukanList par jo meri nahi hai: ' + sName + '. Please hata do.';
   location.href = 'https://wa.me/919541223377?text=' + encodeURIComponent(msg);
+}
+
+// ============================================================
+// PASSWORD STRENGTH METER
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const pwd = document.getElementById('passwordInput');
+  if (pwd){
+    pwd.addEventListener('input', e => {
+      const v = e.target.value;
+      let score = 0;
+      if (v.length >= 8) score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+      ['pb1','pb2','pb3','pb4'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.classList.remove('weak','medium','strong');
+        if (i < score){
+          if (score <= 1) el.classList.add('weak');
+          else if (score <= 2) el.classList.add('medium');
+          else el.classList.add('strong');
+        }
+      });
+    });
+  }
+});
+
+// ============================================================
+// SIGNUP + CLAIM REGISTER OWNER
+// ============================================================
+async function signupAndClaim(){
+  const errEl = document.getElementById('signupErr');
+  errEl.classList.remove('show');
+
+  const email = (document.getElementById('emailInput').value || '').trim().toLowerCase();
+  const password = document.getElementById('passwordInput').value || '';
+  const ownerName = (document.getElementById('ownerNameInput').value || '').trim();
+
+  // Validation
+  if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1){
+    return showErr('Valid email daalo (example@gmail.com)');
+  }
+  if (password.length < 8){
+    return showErr('Password minimum 8 characters ka hona chahiye');
+  }
+
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Account ban raha hai...';
+
+  try {
+    // Step 1: Supabase signUp
+    const signUpRes = await C.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          claim_token: TOKEN,
+          mobile: SHOP.full_mobile || null,
+          source: 'claim_flow'
+        },
+        emailRedirectTo: window.location.origin + '/panel/email-verified.html'
+      }
+    });
+
+    if (signUpRes.error){
+      const m = signUpRes.error.message || '';
+      if (/already.*registered|user.*exists/i.test(m)){
+        // Email already exists — guide user to login flow
+        return showErr('Yeh email pehle se registered hai. Login karo (/panel/login.html) aur fir claim karo.');
+      }
+      return showErr(m || 'Account create nahi hua');
+    }
+
+    // Step 2: Even without session (email verification pending), call
+    // claim_register_owner. Supabase signUp returns a session in some
+    // configurations (email confirm off) or not (email confirm on).
+    // We retry briefly until either path settles.
+    let claimDone = false;
+    for (let i = 0; i < 6; i++){
+      try {
+        const { data: cd, error: ce } = await C.rpc('claim_register_owner', {
+          p_token:        TOKEN,
+          p_owner_name:   ownerName || null,
+          p_owner_email:  email
+        });
+        if (!ce && cd && cd.success){
+          claimDone = true;
+          break;
+        }
+      } catch(_){}
+      await new Promise(r => setTimeout(r, 400));
+    }
+
+    // Whether or not claim_register_owner ran (it'll succeed on /panel/
+    // email-verified.html if not now), show email-sent step.
+    document.getElementById('sentToEmail').textContent = email;
+    showStep('email-sent');
+
+  } catch(e){
+    showErr(e.message || 'Kuch dikkat aayi — phir try karo');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✓ Claim Karo Aur Email Verify Karo';
+  }
+}
+
+function showErr(msg){
+  const el = document.getElementById('signupErr');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 // Boot

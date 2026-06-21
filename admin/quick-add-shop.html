@@ -196,9 +196,11 @@
 
       <div class="field">
         <label>🏷️ Category</label>
-        <select id="f_category">
+        <input type="text" id="f_category_search" placeholder="🔍 Type karke search karo (CA, doctor, plumber...)" autocomplete="off" style="margin-bottom:8px">
+        <select id="f_category" size="1">
           <option value="">— Loading categories... —</option>
         </select>
+        <div class="hint" id="catSearchHint">358+ categories available — search karke quickly choose karo</div>
       </div>
 
       <div class="field">
@@ -299,6 +301,7 @@ let C, MY_CITY_ID = null, SELECTED_CITY_SLUG = 'mandi-dabwali';
 let LAST_RESULT = null;  // { name, mobile, claim_url, area }
 let CURRENT_TMPL = 'friendly';
 let CSV_ROWS = [];
+let ALL_CATEGORIES = [];  // [{slug, name, name_hi, icon, parent_id, parent_name, keywords}]
 
 const CITY_SLUG_TO_ID = {};
 
@@ -316,6 +319,7 @@ async function init(){
   wireCsvDrop();
   wireTemplatePicker();
   wireCityChips();
+  wireCategorySearch();
 }
 
 async function refreshStats(){
@@ -333,36 +337,148 @@ async function refreshStats(){
 async function loadCategories(){
   try {
     const { data, error } = await C.from('categories')
-      .select('id, slug, name, icon, parent_id')
+      .select('id, slug, name, name_hi, icon, parent_id, keywords, description')
       .eq('active', true)
       .order('sort_order', { ascending: true })
       .limit(500);
     if (error) throw error;
-    const sel = document.getElementById('f_category');
-    sel.innerHTML = '<option value="">— Choose category —</option>';
-    // Group by parent
-    const parents = (data || []).filter(c => !c.parent_id);
-    const children = (data || []).filter(c => c.parent_id);
+
+    const all = data || [];
+    const byId = {};
+    all.forEach(c => byId[c.id] = c);
+
+    // Flatten with parent_name for search context
+    ALL_CATEGORIES = all.map(c => ({
+      slug:        c.slug,
+      name:        c.name,
+      name_hi:     c.name_hi || '',
+      icon:        c.icon || '·',
+      parent_id:   c.parent_id || null,
+      parent_name: c.parent_id && byId[c.parent_id] ? byId[c.parent_id].name : '',
+      keywords:    (c.keywords || '').toLowerCase(),
+      description: (c.description || '').toLowerCase()
+    }));
+
+    renderCategoryOptions(ALL_CATEGORIES, '');
+  } catch(e){
+    console.warn('load cats:', e);
+  }
+}
+
+// Render filtered category options. If filter matches multiple, expand
+// the select size to show 8 rows (acts like an instant inline list).
+function renderCategoryOptions(cats, query){
+  const sel = document.getElementById('f_category');
+  const hint = document.getElementById('catSearchHint');
+  if (!sel) return;
+
+  if (!cats.length){
+    sel.innerHTML = '<option value="">No matches — type something else</option>';
+    if (hint) hint.textContent = '⚠️ "' + query + '" se kuch nahi mila — alag word try karo';
+    sel.size = 1;
+    return;
+  }
+
+  if (query){
+    // Filtered — show as flat list, expanded size so admin sees options
+    sel.innerHTML = '<option value="">— Choose from ' + cats.length + ' matches —</option>' +
+      cats.slice(0, 50).map(c => {
+        const label = c.icon + ' ' + c.name + (c.parent_name ? ' — ' + c.parent_name : '');
+        return '<option value="' + escAttr(c.slug) + '">' + escAttr(label) + '</option>';
+      }).join('');
+    sel.size = Math.min(8, cats.length + 1);
+    if (hint) hint.textContent = '✓ ' + cats.length + ' matches for "' + query + '" — pick one';
+  } else {
+    // No query — grouped by parent (default state)
+    const parents = cats.filter(c => !c.parent_id);
+    const children = cats.filter(c => c.parent_id);
+    sel.innerHTML = '<option value="">— Type above to search, or pick here —</option>';
     parents.forEach(p => {
       const og = document.createElement('optgroup');
-      og.label = (p.icon || '') + ' ' + p.name;
-      // Parent itself as fallback
+      og.label = p.icon + ' ' + p.name;
       const opt = document.createElement('option');
       opt.value = p.slug;
       opt.textContent = '  ' + p.name + ' (general)';
       og.appendChild(opt);
-      const kids = children.filter(k => k.parent_id === p.id);
+      const kids = children.filter(k => k.parent_name === p.name);
       kids.forEach(k => {
         const o = document.createElement('option');
         o.value = k.slug;
-        o.textContent = '  ' + (k.icon || '·') + ' ' + k.name;
+        o.textContent = '  ' + k.icon + ' ' + k.name;
         og.appendChild(o);
       });
       sel.appendChild(og);
     });
-  } catch(e){
-    console.warn('load cats:', e);
+    sel.size = 1;
+    if (hint) hint.textContent = ALL_CATEGORIES.length + '+ categories available — search karke quickly choose karo';
   }
+}
+
+function escAttr(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Search synonym expansion — same as register.html pattern
+// Type "CA" → also match "chartered accountant"; "vakeel" → "advocate" etc.
+const CAT_SEARCH_SYNONYMS = {
+  'ca':      ['chartered accountant','tax','audit'],
+  'doctor':  ['hospital','clinic','physician','dr'],
+  'lawyer':  ['advocate','vakeel','legal'],
+  'vakeel':  ['advocate','lawyer','legal'],
+  'mfd':     ['mutual fund','sip','distributor'],
+  'broker':  ['stock','share','sebi','authorised person'],
+  'tailor':  ['darzi','silai','stitching','boutique'],
+  'kapde':   ['cloth','garment','fabric','tailor'],
+  'plumber': ['nal','pipe','water'],
+  'kirana':  ['grocery','general store','provision'],
+  'medical': ['pharmacy','chemist','medicines'],
+  'rang':    ['paint','color'],
+  'tube':    ['borewell','boring','submersible']
+};
+
+function expandQuery(q){
+  const tokens = [q];
+  const lower = q.toLowerCase();
+  for (const key in CAT_SEARCH_SYNONYMS){
+    if (lower.includes(key)) tokens.push(...CAT_SEARCH_SYNONYMS[key]);
+  }
+  return tokens.map(t => t.toLowerCase());
+}
+
+function filterCategories(query){
+  const q = (query || '').trim();
+  if (!q){
+    renderCategoryOptions(ALL_CATEGORIES, '');
+    return;
+  }
+  const queryTokens = expandQuery(q);
+  const matches = ALL_CATEGORIES.filter(c => {
+    const haystack = (c.name + ' ' + c.name_hi + ' ' + c.parent_name + ' ' + c.keywords + ' ' + c.description).toLowerCase();
+    // OR match — any token hits
+    return queryTokens.some(t => haystack.includes(t));
+  });
+  renderCategoryOptions(matches, q);
+}
+
+function wireCategorySearch(){
+  const input = document.getElementById('f_category_search');
+  if (!input) return;
+  let timer = null;
+  input.addEventListener('input', e => {
+    clearTimeout(timer);
+    timer = setTimeout(() => filterCategories(e.target.value), 120);
+  });
+  // Enter → select first match
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      const sel = document.getElementById('f_category');
+      if (sel.options.length > 1){
+        sel.selectedIndex = 1;
+        sel.focus();
+      }
+    }
+  });
 }
 
 async function resolveCities(){
@@ -510,16 +626,16 @@ function buildWaMessage(tmpl, name, area, claimUrl){
   const greeting = '*Namaste!*';
   switch(tmpl){
     case 'friendly':
-      return greeting + '\n\nAapki dukaan *' + name + '*' + (area ? ' (' + area + ')' : '') + ' ka page DukanList par ban gaya hai.\n\nMandi Dabwali ka pehla local business directory — pichle hafte yahan 1,250+ customers ne shops dhundhi.\n\nAapko sirf claim karna hai — *FREE, 30 second me*.\n\n👉 ' + claimUrl + '\n\n— DukanList Team';
+      return greeting + '\n\nAapki dukaan *' + name + '*' + (area ? ' (' + area + ')' : '') + ' ka page DukanList par ban gaya hai.\n\nMandi Dabwali ka pehla local business directory — pichle hafte yahan 1,250+ customers ne shops dhundhi.\n\nClaim karne ke liye:\n1. Yahan tap karo: ' + claimUrl + '\n2. Apna email + password set karo\n3. Email verify karo\n\n*FREE forever* — koi hidden charges nahi.\n\n— DukanList Team';
 
     case 'urgency':
-      return greeting + '\n\n*' + name + '* — pichle 7 din me 12 customers ne aapki shop DukanList par dhundhi — but unclaimed dikhi.\n\n8 customers ne padosi ko call kiya.\n\nEstimated lost business: *₹4,200*\n\n30 second me claim karo:\n👉 ' + claimUrl;
+      return greeting + '\n\n*' + name + '* — pichle 7 din me 12 customers ne aapki shop DukanList par dhundhi — but unclaimed dikhi.\n\n8 customers ne padosi ko call kiya.\n\nEstimated lost business: *₹4,200*\n\n2 minute me claim karo (email + password chahiye):\n👉 ' + claimUrl;
 
     case 'authority':
-      return '*Mandal Members Ke Liye Special Notice*\n\nMandi Dabwali Vyapar Mandal ne DukanList ke saath partnership ki hai. Aap members ki listing *pehle se ban gayi hai*.\n\n*' + name + '* aapka listing claim karna baki hai.\n\n*7 din ke andar* claim karo:\n👉 ' + claimUrl + '\n\n— DukanList × Vyapar Mandal';
+      return '*Mandal Members Ke Liye Special Notice*\n\nMandi Dabwali Vyapar Mandal ne DukanList ke saath partnership ki hai. Aap members ki listing *pehle se ban gayi hai*.\n\n*' + name + '* aapka listing claim karna baki hai.\n\n*7 din ke andar* claim karo (email + password chahiye):\n👉 ' + claimUrl + '\n\n— DukanList × Vyapar Mandal';
 
     case 'social':
-      return greeting + '\n\nAapke padosi *Walatirams 4 Seasons* ne DukanList par claim kar liya — pichle 7 din me unko *47 customers* ne contact kiya.\n\n*' + name + '* aap kab claim karoge?\n\n👉 ' + claimUrl;
+      return greeting + '\n\nAapke padosi *Walatirams 4 Seasons* ne DukanList par claim kar liya — pichle 7 din me unko *47 customers* ne contact kiya.\n\n*' + name + '* aap kab claim karoge?\n\nEmail + password set karo 2 minute me:\n👉 ' + claimUrl;
 
     default:
       return claimUrl;

@@ -1,6 +1,30 @@
 // =====================================================
-// api/claim-via-link.js
+// api/claim-via-link.js — DEPRECATED (db/163 supersedes)
 // =====================================================
+// Previously: synthetic-email magic link flow. Replaced by Option B
+// in db/163 — claim.html now does Supabase signUp directly with a
+// REAL email + password, which aligns with the existing
+// email-mandatory + user-verify setup (db/80, db/93).
+//
+// This endpoint is kept as a stub that returns a clear deprecation
+// notice in case any old WhatsApp claim links still POST to it.
+// Will be removed in a future cleanup pass.
+// =====================================================
+module.exports = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.status(410).json({
+    error: 'This endpoint has been retired',
+    message: 'Use the new claim flow at /claim.html?token=YOUR_TOKEN — Supabase email signup is now done client-side.',
+    deprecated_at: '2026-06-22',
+    new_flow: 'db/163 Option B (email + password at claim time)'
+  });
+};
+
+// =====================================================
+// ORIGINAL CODE BELOW — KEPT AS REFERENCE, NOT EXECUTED
+// =====================================================
+// (Below module.exports — never reached.)
+//
 // WhatsApp Magic Link claim flow (NO SMS / NO email OTP required).
 //
 // FLOW:
