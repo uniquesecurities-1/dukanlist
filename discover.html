@@ -134,6 +134,44 @@
      HOT v2 — TikTok-style additions
      ============================================================ */
 
+  /* Daily Theme pill — bigger and more eye-catching than category chips */
+  .chip-theme{
+    padding:7px 13px !important;
+    border-radius:99px !important;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+    transform:translateZ(0);
+    animation:themeChipPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes themeChipPulse{
+    0%,100%{ box-shadow:0 4px 14px rgba(0,0,0,.18) }
+    50%    { box-shadow:0 6px 20px rgba(0,0,0,.32) }
+  }
+
+  /* Daily Theme celebration toast — shown once per day on Discover open */
+  .theme-celebration{
+    position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-30px);
+    z-index:2000;
+    padding:14px 22px 14px 16px;
+    border-radius:99px;
+    color:#fff;
+    box-shadow:0 16px 40px rgba(0,0,0,.4);
+    font-family:'Manrope',sans-serif;
+    font-weight:800; font-size:14px;
+    display:inline-flex; align-items:center; gap:10px;
+    opacity:0; transition:opacity .3s, transform .35s cubic-bezier(.16,1,.3,1);
+    max-width:90vw;
+  }
+  .theme-celebration.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+  .theme-celebration .tc-emoji{ font-size:1.6rem }
+  .theme-celebration .tc-title{ font-size:13px; opacity:.85; font-weight:600; line-height:1 }
+  .theme-celebration .tc-sub{ font-size:15px; line-height:1.1; margin-top:1px; font-weight:900; letter-spacing:-.01em }
+  .theme-celebration .tc-x{
+    background:rgba(0,0,0,.25); border:0; color:#fff;
+    width:24px; height:24px; border-radius:50%; cursor:pointer;
+    font-size:14px; line-height:1; margin-left:6px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
   /* "Why am I seeing this?" floating button */
   .why-btn{
     position:absolute; top:env(safe-area-inset-top, 8px); right:14px;
@@ -1232,7 +1270,18 @@ function buildChips(allRows, catMap, activeFilter){
     allCats.forEach(function(k){ byCat[k] = (byCat[k] || 0) + 1; });
   });
   var sorted = Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; }).slice(0, 12);
-  var chips = '<div class="chip '+(!activeFilter?'active':'')+'" data-cat="all">🌟 All</div>';
+  var chips = '';
+  // Daily theme pill (Phase 2) — always first; tap to filter to today's vibe.
+  // Only shown when there are matching shops to avoid an empty filter trap.
+  if (STATE.theme && STATE.themeCount >= 3){
+    var t = STATE.theme;
+    var on = !!STATE.themeFilter;
+    chips += '<div class="chip chip-theme '+(on?'active':'')+'" data-theme-pill="1" '+
+             'style="background:' + (on ? t.gradient : 'rgba(255,255,255,.18)') + ';color:#fff;border-color:transparent;font-weight:800">'+
+             esc(t.emoji) + ' ' + esc(t.title) + ' <span style="opacity:.85;font-weight:700;margin-left:3px">·' + STATE.themeCount + '</span>'+
+             '</div>';
+  }
+  chips += '<div class="chip '+(!activeFilter && !STATE.themeFilter ?'active':'')+'" data-cat="all">🌟 All</div>';
   sorted.forEach(function(id){
     var c = catMap[id] || {};
     var label = (c.icon || '🏪') + ' ' + (c.name || 'Shop');
@@ -1241,7 +1290,7 @@ function buildChips(allRows, catMap, activeFilter){
   return chips;
 }
 
-var STATE = { allRows: [], catMap: {}, cityMap: {}, filter: null, cityFilter: null, bcByBiz: {} };
+var STATE = { allRows: [], catMap: {}, cityMap: {}, filter: null, cityFilter: null, bcByBiz: {}, theme: null, themeCount: 0, themeFilter: false };
 
 // City picker — opens overlay, lets user pick a city to filter without reloading
 function openCityPicker(){
@@ -1364,15 +1413,20 @@ async function init(){
       if (b.sub_category_id) b._all_category_ids.push(b.sub_category_id);
     });
 
-    // Personalized ranking (For You feed)
+    // Personalized ranking (For You feed) + today's theme boost
     if (window.DukanAlgo){
-      rows = window.DukanAlgo.rankShops(rows);
+      var theme = window.DukanAlgo.getDailyTheme();
+      STATE.theme = theme;
+      STATE.themeCount = window.DukanAlgo.countMatching(rows, theme);
+      rows = window.DukanAlgo.rankShops(rows, { theme: theme });
     } else {
       rows = rows.sort(function(){ return Math.random() - 0.5; });
     }
 
     STATE.allRows = rows;
     renderFiltered();
+    // Show one-time daily theme celebration (auto-dismisses 4s)
+    showThemeCelebration();
   } catch(e){
     document.getElementById('loadingScreen').innerHTML = '<div style="color:#FCA5A5;text-align:center;padding:24px"><h2>Could not load listings</h2><p style="margin-top:8px;font-size:13px">'+esc(e.message||String(e))+'</p><a href="/" style="display:inline-block;margin-top:14px;background:#FBBF24;color:#78350F;padding:10px 16px;border-radius:8px;font-weight:800;text-decoration:none">← Back</a></div>';
   }
@@ -1380,6 +1434,10 @@ async function init(){
 
 function renderFiltered(){
   var rows = STATE.allRows.slice();
+  // Today's theme filter (Phase 2). Wins over category filter when active.
+  if (STATE.themeFilter && STATE.theme && window.DukanAlgo){
+    rows = rows.filter(function(b){ return window.DukanAlgo.matchesTheme(b, STATE.theme); });
+  }
   // Type-safe filter: DOM data-cat attribute is always a string, but Supabase
   // category_id/city_id columns may be INTEGER or UUID. Coerce to String on both
   // sides so 123 === "123" works. (This is the root cause of the Discover "filter
@@ -1410,7 +1468,15 @@ function renderFiltered(){
       chipsEarly.style.display = '';
       chipsEarly.querySelectorAll('.chip').forEach(function(ch){
         ch.addEventListener('click', function(){
+          // Theme pill toggles the daily theme filter
+          if (ch.getAttribute('data-theme-pill')){
+            STATE.themeFilter = !STATE.themeFilter;
+            if (STATE.themeFilter) STATE.filter = null;  // clear category filter
+            renderFiltered();
+            return;
+          }
           var cat = ch.getAttribute('data-cat');
+          STATE.themeFilter = false;  // category filter wins over theme
           STATE.filter = (cat === 'all' ? null : cat);
           renderFiltered();
         });
@@ -1423,9 +1489,11 @@ function renderFiltered(){
     empty.style.display = '';
     // If a filter is active, replace the static empty-state text with a more
     // helpful "Reset filter" CTA so the user can recover with one tap.
-    if (STATE.filter || STATE.cityFilter){
+    if (STATE.filter || STATE.cityFilter || STATE.themeFilter){
       var labelTxt = '';
-      if (STATE.filter){
+      if (STATE.themeFilter && STATE.theme){
+        labelTxt = STATE.theme.emoji + ' ' + STATE.theme.title;
+      } else if (STATE.filter){
         var cm = STATE.catMap[STATE.filter] || {};
         labelTxt = (cm.icon || '🏷️') + ' ' + (cm.name || 'this category');
       } else if (STATE.cityFilter){
@@ -1827,6 +1895,54 @@ function renderFiltered(){
 }
 
 // ============================================================
+// Daily Theme celebration (one-time per day, auto-dismisses)
+// ============================================================
+function showThemeCelebration(){
+  if (!STATE.theme) return;
+  if (STATE.themeCount < 3) return;  // skip if nothing relevant to show
+  // Only show once per day per browser (localStorage)
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    var seenKey = 'dl_theme_seen_' + STATE.theme.id;
+    if (localStorage.getItem(seenKey) === today) return;
+    localStorage.setItem(seenKey, today);
+  } catch(_){}
+  var t = STATE.theme;
+  var el = document.createElement('div');
+  el.className = 'theme-celebration';
+  el.style.background = t.gradient || ('linear-gradient(135deg,' + t.accent + ',' + t.accent + ')');
+  el.innerHTML =
+    '<span class="tc-emoji">' + esc(t.emoji) + '</span>' +
+    '<div>'+
+      '<div class="tc-title">Today\'s vibe</div>'+
+      '<div class="tc-sub">' + esc(t.title) + ' · ' + STATE.themeCount + ' shops</div>'+
+    '</div>'+
+    '<button class="tc-x" type="button" aria-label="Dismiss">✕</button>';
+  document.body.appendChild(el);
+
+  // Reveal
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+
+  function dismiss(){
+    el.classList.remove('show');
+    setTimeout(function(){ try { el.remove(); } catch(_){} }, 350);
+  }
+  el.querySelector('.tc-x').addEventListener('click', function(e){
+    e.stopPropagation();
+    dismiss();
+  });
+  // Tap the toast to apply the theme filter
+  el.addEventListener('click', function(){
+    STATE.themeFilter = true;
+    STATE.filter = null;
+    renderFiltered();
+    dismiss();
+  });
+  // Auto-dismiss after 4 seconds
+  setTimeout(dismiss, 4000);
+}
+
+// ============================================================
 // "Why am I seeing this?" bottom sheet
 // ============================================================
 function openWhySheet(shopId, reasons, catIds){
@@ -2092,6 +2208,7 @@ function spawnDoubleTapHeart(card, x, y){
 window.__dlResetDiscover = function(){
   STATE.filter = null;
   STATE.cityFilter = null;
+  STATE.themeFilter = false;
   var lbl = document.getElementById('cityBtnLabel');
   if (lbl) lbl.textContent = 'All';
   // Restore original empty state markup in case it was customized

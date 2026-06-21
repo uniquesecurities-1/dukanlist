@@ -353,15 +353,28 @@
 
   // ============================================================
   // Sort a list of shops by score (mutates a copy)
+  // opts.theme  — daily theme object (boost matching shops 0..10 pts)
   // ============================================================
-  function rankShops(shops){
+  function rankShops(shops, opts){
+    opts = opts || {};
     var profile = load();
+    var theme = opts.theme || null;
     var withScores = (shops || []).map(function(s){
       var r = scoreShop(s, profile);
-      return { shop: s, score: r.score, reasons: r.reasons };
+      var score = r.score;
+      var reasons = r.reasons.slice();
+      if (theme){
+        var tb = themeBoost(s, theme);
+        if (tb > 0){
+          score += tb * 12;  // up to +12 pts boost for theme match
+          if (tb >= 0.9){
+            reasons.unshift(theme.emoji + ' ' + theme.title + ' pick');
+          }
+        }
+      }
+      return { shop: s, score: score, reasons: reasons };
     });
     withScores.sort(function(a, b){ return b.score - a.score; });
-    // Attach reasons to the shop object for downstream UI use
     withScores.forEach(function(w){
       w.shop._algoScore = w.score;
       w.shop._algoReasons = w.reasons;
@@ -402,6 +415,171 @@
   }
 
   // ============================================================
+  // DAILY THEMES — Spotify "Daily Mix" style rotation
+  // ============================================================
+  // Each weekday has its own vibe. Theme matters in two ways:
+  //   1. A pill at the top of the chips row invites the user to
+  //      filter to theme-matching shops with one tap.
+  //   2. Even without filter, theme shops get a small score boost
+  //      so they naturally surface higher in the feed.
+  //
+  // Theme matcher returns 0..1 — 1 = perfect match, 0 = no match.
+  // ============================================================
+
+  // Category slug patterns for each theme. Patterns are matched via
+  // .includes() on the lowercased slug AND name. Liberal coverage so
+  // we don't have to maintain an exact slug list as categories grow.
+  var THEME_PATTERNS = {
+    food: {
+      slugs: ['food','restaurant','dhaba','tiffin','hotel','cafe','sweet','mithai','bakery','halwai','dairy','tea','snack','ice-cream','pizza','burger','rolls','chaat','juice','street-food','canteen','khana'],
+      names: /food|restaurant|dhaba|hotel|cafe|sweet|mithai|bakery|halwai|tiffin|tea|snack|ice cream|pizza|burger|chaat|juice|street food/i
+    },
+    wedding: {
+      slugs: ['banquet','wedding','mehndi','photography','photographer','decorator','dj','band','catering','jewellery','salon','beauty','parlour','designer-cloth','readymade-garments','tailor','bridal','tent','flower','gift-shop'],
+      names: /banquet|wedding|mehndi|photograph|decorator|catering|jewellery|salon|beauty|parlour|bridal|tent house|florist|tailor|boutique|designer/i
+    },
+    shop_local: {
+      // Retail-heavy categories — Saturday's "shop local" vibe
+      slugs: ['kirana','grocery','clothes','garments','jewellery','footwear','bag','watch','electronics','mobile','utensils','crockery','stationery','gift','toy','handicraft'],
+      names: /kirana|grocery|cloth|garment|jewellery|footwear|electronics|mobile|utensil|crockery|stationery|gift|handicraft/i
+    },
+    health: {
+      slugs: ['doctor','clinic','hospital','dentist','physiotherap','pharmac','medical','optical','eye','gynec','pediat','health'],
+      names: /doctor|clinic|hospital|dental|physiothera|pharmac|medical|optical|gynec|pediat|health/i
+    }
+  };
+
+  // Returns true if the shop's primary category matches one of the
+  // pattern keys (e.g. matchesTheme(shop, 'food')).
+  function matchesThemePattern(shop, patternKey){
+    var p = THEME_PATTERNS[patternKey];
+    if (!p) return false;
+    var slug = (shop._category_slug || '').toLowerCase();
+    var name = (shop._category_name || '').toLowerCase();
+    if (slug){
+      for (var i = 0; i < p.slugs.length; i++){
+        if (slug.indexOf(p.slugs[i]) >= 0) return true;
+      }
+    }
+    if (name && p.names.test(name)) return true;
+    return false;
+  }
+
+  // Returns today's theme object based on day-of-week (0=Sunday).
+  // Each theme has its own visual identity + match function.
+  function getDailyTheme(){
+    var day = new Date().getDay();
+    var themes = {
+      0: {
+        id: 'sunday', emoji: '🏆',
+        title: 'Top of Town',
+        sub: 'Most-contacted shops this week',
+        gradient: 'linear-gradient(135deg,#F59E0B,#DC2626)',
+        accent: '#F59E0B',
+        // Score boost: shops with high engagement (views + likes)
+        match: function(s){
+          var v = Number(s.view_count || 0);
+          var l = Number(s.likes_count || 0);
+          var raw = v + l * 5;
+          if (raw >= 200) return 1.0;
+          if (raw >= 50)  return 0.6;
+          if (raw >= 20)  return 0.3;
+          return 0;
+        }
+      },
+      1: {
+        id: 'monday', emoji: '🆕',
+        title: 'Fresh Faces',
+        sub: 'New shops this week',
+        gradient: 'linear-gradient(135deg,#7C3AED,#EC4899)',
+        accent: '#EC4899',
+        // Score boost: shops created or pre-listed in last 7 days
+        match: function(s){
+          var ref = s.created_at || s.pre_listed_at;
+          if (!ref) return 0;
+          var days = (Date.now() - new Date(ref).getTime()) / 86400000;
+          if (days < 3)  return 1.0;
+          if (days < 7)  return 0.7;
+          if (days < 14) return 0.3;
+          return 0;
+        }
+      },
+      2: {
+        id: 'tuesday', emoji: '⭐',
+        title: 'Top Rated',
+        sub: 'Loved by locals',
+        gradient: 'linear-gradient(135deg,#F59E0B,#FBBF24)',
+        accent: '#F59E0B',
+        match: function(s){
+          var r = Number(s.rating_avg || 0);
+          var c = Number(s.rating_count || 0);
+          if (r >= 4.5 && c >= 5) return 1.0;
+          if (r >= 4.0 && c >= 3) return 0.6;
+          return 0;
+        }
+      },
+      3: {
+        id: 'wednesday', emoji: '🎁',
+        title: 'Today\'s Deals',
+        sub: 'Active offers right now',
+        gradient: 'linear-gradient(135deg,#10B981,#059669)',
+        accent: '#10B981',
+        match: function(s){
+          // We don't have deals data loaded inline — boost the
+          // 'featured_until' (paid promotion) shops as a proxy.
+          if (s.featured_until){
+            var until = new Date(s.featured_until).getTime();
+            if (until > Date.now()) return 1.0;
+          }
+          return 0;
+        }
+      },
+      4: {
+        id: 'thursday', emoji: '🍱',
+        title: 'Food & Cravings',
+        sub: 'Restaurants, sweets, tiffin',
+        gradient: 'linear-gradient(135deg,#F97316,#DC2626)',
+        accent: '#F97316',
+        match: function(s){ return matchesThemePattern(s, 'food') ? 1.0 : 0; }
+      },
+      5: {
+        id: 'friday', emoji: '💍',
+        title: 'Weekend Prep',
+        sub: 'Wedding & event vendors',
+        gradient: 'linear-gradient(135deg,#EC4899,#BE185D)',
+        accent: '#EC4899',
+        match: function(s){ return matchesThemePattern(s, 'wedding') ? 1.0 : 0; }
+      },
+      6: {
+        id: 'saturday', emoji: '🛍',
+        title: 'Shop Local',
+        sub: 'Retail favourites in your area',
+        gradient: 'linear-gradient(135deg,#0EA5E9,#0D9488)',
+        accent: '#0EA5E9',
+        match: function(s){ return matchesThemePattern(s, 'shop_local') ? 1.0 : 0; }
+      }
+    };
+    return themes[day];
+  }
+
+  // Returns 0..1 boost for a shop given today's theme
+  function themeBoost(shop, theme){
+    if (!theme || typeof theme.match !== 'function') return 0;
+    try { return Math.max(0, Math.min(1, theme.match(shop) || 0)); }
+    catch(_){ return 0; }
+  }
+
+  // Returns count of shops matching the theme (for the pill label)
+  function countMatching(shops, theme){
+    if (!theme || !Array.isArray(shops)) return 0;
+    var n = 0;
+    for (var i = 0; i < shops.length; i++){
+      if (themeBoost(shops[i], theme) > 0.5) n++;
+    }
+    return n;
+  }
+
+  // ============================================================
   // Public API
   // ============================================================
   global.DukanAlgo = {
@@ -415,6 +593,11 @@
     resetProfile:    resetProfile,
     getUserProfile:  getUserProfile,
     getTopCategories: getTopCategories,
+    // Daily Theme helpers (Phase 2)
+    getDailyTheme:   getDailyTheme,
+    themeBoost:      themeBoost,
+    countMatching:   countMatching,
+    matchesTheme:    function(shop, theme){ return themeBoost(shop, theme) > 0.5; },
     _version:        'v1'
   };
 
