@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10B981">
+<meta name="robots" content="noindex,nofollow">
+<title>Claim Successful — DukanList</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Plus Jakarta Sans','Noto Sans Devanagari',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:linear-gradient(135deg,#D1FAE5 0%,#FFFBEB 100%);
+    color:#0F172A;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:20px 16px;
+  }
+  .wrap{max-width:440px;width:100%}
+  .card{background:#fff;border-radius:22px;padding:36px 28px;box-shadow:0 20px 60px rgba(15,23,42,.12),0 4px 16px rgba(15,23,42,.04);border:1px solid rgba(16,185,129,.2);text-align:center}
+  .success-emoji{font-size:5rem;margin-bottom:14px;animation:pop .6s ease-out}
+  @keyframes pop{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+  h1{font-size:1.9rem;font-weight:900;color:#065F46;margin-bottom:8px;letter-spacing:-.02em;line-height:1.1}
+  .shop-line{font-size:1.15rem;font-weight:800;color:#FF6B1A;margin-bottom:18px;line-height:1.3}
+  .body-msg{font-size:1rem;color:#0F172A;margin-bottom:24px;line-height:1.55}
+  .body-msg b{color:#065F46}
+
+  .badge-strip{display:flex;justify-content:center;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+  .badge-pill{background:#D1FAE5;color:#065F46;padding:6px 12px;border-radius:99px;font-size:.78rem;font-weight:800;border:1.5px solid #10B981}
+
+  .spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:18px}
+  .spinner{width:30px;height:30px;border:3.5px solid rgba(255,107,26,.2);border-top-color:#FF6B1A;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner-text{font-size:.85rem;color:#64748B;font-weight:700}
+
+  /* Error fallback */
+  .err{background:#FEE2E2;border-left:4px solid #DC2626;color:#991B1B;padding:14px;border-radius:11px;font-size:.92rem;font-weight:600;margin-top:14px;display:none}
+  .err.show{display:block}
+  .btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;border:0;padding:14px 28px;border-radius:12px;font-weight:900;font-size:1rem;font-family:inherit;cursor:pointer;text-decoration:none;margin-top:12px;box-shadow:0 6px 18px rgba(255,107,26,.32)}
+
+  .foot{text-align:center;font-size:.72rem;color:#94A3B8;font-weight:600;margin-top:20px;letter-spacing:.02em}
+  .foot a{color:#FF6B1A;text-decoration:none;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="card">
+    <div class="success-emoji" id="emoji">🎉</div>
+    <h1 id="title">Mubarak Ho!</h1>
+    <div class="shop-line" id="shopLine">Aapki dukaan verify ho rahi hai...</div>
+
+    <div class="body-msg" id="bodyMsg">
+      Bas ek second — aapko dashboard pe le ja raha hu.
+    </div>
+
+    <div class="badge-strip" id="badgeStrip" style="display:none">
+      <span class="badge-pill">✓ Verified</span>
+      <span class="badge-pill">🆓 Free Forever</span>
+      <span class="badge-pill">🛡 Trusted</span>
+    </div>
+
+    <div class="spinner-wrap" id="spinnerWrap">
+      <div class="spinner"></div>
+      <div class="spinner-text" id="spinnerText">Linking your account...</div>
+    </div>
+
+    <div class="err" id="errBox"></div>
+
+    <div id="manualLink" style="display:none">
+      <a href="/panel/dashboard.html" class="btn-primary">📊 Dashboard Khol Lo</a>
+    </div>
+  </div>
+
+  <div class="foot">
+    Powered by <a href="/">DukanList</a>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+'use strict';
+
+const C = (window.ShopDB && window.ShopDB.client) || null;
+const CLAIM_TOKEN = new URLSearchParams(location.search).get('ct');
+
+function showErr(msg){
+  document.getElementById('spinnerWrap').style.display = 'none';
+  document.getElementById('badgeStrip').style.display = 'none';
+  document.getElementById('emoji').textContent = '⚠️';
+  document.getElementById('title').textContent = 'Dikkat aayi';
+  document.getElementById('shopLine').textContent = '';
+  document.getElementById('bodyMsg').textContent = '';
+
+  const errBox = document.getElementById('errBox');
+  errBox.textContent = msg;
+  errBox.classList.add('show');
+  document.getElementById('manualLink').style.display = 'block';
+}
+
+function showSuccess(shopName){
+  document.getElementById('spinnerWrap').style.display = 'none';
+  document.getElementById('emoji').textContent = '🎉';
+  document.getElementById('title').textContent = 'Mubarak Ho!';
+  document.getElementById('shopLine').textContent = '🏪 ' + (shopName || 'Aapki dukaan');
+  document.getElementById('bodyMsg').innerHTML =
+    '<b>Verified ✓</b> ho gayi DukanList par. ' +
+    'Ab customers aapko search me pa sakte hain. ' +
+    'Dashboard pe le ja raha hu...';
+  document.getElementById('badgeStrip').style.display = '';
+}
+
+// ============================================================
+// MAIN: wait for session → call claim_complete → redirect
+// ============================================================
+async function init(){
+  if (!C){
+    showErr('Page load nahi hua — refresh karo.');
+    return;
+  }
+  if (!CLAIM_TOKEN || CLAIM_TOKEN.length < 16){
+    showErr('Claim token URL me nahi mila. Original WhatsApp link se phir try karo.');
+    return;
+  }
+
+  // Wait briefly for Supabase auto-session to set up after magic link verify
+  let session = null;
+  let attempts = 0;
+  while (attempts < 20){
+    const { data } = await C.auth.getSession();
+    if (data && data.session){ session = data.session; break; }
+    await new Promise(r => setTimeout(r, 150));
+    attempts++;
+  }
+
+  if (!session){
+    showErr('Sign-in complete nahi hua. WhatsApp se claim link phir click karo.');
+    return;
+  }
+
+  document.getElementById('spinnerText').textContent = 'Aapki dukaan link kar raha hu...';
+
+  try {
+    const { data, error } = await C.rpc('claim_complete', {
+      p_token:      CLAIM_TOKEN,
+      p_owner_name: null
+    });
+    if (error) throw error;
+    if (!data || !data.success){
+      throw new Error('Claim complete nahi hua');
+    }
+
+    showSuccess(data.shop_name);
+
+    // Auto-redirect to dashboard after 2.5 seconds
+    setTimeout(() => {
+      location.href = data.redirect_to || '/panel/dashboard.html';
+    }, 2500);
+
+  } catch(e){
+    let msg = e.message || 'Claim complete nahi hua';
+    if (/already.*claim/i.test(msg)){
+      // Already claimed but we're signed in — just go to dashboard
+      msg = 'Yeh dukaan pehle hi claim ho chuki hai. Dashboard pe le ja raha hu...';
+      document.getElementById('errBox').textContent = msg;
+      document.getElementById('errBox').classList.add('show');
+      setTimeout(() => { location.href = '/panel/dashboard.html'; }, 2500);
+      return;
+    }
+    showErr(msg);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

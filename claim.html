@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FF6B1A">
+<meta name="robots" content="noindex,nofollow">
+<title>Claim Your Shop — DukanList</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Plus Jakarta Sans','Noto Sans Devanagari',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%);
+    color:#0F172A;min-height:100vh;
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:20px 16px;
+  }
+  .wrap{max-width:440px;width:100%;margin-top:30px}
+
+  /* Brand */
+  .brand-top{text-align:center;margin-bottom:24px}
+  .brand-logo{display:inline-flex;align-items:center;gap:8px;font-size:1.25rem;font-weight:900;color:#0F172A;letter-spacing:-.02em}
+  .brand-logo em{color:#FF6B1A;font-style:normal}
+  .brand-tag{font-size:.78rem;color:#92400E;font-weight:700;margin-top:4px;letter-spacing:.02em}
+
+  /* Card */
+  .card{background:#fff;border-radius:22px;padding:28px 24px;box-shadow:0 20px 60px rgba(15,23,42,.12),0 4px 16px rgba(15,23,42,.04);border:1px solid rgba(255,107,26,.15)}
+
+  /* Steps */
+  .step{display:none}
+  .step.active{display:block;animation:fadeIn .35s ease-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Shop preview */
+  .shop-preview{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #F59E0B;border-radius:16px;padding:20px;margin-bottom:20px;text-align:center}
+  .shop-emoji{font-size:2.4rem;margin-bottom:6px}
+  .shop-name{font-size:1.4rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2}
+  .shop-meta{font-size:.85rem;color:#92400E;font-weight:700;margin-bottom:10px}
+  .shop-mobile{font-family:'Manrope',sans-serif;font-size:1.05rem;font-weight:800;color:#0F172A;letter-spacing:.04em;background:#fff;display:inline-block;padding:7px 14px;border-radius:99px;border:1.5px solid #FCD34D}
+
+  h1.step-title{font-size:1.3rem;font-weight:900;color:#0F172A;letter-spacing:-.02em;text-align:center;margin-bottom:6px;line-height:1.2}
+  p.step-sub{font-size:.95rem;color:#64748B;text-align:center;margin-bottom:22px;line-height:1.5}
+  p.step-sub b{color:#0F172A}
+
+  /* Buttons */
+  .btn-grid{display:grid;gap:10px}
+  .btn-yes{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:0;padding:18px;border-radius:14px;font-weight:900;font-size:1.1rem;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(16,185,129,.32);transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-yes:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(16,185,129,.4)}
+  .btn-yes:disabled{opacity:.6;cursor:wait}
+  .btn-no{background:transparent;color:#64748B;border:1.5px solid #E2E8F0;padding:14px;border-radius:14px;font-weight:700;font-size:.95rem;font-family:inherit;cursor:pointer;transition:.15s}
+  .btn-no:hover{background:#F1F5F9;color:#0F172A}
+
+  .btn-primary{background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;border:0;padding:16px;border-radius:14px;font-weight:900;font-size:1.05rem;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,26,.32);transition:.2s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(255,107,26,.4)}
+
+  /* Trust badges */
+  .trust-row{display:flex;justify-content:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .trust-pill{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;color:#1E3A8A;padding:6px 12px;border-radius:99px;font-size:.74rem;font-weight:800;border:1px solid #BFDBFE}
+  .trust-pill .tp-ico{font-size:.9rem}
+
+  /* Help text */
+  .help-box{background:#EFF6FF;border-left:3px solid #1E3A8A;color:#1E3A8A;padding:12px 14px;border-radius:9px;font-size:.85rem;font-weight:500;margin-top:14px;line-height:1.5}
+  .help-box b{font-weight:800}
+
+  /* Error */
+  .err{background:#FEE2E2;border-left:4px solid #DC2626;color:#991B1B;padding:11px 14px;border-radius:9px;font-size:.88rem;font-weight:600;margin-bottom:14px;display:none}
+  .err.show{display:block}
+
+  /* Spinner */
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Not found state */
+  .not-found{text-align:center;padding:20px 10px}
+  .not-found .nf-emoji{font-size:4rem;margin-bottom:14px}
+  .not-found h2{font-size:1.4rem;font-weight:900;color:#0F172A;margin-bottom:8px}
+  .not-found p{font-size:.95rem;color:#64748B;line-height:1.55;margin-bottom:18px}
+
+  /* Footer */
+  .foot{text-align:center;font-size:.72rem;color:#94A3B8;font-weight:600;margin-top:20px;letter-spacing:.02em}
+  .foot a{color:#FF6B1A;text-decoration:none;font-weight:700}
+
+  /* Working overlay */
+  .working{text-align:center;padding:40px 20px}
+  .working .w-emoji{font-size:3rem;margin-bottom:14px;animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.6;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
+  .working h2{font-size:1.2rem;font-weight:900;color:#0F172A;margin-bottom:6px}
+  .working p{font-size:.9rem;color:#64748B;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="brand-top">
+    <div class="brand-logo">📋 Dukan<em>List</em></div>
+    <div class="brand-tag">Mandi Dabwali ka Apna Directory</div>
+  </div>
+
+  <div class="card">
+
+    <!-- ================================================ -->
+    <!-- STEP 0: LOADING -->
+    <!-- ================================================ -->
+    <div class="step active" id="step-loading">
+      <div class="working">
+        <div class="w-emoji">⏳</div>
+        <h2>Aapki dukaan dhundh raha hu...</h2>
+        <p>Bas ek second...</p>
+      </div>
+    </div>
+
+    <!-- ================================================ -->
+    <!-- STEP 1: CONFIRM OWNERSHIP -->
+    <!-- ================================================ -->
+    <div class="step" id="step-confirm">
+      <h1 class="step-title">🏪 Yeh Dukaan Aapki Hai?</h1>
+      <p class="step-sub">Confirm karo to <b>1 click me</b> aapki dukaan verified ho jayegi.</p>
+
+      <div class="shop-preview">
+        <div class="shop-emoji">🏪</div>
+        <div class="shop-name" id="shopName">—</div>
+        <div class="shop-meta" id="shopMeta">—</div>
+        <div class="shop-mobile" id="shopMobile">📞 —</div>
+      </div>
+
+      <div class="trust-row">
+        <span class="trust-pill"><span class="tp-ico">🔒</span> Secure Link</span>
+        <span class="trust-pill"><span class="tp-ico">🆓</span> 100% Free</span>
+        <span class="trust-pill"><span class="tp-ico">⚡</span> 30 Second</span>
+      </div>
+
+      <div class="btn-grid">
+        <button class="btn-yes" id="confirmBtn" onclick="claimNow()">
+          ✅ Haan, Mein Owner Hu — Claim Karo
+        </button>
+        <button class="btn-no" onclick="showNotMine()">
+          🤔 Nahi, Yeh Meri Dukaan Nahi
+        </button>
+      </div>
+
+      <div class="help-box">
+        💡 <b>Free hai forever.</b> No app install, no email, no password.
+        Bas yeh button tap karo — aapki dukaan turant verified ho jayegi.
+      </div>
+    </div>
+
+    <!-- ================================================ -->
+    <!-- STEP 2: WORKING (calling API + redirecting) -->
+    <!-- ================================================ -->
+    <div class="step" id="step-working">
+      <div class="working">
+        <div class="w-emoji">🔐</div>
+        <h2>Aapko sign-in kar raha hu...</h2>
+        <p>2-3 second me dashboard pe le jaaunga.</p>
+      </div>
+    </div>
+
+    <!-- ================================================ -->
+    <!-- STEP 3: ERROR (something went wrong but recoverable) -->
+    <!-- ================================================ -->
+    <div class="step" id="step-error">
+      <div class="not-found">
+        <div class="nf-emoji">⚠️</div>
+        <h2>Kuch dikkat aayi</h2>
+        <p id="errorMsg">Phir try karo.</p>
+        <button class="btn-primary" onclick="location.reload()">
+          🔄 Phir Try Karo
+        </button>
+      </div>
+    </div>
+
+    <!-- ================================================ -->
+    <!-- STEP 4: ALREADY CLAIMED -->
+    <!-- ================================================ -->
+    <div class="step" id="step-already">
+      <div class="not-found">
+        <div class="nf-emoji">✅</div>
+        <h2>Pehle Se Claimed Hai</h2>
+        <p>Yeh dukaan pehle hi claim ho chuki hai. Owner panel me login karo.</p>
+        <a href="/panel/login.html" class="btn-primary">Login Karo</a>
+      </div>
+    </div>
+
+    <!-- ================================================ -->
+    <!-- STEP 5: NOT FOUND -->
+    <!-- ================================================ -->
+    <div class="step" id="step-notfound">
+      <div class="not-found">
+        <div class="nf-emoji">😕</div>
+        <h2>Link Invalid Hai</h2>
+        <p>Yeh claim link expired ya invalid hai. DukanList team se naya link maango.</p>
+        <a href="https://wa.me/919541223377?text=Mera%20claim%20link%20invalid%20hai" class="btn-primary" target="_blank">
+          💬 Support Se Baat Karo
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    Powered by <a href="/">DukanList</a> · Free for Local Businesses
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+'use strict';
+
+const C = (window.ShopDB && window.ShopDB.client) || null;
+const TOKEN = new URLSearchParams(location.search).get('token');
+let SHOP = null;
+
+// ============================================================
+// INIT — fetch shop info for confirm page
+// ============================================================
+async function init(){
+  if (!C){
+    showStep('error', 'Page load nahi hua — internet check karo aur refresh karo.');
+    return;
+  }
+  if (!TOKEN || TOKEN.length < 16){
+    showStep('notfound');
+    return;
+  }
+
+  try {
+    const { data, error } = await C.rpc('claim_lookup_by_token', { p_token: TOKEN });
+    if (error) throw error;
+    if (!data || !data.found){
+      showStep('notfound');
+      return;
+    }
+    SHOP = data;
+
+    if (data.already_claimed){
+      showStep('already');
+      return;
+    }
+
+    // Populate confirm step
+    document.getElementById('shopName').textContent = SHOP.name || 'Your Shop';
+    const meta = [SHOP.category_name, SHOP.area, SHOP.city_name].filter(Boolean).join(' · ');
+    document.getElementById('shopMeta').textContent = meta || '';
+    document.getElementById('shopMobile').textContent = '📞 +91 ' + (SHOP.masked_mobile || 'XXXXXXXX');
+
+    showStep('confirm');
+  } catch(e){
+    console.error('claim lookup failed:', e);
+    showStep('notfound');
+  }
+}
+
+function showStep(name, errMsg){
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('step-' + name);
+  if (el) el.classList.add('active');
+  if (name === 'error' && errMsg){
+    document.getElementById('errorMsg').textContent = errMsg;
+  }
+}
+
+// ============================================================
+// CLAIM NOW — single-click flow via server-side magic link
+// ============================================================
+async function claimNow(){
+  const btn = document.getElementById('confirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Ek second...';
+
+  // Show working overlay
+  setTimeout(() => showStep('working'), 100);
+
+  try {
+    const resp = await fetch('/api/claim-via-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: TOKEN })
+    });
+
+    const body = await resp.json().catch(() => ({}));
+
+    if (!resp.ok){
+      if (body.already_claimed){
+        showStep('already');
+        return;
+      }
+      const msg = body.error || ('Server error (' + resp.status + ')');
+      showStep('error', msg);
+      return;
+    }
+
+    if (!body.success || !body.magicLink){
+      showStep('error', 'Sign-in link generate nahi hua. Phir try karo.');
+      return;
+    }
+
+    // Navigate to the magic link — Supabase will set session and
+    // redirect to /claim-success.html?ct=TOKEN
+    location.href = body.magicLink;
+
+  } catch(e){
+    console.error('claim failed:', e);
+    showStep('error', 'Internet ya server problem. Phir try karo.');
+  }
+}
+
+// ============================================================
+// "NOT MINE" path
+// ============================================================
+function showNotMine(){
+  const sName = SHOP ? SHOP.name : 'this shop';
+  const msg = 'Mereko ek listing aayi hai DukanList par jo meri nahi hai: ' + sName + '. Please hata do.';
+  location.href = 'https://wa.me/919541223377?text=' + encodeURIComponent(msg);
+}
+
+// Boot
+init();
+</script>
+</body>
+</html>

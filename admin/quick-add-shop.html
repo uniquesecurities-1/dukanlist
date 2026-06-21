@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F172A">
+<meta name="robots" content="noindex,nofollow">
+<title>Quick Add Shop — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Manrope',sans-serif;background:#F1F5F9;color:#0F172A;min-height:100vh;padding-bottom:80px}
+  .topbar{background:#0F172A;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .topbar .brand{font-weight:900;font-size:1rem;display:flex;align-items:center;gap:8px}
+  .topbar .badge{background:#1E3A8A;color:#fff;font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.04em}
+  .topbar a{color:#94a3b8;text-decoration:none;font-size:.85rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+
+  .container{max-width:600px;margin:0 auto;padding:16px}
+
+  /* Stats Strip */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+  .stat-tile{background:#fff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:0 2px 6px rgba(15,23,42,.05);border:1px solid #E2E8F0}
+  .stat-val{font-size:1.3rem;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;line-height:1}
+  .stat-lbl{font-size:.62rem;color:#64748B;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:3px;line-height:1.2}
+  .stat-tile.green .stat-val{color:#059669}
+  .stat-tile.amber .stat-val{color:#D97706}
+  .stat-tile.blue .stat-val{color:#1E3A8A}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;background:#fff;border-radius:14px;padding:6px;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+  .tab{flex:1;padding:11px 6px;text-align:center;font-size:.84rem;font-weight:800;color:#64748B;cursor:pointer;border-radius:10px;border:0;background:transparent;font-family:inherit;transition:all .2s}
+  .tab.active{background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;box-shadow:0 4px 12px rgba(255,107,26,.32)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+
+  /* Forms */
+  .card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 14px rgba(15,23,42,.06);border:1px solid #E2E8F0;margin-bottom:14px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.75rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .field input, .field select, .field textarea{
+    width:100%;padding:12px 14px;font-size:1rem;border:1.5px solid #E2E8F0;border-radius:11px;
+    font-family:inherit;outline:0;background:#FAFAFA;transition:.15s;color:#0F172A;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:#FF6B1A;background:#fff;box-shadow:0 0 0 3px rgba(255,107,26,.12)
+  }
+  .field input[type="tel"]{font-family:'Manrope',sans-serif;letter-spacing:.04em;font-weight:600}
+  .field .hint{font-size:.72rem;color:#94A3B8;margin-top:4px;font-weight:500}
+
+  /* City chips */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .chip{background:#F1F5F9;border:1.5px solid #E2E8F0;padding:6px 12px;border-radius:99px;font-size:.78rem;font-weight:700;cursor:pointer;color:#475569;transition:.15s;font-family:inherit}
+  .chip:hover{background:#FFF7ED;border-color:#FFB088;color:#9A3412}
+  .chip.active{background:linear-gradient(135deg,#FF6B1A,#EA580C);border-color:transparent;color:#fff;box-shadow:0 3px 8px rgba(255,107,26,.3)}
+
+  /* Submit */
+  .btn-pri{width:100%;background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;border:0;padding:14px;border-radius:12px;font-weight:900;font-size:1rem;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(255,107,26,.32);transition:.2s}
+  .btn-pri:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(255,107,26,.4)}
+  .btn-pri:disabled{opacity:.55;cursor:wait;transform:none}
+  .btn-sec{width:100%;background:#F1F5F9;color:#0F172A;border:1.5px solid #E2E8F0;padding:12px;border-radius:11px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;transition:.15s}
+  .btn-sec:hover{background:#E2E8F0}
+
+  /* Success card */
+  .success-card{display:none;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border:2px solid #10B981;border-radius:16px;padding:20px;margin-bottom:14px}
+  .success-card.show{display:block}
+  .success-card h3{font-size:1.1rem;font-weight:900;color:#065F46;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .success-card .shop-name{font-size:1.25rem;font-weight:900;color:#0F172A;margin-bottom:14px}
+  .success-card .claim-url{background:#fff;border:1.5px dashed #10B981;border-radius:10px;padding:10px 12px;font-family:monospace;font-size:.78rem;color:#065F46;word-break:break-all;margin-bottom:14px}
+  .wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;border:0;padding:14px;border-radius:12px;font-weight:900;font-size:1rem;cursor:pointer;font-family:inherit;width:100%;box-shadow:0 6px 18px rgba(37,211,102,.32);text-decoration:none;margin-bottom:10px}
+  .wa-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(37,211,102,.4)}
+
+  /* Template picker */
+  .tmpl-picker{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .tmpl-chip{flex:1;min-width:80px;padding:7px;text-align:center;font-size:.75rem;font-weight:700;border:1.5px solid #10B981;border-radius:8px;cursor:pointer;background:#fff;color:#065F46;font-family:inherit}
+  .tmpl-chip.active{background:#10B981;color:#fff}
+
+  /* Error */
+  .err{background:#FEE2E2;border-left:4px solid #DC2626;color:#991B1B;padding:11px 14px;border-radius:9px;font-size:.88rem;font-weight:600;margin-bottom:12px;display:none}
+  .err.show{display:block}
+
+  /* CSV upload area */
+  .csv-drop{border:2.5px dashed #CBD5E1;border-radius:14px;padding:30px 20px;text-align:center;cursor:pointer;transition:.15s;background:#FAFAFA;margin-bottom:14px}
+  .csv-drop:hover{border-color:#FF6B1A;background:#FFF7ED}
+  .csv-drop.dragover{border-color:#FF6B1A;background:#FFEDD5}
+  .csv-drop .ico{font-size:2.4rem;margin-bottom:8px}
+  .csv-drop h4{font-size:.95rem;font-weight:800;color:#0F172A;margin-bottom:4px}
+  .csv-drop p{font-size:.82rem;color:#64748B}
+  .csv-preview{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px;margin-top:14px;font-size:.78rem;font-family:monospace;max-height:200px;overflow:auto}
+  .csv-stat{display:flex;gap:14px;font-size:.85rem;font-weight:700;margin-bottom:10px;flex-wrap:wrap}
+  .csv-stat span{padding:5px 10px;border-radius:6px;background:#EEF2FF;color:#3730A3}
+  .csv-stat .green{background:#D1FAE5;color:#065F46}
+  .csv-stat .red{background:#FEE2E2;color:#991B1B}
+
+  /* Progress */
+  .progress{background:#E2E8F0;border-radius:99px;height:10px;overflow:hidden;margin:8px 0}
+  .progress .bar{height:100%;background:linear-gradient(90deg,#FF6B1A,#EA580C);transition:width .3s;border-radius:99px}
+
+  /* Bulk results */
+  .blk-results{background:#fff;border-radius:12px;padding:14px;border:1px solid #E2E8F0;max-height:400px;overflow:auto}
+  .blk-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:.85rem}
+  .blk-row:last-child{border-bottom:0}
+  .blk-row .ok{color:#059669;font-weight:800}
+  .blk-row .fail{color:#DC2626;font-weight:800}
+  .blk-row .wa-link{color:#25D366;text-decoration:none;font-weight:700;font-size:.78rem}
+
+  @media (max-width:480px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .tab{font-size:.78rem;padding:10px 4px}
+  }
+</style>
+<!-- Premium polish layer -->
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+<script src="/assets/js/admin-error-monitor.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">📋 Quick Add Shop <span class="badge">ADMIN</span></div>
+  <a href="/admin/dashboard.html">← Dashboard</a>
+</header>
+
+<div class="container">
+
+  <!-- Stats Strip -->
+  <div class="stats">
+    <div class="stat-tile blue">
+      <div class="stat-val" id="statTotalPreListed">—</div>
+      <div class="stat-lbl">Total Pre-Listed</div>
+    </div>
+    <div class="stat-tile amber">
+      <div class="stat-val" id="statUnclaimed">—</div>
+      <div class="stat-lbl">Unclaimed</div>
+    </div>
+    <div class="stat-tile green">
+      <div class="stat-val" id="statVerified">—</div>
+      <div class="stat-lbl">Claimed ✓</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-val" id="statTodayAdded">—</div>
+      <div class="stat-lbl">Aaj Added</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="single">✍️ Single Add</button>
+    <button class="tab" data-tab="bulk">📑 Bulk CSV</button>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- TAB 1: SINGLE ADD -->
+  <!-- ============================================== -->
+  <div class="tab-content active" id="tab-single">
+
+    <div class="err" id="singleErr"></div>
+
+    <div class="success-card" id="successCard">
+      <h3>✅ Added Successfully!</h3>
+      <div class="shop-name" id="successShopName"></div>
+
+      <div style="font-size:.75rem;color:#065F46;font-weight:800;text-transform:uppercase;margin-bottom:6px">📋 Claim URL</div>
+      <div class="claim-url" id="successClaimUrl"></div>
+
+      <div style="font-size:.75rem;color:#065F46;font-weight:800;text-transform:uppercase;margin-bottom:6px">📨 WhatsApp Template Choose Karo</div>
+      <div class="tmpl-picker">
+        <button class="tmpl-chip active" data-tmpl="friendly">😊 Friendly</button>
+        <button class="tmpl-chip" data-tmpl="urgency">⚡ Urgency</button>
+        <button class="tmpl-chip" data-tmpl="authority">🏛 Authority</button>
+        <button class="tmpl-chip" data-tmpl="social">👥 Social</button>
+      </div>
+
+      <a href="#" class="wa-btn" id="waSendBtn" target="_blank" rel="noopener">
+        💬 Owner Ko WhatsApp Bhejo
+      </a>
+      <button class="btn-sec" onclick="resetSingleForm()">+ Ek Aur Add Karo</button>
+    </div>
+
+    <div class="card" id="singleFormCard">
+      <div class="field">
+        <label>🏪 Shop Name *</label>
+        <input type="text" id="f_name" placeholder="Walatirams 4 Seasons" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>📱 Mobile Number *</label>
+        <input type="tel" id="f_mobile" placeholder="98XXXXXXXX" inputmode="numeric" maxlength="10">
+        <div class="hint">10-digit Indian mobile (6/7/8/9 se start)</div>
+      </div>
+
+      <div class="field">
+        <label>📍 Area / Landmark</label>
+        <input type="text" id="f_area" placeholder="School Road, Mandi Dabwali" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>🏷️ Category</label>
+        <select id="f_category">
+          <option value="">— Loading categories... —</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>🏙 City</label>
+        <div class="chips" id="cityChips">
+          <span class="chip active" data-city="mandi-dabwali">Mandi Dabwali</span>
+          <span class="chip" data-city="sirsa">Sirsa</span>
+          <span class="chip" data-city="bathinda">Bathinda</span>
+          <span class="chip" data-city="mansa">Mansa</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>📌 Source (Data kahan se?)</label>
+        <select id="f_source">
+          <option value="manual">Manual Walk-through</option>
+          <option value="vyapar-mandal">Vyapar Mandal List</option>
+          <option value="personal-contact">Personal Contact</option>
+          <option value="customer-reference">Customer Reference</option>
+          <option value="newspaper-directory">Newspaper Directory</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>✋ Consent Method</label>
+        <select id="f_consent">
+          <option value="verbal">Verbal (owner ne haan kaha)</option>
+          <option value="whatsapp-optin">WhatsApp opt-in</option>
+          <option value="mandal-broadcast">Vyapar Mandal broadcast</option>
+          <option value="public-data">Public board data only</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>📝 Notes (optional)</label>
+        <textarea id="f_notes" rows="2" placeholder="Mandal member #145, recommended by Sharma ji"></textarea>
+      </div>
+
+      <button class="btn-pri" id="singleSubmitBtn" onclick="submitSingle()">
+        ➕ Shop Add Karo
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- TAB 2: BULK CSV -->
+  <!-- ============================================== -->
+  <div class="tab-content" id="tab-bulk">
+
+    <div class="card">
+      <h3 style="font-size:1rem;font-weight:900;margin-bottom:6px">📑 Bulk CSV Upload</h3>
+      <p style="font-size:.85rem;color:#64748B;margin-bottom:14px;line-height:1.5">
+        CSV file me <b>5 columns</b>: <code>shop_name, mobile, area, category_slug, source</code>
+      </p>
+
+      <div class="csv-drop" id="csvDrop">
+        <div class="ico">📂</div>
+        <h4>CSV File Drop Karo Yahan</h4>
+        <p>Ya tap karke select karo</p>
+        <input type="file" id="csvInput" accept=".csv" style="display:none">
+      </div>
+
+      <button class="btn-sec" onclick="downloadCsvTemplate()" style="margin-bottom:12px">
+        ⬇️ Sample CSV Template Download Karo
+      </button>
+
+      <div id="csvPreviewWrap" style="display:none">
+        <div class="csv-stat" id="csvStat"></div>
+        <div class="csv-preview" id="csvPreview"></div>
+        <button class="btn-pri" id="csvProcessBtn" onclick="processCsv()" style="margin-top:14px">
+          🚀 Process Karo
+        </button>
+      </div>
+
+      <div id="csvProgressWrap" style="display:none;margin-top:14px">
+        <div style="font-size:.85rem;font-weight:700;color:#0F172A;margin-bottom:6px" id="csvProgressMsg">Processing...</div>
+        <div class="progress"><div class="bar" id="csvProgressBar" style="width:0%"></div></div>
+      </div>
+
+      <div id="csvResultsWrap" style="display:none;margin-top:14px">
+        <h4 style="font-size:.95rem;font-weight:900;margin-bottom:10px">📊 Results:</h4>
+        <div class="csv-stat" id="csvFinalStat"></div>
+        <div class="blk-results" id="csvResults"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/admin-common.js"></script>
+<script>
+'use strict';
+
+let C, MY_CITY_ID = null, SELECTED_CITY_SLUG = 'mandi-dabwali';
+let LAST_RESULT = null;  // { name, mobile, claim_url, area }
+let CURRENT_TMPL = 'friendly';
+let CSV_ROWS = [];
+
+const CITY_SLUG_TO_ID = {};
+
+// ============================================================
+// INIT
+// ============================================================
+async function init(){
+  const user = await AdminCommon.requireAdmin();
+  if (!user) return;
+  C = ShopDB.client;
+  await refreshStats();
+  await loadCategories();
+  await resolveCities();
+  wireTabs();
+  wireCsvDrop();
+  wireTemplatePicker();
+  wireCityChips();
+}
+
+async function refreshStats(){
+  try {
+    const { data, error } = await C.rpc('admin_pre_list_stats');
+    if (error){ console.warn(error); return; }
+    if (!data) return;
+    document.getElementById('statTotalPreListed').textContent = data.total_pre_listed || 0;
+    document.getElementById('statUnclaimed').textContent      = data.unclaimed || 0;
+    document.getElementById('statVerified').textContent       = data.verified || 0;
+    document.getElementById('statTodayAdded').textContent     = data.today_added || 0;
+  } catch(e){ console.warn(e); }
+}
+
+async function loadCategories(){
+  try {
+    const { data, error } = await C.from('categories')
+      .select('id, slug, name, icon, parent_id')
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+      .limit(500);
+    if (error) throw error;
+    const sel = document.getElementById('f_category');
+    sel.innerHTML = '<option value="">— Choose category —</option>';
+    // Group by parent
+    const parents = (data || []).filter(c => !c.parent_id);
+    const children = (data || []).filter(c => c.parent_id);
+    parents.forEach(p => {
+      const og = document.createElement('optgroup');
+      og.label = (p.icon || '') + ' ' + p.name;
+      // Parent itself as fallback
+      const opt = document.createElement('option');
+      opt.value = p.slug;
+      opt.textContent = '  ' + p.name + ' (general)';
+      og.appendChild(opt);
+      const kids = children.filter(k => k.parent_id === p.id);
+      kids.forEach(k => {
+        const o = document.createElement('option');
+        o.value = k.slug;
+        o.textContent = '  ' + (k.icon || '·') + ' ' + k.name;
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    });
+  } catch(e){
+    console.warn('load cats:', e);
+  }
+}
+
+async function resolveCities(){
+  try {
+    const slugs = ['mandi-dabwali','sirsa','bathinda','mansa'];
+    const { data } = await C.from('geo_cities').select('id, name, slug').limit(50);
+    if (!data) return;
+    data.forEach(c => {
+      const key = c.slug || c.name.toLowerCase().replace(/\s+/g,'-');
+      CITY_SLUG_TO_ID[key] = c.id;
+      // Also try matching by name
+      if (!c.slug){
+        const nameKey = c.name.toLowerCase().replace(/\s+/g,'-');
+        CITY_SLUG_TO_ID[nameKey] = c.id;
+      }
+    });
+    MY_CITY_ID = CITY_SLUG_TO_ID['mandi-dabwali'] || null;
+  } catch(e){ console.warn(e); }
+}
+
+function wireTabs(){
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+    });
+  });
+}
+
+function wireCityChips(){
+  document.querySelectorAll('#cityChips .chip').forEach(ch => {
+    ch.addEventListener('click', () => {
+      document.querySelectorAll('#cityChips .chip').forEach(x => x.classList.remove('active'));
+      ch.classList.add('active');
+      SELECTED_CITY_SLUG = ch.dataset.city;
+    });
+  });
+}
+
+function wireTemplatePicker(){
+  document.querySelectorAll('.tmpl-chip').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tmpl-chip').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      CURRENT_TMPL = t.dataset.tmpl;
+      if (LAST_RESULT) updateWaButton();
+    });
+  });
+}
+
+// ============================================================
+// SINGLE ADD
+// ============================================================
+async function submitSingle(){
+  const errEl = document.getElementById('singleErr');
+  errEl.classList.remove('show');
+
+  const name = document.getElementById('f_name').value.trim();
+  const mobileRaw = document.getElementById('f_mobile').value.trim();
+  const area = document.getElementById('f_area').value.trim();
+  const category = document.getElementById('f_category').value.trim();
+  const source = document.getElementById('f_source').value;
+  const consent = document.getElementById('f_consent').value;
+  const notes = document.getElementById('f_notes').value.trim();
+
+  // Validation
+  if (name.length < 2){
+    return showErr('Shop name required (min 2 chars)');
+  }
+  const mobile = mobileRaw.replace(/\D/g,'').slice(-10);
+  if (!/^[6789]\d{9}$/.test(mobile)){
+    return showErr('Mobile invalid — must be 10 digits, start with 6/7/8/9');
+  }
+
+  const btn = document.getElementById('singleSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Adding...';
+
+  try {
+    const cityId = CITY_SLUG_TO_ID[SELECTED_CITY_SLUG] || MY_CITY_ID;
+    const { data, error } = await C.rpc('admin_pre_list_shop', {
+      p_name:           name,
+      p_mobile:         mobile,
+      p_area:           area || null,
+      p_category_slug:  category || null,
+      p_city_id:        cityId,
+      p_source:         source,
+      p_consent_method: consent,
+      p_notes:          notes || null
+    });
+    if (error) throw error;
+    if (!data || !data.success) throw new Error('Failed to add');
+
+    LAST_RESULT = {
+      business_id: data.business_id,
+      name:        name,
+      mobile:      mobile,
+      area:        area,
+      claim_url:   data.claim_url
+    };
+
+    showSuccess();
+    refreshStats();
+  } catch(e){
+    showErr(e.message || 'Failed to add shop');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '➕ Shop Add Karo';
+  }
+}
+
+function showErr(msg){
+  const el = document.getElementById('singleErr');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function showSuccess(){
+  document.getElementById('singleFormCard').style.display = 'none';
+  document.getElementById('successCard').classList.add('show');
+  document.getElementById('successShopName').textContent = '🏪 ' + LAST_RESULT.name;
+  document.getElementById('successClaimUrl').textContent = LAST_RESULT.claim_url;
+  updateWaButton();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function resetSingleForm(){
+  document.getElementById('f_name').value = '';
+  document.getElementById('f_mobile').value = '';
+  document.getElementById('f_area').value = '';
+  document.getElementById('f_notes').value = '';
+  document.getElementById('successCard').classList.remove('show');
+  document.getElementById('singleFormCard').style.display = '';
+  document.getElementById('f_name').focus();
+  LAST_RESULT = null;
+}
+
+// ============================================================
+// WhatsApp templates
+// ============================================================
+function buildWaMessage(tmpl, name, area, claimUrl){
+  const greeting = '*Namaste!*';
+  switch(tmpl){
+    case 'friendly':
+      return greeting + '\n\nAapki dukaan *' + name + '*' + (area ? ' (' + area + ')' : '') + ' ka page DukanList par ban gaya hai.\n\nMandi Dabwali ka pehla local business directory — pichle hafte yahan 1,250+ customers ne shops dhundhi.\n\nAapko sirf claim karna hai — *FREE, 30 second me*.\n\n👉 ' + claimUrl + '\n\n— DukanList Team';
+
+    case 'urgency':
+      return greeting + '\n\n*' + name + '* — pichle 7 din me 12 customers ne aapki shop DukanList par dhundhi — but unclaimed dikhi.\n\n8 customers ne padosi ko call kiya.\n\nEstimated lost business: *₹4,200*\n\n30 second me claim karo:\n👉 ' + claimUrl;
+
+    case 'authority':
+      return '*Mandal Members Ke Liye Special Notice*\n\nMandi Dabwali Vyapar Mandal ne DukanList ke saath partnership ki hai. Aap members ki listing *pehle se ban gayi hai*.\n\n*' + name + '* aapka listing claim karna baki hai.\n\n*7 din ke andar* claim karo:\n👉 ' + claimUrl + '\n\n— DukanList × Vyapar Mandal';
+
+    case 'social':
+      return greeting + '\n\nAapke padosi *Walatirams 4 Seasons* ne DukanList par claim kar liya — pichle 7 din me unko *47 customers* ne contact kiya.\n\n*' + name + '* aap kab claim karoge?\n\n👉 ' + claimUrl;
+
+    default:
+      return claimUrl;
+  }
+}
+
+function updateWaButton(){
+  if (!LAST_RESULT) return;
+  const msg = buildWaMessage(CURRENT_TMPL, LAST_RESULT.name, LAST_RESULT.area, LAST_RESULT.claim_url);
+  const waUrl = 'https://wa.me/91' + LAST_RESULT.mobile + '?text=' + encodeURIComponent(msg);
+  document.getElementById('waSendBtn').href = waUrl;
+
+  // Also increment claim_sent_count when admin clicks
+  document.getElementById('waSendBtn').onclick = async () => {
+    try {
+      await C.rpc('admin_increment_claim_sent', { p_business_id: LAST_RESULT.business_id });
+    } catch(_){}
+  };
+}
+
+// ============================================================
+// CSV BULK UPLOAD
+// ============================================================
+function wireCsvDrop(){
+  const drop = document.getElementById('csvDrop');
+  const input = document.getElementById('csvInput');
+
+  drop.addEventListener('click', () => input.click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) parseCsvFile(f);
+  });
+  input.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) parseCsvFile(f);
+  });
+}
+
+function parseCsvFile(file){
+  if (!/\.csv$/i.test(file.name)){
+    alert('CSV file dijiye');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    const rows = parseCsvText(text);
+    CSV_ROWS = rows;
+    renderCsvPreview(rows);
+  };
+  reader.readAsText(file);
+}
+
+function parseCsvText(text){
+  // Simple CSV parser — handles quoted strings + escapes
+  const rows = [];
+  let i = 0, cell = '', row = [], inQuote = false;
+  while (i < text.length){
+    const ch = text[i];
+    if (inQuote){
+      if (ch === '"' && text[i+1] === '"'){ cell += '"'; i += 2; continue; }
+      if (ch === '"'){ inQuote = false; i++; continue; }
+      cell += ch; i++;
+      continue;
+    }
+    if (ch === '"'){ inQuote = true; i++; continue; }
+    if (ch === ','){ row.push(cell); cell = ''; i++; continue; }
+    if (ch === '\n' || ch === '\r'){
+      if (cell !== '' || row.length){ row.push(cell); rows.push(row); }
+      row = []; cell = '';
+      if (ch === '\r' && text[i+1] === '\n') i++;
+      i++; continue;
+    }
+    cell += ch; i++;
+  }
+  if (cell !== '' || row.length){ row.push(cell); rows.push(row); }
+  // First row = header
+  if (!rows.length) return [];
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const dataRows = rows.slice(1).map(r => {
+    const obj = {};
+    header.forEach((h, idx) => { obj[h] = (r[idx] || '').trim(); });
+    return obj;
+  }).filter(r => r.shop_name && r.mobile);
+  return dataRows;
+}
+
+function renderCsvPreview(rows){
+  const wrap = document.getElementById('csvPreviewWrap');
+  const stat = document.getElementById('csvStat');
+  const prev = document.getElementById('csvPreview');
+  if (!rows.length){
+    wrap.style.display = 'none';
+    alert('CSV me valid rows nahi hain. Header check karo.');
+    return;
+  }
+  let valid = 0, invalid = 0;
+  rows.forEach(r => {
+    const m = (r.mobile || '').replace(/\D/g,'').slice(-10);
+    if (/^[6789]\d{9}$/.test(m) && (r.shop_name || '').trim().length >= 2) valid++;
+    else invalid++;
+  });
+  stat.innerHTML =
+    '<span>📋 Total: <b>' + rows.length + '</b></span>' +
+    '<span class="green">✓ Valid: <b>' + valid + '</b></span>' +
+    (invalid ? '<span class="red">✗ Invalid: <b>' + invalid + '</b></span>' : '');
+  // Preview first 5
+  prev.innerHTML = rows.slice(0,5).map((r,i) => {
+    return '<div>' + (i+1) + '. <b>' + esc(r.shop_name) + '</b> · ' + esc(r.mobile) + ' · ' + esc(r.area || '—') + '</div>';
+  }).join('') + (rows.length > 5 ? '<div style="color:#64748B;font-style:italic;margin-top:6px">...aur ' + (rows.length - 5) + ' rows</div>' : '');
+  wrap.style.display = '';
+}
+
+async function processCsv(){
+  const btn = document.getElementById('csvProcessBtn');
+  btn.disabled = true;
+  document.getElementById('csvProgressWrap').style.display = '';
+
+  const results = [];
+  const total = CSV_ROWS.length;
+
+  for (let i = 0; i < total; i++){
+    const r = CSV_ROWS[i];
+    document.getElementById('csvProgressMsg').textContent = 'Adding ' + (i+1) + ' of ' + total + ': ' + (r.shop_name || '');
+    document.getElementById('csvProgressBar').style.width = Math.round(((i+1)/total)*100) + '%';
+
+    try {
+      const cityId = CITY_SLUG_TO_ID[(r.city || 'mandi-dabwali').toLowerCase().trim()] || MY_CITY_ID;
+      const { data, error } = await C.rpc('admin_pre_list_shop', {
+        p_name:           r.shop_name,
+        p_mobile:         r.mobile,
+        p_area:           r.area || null,
+        p_category_slug:  r.category_slug || null,
+        p_city_id:        cityId,
+        p_source:         r.source || 'csv-bulk',
+        p_consent_method: r.consent || 'verbal',
+        p_notes:          r.notes || null
+      });
+      if (error) throw error;
+      results.push({ ok:true, name:r.shop_name, mobile:(data.claim_url ? r.mobile : ''), claim_url:data.claim_url });
+    } catch(e){
+      results.push({ ok:false, name:r.shop_name, mobile:r.mobile, error: e.message });
+    }
+  }
+
+  document.getElementById('csvProgressWrap').style.display = 'none';
+  renderCsvResults(results);
+  refreshStats();
+  btn.disabled = false;
+}
+
+function renderCsvResults(results){
+  const okCount = results.filter(r => r.ok).length;
+  const failCount = results.filter(r => !r.ok).length;
+
+  document.getElementById('csvFinalStat').innerHTML =
+    '<span class="green">✓ Added: <b>' + okCount + '</b></span>' +
+    (failCount ? '<span class="red">✗ Failed: <b>' + failCount + '</b></span>' : '');
+
+  document.getElementById('csvResults').innerHTML = results.map(r => {
+    if (r.ok){
+      const waUrl = 'https://wa.me/91' + r.mobile + '?text=' +
+        encodeURIComponent(buildWaMessage('friendly', r.name, '', r.claim_url));
+      return '<div class="blk-row">' +
+        '<div><span class="ok">✓</span> ' + esc(r.name) + ' <span style="color:#94A3B8">· ' + esc(r.mobile) + '</span></div>' +
+        '<a href="' + waUrl + '" target="_blank" rel="noopener" class="wa-link">💬 WhatsApp →</a>' +
+        '</div>';
+    } else {
+      return '<div class="blk-row">' +
+        '<div><span class="fail">✗</span> ' + esc(r.name) + ' <span style="color:#94A3B8">· ' + esc(r.mobile) + '</span></div>' +
+        '<span style="color:#DC2626;font-size:.75rem">' + esc(r.error) + '</span>' +
+        '</div>';
+    }
+  }).join('');
+  document.getElementById('csvResultsWrap').style.display = '';
+}
+
+function downloadCsvTemplate(){
+  const csv = 'shop_name,mobile,area,category_slug,city,source,consent,notes\n' +
+              'Sharma Kirana,9876543210,Sirsa Road,kirana-grocery,mandi-dabwali,vyapar-mandal,verbal,Mandal Member #145\n' +
+              'Bharat Sweets,9988776655,Main Bazaar,sweet-shop,mandi-dabwali,personal-contact,verbal,Family friend\n';
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dukanlist-shops-template.csv';
+  a.click();
+}
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+init();
+</script>
+</body>
+</html>
