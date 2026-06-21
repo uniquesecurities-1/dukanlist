@@ -1,5 +1,5 @@
 {
-  "version": "4.0",
+  "version": "4.1",
   "updated": "2026-06-15",
   "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
   "parents": [
@@ -302,6 +302,41 @@
           "name": "Pest Control",
           "name_hi": "पेस्ट कंट्रोल",
           "icon": "🐜"
+        },
+        {
+          "slug": "gas-stove-repair",
+          "name": "Gas Stove / Hob / Bhatti Repair",
+          "name_hi": "गैस चूल्हा / हॉब / भट्टी मरम्मत",
+          "icon": "🔥",
+          "keywords": "gas stove repair,gas chulha repair,chulha mistri,gas mistri,hob repair,burner clean,igniter repair,knob replace,regulator change,gas leak,bhatti repair,halwai bhatti,commercial stove,glass top stove,LPG stove,gas service"
+        },
+        {
+          "slug": "geyser-repair",
+          "name": "Geyser / Water Heater Repair",
+          "name_hi": "गीज़र / वाटर हीटर मरम्मत",
+          "icon": "🚿",
+          "keywords": "geyser repair,water heater repair,electric geyser,gas geyser,instant geyser,bajaj geyser,havells geyser,racold,ao smith,thermostat,heating element,geyser leak"
+        },
+        {
+          "slug": "chimney-repair",
+          "name": "Kitchen Chimney Installation & Repair",
+          "name_hi": "किचन चिमनी इंस्टॉल / मरम्मत",
+          "icon": "🏠",
+          "keywords": "chimney repair,chimney installation,chimney cleaning,filter change,faber chimney,kaff,elica,hindware chimney,glen chimney,auto clean chimney,motor repair,modular chimney"
+        },
+        {
+          "slug": "microwave-otg-repair",
+          "name": "Microwave / OTG / Oven Repair",
+          "name_hi": "माइक्रोवेव / OTG मरम्मत",
+          "icon": "🍞",
+          "keywords": "microwave repair,otg repair,oven repair,ifb microwave,lg microwave,samsung microwave,whirlpool,bajaj microwave,convection microwave,grill microwave,magnetron repair"
+        },
+        {
+          "slug": "mixer-grinder-repair",
+          "name": "Mixer / Grinder / Small Appliance Repair",
+          "name_hi": "मिक्सी / ग्राइंडर मरम्मत",
+          "icon": "🥤",
+          "keywords": "mixer repair,mixer grinder repair,juicer repair,food processor repair,wet grinder,preethi,bajaj mixer,sumeet,philips mixer,butterfly mixer,motor rewinding,blade change"
         },
         {
           "slug": "maid-service",
@@ -919,6 +954,41 @@
           "name": "Hosiery / Undergarments",
           "name_hi": "होज़री",
           "icon": "👙"
+        },
+        {
+          "slug": "gas-stove-shop",
+          "name": "Gas Stove / Hob Dealer",
+          "name_hi": "गैस चूल्हा / हॉब की दुकान",
+          "icon": "🔥",
+          "keywords": "gas stove,gas chulha,hob,cooktop,gas stove shop,2 burner,3 burner,4 burner,glass top stove,sunflame,prestige stove,glen,hindware,elica hob,faber,kaff,butterfly stove,inalsa,kitchen stove"
+        },
+        {
+          "slug": "gas-bhatti-commercial",
+          "name": "Commercial Gas Bhatti / Halwai Burner",
+          "name_hi": "कमर्शियल गैस भट्टी / हलवाई",
+          "icon": "🔥",
+          "keywords": "commercial bhatti,halwai bhatti,restaurant bhatti,dhaba bhatti,gas bhatti,commercial gas stove,industrial burner,deg bhatti,kadhai bhatti,jumbo burner,canteen stove,catering stove,hotel kitchen stove,SS bhatti,stainless steel bhatti"
+        },
+        {
+          "slug": "gas-accessories",
+          "name": "Gas Regulator / Pipe / Accessories",
+          "name_hi": "गैस रेगुलेटर / पाइप / सामान",
+          "icon": "🛠️",
+          "keywords": "gas accessories,gas regulator,gas pipe,suraksha pipe,rubber pipe,gas lighter,burner cap,gas knob,igniter,gas hose,ISI gas pipe,LPG accessories,gas safety,gas valve,gas burner spare,stove spare parts,Indane accessories,HP gas accessories,Bharat gas accessories"
+        },
+        {
+          "slug": "kitchen-appliances-shop",
+          "name": "Kitchen Appliances Shop",
+          "name_hi": "किचन उपकरण की दुकान",
+          "icon": "🍳",
+          "keywords": "kitchen appliances,mixer grinder,juicer,microwave,otg,oven,induction cooktop,electric kettle,toaster,sandwich maker,small appliances,bajaj,preethi,prestige,philips kitchen,butterfly,inalsa,havells kitchen"
+        },
+        {
+          "slug": "induction-cooktop",
+          "name": "Induction Cooktop Dealer",
+          "name_hi": "इंडक्शन कुकटॉप",
+          "icon": "🔌",
+          "keywords": "induction cooktop,induction stove,electric cooktop,pigeon induction,prestige induction,bajaj induction,havells induction,philips induction,butterfly induction,induction plate,smart induction"
         },
         {
           "slug": "utensils-shop",

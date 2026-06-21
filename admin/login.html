@@ -116,7 +116,13 @@
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="current-password">
+      <div style="position:relative">
+        <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:46px">
+        <button type="button" id="pwToggle" onclick="togglePasswordVisibility()" aria-label="Show password"
+          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:1.15rem;line-height:1;color:#64748B;transition:.15s;font-family:inherit">
+          <span id="pwEyeIcon">👁</span>
+        </button>
+      </div>
       <div class="help"><a href="#" onclick="showForgotForm(event)" style="color:#1E3A8A;font-weight:600;text-decoration:underline">Forgot password?</a></div>
     </div>
     <div class="alert error" id="loginErr" style="display:none"></div>
@@ -206,6 +212,27 @@ const c = ShopDB.client;
 let CURRENT_FACTOR_ID = null;
 let CURRENT_CHALLENGE_ID = null;
 let LOGIN_EMAIL = '';
+
+// =========================================================
+// Password visibility toggle (eye icon)
+// =========================================================
+function togglePasswordVisibility(){
+  const inp = document.getElementById('password');
+  const ico = document.getElementById('pwEyeIcon');
+  const btn = document.getElementById('pwToggle');
+  if (!inp) return;
+  if (inp.type === 'password'){
+    inp.type = 'text';
+    ico.textContent = '🙈';
+    btn.style.color = '#FF6B1A';
+    btn.setAttribute('aria-label', 'Hide password');
+  } else {
+    inp.type = 'password';
+    ico.textContent = '👁';
+    btn.style.color = '#64748B';
+    btn.setAttribute('aria-label', 'Show password');
+  }
+}
 
 // =========================================================
 // STEP 1: Email + Password login
