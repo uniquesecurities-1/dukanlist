@@ -240,7 +240,7 @@
   <!-- ============================================ -->
   <div class="tab-content" id="tab-bulk">
     <div class="tip">
-      💡 <b>Bulk mode:</b> Same category aur area ke 100+ shops add karo ek baar me. Bas naam paste karo, one per line.
+      💡 <b>Bulk mode:</b> Add 100+ shops in one go using the same category and area. Just paste names — one per line.
     </div>
 
     <div class="err" id="bulkErr"></div>
@@ -526,7 +526,7 @@ function wireCatSearch(inputId, resultsId, selectedDivId, selIconId, selNameId, 
       if (!q){ results.classList.remove('show'); results.innerHTML = ''; return; }
       const matches = filterCats(q);
       if (!matches.length){
-        results.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E;font-weight:700;font-size:.85rem">"' + esc(q) + '" se kuch nahi mila</div>';
+        results.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E;font-weight:700;font-size:.85rem">No matches for "' + esc(q) + '"</div>';
         results.classList.add('show');
         return;
       }

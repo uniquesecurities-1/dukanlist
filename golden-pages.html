@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#D97706">
 <title>Golden Pages — Local Business Directory · DukanList</title>
-<meta name="description" content="Mandi Dabwali, Sirsa, Bathinda ki har dukaan, aadti, doctor, school, sanstha — ek hi page me. Reference-based directory by DukanList.">
+<meta name="description" content="Every shop, clinic, doctor, school and organisation across Mandi Dabwali, Sirsa & Bathinda — all in one place. A free reference-based directory by DukanList.">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -229,10 +229,10 @@
   <div class="hero-inner">
     <span class="hero-badge">🥇 FREE Town Directory · Mandi Dabwali to Bathinda</span>
     <h1 class="hero-tag">
-      Har dukaan, har doctor, har school — <span class="grad">already listed, FREE</span>
+      Every shop, every doctor, every school — <span class="grad">already listed, FREE</span>
     </h1>
     <p class="hero-sub">
-      Reference-based directory built from local <b>newspapers, Vyapar Mandal &amp; public records</b>. Find any shop or claim yours in 1 WhatsApp.
+      A reference-based directory built from local <b>newspapers, trade associations &amp; public records</b>. Find any business — or claim yours with one WhatsApp message.
     </p>
 
     <!-- Search card -->
@@ -301,7 +301,7 @@
 
     <!-- Register strip -->
     <div class="hero-register-strip">
-      <span>Aapki shop yahan nahi hai?</span>
+      <span>Don't see your business?</span>
       <a href="/register.html">🏪 List Free →</a>
     </div>
   </div>
@@ -322,8 +322,8 @@
   <div class="trust-banner">
     <div class="tb-icon">✅</div>
     <div class="tb-text">
-      <h3>Every listing here is <b>FREE</b> — added from local newspapers, Vyapar Mandal &amp; public directories</h3>
-      <p>Apni shop dikh rahi hai? <b>WhatsApp humein</b> — hum verify karke aapko full profile (photos, reviews, hours, contact form) <b>bilkul free</b> de denge. No charges, no hidden fees.</p>
+      <h3>Every listing here is <b>FREE</b> — added from local newspapers, trade associations &amp; public directories</h3>
+      <p>Found your shop here? <b>WhatsApp us</b> — we'll verify you and unlock your full profile (photos, reviews, hours, contact form) <b>absolutely free</b>. No charges, no hidden fees.</p>
     </div>
     <a id="trustCTA" href="#" target="_blank" rel="noopener" class="tb-cta">💬 WhatsApp to Claim</a>
   </div>
@@ -331,7 +331,7 @@
   <div id="results"></div>
 
   <div class="footer-cta">
-    <h3>🏪 Aapki shop yahan nahi hai?</h3>
+    <h3>🏪 Don't see your business?</h3>
     <p>Build your full DukanList profile — photos, hours, reviews, contact form, everything customers need. Free forever.</p>
     <a href="/register.html">+ Register Your Shop</a>
   </div>
@@ -391,7 +391,7 @@ function buildGenericClaimUrl(){
 // ============================================================
 async function init(){
   if (!C){
-    document.getElementById('loading').innerHTML = '⚠️ Page load failed. Refresh karo.';
+    document.getElementById('loading').innerHTML = '⚠️ Page failed to load. Please refresh.';
     return;
   }
 
@@ -580,7 +580,7 @@ function shopCardHtml(s){
              ownerBit + mobileBit + areaBit + cityBit +
            '</div>' +
            '<div class="shop-actions">' +
-             '<a href="' + claimUrl + '" target="_blank" rel="noopener" class="btn btn-claim">💬 Yeh meri shop hai</a>' +
+             '<a href="' + claimUrl + '" target="_blank" rel="noopener" class="btn btn-claim">💬 I\'m the owner</a>' +
              '<button class="btn btn-notify" data-act="notify">📞 Contact owner</button>' +
            '</div>' +
          '</div>';
