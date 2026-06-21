@@ -92,16 +92,20 @@
     .hero-search-card{border-width:1.5px;padding:6px;border-radius:14px}
     .hsc-row{padding:8px 10px}
     .hsc-btn{padding:8px 16px;font-size:.86rem}
-    .hero-chips{grid-template-columns:repeat(4,1fr);gap:6px}
-    .hchip{padding:8px 3px;font-size:.7rem;border-radius:9px;gap:3px}
-    .hdtw-strip{padding:9px 8px;border-radius:12px;gap:2px}
+    /* On mobile, switch to horizontal scroll so long category names
+       like "Education & Training" aren't clipped. */
+    .hero-chips{display:flex;grid-template-columns:none;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin:0 -4px;scroll-padding:0 16px}
+    .hero-chips::-webkit-scrollbar{display:none}
+    .hchip{flex-shrink:0;padding:8px 12px;font-size:.74rem;border-radius:9px;gap:4px;white-space:nowrap;overflow:visible;text-overflow:clip;max-width:none}
+    .hdtw-strip{padding:10px 6px;border-radius:12px;gap:2px}
+    .hdtw-step{gap:6px;padding:2px 4px}
     .hdtw-ico{width:30px;height:30px;font-size:.95rem}
-    .hdtw-txt b{font-size:.66rem}
-    .hdtw-txt span{font-size:.56rem;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-    .hdtw-arrow{font-size:.78rem}
-    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 8px 0;max-width:360px}
-    .hero-stat b{font-size:1.05rem;line-height:1.1}
-    .hero-stat span{font-size:.58rem;margin-top:1px}
+    .hdtw-txt b{font-size:.66rem;line-height:1.2}
+    .hdtw-txt span{font-size:.56rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25}
+    .hdtw-arrow{font-size:.78rem;padding:0}
+    .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 6px;padding:12px 6px 0;max-width:100%;margin:14px auto 0}
+    .hero-stat b{font-size:.98rem;line-height:1.1}
+    .hero-stat span{font-size:.55rem;margin-top:1px;letter-spacing:0}
     .hero-register-strip{flex-direction:column;gap:8px;padding:14px 18px;border-radius:14px;width:100%;max-width:320px}
     .hero-register-strip a{width:100%;text-align:center}
     .nav-links a:not(.nav-cta){display:none}
@@ -270,7 +274,7 @@
         <div class="hdtw-ico hdtw-ico-1">📰</div>
         <div class="hdtw-txt">
           <b>1. We list</b>
-          <span>from local public sources</span>
+          <span>from public sources</span>
         </div>
       </div>
       <div class="hdtw-arrow">→</div>
@@ -278,7 +282,7 @@
         <div class="hdtw-ico hdtw-ico-2">👀</div>
         <div class="hdtw-txt">
           <b>2. You find</b>
-          <span>your shop on the page</span>
+          <span>your shop here</span>
         </div>
       </div>
       <div class="hdtw-arrow">→</div>
@@ -286,7 +290,7 @@
         <div class="hdtw-ico hdtw-ico-3">💬</div>
         <div class="hdtw-txt">
           <b>3. WhatsApp</b>
-          <span>us — full profile FREE</span>
+          <span>full profile FREE</span>
         </div>
       </div>
     </div>
