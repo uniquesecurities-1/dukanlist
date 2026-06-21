@@ -819,15 +819,17 @@ async function submitSingle(saveAndNext){
     loadRecentList();
 
     if (saveAndNext){
-      // Save + clear fields + keep selectors (category & city) so next add is faster
+      // Save + clear ALL entry fields including categories. City + source kept
+      // (city repeats per batch session, source is "Recommended by ..." style notes).
       showToast('✓ Added: ' + name);
       document.getElementById('f_name').value = '';
       document.getElementById('f_name_hi').value = '';
       document.getElementById('f_owner_name').value = '';
       document.getElementById('f_area').value = '';
       document.getElementById('f_mobile').value = '';
+      clearAllCats();                    // reset multi-cat picker chips
       resetHindiAutoFill();              // re-enable auto-translate for next entry
-      // Keep source as it likely repeats per batch
+      // Keep city + source as they typically repeat per batch
       document.getElementById('f_name').focus();
     } else {
       document.getElementById('singleOkName').textContent = '🏪 ' + name;
