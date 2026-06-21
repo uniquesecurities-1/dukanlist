@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#D97706">
+<title>Golden Pages — Local Business Directory · DukanList</title>
+<meta name="description" content="Mandi Dabwali, Sirsa, Bathinda ki har dukaan, aadti, doctor, school, sanstha — ek hi page me. Reference-based directory by DukanList.">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Noto Sans Devanagari',-apple-system,sans-serif;background:#FFFBEB;color:#0F172A;min-height:100vh}
+
+  /* Top nav (links back to DukanList) */
+  .topnav{background:#0F172A;color:#fff;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+  .topnav .brand{font-weight:900;font-size:1rem;display:flex;align-items:center;gap:8px}
+  .topnav .brand em{color:#FBBF24;font-style:normal;font-weight:600;font-size:.86rem;letter-spacing:.01em}
+  .topnav a{color:#cbd5e1;text-decoration:none;font-size:.85rem;font-weight:700;padding:6px 12px;border-radius:8px}
+  .topnav a:hover{background:rgba(255,255,255,.1);color:#fff}
+
+  /* Hero */
+  .hero{background:linear-gradient(135deg,#78350F 0%,#92400E 60%,#D97706 100%);color:#fff;padding:34px 18px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-50%;right:-15%;width:50%;height:200%;background:radial-gradient(circle,rgba(251,191,36,.25),transparent 60%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:900;letter-spacing:-.025em;margin-bottom:8px;line-height:1.1;position:relative}
+  .hero h1 .gold{color:#FBBF24}
+  .hero p.sub{font-size:.95rem;font-weight:600;opacity:.92;margin-bottom:22px;line-height:1.45;max-width:520px;margin-left:auto;margin-right:auto;position:relative}
+
+  .search-box{background:#fff;border-radius:14px;padding:6px;display:flex;gap:6px;max-width:540px;margin:0 auto;box-shadow:0 12px 32px rgba(0,0,0,.18);position:relative}
+  .search-box input{flex:1;border:0;outline:0;padding:12px 14px;font-size:1rem;font-family:inherit;color:#0F172A;border-radius:10px}
+  .search-box input::placeholder{color:#94A3B8}
+  .search-box button{background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;border:0;padding:10px 18px;border-radius:10px;font-weight:900;font-size:.92rem;cursor:pointer;font-family:inherit;flex-shrink:0;box-shadow:0 4px 12px rgba(217,119,6,.4)}
+
+  .hero-meta{display:flex;justify-content:center;gap:14px;margin-top:14px;font-size:.82rem;font-weight:700;opacity:.9;position:relative;flex-wrap:wrap}
+  .hero-meta span{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);padding:5px 12px;border-radius:99px;backdrop-filter:blur(8px)}
+
+  /* Sub bar */
+  .subbar{background:#fff;border-bottom:1px solid #FDE68A;padding:10px 16px;display:flex;gap:8px;overflow-x:auto;align-items:center;position:sticky;top:46px;z-index:40;-webkit-overflow-scrolling:touch}
+  .subbar::-webkit-scrollbar{display:none}
+  .subbar .chip{flex-shrink:0;background:#FFFBEB;border:1.5px solid #FDE68A;color:#78350F;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:.15s;font-family:inherit}
+  .subbar .chip:hover{background:#FEF3C7}
+  .subbar .chip.active{background:linear-gradient(135deg,#D97706,#92400E);color:#fff;border-color:transparent;box-shadow:0 4px 10px rgba(217,119,6,.35)}
+  .subbar .count{font-size:.7rem;font-weight:700;opacity:.85;margin-left:2px}
+
+  /* Main */
+  .container{max-width:1100px;margin:0 auto;padding:18px 16px 40px}
+
+  /* Category section */
+  .cat-section{margin-bottom:26px}
+  .cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+  .cat-head h2{font-size:1.15rem;font-weight:900;color:#78350F;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+  .cat-head h2 .cat-count{background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:99px;font-size:.74rem;font-weight:800;letter-spacing:.02em}
+  .cat-head .view-all{font-size:.78rem;font-weight:800;color:#D97706;text-decoration:none;background:transparent;border:0;cursor:pointer;font-family:inherit}
+  .cat-head .view-all:hover{text-decoration:underline}
+
+  /* Shop grid */
+  .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+  .shop-card{background:#fff;border:1.5px solid #FDE68A;border-radius:13px;padding:14px;transition:.15s;box-shadow:0 2px 6px rgba(217,119,6,.06)}
+  .shop-card:hover{border-color:#D97706;box-shadow:0 8px 20px rgba(217,119,6,.18);transform:translateY(-2px)}
+  .shop-name{font-size:1rem;font-weight:800;color:#0F172A;line-height:1.25;margin-bottom:4px;letter-spacing:-.01em}
+  .shop-meta{font-size:.78rem;color:#78350F;font-weight:600;margin-bottom:10px;line-height:1.4}
+  .shop-meta .pin{color:#D97706;font-weight:800;margin-right:3px}
+  .shop-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed #FDE68A}
+  .shop-actions .btn{flex:1;min-width:120px;text-align:center;padding:8px 10px;border-radius:8px;font-size:.78rem;font-weight:800;cursor:pointer;border:0;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:.12s}
+  .shop-actions .btn-claim{background:linear-gradient(135deg,#10B981,#059669);color:#fff}
+  .shop-actions .btn-claim:hover{background:linear-gradient(135deg,#059669,#047857)}
+  .shop-actions .btn-notify{background:#fff;color:#D97706;border:1.5px solid #FCD34D}
+  .shop-actions .btn-notify:hover{background:#FFFBEB}
+
+  /* "Show more" / pagination */
+  .show-more{display:block;margin:14px auto 0;background:#fff;border:1.5px solid #FCD34D;color:#92400E;padding:11px 22px;border-radius:11px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;transition:.15s}
+  .show-more:hover{background:#FEF3C7}
+
+  /* Empty state */
+  .empty{text-align:center;padding:60px 20px;color:#92400E}
+  .empty .emoji{font-size:3rem;margin-bottom:14px}
+  .empty h3{font-size:1.2rem;font-weight:900;color:#78350F;margin-bottom:6px}
+  .empty p{font-size:.9rem;font-weight:600;line-height:1.5}
+
+  /* Footer CTA */
+  .footer-cta{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #FCD34D;border-radius:16px;padding:24px 20px;margin-top:30px;text-align:center}
+  .footer-cta h3{font-size:1.2rem;font-weight:900;color:#78350F;margin-bottom:8px;letter-spacing:-.01em}
+  .footer-cta p{font-size:.92rem;color:#92400E;font-weight:600;margin-bottom:14px;line-height:1.5;max-width:540px;margin-left:auto;margin-right:auto}
+  .footer-cta a{display:inline-block;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;padding:11px 22px;border-radius:11px;font-weight:800;font-size:.9rem;text-decoration:none;box-shadow:0 6px 18px rgba(217,119,6,.32)}
+
+  /* Notify modal */
+  .modal-bd{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;animation:fadeIn .25s}
+  .modal-bd.show{display:flex}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{background:#fff;border-radius:18px;max-width:440px;width:100%;padding:24px;animation:slide .3s cubic-bezier(.16,1,.3,1);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+  @keyframes slide{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal h3{font-size:1.2rem;font-weight:900;color:#0F172A;margin-bottom:6px;letter-spacing:-.01em}
+  .modal .modal-sub{font-size:.88rem;color:#64748B;font-weight:600;margin-bottom:16px;line-height:1.5}
+  .modal label{display:block;font-size:.75rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .modal textarea{width:100%;padding:11px 13px;font-size:.92rem;border:1.5px solid #E2E8F0;border-radius:10px;font-family:inherit;outline:0;background:#FAFAFA;resize:vertical;min-height:80px;color:#0F172A}
+  .modal textarea:focus{border-color:#D97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.12)}
+  .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  .modal-actions .btn-cancel{background:#F1F5F9;color:#64748B;border:0;padding:12px;border-radius:10px;font-weight:800;font-family:inherit;cursor:pointer}
+  .modal-actions .btn-send{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:0;padding:12px;border-radius:10px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 4px 12px rgba(16,185,129,.3)}
+
+  /* Toast */
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#0F172A;color:#fff;padding:12px 18px;border-radius:99px;font-size:.9rem;font-weight:700;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:.3s}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Loading */
+  .loading{text-align:center;padding:50px 20px;color:#92400E}
+  .loading .sp{display:inline-block;width:36px;height:36px;border:3.5px solid rgba(217,119,6,.2);border-top-color:#D97706;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media (max-width:560px){
+    .hero h1{font-size:1.6rem}
+    .hero p.sub{font-size:.85rem}
+    .shop-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">🥇 <span>Dukan<em>List</em></span> · Golden Pages</div>
+  <a href="/">← Back to DukanList</a>
+</nav>
+
+<section class="hero">
+  <h1>🥇 <span class="gold">Golden Pages</span></h1>
+  <p class="sub">Mandi Dabwali, Sirsa, Bathinda ki <b>har dukaan</b> — aadti, doctor, school, sanstha, sab kuch ek hi page me.</p>
+
+  <div class="search-box">
+    <input type="text" id="searchBox" placeholder="🔍 Search any shop, area, category..." autocomplete="off">
+    <button onclick="doSearch()">Search</button>
+  </div>
+
+  <div class="hero-meta">
+    <span>📍 <b id="metaTotal">—</b> listings</span>
+    <span>🆕 <b id="metaWeek">—</b> this week</span>
+    <span>🏷️ <b id="metaCats">—</b> categories</span>
+  </div>
+</section>
+
+<div class="subbar" id="subbar">
+  <span class="chip active" data-cat="all">🌟 All</span>
+  <!-- categories added by JS -->
+</div>
+
+<div class="container" id="container">
+  <div class="loading" id="loading">
+    <div class="sp"></div>
+    <div>Loading Golden Pages...</div>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="footer-cta">
+    <h3>🏪 Apni dukaan add karwana chahte ho?</h3>
+    <p>Aap khud DukanList par full profile bana sakte ho — photos, hours, reviews, contact form, sab kuch. Free hai forever.</p>
+    <a href="/register.html">+ Register Your Shop</a>
+  </div>
+</div>
+
+<!-- Notify modal -->
+<div class="modal-bd" id="notifyBd" onclick="if(event.target===this)closeNotify()">
+  <div class="modal">
+    <h3>📞 Help Us Reach This Shop</h3>
+    <p class="modal-sub">Aapka request DukanList team ko jayega. Hum is shop ke owner se contact karke claim karne ko bolenge.</p>
+    <label>Aapka message (optional)</label>
+    <textarea id="notifyNote" placeholder="Mein customer hu, mereko inka contact chahiye tha..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNotify()">Cancel</button>
+      <button class="btn-send" onclick="submitNotify()">📤 Send Request</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+'use strict';
+
+const C = (window.ShopDB && window.ShopDB.client) || null;
+let CURRENT_CAT_SLUG = null;     // null = all
+let CURRENT_SEARCH = '';
+let CATEGORIES_LIST = [];
+let SHOPS_CACHE = {};            // {cat_slug: [shops...]}
+let CURRENT_NOTIFY_ID = null;
+
+// ============================================================
+// INIT
+// ============================================================
+async function init(){
+  if (!C){
+    document.getElementById('loading').innerHTML = '⚠️ Page load failed. Refresh karo.';
+    return;
+  }
+
+  // Parse URL hash for deep links — #shop=<slug> highlights one
+  const hash = (location.hash || '').replace(/^#/, '');
+  if (hash.indexOf('shop=') === 0){
+    // Will be handled after categories load
+    window._pendingShopSlug = hash.replace('shop=','');
+  }
+
+  await Promise.all([loadStats(), loadCategories()]);
+  await loadAndRender(null);
+}
+
+async function loadStats(){
+  try {
+    const { data } = await C.rpc('gp_stats');
+    if (data){
+      document.getElementById('metaTotal').textContent = (data.total || 0).toLocaleString();
+      document.getElementById('metaWeek').textContent = (data.week_added || 0).toLocaleString();
+      document.getElementById('metaCats').textContent = ((data.top_categories || []).length) || 0;
+    }
+  } catch(e){ console.warn(e); }
+}
+
+async function loadCategories(){
+  try {
+    const { data } = await C.rpc('gp_categories_with_counts');
+    CATEGORIES_LIST = data || [];
+    renderCategoryChips();
+  } catch(e){ console.warn(e); }
+}
+
+function renderCategoryChips(){
+  const bar = document.getElementById('subbar');
+  let html = '<span class="chip ' + (CURRENT_CAT_SLUG ? '' : 'active') + '" data-cat="all">🌟 All</span>';
+  CATEGORIES_LIST.slice(0, 20).forEach(c => {
+    html += '<span class="chip ' + (CURRENT_CAT_SLUG === c.category_slug ? 'active' : '') + '" data-cat="' + esc(c.category_slug) + '">' +
+            esc(c.icon || '·') + ' ' + esc(c.category_name) + ' <span class="count">' + c.shop_count + '</span></span>';
+  });
+  bar.innerHTML = html;
+  bar.querySelectorAll('.chip').forEach(ch => {
+    ch.addEventListener('click', () => {
+      const cat = ch.getAttribute('data-cat');
+      CURRENT_CAT_SLUG = (cat === 'all' ? null : cat);
+      CURRENT_SEARCH = '';
+      document.getElementById('searchBox').value = '';
+      loadAndRender(CURRENT_CAT_SLUG);
+      // scroll smoothly to top of results
+      document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+}
+
+// ============================================================
+// LOAD AND RENDER SHOPS
+// ============================================================
+async function loadAndRender(catSlug){
+  const results = document.getElementById('results');
+  const loading = document.getElementById('loading');
+  loading.style.display = '';
+  results.innerHTML = '';
+
+  try {
+    if (catSlug || CURRENT_SEARCH){
+      // Specific category OR search → flat list
+      const { data, error } = await C.rpc('gp_list_shops', {
+        p_category_slug: catSlug,
+        p_search:        CURRENT_SEARCH || null,
+        p_limit:         100,
+        p_offset:        0
+      });
+      if (error) throw error;
+      renderFlatList(data || [], catSlug);
+    } else {
+      // No filter → grouped by top categories
+      await renderGrouped();
+    }
+  } catch(e){
+    results.innerHTML = '<div class="empty"><div class="emoji">⚠️</div><h3>Could not load</h3><p>' + esc(e.message || 'Unknown error') + '</p></div>';
+  } finally {
+    loading.style.display = 'none';
+  }
+}
+
+async function renderGrouped(){
+  const results = document.getElementById('results');
+  const topCats = CATEGORIES_LIST.slice(0, 8);   // show top 8 categories grouped
+  if (!topCats.length){
+    results.innerHTML = '<div class="empty"><div class="emoji">📭</div><h3>No listings yet</h3><p>Golden Pages ke shops jaldi aayenge. Tab tak main DukanList check karo.</p></div>';
+    return;
+  }
+  // Fetch all category shops in parallel
+  const promises = topCats.map(c => C.rpc('gp_list_shops', { p_category_slug: c.category_slug, p_limit: 6 }));
+  const responses = await Promise.all(promises);
+
+  let html = '';
+  topCats.forEach((c, i) => {
+    const shops = (responses[i] && responses[i].data) || [];
+    if (!shops.length) return;
+    html += '<div class="cat-section">' +
+              '<div class="cat-head">' +
+                '<h2>' + esc(c.icon || '·') + ' ' + esc(c.category_name) + ' <span class="cat-count">' + c.shop_count + ' listings</span></h2>' +
+                '<button class="view-all" onclick="filterByCat(\'' + esc(c.category_slug) + '\')">View all →</button>' +
+              '</div>' +
+              '<div class="shop-grid">' + shops.map(shopCardHtml).join('') + '</div>' +
+            '</div>';
+  });
+  results.innerHTML = html;
+  wireShopButtons();
+}
+
+function renderFlatList(shops, catSlug){
+  const results = document.getElementById('results');
+  if (!shops.length){
+    results.innerHTML = '<div class="empty"><div class="emoji">🔍</div><h3>No matches</h3><p>Filter ya search alag try karo.</p></div>';
+    return;
+  }
+  const headEmoji = catSlug ? (CATEGORIES_LIST.find(c => c.category_slug === catSlug) || {}).icon : '🔎';
+  const headName = catSlug ? (CATEGORIES_LIST.find(c => c.category_slug === catSlug) || {}).category_name : 'Search Results';
+  const html = '<div class="cat-section">' +
+                 '<div class="cat-head"><h2>' + esc(headEmoji || '·') + ' ' + esc(headName || 'Results') + ' <span class="cat-count">' + shops.length + '</span></h2></div>' +
+                 '<div class="shop-grid">' + shops.map(shopCardHtml).join('') + '</div>' +
+               '</div>';
+  results.innerHTML = html;
+  wireShopButtons();
+}
+
+function shopCardHtml(s){
+  return '<div class="shop-card" data-id="' + esc(s.id) + '" data-name="' + esc(s.name) + '" data-token="' + esc(s.claim_token || '') + '">' +
+           '<div class="shop-name">🏪 ' + esc(s.name) + '</div>' +
+           '<div class="shop-meta">' +
+             (s.area ? '<span class="pin">📍</span>' + esc(s.area) : '<i style="opacity:.6">Area not provided</i>') +
+             (s.city_name ? ' · ' + esc(s.city_name) : '') +
+           '</div>' +
+           '<div class="shop-actions">' +
+             (s.claim_token ? '<a href="/claim.html?token=' + esc(s.claim_token) + '" class="btn btn-claim">👋 Owner? Claim</a>' : '') +
+             '<button class="btn btn-notify" data-act="notify">📞 Help us reach</button>' +
+           '</div>' +
+         '</div>';
+}
+
+function wireShopButtons(){
+  document.querySelectorAll('.shop-card .btn-notify').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.shop-card');
+      CURRENT_NOTIFY_ID = card.getAttribute('data-id');
+      document.getElementById('notifyBd').classList.add('show');
+    });
+  });
+}
+
+function filterByCat(slug){
+  CURRENT_CAT_SLUG = slug;
+  CURRENT_SEARCH = '';
+  document.getElementById('searchBox').value = '';
+  renderCategoryChips();
+  loadAndRender(slug);
+  document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function doSearch(){
+  const q = document.getElementById('searchBox').value.trim();
+  if (!q){
+    CURRENT_SEARCH = '';
+    loadAndRender(CURRENT_CAT_SLUG);
+    return;
+  }
+  CURRENT_SEARCH = q;
+  CURRENT_CAT_SLUG = null;
+  renderCategoryChips();
+  loadAndRender(null);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sb = document.getElementById('searchBox');
+  sb.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){ e.preventDefault(); doSearch(); }
+  });
+});
+
+// ============================================================
+// NOTIFY OWNER (help-us-reach)
+// ============================================================
+function closeNotify(){
+  document.getElementById('notifyBd').classList.remove('show');
+}
+
+async function submitNotify(){
+  if (!CURRENT_NOTIFY_ID) return;
+  const note = document.getElementById('notifyNote').value.trim();
+  try {
+    const ipHash = hashFingerprint();
+    const { error } = await C.rpc('gp_help_reach', {
+      p_business_id:   CURRENT_NOTIFY_ID,
+      p_customer_note: note || null,
+      p_ip_hash:       ipHash
+    });
+    if (error) throw error;
+    closeNotify();
+    document.getElementById('notifyNote').value = '';
+    showToast('✓ Request sent — DukanList team will reach out');
+  } catch(e){
+    showToast('⚠️ Could not send — try again');
+  }
+}
+
+function hashFingerprint(){
+  // Very rough client-side fingerprint for dedup only (NOT identifying)
+  try {
+    const fp = (navigator.userAgent + '|' + navigator.language + '|' + screen.width + 'x' + screen.height).slice(0, 80);
+    let hash = 0;
+    for (let i = 0; i < fp.length; i++){
+      hash = ((hash << 5) - hash) + fp.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'fp_' + Math.abs(hash);
+  } catch(_){ return null; }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+init();
+</script>
+</body>
+</html>

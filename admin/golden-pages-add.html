@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#D97706">
+<meta name="robots" content="noindex,nofollow">
+<title>Golden Pages Add — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥇</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Manrope',sans-serif;background:#FFFBEB;color:#0F172A;min-height:100vh;padding-bottom:60px}
+  .topbar{background:linear-gradient(135deg,#78350F,#92400E);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .topbar .brand{font-weight:900;font-size:1rem;display:flex;align-items:center;gap:8px}
+  .topbar .badge{background:#FBBF24;color:#78350F;font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.04em}
+  .topbar a{color:#FED7AA;text-decoration:none;font-size:.85rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+
+  .container{max-width:620px;margin:0 auto;padding:16px}
+
+  /* Hero strip */
+  .hero{background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#78350F;border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;box-shadow:0 6px 20px rgba(245,158,11,.25)}
+  .hero h1{font-size:1.3rem;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+  .hero p{font-size:.85rem;font-weight:700;opacity:.85;line-height:1.4}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+  .stat-tile{background:#fff;border:1.5px solid #FDE68A;border-radius:11px;padding:10px 6px;text-align:center}
+  .stat-val{font-size:1.4rem;font-weight:900;color:#92400E;font-family:'Plus Jakarta Sans',sans-serif;line-height:1}
+  .stat-lbl{font-size:.64rem;color:#78350F;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;background:#fff;border-radius:14px;padding:6px;border:1.5px solid #FDE68A;margin-bottom:16px;box-shadow:0 4px 12px rgba(217,119,6,.08)}
+  .tab{flex:1;padding:12px 6px;text-align:center;font-size:.85rem;font-weight:800;color:#92400E;cursor:pointer;border-radius:10px;border:0;background:transparent;font-family:inherit;transition:all .2s}
+  .tab.active{background:linear-gradient(135deg,#D97706,#92400E);color:#fff;box-shadow:0 4px 12px rgba(217,119,6,.4)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+
+  /* Form card */
+  .card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(217,119,6,.1);border:1.5px solid #FDE68A;margin-bottom:14px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.78rem;font-weight:800;color:#78350F;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .field input, .field select, .field textarea{
+    width:100%;padding:12px 14px;font-size:1rem;border:1.5px solid #FCD34D;border-radius:11px;
+    font-family:inherit;outline:0;background:#FFFBEB;color:#0F172A;transition:.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:#D97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.15)
+  }
+  .field .hint{font-size:.72rem;color:#92400E;font-weight:600;margin-top:5px;line-height:1.4}
+  .field .opt{color:#A3A3A3;font-weight:600;text-transform:none;font-size:.72rem;margin-left:6px}
+
+  /* Category chips (reused pattern from quick-add-shop) */
+  .cat-results{display:none;background:#fff;border:1.5px solid #FCD34D;border-radius:11px;padding:6px;max-height:280px;overflow-y:auto;margin-top:6px}
+  .cat-results.show{display:block}
+  .cat-result-chip{
+    width:100%;text-align:left;background:#FFFBEB;border:1px solid #FDE68A;
+    border-radius:9px;padding:9px 12px;margin-bottom:4px;cursor:pointer;
+    font-family:inherit;font-size:.9rem;font-weight:700;color:#0F172A;
+    display:flex;align-items:center;gap:10px;transition:.12s;
+  }
+  .cat-result-chip:hover{background:#FEF3C7;border-color:#D97706}
+  .cat-result-chip .ico{font-size:1.15rem;flex-shrink:0}
+  .cat-result-chip .text{flex:1;min-width:0}
+  .cat-result-chip .slug-code{font-size:.7rem;color:#78350F;font-family:monospace;background:#fff;padding:1px 6px;border-radius:4px;margin-top:2px;display:inline-block}
+  .cat-result-chip .arrow{color:#D97706;font-weight:900}
+
+  .cat-selected{
+    background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #D97706;
+    border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:10px;
+  }
+  .cat-selected .ico{font-size:1.4rem;flex-shrink:0}
+  .cat-selected .name{font-size:.95rem;font-weight:800;color:#0F172A;flex:1}
+  .cat-selected button{background:#fff;border:1.5px solid #D97706;color:#92400E;padding:5px 11px;border-radius:7px;font-weight:800;font-size:.75rem;cursor:pointer;font-family:inherit}
+
+  /* Submit */
+  .btn-pri{width:100%;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;border:0;padding:14px;border-radius:12px;font-weight:900;font-size:1rem;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(217,119,6,.32);transition:.2s}
+  .btn-pri:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(217,119,6,.42)}
+  .btn-pri:disabled{opacity:.55;cursor:wait}
+  .btn-sec{width:100%;background:#FFFBEB;color:#92400E;border:1.5px solid #FCD34D;padding:12px;border-radius:11px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit}
+
+  /* Success */
+  .ok-card{display:none;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border:2px solid #10B981;border-radius:14px;padding:18px;margin-bottom:14px}
+  .ok-card.show{display:block}
+  .ok-card h3{font-size:1.1rem;font-weight:900;color:#065F46;margin-bottom:6px}
+  .ok-card .added-name{font-size:1.15rem;font-weight:900;color:#0F172A;margin-bottom:10px}
+  .ok-card .gp-link{background:#fff;border:1.5px dashed #10B981;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:.76rem;color:#065F46;word-break:break-all;margin-bottom:10px}
+
+  /* Bulk textarea */
+  .bulk-area{width:100%;min-height:200px;padding:14px;font-family:'Manrope',monospace;font-size:.95rem;border:1.5px solid #FCD34D;border-radius:11px;background:#FFFBEB;color:#0F172A;outline:0;resize:vertical;line-height:1.5}
+  .bulk-area:focus{border-color:#D97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.15)}
+
+  /* Bulk results */
+  .blk-stat{display:flex;gap:10px;font-size:.85rem;font-weight:700;margin-bottom:10px;flex-wrap:wrap}
+  .blk-stat span{padding:5px 11px;border-radius:7px}
+  .blk-stat .ok{background:#D1FAE5;color:#065F46}
+  .blk-stat .fail{background:#FEE2E2;color:#991B1B}
+  .blk-list{background:#fff;border:1px solid #FCD34D;border-radius:9px;padding:10px;max-height:280px;overflow-y:auto;font-size:.84rem;font-weight:600}
+  .blk-list div{padding:4px 0;border-bottom:1px solid #FEF3C7}
+  .blk-list div:last-child{border-bottom:0}
+  .blk-list .blk-ok{color:#065F46}
+  .blk-list .blk-fail{color:#991B1B}
+
+  /* Error */
+  .err{background:#FEE2E2;border-left:4px solid #DC2626;color:#991B1B;padding:11px 14px;border-radius:9px;font-size:.88rem;font-weight:600;margin-bottom:12px;display:none}
+  .err.show{display:block}
+
+  /* Spinner */
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Tip box */
+  .tip{background:#FEF3C7;border-left:3px solid #D97706;color:#78350F;padding:10px 13px;border-radius:8px;font-size:.8rem;font-weight:600;line-height:1.5;margin-bottom:14px}
+  .tip b{color:#92400E}
+  .tip code{background:#fff;padding:1px 5px;border-radius:3px;font-size:.78rem}
+</style>
+<link rel="stylesheet" href="/assets/css/admin-premium.css">
+<script src="/assets/js/admin-error-monitor.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🥇 Golden Pages <span class="badge">SOFT LIST</span></div>
+  <a href="/admin/dashboard.html">← Dashboard</a>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>🥇 Golden Pages Add</h1>
+    <p>Reference-based soft listings — 5 sec per shop. Lives only on /golden-pages.html (not main DukanList).</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-tile">
+      <div class="stat-val" id="statTotal">—</div>
+      <div class="stat-lbl">Total Soft Listed</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-val" id="statToday">—</div>
+      <div class="stat-lbl">Aaj Added</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-val" id="statWeek">—</div>
+      <div class="stat-lbl">Is Hafte</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="single">✍️ Single Add</button>
+    <button class="tab" data-tab="bulk">📋 Bulk Paste (100 names)</button>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TAB 1: SINGLE ADD -->
+  <!-- ============================================ -->
+  <div class="tab-content active" id="tab-single">
+    <div class="err" id="singleErr"></div>
+
+    <div class="ok-card" id="singleOk">
+      <h3>✅ Soft-listed!</h3>
+      <div class="added-name" id="singleOkName"></div>
+      <div style="font-size:.7rem;color:#065F46;font-weight:800;text-transform:uppercase;margin-bottom:4px">Golden Pages URL</div>
+      <div class="gp-link" id="singleOkUrl"></div>
+      <button class="btn-sec" onclick="resetSingleForm()">+ Add another shop</button>
+    </div>
+
+    <div class="card" id="singleForm">
+      <div class="field">
+        <label>🏪 Shop Name *</label>
+        <input type="text" id="f_name" placeholder="Sharma Brothers Aadti" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>🏷️ Category *</label>
+        <input type="text" id="f_cat_search" placeholder="🔍 Search: gas, doctor, aadti, sweet..." autocomplete="off">
+        <div id="catSelected" class="cat-selected" style="display:none;margin-top:6px">
+          <span class="ico" id="catSelIcon">·</span>
+          <div class="name" id="catSelName">—</div>
+          <button type="button" onclick="clearCat()">✕ Change</button>
+        </div>
+        <div id="catResults" class="cat-results"></div>
+      </div>
+
+      <div class="field">
+        <label>📍 Area / Landmark <span class="opt">(optional but recommended)</span></label>
+        <input type="text" id="f_area" placeholder="Main Mandi, near bus stand" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>📱 Mobile <span class="opt">(optional — if reference se pata ho)</span></label>
+        <input type="tel" id="f_mobile" placeholder="98XXXXXXXX" inputmode="numeric" maxlength="10">
+        <div class="hint">Optional. Agar pata ho to add karo — claim flow easier hota hai.</div>
+      </div>
+
+      <div class="field">
+        <label>📌 Reference / Source <span class="opt">(notes)</span></label>
+        <input type="text" id="f_source" placeholder="Rajesh ji ne bataya / Vyapar Mandal list" autocomplete="off">
+      </div>
+
+      <button class="btn-pri" id="singleSubmit" onclick="submitSingle()">🥇 Add to Golden Pages</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TAB 2: BULK PASTE -->
+  <!-- ============================================ -->
+  <div class="tab-content" id="tab-bulk">
+    <div class="tip">
+      💡 <b>Bulk mode:</b> Same category aur area ke 100+ shops add karo ek baar me. Bas naam paste karo, one per line.
+    </div>
+
+    <div class="err" id="bulkErr"></div>
+
+    <div class="card">
+      <div class="field">
+        <label>🏷️ Category (sab shops ke liye same) *</label>
+        <input type="text" id="b_cat_search" placeholder="🔍 Search: gas, doctor, aadti, sweet..." autocomplete="off">
+        <div id="bCatSelected" class="cat-selected" style="display:none;margin-top:6px">
+          <span class="ico" id="bCatSelIcon">·</span>
+          <div class="name" id="bCatSelName">—</div>
+          <button type="button" onclick="clearBCat()">✕ Change</button>
+        </div>
+        <div id="bCatResults" class="cat-results"></div>
+      </div>
+
+      <div class="field">
+        <label>📍 Area / Landmark (same for all)</label>
+        <input type="text" id="b_area" placeholder="Main Mandi" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>📋 Paste shop names (one per line, max 500)</label>
+        <textarea id="b_names" class="bulk-area" placeholder="Sharma Brothers Aadti&#10;Ramesh & Sons&#10;Gupta Trading Co&#10;Bansal Aadti Bhandar&#10;...&#10;(paste 100 names)"></textarea>
+        <div class="hint" id="b_count">0 names ready</div>
+      </div>
+
+      <button class="btn-pri" id="bulkSubmit" onclick="submitBulk()">🚀 Process All</button>
+    </div>
+
+    <div id="bulkResults" style="display:none">
+      <h3 style="font-size:1rem;font-weight:900;color:#92400E;margin-bottom:10px">📊 Results</h3>
+      <div class="blk-stat" id="bulkStat"></div>
+      <div class="blk-list" id="bulkList"></div>
+      <button class="btn-sec" onclick="resetBulkForm()" style="margin-top:14px">+ Add another batch</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/admin-common.js"></script>
+<script>
+'use strict';
+
+let C;
+let ALL_CATEGORIES = [];
+let SELECTED_CAT = null;       // {slug, name, icon}
+let SELECTED_BCAT = null;      // bulk's category
+
+// ============================================================
+// INIT
+// ============================================================
+async function init(){
+  const user = await AdminCommon.requireAdmin();
+  if (!user) return;
+  C = ShopDB.client;
+
+  await refreshStats();
+  await loadCategories();
+  wireTabs();
+  wireCatSearch('f_cat_search', 'catResults', 'catSelected', 'catSelIcon', 'catSelName', s => SELECTED_CAT = s);
+  wireCatSearch('b_cat_search', 'bCatResults', 'bCatSelected', 'bCatSelIcon', 'bCatSelName', s => SELECTED_BCAT = s);
+
+  // Live count of names pasted
+  const ta = document.getElementById('b_names');
+  ta.addEventListener('input', () => {
+    const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+    document.getElementById('b_count').textContent = lines.length + ' names ready';
+  });
+}
+
+async function refreshStats(){
+  try {
+    const { data, error } = await C.rpc('gp_stats');
+    if (error || !data) return;
+    document.getElementById('statTotal').textContent = data.total || 0;
+    document.getElementById('statToday').textContent = data.today_added || 0;
+    document.getElementById('statWeek').textContent = data.week_added || 0;
+  } catch(e){ console.warn(e); }
+}
+
+async function loadCategories(){
+  try {
+    const { data, error } = await C.from('categories')
+      .select('id, slug, name, name_hi, icon, parent_id, keywords')
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+      .limit(500);
+    if (error) throw error;
+    const all = data || [];
+    const byId = {}; all.forEach(c => byId[c.id] = c);
+    ALL_CATEGORIES = all.map(c => ({
+      slug: c.slug,
+      name: c.name,
+      name_hi: c.name_hi || '',
+      icon: c.icon || '·',
+      parent_name: c.parent_id && byId[c.parent_id] ? byId[c.parent_id].name : '',
+      keywords: (c.keywords || '').toLowerCase()
+    }));
+  } catch(e){ console.warn('cats:', e); }
+}
+
+function wireTabs(){
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+    });
+  });
+}
+
+// ============================================================
+// CATEGORY SEARCH (shared)
+// ============================================================
+const SYNS = {
+  'ca':['chartered accountant','tax'], 'doctor':['hospital','clinic','dr'],
+  'vakeel':['advocate','lawyer'], 'mfd':['mutual fund','sip'], 'broker':['stock','sebi'],
+  'tailor':['darzi','silai'], 'kapde':['cloth','garment'], 'plumber':['nal','pipe'],
+  'kirana':['grocery'], 'medical':['pharmacy','chemist'], 'gas':['chulha','bhatti']
+};
+
+function expandQuery(q){
+  const tokens = [q.toLowerCase()];
+  const lower = q.toLowerCase();
+  for (const key in SYNS){ if (lower.includes(key)) tokens.push(...SYNS[key]); }
+  return tokens;
+}
+
+function filterCats(q){
+  const queryTokens = expandQuery(q);
+  return ALL_CATEGORIES.filter(c => {
+    const hay = (c.name + ' ' + c.name_hi + ' ' + c.parent_name + ' ' + c.keywords + ' ' + c.slug).toLowerCase();
+    return queryTokens.some(t => hay.includes(t));
+  }).slice(0, 25);
+}
+
+function wireCatSearch(inputId, resultsId, selectedDivId, selIconId, selNameId, onSelect){
+  const input = document.getElementById(inputId);
+  const results = document.getElementById(resultsId);
+  const selDiv = document.getElementById(selectedDivId);
+  if (!input || !results) return;
+
+  let timer = null;
+  input.addEventListener('input', e => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const q = e.target.value.trim();
+      if (!q){ results.classList.remove('show'); results.innerHTML = ''; return; }
+      const matches = filterCats(q);
+      if (!matches.length){
+        results.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E;font-weight:700;font-size:.85rem">"' + esc(q) + '" se kuch nahi mila</div>';
+        results.classList.add('show');
+        return;
+      }
+      results.innerHTML = matches.map(c => {
+        return '<button type="button" class="cat-result-chip" data-slug="' + esc(c.slug) + '" data-name="' + esc(c.name) + '" data-icon="' + esc(c.icon) + '">' +
+                 '<span class="ico">' + esc(c.icon) + '</span>' +
+                 '<div class="text">' +
+                   '<div>' + esc(c.name) + '</div>' +
+                   '<span class="slug-code">' + esc(c.slug) + '</span>' +
+                 '</div>' +
+                 '<span class="arrow">→</span>' +
+               '</button>';
+      }).join('');
+      results.classList.add('show');
+      results.querySelectorAll('.cat-result-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const slug = btn.getAttribute('data-slug');
+          const name = btn.getAttribute('data-name');
+          const icon = btn.getAttribute('data-icon');
+          onSelect({ slug, name, icon });
+          document.getElementById(selIconId).textContent = icon;
+          document.getElementById(selNameId).textContent = name + '  (' + slug + ')';
+          selDiv.style.display = 'flex';
+          results.classList.remove('show');
+          input.value = '';
+        });
+      });
+    }, 120);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      const first = results.querySelector('.cat-result-chip');
+      if (first) first.click();
+    }
+  });
+}
+
+function clearCat(){
+  SELECTED_CAT = null;
+  document.getElementById('catSelected').style.display = 'none';
+  document.getElementById('f_cat_search').focus();
+}
+function clearBCat(){
+  SELECTED_BCAT = null;
+  document.getElementById('bCatSelected').style.display = 'none';
+  document.getElementById('b_cat_search').focus();
+}
+
+// ============================================================
+// SINGLE ADD
+// ============================================================
+async function submitSingle(){
+  const errEl = document.getElementById('singleErr');
+  errEl.classList.remove('show');
+
+  const name = document.getElementById('f_name').value.trim();
+  if (name.length < 2) return showSingleErr('Shop name required');
+  if (!SELECTED_CAT) return showSingleErr('Pick a category from search');
+  const area = document.getElementById('f_area').value.trim();
+  const mobileRaw = document.getElementById('f_mobile').value.trim();
+  const mobile = mobileRaw ? mobileRaw.replace(/\D/g,'').slice(-10) : null;
+  if (mobile && !/^[6789]\d{9}$/.test(mobile)) return showSingleErr('Mobile invalid — 10 digits, 6/7/8/9 start');
+  const source = document.getElementById('f_source').value.trim();
+
+  const btn = document.getElementById('singleSubmit');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Adding...';
+
+  try {
+    const { data, error } = await C.rpc('admin_soft_add_shop', {
+      p_name:          name,
+      p_category_slug: SELECTED_CAT.slug,
+      p_area:          area || null,
+      p_mobile:        mobile || null,
+      p_source:        'reference',
+      p_notes:         source || null
+    });
+    if (error) throw error;
+    if (!data || !data.success) throw new Error('Failed');
+
+    document.getElementById('singleOkName').textContent = '🏪 ' + name;
+    document.getElementById('singleOkUrl').textContent = data.gp_url || ('/golden-pages.html');
+    document.getElementById('singleForm').style.display = 'none';
+    document.getElementById('singleOk').classList.add('show');
+    refreshStats();
+  } catch(e){
+    showSingleErr(e.message || 'Failed');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🥇 Add to Golden Pages';
+  }
+}
+
+function showSingleErr(msg){
+  const el = document.getElementById('singleErr');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function resetSingleForm(){
+  document.getElementById('f_name').value = '';
+  document.getElementById('f_area').value = '';
+  document.getElementById('f_mobile').value = '';
+  document.getElementById('f_source').value = '';
+  clearCat();
+  document.getElementById('singleOk').classList.remove('show');
+  document.getElementById('singleForm').style.display = '';
+  document.getElementById('f_name').focus();
+}
+
+// ============================================================
+// BULK ADD
+// ============================================================
+async function submitBulk(){
+  const errEl = document.getElementById('bulkErr');
+  errEl.classList.remove('show');
+
+  if (!SELECTED_BCAT) return showBulkErr('Pick a category for bulk add');
+  const area = document.getElementById('b_area').value.trim();
+  const rawText = document.getElementById('b_names').value;
+  const names = rawText.split('\n').map(s => s.trim()).filter(s => s.length >= 2);
+  if (!names.length) return showBulkErr('Paste at least 1 name');
+  if (names.length > 500) return showBulkErr('Max 500 names per batch — split into chunks');
+
+  const btn = document.getElementById('bulkSubmit');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Processing ' + names.length + '...';
+
+  try {
+    const { data, error } = await C.rpc('admin_soft_bulk_add', {
+      p_names:          names,
+      p_category_slug:  SELECTED_BCAT.slug,
+      p_area:           area || null
+    });
+    if (error) throw error;
+    if (!data || !data.success) throw new Error('Bulk failed');
+
+    renderBulkResults(data);
+    refreshStats();
+  } catch(e){
+    showBulkErr(e.message || 'Failed');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Process All';
+  }
+}
+
+function showBulkErr(msg){
+  const el = document.getElementById('bulkErr');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+}
+
+function renderBulkResults(data){
+  document.getElementById('bulkResults').style.display = '';
+  document.getElementById('bulkStat').innerHTML =
+    '<span class="ok">✓ Added: <b>' + (data.added || 0) + '</b></span>' +
+    (data.skipped ? '<span class="fail">✗ Skipped: <b>' + data.skipped + '</b></span>' : '');
+
+  const addedHtml = (data.added_list || []).map(a => '<div class="blk-ok">✓ ' + esc(a.name) + '</div>').join('');
+  const skipHtml = (data.skipped_list || []).map(s => '<div class="blk-fail">✗ ' + esc(s.name) + ' — ' + esc(s.reason) + '</div>').join('');
+  document.getElementById('bulkList').innerHTML = addedHtml + skipHtml;
+  document.getElementById('bulkResults').scrollIntoView({ behavior:'smooth' });
+}
+
+function resetBulkForm(){
+  document.getElementById('b_names').value = '';
+  document.getElementById('b_area').value = '';
+  document.getElementById('b_count').textContent = '0 names ready';
+  clearBCat();
+  document.getElementById('bulkResults').style.display = 'none';
+}
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+init();
+</script>
+</body>
+</html>
