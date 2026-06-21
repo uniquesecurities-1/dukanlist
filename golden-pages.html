@@ -123,17 +123,17 @@
 
 <section class="hero">
   <h1>🥇 <span class="gold">Golden Pages</span></h1>
-  <p class="sub">Mandi Dabwali, Sirsa, Bathinda ki <b>har dukaan</b> — aadti, doctor, school, sanstha, sab kuch ek hi page me.</p>
+  <p class="sub">Every shop in <b>Mandi Dabwali, Sirsa &amp; Bathinda</b> — aadti, doctors, schools, organisations &amp; more, all in one place.</p>
 
   <div class="search-box">
-    <input type="text" id="searchBox" placeholder="🔍 Search any shop, area, category..." autocomplete="off">
+    <input type="text" id="searchBox" placeholder="🔍 Search any shop, area or category..." autocomplete="off">
     <button onclick="doSearch()">Search</button>
   </div>
 
   <div class="hero-meta">
-    <span>📍 <b id="metaTotal">—</b> listings</span>
-    <span>🆕 <b id="metaWeek">—</b> this week</span>
-    <span>🏷️ <b id="metaCats">—</b> categories</span>
+    <span>📍 <b id="metaTotal">0</b> listings</span>
+    <span>🆕 <b id="metaWeek">0</b> added this week</span>
+    <span>🏷️ <b id="metaCats">0</b> categories</span>
   </div>
 </section>
 
@@ -145,14 +145,14 @@
 <div class="container" id="container">
   <div class="loading" id="loading">
     <div class="sp"></div>
-    <div>Loading Golden Pages...</div>
+    <div>Loading the directory…</div>
   </div>
 
   <div id="results"></div>
 
   <div class="footer-cta">
-    <h3>🏪 Apni dukaan add karwana chahte ho?</h3>
-    <p>Aap khud DukanList par full profile bana sakte ho — photos, hours, reviews, contact form, sab kuch. Free hai forever.</p>
+    <h3>🏪 Want to list your shop?</h3>
+    <p>Build your full DukanList profile — photos, hours, reviews, contact form, everything customers need. Free forever.</p>
     <a href="/register.html">+ Register Your Shop</a>
   </div>
 </div>
@@ -160,10 +160,10 @@
 <!-- Notify modal -->
 <div class="modal-bd" id="notifyBd" onclick="if(event.target===this)closeNotify()">
   <div class="modal">
-    <h3>📞 Help Us Reach This Shop</h3>
-    <p class="modal-sub">Aapka request DukanList team ko jayega. Hum is shop ke owner se contact karke claim karne ko bolenge.</p>
-    <label>Aapka message (optional)</label>
-    <textarea id="notifyNote" placeholder="Mein customer hu, mereko inka contact chahiye tha..."></textarea>
+    <h3>📞 Help us reach this shop</h3>
+    <p class="modal-sub">Your request goes to the DukanList team. We'll personally contact the owner and ask them to claim this listing.</p>
+    <label>Your message (optional)</label>
+    <textarea id="notifyNote" placeholder="I'm a customer and need their contact details..."></textarea>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeNotify()">Cancel</button>
       <button class="btn-send" onclick="submitNotify()">📤 Send Request</button>
@@ -280,7 +280,13 @@ async function renderGrouped(){
   const results = document.getElementById('results');
   const topCats = CATEGORIES_LIST.slice(0, 8);   // show top 8 categories grouped
   if (!topCats.length){
-    results.innerHTML = '<div class="empty"><div class="emoji">📭</div><h3>No listings yet</h3><p>Golden Pages ke shops jaldi aayenge. Tab tak main DukanList check karo.</p></div>';
+    results.innerHTML =
+      '<div class="empty">' +
+        '<div class="emoji">📭</div>' +
+        '<h3>No listings yet</h3>' +
+        '<p>We\'re actively adding shops from reference lists. Check back soon — or browse the main DukanList in the meantime.</p>' +
+        '<p style="margin-top:14px"><a href="/" style="display:inline-block;background:#D97706;color:#fff;padding:11px 22px;border-radius:10px;font-weight:800;text-decoration:none;font-size:.88rem">→ Open DukanList</a></p>' +
+      '</div>';
     return;
   }
   // Fetch all category shops in parallel
@@ -306,7 +312,7 @@ async function renderGrouped(){
 function renderFlatList(shops, catSlug){
   const results = document.getElementById('results');
   if (!shops.length){
-    results.innerHTML = '<div class="empty"><div class="emoji">🔍</div><h3>No matches</h3><p>Filter ya search alag try karo.</p></div>';
+    results.innerHTML = '<div class="empty"><div class="emoji">🔍</div><h3>No matches</h3><p>Try a different category or search term.</p></div>';
     return;
   }
   const headEmoji = catSlug ? (CATEGORIES_LIST.find(c => c.category_slug === catSlug) || {}).icon : '🔎';
@@ -327,8 +333,8 @@ function shopCardHtml(s){
              (s.city_name ? ' · ' + esc(s.city_name) : '') +
            '</div>' +
            '<div class="shop-actions">' +
-             (s.claim_token ? '<a href="/claim.html?token=' + esc(s.claim_token) + '" class="btn btn-claim">👋 Owner? Claim</a>' : '') +
-             '<button class="btn btn-notify" data-act="notify">📞 Help us reach</button>' +
+             (s.claim_token ? '<a href="/claim.html?token=' + esc(s.claim_token) + '" class="btn btn-claim">👋 I\'m the owner</a>' : '') +
+             '<button class="btn btn-notify" data-act="notify">📞 Request contact</button>' +
            '</div>' +
          '</div>';
 }
@@ -397,7 +403,7 @@ async function submitNotify(){
     document.getElementById('notifyNote').value = '';
     showToast('✓ Request sent — DukanList team will reach out');
   } catch(e){
-    showToast('⚠️ Could not send — try again');
+    showToast('⚠️ Could not send. Please try again.');
   }
 }
 
