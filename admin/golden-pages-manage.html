@@ -82,6 +82,7 @@
   /* Loading + empty */
   .loading{text-align:center;padding:50px 20px;color:#92400E}
   .loading .sp{display:inline-block;width:36px;height:36px;border:3.5px solid rgba(217,119,6,.2);border-top-color:#D97706;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:14px}
+  .loading.hidden{display:none!important}
   @keyframes spin{to{transform:rotate(360deg)}}
   .empty{background:#fff;border:1.5px dashed #FCD34D;border-radius:14px;padding:40px 20px;text-align:center;color:#92400E}
   .empty .ico{font-size:3rem;margin-bottom:10px}
@@ -348,10 +349,17 @@ function wireFilters(){
 // ============================================================
 // LOAD LIST
 // ============================================================
-// Single helper so the spinner state can't drift out of sync with render
+// Single helper. Uses CSS class (with !important) AND inline style — belt+suspenders.
 function setLoading(on){
   const el = document.getElementById('loadingState');
-  if (el) el.style.display = on ? '' : 'none';
+  if (!el) return;
+  if (on){
+    el.classList.remove('hidden');
+    el.style.display = '';
+  } else {
+    el.classList.add('hidden');
+    el.style.display = 'none';
+  }
 }
 
 async function loadList(){

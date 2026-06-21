@@ -154,6 +154,7 @@
   .shop-info-row span{display:inline-flex;align-items:center;gap:4px}
   .shop-info-row .lbl{color:#92400E;font-weight:800;opacity:.8}
   .shop-free-badge{display:inline-block;background:linear-gradient(135deg,#10B981,#059669);color:#fff;font-size:.62rem;font-weight:900;padding:2px 7px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase;float:right;margin-top:2px}
+  .shop-verified-badge{display:inline-block;background:linear-gradient(135deg,#1E40AF,#1E1B4B);color:#fff;font-size:.62rem;font-weight:900;padding:2px 8px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase;float:right;margin-top:2px;margin-right:5px;box-shadow:0 1px 3px rgba(30,27,75,.3)}
 
   /* Trust banner */
   .trust-banner{background:linear-gradient(135deg,#ECFDF5 0%,#FEF3C7 100%);border:2px dashed #10B981;border-radius:14px;padding:14px 16px;margin:0 0 18px 0;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
@@ -604,8 +605,13 @@ function shopCardHtml(s){
     ? '<span><span class="lbl">🏙</span> ' + esc(s.city_name) + '</span>'
     : '';
 
+  const verifiedBadge = s.is_verified_owner
+    ? '<span class="shop-verified-badge" title="Owner email verified — listing managed by owner">✓ Verified Owner</span>'
+    : '';
+
   return '<div class="shop-card" data-id="' + esc(s.id) + '" data-name="' + esc(s.name) + '">' +
            '<span class="shop-free-badge">✓ FREE</span>' +
+           verifiedBadge +
            '<div class="shop-cat-pill">' + esc(catLabel) + '</div>' +
            '<div class="shop-name">🏪 ' + esc(s.name) + '</div>' +
            (s.name_hi ? '<div class="shop-name-hi">' + esc(s.name_hi) + '</div>' : '') +
