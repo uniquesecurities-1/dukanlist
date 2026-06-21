@@ -196,11 +196,27 @@
 
       <div class="field">
         <label>🏷️ Category</label>
-        <input type="text" id="f_category_search" placeholder="🔍 Type karke search karo (CA, doctor, plumber...)" autocomplete="off" style="margin-bottom:8px">
-        <select id="f_category" size="1">
+        <input type="text" id="f_category_search" placeholder="🔍 Type karke search karo (CA, doctor, gas, plumber...)" autocomplete="off" style="margin-bottom:8px">
+
+        <!-- Selected category chip (shown after picking from chips below) -->
+        <div id="catSelectedChip" style="display:none;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border:2px solid #10B981;border-radius:11px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.5rem" id="catSelectedIcon">✓</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.7rem;font-weight:800;color:#065F46;text-transform:uppercase;letter-spacing:.04em">Selected</div>
+            <div style="font-size:.95rem;font-weight:800;color:#0F172A" id="catSelectedName">—</div>
+          </div>
+          <button type="button" onclick="clearSelectedCategory()" style="background:#fff;border:1.5px solid #10B981;color:#065F46;padding:6px 12px;border-radius:8px;font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit">✕ Change</button>
+        </div>
+
+        <!-- Clickable search results (chips) -->
+        <div id="catSearchResults" style="display:none;background:#fff;border:1.5px solid #E2E8F0;border-radius:11px;padding:8px;max-height:280px;overflow-y:auto"></div>
+
+        <!-- Fallback full dropdown (when no search active) -->
+        <select id="f_category" style="margin-top:8px">
           <option value="">— Loading categories... —</option>
         </select>
-        <div class="hint" id="catSearchHint">358+ categories available — search karke quickly choose karo</div>
+
+        <div class="hint" id="catSearchHint">Search karo OR neeche dropdown se choose karo</div>
       </div>
 
       <div class="field">
@@ -373,37 +389,77 @@ async function loadCategories(){
   }
 }
 
-// Render filtered category options. If filter matches multiple, expand
-// the select size to show 8 rows (acts like an instant inline list).
+// Render category options. Two-track display:
+//   • Top: clickable chip results (when search active) — bullet-proof
+//     click → select behaviour (works on desktop + mobile)
+//   • Bottom: normal <select> dropdown (full grouped list) as fallback
+// The select stays size=1 always — never multi-line listbox (those
+// are unreliable for click-to-select across browsers).
 function renderCategoryOptions(cats, query){
   const sel = document.getElementById('f_category');
   const hint = document.getElementById('catSearchHint');
+  const results = document.getElementById('catSearchResults');
   if (!sel) return;
 
-  if (!cats.length){
-    sel.innerHTML = '<option value="">No matches — type something else</option>';
-    if (hint) hint.textContent = '⚠️ "' + query + '" se kuch nahi mila — alag word try karo';
-    sel.size = 1;
-    return;
-  }
-
   if (query){
-    // Filtered — show as flat list, expanded size so admin sees options
-    sel.innerHTML = '<option value="">— Choose from ' + cats.length + ' matches —</option>' +
-      cats.slice(0, 50).map(c => {
-        const label = c.icon + ' ' + c.name + (c.parent_name ? ' — ' + c.parent_name : '');
-        return '<option value="' + escAttr(c.slug) + '">' + escAttr(label) + '</option>';
-      }).join('');
-    sel.size = Math.min(8, cats.length + 1);
-    if (hint) hint.textContent = '✓ ' + cats.length + ' matches for "' + query + '" — pick one';
+    // ===== SEARCH MODE — show clickable chips above =====
+    if (!cats.length){
+      results.innerHTML = '<div style="padding:14px;text-align:center;color:#94A3B8;font-size:.88rem;font-weight:600">😕 "' + esc(query) + '" se koi category nahi mili</div>';
+      results.style.display = 'block';
+      if (hint) hint.textContent = '⚠️ Alag word try karo — ya neeche dropdown se choose karo';
+      sel.style.display = 'none';
+      return;
+    }
+
+    // Show top 30 matches as CLICKABLE divs
+    results.innerHTML = cats.slice(0, 30).map(c => {
+      const parentTxt = c.parent_name ? ' <span style="color:#94A3B8;font-size:.7rem;font-weight:600">· ' + esc(c.parent_name) + '</span>' : '';
+      return '<button type="button" class="cat-result-chip" data-slug="' + esc(c.slug) + '" data-name="' + esc(c.name) + '" data-icon="' + esc(c.icon || '·') + '" ' +
+             'style="width:100%;text-align:left;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:9px;padding:10px 14px;margin-bottom:5px;cursor:pointer;font-family:inherit;font-size:.92rem;font-weight:700;color:#0F172A;transition:.12s;display:flex;align-items:center;gap:10px">' +
+             '<span style="font-size:1.2rem;flex-shrink:0">' + esc(c.icon || '·') + '</span>' +
+             '<div style="flex:1;min-width:0">' +
+               '<div>' + esc(c.name) + '</div>' +
+               '<div style="font-size:.7rem;color:#64748B;font-weight:600;margin-top:1px"><code style="background:#fff;padding:1px 5px;border-radius:3px;color:#1E3A8A">' + esc(c.slug) + '</code>' + parentTxt + '</div>' +
+             '</div>' +
+             '<span style="color:#10B981;font-size:1.1rem;font-weight:900">→</span>' +
+             '</button>';
+    }).join('');
+    results.style.display = 'block';
+    sel.style.display = 'none';
+
+    // Wire up clicks
+    results.querySelectorAll('.cat-result-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const slug = btn.getAttribute('data-slug');
+        const name = btn.getAttribute('data-name');
+        const icon = btn.getAttribute('data-icon');
+        selectCategory(slug, name, icon);
+      });
+      // Hover effect
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background = '#FEF3C7';
+        btn.style.borderColor = '#F59E0B';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.background = '#F8FAFC';
+        btn.style.borderColor = '#E2E8F0';
+      });
+    });
+
+    if (hint) hint.textContent = '✓ ' + cats.length + ' matches — kisi par bhi tap karo';
+
   } else {
-    // No query — grouped by parent (default state)
+    // ===== DEFAULT MODE — hide chips, show dropdown grouped =====
+    results.style.display = 'none';
+    results.innerHTML = '';
+    sel.style.display = '';
+
     const parents = cats.filter(c => !c.parent_id);
     const children = cats.filter(c => c.parent_id);
-    sel.innerHTML = '<option value="">— Type above to search, or pick here —</option>';
+    sel.innerHTML = '<option value="">— Choose category —</option>';
     parents.forEach(p => {
       const og = document.createElement('optgroup');
-      og.label = p.icon + ' ' + p.name;
+      og.label = (p.icon || '·') + ' ' + p.name;
       const opt = document.createElement('option');
       opt.value = p.slug;
       opt.textContent = '  ' + p.name + ' (general)';
@@ -412,14 +468,69 @@ function renderCategoryOptions(cats, query){
       kids.forEach(k => {
         const o = document.createElement('option');
         o.value = k.slug;
-        o.textContent = '  ' + k.icon + ' ' + k.name;
+        o.textContent = '  ' + (k.icon || '·') + ' ' + k.name;
         og.appendChild(o);
       });
       sel.appendChild(og);
     });
-    sel.size = 1;
-    if (hint) hint.textContent = ALL_CATEGORIES.length + '+ categories available — search karke quickly choose karo';
+    if (hint) hint.textContent = ALL_CATEGORIES.length + '+ categories — search karo ya dropdown se choose karo';
   }
+}
+
+// Helper: when a chip is clicked, show a selected confirmation and set the
+// hidden <select> value (form reads from #f_category.value at submit time).
+function selectCategory(slug, name, icon){
+  const sel = document.getElementById('f_category');
+  const chip = document.getElementById('catSelectedChip');
+  const chipName = document.getElementById('catSelectedName');
+  const chipIcon = document.getElementById('catSelectedIcon');
+  const results = document.getElementById('catSearchResults');
+  const searchInput = document.getElementById('f_category_search');
+  const hint = document.getElementById('catSearchHint');
+
+  // Set the underlying <select> value (form submission reads this)
+  // First ensure the option exists in the select; if not, add it.
+  let existingOpt = null;
+  for (let i = 0; i < sel.options.length; i++){
+    if (sel.options[i].value === slug){ existingOpt = sel.options[i]; break; }
+  }
+  if (!existingOpt){
+    // Add a hidden option for this slug so .value works reliably
+    const o = document.createElement('option');
+    o.value = slug;
+    o.textContent = (icon || '·') + ' ' + name;
+    sel.appendChild(o);
+  }
+  sel.value = slug;
+
+  // Show selected chip, hide search results
+  chip.style.display = 'flex';
+  chipName.textContent = name + '  (' + slug + ')';
+  chipIcon.textContent = icon || '✓';
+  results.style.display = 'none';
+  results.innerHTML = '';
+  sel.style.display = 'none';
+
+  // Clear search input
+  if (searchInput) searchInput.value = '';
+  if (hint) hint.textContent = '✓ Category selected — submit ke time yeh use hogi';
+
+  // Visual feedback — scroll to next field
+  setTimeout(() => {
+    const next = document.getElementById('cityChips');
+    if (next) next.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 300);
+}
+
+function clearSelectedCategory(){
+  const sel = document.getElementById('f_category');
+  const chip = document.getElementById('catSelectedChip');
+  const searchInput = document.getElementById('f_category_search');
+  sel.value = '';
+  chip.style.display = 'none';
+  sel.style.display = '';
+  if (searchInput) searchInput.focus();
+  renderCategoryOptions(ALL_CATEGORIES, '');
 }
 
 function escAttr(s){
@@ -476,17 +587,31 @@ function wireCategorySearch(){
     clearTimeout(timer);
     timer = setTimeout(() => filterCategories(e.target.value), 120);
   });
-  // Enter → select first match
+  // Enter → pick first chip if search results visible
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter'){
       e.preventDefault();
-      const sel = document.getElementById('f_category');
-      if (sel.options.length > 1){
-        sel.selectedIndex = 1;
-        sel.focus();
-      }
+      const firstChip = document.querySelector('#catSearchResults .cat-result-chip');
+      if (firstChip) firstChip.click();
     }
   });
+
+  // ALSO wire the fallback dropdown — when user picks from it directly,
+  // show the selected chip confirmation just like the search results do.
+  const sel = document.getElementById('f_category');
+  if (sel){
+    sel.addEventListener('change', () => {
+      const slug = sel.value;
+      if (!slug){
+        clearSelectedCategory();
+        return;
+      }
+      const cat = ALL_CATEGORIES.find(c => c.slug === slug);
+      if (cat){
+        selectCategory(cat.slug, cat.name, cat.icon || '·');
+      }
+    });
+  }
 }
 
 async function resolveCities(){
