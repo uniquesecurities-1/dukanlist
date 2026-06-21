@@ -143,6 +143,7 @@
   <nav>
     <a href="/admin/golden-pages-add.html">+ Add</a>
     <a href="/admin/golden-pages-manage.html" class="active">Manage</a>
+    <a href="/admin/owner-invites.html" style="background:#3B82F6;color:#fff">📧 Invites</a>
     <a href="/admin/dashboard.html">← Dashboard</a>
   </nav>
 </header>
@@ -347,8 +348,14 @@ function wireFilters(){
 // ============================================================
 // LOAD LIST
 // ============================================================
+// Single helper so the spinner state can't drift out of sync with render
+function setLoading(on){
+  const el = document.getElementById('loadingState');
+  if (el) el.style.display = on ? '' : 'none';
+}
+
 async function loadList(){
-  document.getElementById('loadingState').style.display = '';
+  setLoading(true);
   document.getElementById('listGrid').innerHTML = '';
   document.getElementById('pager').style.display = 'none';
 
@@ -374,16 +381,21 @@ async function loadList(){
       display = display.filter(r => (r.help_request_count || 0) > 0);
     }
 
-    document.getElementById('loadingState').style.display = 'none';
     renderList(display);
     renderPager();
   } catch(e){
-    document.getElementById('loadingState').style.display = 'none';
     document.getElementById('listGrid').innerHTML = '<div class="empty"><div class="ico">⚠️</div><h3>Could not load</h3><p>' + esc(e.message || 'Unknown') + '</p></div>';
+  } finally {
+    // Guaranteed hide — runs even if render throws, or RPC errors out
+    setLoading(false);
   }
 }
 
 function renderList(rows){
+  // Belt-and-suspenders: hide spinner whenever we're about to render anything.
+  // Protects against any future code path that forgets to hide it.
+  setLoading(false);
+
   document.getElementById('totalCount').textContent =
     TOTAL_COUNT === 0 ? 'No listings yet' :
     (TOTAL_COUNT === 1 ? '1 listing total' : TOTAL_COUNT + ' listings total');

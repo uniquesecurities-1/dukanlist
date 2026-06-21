@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="robots" content="noindex,nofollow">
+<title>Owner Invites — DukanList Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📧</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Manrope',sans-serif;background:#F8FAFC;color:#0F172A;min-height:100vh;padding-bottom:60px}
+
+  .topbar{background:linear-gradient(135deg,#1E1B4B,#1E3A8A);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.12);flex-wrap:wrap;gap:10px}
+  .topbar .brand{font-weight:900;font-size:1rem;display:flex;align-items:center;gap:8px}
+  .topbar .badge{background:#3B82F6;color:#fff;font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.04em}
+  .topbar nav{display:flex;gap:8px;flex-wrap:wrap}
+  .topbar nav a{background:rgba(255,255,255,.1);color:#cbd5e1;text-decoration:none;padding:6px 11px;border-radius:7px;font-size:.78rem;font-weight:800}
+  .topbar nav a:hover{background:rgba(255,255,255,.18);color:#fff}
+  .topbar nav a.active{background:#3B82F6;color:#fff}
+
+  .container{max-width:1100px;margin:0 auto;padding:16px}
+
+  .hero{background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;padding:20px 18px;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 14px rgba(30,58,138,.18)}
+  .hero h1{font-size:1.4rem;font-weight:900;margin-bottom:4px;letter-spacing:-.01em}
+  .hero p{font-size:.88rem;opacity:.92;line-height:1.45;font-weight:600}
+
+  .filters{background:#fff;border-radius:14px;padding:14px;border:1px solid #E2E8F0;margin-bottom:14px;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+  .filters-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+  .filters input, .filters select{padding:9px 12px;border:1.5px solid #CBD5E1;border-radius:9px;font-family:inherit;font-size:.88rem;background:#fff;color:#0F172A;outline:0;min-width:120px}
+  .filters input:focus, .filters select:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+  .filters .search-input{flex:1;min-width:200px}
+  .filter-chip{background:#F1F5F9;border:1.5px solid #CBD5E1;color:#475569;padding:7px 13px;border-radius:99px;font-size:.78rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+  .filter-chip:hover{background:#E2E8F0}
+  .filter-chip.active{background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;border-color:transparent}
+
+  .count-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 4px;flex-wrap:wrap;gap:8px}
+  .count-bar .total{font-size:.92rem;color:#1E3A8A;font-weight:800}
+
+  .list-grid{display:grid;gap:8px}
+  .row{background:#fff;border:1px solid #E2E8F0;border-radius:11px;padding:14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;transition:.12s}
+  .row:hover{border-color:#3B82F6;box-shadow:0 4px 12px rgba(59,130,246,.1)}
+
+  .row-info{min-width:0}
+  .row-name{font-size:1rem;font-weight:800;color:#0F172A;margin-bottom:4px;letter-spacing:-.01em}
+  .row-name .hindi{font-weight:600;color:#475569;font-size:.85rem;margin-left:6px}
+  .row-meta{font-size:.78rem;color:#475569;font-weight:600;margin-bottom:6px;line-height:1.5}
+  .row-meta .sep{color:#CBD5E1;margin:0 4px}
+  .row-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+  .row-badge{font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+  .badge-ok{background:#D1FAE5;color:#065F46}
+  .badge-mid{background:#FEF3C7;color:#92400E}
+  .badge-warn{background:#FEE2E2;color:#991B1B}
+  .badge-info{background:#DBEAFE;color:#1E3A8A}
+  .badge-gold{background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff}
+  .badge-blue{background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff}
+
+  .row-actions{display:flex;gap:5px;flex-direction:column;align-items:stretch;min-width:150px}
+  .btn{border:0;padding:8px 14px;border-radius:8px;font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:.12s;line-height:1.2;white-space:nowrap}
+  .btn-invite{background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;box-shadow:0 2px 6px rgba(30,58,138,.25)}
+  .btn-invite:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(30,58,138,.35)}
+  .btn-resend{background:#EEF2FF;color:#3730A3;border:1px solid #C7D2FE}
+  .btn-resend:hover{background:#E0E7FF}
+  .btn-link{background:#fff;color:#475569;border:1px solid #CBD5E1;font-size:.7rem;padding:5px 10px}
+  .btn-link:hover{background:#F1F5F9}
+
+  .pager{display:flex;justify-content:center;align-items:center;gap:12px;margin:18px 0 4px;font-size:.85rem;color:#475569;font-weight:700}
+  .pager button{background:#fff;border:1px solid #CBD5E1;padding:7px 14px;border-radius:8px;font-family:inherit;font-weight:800;color:#1E3A8A;cursor:pointer;font-size:.82rem}
+  .pager button:disabled{opacity:.4;cursor:not-allowed}
+
+  .empty{background:#fff;border:1.5px dashed #CBD5E1;border-radius:13px;padding:30px;text-align:center;color:#475569}
+  .empty .emoji{font-size:2.4rem;margin-bottom:10px}
+  .empty h3{font-size:1rem;font-weight:900;color:#1E3A8A;margin-bottom:5px}
+  .empty p{font-size:.82rem;font-weight:600;line-height:1.5}
+
+  /* Modal */
+  .modal-bd{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .modal-bd.show{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:480px;width:100%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+  .modal h3{font-size:1.15rem;font-weight:900;color:#0F172A;margin-bottom:4px;letter-spacing:-.01em}
+  .modal .sub{font-size:.84rem;color:#64748B;font-weight:600;margin-bottom:14px;line-height:1.5}
+  .modal label{display:block;font-size:.72rem;font-weight:900;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;margin-top:10px}
+  .modal input{width:100%;padding:11px 13px;border:1.5px solid #CBD5E1;border-radius:10px;font-family:inherit;font-size:.94rem;outline:0;color:#0F172A}
+  .modal input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+  .modal .info-box{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:11px 13px;margin:10px 0;font-size:.8rem;color:#3730A3;font-weight:600;line-height:1.5}
+  .modal .biz-preview{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:11px 13px;margin-bottom:12px}
+  .modal .biz-preview b{display:block;font-size:.95rem;color:#0F172A;margin-bottom:3px}
+  .modal .biz-preview span{font-size:.78rem;color:#64748B;font-weight:600}
+  .modal-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:14px}
+  .modal-actions .btn-cancel{background:#F1F5F9;color:#475569;padding:11px;border-radius:10px;font-weight:800;font-family:inherit;cursor:pointer;border:0}
+  .modal-actions .btn-send{background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;padding:11px;border-radius:10px;font-weight:800;font-family:inherit;cursor:pointer;border:0;box-shadow:0 4px 12px rgba(59,130,246,.3)}
+  .modal-actions .btn-send:disabled{opacity:.6;cursor:wait}
+
+  /* Toast */
+  .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-10px);background:#10B981;color:#fff;padding:11px 18px;border-radius:99px;font-weight:800;font-size:.88rem;z-index:300;box-shadow:0 8px 24px rgba(16,185,129,.4);opacity:0;transition:.25s;max-width:90%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:#EF4444;box-shadow:0 8px 24px rgba(239,68,68,.4)}
+
+  .loading{text-align:center;padding:40px;color:#3B82F6}
+  .loading .sp{display:inline-block;width:32px;height:32px;border:3px solid #DBEAFE;border-top-color:#3B82F6;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media (max-width:560px){
+    .row{grid-template-columns:1fr}
+    .row-actions{flex-direction:row;flex-wrap:wrap;min-width:0;padding-top:8px;border-top:1px dashed #E2E8F0}
+    .row-actions .btn{flex:1;min-width:0;padding:7px 8px;font-size:.74rem}
+    .modal-actions{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">📧 Owner Invites <span class="badge">ADMIN</span></div>
+  <nav>
+    <a href="/admin/dashboard.html">← Dashboard</a>
+    <a href="/admin/golden-pages-add.html">+ Add Listing</a>
+    <a href="/admin/golden-pages-manage.html">📋 Manage GP</a>
+    <a href="/admin/owner-invites.html" class="active">📧 Invites</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>📧 Send Email Invites</h1>
+    <p>Find any account-less listing and email a magic link to the owner. They verify by clicking — then they can login and manage the listing.</p>
+  </div>
+
+  <div class="filters">
+    <div class="filters-row">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by name, owner, area or mobile..." autocomplete="off">
+      <select id="cityFilter"><option value="">All cities</option></select>
+    </div>
+    <div class="filters-row" style="margin-top:8px">
+      <button class="filter-chip active" data-status="">📋 All</button>
+      <button class="filter-chip" data-status="active">🏪 Main DukanList</button>
+      <button class="filter-chip" data-status="soft_listed">🥇 Golden Pages</button>
+    </div>
+  </div>
+
+  <div class="count-bar">
+    <div class="total" id="totalCount">Loading…</div>
+  </div>
+
+  <div id="listing">
+    <div class="loading"><div class="sp"></div><div>Loading account-less listings…</div></div>
+  </div>
+
+  <div class="pager" id="pager" style="display:none">
+    <button id="prevPage">← Prev</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="nextPage">Next →</button>
+  </div>
+
+</div>
+
+<!-- Invite modal -->
+<div class="modal-bd" id="inviteBd" onclick="if(event.target===this)closeInvite()">
+  <div class="modal">
+    <h3 id="inviteTitle">📧 Send Owner Email Invite</h3>
+    <p class="sub">An email with a magic-link will be sent. Owner clicks it → account auto-verified → listing linked to them.</p>
+
+    <div class="biz-preview" id="bizPreview"></div>
+
+    <label>Owner email address *</label>
+    <input type="email" id="inviteEmail" placeholder="owner@example.com" autocomplete="email">
+
+    <div class="info-box">
+      💡 The owner will receive: <b>"Click here to verify and claim your shop listing on DukanList."</b><br>
+      Their email is verified the moment they click. No password needed at first — they can set one later.
+    </div>
+
+    <label>Notes (optional, admin-only)</label>
+    <input type="text" id="inviteNotes" placeholder="Got their email via WhatsApp on 21-Jun">
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeInvite()">Cancel</button>
+      <button class="btn-send" id="sendBtn" onclick="sendInvite()">📤 Send Email Invite</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script>
+'use strict';
+
+const C = (window.ShopDB && window.ShopDB.client) || null;
+const PER_PAGE = 25;
+let CURRENT_PAGE = 0;
+let CURRENT_STATUS = '';      // '' = both
+let CURRENT_SEARCH = '';
+let CURRENT_CITY_ID = null;
+let TOTAL_COUNT = 0;
+let CURRENT_BIZ = null;       // selected business for invite modal
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function fmt(ts){ if(!ts)return''; try{const d=new Date(ts); const diff=Date.now()-d.getTime(); const m=Math.floor(diff/60000); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago';}catch(e){return''}}
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '');
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+async function init(){
+  if (!C){
+    document.getElementById('listing').innerHTML = '<div class="empty"><div class="emoji">⚠️</div><h3>Supabase not loaded</h3><p>Refresh the page.</p></div>';
+    return;
+  }
+  await Promise.all([loadCities(), load()]);
+
+  // wire filters
+  document.querySelectorAll('.filter-chip').forEach(ch => {
+    ch.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
+      ch.classList.add('active');
+      CURRENT_STATUS = ch.dataset.status;
+      CURRENT_PAGE = 0;
+      load();
+    });
+  });
+
+  // debounced search
+  let searchTimer;
+  document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      CURRENT_SEARCH = e.target.value.trim();
+      CURRENT_PAGE = 0;
+      load();
+    }, 350);
+  });
+
+  document.getElementById('cityFilter').addEventListener('change', e => {
+    CURRENT_CITY_ID = e.target.value ? parseInt(e.target.value, 10) : null;
+    CURRENT_PAGE = 0;
+    load();
+  });
+
+  document.getElementById('prevPage').addEventListener('click', () => {
+    if (CURRENT_PAGE > 0){ CURRENT_PAGE--; load(); }
+  });
+  document.getElementById('nextPage').addEventListener('click', () => {
+    if ((CURRENT_PAGE + 1) * PER_PAGE < TOTAL_COUNT){ CURRENT_PAGE++; load(); }
+  });
+}
+
+async function loadCities(){
+  try {
+    const { data } = await C.from('geo_cities').select('id, name').eq('active', true).order('name');
+    const sel = document.getElementById('cityFilter');
+    (data || []).forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      sel.appendChild(o);
+    });
+  } catch(e){ console.warn('city load failed', e); }
+}
+
+async function load(){
+  document.getElementById('listing').innerHTML = '<div class="loading"><div class="sp"></div><div>Loading…</div></div>';
+  document.getElementById('pager').style.display = 'none';
+
+  try {
+    const { data, error } = await C.rpc('admin_unclaimed_list', {
+      p_search:        CURRENT_SEARCH || null,
+      p_status_filter: CURRENT_STATUS || null,
+      p_city_id:       CURRENT_CITY_ID,
+      p_limit:         PER_PAGE,
+      p_offset:        CURRENT_PAGE * PER_PAGE
+    });
+    if (error) throw error;
+
+    TOTAL_COUNT = (data && data.length) ? Number(data[0].total_count || 0) : 0;
+    render(data || []);
+  } catch(e){
+    console.error(e);
+    document.getElementById('listing').innerHTML =
+      '<div class="empty"><div class="emoji">⚠️</div><h3>Load failed</h3><p>' + esc(e.message || 'Unknown') + '</p></div>';
+  }
+}
+
+function statusBadge(row){
+  if (row.status === 'active') return '<span class="row-badge badge-blue">🏪 DukanList</span>';
+  if (row.status === 'soft_listed') return '<span class="row-badge badge-gold">🥇 Golden Pages</span>';
+  return '<span class="row-badge badge-mid">' + esc(row.status) + '</span>';
+}
+
+function inviteStatusBadge(row){
+  if (row.invite_count > 0){
+    return '<span class="row-badge badge-info">📧 ' + row.invite_count + ' invite' + (row.invite_count > 1 ? 's' : '') + ' sent</span>';
+  }
+  return '<span class="row-badge badge-warn">📭 Never invited</span>';
+}
+
+function render(rows){
+  document.getElementById('totalCount').textContent =
+    TOTAL_COUNT.toLocaleString() + ' account-less listing' + (TOTAL_COUNT === 1 ? '' : 's');
+
+  if (!rows.length){
+    document.getElementById('listing').innerHTML =
+      '<div class="empty"><div class="emoji">📭</div><h3>No account-less listings</h3><p>' +
+      (CURRENT_SEARCH || CURRENT_STATUS || CURRENT_CITY_ID ? 'Try clearing filters.' : 'All listings have owners — or none have been bulk-added yet.') +
+      '</p></div>';
+    return;
+  }
+
+  const html = '<div class="list-grid">' + rows.map(r => {
+    const lastInvite = r.last_invite_at
+      ? '<div class="row-meta" style="font-size:.74rem;margin-top:6px;color:#3730A3;background:#EEF2FF;padding:5px 9px;border-radius:7px;display:inline-block">📨 Last sent to <b>' + esc(r.last_invite_to || '?') + '</b> · ' + esc(fmt(r.last_invite_at)) + '</div>'
+      : '';
+
+    return '<div class="row" data-id="' + esc(r.id) + '">' +
+      '<div class="row-info">' +
+        '<div class="row-name">' + esc(r.name) +
+          (r.name_hi ? '<span class="hindi">· ' + esc(r.name_hi) + '</span>' : '') +
+        '</div>' +
+        '<div class="row-meta">' +
+          (r.category_icon || '·') + ' ' + esc(r.category_name || 'No category') +
+          (r.city_name ? '<span class="sep">·</span>' + esc(r.city_name) : '') +
+          (r.area ? '<span class="sep">·</span>' + esc(r.area) : '') +
+          '<span class="sep">·</span>' + esc(fmt(r.pre_listed_at) || '—') +
+        '</div>' +
+        (r.owner_name || r.mobile
+          ? '<div class="row-meta">' +
+              (r.owner_name ? '👤 ' + esc(r.owner_name) : '') +
+              (r.owner_name && r.mobile ? '<span class="sep">·</span>' : '') +
+              (r.mobile ? '📞 ' + esc(r.mobile) : '') +
+            '</div>'
+          : '') +
+        '<div class="row-badges">' +
+          statusBadge(r) +
+          inviteStatusBadge(r) +
+        '</div>' +
+        lastInvite +
+      '</div>' +
+      '<div class="row-actions">' +
+        '<button class="btn ' + (r.invite_count > 0 ? 'btn-resend' : 'btn-invite') + '" data-act="invite" data-id="' + esc(r.id) + '">' +
+          (r.invite_count > 0 ? '📧 Resend Invite' : '📧 Send Invite') +
+        '</button>' +
+        '<a class="btn btn-link" target="_blank" rel="noopener" href="/claim.html?token=' + esc(r.claim_token || '') + '">🔗 Open claim link</a>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+
+  document.getElementById('listing').innerHTML = html;
+
+  // wire row buttons
+  document.querySelectorAll('button[data-act="invite"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const row = rows.find(x => x.id === id);
+      if (row) openInvite(row);
+    });
+  });
+
+  // pagination
+  const totalPages = Math.ceil(TOTAL_COUNT / PER_PAGE);
+  if (totalPages > 1){
+    document.getElementById('pager').style.display = 'flex';
+    document.getElementById('pageInfo').textContent = 'Page ' + (CURRENT_PAGE + 1) + ' of ' + totalPages;
+    document.getElementById('prevPage').disabled = CURRENT_PAGE === 0;
+    document.getElementById('nextPage').disabled = CURRENT_PAGE + 1 >= totalPages;
+  }
+}
+
+function openInvite(biz){
+  CURRENT_BIZ = biz;
+  document.getElementById('bizPreview').innerHTML =
+    '<b>🏪 ' + esc(biz.name) + '</b>' +
+    '<span>' + esc(biz.category_name || '') +
+    (biz.city_name ? ' · ' + esc(biz.city_name) : '') +
+    (biz.area ? ' · ' + esc(biz.area) : '') + '</span>';
+  document.getElementById('inviteEmail').value = '';
+  document.getElementById('inviteNotes').value = '';
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('sendBtn').innerHTML = '📤 Send Email Invite';
+  document.getElementById('inviteBd').classList.add('show');
+  setTimeout(() => document.getElementById('inviteEmail').focus(), 200);
+}
+
+function closeInvite(){
+  document.getElementById('inviteBd').classList.remove('show');
+  CURRENT_BIZ = null;
+}
+
+async function sendInvite(){
+  if (!CURRENT_BIZ) return;
+  const email = document.getElementById('inviteEmail').value.trim().toLowerCase();
+  const notes = document.getElementById('inviteNotes').value.trim();
+  if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email)){
+    return showToast('Invalid email format', true);
+  }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Sending…';
+
+  try {
+    // STEP 1: Log the invite in our audit table (also bumps claim_status to pending)
+    const { data: logData, error: logErr } = await C.rpc('admin_log_email_invite', {
+      p_business_id: CURRENT_BIZ.id,
+      p_email:       email,
+      p_notes:       notes || null,
+      p_sent_via:    'magic-link'
+    });
+    if (logErr) throw logErr;
+
+    // STEP 2: Trigger the magic-link via Supabase auth. It will create
+    // the auth user on first click, mark email as verified, and redirect
+    // to /claim.html where the existing claim_register_owner RPC links
+    // the business to this new auth user.
+    const claimUrl = logData.claim_url || ('https://dukanlist.com/claim.html?token=' + CURRENT_BIZ.claim_token);
+
+    const { error: otpErr } = await C.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: claimUrl,
+        shouldCreateUser: true
+      }
+    });
+    if (otpErr) throw otpErr;
+
+    showToast('✓ Email invite sent to ' + email);
+    closeInvite();
+    setTimeout(load, 500);  // refresh list to show updated invite count
+  } catch(e){
+    console.error(e);
+    showToast('Failed: ' + (e.message || 'Unknown'), true);
+    btn.disabled = false;
+    btn.innerHTML = '📤 Send Email Invite';
+  }
+}
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeInvite();
+});
+
+init();
+</script>
+</body>
+</html>
