@@ -28,6 +28,15 @@
   }
   .nav a:hover{background:rgba(255,255,255,0.1);color:white}
   .nav a.active{background:#1E3A8A;color:white}
+  .nav a.nav-golden{
+    background:linear-gradient(135deg,#fbbf24,#f59e0b);
+    color:#7c2d12;font-weight:800;
+    box-shadow:0 2px 8px rgba(251,191,36,0.35);
+  }
+  .nav a.nav-golden:hover{
+    background:linear-gradient(135deg,#fcd34d,#fbbf24);
+    color:#7c2d12;transform:translateY(-1px);
+  }
   .logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:6px}
   .logout:hover{background:rgba(255,255,255,0.1);color:white}
 
@@ -187,6 +196,7 @@
     <a href="/admin/duplicates.html">🔍 Duplicates</a>
     <a href="/admin/monitoring.html">📡 Monitoring</a>
     <a href="/admin/pucho-moderation.html">💬 Pucho Bhai</a>
+    <a href="/admin/golden-pages-manage.html" class="nav-golden">🥇 Golden Pages</a>
     <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
     <a href="/admin/test-cleanup" id="navCleanup" style="display:none">🧹 Cleanup</a>
     <a href="/" target="_blank">🌐 Public Site</a>
