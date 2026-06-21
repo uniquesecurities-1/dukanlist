@@ -166,40 +166,62 @@
       <button class="btn-sec" onclick="resetSingleForm()">+ Add another shop</button>
     </div>
 
+    <!-- Recently added (last 2 hours, by anyone) -->
+    <div id="recentPanel" style="display:none;background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:11px;padding:10px 12px;margin-bottom:14px">
+      <div style="font-size:.72rem;font-weight:800;color:#78350F;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">⏱ Recently added (last 2 hours)</div>
+      <div id="recentList" style="font-size:.82rem;color:#0F172A;line-height:1.6"></div>
+    </div>
+
     <div class="card" id="singleForm">
+
       <div class="field">
-        <label>🏪 Shop Name *</label>
-        <input type="text" id="f_name" placeholder="Sharma Brothers Aadti" autocomplete="off">
+        <label>🏢 Name *</label>
+        <input type="text" id="f_name" placeholder="e.g. Millennium School, Sharma Sweets, Dr Sachdeva Clinic" autocomplete="off">
+        <div class="hint">Shop, clinic, school, organisation — anything in town.</div>
       </div>
 
       <div class="field">
-        <label>🏷️ Category *</label>
-        <input type="text" id="f_cat_search" placeholder="🔍 Search: gas, doctor, aadti, sweet..." autocomplete="off">
-        <div id="catSelected" class="cat-selected" style="display:none;margin-top:6px">
-          <span class="ico" id="catSelIcon">·</span>
-          <div class="name" id="catSelName">—</div>
-          <button type="button" onclick="clearCat()">✕ Change</button>
-        </div>
+        <label>🌐 Name in Hindi <span class="opt">(optional)</span></label>
+        <input type="text" id="f_name_hi" placeholder="मिलेनियम स्कूल" autocomplete="off">
+        <div class="hint">If the signboard uses Hindi / vernacular script.</div>
+      </div>
+
+      <div class="field">
+        <label>🏷️ Categories * <span class="opt">(up to 5 — first one is primary ⭐)</span></label>
+        <input type="text" id="f_cat_search" placeholder="🔍 Search and add (gas, doctor, school, sweet...)" autocomplete="off">
+
+        <!-- Selected categories chips -->
+        <div id="catSelectedList" style="display:none;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1.5px solid #D97706;border-radius:11px;padding:10px;margin-top:8px"></div>
+
+        <!-- Search results -->
         <div id="catResults" class="cat-results"></div>
       </div>
 
       <div class="field">
-        <label>📍 Area / Landmark <span class="opt">(optional but recommended)</span></label>
-        <input type="text" id="f_area" placeholder="Main Mandi, near bus stand" autocomplete="off">
+        <label>🏙 City *</label>
+        <div id="cityChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"></div>
       </div>
 
       <div class="field">
-        <label>📱 Mobile <span class="opt">(optional — if reference se pata ho)</span></label>
-        <input type="tel" id="f_mobile" placeholder="98XXXXXXXX" inputmode="numeric" maxlength="10">
-        <div class="hint">Optional. Agar pata ho to add karo — claim flow easier hota hai.</div>
+        <label>📍 Area / Landmark <span class="opt">(optional but recommended)</span></label>
+        <input type="text" id="f_area" placeholder="Malout Road, near Bus Stand" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>📱 Mobile <span class="opt">(optional)</span></label>
+        <input type="tel" id="f_mobile" placeholder="10-digit Indian number" inputmode="numeric" maxlength="10">
+        <div class="hint">If you have it, add now — owners can claim faster later.</div>
       </div>
 
       <div class="field">
         <label>📌 Reference / Source <span class="opt">(notes)</span></label>
-        <input type="text" id="f_source" placeholder="Rajesh ji ne bataya / Vyapar Mandal list" autocomplete="off">
+        <input type="text" id="f_source" placeholder="Recommended by Rajesh ji / Vyapar Mandal list / personal visit" autocomplete="off">
       </div>
 
-      <button class="btn-pri" id="singleSubmit" onclick="submitSingle()">🥇 Add to Golden Pages</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-sec" id="singleSubmitAndNext" onclick="submitSingle(true)">+ Save &amp; Add Another</button>
+        <button class="btn-pri" id="singleSubmit" onclick="submitSingle(false)">🥇 Add to Golden Pages</button>
+      </div>
     </div>
   </div>
 
@@ -215,7 +237,7 @@
 
     <div class="card">
       <div class="field">
-        <label>🏷️ Category (sab shops ke liye same) *</label>
+        <label>🏷️ Category <span class="opt">(same for all)</span> *</label>
         <input type="text" id="b_cat_search" placeholder="🔍 Search: gas, doctor, aadti, sweet..." autocomplete="off">
         <div id="bCatSelected" class="cat-selected" style="display:none;margin-top:6px">
           <span class="ico" id="bCatSelIcon">·</span>
@@ -226,7 +248,12 @@
       </div>
 
       <div class="field">
-        <label>📍 Area / Landmark (same for all)</label>
+        <label>🏙 City <span class="opt">(same for all)</span> *</label>
+        <div id="bCityChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"></div>
+      </div>
+
+      <div class="field">
+        <label>📍 Area / Landmark <span class="opt">(same for all)</span></label>
         <input type="text" id="b_area" placeholder="Main Mandi" autocomplete="off">
       </div>
 
@@ -257,8 +284,20 @@
 
 let C;
 let ALL_CATEGORIES = [];
-let SELECTED_CAT = null;       // {slug, name, icon}
-let SELECTED_BCAT = null;      // bulk's category
+let SELECTED_CATS = [];         // multi-cat array for single add
+let SELECTED_BCAT = null;       // bulk still single-cat (one category for whole batch)
+let CITY_LIST = [];             // [{id,name,slug}]
+let SELECTED_CITY_ID = null;
+let SELECTED_BCITY_ID = null;
+const MAX_CATS = 5;
+
+const DEFAULT_CITIES = [
+  { slug:'mandi-dabwali', name:'Mandi Dabwali' },
+  { slug:'sirsa',         name:'Sirsa' },
+  { slug:'bathinda',      name:'Bathinda' },
+  { slug:'mansa',         name:'Mansa' },
+  { slug:'muktsar',       name:'Muktsar' }
+];
 
 // ============================================================
 // INIT
@@ -270,8 +309,14 @@ async function init(){
 
   await refreshStats();
   await loadCategories();
+  await loadCities();
+  renderCityChips('cityChips', id => SELECTED_CITY_ID = id);
+  renderCityChips('bCityChips', id => SELECTED_BCITY_ID = id);
+
   wireTabs();
-  wireCatSearch('f_cat_search', 'catResults', 'catSelected', 'catSelIcon', 'catSelName', s => SELECTED_CAT = s);
+  // Multi-cat picker for single add (separate handler)
+  wireMultiCatSearch();
+  // Bulk picker stays single-cat — one category per batch
   wireCatSearch('b_cat_search', 'bCatResults', 'bCatSelected', 'bCatSelIcon', 'bCatSelName', s => SELECTED_BCAT = s);
 
   // Live count of names pasted
@@ -279,6 +324,55 @@ async function init(){
   ta.addEventListener('input', () => {
     const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
     document.getElementById('b_count').textContent = lines.length + ' names ready';
+  });
+
+  // Load recently added panel
+  loadRecentList();
+}
+
+async function loadCities(){
+  try {
+    const { data } = await C.from('geo_cities').select('id, name, slug').eq('active', true).limit(50);
+    CITY_LIST = data || [];
+  } catch(_){ CITY_LIST = []; }
+}
+
+function renderCityChips(targetId, onPick){
+  const host = document.getElementById(targetId);
+  if (!host) return;
+  host.innerHTML = '';
+  let pickedDefault = false;
+  DEFAULT_CITIES.forEach((dc, i) => {
+    const dbCity = CITY_LIST.find(c => (c.slug === dc.slug) || (c.name || '').toLowerCase() === dc.name.toLowerCase());
+    if (!dbCity) return;
+    const isFirst = !pickedDefault;
+    if (isFirst){
+      pickedDefault = true;
+      onPick(dbCity.id);
+    }
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'city-chip' + (isFirst ? ' active' : '');
+    chip.setAttribute('data-cid', dbCity.id);
+    chip.textContent = dc.name;
+    chip.style.cssText = 'background:' + (isFirst ? 'linear-gradient(135deg,#D97706,#92400E)' : '#FFFBEB') +
+                        ';color:' + (isFirst ? '#fff' : '#78350F') +
+                        ';border:1.5px solid ' + (isFirst ? 'transparent' : '#FCD34D') +
+                        ';padding:7px 13px;border-radius:99px;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;transition:.15s';
+    chip.addEventListener('click', () => {
+      host.querySelectorAll('.city-chip').forEach(c => {
+        c.classList.remove('active');
+        c.style.background = '#FFFBEB';
+        c.style.color = '#78350F';
+        c.style.borderColor = '#FCD34D';
+      });
+      chip.classList.add('active');
+      chip.style.background = 'linear-gradient(135deg,#D97706,#92400E)';
+      chip.style.color = '#fff';
+      chip.style.borderColor = 'transparent';
+      onPick(parseInt(chip.getAttribute('data-cid'), 10));
+    });
+    host.appendChild(chip);
   });
 }
 
@@ -403,11 +497,114 @@ function wireCatSearch(inputId, resultsId, selectedDivId, selIconId, selNameId, 
   });
 }
 
-function clearCat(){
-  SELECTED_CAT = null;
-  document.getElementById('catSelected').style.display = 'none';
-  document.getElementById('f_cat_search').focus();
+// ============================================================
+// MULTI-CATEGORY PICKER (single-add form)
+// ============================================================
+function wireMultiCatSearch(){
+  const input = document.getElementById('f_cat_search');
+  const results = document.getElementById('catResults');
+  if (!input || !results) return;
+  let timer = null;
+  input.addEventListener('input', e => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const q = e.target.value.trim();
+      if (!q){ results.classList.remove('show'); results.innerHTML = ''; return; }
+      const matches = filterCats(q);
+      if (!matches.length){
+        results.innerHTML = '<div style="padding:14px;text-align:center;color:#92400E;font-weight:700;font-size:.85rem">"' + esc(q) + '" — no matches</div>';
+        results.classList.add('show');
+        return;
+      }
+      results.innerHTML = matches.map(c => {
+        return '<button type="button" class="cat-result-chip" data-slug="' + esc(c.slug) + '" data-name="' + esc(c.name) + '" data-icon="' + esc(c.icon) + '">' +
+                 '<span class="ico">' + esc(c.icon) + '</span>' +
+                 '<div class="text">' +
+                   '<div>' + esc(c.name) + '</div>' +
+                   '<span class="slug-code">' + esc(c.slug) + '</span>' +
+                 '</div>' +
+                 '<span class="arrow">+</span>' +
+               '</button>';
+      }).join('');
+      results.classList.add('show');
+      results.querySelectorAll('.cat-result-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          addCategoryToSelection(
+            btn.getAttribute('data-slug'),
+            btn.getAttribute('data-name'),
+            btn.getAttribute('data-icon')
+          );
+          results.classList.remove('show');
+          input.value = '';
+          input.focus();
+        });
+      });
+    }, 120);
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      const first = results.querySelector('.cat-result-chip');
+      if (first) first.click();
+    }
+  });
 }
+
+function addCategoryToSelection(slug, name, icon){
+  if (SELECTED_CATS.some(c => c.slug === slug)) return;  // already added
+  if (SELECTED_CATS.length >= MAX_CATS){
+    alert('Maximum ' + MAX_CATS + ' categories allowed per listing.');
+    return;
+  }
+  SELECTED_CATS.push({ slug, name, icon: icon || '·' });
+  renderSelectedCats();
+}
+
+function renderSelectedCats(){
+  const host = document.getElementById('catSelectedList');
+  if (!host) return;
+  if (!SELECTED_CATS.length){
+    host.style.display = 'none';
+    host.innerHTML = '';
+    return;
+  }
+  host.style.display = 'block';
+  let html = '<div style="font-size:.7rem;font-weight:800;color:#78350F;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Selected (' + SELECTED_CATS.length + '/' + MAX_CATS + ') — ⭐ primary, click to change</div>';
+  html += SELECTED_CATS.map((c, i) => {
+    const isPrimary = (i === 0);
+    const bg = isPrimary ? 'linear-gradient(135deg,#FEF3C7,#FDE68A)' : '#fff';
+    const border = isPrimary ? '#F59E0B' : '#FCD34D';
+    const star = isPrimary ? '⭐ ' : '';
+    return '<div style="display:flex;align-items:center;gap:8px;background:' + bg + ';border:1.5px solid ' + border + ';border-radius:9px;padding:8px 12px;margin-bottom:6px;cursor:pointer" onclick="promoteCatToPrimary(\'' + esc(c.slug) + '\')">' +
+             '<span style="font-size:1.2rem;flex-shrink:0">' + esc(c.icon) + '</span>' +
+             '<div style="flex:1;min-width:0">' +
+               '<div style="font-size:.9rem;font-weight:800;color:#0F172A">' + star + esc(c.name) + '</div>' +
+               '<div style="font-size:.68rem;color:#78350F;font-family:monospace;margin-top:1px">' + esc(c.slug) + '</div>' +
+             '</div>' +
+             '<button type="button" onclick="event.stopPropagation();removeCatFromSelection(\'' + esc(c.slug) + '\')" style="background:#fff;border:1.5px solid #DC2626;color:#DC2626;width:26px;height:26px;border-radius:50%;font-weight:900;cursor:pointer;font-family:inherit;font-size:.92rem;line-height:1;flex-shrink:0">×</button>' +
+           '</div>';
+  }).join('');
+  host.innerHTML = html;
+}
+
+function promoteCatToPrimary(slug){
+  const idx = SELECTED_CATS.findIndex(c => c.slug === slug);
+  if (idx <= 0) return;
+  const item = SELECTED_CATS.splice(idx, 1)[0];
+  SELECTED_CATS.unshift(item);
+  renderSelectedCats();
+}
+
+function removeCatFromSelection(slug){
+  SELECTED_CATS = SELECTED_CATS.filter(c => c.slug !== slug);
+  renderSelectedCats();
+}
+
+function clearAllCats(){
+  SELECTED_CATS = [];
+  renderSelectedCats();
+}
+
 function clearBCat(){
   SELECTED_BCAT = null;
   document.getElementById('bCatSelected').style.display = 'none';
@@ -415,47 +612,109 @@ function clearBCat(){
 }
 
 // ============================================================
-// SINGLE ADD
+// SINGLE ADD — multi-cat + city + Hindi name
 // ============================================================
-async function submitSingle(){
+async function submitSingle(saveAndNext){
   const errEl = document.getElementById('singleErr');
   errEl.classList.remove('show');
 
   const name = document.getElementById('f_name').value.trim();
-  if (name.length < 2) return showSingleErr('Shop name required');
-  if (!SELECTED_CAT) return showSingleErr('Pick a category from search');
+  if (name.length < 2) return showSingleErr('Name required (min 2 chars)');
+  if (!SELECTED_CATS.length) return showSingleErr('Pick at least one category');
+  if (!SELECTED_CITY_ID) return showSingleErr('Pick a city');
+
+  const nameHi = document.getElementById('f_name_hi').value.trim();
   const area = document.getElementById('f_area').value.trim();
   const mobileRaw = document.getElementById('f_mobile').value.trim();
   const mobile = mobileRaw ? mobileRaw.replace(/\D/g,'').slice(-10) : null;
-  if (mobile && !/^[6789]\d{9}$/.test(mobile)) return showSingleErr('Mobile invalid — 10 digits, 6/7/8/9 start');
+  if (mobile && !/^[6789]\d{9}$/.test(mobile)) return showSingleErr('If providing mobile: 10 digits, must start with 6/7/8/9');
   const source = document.getElementById('f_source').value.trim();
 
-  const btn = document.getElementById('singleSubmit');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Adding...';
+  const slugs = SELECTED_CATS.map(c => c.slug);
+  const primarySlug = SELECTED_CATS[0].slug;
+
+  const btnPrimary = document.getElementById('singleSubmit');
+  const btnNext = document.getElementById('singleSubmitAndNext');
+  btnPrimary.disabled = true; btnNext.disabled = true;
+  const activeBtn = saveAndNext ? btnNext : btnPrimary;
+  const activeOrig = activeBtn.innerHTML;
+  activeBtn.innerHTML = '<span class="spinner"></span> Adding...';
 
   try {
     const { data, error } = await C.rpc('admin_soft_add_shop', {
-      p_name:          name,
-      p_category_slug: SELECTED_CAT.slug,
-      p_area:          area || null,
-      p_mobile:        mobile || null,
-      p_source:        'reference',
-      p_notes:         source || null
+      p_name:                   name,
+      p_category_slugs:         slugs,
+      p_primary_category_slug:  primarySlug,
+      p_area:                   area || null,
+      p_mobile:                 mobile || null,
+      p_city_id:                SELECTED_CITY_ID,
+      p_name_hi:                nameHi || null,
+      p_source:                 'reference',
+      p_notes:                  source || null
     });
     if (error) throw error;
     if (!data || !data.success) throw new Error('Failed');
 
-    document.getElementById('singleOkName').textContent = '🏪 ' + name;
-    document.getElementById('singleOkUrl').textContent = data.gp_url || ('/golden-pages.html');
-    document.getElementById('singleForm').style.display = 'none';
-    document.getElementById('singleOk').classList.add('show');
     refreshStats();
+    loadRecentList();
+
+    if (saveAndNext){
+      // Save + clear fields + keep selectors (category & city) so next add is faster
+      showToast('✓ Added: ' + name);
+      document.getElementById('f_name').value = '';
+      document.getElementById('f_name_hi').value = '';
+      document.getElementById('f_area').value = '';
+      document.getElementById('f_mobile').value = '';
+      // Keep source as it likely repeats per batch
+      document.getElementById('f_name').focus();
+    } else {
+      document.getElementById('singleOkName').textContent = '🏪 ' + name;
+      document.getElementById('singleOkUrl').textContent = data.gp_url || ('/golden-pages.html');
+      document.getElementById('singleForm').style.display = 'none';
+      document.getElementById('singleOk').classList.add('show');
+    }
   } catch(e){
     showSingleErr(e.message || 'Failed');
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🥇 Add to Golden Pages';
+    btnPrimary.disabled = false;
+    btnNext.disabled = false;
+    activeBtn.innerHTML = activeOrig;
   }
+}
+
+// Lightweight toast (non-blocking, used by Save & Add Another)
+function showToast(msg){
+  let t = document.getElementById('gpToast');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'gpToast';
+    t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-10px);background:#10B981;color:#fff;padding:10px 18px;border-radius:99px;font-weight:800;font-size:.88rem;z-index:1000;box-shadow:0 8px 24px rgba(16,185,129,.4);opacity:0;transition:.25s;font-family:inherit';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(-10px)';
+  }, 2000);
+}
+
+// Recently added panel (last 2 hours)
+async function loadRecentList(){
+  try {
+    const { data, error } = await C.rpc('admin_gp_recent_soft_listings', { p_limit: 8 });
+    if (error || !data || !data.length){
+      document.getElementById('recentPanel').style.display = 'none';
+      return;
+    }
+    const html = data.map(r => {
+      return '<div>• <b>' + esc(r.name) + '</b> · ' + esc(r.category_name || '—') +
+             (r.city_name ? ' · ' + esc(r.city_name) : '') + '</div>';
+    }).join('');
+    document.getElementById('recentList').innerHTML = html;
+    document.getElementById('recentPanel').style.display = '';
+  } catch(_){ /* silent */ }
 }
 
 function showSingleErr(msg){
@@ -467,10 +726,11 @@ function showSingleErr(msg){
 
 function resetSingleForm(){
   document.getElementById('f_name').value = '';
+  document.getElementById('f_name_hi').value = '';
   document.getElementById('f_area').value = '';
   document.getElementById('f_mobile').value = '';
   document.getElementById('f_source').value = '';
-  clearCat();
+  clearAllCats();
   document.getElementById('singleOk').classList.remove('show');
   document.getElementById('singleForm').style.display = '';
   document.getElementById('f_name').focus();
@@ -484,6 +744,7 @@ async function submitBulk(){
   errEl.classList.remove('show');
 
   if (!SELECTED_BCAT) return showBulkErr('Pick a category for bulk add');
+  if (!SELECTED_BCITY_ID) return showBulkErr('Pick a city for bulk add');
   const area = document.getElementById('b_area').value.trim();
   const rawText = document.getElementById('b_names').value;
   const names = rawText.split('\n').map(s => s.trim()).filter(s => s.length >= 2);
@@ -497,13 +758,15 @@ async function submitBulk(){
     const { data, error } = await C.rpc('admin_soft_bulk_add', {
       p_names:          names,
       p_category_slug:  SELECTED_BCAT.slug,
-      p_area:           area || null
+      p_area:           area || null,
+      p_city_id:        SELECTED_BCITY_ID
     });
     if (error) throw error;
     if (!data || !data.success) throw new Error('Bulk failed');
 
     renderBulkResults(data);
     refreshStats();
+    loadRecentList();
   } catch(e){
     showBulkErr(e.message || 'Failed');
   } finally {
