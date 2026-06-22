@@ -681,11 +681,24 @@ textarea:focus {
 }
 
 
-/* ===== TOAST ===== */
+/* ===== TOAST =====
+   IMPORTANT: pages may also define their own .toast position (top vs bottom).
+   To avoid the toast stretching across the viewport (top+bottom or left+right
+   both set), we force `top:auto; left:auto; width:auto; height:auto` here.
+   And — CRITICAL — `pointer-events:none` by default so the invisible (opacity:0)
+   toast NEVER blocks clicks on modals or page content beneath it.
+   When the toast is .show, pointer-events become auto so the user can interact
+   if needed (e.g., dismiss button). */
 .toast {
   position: fixed !important;
   bottom: 30px !important;
   right: 30px !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 92vw !important;
+  transform: none !important;
   background: var(--ink) !important;
   color: #fff !important;
   padding: 14px 20px !important;
@@ -695,6 +708,10 @@ textarea:focus {
   box-shadow: var(--shadow-xl) !important;
   z-index: 9999 !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
+  pointer-events: none !important;
+}
+.toast.show {
+  pointer-events: auto !important;
 }
 
 
