@@ -264,11 +264,21 @@
   <div class="section">
     <h2 class="section-title">⚡ Quick Actions</h2>
     <div class="quick-links">
+      <a href="/admin/owner-invites.html" class="quick-link" style="background:linear-gradient(135deg,#EDE9FE 0%,#C7D2FE 100%);border:1.5px solid #4338CA;position:relative">
+        <div class="ql-icon">📧</div>
+        <div class="ql-title" style="color:#1E1B4B">Owner Invites</div>
+        <div class="ql-desc" style="color:#3730A3">Send email magic link to claim listings · adds email to listings without owner</div>
+        <span style="position:absolute;top:8px;right:10px;background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;font-size:9px;font-weight:900;letter-spacing:.04em;padding:2px 7px;border-radius:99px">NEW</span>
+      </a>
       <a href="/admin/golden-pages-add.html" class="quick-link" style="background:linear-gradient(135deg,#DBEAFE 0%,#BFDBFE 100%);border:1.5px solid #1E3A8A;position:relative">
         <div class="ql-icon">📥</div>
         <div class="ql-title" style="color:#1E1B4B">Bulk Add Listings</div>
         <div class="ql-desc" style="color:#1E3A8A">Single or paste 100s · Golden Pages or Main DukanList</div>
-        <span style="position:absolute;top:8px;right:10px;background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;font-size:9px;font-weight:900;letter-spacing:.04em;padding:2px 7px;border-radius:99px">NEW</span>
+      </a>
+      <a href="/admin/golden-pages-manage.html" class="quick-link" style="background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);border:1.5px solid #D97706">
+        <div class="ql-icon">🥇</div>
+        <div class="ql-title" style="color:#78350F">Golden Pages Manage</div>
+        <div class="ql-desc" style="color:#92400E">View, edit, promote, delete soft-listed shops</div>
       </a>
       <a href="/admin/spotlight.html" class="quick-link" style="background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border:1.5px solid #F59E0B;position:relative">
         <div class="ql-icon">⭐</div>
@@ -297,6 +307,127 @@
         <div class="ql-title">User Accounts</div>
         <div class="ql-desc">Auth user management</div>
       </a>
+    </div>
+  </div>
+
+  <!-- ===== ALL ADMIN TOOLS — comprehensive shortcut directory ===== -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+      <h2 class="section-title" style="margin:0">🗂️ All Admin Tools <span style="background:#E0E7FF;color:#3730A3;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">SHORTCUTS</span></h2>
+      <span style="font-size:12px;color:#64748b">Every admin URL · grouped · always one click away</span>
+    </div>
+
+    <style>
+      .tool-group{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+      .tool-group-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0}
+      .tool-group-head .icon{font-size:1.2rem}
+      .tool-group-head .name{font-weight:900;font-size:.92rem;color:#0F172A;letter-spacing:-.01em}
+      .tool-group-head .sub{font-size:.74rem;color:#64748b;font-weight:600;margin-left:auto}
+      .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+      .tool-link{display:flex;align-items:center;gap:7px;padding:8px 11px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;color:#0F172A;text-decoration:none;font-size:.82rem;font-weight:700;transition:.12s;line-height:1.2;min-height:38px}
+      .tool-link:hover{background:#EEF2FF;border-color:#6366F1;color:#1E3A8A;text-decoration:none;transform:translateY(-1px);box-shadow:0 4px 10px rgba(99,102,241,.15)}
+      .tool-link .em{font-size:.95rem;flex-shrink:0}
+      .tool-link .new-pill{margin-left:auto;background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;font-size:.55rem;font-weight:900;padding:1px 6px;border-radius:99px;letter-spacing:.04em}
+      @media (max-width:560px){
+        .tool-grid{grid-template-columns:1fr 1fr;gap:5px}
+        .tool-link{padding:8px 9px;font-size:.78rem;min-height:36px}
+        .tool-group{padding:11px 12px}
+      }
+    </style>
+
+    <!-- 🎯 Daily Operations -->
+    <div class="tool-group">
+      <div class="tool-group-head">
+        <span class="icon">🎯</span><span class="name">Daily Operations</span>
+        <span class="sub">Approve / review queue</span>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-link" href="/admin/moderation.html?tab=pending"><span class="em">⏳</span> Pending Approvals</a>
+        <a class="tool-link" href="/admin/moderation.html?tab=flagged"><span class="em">🚩</span> Flagged Reviews</a>
+        <a class="tool-link" href="/admin/verification.html"><span class="em">🔵</span> Verification Queue</a>
+        <a class="tool-link" href="/admin/quick-approve.html"><span class="em">⚡</span> Quick Approve</a>
+        <a class="tool-link" href="/admin/suspicious.html"><span class="em">🚨</span> Suspicious Shops</a>
+        <a class="tool-link" href="/admin/incomplete-shops.html"><span class="em">🩹</span> Incomplete Shops</a>
+        <a class="tool-link" href="/admin/duplicates.html"><span class="em">🔍</span> Duplicates</a>
+      </div>
+    </div>
+
+    <!-- 🥇 Golden Pages & Onboarding -->
+    <div class="tool-group">
+      <div class="tool-group-head">
+        <span class="icon">🥇</span><span class="name">Golden Pages &amp; Onboarding</span>
+        <span class="sub">Bulk add · invite · claim</span>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-link" href="/admin/golden-pages-add.html"><span class="em">📥</span> Bulk Add (GP/Main)</a>
+        <a class="tool-link" href="/admin/golden-pages-manage.html"><span class="em">📋</span> Manage Golden Pages</a>
+        <a class="tool-link" href="/admin/owner-invites.html"><span class="em">📧</span> Owner Invites <span class="new-pill">NEW</span></a>
+        <a class="tool-link" href="/admin/quick-add-shop.html"><span class="em">+</span> Quick Add Shop</a>
+      </div>
+    </div>
+
+    <!-- 📣 Marketing & Engagement -->
+    <div class="tool-group">
+      <div class="tool-group-head">
+        <span class="icon">📣</span><span class="name">Marketing &amp; Engagement</span>
+        <span class="sub">Announce · promote · feature</span>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-link" href="/admin/announcements.html"><span class="em">📣</span> Announcements</a>
+        <a class="tool-link" href="/admin/broadcast.html"><span class="em">💬</span> Broadcast</a>
+        <a class="tool-link" href="/admin/spotlight.html"><span class="em">⭐</span> Spotlight + Lost Searches</a>
+        <a class="tool-link" href="/admin/featured.html"><span class="em">★</span> Featured Listings</a>
+        <a class="tool-link" href="/admin/deals.html"><span class="em">🎁</span> Deals</a>
+      </div>
+    </div>
+
+    <!-- 💬 Community & Moderation -->
+    <div class="tool-group">
+      <div class="tool-group-head">
+        <span class="icon">💬</span><span class="name">Community &amp; Moderation</span>
+        <span class="sub">Pucho Bhai · Reviews · Pro</span>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-link" href="/admin/pucho-moderation.html"><span class="em">💬</span> Pucho Bhai Moderation</a>
+        <a class="tool-link" href="/admin/reviews.html"><span class="em">⭐</span> Reviews</a>
+        <a class="tool-link" href="/admin/professional-verify.html"><span class="em">🎖️</span> Professional Verify</a>
+        <a class="tool-link" href="/admin/pro-legal-notify.html"><span class="em">⚖️</span> Pro Legal Notify</a>
+      </div>
+    </div>
+
+    <!-- 🛠 System & Data -->
+    <div class="tool-group">
+      <div class="tool-group-head">
+        <span class="icon">🛠</span><span class="name">System &amp; Data</span>
+        <span class="sub">Catalog · health · audit</span>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-link" href="/admin/health.html"><span class="em">❤️</span> Health Dashboard</a>
+        <a class="tool-link" href="/admin/activity.html"><span class="em">📋</span> Activity Log</a>
+        <a class="tool-link" href="/admin/monitoring.html"><span class="em">📡</span> Monitoring</a>
+        <a class="tool-link" href="/admin/categories.html"><span class="em">🏷️</span> Categories</a>
+        <a class="tool-link" href="/admin/cities.html"><span class="em">🏙</span> Cities</a>
+        <a class="tool-link" href="/admin/admins.html"><span class="em">👥</span> Admins</a>
+        <a class="tool-link" href="/admin/settings.html"><span class="em">⚙️</span> Settings</a>
+        <a class="tool-link" href="/admin/test-cleanup.html"><span class="em">🧹</span> Cleanup</a>
+      </div>
+    </div>
+
+    <!-- 🌐 External & Direct DB -->
+    <div class="tool-group">
+      <div class="tool-group-head">
+        <span class="icon">🌐</span><span class="name">External &amp; Direct DB</span>
+        <span class="sub">Supabase · public site · panel</span>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-link" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/editor" target="_blank" rel="noopener"><span class="em">🗄️</span> Supabase Tables</a>
+        <a class="tool-link" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/sql/new" target="_blank" rel="noopener"><span class="em">📝</span> Supabase SQL Editor</a>
+        <a class="tool-link" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/auth/users" target="_blank" rel="noopener"><span class="em">🔐</span> Supabase Auth Users</a>
+        <a class="tool-link" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/functions" target="_blank" rel="noopener"><span class="em">⚡</span> Edge Functions</a>
+        <a class="tool-link" href="/" target="_blank"><span class="em">🌐</span> Public DukanList</a>
+        <a class="tool-link" href="/golden-pages.html" target="_blank"><span class="em">🥇</span> Public Golden Pages</a>
+        <a class="tool-link" href="/panel/login.html" target="_blank"><span class="em">🏪</span> Owner Panel Login</a>
+      </div>
     </div>
   </div>
 
