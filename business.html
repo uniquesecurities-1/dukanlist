@@ -44,6 +44,50 @@
 .shop-trust-card .stc-foot{ margin-top:14px; padding-top:12px; border-top:1px dashed #BBF7D0; font-size:.74rem; color:#15803D; text-align:center }
 .shop-trust-card .stc-foot a{ color:#15803D; font-weight:800; text-decoration:underline }
 
+/* ===== BUSINESS MAP CARD — embed of Google Maps for location context ===== */
+.biz-map-card{
+  margin-top:14px;
+  background:#fff;
+  border:1px solid #FDE68A;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 2px 10px rgba(217,119,6,.08);
+}
+.biz-map-head{
+  padding:11px 14px;
+  font-family:'Manrope',sans-serif;
+  font-weight:800; color:#78350F;
+  font-size:.92rem; letter-spacing:-.01em;
+  background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+  border-bottom:1px solid #FDE68A;
+  display:flex; align-items:center; gap:6px;
+}
+.biz-map-frame{
+  position:relative;
+  width:100%;
+  aspect-ratio:4/3;
+  background:#F1F5F9;
+}
+.biz-map-frame iframe{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  border:0; display:block;
+}
+.biz-map-foot{
+  padding:10px 14px;
+  background:#F8FAFC;
+  text-align:center;
+  font-size:.82rem;
+  border-top:1px solid #E2E8F0;
+}
+.biz-map-foot a{ color:#1E40AF; font-weight:800; text-decoration:none }
+.biz-map-foot a:hover{ text-decoration:underline }
+@media (max-width:760px){
+  /* On mobile the right column already has "Open in Google Maps" link
+     and sticky bottom bar has Map button — embed becomes redundant + slows page */
+  .biz-map-card{ display:none !important; }
+}
+
 /* Slim Report-this-listing block — replaces older trust card. Honest tone, no overclaim. */
 .shop-report-block{ margin-top:14px; background:#F8FAFC; border:1px solid rgba(15,23,42,.08); border-radius:11px; padding:10px 14px; box-shadow:0 1px 3px rgba(15,23,42,.04) }
 .shop-report-block .srb-line{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:.82rem; color:#475569 }
@@ -353,23 +397,12 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   .prem-meta-chip{ font-size:.66rem; padding:3px 8px }
   .prem-cat-chip, .prem-area-chip{ font-size:.66rem; padding:4px 9px }
 
-  /* CTA row redesigned: WA + Call are primary (labelled, flex:1).
-     Directions/Save/Share collapse to 44px square icon-only buttons. */
-  .prem-hero-cta{ gap:5px; margin-top:10px; align-items:stretch }
-  .prem-btn{ padding:11px 10px; font-size:.78rem; min-width:0; white-space:nowrap; justify-content:center }
-  .prem-btn-ico{ font-size:1rem }
-  /* Primary buttons take the remaining flex space, show label */
-  .prem-btn-wa, .prem-btn-call{ flex:1; padding:11px 8px; font-size:.84rem }
-  .prem-btn-wa .prem-btn-txt, .prem-btn-call .prem-btn-txt{ display:inline; font-weight:800 }
-  /* Secondary buttons become 44px icon-only squares */
-  .prem-btn-dir, .prem-btn-save, .prem-btn-share{
-    flex:0 0 44px; width:44px; padding:0;
-    height:44px;
-    display:inline-flex; align-items:center; justify-content:center;
-  }
-  .prem-btn-dir .prem-btn-txt,
-  .prem-btn-save .prem-btn-txt,
-  .prem-btn-share .prem-btn-txt{ display:none }
+  /* Banner CTAs hidden on mobile — sticky bottom bar (.prem-mobile-bar)
+     already has WhatsApp / Call / Map. Frees up vertical space + removes
+     duplication. Save/Share live in detail sections below. */
+  .prem-hero-cta{ display:none !important; }
+  .prem-hero{ min-height:240px }
+  .prem-hero-content{ height:240px; padding:18px 16px 14px }
 }
 @media (prefers-reduced-motion:reduce){
   .prem-hero-bg{ animation:none !important }
@@ -1586,6 +1619,23 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               </div>
             </div>
           </div>
+          <!-- Google Maps embed — fills the empty space below the Report block
+               on desktop AND gives visitors immediate location context.
+               JS sets the iframe src from lat/lng (preferred) or address text. -->
+          <div class="biz-map-card" id="bizMapCard" style="display:none">
+            <div class="biz-map-head">
+              📍 <span data-i18n-en>Location on map</span><span data-i18n-hi>नक्शे पर स्थान</span>
+            </div>
+            <div class="biz-map-frame">
+              <iframe id="bizMapEmbed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Business location map"></iframe>
+            </div>
+            <div class="biz-map-foot">
+              <a id="bizMapOpen" target="_blank" rel="noopener">
+                <span data-i18n-en>Open in Google Maps →</span><span data-i18n-hi>Google Maps में खोलें →</span>
+              </a>
+            </div>
+          </div>
+
           <!-- Slim "Report this listing" block — replaces older trust card.
                The older card overpromised "personally checked / owner-managed"
                which doesn't hold for soft-listed + admin-bulk-published rows. -->
@@ -2759,6 +2809,36 @@ function render(){
     }
   } catch(premErr){
     console.warn('Premium hero population skipped:', premErr);
+  }
+
+  // ===== Populate the inline Google Maps embed (desktop) =====
+  try {
+    const _mapCard = document.getElementById('bizMapCard');
+    const _mapIframe = document.getElementById('bizMapEmbed');
+    const _mapOpen = document.getElementById('bizMapOpen');
+    if (_mapCard && _mapIframe){
+      let q = '';
+      if (b.lat && b.lng){
+        q = b.lat + ',' + b.lng;
+      } else {
+        // Build a search query from the business identifiers we have
+        const addrParts = [
+          b.name, b.address_line1, b.address_line2,
+          b.geo_localities?.name, b.geo_cities?.name, b.pincode
+        ].filter(Boolean);
+        q = addrParts.join(', ');
+      }
+      if (q){
+        // Output=embed gives a no-key inline map. Sufficient for visitor context.
+        _mapIframe.src = 'https://www.google.com/maps?q=' + encodeURIComponent(q) + '&output=embed';
+        if (_mapOpen){
+          _mapOpen.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+        }
+        _mapCard.style.display = '';
+      }
+    }
+  } catch(mapErr){
+    console.warn('Map embed skipped:', mapErr);
   }
 
   // Wire sticky mobile bottom bar (same destinations as premium hero CTAs)
