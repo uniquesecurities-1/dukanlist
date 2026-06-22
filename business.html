@@ -43,6 +43,14 @@
 .shop-trust-card .stc-list .stc-sub{ font-size:.74rem; color:#15803D; opacity:.85; font-weight:600 }
 .shop-trust-card .stc-foot{ margin-top:14px; padding-top:12px; border-top:1px dashed #BBF7D0; font-size:.74rem; color:#15803D; text-align:center }
 .shop-trust-card .stc-foot a{ color:#15803D; font-weight:800; text-decoration:underline }
+
+/* Slim Report-this-listing block — replaces older trust card. Honest tone, no overclaim. */
+.shop-report-block{ margin-top:14px; background:#F8FAFC; border:1px solid rgba(15,23,42,.08); border-radius:11px; padding:10px 14px; box-shadow:0 1px 3px rgba(15,23,42,.04) }
+.shop-report-block .srb-line{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:.82rem; color:#475569 }
+.shop-report-block .srb-ico{ font-size:1rem; color:#94a3b8 }
+.shop-report-block .srb-text{ flex:1; min-width:140px; line-height:1.4 }
+.shop-report-block .srb-link{ color:#1E40AF; font-weight:800; text-decoration:none; font-size:.82rem; white-space:nowrap; padding:6px 10px; border-radius:7px; background:#EFF6FF; border:1px solid #BFDBFE }
+.shop-report-block .srb-link:hover{ background:#DBEAFE; text-decoration:none }
 .visit-guide-card{ background:linear-gradient(135deg,#F8FAFC 0%,#FFFFFF 100%); border:1px solid rgba(15,23,42,.06); border-left:3px solid #1E40AF }
 .visit-guide-card h3{ color:#0F172A; margin-bottom:14px !important }
 .visit-guide-card .vg-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
@@ -910,9 +918,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
    Just hide the redundant "Why trustworthy" card + compact stuff.
 ============================================================ */
 @media (max-width: 760px){
-  /* HIDE the redundant "Why this listing is trustworthy" card on mobile —
-     same info is conveyed by the Admin Verified pill + verif-row badges */
+  /* Older trust card is now replaced by .shop-report-block (slim line) — leave
+     this rule for any legacy renders that still emit the old class. */
   .shop-trust-card{ display:none !important }
+  .shop-report-block{ padding:9px 12px !important; margin-top:10px !important }
+  .shop-report-block .srb-line{ flex-direction:column; align-items:flex-start; gap:4px }
 
   /* Compact Profile Highlights on mobile (don't hide — keep but smaller) */
   .shop-highlights{ padding:12px 14px !important; margin-top:10px !important }
@@ -1280,18 +1290,20 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               </div>
             </div>
           </div>
-          <!-- Customer Confidence Card — fills desktop left column with trust signals -->
-          <div class="shop-trust-card" id="shopTrustCard">
-            <div class="stc-title">🛡️ <span data-i18n-en>Why this listing is trustworthy</span><span data-i18n-hi>यह लिस्टिंग भरोसेमंद क्यों है</span></div>
-            <ul class="stc-list">
-              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Admin verified</b><b data-i18n-hi>एडमिन वेरिफाइड</b><br><span class="stc-sub" data-i18n-en>Personally checked by DukanList team</span><span class="stc-sub" data-i18n-hi>DukanList टीम द्वारा जांचा गया</span></span></li>
-              <li><span class="stc-ico">✓</span><span><b data-i18n-en>100% FREE listing</b><b data-i18n-hi>100% मुफ्त लिस्टिंग</b><br><span class="stc-sub" data-i18n-en>No paid rankings, no commission</span><span class="stc-sub" data-i18n-hi>कोई paid ranking नहीं, कोई commission नहीं</span></span></li>
-              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Owner-managed profile</b><b data-i18n-hi>मालिक द्वारा संचालित</b><br><span class="stc-sub" data-i18n-en>Real owner, real updates</span><span class="stc-sub" data-i18n-hi>असली मालिक, असली अपडेट</span></span></li>
-              <li><span class="stc-ico">✓</span><span><b data-i18n-en>Sirsa · Bathinda · Mansa · Muktsar local</b><b data-i18n-hi>स्थानीय Sirsa · Bathinda · Mansa · Muktsar</b><br><span class="stc-sub" data-i18n-en>Built for our 2 districts only — no national spam</span><span class="stc-sub" data-i18n-hi>केवल 2 जिलों के लिए — कोई national spam नहीं</span></span></li>
-            </ul>
-            <div class="stc-foot">
-              <span data-i18n-en>Got a concern? <a href="#" onclick="document.getElementById(\'reportModal\').classList.add(\'open\');return false">Report this listing</a></span>
-              <span data-i18n-hi>कुछ गलत लगा? <a href="#" onclick="document.getElementById(\'reportModal\').classList.add(\'open\');return false">रिपोर्ट करें</a></span>
+          <!-- Slim "Report this listing" block — replaces older trust card.
+               The older card overpromised "personally checked / owner-managed"
+               which doesn't hold for soft-listed + admin-bulk-published rows. -->
+          <div class="shop-report-block" id="shopReportBlock">
+            <div class="srb-line">
+              <span class="srb-ico">⚐</span>
+              <span class="srb-text">
+                <span data-i18n-en>See something wrong, fake, or outdated?</span>
+                <span data-i18n-hi>कुछ गलत, fake या पुराना दिख रहा है?</span>
+              </span>
+              <a href="#" class="srb-link" onclick="document.getElementById('reportModal').classList.add('open');return false">
+                <span data-i18n-en>Report this listing →</span>
+                <span data-i18n-hi>रिपोर्ट करें →</span>
+              </a>
             </div>
           </div>
         </div>
