@@ -2811,48 +2811,31 @@ function render(){
     console.warn('Premium hero population skipped:', premErr);
   }
 
-  // ===== Populate the inline Google Maps embed (desktop) =====
-  // IMPORTANT: Never include `b.name` in the search query — Google Maps will
-  // match similarly-named OTHER businesses in the same area (e.g. "Goyal Saree
-  // Emporium" wrongly pinned to "Goyal Sanitary & Tile Store"). Use coords if
-  // available, else use ADDRESS-ONLY text (no name).
+  // ===== Inline Google Maps embed — ONLY when we have precise GPS coords =====
+  // Why this is restrictive: the anonymous Maps embed endpoint (output=embed)
+  // does keyword-heavy POI matching, NOT full geocoding like the regular
+  // /maps/search/ endpoint. With just an address string, it can wrongly pin a
+  // similarly-named business in the same area (e.g. "Goyal Saree Emporium"
+  // got pinned to a nearby "Goyal Sanitary & Tile Store").
+  //
+  // Safe behavior:
+  //   - Has lat + lng → show pinpoint embed (no risk of name-collision)
+  //   - No coords    → DON'T embed. The existing "Open in Google Maps" button
+  //                    in the right column already uses the full /search/?api=1
+  //                    endpoint which handles addresses correctly.
   try {
     const _mapCard = document.getElementById('bizMapCard');
     const _mapIframe = document.getElementById('bizMapEmbed');
     const _mapOpen = document.getElementById('bizMapOpen');
-    const _mapHead = _mapCard ? _mapCard.querySelector('.biz-map-head') : null;
-    if (_mapCard && _mapIframe){
-      let q = '';
-      let exact = false;
-      if (b.lat && b.lng){
-        // Precise GPS coordinates — best case
-        q = b.lat + ',' + b.lng;
-        exact = true;
-      } else {
-        // Address-only query (NO business name to prevent name-collision matches)
-        const addrParts = [
-          b.address_line1, b.address_line2,
-          b.geo_localities?.name, b.geo_cities?.name, b.pincode
-        ].filter(s => s && String(s).trim().length > 0);
-        // Need at least a street/locality + city to be useful — bail otherwise
-        const hasStreet = !!(b.address_line1 && b.address_line1.trim().length > 3);
-        if (hasStreet){
-          q = addrParts.join(', ');
-        }
+    if (_mapCard && _mapIframe && b.lat && b.lng){
+      const q = b.lat + ',' + b.lng;
+      _mapIframe.src = 'https://www.google.com/maps?q=loc:' + encodeURIComponent(q) + '&output=embed';
+      if (_mapOpen){
+        _mapOpen.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
       }
-      if (q){
-        _mapIframe.src = 'https://www.google.com/maps?q=' + encodeURIComponent(q) + '&output=embed';
-        if (_mapOpen){
-          _mapOpen.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
-        }
-        // Small disclaimer when we don't have precise coords — pin shows the
-        // street/area, not the exact shop entrance.
-        if (!exact && _mapHead){
-          _mapHead.innerHTML += ' <span style="font-weight:600;font-size:.7rem;color:#94A3B8;margin-left:6px">· approximate area</span>';
-        }
-        _mapCard.style.display = '';
-      }
+      _mapCard.style.display = '';
     }
+    // No coords → leave _mapCard hidden (its inline style="display:none" stays)
   } catch(mapErr){
     console.warn('Map embed skipped:', mapErr);
   }
