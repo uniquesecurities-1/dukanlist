@@ -44,6 +44,13 @@ const C = (window.ShopDB && window.ShopDB.client) || null;
 const params = new URLSearchParams(window.location.search);
 const TOKEN = params.get('token') || '';
 
+// Supabase sends auth errors as URL params or hash fragment when magic
+// link can't be redeemed (expired, already used, invalid).
+const hashParams = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+const ERR_CODE = params.get('error_code') || hashParams.get('error_code') || '';
+const ERR_TYPE = params.get('error') || hashParams.get('error') || '';
+const ERR_DESC = params.get('error_description') || hashParams.get('error_description') || '';
+
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 
 function showState(emoji, title, subHTML, btnHTML, isErr){
@@ -58,6 +65,43 @@ async function run(){
   if (!C){
     return showState('⚠️', 'Page failed to load', '<p>Please refresh the page.</p>', '');
   }
+
+  // Check FIRST for an auth error param — magic link may have already
+  // been used or expired. We want to show a friendly recovery message
+  // instead of the generic "verify via email link" fallback.
+  if (ERR_CODE === 'otp_expired' || ERR_TYPE === 'access_denied'){
+    // Possibility: link was clicked twice. The FIRST click already
+    // verified the email. Check if a session exists (might still be
+    // logged in from the successful first click).
+    let existingSession = null;
+    try {
+      const { data } = await C.auth.getSession();
+      if (data && data.session) existingSession = data.session;
+    } catch(_){}
+
+    if (existingSession){
+      // First click already worked — show success + go to panel
+      return showState(
+        '✅',
+        'You are already verified',
+        '<p>This link was already used successfully. You are logged in as <b>' + esc(existingSession.user.email) + '</b>.</p>',
+        '<a class="btn" href="/panel/dashboard.html">→ Go to Owner Panel</a>' +
+        '<a class="btn btn-2" href="/">View DukanList</a>'
+      );
+    }
+
+    // Truly expired and no session — ask admin to resend
+    return showState(
+      '⏱',
+      'Link expired',
+      '<p>This invitation link is no longer valid. It may have been used once already, or has expired.</p>' +
+      '<p style="font-size:.86rem;color:#475569">If you have not yet verified your email, please <b>contact the DukanList team</b> to send a fresh invite. We will WhatsApp you a new link.</p>' +
+      (ERR_DESC ? '<p style="font-size:.75rem;color:#94A3B8">Details: ' + esc(ERR_DESC) + '</p>' : ''),
+      '<a class="btn" href="https://wa.me/919876543210?text=' + encodeURIComponent('Hi DukanList Team, my claim link expired. Please send a fresh invite.') + '" target="_blank" rel="noopener">💬 WhatsApp Team</a>' +
+      '<a class="btn btn-2" href="/panel/login.html">→ Try Login</a>'
+    );
+  }
+
   if (!TOKEN){
     return showState('⚠️', 'Missing claim token', '<p>The link is missing the <code>token</code> parameter. Please use the link from your invitation email.</p>', '');
   }
