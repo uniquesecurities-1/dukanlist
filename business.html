@@ -207,8 +207,185 @@ body.claim-locked #stickyCtaBar{
     radial-gradient(ellipse at top left, rgba(255,107,26,.10), transparent 55%),
     radial-gradient(ellipse at top right, rgba(30,58,138,.06), transparent 55%),
     linear-gradient(180deg, #FFFDF9 0%, #fff 70%);
-  padding:40px 24px 56px;
+  padding:18px 24px 40px;
   position:relative; overflow:hidden;
+}
+
+/* ===== PREMIUM SHOP HERO (saffron + cream, Indian premium) =====
+   Full-width banner with shop identity overlay + action buttons.
+   Renders strong even with zero photos (uses saffron gradient art). */
+.prem-hero{
+  position:relative;
+  border-radius:20px;
+  overflow:hidden;
+  min-height:340px;
+  margin-bottom:24px;
+  box-shadow:0 14px 40px rgba(120,53,15,.16), 0 2px 8px rgba(15,23,42,.06);
+  isolation:isolate;
+}
+.prem-hero-bg{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(251,191,36,.55), transparent 55%),
+    radial-gradient(circle at 82% 78%, rgba(217,119,6,.45), transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(254,243,199,.40), transparent 60%),
+    linear-gradient(135deg, #FEF3C7 0%, #FDE68A 30%, #FBBF24 70%, #F59E0B 100%);
+  background-size: 200% 200%;
+  animation: premHeroShine 18s ease-in-out infinite;
+  z-index:0;
+}
+.prem-hero-bg::before{
+  content:''; position:absolute; inset:0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 18px, rgba(255,255,255,.05) 18px 19px),
+    repeating-linear-gradient(-45deg, transparent 0 18px, rgba(120,53,15,.04) 18px 19px);
+}
+.prem-hero-bg::after{
+  /* Subtle Indian rangoli-inspired sparkle */
+  content:'✦'; position:absolute; top:24px; right:30px;
+  font-size:1.4rem; color:rgba(120,53,15,.18); transform:rotate(15deg);
+  text-shadow:0 0 10px rgba(255,255,255,.5);
+}
+@keyframes premHeroShine{
+  0%,100%{ background-position:0 0; }
+  50%   { background-position:100% 100%; }
+}
+.prem-hero-overlay{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 0%, transparent 40%, rgba(120,53,15,.65) 90%, rgba(120,53,15,.78) 100%);
+  z-index:1;
+}
+.prem-hero-content{
+  position:relative; z-index:2;
+  padding:30px 32px 28px;
+  display:flex; flex-direction:column; gap:10px;
+  min-height:inherit; height:340px;
+  justify-content:flex-end;
+}
+.prem-hero-eyebrow{
+  display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;
+}
+.prem-cat-chip, .prem-area-chip{
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(255,255,255,.95); color:#7c2d12;
+  font-size:.74rem; font-weight:800; padding:5px 11px;
+  border-radius:99px; letter-spacing:.02em;
+  backdrop-filter:blur(8px);
+  box-shadow:0 2px 6px rgba(120,53,15,.18);
+}
+.prem-area-chip{ background:rgba(120,53,15,.85); color:#FEF3C7; }
+.prem-hero-name{
+  font-family:'Manrope',sans-serif;
+  font-size:clamp(1.7rem, 4.2vw, 2.6rem);
+  font-weight:900; letter-spacing:-.025em;
+  color:#fff; line-height:1.08;
+  margin:0;
+  text-shadow:0 2px 14px rgba(120,53,15,.45), 0 1px 3px rgba(0,0,0,.18);
+}
+html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
+.prem-hero-name-hi{
+  font-family:'Noto Sans Devanagari',sans-serif;
+  font-size:1rem; font-weight:700;
+  color:#FEF3C7; opacity:.95;
+  text-shadow:0 1px 4px rgba(120,53,15,.6);
+}
+.prem-hero-name-hi:empty{ display:none }
+.prem-hero-byline{
+  font-size:.84rem; font-weight:600; color:#FEF3C7;
+  letter-spacing:.01em;
+}
+.prem-hero-byline:empty{ display:none }
+.prem-hero-meta{
+  display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;
+}
+.prem-meta-chip{
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(255,255,255,.92); color:#7c2d12;
+  font-size:.74rem; font-weight:800; padding:4px 10px;
+  border-radius:99px; letter-spacing:.01em;
+  backdrop-filter:blur(8px);
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+.prem-meta-chip.prem-open{ background:#10B981; color:#fff }
+.prem-meta-chip.prem-open.closed{ background:#7c2d12; color:#FEF3C7 }
+.prem-meta-chip.prem-rating{ background:linear-gradient(135deg,#FBBF24,#D97706); color:#fff }
+.prem-meta-chip.prem-verified{ background:#1E40AF; color:#fff }
+.prem-hero-cta{
+  display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;
+}
+.prem-btn{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:11px 18px;
+  font-family:'Manrope',sans-serif; font-weight:800; font-size:.86rem;
+  border-radius:11px; text-decoration:none;
+  cursor:pointer; border:0;
+  transition:transform .15s, box-shadow .15s;
+  white-space:nowrap;
+  letter-spacing:-.005em;
+}
+.prem-btn:hover{ transform:translateY(-1px); text-decoration:none }
+.prem-btn-wa{
+  background:linear-gradient(135deg,#25D366,#128C7E); color:#fff;
+  box-shadow:0 6px 18px rgba(37,211,102,.35);
+}
+.prem-btn-wa:hover{ box-shadow:0 10px 24px rgba(37,211,102,.5) }
+.prem-btn-call{
+  background:linear-gradient(135deg,#fff,#FEF3C7); color:#7c2d12;
+  box-shadow:0 6px 18px rgba(120,53,15,.25);
+}
+.prem-btn-call:hover{ box-shadow:0 10px 24px rgba(120,53,15,.35) }
+.prem-btn-dir{
+  background:rgba(255,255,255,.95); color:#7c2d12;
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+}
+.prem-btn-save, .prem-btn-share{
+  background:rgba(120,53,15,.75); color:#FEF3C7;
+  backdrop-filter:blur(8px);
+}
+.prem-btn-save.saved{ background:#DC2626; color:#fff }
+.prem-btn-ico{ font-size:1rem; line-height:1 }
+@media (max-width:560px){
+  .prem-hero{ min-height:280px; border-radius:14px; margin-bottom:18px }
+  .prem-hero-content{ height:280px; padding:22px 18px 18px; gap:7px }
+  .prem-hero-name{ font-size:1.5rem }
+  .prem-hero-name-hi{ font-size:.86rem }
+  .prem-hero-byline{ font-size:.74rem }
+  .prem-meta-chip{ font-size:.66rem; padding:3px 8px }
+  .prem-cat-chip, .prem-area-chip{ font-size:.66rem; padding:4px 9px }
+  .prem-hero-cta{ gap:5px; margin-top:10px }
+  .prem-btn{ padding:9px 12px; font-size:.78rem; flex:1; justify-content:center; min-width:0 }
+  .prem-btn-txt{ display:none } /* Show only icons on phone for space */
+  .prem-btn-wa .prem-btn-txt,
+  .prem-btn-call .prem-btn-txt{ display:inline } /* Keep label on primary actions */
+}
+@media (prefers-reduced-motion:reduce){
+  .prem-hero-bg{ animation:none !important }
+}
+
+/* ===== STICKY MOBILE BOTTOM BAR (Call + WhatsApp always visible) ===== */
+.prem-mobile-bar{
+  position:fixed; left:0; right:0; bottom:0;
+  z-index:90;
+  background:rgba(255,251,235,.95);
+  border-top:1.5px solid #FCD34D;
+  box-shadow:0 -4px 18px rgba(120,53,15,.18);
+  backdrop-filter:blur(10px);
+  padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+  display:none;
+  gap:8px;
+}
+.prem-mobile-bar a, .prem-mobile-bar button{
+  flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:11px 8px; border-radius:11px;
+  font-family:'Manrope',sans-serif; font-weight:900; font-size:.86rem;
+  text-decoration:none; border:0; cursor:pointer; letter-spacing:-.005em;
+}
+.prem-mobile-bar .pmb-wa{ background:linear-gradient(135deg,#25D366,#128C7E); color:#fff }
+.prem-mobile-bar .pmb-call{ background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff }
+.prem-mobile-bar .pmb-dir{ background:#fff; color:#7c2d12; border:1px solid #FCD34D }
+@media (max-width:760px){
+  .prem-mobile-bar{ display:flex }
+  body{ padding-bottom:64px !important }
 }
 .biz-hero::before{
   content:''; position:absolute; top:0; left:0; right:0; height:1px;
@@ -1246,6 +1423,13 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   <a href="/browse.html" class="btn btn-pri">← Browse Categories</a>
 </div>
 
+<!-- ===== STICKY MOBILE BOTTOM BAR — always-visible Call / WhatsApp ===== -->
+<div class="prem-mobile-bar" id="premMobileBar" style="display:none">
+  <a class="pmb-wa" id="pmbWa" target="_blank" rel="noopener">💬 <span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span></a>
+  <a class="pmb-call" id="pmbCall">📞 <span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span></a>
+  <a class="pmb-dir" id="pmbDir" target="_blank" rel="noopener">📍 <span data-i18n-en>Map</span><span data-i18n-hi>दिशा</span></a>
+</div>
+
 <div id="bizContent" style="display:none">
 
   <!-- Breadcrumbs -->
@@ -1261,7 +1445,51 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <div class="detail-trust-strip" id="detailTrustStrip"></div>
       </div>
       <!-- Mobile-only prominent business name (desktop keeps H1 inside meta-card) -->
-      <h1 class="biz-hero-name-mobile" id="bizNameMobile"></h1>
+      <h1 class="biz-hero-name-mobile" id="bizNameMobile" style="display:none"></h1>
+
+      <!-- ====== PREMIUM SHOP HERO (saffron + cream, Indian premium) ====== -->
+      <section class="prem-hero" id="premHero">
+        <div class="prem-hero-bg" id="premHeroBg"></div>
+        <div class="prem-hero-overlay"></div>
+        <div class="prem-hero-content">
+          <div class="prem-hero-eyebrow">
+            <span class="prem-cat-chip" id="premCatChip"></span>
+            <span class="prem-area-chip" id="premAreaChip"></span>
+          </div>
+          <h1 class="prem-hero-name" id="premHeroName"></h1>
+          <div class="prem-hero-name-hi" id="premHeroNameHi"></div>
+          <div class="prem-hero-byline" id="premHeroByline"></div>
+          <div class="prem-hero-meta" id="premHeroMeta">
+            <span class="prem-meta-chip prem-open" id="premOpenChip" style="display:none"></span>
+            <span class="prem-meta-chip prem-rating" id="premRatingChip" style="display:none"></span>
+            <span class="prem-meta-chip prem-since" id="premSinceChip" style="display:none"></span>
+            <span class="prem-meta-chip prem-verified" id="premVerifiedChip" style="display:none"></span>
+          </div>
+          <div class="prem-hero-cta" id="premHeroCta">
+            <a class="prem-btn prem-btn-wa" id="premCtaWa" target="_blank" rel="noopener">
+              <span class="prem-btn-ico">💬</span>
+              <span class="prem-btn-txt"><span data-i18n-en>WhatsApp</span><span data-i18n-hi>WhatsApp</span></span>
+            </a>
+            <a class="prem-btn prem-btn-call" id="premCtaCall">
+              <span class="prem-btn-ico">📞</span>
+              <span class="prem-btn-txt"><span data-i18n-en>Call</span><span data-i18n-hi>कॉल</span></span>
+            </a>
+            <a class="prem-btn prem-btn-dir" id="premCtaDir" target="_blank" rel="noopener">
+              <span class="prem-btn-ico">📍</span>
+              <span class="prem-btn-txt"><span data-i18n-en>Directions</span><span data-i18n-hi>दिशा</span></span>
+            </a>
+            <button class="prem-btn prem-btn-save" id="premCtaSave" type="button">
+              <span class="prem-btn-ico">♡</span>
+              <span class="prem-btn-txt"><span data-i18n-en>Save</span><span data-i18n-hi>सहेजें</span></span>
+            </button>
+            <button class="prem-btn prem-btn-share" id="premCtaShare" type="button">
+              <span class="prem-btn-ico">↗</span>
+              <span class="prem-btn-txt"><span data-i18n-en>Share</span><span data-i18n-hi>शेयर</span></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <div class="biz-top">
         <div class="gallery">
           <div class="main" id="galleryMain"></div>
@@ -2322,6 +2550,168 @@ function render(){
     document.getElementById('bizNameHi').textContent = b.name_hi;
     document.getElementById('bizNameHi').style.display = '';
   }
+
+  // ===== Populate the new PREMIUM SHOP HERO (saffron banner) =====
+  try {
+    const _set = (id, content, asHTML) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (asHTML) el.innerHTML = content; else el.textContent = content;
+    };
+    _set('premHeroName', b.name || '');
+    _set('premHeroNameHi', b.name_hi || '');
+
+    // Category chip
+    const catIcon = b.categories?.icon || '';
+    const catName = b.categories?.name || '';
+    if (catName){
+      _set('premCatChip', `${catIcon} ${escapeHTML(catName)}`, true);
+    } else {
+      document.getElementById('premCatChip').style.display = 'none';
+    }
+
+    // Area chip (locality + city)
+    const locName = b.geo_localities?.name || '';
+    const cityName = b.geo_cities?.name || '';
+    const areaParts = [];
+    if (locName) areaParts.push(locName);
+    if (cityName && cityName !== locName) areaParts.push(cityName);
+    if (areaParts.length){
+      _set('premAreaChip', `📍 ${escapeHTML(areaParts.join(' · '))}`, true);
+    } else {
+      document.getElementById('premAreaChip').style.display = 'none';
+    }
+
+    // Byline — owner + established
+    const bylineParts = [];
+    if (b.owner_name) bylineParts.push(`by ${b.owner_name}`);
+    if (b.established_year){
+      const yrs = new Date().getFullYear() - Number(b.established_year);
+      if (yrs >= 1) bylineParts.push(`${yrs}+ years`);
+    }
+    _set('premHeroByline', bylineParts.join(' · '));
+
+    // Open/closed pill — uses existing getOpenStatus if available
+    if (b.hours_json && typeof getOpenStatus === 'function'){
+      try {
+        const os = getOpenStatus(b.hours_json) || {};
+        const oc = document.getElementById('premOpenChip');
+        if (oc){
+          if (os.isOpen){
+            oc.innerHTML = `● Open${os.closesAt ? ' · closes ' + os.closesAt : ''}`;
+            oc.style.display = '';
+            oc.classList.remove('closed');
+          } else if (os.opensAt){
+            oc.innerHTML = `● Closed · opens ${os.opensAt}`;
+            oc.style.display = '';
+            oc.classList.add('closed');
+          }
+        }
+      } catch(_){}
+    }
+
+    // Rating pill (hide if zero)
+    if (Number(b.rating_avg) > 0 && Number(b.rating_count) > 0){
+      const rc = Number(b.rating_count);
+      _set('premRatingChip',
+        `★ ${Number(b.rating_avg).toFixed(1)} · ${rc} review${rc === 1 ? '' : 's'}`);
+      document.getElementById('premRatingChip').style.display = '';
+    }
+
+    // Since (established) chip
+    if (b.established_year){
+      _set('premSinceChip', `🏛 Since ${b.established_year}`);
+      document.getElementById('premSinceChip').style.display = '';
+    }
+
+    // Verified chip
+    if (Number(b.verified_score) >= 4){
+      _set('premVerifiedChip', '🛡 Verified');
+      document.getElementById('premVerifiedChip').style.display = '';
+    }
+
+    // CTA links
+    const fullMobile = String(b.mobile || '').replace(/\D/g, '').slice(-10);
+    const wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
+    const waMsgPrem = encodeURIComponent(`Hello, I found your business "${b.name}" on DukanList. I'd like to know more.`);
+    const _waEl = document.getElementById('premCtaWa');
+    const _callEl = document.getElementById('premCtaCall');
+    const _dirEl = document.getElementById('premCtaDir');
+    if (_waEl){
+      if (wa){ _waEl.href = `https://wa.me/91${wa}?text=${waMsgPrem}`; }
+      else   { _waEl.style.display = 'none'; }
+    }
+    if (_callEl){
+      if (fullMobile){ _callEl.href = `tel:+91${fullMobile}`; }
+      else            { _callEl.style.display = 'none'; }
+    }
+    if (_dirEl){
+      if (b.lat && b.lng){
+        _dirEl.href = `https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}`;
+      } else {
+        const addrText = [b.address_line1, b.address_line2, b.geo_cities?.name].filter(Boolean).join(', ');
+        _dirEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addrText)}`;
+      }
+    }
+
+    // Save + Share buttons reuse existing handlers if they exist
+    const _saveEl = document.getElementById('premCtaSave');
+    if (_saveEl){
+      _saveEl.addEventListener('click', () => {
+        // Try existing shortlist toggle
+        try {
+          if (typeof window.toggleShortlist === 'function') window.toggleShortlist(b.id, b.name);
+          else if (typeof window.saveBusiness === 'function') window.saveBusiness(b);
+          else {
+            // Fallback — localStorage stub
+            const key = 'dl_saved';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            if (!list.includes(b.id)) list.push(b.id);
+            localStorage.setItem(key, JSON.stringify(list));
+            _saveEl.classList.add('saved');
+            _saveEl.querySelector('.prem-btn-ico').textContent = '❤';
+          }
+        } catch(_){}
+      });
+    }
+    const _shareEl = document.getElementById('premCtaShare');
+    if (_shareEl){
+      _shareEl.addEventListener('click', async () => {
+        const url = window.location.href;
+        const title = b.name + ' — DukanList';
+        try {
+          if (navigator.share){
+            await navigator.share({ title, text: title, url });
+          } else if (navigator.clipboard){
+            await navigator.clipboard.writeText(url);
+            alert('Link copied');
+          }
+        } catch(_){}
+      });
+    }
+  } catch(premErr){
+    console.warn('Premium hero population skipped:', premErr);
+  }
+
+  // Wire sticky mobile bottom bar (same destinations as premium hero CTAs)
+  try {
+    const _mb = document.getElementById('premMobileBar');
+    if (_mb){
+      const _mbWa = document.getElementById('pmbWa');
+      const _mbCall = document.getElementById('pmbCall');
+      const _mbDir = document.getElementById('pmbDir');
+      const _premWa = document.getElementById('premCtaWa');
+      const _premCall = document.getElementById('premCtaCall');
+      const _premDir = document.getElementById('premCtaDir');
+      if (_mbWa && _premWa)   _mbWa.href   = _premWa.href || '#';
+      if (_mbCall && _premCall) _mbCall.href = _premCall.href || '#';
+      if (_mbDir && _premDir) _mbDir.href = _premDir.href || '#';
+      // Only show bottom bar when at least one contact action works
+      if ((_premWa && _premWa.style.display !== 'none') || (_premCall && _premCall.style.display !== 'none')){
+        _mb.style.display = '';
+      }
+    }
+  } catch(_){}
 
   // Inject UNCLAIMED banner right after the business name
   if (_isUnclaimed || _isClaimPending){
