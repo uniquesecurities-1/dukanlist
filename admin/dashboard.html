@@ -1130,6 +1130,14 @@ function renderRecentFiltered(){
     rows = rows.filter(r => (r.photos_count || 0) === 0);
   } else if (st.quickFilter === 'noReviews'){
     rows = rows.filter(r => (r.rating_count || 0) === 0);
+  } else if (st.quickFilter === 'emailPending'){
+    // Listings where owner can't yet log in:
+    //  - No account linked at all (admin bulk-published / shadow row only)
+    //  - OR account linked but auth.users.email_confirmed_at IS NULL
+    rows = rows.filter(r => !r.owner_account_exists || !r.owner_email_verified);
+  } else if (st.quickFilter === 'emailVerified'){
+    // Inverse — fully verified owners (for cross-check)
+    rows = rows.filter(r => r.owner_account_exists && r.owner_email_verified);
   }
   // Search
   if (st.search){
@@ -1255,6 +1263,9 @@ function renderRecentTable(rows, totalCount){
       ${quickChip('hasFlags', '⚠ Has Flags')}
       ${quickChip('noPhotos', '📷 No Photos')}
       ${quickChip('noReviews', '⭐ No Reviews')}
+      <span style="color:#94a3b8;font-size:11px;font-weight:700;margin-left:10px;padding-left:10px;border-left:1px dashed #cbd5e1">EMAIL:</span>
+      ${quickChip('emailPending', '📧 Email Pending')}
+      ${quickChip('emailVerified', '✓ Email Verified')}
     </div>
 
     ${rows.length === 0 ? `
@@ -1265,7 +1276,7 @@ function renderRecentTable(rows, totalCount){
       </div>
     ` : `
       <div style="font-size:.78rem;color:#475569;margin-bottom:6px;padding:6px 10px;background:#F1F5F9;border:1px dashed #CBD5E1;border-radius:6px;display:inline-block">
-        💡 Table is wide — <b>scroll sideways inside the table</b> to see <b>Created</b> and <b>Actions</b> columns
+        💡 Table is wide — <b>scroll sideways</b> to see Created &amp; Actions. Each row's Status cell shows a small email-state pill (<span style="background:#D1FAE5;color:#065F46;padding:1px 5px;border-radius:99px;font-size:.6rem;font-weight:800">✓ EMAIL</span> · <span style="background:#FED7AA;color:#9A3412;padding:1px 5px;border-radius:99px;font-size:.6rem;font-weight:800">⚠ EMAIL PENDING</span> · <span style="background:#FEF3C7;color:#78350F;padding:1px 5px;border-radius:99px;font-size:.6rem;font-weight:800">🟡 NO ACCOUNT</span>).
       </div>
       <div class="recent-table-wrap" style="overflow-x:auto;position:relative">
         <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:1280px">
@@ -1315,7 +1326,18 @@ function renderRecentTable(rows, totalCount){
                   <div>${escapeHtml(r.city_name || '—')}, ${escapeHtml(r.state_code || '')}</div>
                   ${r.pincode ? `<div style="color:#94a3b8;font-size:11px">PIN: ${escapeHtml(r.pincode)}</div>` : ''}
                 </td>
-                <td style="padding:10px 10px">${statusBadge(r.status)}</td>
+                <td style="padding:10px 10px">${statusBadge(r.status)}${
+                  // Tiny email-status badge below the status pill
+                  (function(){
+                    if (r.owner_account_exists && r.owner_email_verified){
+                      return '<div title="Owner email verified · ' + escapeHtml(r.owner_auth_email || '') + '" style="margin-top:4px;font-size:9px;font-weight:800;color:#065F46;background:#D1FAE5;padding:2px 6px;border-radius:99px;display:inline-block;letter-spacing:.04em">✓ EMAIL</div>';
+                    }
+                    if (r.owner_account_exists && !r.owner_email_verified){
+                      return '<div title="Account linked but email NOT verified — owner cannot login until they verify" style="margin-top:4px;font-size:9px;font-weight:800;color:#9A3412;background:#FED7AA;padding:2px 6px;border-radius:99px;display:inline-block;letter-spacing:.04em">⚠ EMAIL PENDING</div>';
+                    }
+                    return '<div title="No owner account at all · admin bulk-published or Golden Pages" style="margin-top:4px;font-size:9px;font-weight:800;color:#78350F;background:#FEF3C7;padding:2px 6px;border-radius:99px;display:inline-block;letter-spacing:.04em">🟡 NO ACCOUNT</div>';
+                  })()
+                }</td>
                 <td style="padding:10px 10px">${verifyBadge(r.verified_score)}</td>
                 <td style="padding:10px 10px;font-size:12px;white-space:nowrap">${ratingDisplay(r.rating_avg, r.rating_count)}</td>
                 <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">${r.photos_count || 0} 📸</td>
