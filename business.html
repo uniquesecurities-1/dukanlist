@@ -2812,27 +2812,43 @@ function render(){
   }
 
   // ===== Populate the inline Google Maps embed (desktop) =====
+  // IMPORTANT: Never include `b.name` in the search query — Google Maps will
+  // match similarly-named OTHER businesses in the same area (e.g. "Goyal Saree
+  // Emporium" wrongly pinned to "Goyal Sanitary & Tile Store"). Use coords if
+  // available, else use ADDRESS-ONLY text (no name).
   try {
     const _mapCard = document.getElementById('bizMapCard');
     const _mapIframe = document.getElementById('bizMapEmbed');
     const _mapOpen = document.getElementById('bizMapOpen');
+    const _mapHead = _mapCard ? _mapCard.querySelector('.biz-map-head') : null;
     if (_mapCard && _mapIframe){
       let q = '';
+      let exact = false;
       if (b.lat && b.lng){
+        // Precise GPS coordinates — best case
         q = b.lat + ',' + b.lng;
+        exact = true;
       } else {
-        // Build a search query from the business identifiers we have
+        // Address-only query (NO business name to prevent name-collision matches)
         const addrParts = [
-          b.name, b.address_line1, b.address_line2,
+          b.address_line1, b.address_line2,
           b.geo_localities?.name, b.geo_cities?.name, b.pincode
-        ].filter(Boolean);
-        q = addrParts.join(', ');
+        ].filter(s => s && String(s).trim().length > 0);
+        // Need at least a street/locality + city to be useful — bail otherwise
+        const hasStreet = !!(b.address_line1 && b.address_line1.trim().length > 3);
+        if (hasStreet){
+          q = addrParts.join(', ');
+        }
       }
       if (q){
-        // Output=embed gives a no-key inline map. Sufficient for visitor context.
         _mapIframe.src = 'https://www.google.com/maps?q=' + encodeURIComponent(q) + '&output=embed';
         if (_mapOpen){
           _mapOpen.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+        }
+        // Small disclaimer when we don't have precise coords — pin shows the
+        // street/area, not the exact shop entrance.
+        if (!exact && _mapHead){
+          _mapHead.innerHTML += ' <span style="font-weight:600;font-size:.7rem;color:#94A3B8;margin-left:6px">· approximate area</span>';
         }
         _mapCard.style.display = '';
       }
