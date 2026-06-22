@@ -362,6 +362,49 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   .prem-hero-bg{ animation:none !important }
 }
 
+/* ===== PHASE 1B — Hide DUPLICATED meta + tighten spacing on desktop =====
+   Premium banner now shows: name, hindi name, category, area, owner byline,
+   open status, rating, CTAs. So we can suppress all the duplicates that
+   the old layout was rendering separately below, freeing huge vertical space. */
+@media (min-width:761px){
+  /* Empty placeholder gallery card (.ph-fb) is fully replaced by premium banner */
+  #galleryMain:has(.ph-fb){ display:none !important; }
+  /* Empty thumbs row vanishes too when no photos */
+  #galleryThumbs:empty{ display:none !important; }
+
+  /* Tighten biz-hero outer spacing — banner already has its own padding */
+  .biz-hero{ padding:14px 24px 28px !important; }
+  .biz-hero-top-bar{ margin-bottom:14px !important; }
+
+  /* Hide redundant chunks of the old biz-meta-card now that banner shows them */
+  .biz-meta-card #bizCatPill{ display:none !important; }
+  .biz-meta-card .biz-title{ display:none !important; }
+  .biz-meta-card .biz-title-hi{ display:none !important; }
+  .biz-meta-card .owner-credit{ display:none !important; }
+  .biz-meta-card #catBadges:empty{ display:none !important; }
+  .biz-meta-card #adminVerified[style*="display:none"]{ display:none !important; }
+  .biz-meta-card #publicLoyaltyBadge[style*="display:none"]{ display:none !important; }
+  /* Hide ALL duplicate CTA rows inside meta-card — banner has all of these */
+  .biz-meta-card > .cta-row{ display:none !important; }
+
+  /* Tighten the meta-card padding so it's not stretched vertically when sparse */
+  .biz-meta-card{
+    padding:22px 24px !important;
+    box-shadow:0 6px 20px rgba(15,23,42,.05) !important;
+  }
+
+  /* Stop sticky positioning when there's no gallery — it just causes whitespace */
+  .gallery:has(#galleryMain:not(:has(img))){ position:static !important; }
+
+  /* Profile Highlights card sits below banner instead of below empty gallery */
+  .shop-highlights{ margin-top:0 !important; }
+}
+
+/* Mobile: hide the .ph-fb too — banner is enough on mobile */
+@media (max-width:760px){
+  #galleryMain:has(.ph-fb){ display:none !important; }
+}
+
 /* ===== STICKY MOBILE BOTTOM BAR (Call + WhatsApp always visible) ===== */
 .prem-mobile-bar{
   position:fixed; left:0; right:0; bottom:0;
