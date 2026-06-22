@@ -467,7 +467,7 @@ function render(){
         + '<div class="meta-row"><span class="ml">🔑 Login Email <span style="font-weight:500;color:#94a3b8;font-size:10px">(auth.users — used for sign-in)</span></span>'
           + '<span class="mv" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">'
           + '<b style="color:' + (s.owner_email ? '#065F46' : '#DC2626') + '">' + esc(s.owner_email || '— not set —') + '</b>'
-          + (s.owner_user_id ? '<button type="button" onclick="openEmailEdit()" title="Change LOGIN email — instantly auto-confirmed" style="background:#1E3A8A;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Change Login Email</button> <button type="button" onclick="unlinkOwner()" title="Unlink this auth user from the shop. Also clears owner_phone so the row cannot be auto-claimed again." style="background:#DC2626;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔗 Unlink Owner</button>' : '<span style="color:#DC2626;font-size:11px;font-weight:600">⚠ No auth account linked</span>')
+          + (s.owner_user_id ? '<button type="button" onclick="openEmailEdit()" title="Change LOGIN email — instantly auto-confirmed" style="background:#1E3A8A;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Change Login Email</button> <button type="button" onclick="unlinkOwner()" title="Unlink this auth user from the shop. Also clears owner_phone so the row cannot be auto-claimed again." style="background:#DC2626;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔗 Unlink Owner</button>' : '<span style="color:#DC2626;font-size:11px;font-weight:600;display:block;width:100%;margin-bottom:6px">⚠ No auth account linked</span><button type="button" onclick="resendOwnerInvite()" title="Send a magic-link verification email to the shop email (or any email you type). Owner clicks → auto-verified → can login." style="background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 2px 6px rgba(30,58,138,.25)">📧 Send Verification Email</button>')
           + '</span></div>'
         + '<div class="meta-row"><span class="ml">📧 Shop Email <span style="font-weight:500;color:#94a3b8;font-size:10px">(public contact · edit below ↓)</span></span><span class="mv">' + esc(s.shop_email || s.email || '—') + '</span></div>'
         + ((s.owner_email && (s.shop_email || s.email) && s.owner_email !== (s.shop_email || s.email)) ? '<div class="meta-row" style="background:#FEF3C7;border-left:3px solid #F59E0B;padding:6px 10px;margin-top:4px;border-radius:6px;font-size:11.5px;color:#7C2D12;line-height:1.4">⚠️ <b>Login email ≠ Shop email.</b> Shopkeeper uses the <b>Login Email</b> to sign in. If they think the Shop Email is correct, click <b>Change Login Email</b> above.</div>' : '')
@@ -1873,6 +1873,65 @@ async function adminImpersonate(email){
     );
     toast('🎭 Link ready');
   } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// ====== Send / Resend Verification Email (admin one-click invite) ======
+// Available when this shop has NO linked auth account. Sends a magic-link
+// to the shop email (or any email admin types) — same flow as the dedicated
+// /admin/owner-invites page, just inline in shop detail for one-click action.
+async function resendOwnerInvite(){
+  if (!SHOP){ alert('Shop not loaded yet'); return; }
+  if (SHOP.owner_user_id){
+    alert('This shop already has a linked auth account. Use "Change Login Email" instead.');
+    return;
+  }
+
+  // Default to the shop's existing email if present
+  var defaultEmail = (SHOP.shop_email || SHOP.email || '').trim();
+  var email = window.prompt(
+    'Send verification email to which address?\n\n' +
+    'Owner will receive a magic-link. Clicking it auto-verifies the email + creates the auth account + links it to this shop.\n\n' +
+    'You can change the address if needed:',
+    defaultEmail
+  );
+  if (!email) return;
+  email = email.trim().toLowerCase();
+
+  if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email)){
+    alert('⚠️ Not a valid email format. Try again.');
+    return;
+  }
+
+  // Use the global supabase client (loaded by supabase-init.js as ShopDB.client)
+  var c = (typeof ShopDB !== 'undefined' && ShopDB.client) ? ShopDB.client : null;
+  if (!c){ alert('Supabase not ready. Refresh the page.'); return; }
+
+  try {
+    // Step 1 — audit log + bump claim_status to pending
+    var logRes = await c.rpc('admin_log_email_invite', {
+      p_business_id: SHOP.id,
+      p_email:       email,
+      p_notes:       'Sent inline from /admin/shop',
+      p_sent_via:    'magic-link'
+    });
+    if (logRes.error) throw logRes.error;
+
+    // Step 2 — fire the actual magic link via Supabase auth
+    var claimUrl = (logRes.data && logRes.data.claim_url)
+      || ('https://dukanlist.com/claim-complete.html?token=' + (SHOP.claim_token || ''));
+    var otpRes = await c.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: claimUrl,
+        shouldCreateUser: true
+      }
+    });
+    if (otpRes.error) throw otpRes.error;
+
+    alert('✅ Email sent to ' + email + '\n\nOwner ko bolo inbox check kare (+ spam folder). Link click karne par account auto-verify + linked ho jayega.');
+  } catch(e){
+    alert('❌ Failed: ' + (e.message || e));
+  }
 }
 
 // ====== Unlink Owner (security fix — break auto-claim chain) ======

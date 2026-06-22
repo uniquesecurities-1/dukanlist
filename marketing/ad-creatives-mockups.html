@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DukanList Instagram Ad Creative Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;700;800;900&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;background:#F1F5F9;color:#0F172A;padding:30px;line-height:1.5}
+  h1{font-family:'Manrope',sans-serif;font-size:1.8rem;font-weight:900;margin-bottom:8px;letter-spacing:-.02em}
+  .lead{color:#475569;margin-bottom:30px;font-size:.95rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:24px;max-width:1400px;margin:0 auto}
+  .ad-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,.08)}
+  .ad-label{padding:14px 18px;background:#0F172A;color:#fff;font-weight:800;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+  .ad-label .fmt{background:#3B82F6;color:#fff;font-size:.62rem;padding:3px 8px;border-radius:99px;letter-spacing:.05em}
+  .ad-visual{aspect-ratio:1/1;position:relative;overflow:hidden}
+  .ad-visual.story{aspect-ratio:9/16}
+  .ad-text{padding:14px 18px;background:#fff;border-top:1px solid #E2E8F0}
+  .ad-text b{color:#0F172A;font-size:.92rem;display:block;margin-bottom:6px}
+  .ad-text p{color:#475569;font-size:.84rem;line-height:1.5}
+  .ad-text .cta{margin-top:10px;display:inline-block;background:#D97706;color:#fff;padding:6px 14px;border-radius:6px;font-size:.78rem;font-weight:800;text-decoration:none}
+
+  /* ====== Creative #1 — Pucho Bhai chat ====== */
+  .c1{background:linear-gradient(135deg,#FEF3C7 0%,#FBBF24 70%,#D97706 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;color:#7c2d12}
+  .c1 .bubble{background:#fff;border-radius:18px 18px 18px 4px;padding:14px 18px;font-weight:700;color:#0F172A;max-width:84%;box-shadow:0 4px 12px rgba(120,53,15,.18);margin-bottom:10px;font-size:.95rem}
+  .c1 .bubble.user{background:rgba(255,255,255,.95)}
+  .c1 .bubble.bot{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border-radius:18px 18px 4px 18px;align-self:flex-end;margin-left:auto}
+  .c1 .logo{position:absolute;bottom:14px;right:14px;background:rgba(120,53,15,.85);color:#fff;font-weight:900;font-size:.82rem;padding:7px 12px;border-radius:99px;backdrop-filter:blur(8px)}
+  .c1 .badge{position:absolute;top:14px;left:14px;background:#fff;color:#7c2d12;font-weight:900;font-size:.7rem;padding:5px 11px;border-radius:99px;letter-spacing:.04em}
+  .c1 .heading{position:absolute;top:50px;left:24px;right:24px;font-family:'Manrope',sans-serif;font-size:1.4rem;font-weight:900;color:#7c2d12;line-height:1.1;letter-spacing:-.02em;margin-bottom:14px}
+
+  /* ====== Creative #2 — Owner registration carousel slide ====== */
+  .c2{background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px 24px;color:#7c2d12;text-align:center}
+  .c2 .number{background:linear-gradient(135deg,#D97706,#92400E);color:#fff;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-family:'Manrope',sans-serif;font-weight:900;font-size:1.4rem;margin-bottom:18px;box-shadow:0 6px 18px rgba(217,119,6,.35)}
+  .c2 .headline{font-family:'Manrope',sans-serif;font-size:1.6rem;font-weight:900;color:#7c2d12;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px;max-width:80%}
+  .c2 .sub{font-size:.86rem;color:#92400E;font-weight:600;max-width:80%;line-height:1.5;margin-bottom:18px}
+  .c2 .cta-pill{background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-weight:800;font-size:.82rem;padding:10px 22px;border-radius:99px;box-shadow:0 6px 18px rgba(217,119,6,.35)}
+  .c2 .logo{position:absolute;bottom:14px;right:14px;font-weight:900;font-size:.75rem;color:#7c2d12;background:rgba(255,255,255,.85);padding:4px 10px;border-radius:99px}
+
+  /* ====== Creative #3 — Community story reel ====== */
+  .c3{background:linear-gradient(180deg,#78350F 0%,#92400E 60%,#D97706 100%);color:#FEF3C7;padding:30px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .c3::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent 0 18px,rgba(255,255,255,.04) 18px 19px);pointer-events:none}
+  .c3 .top{position:relative;z-index:1}
+  .c3 .badge{display:inline-block;background:rgba(255,255,255,.92);color:#7c2d12;font-weight:900;font-size:.7rem;padding:5px 12px;border-radius:99px;letter-spacing:.04em;margin-bottom:18px}
+  .c3 .title{font-family:'Manrope',sans-serif;font-size:1.7rem;font-weight:900;letter-spacing:-.02em;line-height:1.1;color:#fff;text-shadow:0 2px 8px rgba(120,53,15,.5);margin-bottom:10px}
+  .c3 .quote{font-size:.92rem;color:#FEF3C7;line-height:1.5;font-weight:600;opacity:.95}
+  .c3 .footer{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-end}
+  .c3 .url{font-weight:900;font-size:.85rem;background:rgba(255,255,255,.18);color:#fff;padding:8px 14px;border-radius:99px;backdrop-filter:blur(8px)}
+  .c3 .made-in{font-size:.7rem;color:#FEF3C7;opacity:.8;font-weight:600;text-align:right;line-height:1.3}
+
+  /* ====== Creative #4 — Find Save Call ====== */
+  .c4{background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 50%,#FDE68A 100%);padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:#7c2d12;position:relative}
+  .c4 .phone{background:#0F172A;border-radius:18px;padding:16px;color:#fff;margin-bottom:14px;box-shadow:0 8px 22px rgba(15,23,42,.25)}
+  .c4 .phone .search{background:rgba(255,255,255,.1);border-radius:9px;padding:9px 12px;font-size:.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+  .c4 .phone .result{background:#fff;color:#0F172A;border-radius:9px;padding:9px 11px;font-size:.74rem;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .c4 .phone .result .open{background:#10B981;color:#fff;font-size:.6rem;padding:1px 6px;border-radius:99px;font-weight:800;margin-left:auto}
+  .c4 .three-icons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .c4 .three-icons div{background:#fff;border-radius:11px;padding:11px 7px;text-align:center;border:1.5px solid #FCD34D}
+  .c4 .three-icons div .em{font-size:1.4rem;display:block;margin-bottom:4px}
+  .c4 .three-icons div .lbl{font-size:.62rem;font-weight:800;color:#7c2d12;letter-spacing:.04em;text-transform:uppercase}
+  .c4 .tag{text-align:center;font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#7c2d12;letter-spacing:-.01em}
+  .c4 .url{text-align:center;font-size:.74rem;font-weight:800;color:#92400E;margin-top:5px}
+
+  /* ====== Creative #5 — Verified shops collage ====== */
+  .c5{background:#FFFBEB;padding:18px;position:relative}
+  .c5 .heading{font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#7c2d12;text-align:center;margin-bottom:12px;letter-spacing:-.01em}
+  .c5 .photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .c5 .photo-tile{background:#0F172A;color:#fff;aspect-ratio:1/1;border-radius:9px;padding:11px 9px;display:flex;flex-direction:column;justify-content:space-between;font-size:.66rem;position:relative;overflow:hidden}
+  .c5 .photo-tile::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#D97706,#92400E);opacity:.6}
+  .c5 .photo-tile > *{position:relative;z-index:1}
+  .c5 .photo-tile .verified{background:#10B981;color:#fff;font-size:.55rem;font-weight:900;padding:2px 6px;border-radius:99px;align-self:flex-start;letter-spacing:.04em}
+  .c5 .photo-tile .name{font-weight:900;font-size:.78rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .c5 .cta-bar{background:#0F172A;color:#fff;text-align:center;padding:10px;border-radius:9px;font-weight:800;font-size:.86rem}
+  .c5 .url{margin-top:6px;text-align:center;font-size:.72rem;color:#7c2d12;font-weight:800}
+
+  .scribbles{margin-top:30px;padding:20px;background:#fff;border-radius:14px;border-left:4px solid #D97706}
+  .scribbles h2{font-family:'Manrope',sans-serif;font-size:1.2rem;margin-bottom:10px;letter-spacing:-.01em}
+  .scribbles p{color:#475569;font-size:.88rem;line-height:1.6;margin-bottom:6px}
+  .scribbles code{background:#F1F5F9;padding:2px 6px;border-radius:4px;font-size:.82rem;color:#0F172A;font-family:'SF Mono','Monaco',monospace}
+</style>
+</head>
+<body>
+
+<h1>📸 DukanList Instagram Ad Mockups</h1>
+<p class="lead">5 ready creative concepts for the Dabwali launch. Use these as direct screenshots OR replicate the layouts in Canva using the brand colours below.</p>
+
+<div class="grid">
+
+  <!-- Creative #1 -->
+  <div class="ad-card">
+    <div class="ad-label">Creative #1 — Pucho Bhai <span class="fmt">FEED · 1080×1080</span></div>
+    <div class="ad-visual c1">
+      <span class="badge">🥇 DukanList</span>
+      <div style="margin-top:60px;width:100%;display:flex;flex-direction:column">
+        <div class="bubble user">Bhai, kahan milega 24×7 gas wala?</div>
+        <div class="bubble bot">→ DukanList pe pucho bhai 💬</div>
+      </div>
+      <span class="logo">dukanlist.com</span>
+    </div>
+    <div class="ad-text">
+      <b>Headline:</b> Pucho Bhai · har sawaal ka jawab
+      <p>Dabwali me kuch dhundh rahe ho? Gas wala, doctor, halwai, mechanic, school — sab DukanList pe milega. Ek baar try karo.</p>
+      <a href="#" class="cta">Learn More →</a>
+    </div>
+  </div>
+
+  <!-- Creative #2 — Slide 1 -->
+  <div class="ad-card">
+    <div class="ad-label">Creative #2 — Owner CTA <span class="fmt">CAROUSEL · slide 5/5</span></div>
+    <div class="ad-visual c2" style="position:relative">
+      <span class="logo">🥇 dukanlist.com</span>
+      <div class="number">5</div>
+      <div class="headline">Register karo abhi</div>
+      <p class="sub">Sirf 2 minute me · zero kharcha · 1000+ Dabwali vyapari pehle se</p>
+      <span class="cta-pill">→ dukanlist.com/register</span>
+    </div>
+    <div class="ad-text">
+      <b>Headline:</b> Free me dukaan list karo · DukanList
+      <p>Dabwali ke 1000+ vyapari pehle se DukanList pe hain. Aap kab join kar rahe hain? ✓ Photos · hours · WhatsApp · zero commission.</p>
+      <a href="#" class="cta">Sign Up →</a>
+    </div>
+  </div>
+
+  <!-- Creative #3 — Story reel cover -->
+  <div class="ad-card">
+    <div class="ad-label">Creative #3 — Community Story <span class="fmt">REEL · 1080×1920</span></div>
+    <div class="ad-visual story c3">
+      <div class="top">
+        <span class="badge">🇮🇳 Made in Mandi Dabwali</span>
+        <div class="title">Yeh hai humara<br>Dabwali</div>
+        <div class="quote">"Saari dukaane, doctor, school, mistri — sab apne hain. Aaj sab DukanList pe."</div>
+      </div>
+      <div class="footer">
+        <span class="url">dukanlist.com</span>
+        <div class="made-in">Free local<br>directory</div>
+      </div>
+    </div>
+    <div class="ad-text">
+      <b>Headline:</b> Apne Dabwali ka apna DukanList
+      <p>Made in Mandi Dabwali, banaya gaya tumhare liye. Har dukaan, har doctor, har mistri — ek hi jagah. Try free → dukanlist.com</p>
+      <a href="#" class="cta">Watch Now →</a>
+    </div>
+  </div>
+
+  <!-- Creative #4 -->
+  <div class="ad-card">
+    <div class="ad-label">Creative #4 — Find Save Call <span class="fmt">FEED · 1080×1080</span></div>
+    <div class="ad-visual c4">
+      <div class="phone">
+        <div class="search">🔍 doctor in Dabwali</div>
+        <div class="result">🏥 Dr Mehta Clinic <span class="open">OPEN</span></div>
+        <div class="result">🏥 Singla Hospital <span class="open">OPEN</span></div>
+        <div class="result">🏥 Bansal Polyclinic <span style="background:#94A3B8;color:#fff;font-size:.6rem;padding:1px 6px;border-radius:99px;font-weight:800;margin-left:auto">CLOSED</span></div>
+      </div>
+      <div class="three-icons">
+        <div><span class="em">🔍</span><span class="lbl">Find</span></div>
+        <div><span class="em">❤</span><span class="lbl">Save</span></div>
+        <div><span class="em">📞</span><span class="lbl">Call</span></div>
+      </div>
+      <div>
+        <div class="tag">Dabwali ki har dukaan<br>ek tap par</div>
+        <div class="url">🥇 dukanlist.com</div>
+      </div>
+    </div>
+    <div class="ad-text">
+      <b>Headline:</b> Halwai, doctor, plumber — sab DukanList pe
+      <p>Reviews padho, photos dekho, seedha call karo. Free local directory, made for Dabwali.</p>
+      <a href="#" class="cta">Try Now →</a>
+    </div>
+  </div>
+
+  <!-- Creative #5 -->
+  <div class="ad-card">
+    <div class="ad-label">Creative #5 — Verified Trust <span class="fmt">FEED · 1080×1080</span></div>
+    <div class="ad-visual c5">
+      <div class="heading">🥇 Dabwali ke verified vyapari</div>
+      <div class="photo-grid">
+        <div class="photo-tile"><span class="verified">✓ VERIFIED</span><span class="name">Premi Desi<br>Ghee Bhandhar</span></div>
+        <div class="photo-tile"><span class="verified">✓ VERIFIED</span><span class="name">Suvidha<br>Gas Service</span></div>
+        <div class="photo-tile"><span class="verified">✓ VERIFIED</span><span class="name">Madaan<br>PG</span></div>
+        <div class="photo-tile"><span class="verified">✓ VERIFIED</span><span class="name">Sharma<br>Sweets</span></div>
+      </div>
+      <div class="cta-bar">Apni dukaan bhi list karo — FREE</div>
+      <div class="url">🥇 dukanlist.com</div>
+    </div>
+    <div class="ad-text">
+      <b>Headline:</b> Pehle se 1000+ Dabwali vyapari DukanList pe
+      <p>Yeh hain kuch trusted vyapari jo pehle se DukanList pe hain. Aap bhi join karo — free, forever.</p>
+      <a href="#" class="cta">Join Free →</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="scribbles" style="max-width:1400px;margin:30px auto 0">
+  <h2>🎨 How to use these mockups</h2>
+  <p><b>Option 1:</b> Open this file in a browser, screenshot each card (use Win+Shift+S), save as PNG, upload to Instagram Ads Manager.</p>
+  <p><b>Option 2:</b> Open in Canva → File → Create new design 1080×1080 → recreate the layout using the brand colours below. Canva has all the fonts and the saffron palette is one search away.</p>
+  <p><b>Brand colours:</b> <code>#D97706</code> (saffron) · <code>#92400E</code> (saffron deep) · <code>#FBBF24</code> (gold) · <code>#FFFBEB</code> (cream) · <code>#0F172A</code> (ink) · <code>#25D366</code> (WhatsApp green)</p>
+  <p><b>Fonts:</b> Manrope 800–900 for headlines · Plus Jakarta Sans 500–700 for body · Noto Sans Devanagari for Hindi</p>
+  <p><b>Real shop photos:</b> Get permission from 4–6 well-known Dabwali shopkeepers to use their shopfront photos in Creative #5. Pay them in advertising goodwill (mention them in posts).</p>
+</div>
+
+</body>
+</html>
