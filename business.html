@@ -352,11 +352,24 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   .prem-hero-byline{ font-size:.74rem }
   .prem-meta-chip{ font-size:.66rem; padding:3px 8px }
   .prem-cat-chip, .prem-area-chip{ font-size:.66rem; padding:4px 9px }
-  .prem-hero-cta{ gap:5px; margin-top:10px }
-  .prem-btn{ padding:9px 12px; font-size:.78rem; flex:1; justify-content:center; min-width:0 }
-  .prem-btn-txt{ display:none } /* Show only icons on phone for space */
-  .prem-btn-wa .prem-btn-txt,
-  .prem-btn-call .prem-btn-txt{ display:inline } /* Keep label on primary actions */
+
+  /* CTA row redesigned: WA + Call are primary (labelled, flex:1).
+     Directions/Save/Share collapse to 44px square icon-only buttons. */
+  .prem-hero-cta{ gap:5px; margin-top:10px; align-items:stretch }
+  .prem-btn{ padding:11px 10px; font-size:.78rem; min-width:0; white-space:nowrap; justify-content:center }
+  .prem-btn-ico{ font-size:1rem }
+  /* Primary buttons take the remaining flex space, show label */
+  .prem-btn-wa, .prem-btn-call{ flex:1; padding:11px 8px; font-size:.84rem }
+  .prem-btn-wa .prem-btn-txt, .prem-btn-call .prem-btn-txt{ display:inline; font-weight:800 }
+  /* Secondary buttons become 44px icon-only squares */
+  .prem-btn-dir, .prem-btn-save, .prem-btn-share{
+    flex:0 0 44px; width:44px; padding:0;
+    height:44px;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .prem-btn-dir .prem-btn-txt,
+  .prem-btn-save .prem-btn-txt,
+  .prem-btn-share .prem-btn-txt{ display:none }
 }
 @media (prefers-reduced-motion:reduce){
   .prem-hero-bg{ animation:none !important }
@@ -398,6 +411,18 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
 
   /* Profile Highlights card sits below banner instead of below empty gallery */
   .shop-highlights{ margin-top:0 !important; }
+
+  /* === Tighten the gap between biz-hero and the next content section === */
+  .biz-hero{ padding-bottom:18px !important; }
+  .sec-content{ margin-top:8px !important; margin-bottom:24px !important; }
+
+  /* Equalize gap below the 2-col biz-top grid so left short column doesn't
+     create a yawning empty band. Use minmax + align-items:start (default)
+     plus a thin separator at bottom. */
+  .biz-top{ gap:18px !important; }
+  /* Cap the right meta-card height so both columns stay similar in length */
+  .biz-meta-card{ align-self:start; }
+  .gallery{ align-self:start; }
 }
 
 /* Mobile: hide the .ph-fb too — banner is enough on mobile */
