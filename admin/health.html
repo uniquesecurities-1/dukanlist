@@ -245,6 +245,7 @@ async function loadHealth(){
     ['Total Shops', stats.total_shops, ''],
     ['Active', stats.active_shops, ''],
     ['Pending', stats.pending_shops, stats.pending_shops > 0 ? 'needs review' : ''],
+    ['Soft Listed', stats.soft_listed_shops, 'Golden Pages'],
     ['Banned', stats.banned_shops, ''],
     ['Total Owners', stats.total_owners, ''],
     ['Added (24h)', stats.shops_added_24h, ''],
@@ -252,10 +253,18 @@ async function loadHealth(){
     ['Categories', stats.total_categories, ''],
     ['Cities', stats.total_cities, ''],
     ['Localities', stats.total_localities, ''],
+    ['Verified Phones', stats.verified_mobiles, ''],
+    ['Account-less Active', stats.accountless_active, 'waiting invite'],
+    ['Open Flags', stats.open_flags, stats.open_flags > 0 ? 'review needed' : 'clean'],
+    ['Invites Sent (24h)', stats.invites_24h, ''],
+    ['Self-Adds (24h)', stats.self_adds_24h, ''],
     ['Errors (24h)', stats.errors_last_24h, stats.errors_last_24h > 0 ? (stats.errors_unresolved + ' unresolved') : 'clean']
   ];
   document.getElementById('statsGrid').innerHTML = cards.map(([label, val, delta]) => {
-    const cls = (label === 'Errors (24h)' && val > 0) ? 'warn' : (label === 'Pending' && val > 0) ? 'warn' : '';
+    let cls = '';
+    if (label === 'Errors (24h)' && val > 0) cls = 'warn';
+    else if (label === 'Pending' && val > 0) cls = 'warn';
+    else if (label === 'Open Flags' && val > 0) cls = 'warn';
     return '<div class="stat-card ' + cls + '"><div class="label">' + esc(label) + '</div><div class="value">' + (val != null ? esc(val) : '—') + '</div>' + (delta ? '<div class="delta">' + esc(delta) + '</div>' : '') + '</div>';
   }).join('');
 
@@ -312,12 +321,23 @@ async function resolveError(id){
 }
 
 const RPC_TESTS = [
+  // ===== Core admin =====
   { name: 'is_admin',                desc: 'Long-existing admin check',                       args: {},                         safe: true },
-  { name: 'admin_health_check',      desc: 'Returns invariants + stats (needs db/136)',       args: {},                         safe: true },
+  { name: 'admin_health_check',      desc: 'Returns invariants + stats (needs db/136+179)',   args: {},                         safe: true },
   { name: 'admin_get_shop_full',     desc: 'Fetch one shop (uses random first business id)',  args: 'auto-shop',                safe: true },
   { name: 'admin_recent_errors',     desc: 'Recent error log (needs db/136)',                 args: { p_limit: 1 },             safe: true },
   { name: 'admin_update_shop',       desc: 'Whitelist + array-cast sanity (empty patch)',     args: 'auto-shop-patch',          safe: true },
-  { name: 'get_spotlight_of_week',   desc: 'Weekly spotlight picker (needs db/132)',          args: {},                         safe: true }
+  { name: 'get_spotlight_of_week',   desc: 'Weekly spotlight picker (needs db/132)',          args: {},                         safe: true },
+
+  // ===== Golden Pages — public =====
+  { name: 'gp_list_shops',           desc: 'Public listing query (db/178)',                   args: { p_limit: 1 },             safe: true },
+  { name: 'gp_categories_with_counts', desc: 'Category sidebar with counts (db/166)',         args: {},                         safe: true },
+  { name: 'gp_stats',                desc: 'Hero stats (total, this week, etc) (db/166)',     args: {},                         safe: true },
+
+  // ===== Golden Pages — admin =====
+  { name: 'admin_gp_list_all',       desc: 'Paginated manage list (db/178)',                  args: { p_limit: 1 },             safe: true },
+  { name: 'admin_unclaimed_list',    desc: 'All account-less listings (db/175)',              args: { p_limit: 1 },             safe: true },
+  { name: 'admin_gp_review_flags',   desc: 'Open flag reports (db/176)',                      args: { p_status: 'open', p_limit: 1 }, safe: true }
 ];
 
 async function runRpcSelfTest(){
