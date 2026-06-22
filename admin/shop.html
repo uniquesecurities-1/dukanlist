@@ -321,18 +321,27 @@ function render(){
             + '<div></div>'
           + '</div>'
           + '<div class="grid-2">'
-            // Single source of truth: auth.users.email. The public "shop
-            // email" is just a mirror of the login email — they are kept
-            // in sync by api/admin-update-shop-email.js cascade and the
-            // one-time db/92 backfill. Editing here is disabled to
-            // prevent the two values from diverging again.
-            + '<div class="field"><label>Shop Email (public contact)</label>'
-              + '<input type="email" disabled value="' + esc(s.owner_email || s.shop_email || s.email || '— not set —') + '" style="background:#F8FAFC;color:#475569;cursor:not-allowed">'
-              + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">Mirrors the login email — change it via "Change Login Email" in Owner Account panel →</small>'
-            + '</div>'
+            // Shop Email editability rule:
+            //   - If owner_user_id IS NULL (no auth account linked yet) →
+            //     editable directly. Source of truth is just businesses.email.
+            //     Admin uses this to set/correct the email BEFORE inviting the
+            //     owner to verify.
+            //   - If owner_user_id IS NOT NULL (linked auth account exists) →
+            //     disabled here. Must use "Change Login Email" button which
+            //     cascades through auth.users → businesses.email.
+            + (s.owner_user_id
+                ? '<div class="field"><label>Shop Email (public contact)</label>'
+                    + '<input type="email" disabled value="' + esc(s.owner_email || s.shop_email || s.email || '— not set —') + '" style="background:#F8FAFC;color:#475569;cursor:not-allowed">'
+                    + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">🔒 Mirrors the login email — change it via "Change Login Email" in Owner Account panel →</small>'
+                  + '</div>'
+                : '<div class="field"><label>Shop Email (public contact) <span style="color:#3B82F6;font-size:11px;font-weight:600">· editable</span></label>'
+                    + '<input type="email" name="email" placeholder="owner@example.com" value="' + esc(s.shop_email || s.email || '') + '">'
+                    + '<small style="display:block;margin-top:4px;color:#64748b;font-size:11px">✏️ No auth account linked yet — you can edit + save directly. Once owner claims, this becomes locked.</small>'
+                  + '</div>'
+              )
             + '<div class="field"><label style="color:#94a3b8;font-size:12px">Login Email (read-only)</label>'
               + '<input type="email" disabled value="' + esc(s.owner_email || '— not set —') + '" style="background:#F8FAFC;color:#64748b;cursor:not-allowed">'
-              + '<small style="display:block;margin-top:4px;color:#94a3b8;font-size:11px">To change login email, use "Change Login Email" button in Owner Account panel →</small>'
+              + '<small style="display:block;margin-top:4px;color:#94a3b8;font-size:11px">' + (s.owner_user_id ? 'To change login email, use "Change Login Email" button in Owner Account panel →' : 'No auth account yet · click "📧 Send Verification Email" in Owner Account panel to create one') + '</small>'
             + '</div>'
           + '</div>'
           + field('textarea', 'usp_text',   'USP / Tagline (English)', s.usp_text)
@@ -729,12 +738,25 @@ async function saveShop(e){
     var v = f.querySelector('[name="' + k + '"]')?.value;
     if (v !== undefined && v !== SHOP[k]) patch[k] = v;
   });
-  // Shop email is deliberately NOT included in this patch. It is now
-  // a read-only mirror of auth.users.email. To change it, admin uses
-  // the "Change Login Email" button which cascades to businesses.email
-  // (see api/admin-update-shop-email.js). Including it here would
-  // re-introduce the historical bug of the two email columns drifting
-  // apart from each other.
+  // Shop email — editable IF and ONLY IF no auth account is linked yet.
+  // Once an account exists, source-of-truth becomes auth.users.email and
+  // admin must use the "Change Login Email" button (which cascades).
+  // For account-less listings, businesses.email is just a standalone
+  // column and admin can safely edit it (e.g., fix a typo before invite).
+  if (!SHOP.owner_user_id){
+    var emailField = f.querySelector('[name="email"]');
+    if (emailField){
+      var newEmail = (emailField.value || '').trim().toLowerCase();
+      var oldEmail = (SHOP.shop_email || SHOP.email || '').trim().toLowerCase();
+      if (newEmail !== oldEmail){
+        if (newEmail && !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(newEmail)){
+          alert('⚠️ Email format galat hai. Sahi format me daalo (e.g. name@example.com).');
+          return;
+        }
+        patch.email = newEmail || null;
+      }
+    }
+  }
   // Trust signals
   var yEl = f.querySelector('[name="established_year"]');
   if (yEl){
