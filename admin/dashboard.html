@@ -303,7 +303,7 @@
   <!-- Recent Registrations -->
   <div class="section">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-      <h2 class="section-title" style="margin:0">📋 Recent Registrations <span id="recentLabel" style="color:#94a3b8;font-size:12px;font-weight:500">(latest 25)</span></h2>
+      <h2 class="section-title" style="margin:0">🏪 Main DukanList — Recent <span id="recentLabel" style="color:#94a3b8;font-size:12px;font-weight:500">(latest 25)</span> <span style="background:#DBEAFE;color:#1E40AF;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">EXCLUDES GOLDEN PAGES</span></h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button id="showAllBtn" onclick="toggleShowAll()"
           style="background:#7C3AED;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
@@ -326,6 +326,65 @@
       <div class="loader">Loading...</div>
     </div>
   </div>
+
+  <!-- Golden Pages — dedicated panel so it's never confused with main DukanList -->
+  <div class="section" style="background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 100%);border:1.5px solid #FCD34D;border-radius:14px;padding:18px 18px 14px;margin-bottom:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <h2 class="section-title" style="margin:0;color:#78350F">🥇 Golden Pages — Recent <span id="gpRecentLabel" style="color:#92400E;font-size:12px;font-weight:500">(latest 10)</span> <span style="background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">SOFT-LISTED ONLY</span></h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <a href="/admin/golden-pages-add.html" style="background:linear-gradient(135deg,#D97706,#92400E);color:#fff;text-decoration:none;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">+ Add</a>
+        <a href="/admin/golden-pages-manage.html" style="background:#fff;color:#92400E;text-decoration:none;border:1.5px solid #FCD34D;border-radius:6px;padding:7px 13px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">📋 Manage all →</a>
+      </div>
+    </div>
+    <div id="gpRecentList">
+      <div class="loader" style="color:#92400E">Loading…</div>
+    </div>
+  </div>
+
+  <!-- GP recent panel loader -->
+  <script>
+  (async function loadGoldenPagesRecent(){
+    if (typeof ShopDB === 'undefined' || !ShopDB.client) return;
+    const c = ShopDB.client;
+    const host = document.getElementById('gpRecentList');
+    if (!host) return;
+    try {
+      const { data, error } = await c.rpc('admin_recent_soft_listed', { p_limit: 10 });
+      if (error) throw error;
+      const rows = data || [];
+      if (!rows.length){
+        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/golden-pages-add.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
+        return;
+      }
+      function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+      function ago(ts){ if(!ts)return''; try{const d=new Date(ts); const m=Math.floor((Date.now()-d.getTime())/60000); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago';}catch(e){return''} }
+
+      const html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">' +
+        rows.map(r => {
+          const claimedBadge = r.has_owner_account
+            ? '<span style="background:#D1FAE5;color:#065F46;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:4px">✓ CLAIMED</span>'
+            : '<span style="background:#FEE2E2;color:#991B1B;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:4px">UNCLAIMED</span>';
+          return '<div style="background:#fff;border:1px solid #FDE68A;border-radius:10px;padding:11px 13px">' +
+            '<div style="font-size:.92rem;font-weight:800;color:#0F172A;line-height:1.25;margin-bottom:3px">🏪 ' + esc(r.name) +
+              (r.name_hi ? '<span style="font-weight:600;color:#78350F;font-size:.78rem;margin-left:5px">' + esc(r.name_hi) + '</span>' : '') + '</div>' +
+            '<div style="font-size:.74rem;color:#78350F;font-weight:600;line-height:1.5">' +
+              esc(r.primary_cat || '—') +
+              (r.city_name ? ' · ' + esc(r.city_name) : '') +
+              (r.mobile ? ' · 📞 ' + esc(r.mobile) : '') +
+              ' · ' + esc(ago(r.pre_listed_at)) +
+            '</div>' +
+            '<div style="margin-top:6px">' +
+              claimedBadge +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+      host.innerHTML = html;
+    } catch(e){
+      host.innerHTML = '<div style="padding:12px;color:#991B1B;font-size:.85rem;font-weight:600">⚠️ Could not load Golden Pages: ' + (e.message || e) + '</div>';
+    }
+  })();
+  </script>
 
   <div class="footer">
     DukanList Admin · DigiMutual Goals Pvt. Ltd.
