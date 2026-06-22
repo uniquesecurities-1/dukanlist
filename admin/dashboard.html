@@ -1148,6 +1148,7 @@ function renderRecentFiltered(){
       (r.mobile || '').includes(q) ||
       (r.whatsapp || '').includes(q) ||
       (r.email || '').toLowerCase().includes(q) ||
+      (r.owner_auth_email || '').toLowerCase().includes(q) ||
       (r.primary_cat || '').toLowerCase().includes(q) ||
       (r.city_name || '').toLowerCase().includes(q)
     );
@@ -1319,7 +1320,10 @@ function renderRecentTable(rows, totalCount){
                 <td style="padding:10px 10px;color:#475569;font-size:12px;white-space:nowrap">
                   <div title="Primary mobile">📞 ${escapeHtml(mobile)}</div>
                   ${wa && !waSameAsMobile ? `<div style="color:#16A34A;margin-top:2px" title="WhatsApp">💬 ${escapeHtml(wa)}</div>` : ''}
-                  ${r.email ? `<div style="color:#0891B2;margin-top:2px;font-size:11px" title="Email">✉ ${escapeHtml(r.email)}</div>` : ''}
+                  ${r.email ? `<div style="color:#0891B2;margin-top:2px;font-size:11px" title="Public shop email">✉ ${escapeHtml(r.email)}</div>` : ''}
+                  ${r.owner_auth_email && r.owner_auth_email !== r.email
+                    ? `<div style="color:#7C3AED;margin-top:2px;font-size:11px" title="Owner login email (auth.users)">🔑 ${escapeHtml(r.owner_auth_email)}</div>`
+                    : ''}
                 </td>
                 <td style="padding:10px 10px;color:#64748b">${escapeHtml(r.primary_cat || '—')}</td>
                 <td style="padding:10px 10px;color:#64748b;font-size:12px;white-space:nowrap">
