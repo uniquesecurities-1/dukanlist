@@ -264,15 +264,35 @@
       </div>
     </form>
 
-    <!-- NEW: Discover (TikTok-style vertical feed) entry pill — pulsing for attention -->
-    <div style="text-align:center;margin:12px 0 18px">
-      <a href="/discover.html" id="discoverPill" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED 0%,#EC4899 50%,#F59E0B 100%);color:#fff;padding:9px 18px;border-radius:99px;font-weight:900;font-size:.92rem;text-decoration:none;box-shadow:0 8px 22px rgba(124,58,237,.38);font-family:'Manrope',sans-serif;animation:pulseGlow 2.4s infinite;letter-spacing:.01em;white-space:nowrap;max-width:calc(100% - 24px)">
-        <span style="font-size:1.05rem">🎬</span>
-        <span data-i18n-en>Discover Listings</span><span data-i18n-hi>लिस्टिंग देखें</span>
-        <span style="background:rgba(255,255,255,.28);padding:2px 7px;border-radius:99px;font-size:.62rem;font-weight:900;letter-spacing:.06em">NEW</span>
-      </a>
-    </div>
-    <style>@keyframes pulseGlow{0%,100%{box-shadow:0 10px 26px rgba(124,58,237,.4)}50%{box-shadow:0 14px 36px rgba(236,72,153,.55),0 0 0 10px rgba(236,72,153,.08)}}#discoverPill:hover{transform:translateY(-2px);transition:transform .2s}</style>
+    <!-- ⭐ GOLDEN PAGES — main attraction (moved up, made dominant) -->
+    <a href="/golden-pages.html" class="gp-hero-card" id="gpHeroCard" title="Free local business directory — anyone can list, anyone can find">
+      <span class="gp-hero-icon">🥇</span>
+      <span class="gp-hero-body">
+        <span class="gp-hero-title"><span data-i18n-en>Golden Pages</span><span data-i18n-hi>गोल्डन पेजेस</span></span>
+        <span class="gp-hero-sub"><span data-i18n-en>Free local directory · Find or list any business in 30 seconds</span><span data-i18n-hi>फ्री लोकल डायरेक्टरी · कोई भी दुकान खोजें या लिस्ट करें</span></span>
+      </span>
+      <span class="gp-hero-arrow">→</span>
+    </a>
+    <style>
+      .gp-hero-card{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#78350F 0%,#92400E 35%,#D97706 70%,#FBBF24 100%);background-size:200% 200%;color:#fff!important;border-radius:18px;padding:18px 20px;margin:14px auto 18px;max-width:620px;text-decoration:none!important;box-shadow:0 10px 30px rgba(217,119,6,.35),0 0 0 2px rgba(251,191,36,.4),inset 0 1px 0 rgba(255,255,255,.18);position:relative;border:2px solid #FBBF24;animation:gpHeroShine 3.5s ease-in-out infinite;transition:.25s;font-family:'Manrope',sans-serif}
+      .gp-hero-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(217,119,6,.5),0 0 0 2px rgba(251,191,36,.7);background-position:100% 100%;text-decoration:none}
+      .gp-hero-icon{font-size:2.4rem;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));flex-shrink:0;animation:gpHeroIconBob 2.4s ease-in-out infinite}
+      .gp-hero-body{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;text-align:left}
+      .gp-hero-title{font-size:1.25rem;font-weight:900;letter-spacing:-.015em;line-height:1.1;color:#fff}
+      .gp-hero-sub{font-size:.82rem;font-weight:600;color:#FEF3C7;opacity:.95;line-height:1.35}
+      .gp-hero-arrow{font-size:1.6rem;font-weight:900;flex-shrink:0;color:#FEF3C7;animation:gpHeroArrow 1.8s ease-in-out infinite}
+      @keyframes gpHeroShine{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+      @keyframes gpHeroIconBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
+      @keyframes gpHeroArrow{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+      @media (max-width:560px){
+        .gp-hero-card{padding:14px 16px;gap:10px;border-radius:14px;margin:10px auto 14px;border-width:1.5px}
+        .gp-hero-icon{font-size:2rem}
+        .gp-hero-title{font-size:1.05rem}
+        .gp-hero-sub{font-size:.74rem}
+        .gp-hero-arrow{font-size:1.3rem}
+      }
+      @media (prefers-reduced-motion:reduce){.gp-hero-card,.gp-hero-icon,.gp-hero-arrow{animation:none!important}}
+    </style>
 
     <div class="hero-chips-wrap">
       <div class="hero-chips-label">
@@ -317,41 +337,47 @@
       </div>
     </div>
 
-    <div class="hero-extras">
+    <!-- Secondary actions — Discover, Pucho Bhai, Pro, Open Now (de-emphasised so Golden Pages stays the star) -->
+    <div class="hero-extras hero-extras-v2">
       <label id="openNowHome">
         <input type="checkbox" id="openNowCheck" onchange="document.getElementById('openNowHome').classList.toggle('on', this.checked);">
         <span class="dot"></span>
         <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
       </label>
-      <a href="/puchobhai" class="pucho-bhai-mega-pill" id="puchoBhaiPill">
-        <span class="pucho-mega-spark">✨</span>
-        <span class="pucho-mega-text">
-          💬 <b><span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span></b>
-          <span class="pucho-mega-cta" data-i18n-en>← Try Now!</span><span class="pucho-mega-cta" data-i18n-hi style="display:none">← देखो!</span>
-        </span>
-        <span class="pucho-mega-new">NEW</span>
+      <a href="/discover.html" class="mini-pill mp-discover">
+        <span class="mp-ico">🎬</span>
+        <span><span data-i18n-en>Discover</span><span data-i18n-hi>लिस्टिंग देखें</span></span>
       </a>
-      <a href="/golden-pages.html" class="golden-pages-pill" id="goldenPagesPill" title="Complete town directory — every shop, aadti, doctor, school, sanstha">
-        <span class="gp-spark">🥇</span>
-        <span class="gp-text">
-          <b><span data-i18n-en>Golden Pages</span><span data-i18n-hi>गोल्डन पेजेस</span></b>
-          <span class="gp-cta" data-i18n-en>→ Town Directory</span><span class="gp-cta" data-i18n-hi style="display:none">→ शहर डायरेक्टरी</span>
-        </span>
+      <a href="/puchobhai" class="mini-pill mp-pucho">
+        <span class="mp-ico">💬</span>
+        <span><span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span></span>
       </a>
-      <style>.golden-pages-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 16px 10px 13px;background:linear-gradient(135deg,#78350F 0,#92400E 45%,#D97706 100%);background-size:180% 180%;color:#fff!important;border-radius:99px;font-family:Manrope,sans-serif;font-weight:800;font-size:.86rem;text-decoration:none!important;box-shadow:0 4px 14px rgba(217,119,6,.32),0 0 0 2px rgba(251,191,36,.45),inset 0 1px 0 rgba(255,255,255,.18);position:relative;z-index:2;border:2px solid #FBBF24;transition:.25s;letter-spacing:-.005em;white-space:nowrap;animation:gpShine 3s ease-in-out infinite}.golden-pages-pill:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 22px rgba(217,119,6,.45),0 0 0 2px rgba(251,191,36,.7);background-position:100% 100%}@keyframes gpShine{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}.gp-spark{font-size:1.05rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}.gp-text{display:inline-flex;align-items:center;gap:7px;line-height:1}.gp-text b{font-weight:900}.gp-cta{font-weight:700;font-size:.74rem;background:rgba(0,0,0,.22);padding:3px 9px;border-radius:99px;color:#FEF3C7;letter-spacing:.02em}@media (max-width:480px){.golden-pages-pill{padding:8px 13px 8px 11px;font-size:.78rem;gap:6px}.gp-cta{font-size:.68rem;padding:2px 7px}.gp-spark{font-size:.95rem}}</style>
-      <a href="/pro" class="pro-entry-pill" id="proEntryPill" title="For Doctors, CAs, Lawyers, Principals & all Professionals">
-        <span class="pro-pill-ico">🎖️</span>
-        <span class="pro-pill-text">
-          <b data-i18n-en>For Doctors / CA</b><b data-i18n-hi>Doctors / CA</b>
-          <span class="pro-pill-cta" data-i18n-en>→ Listed with dignity</span><span class="pro-pill-cta" data-i18n-hi>→ सम्मान के साथ</span>
-        </span>
+      <a href="/pro" class="mini-pill mp-pro">
+        <span class="mp-ico">🎖️</span>
+        <span><span data-i18n-en>For Doctors / CA</span><span data-i18n-hi>Doctors / CA</span></span>
       </a>
-      <style>.pro-entry-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 12px;background:linear-gradient(135deg,#1e3a8a 0,#3730a3 60%,#ff6b1a 100%);background-size:180% 180%;color:#fff!important;border-radius:99px;font-family:Manrope,sans-serif;font-weight:800;font-size:.86rem;text-decoration:none!important;box-shadow:0 4px 14px rgba(30,58,138,.3),0 0 0 2px rgba(255,255,255,.4);transition:.25s;animation:3.2s ease-in-out infinite proPillBob;letter-spacing:-.005em;white-space:nowrap}.pro-entry-pill:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 22px rgba(30,58,138,.45),0 0 0 2px rgba(255,107,26,.4);background-position:100% 100%}.pro-pill-ico{font-size:1.05rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))}.pro-pill-text{display:inline-flex;align-items:center;gap:7px;line-height:1}.pro-pill-text b{font-weight:900}.pro-pill-cta{font-weight:700;font-size:.78rem;background:rgba(255,255,255,.22);padding:3px 9px;border-radius:99px;letter-spacing:.01em}@keyframes proPillBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}@media (max-width:560px){.pro-entry-pill{padding:8px 13px 8px 10px;font-size:.78rem}.pro-pill-cta{font-size:.7rem;padding:2px 7px}.pro-pill-ico{font-size:.95rem}}</style>
-      <style>.pucho-bhai-mega-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 18px 10px 14px;background:linear-gradient(135deg,#7c3aed 0,#ec4899 50%,#f59e0b 100%);background-size:200% 200%;color:#fff;border-radius:99px;font-weight:800;font-size:.92rem;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.4),0 2px 6px rgba(245,158,11,.3),inset 0 1px 0 rgba(255,255,255,.25);position:relative;z-index:2;border:2.5px solid #fcd34d;animation:3s ease-in-out infinite puchoMegaShine,1.6s ease-in-out infinite puchoMegaBob;transform-origin:center;white-space:nowrap}.pucho-bhai-mega-pill:hover{transform:scale(1.05) translateY(-2px);box-shadow:0 8px 22px rgba(124,58,237,.5),0 4px 10px rgba(245,158,11,.4)}@keyframes puchoMegaShine{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}@keyframes puchoMegaBob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(1deg)}}.pucho-mega-spark{font-size:1.15rem;display:inline-block;animation:2s linear infinite puchoMegaSpin;filter:drop-shadow(0 0 6px rgba(252,211,77,.9))}@keyframes puchoMegaSpin{from{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.2)}to{transform:rotate(360deg) scale(1)}}.pucho-mega-text{display:inline-flex;align-items:center;gap:6px}.pucho-mega-cta{font-size:.78rem;font-weight:800;color:#fffbeb;padding:2px 8px;background:rgba(0,0,0,.18);border-radius:99px;letter-spacing:.02em;animation:1.2s ease-in-out infinite puchoCtaBlink;margin-left:2px}@keyframes puchoCtaBlink{0%,100%{opacity:1;transform:translateX(0)}50%{opacity:.65;transform:translateX(3px)}}.pucho-mega-new{background:#fcd34d;color:#7c2d12;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:99px;letter-spacing:.08em;box-shadow:0 1px 3px rgba(0,0,0,.18);animation:1s ease-in-out infinite puchoNewPop}@keyframes puchoNewPop{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}@media (prefers-reduced-motion:reduce){.pucho-bhai-mega-pill,.pucho-mega-cta,.pucho-mega-new,.pucho-mega-spark{animation:none!important}}@media (max-width:480px){.pucho-bhai-mega-pill{font-size:.82rem;padding:8px 14px 8px 12px;gap:6px}.pucho-mega-cta{font-size:.7rem;padding:1px 6px}}</style>
       <button type="button" id="installBtn" style="display:none">
         📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
       </button>
     </div>
+    <style>
+      .hero-extras-v2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+      .mini-pill{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;font-family:Manrope,sans-serif;font-weight:800;font-size:.82rem;text-decoration:none!important;color:#fff!important;white-space:nowrap;transition:.18s;box-shadow:0 3px 10px rgba(15,23,42,.12)}
+      .mini-pill:hover{transform:translateY(-1px);text-decoration:none}
+      .mp-ico{font-size:.98rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
+      .mp-discover{background:linear-gradient(135deg,#7C3AED,#EC4899)}
+      .mp-discover:hover{box-shadow:0 6px 16px rgba(124,58,237,.35)}
+      .mp-pucho{background:linear-gradient(135deg,#3B82F6,#1E3A8A)}
+      .mp-pucho:hover{box-shadow:0 6px 16px rgba(59,130,246,.3)}
+      .mp-pro{background:linear-gradient(135deg,#1E3A8A,#0F172A)}
+      .mp-pro:hover{box-shadow:0 6px 16px rgba(30,58,138,.3)}
+      @media (max-width:560px){
+        .hero-extras-v2{gap:6px;margin-bottom:14px}
+        .mini-pill{padding:7px 11px;font-size:.74rem;gap:4px}
+        .mp-ico{font-size:.88rem}
+        #openNowHome{padding:6px 11px!important;font-size:.74rem!important}
+      }
+    </style>
 
     <div class="hero-stats">
       <div class="hero-stat"><b id="stat-shops">—</b><span data-i18n-en>Active Listings</span><span data-i18n-hi>लाइव दुकानें</span></div>
@@ -520,6 +546,51 @@
       </div>
     </div>
   </div>
+</section>
+
+<!-- ===== UNCLAIMED BUSINESSES (admin-bulk-published, awaiting owner) ===== -->
+<section id="unclaimedSection" style="background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 100%);padding:50px 0;display:none">
+  <div class="section-head reveal">
+    <span class="eyebrow" style="color:#92400E">
+      🏷 <span data-i18n-en>Unclaimed Businesses</span><span data-i18n-hi>अनदावेदार व्यवसाय</span>
+    </span>
+    <h2 style="color:#78350F">
+      <span data-i18n-en>Listed by us — waiting for the owner</span>
+      <span data-i18n-hi>हमने जोड़े हैं — मालिक का इंतज़ार</span>
+    </h2>
+    <p style="color:#92400E">
+      <span data-i18n-en>These businesses were added by the DukanList team from local references. Owners haven't claimed yet. If any is yours, WhatsApp us to take over — it's free.</span>
+      <span data-i18n-hi>स्थानीय जानकारी से हमने जोड़े हैं। मालिक ने अभी क्लेम नहीं किया। अगर आपका है तो WhatsApp करें — फ्री है।</span>
+    </p>
+  </div>
+  <div class="cats-wrap">
+    <div id="unclaimedGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"></div>
+    <div id="unclaimedViewAll" style="text-align:center;margin-top:18px;display:none">
+      <span style="font-size:.82rem;color:#92400E;font-weight:600"><span data-i18n-en>And <b id="unclaimedExtra">0</b> more — </span><span data-i18n-hi>और <b>0</b> — </span></span>
+      <a href="/golden-pages.html" style="color:#78350F;font-weight:800;text-decoration:underline">browse Golden Pages →</a>
+    </div>
+  </div>
+  <style>
+    .unclaimed-card{background:#fff;border:1.5px solid #FCD34D;border-radius:13px;padding:13px;text-decoration:none;color:#0F172A;display:block;transition:.15s;position:relative;box-shadow:0 2px 6px rgba(217,119,6,.08)}
+    .unclaimed-card:hover{border-color:#D97706;box-shadow:0 8px 18px rgba(217,119,6,.18);transform:translateY(-2px);text-decoration:none}
+    .uc-tag{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;font-size:.6rem;font-weight:900;padding:3px 8px;border-radius:99px;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 2px 6px rgba(217,119,6,.3)}
+    .uc-cat{display:inline-block;background:#FEF3C7;color:#78350F;font-size:.66rem;font-weight:800;padding:2px 8px;border-radius:99px;margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase}
+    .uc-name{font-size:.96rem;font-weight:800;color:#0F172A;line-height:1.25;letter-spacing:-.01em;margin-bottom:3px}
+    .uc-name-hi{font-size:.78rem;color:#78350F;font-weight:600;font-family:'Noto Sans Devanagari',sans-serif;margin-bottom:6px}
+    .uc-meta{font-size:.74rem;color:#64748B;font-weight:600;line-height:1.5;margin-top:6px}
+    .uc-meta .lbl{color:#92400E;font-weight:800;margin-right:3px}
+    .uc-meta div{margin-bottom:2px}
+    .uc-actions{margin-top:9px;padding-top:9px;border-top:1px dashed #FDE68A;display:flex;gap:5px}
+    .uc-actions .uc-btn{flex:1;padding:6px 8px;font-size:.7rem;font-weight:800;border-radius:7px;text-align:center;text-decoration:none}
+    .uc-claim{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff!important}
+    .uc-claim:hover{background:linear-gradient(135deg,#128C7E,#075E54);text-decoration:none}
+    .uc-view{background:#F1F5F9;color:#475569!important}
+    .uc-view:hover{background:#E2E8F0;text-decoration:none}
+    @media (max-width:560px){
+      #unclaimedGrid{grid-template-columns:1fr;gap:10px}
+      .unclaimed-card{padding:11px}
+    }
+  </style>
 </section>
 
 <!-- ===== WHAT'S NEW (platform announcements) ===== -->
@@ -1061,6 +1132,94 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 <script src="/assets/js/pwa.js" defer></script>
 
 <script src="/assets/js/city-persist.js"></script>
+
+<!-- ===== UNCLAIMED LISTINGS LOADER (homepage section) ===== -->
+<script>
+(function(){
+  'use strict';
+
+  // Single source of truth for the WhatsApp claim number — same constant
+  // pattern as /golden-pages.html so admin can change in one place later.
+  const CLAIM_WHATSAPP = '919876543210';   // TODO: replace with real team WhatsApp
+  const CLAIM_BRAND    = 'DukanList Team';
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+  }
+
+  function buildClaimUrl(name, slug){
+    const msg = 'Hi ' + CLAIM_BRAND + ',\n\nI am the owner of:\n' +
+                '🏪 ' + (name || '') + '\n' +
+                (slug ? '🔗 https://dukanlist.com/shop/' + slug + '\n' : '') +
+                '\nPlease verify and help me claim this listing. Thanks!';
+    return 'https://wa.me/' + CLAIM_WHATSAPP + '?text=' + encodeURIComponent(msg);
+  }
+
+  function cardHtml(r){
+    const cat = (r.category_icon ? r.category_icon + ' ' : '') + (r.category_name || 'Listed');
+    const claimHref = buildClaimUrl(r.name, r.slug);
+    const viewHref  = '/business.html?slug=' + encodeURIComponent(r.slug);
+    const mobile = r.mobile_full
+      ? '📱 +91 ' + esc(r.mobile_full)
+      : (r.mobile_last4 ? '📱 XXXXXX-' + esc(r.mobile_last4) : '');
+
+    return '<a href="' + viewHref + '" class="unclaimed-card">' +
+      '<span class="uc-tag">🏷 Unclaimed</span>' +
+      '<span class="uc-cat">' + esc(cat) + '</span>' +
+      '<div class="uc-name">' + esc(r.name) + '</div>' +
+      (r.name_hi ? '<div class="uc-name-hi">' + esc(r.name_hi) + '</div>' : '') +
+      '<div class="uc-meta">' +
+        (r.owner_name ? '<div><span class="lbl">👤</span> ' + esc(r.owner_name) + '</div>' : '') +
+        (mobile ? '<div>' + mobile + '</div>' : '') +
+        (r.area ? '<div><span class="lbl">📍</span> ' + esc(r.area) + '</div>' : '') +
+        (r.city_name ? '<div><span class="lbl">🏙</span> ' + esc(r.city_name) + '</div>' : '') +
+      '</div>' +
+      '<div class="uc-actions" onclick="event.preventDefault();event.stopPropagation();">' +
+        '<a href="' + claimHref + '" target="_blank" rel="noopener" class="uc-btn uc-claim">💬 I\'m the owner</a>' +
+        '<a href="' + viewHref + '" class="uc-btn uc-view">View</a>' +
+      '</div>' +
+    '</a>';
+  }
+
+  async function loadUnclaimed(){
+    if (!window.ShopDB || !window.ShopDB.client) return;
+    const C = window.ShopDB.client;
+    try {
+      const { data, error } = await C.rpc('public_unclaimed_listings', { p_limit: 8 });
+      if (error) throw error;
+      const rows = data || [];
+      if (!rows.length){
+        // Hide the entire section when nothing to show — keeps homepage clean
+        return;
+      }
+      const total = Number(rows[0].total_count || rows.length);
+      const grid  = document.getElementById('unclaimedGrid');
+      const sect  = document.getElementById('unclaimedSection');
+      if (!grid || !sect) return;
+      grid.innerHTML = rows.map(cardHtml).join('');
+      sect.style.display = '';
+      // Show "and N more" footer when total exceeds what's rendered
+      const extra = Math.max(0, total - rows.length);
+      if (extra > 0){
+        const wrap = document.getElementById('unclaimedViewAll');
+        const num  = document.getElementById('unclaimedExtra');
+        if (num) num.textContent = extra;
+        if (wrap) wrap.style.display = '';
+      }
+    } catch(e){
+      // RPC missing or migration not applied yet — silently skip
+      console.warn('Unclaimed section skipped:', e.message || e);
+    }
+  }
+
+  // Defer slightly so it runs after Supabase init + main DOM/skeleton work
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => setTimeout(loadUnclaimed, 350));
+  } else {
+    setTimeout(loadUnclaimed, 350);
+  }
+})();
+</script>
 
 <!-- ===== LOCALITY SELECTOR (first-visit modal) ===== -->
 <div id="localityModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:10001;align-items:center;justify-content:center;padding:20px;animation:locFade .3s ease-out">
