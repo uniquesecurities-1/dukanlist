@@ -795,12 +795,56 @@ function timeAgo(iso){
 }
 
 function showToast(msg, kind){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.remove('success','error');
-  if (kind) t.classList.add(kind);
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+  // For success/error we use a custom inline-styled ribbon so cross-page CSS
+  // (admin-premium.css) cannot stretch or override it. The old #toast element
+  // is kept for back-compat but bypassed here.
+  // Remove any existing ribbon first
+  const existing = document.getElementById('actionRibbon');
+  if (existing) existing.remove();
+
+  const ribbon = document.createElement('div');
+  ribbon.id = 'actionRibbon';
+  const isErr = kind === 'error';
+  const grad = isErr
+    ? 'linear-gradient(135deg,#DC2626,#991B1B)'
+    : 'linear-gradient(135deg,#10B981,#059669)';
+  const shadow = isErr
+    ? '0 12px 32px rgba(220,38,38,.4)'
+    : '0 12px 32px rgba(16,185,129,.4)';
+  ribbon.textContent = msg;
+  ribbon.style.cssText = [
+    'position:fixed',
+    'top:24px',
+    'left:50%',
+    'transform:translateX(-50%) translateY(-32px)',
+    'background:' + grad,
+    'color:#fff',
+    'padding:14px 28px',
+    'border-radius:99px',
+    'font-weight:800',
+    'font-size:1rem',
+    'letter-spacing:.01em',
+    'box-shadow:' + shadow,
+    'z-index:99999',
+    'pointer-events:none',
+    'opacity:0',
+    'transition:opacity .35s cubic-bezier(.16,1,.3,1), transform .35s cubic-bezier(.16,1,.3,1)',
+    'white-space:nowrap',
+    'max-width:90vw',
+    'overflow:hidden',
+    'text-overflow:ellipsis',
+    'font-family:inherit'
+  ].join(';') + ';';
+  document.body.appendChild(ribbon);
+  requestAnimationFrame(() => {
+    ribbon.style.opacity = '1';
+    ribbon.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(() => {
+    ribbon.style.opacity = '0';
+    ribbon.style.transform = 'translateX(-50%) translateY(-32px)';
+    setTimeout(() => { try { ribbon.remove(); } catch(_){} }, 400);
+  }, 2400);
 }
 
 function esc(s){
