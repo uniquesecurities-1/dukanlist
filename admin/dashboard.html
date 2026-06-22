@@ -343,11 +343,24 @@
 
   <!-- GP recent panel loader -->
   <script>
+  // Wait for ShopDB to be ready (Supabase JS may not be loaded yet at this point)
+  async function _waitForShopDB(maxMs){
+    const start = Date.now();
+    while (Date.now() - start < (maxMs || 8000)) {
+      if (typeof ShopDB !== 'undefined' && ShopDB.client) return ShopDB.client;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return null;
+  }
+
   (async function loadGoldenPagesRecent(){
-    if (typeof ShopDB === 'undefined' || !ShopDB.client) return;
-    const c = ShopDB.client;
+    const c = await _waitForShopDB(8000);
     const host = document.getElementById('gpRecentList');
     if (!host) return;
+    if (!c){
+      host.innerHTML = '<div style="padding:12px;color:#991B1B;font-size:.85rem;font-weight:600">⚠️ Supabase not ready after 8s — please refresh.</div>';
+      return;
+    }
     try {
       const { data, error } = await c.rpc('admin_recent_soft_listed', { p_limit: 10 });
       if (error) throw error;
