@@ -694,43 +694,79 @@ function closeEdit(){
 }
 
 async function saveEdit(){
-  if (!EDITING) return;
+  console.log('[saveEdit] called', EDITING);
+  if (!EDITING) {
+    alert('Edit state missing. Close modal and re-open.');
+    return;
+  }
   const errEl = document.getElementById('editErr');
   errEl.classList.remove('show');
 
   const name = document.getElementById('e_name').value.trim();
-  if (name.length < 2){ errEl.textContent = 'Name is required'; errEl.classList.add('show'); return; }
-  if (!EDITING.selectedCats.length){ errEl.textContent = 'Pick at least one category'; errEl.classList.add('show'); return; }
-  if (!EDITING.cityId){ errEl.textContent = 'Pick a city'; errEl.classList.add('show'); return; }
+  if (name.length < 2){
+    errEl.textContent = 'Name is required (min 2 chars)';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!EDITING.selectedCats || !EDITING.selectedCats.length){
+    errEl.textContent = 'Pick at least one category';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!EDITING.cityId){
+    errEl.textContent = 'Pick a city';
+    errEl.classList.add('show');
+    return;
+  }
 
   const mobileRaw = document.getElementById('e_mobile').value.trim();
   if (mobileRaw && !/^[6789]\d{9}$/.test(mobileRaw.replace(/\D/g,'').slice(-10))){
-    errEl.textContent = 'Invalid mobile format'; errEl.classList.add('show'); return;
+    errEl.textContent = 'Invalid mobile format (10 digits starting 6/7/8/9)';
+    errEl.classList.add('show');
+    return;
   }
 
   const slugs = EDITING.selectedCats.map(c => c.slug);
   const primary = slugs[0];
 
+  const args = {
+    p_business_id:           EDITING.id,
+    p_name:                  name,
+    p_name_hi:               document.getElementById('e_name_hi').value,
+    p_owner_name:            document.getElementById('e_owner_name').value,
+    p_mobile:                document.getElementById('e_mobile').value,
+    p_area:                  document.getElementById('e_area').value,
+    p_city_id:               EDITING.cityId,
+    p_category_slugs:        slugs,
+    p_primary_category_slug: primary,
+    p_notes:                 document.getElementById('e_notes').value
+  };
+  console.log('[saveEdit] calling admin_gp_update_soft with', args);
+
+  // Visually disable the Save button so user knows something's happening
+  const btnSave = document.querySelector('.btn-save');
+  const origLabel = btnSave ? btnSave.innerHTML : '';
+  if (btnSave){ btnSave.disabled = true; btnSave.innerHTML = '⏳ Saving…'; }
+
   try {
-    const { error } = await C.rpc('admin_gp_update_soft', {
-      p_business_id:           EDITING.id,
-      p_name:                  name,
-      p_name_hi:               document.getElementById('e_name_hi').value,
-      p_owner_name:            document.getElementById('e_owner_name').value,
-      p_mobile:                document.getElementById('e_mobile').value,
-      p_area:                  document.getElementById('e_area').value,
-      p_city_id:               EDITING.cityId,
-      p_category_slugs:        slugs,
-      p_primary_category_slug: primary,
-      p_notes:                 document.getElementById('e_notes').value
-    });
+    const { data, error } = await C.rpc('admin_gp_update_soft', args);
+    console.log('[saveEdit] response', { data, error });
     if (error) throw error;
     showToast('✓ Updated', 'success');
     closeEdit();
     loadList();
   } catch(e){
-    errEl.textContent = '⚠️ ' + (e.message || 'Save failed');
+    console.error('[saveEdit] failed', e);
+    // Show the full PostgreSQL error message inline so admin sees the exact reason
+    const msg = (e && (e.message || e.error_description || e.hint || e.details)) || 'Save failed (no error message)';
+    errEl.textContent = '⚠️ ' + msg;
     errEl.classList.add('show');
+    // Scroll error into view inside modal
+    try { errEl.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(_){}
+    // Also alert so user can't miss it
+    alert('Save failed:\n\n' + msg + '\n\n(See browser console for full details: F12 → Console)');
+  } finally {
+    if (btnSave){ btnSave.disabled = false; btnSave.innerHTML = origLabel; }
   }
 }
 
