@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DukanList — Play Store Screenshot Composer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#FFFBF5;color:#0F172A;padding:24px;min-height:100vh}
+  .wrap{max-width:1280px;margin:0 auto}
+  h1{font-family:'Manrope',sans-serif;font-weight:900;font-size:1.8rem;margin-bottom:6px;letter-spacing:-.02em}
+  .lede{color:#64748B;margin-bottom:24px;font-size:.95rem}
+
+  .panel{background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:24px;margin-bottom:18px;box-shadow:0 4px 16px rgba(15,23,42,.04)}
+  .panel h2{font-family:'Manrope',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:12px}
+
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+  @media (max-width:700px){.controls{grid-template-columns:1fr}}
+
+  label{display:block;font-size:.78rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  select,input[type=file]{width:100%;padding:10px 12px;font-size:.95rem;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;background:#FAFAFA;color:#0F172A}
+  select:focus{outline:0;border-color:#D97706;background:#fff}
+  input[type=file]{padding:8px 12px}
+  input[type=text]{width:100%;padding:10px 12px;font-size:.95rem;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;background:#FAFAFA;color:#0F172A}
+
+  .caption-preview{background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:10px;padding:14px 16px;margin-top:8px;font-size:.92rem}
+  .caption-preview b{color:#78350F}
+
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{background:linear-gradient(135deg,#D97706,#92400E);color:#fff;border:0;padding:12px 22px;border-radius:10px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit}
+  .btn:hover{filter:brightness(1.07)}
+  .btn:disabled{background:#94A3B8;cursor:not-allowed}
+  .btn-secondary{background:#F1F5F9;color:#0F172A}
+
+  .preview-wrap{display:flex;justify-content:center;align-items:flex-start;background:#F8FAFC;border-radius:14px;padding:20px;min-height:300px;overflow:auto}
+  canvas{max-width:100%;height:auto;box-shadow:0 8px 32px rgba(15,23,42,.18);border-radius:6px;display:block}
+
+  .empty{color:#94A3B8;font-size:.95rem;padding:60px 20px;text-align:center}
+
+  .help{background:#EFF6FF;border-left:4px solid #1E3A8A;padding:13px 16px;border-radius:0 8px 8px 0;font-size:.88rem;color:#1E3A8A;margin-top:14px}
+  .help ol{padding-left:22px;line-height:1.7}
+
+  .footer-note{margin-top:24px;color:#64748B;font-size:.85rem;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <h1>DukanList — Play Store Screenshot Composer</h1>
+  <p class="lede">Drop a raw app screenshot, pick a caption, get a ready-to-upload 1080 × 1920 PNG with bilingual saffron caption strip on top.</p>
+
+  <!-- CONTROLS -->
+  <div class="panel">
+    <h2>1. Choose your screenshot + caption</h2>
+
+    <div class="controls">
+      <div>
+        <label>📱 Raw screenshot file</label>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg">
+      </div>
+      <div>
+        <label>🏷 Caption (pick frame number)</label>
+        <select id="captionPicker">
+          <option value="">— pick frame —</option>
+          <option value="1">Frame 1 — Hero (homepage)</option>
+          <option value="2">Frame 2 — Browse categories</option>
+          <option value="3">Frame 3 — Shop detail (Call / WhatsApp / Maps)</option>
+          <option value="4">Frame 4 — Reviews</option>
+          <option value="5">Frame 5 — Map embed</option>
+          <option value="6">Frame 6 — Pucho Bhai community</option>
+          <option value="7">Frame 7 — Register your shop (free)</option>
+          <option value="8">Frame 8 — Hindi + English</option>
+          <option value="CUSTOM">— Custom (type your own) —</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="customRow" style="display:none">
+      <div class="controls">
+        <div>
+          <label>EN caption</label>
+          <input type="text" id="enText" placeholder="English headline">
+        </div>
+        <div>
+          <label>HI caption</label>
+          <input type="text" id="hiText" placeholder="हिंदी हेडलाइन">
+        </div>
+      </div>
+    </div>
+
+    <div id="capPreview" class="caption-preview" style="display:none">
+      <b>English:</b> <span id="capEnView"></span><br>
+      <b>Hindi:</b> <span id="capHiView"></span>
+    </div>
+
+    <div class="btns">
+      <button class="btn" id="renderBtn" disabled>🎨 Render preview</button>
+      <button class="btn btn-secondary" id="downloadBtn" disabled>⬇ Download PNG</button>
+    </div>
+
+    <div class="help">
+      <strong>How this works:</strong>
+      <ol>
+        <li>Your screenshot is drawn on a 1080 × 1920 canvas. The top 200 px becomes a saffron caption strip with the chosen English + Hindi text.</li>
+        <li>If your screenshot is not 1080 wide, it auto-scales to fit while preserving aspect ratio.</li>
+        <li>If your screenshot is taller than 1720 px (1920 − 200 strip), the top portion is used and the rest cropped. Pick screenshots that show the most important content near the top.</li>
+        <li>Everything runs in your browser — no upload to any server.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="panel">
+    <h2>2. Preview (1080 × 1920)</h2>
+    <div class="preview-wrap" id="previewWrap">
+      <div class="empty">Render preview ke baad yahan dikhega.</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    DukanList Play Store launch kit · 26 June 2026
+  </div>
+
+</div>
+
+<canvas id="canvas" width="1080" height="1920" style="display:none"></canvas>
+
+<script>
+'use strict';
+
+const CAPTIONS = {
+  '1': { en: 'Every shop in your town',          hi: 'हर दुकान आपके फ़ोन पर' },
+  '2': { en: 'Browse 370+ categories',           hi: '370+ श्रेणियाँ खोजें' },
+  '3': { en: 'Call, WhatsApp, Maps — one tap',   hi: 'एक टैप पर कॉल, WhatsApp, नक्शा' },
+  '4': { en: 'Real reviews from real customers', hi: 'असली ग्राहकों की सच्ची राय' },
+  '5': { en: 'Find them on Google Maps',         hi: 'Google Maps पर सीधा रास्ता' },
+  '6': { en: 'Ask your neighbourhood anything',  hi: 'अपने मोहल्ले से पूछिए' },
+  '7': { en: 'List your shop FREE, forever',     hi: 'अपनी दुकान मुफ़्त में रजिस्टर करें' },
+  '8': { en: 'Works in English and Hindi',       hi: 'अंग्रेज़ी और हिंदी, दोनों में' }
+};
+
+let _img = null;
+let _en = '';
+let _hi = '';
+let _frame = '';
+
+const fileInput   = document.getElementById('fileInput');
+const captionPicker = document.getElementById('captionPicker');
+const customRow   = document.getElementById('customRow');
+const enText      = document.getElementById('enText');
+const hiText      = document.getElementById('hiText');
+const capPreview  = document.getElementById('capPreview');
+const capEnView   = document.getElementById('capEnView');
+const capHiView   = document.getElementById('capHiView');
+const renderBtn   = document.getElementById('renderBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const previewWrap = document.getElementById('previewWrap');
+const canvas      = document.getElementById('canvas');
+
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      _img = img;
+      checkReady();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+captionPicker.addEventListener('change', () => {
+  const v = captionPicker.value;
+  _frame = v;
+  if (v === 'CUSTOM') {
+    customRow.style.display = 'block';
+    _en = enText.value;
+    _hi = hiText.value;
+  } else if (v && CAPTIONS[v]) {
+    customRow.style.display = 'none';
+    _en = CAPTIONS[v].en;
+    _hi = CAPTIONS[v].hi;
+  } else {
+    _en = ''; _hi = '';
+  }
+  updateCapPreview();
+  checkReady();
+});
+
+enText.addEventListener('input', () => { _en = enText.value; updateCapPreview(); checkReady(); });
+hiText.addEventListener('input', () => { _hi = hiText.value; updateCapPreview(); checkReady(); });
+
+function updateCapPreview(){
+  if (_en || _hi){
+    capPreview.style.display = 'block';
+    capEnView.textContent = _en || '—';
+    capHiView.textContent = _hi || '—';
+  } else {
+    capPreview.style.display = 'none';
+  }
+}
+
+function checkReady(){
+  const ready = !!_img && !!_en && !!_hi;
+  renderBtn.disabled = !ready;
+}
+
+renderBtn.addEventListener('click', renderComposite);
+
+function renderComposite(){
+  const W = 1080, H = 1920, STRIP_H = 200;
+  const ctx = canvas.getContext('2d');
+  canvas.width = W; canvas.height = H;
+
+  // Background — cream so any letterboxing looks intentional
+  ctx.fillStyle = '#FFFBF5';
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw screenshot into the lower 1720 px area
+  const targetW = W, targetH = H - STRIP_H;
+  const imgRatio = _img.width / _img.height;
+  const targetRatio = targetW / targetH;
+  let drawW, drawH, drawX, drawY;
+  if (imgRatio > targetRatio){
+    // image is wider than target — fit by height, crop sides
+    drawH = targetH;
+    drawW = drawH * imgRatio;
+    drawX = (targetW - drawW) / 2;
+    drawY = STRIP_H;
+  } else {
+    // image is taller — fit by width, use top portion
+    drawW = targetW;
+    drawH = drawW / imgRatio;
+    drawX = 0;
+    drawY = STRIP_H;
+    // Source: take from top of the image, clip the bottom
+  }
+  ctx.drawImage(_img, drawX, drawY, drawW, drawH);
+
+  // Crop bottom (mask anything below H)
+  // Not needed because canvas auto-clips. Just clear any draw past H.
+
+  // Saffron strip on top
+  ctx.fillStyle = '#FF6B1A';
+  ctx.fillRect(0, 0, W, STRIP_H);
+
+  // Deep saffron divider line at strip bottom
+  ctx.fillStyle = '#D97706';
+  ctx.fillRect(0, STRIP_H - 6, W, 6);
+
+  // English headline
+  ctx.fillStyle = '#FFFBF5';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '800 64px "Manrope", "Inter", sans-serif';
+  ctx.fillText(_en, W / 2, 76);
+
+  // Hindi subhead
+  ctx.fillStyle = 'rgba(255, 251, 245, 0.88)';
+  ctx.font = '500 44px "Noto Sans Devanagari", sans-serif';
+  ctx.fillText(_hi, W / 2, 146);
+
+  // Show preview
+  showPreview();
+  downloadBtn.disabled = false;
+}
+
+function showPreview(){
+  previewWrap.innerHTML = '';
+  const previewCanvas = document.createElement('canvas');
+  previewCanvas.width = canvas.width;
+  previewCanvas.height = canvas.height;
+  previewCanvas.style.maxHeight = '70vh';
+  previewCanvas.style.width = 'auto';
+  previewCanvas.getContext('2d').drawImage(canvas, 0, 0);
+  previewWrap.appendChild(previewCanvas);
+}
+
+downloadBtn.addEventListener('click', () => {
+  const a = document.createElement('a');
+  const name = _frame && _frame !== 'CUSTOM' ? ('dukanlist-screenshot-' + _frame + '.png') : 'dukanlist-screenshot.png';
+  a.download = name;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+});
+
+</script>
+
+</body>
+</html>
