@@ -1,8 +1,13 @@
-[{
-   "relation": ["delegate_permission/common.handle_all_urls"],
-   "target": {
-     "namespace": "android_app",
-     "package_name": "com.dukanlist.twa",
-     "sha256_cert_fingerprints": ["E1:E6:74:15:FC:3F:EC:AC:A1:48:74:B8:FB:51:2C:D4:8D:0B:2E:F8:47:C1:B8:26:95:96:77:7A:65:B5:2B:D9"]
-   }
- }]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.dukanlist.twa",
+      "sha256_cert_fingerprints": [
+        "ED:AB:F2:98:5F:B4:F3:89:A2:12:97:EF:0C:30:C1:0D:B6:E8:50:CE:29:26:27:F1:93:61:7A:BC:26:41:1F:0D",
+        "E1:E6:74:15:FC:3F:EC:AC:A1:48:74:B8:FB:51:2C:D4:8D:0B:2E:F8:47:C1:B8:26:95:96:77:7A:65:B5:2B:D9"
+      ]
+    }
+  }
+]
