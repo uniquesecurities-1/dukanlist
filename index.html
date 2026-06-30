@@ -175,6 +175,108 @@
   <button type="button" id="stickyMiniBtn" data-i18n-en="Go" data-i18n-hi="खोजें">Go</button>
 </div>
 
+<!-- ===== APP LIVE NOW banner (dismissible, localStorage 7 days) ===== -->
+<div id="appLaunchBanner" style="display:none;position:relative;background:linear-gradient(135deg,#16A34A 0%,#15803D 55%,#14532D 100%);color:#fff;font-family:'Plus Jakarta Sans','Manrope',sans-serif;z-index:60;box-shadow:0 4px 14px rgba(22,163,74,.32);overflow:hidden">
+  <!-- shimmer overlay -->
+  <div style="position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);background-size:220% 100%;animation:alb-shimmer 3.5s linear infinite;pointer-events:none"></div>
+  <div style="position:relative;max-width:1180px;margin:0 auto;padding:10px 44px 10px 14px;display:flex;align-items:center;gap:12px">
+    <!-- Google Play icon (inline SVG, no external dep) -->
+    <div aria-hidden="true" style="flex-shrink:0;width:36px;height:36px;background:#fff;border-radius:9px;display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.18)">
+      <svg width="20" height="22" viewBox="0 0 60 65" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3 1.7C2 2.6 1.5 3.9 1.5 5.5v54c0 1.6.5 2.9 1.5 3.8L3.3 63.6 33.9 33V32.6L3.3 2 3 1.7z" fill="#00D7FE"/>
+        <path d="M44.1 43.3l-10.2-10.2v-.4l10.2-10.2.3.1 12.1 6.9c3.5 2 3.5 5.2 0 7.2l-12.1 6.5-.3.1z" fill="#FFCE00"/>
+        <path d="M44.4 43.2L33.9 32.8 3 63.6c1.2 1.2 3.1 1.4 5.3.2l36.1-20.6" fill="#FF3C44"/>
+        <path d="M44.4 22.4L8.3 1.9C6.1.7 4.2.8 3 2L33.9 32.8l10.5-10.4z" fill="#00F076"/>
+      </svg>
+    </div>
+    <!-- text content -->
+    <div style="flex:1;min-width:0;line-height:1.25">
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+        <strong style="font-weight:900;font-size:.92rem;letter-spacing:-.005em">
+          <span data-i18n-en>DukanList Android App</span>
+          <span data-i18n-hi>DukanList Android ऐप</span>
+        </strong>
+        <span style="background:rgba(255,255,255,.28);color:#fff;padding:1px 8px;border-radius:99px;font-size:.6rem;font-weight:900;letter-spacing:.06em;backdrop-filter:blur(4px);animation:alb-pulse 1.6s ease-in-out infinite;display:inline-flex;align-items:center;gap:3px">
+          <span style="width:6px;height:6px;background:#A7F3D0;border-radius:50%;box-shadow:0 0 6px #A7F3D0;animation:alb-livedot 1.4s ease-in-out infinite"></span>
+          <span data-i18n-en>LIVE NOW</span>
+          <span data-i18n-hi>अब उपलब्ध</span>
+        </span>
+      </div>
+      <div style="font-size:.74rem;opacity:.94;margin-top:2px;font-weight:500">
+        <span data-i18n-en>Now on Google Play — tap to install · Free · 1.8 MB</span>
+        <span data-i18n-hi>अब Google Play पर — install करें · Free · 1.8 MB</span>
+      </div>
+    </div>
+    <!-- Install CTA (Play Store) -->
+    <a href="https://play.google.com/store/apps/details?id=com.dukanlist.twa"
+       target="_blank" rel="noopener"
+       style="background:#fff;color:#15803D;padding:7px 13px;border-radius:99px;font-weight:800;font-size:.78rem;text-decoration:none;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.18);display:inline-flex;align-items:center;gap:5px;flex-shrink:0;transition:transform .15s ease, box-shadow .15s ease"
+       onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 5px 14px rgba(0,0,0,.22)'"
+       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 10px rgba(0,0,0,.18)'">
+      <span style="font-size:.92rem">📲</span>
+      <span data-i18n-en>Install Now</span>
+      <span data-i18n-hi>Install करें</span>
+    </a>
+    <!-- Dismiss button (absolute top-right) -->
+    <button onclick="dismissAppBanner()" aria-label="Dismiss" title="Dismiss"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.18);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.72rem;font-family:inherit;display:grid;place-items:center;padding:0;line-height:1;backdrop-filter:blur(4px);transition:background .15s ease"
+            onmouseover="this.style.background='rgba(255,255,255,.32)'"
+            onmouseout="this.style.background='rgba(255,255,255,.18)'">✕</button>
+  </div>
+</div>
+<style>
+  @keyframes alb-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  @keyframes alb-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.78;transform:scale(.97)}}
+  @keyframes alb-livedot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+  @media (max-width:560px){
+    #appLaunchBanner > div:nth-child(2){padding:9px 36px 9px 10px !important;gap:9px !important}
+    #appLaunchBanner strong{font-size:.82rem !important}
+    #appLaunchBanner .alb-badge,#appLaunchBanner span[data-i18n-en="LIVE NOW"]{font-size:.54rem !important;padding:1px 6px !important}
+    #appLaunchBanner div[style*="font-size:.74rem"]{font-size:.64rem !important;line-height:1.3 !important}
+    #appLaunchBanner a[href^="https://wa.me"]{padding:6px 11px !important;font-size:.7rem !important;gap:3px !important}
+    #appLaunchBanner button[aria-label="Dismiss"]{right:7px !important;width:22px !important;height:22px !important;font-size:.66rem !important}
+    #appLaunchBanner svg{width:18px !important;height:20px !important}
+    #appLaunchBanner > div:nth-child(2) > div:first-child{width:32px !important;height:32px !important}
+  }
+  html[data-lang=en] #appLaunchBanner [data-i18n-hi]{display:none}
+  html[data-lang=hi] #appLaunchBanner [data-i18n-en]{display:none}
+  html[data-lang=hi] #appLaunchBanner strong,
+  html[data-lang=hi] #appLaunchBanner div[style*="font-size:.74rem"]{font-family:'Noto Sans Devanagari','Plus Jakarta Sans',sans-serif}
+</style>
+<script>
+  (function(){
+    var KEY='dukan_app_launch_banner_dismissed_v2_live';
+    var DAYS=7;
+    var banner=document.getElementById('appLaunchBanner');
+    if(!banner)return;
+    try{
+      var ts=parseInt(localStorage.getItem(KEY)||'0',10);
+      if(ts && (Date.now()-ts) < DAYS*24*60*60*1000){
+        return; // recently dismissed → keep hidden
+      }
+    }catch(e){}
+    // Show with slide-down animation
+    banner.style.display='block';
+    banner.style.transform='translateY(-100%)';
+    banner.style.opacity='0';
+    banner.style.transition='transform .45s cubic-bezier(.2,.8,.2,1), opacity .45s ease';
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        banner.style.transform='translateY(0)';
+        banner.style.opacity='1';
+      });
+    });
+  })();
+  function dismissAppBanner(){
+    var b=document.getElementById('appLaunchBanner');
+    if(!b)return;
+    b.style.transform='translateY(-100%)';
+    b.style.opacity='0';
+    try{localStorage.setItem('dukan_app_launch_banner_dismissed_v2_live',String(Date.now()));}catch(e){}
+    setTimeout(function(){b.style.display='none';},450);
+  }
+</script>
+
 <!-- ===== FESTIVAL MODE banner (auto-shown only during Indian festivals) ===== -->
 <div id="festBanner" style="display:none;position:relative;padding:10px 18px;color:#fff;font-weight:700;font-size:.86rem;text-align:center;font-family:'Plus Jakarta Sans','Manrope',sans-serif;z-index:50;line-height:1.4">
   <span id="festEmoji" style="font-size:1.05rem;margin-right:5px"></span>
