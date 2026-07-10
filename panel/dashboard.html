@@ -552,6 +552,22 @@
 .streak-pill .streak-num{ font-family:'Manrope',sans-serif; font-size:.95rem; font-weight:900 }
 .streak-pill .streak-lbl{ opacity:.85; font-size:.72rem }
 .streak-pill .streak-emoji{ font-size:.95rem }
+
+/* ===== SOFT-HIDE RULES (2026-07) ==========================================
+   Belt-and-suspenders CSS to hide features that JS re-shows after render.
+   Any element with data-dl-soft-hidden attribute stays hidden even if JS
+   sets element.style.display = '' (because CSS !important beats inline
+   style unless JS uses setProperty(..., 'important') which none of ours do).
+   Also nukes .streak-pill, #tipOfDayCard (Tip of the Day), and dynamic
+   quick-win cards that renderQuickWins() creates.
+   To restore any feature: remove the corresponding selector below.
+=========================================================================== */
+[data-dl-soft-hidden]{ display:none !important }
+.streak-pill{ display:none !important }
+#tipOfDayCard{ display:none !important }
+#quickWinsHost, #quickWinsCard, #todayQuickWinsCard{ display:none !important }
+/* ========================================================================= */
+
 /* ===== Phase 4 (2026-06-05): Loyalty Tracker Card ===== */
 .loyalty-card{
   background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 50%,#FCD34D 100%);
