@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DukanList Launch Posters — Render & Download</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@500;700;800;900&family=Noto+Sans+Devanagari:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans','Manrope',sans-serif;background:#0F172A;color:#fff;padding:24px;min-height:100vh}
+  .wrap{max-width:1400px;margin:0 auto}
+  h1{font-weight:900;font-size:2rem;margin-bottom:8px;letter-spacing:-.02em}
+  .lede{color:#94A3B8;margin-bottom:24px;font-size:1rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;margin-bottom:24px}
+  .card{background:#1E293B;border:1px solid #334155;border-radius:14px;padding:16px;display:flex;flex-direction:column}
+  .card h3{font-weight:800;font-size:1rem;margin-bottom:6px}
+  .card .desc{color:#94A3B8;font-size:.85rem;margin-bottom:14px;line-height:1.4}
+  .poster-frame{background:#000;border-radius:10px;overflow:hidden;aspect-ratio:9/16;max-width:360px;width:100%;margin:0 auto 14px;display:flex;align-items:stretch}
+  .poster-frame canvas{width:100%;height:100%;display:block}
+  .btn{background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;padding:10px 16px;border-radius:9px;font-weight:800;font-size:.9rem;cursor:pointer;font-family:inherit;width:100%}
+  .btn:hover{filter:brightness(1.1)}
+  .info{background:#1E293B;border:1px solid #334155;border-radius:14px;padding:18px;font-size:.88rem;line-height:1.6;color:#CBD5E1}
+  .info strong{color:#fff}
+  .info code{background:#0F172A;color:#FBBF24;padding:1px 6px;border-radius:4px;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<h1>🎨 DukanList Launch Posters</h1>
+<p class="lede">3 ready-to-render 1080×1920 posters. Click "Download PNG" on each — save and share on WhatsApp Status, Instagram Story.</p>
+
+<div class="grid" id="grid"></div>
+
+<div class="info">
+  <strong>How to use:</strong><br>
+  1. Click <code>Download PNG</code> on any poster<br>
+  2. PNG saves to your Downloads folder (1080×1920, perfect for WhatsApp Status / Instagram Story)<br>
+  3. Share directly from phone / Telegram desktop / WhatsApp web<br><br>
+
+  <strong>Note:</strong> These posters use CSS Canvas rendering. Fonts must be loaded first — wait 2 seconds before first download for best quality.
+</div>
+
+</div>
+
+<script>
+const POSTERS = [
+  {
+    id: 1,
+    title: '🎉 We Are LIVE',
+    desc: 'Big celebration — bold "We Are LIVE!" + saffron storefront icon + install CTA. Most universal poster.',
+  },
+  {
+    id: 2,
+    title: '🏪 Featured Shops',
+    desc: 'Trust + social proof. Featured real shop names from your DB: Dr Sachdeva, Ajay Handloom, Rk Photography.',
+  },
+  {
+    id: 3,
+    title: '📱 Phone in Hand',
+    desc: 'App preview front and center. Mockup phone showing dukanlist.com homepage with saffron header.',
+  }
+];
+
+const W = 1080, H = 1920;
+
+function makeCanvas(){
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  return c;
+}
+
+function gradient(ctx, x1, y1, x2, y2, stops){
+  const g = ctx.createLinearGradient(x1,y1,x2,y2);
+  stops.forEach(s => g.addColorStop(s[0], s[1]));
+  return g;
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+function drawStorefrontIcon(ctx, x, y, size, fg){
+  // White "store" silhouette inside saffron square
+  ctx.fillStyle = fg;
+  // roof
+  ctx.beginPath();
+  ctx.moveTo(x + size*0.18, y + size*0.32);
+  ctx.lineTo(x + size*0.50, y + size*0.16);
+  ctx.lineTo(x + size*0.82, y + size*0.32);
+  ctx.lineTo(x + size*0.78, y + size*0.40);
+  ctx.lineTo(x + size*0.22, y + size*0.40);
+  ctx.closePath();
+  ctx.fill();
+  // awning curve (3 scallops)
+  for(let i = 0; i < 4; i++){
+    const cx = x + size*(0.28 + i*0.15);
+    ctx.beginPath();
+    ctx.arc(cx, y + size*0.45, size*0.06, 0, Math.PI);
+    ctx.fill();
+  }
+  // base building
+  ctx.fillRect(x + size*0.22, y + size*0.50, size*0.56, size*0.32);
+  // door
+  ctx.fillStyle = x + size*0.22 ? '#FF6B1A' : fg; // saffron, cut-out
+  ctx.fillStyle = '#FF6B1A';
+  ctx.fillRect(x + size*0.42, y + size*0.58, size*0.16, size*0.24);
+  // window
+  ctx.fillRect(x + size*0.28, y + size*0.58, size*0.10, size*0.10);
+}
+
+function drawGooglePlayBadge(ctx, x, y, scale){
+  scale = scale || 1;
+  const w = 280 * scale, h = 80 * scale;
+  ctx.fillStyle = '#000';
+  roundRect(ctx, x, y, w, h, 12*scale);
+  ctx.fill();
+  // Play triangle (multi-color)
+  const tx = x + 18*scale, ty = y + 15*scale, ts = 50*scale;
+  ctx.fillStyle = '#00D7FE';
+  ctx.beginPath();
+  ctx.moveTo(tx, ty);
+  ctx.lineTo(tx, ty + ts);
+  ctx.lineTo(tx + ts*0.6, ty + ts/2);
+  ctx.closePath();
+  ctx.fill();
+  // Text
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  ctx.font = `500 ${12*scale}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.fillText('GET IT ON', tx + ts*0.85, ty + 14*scale);
+  ctx.font = `800 ${22*scale}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.fillText('Google Play', tx + ts*0.85, ty + 38*scale);
+}
+
+function poster1(canvas){
+  const ctx = canvas.getContext('2d');
+  // Bg cream gradient
+  const bg = gradient(ctx, 0, 0, 0, H, [[0,'#FFFBF5'], [0.5,'#FFE4B5'], [1,'#FFB347']]);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Saffron diagonal ribbon top
+  ctx.save();
+  ctx.translate(0, 0);
+  ctx.fillStyle = '#FF6B1A';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(W, 0);
+  ctx.lineTo(W, 380);
+  ctx.lineTo(0, 460);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // Top text
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.font = '800 50px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('🎉 ANNOUNCING', W/2, 130);
+  ctx.font = '900 92px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('WE ARE LIVE!', W/2, 240);
+  // Hindi
+  ctx.font = '700 38px "Noto Sans Devanagari", sans-serif';
+  ctx.fillText('हम Play Store पर LIVE हैं!', W/2, 320);
+
+  // Big saffron storefront icon (with drop shadow)
+  const iconSize = 380;
+  const iconX = (W - iconSize) / 2;
+  const iconY = 580;
+  // shadow
+  ctx.shadowColor = 'rgba(0,0,0,.25)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 20;
+  ctx.fillStyle = '#FF6B1A';
+  roundRect(ctx, iconX, iconY, iconSize, iconSize, 60);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  drawStorefrontIcon(ctx, iconX, iconY, iconSize, '#FFFBF5');
+
+  // App name
+  ctx.fillStyle = '#0F172A';
+  ctx.textAlign = 'center';
+  ctx.font = '900 62px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('DukanList', W/2, 1080);
+  ctx.fillStyle = '#92400E';
+  ctx.font = '700 32px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Local Shops & Pros', W/2, 1130);
+
+  // Tagline
+  ctx.fillStyle = '#0F172A';
+  ctx.font = '700 36px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Every shop. Every doctor.', W/2, 1240);
+  ctx.fillText('Every professional.', W/2, 1290);
+  // Hindi tagline
+  ctx.fillStyle = '#5F3E0A';
+  ctx.font = '700 32px "Noto Sans Devanagari", sans-serif';
+  ctx.fillText('हर दुकान · हर डॉक्टर · हर professional', W/2, 1360);
+
+  // Live pill badge
+  ctx.fillStyle = '#16A34A';
+  const pillX = W/2 - 200, pillY = 1430;
+  roundRect(ctx, pillX, pillY, 400, 70, 35);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('🟢  NOW ON PLAY STORE', W/2, 1476);
+
+  // Google Play badge
+  drawGooglePlayBadge(ctx, W/2 - 200, 1560, 1.4);
+
+  // Bottom URL
+  ctx.fillStyle = '#0F172A';
+  ctx.font = '700 28px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('dukanlist.com', W/2, 1820);
+  ctx.fillStyle = '#92400E';
+  ctx.font = '600 22px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('From Mandi Dabwali · For All Bharat', W/2, 1860);
+}
+
+function poster2(canvas){
+  const ctx = canvas.getContext('2d');
+  // Bg
+  ctx.fillStyle = '#FFFBF5';
+  ctx.fillRect(0,0,W,H);
+
+  // Saffron top band
+  ctx.fillStyle = '#FF6B1A';
+  ctx.fillRect(0, 0, W, 260);
+
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.font = '900 64px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('FEATURED ON DUKANLIST', W/2, 100);
+  ctx.font = '700 32px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Trusted local businesses · Now on Play Store', W/2, 160);
+  ctx.font = '600 30px "Noto Sans Devanagari", sans-serif';
+  ctx.fillText('हमारे साथ जुड़े हुए असली दुकानदार', W/2, 210);
+
+  // 3 shop cards
+  const shops = [
+    {emoji:'🦷', name:'Dr Sachdeva\'s Dinesh Dental Clinic', cat:'Dentist · Mandi Dabwali', stars:'🛡️  Verified Owner'},
+    {emoji:'🧵', name:'Ajay Handloom', cat:'Textiles · Mandi Dabwali', stars:'🛡️  Verified Owner'},
+    {emoji:'📸', name:'Rk Photography', cat:'Photography · Mandi Dabwali', stars:'🛡️  Verified Owner'},
+  ];
+  shops.forEach((s, i) => {
+    const cardY = 340 + i * 290;
+    // Card bg
+    ctx.shadowColor = 'rgba(255,107,26,.18)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 10;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, 80, cardY, W-160, 260, 24);
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    // Border
+    ctx.strokeStyle = '#FED7AA';
+    ctx.lineWidth = 3;
+    roundRect(ctx, 80, cardY, W-160, 260, 24);
+    ctx.stroke();
+
+    // Emoji circle
+    ctx.fillStyle = '#FFF7ED';
+    ctx.beginPath();
+    ctx.arc(180, cardY + 90, 70, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '70px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(s.emoji, 180, cardY + 115);
+
+    // Verified pill
+    ctx.fillStyle = '#16A34A';
+    roundRect(ctx, W - 280, cardY + 25, 180, 40, 20);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✓ VERIFIED', W - 190, cardY + 53);
+
+    // Name
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '900 34px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'left';
+    // Wrap long names
+    const maxNameWidth = W - 80 - 80 - 300;
+    const words = s.name.split(' ');
+    let line = '', y = cardY + 95;
+    words.forEach(w => {
+      const testLine = line + (line ? ' ' : '') + w;
+      if (ctx.measureText(testLine).width > maxNameWidth) {
+        ctx.fillText(line, 290, y);
+        line = w;
+        y += 40;
+      } else {
+        line = testLine;
+      }
+    });
+    if (line) ctx.fillText(line, 290, y);
+
+    // Category
+    ctx.fillStyle = '#92400E';
+    ctx.font = '700 26px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(s.cat, 290, y + 50);
+    // Stars
+    ctx.fillStyle = '#D97706';
+    ctx.font = '700 24px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(s.stars, 290, y + 90);
+
+    // Action buttons (Call + WhatsApp)
+    ctx.fillStyle = '#1E3A8A';
+    roundRect(ctx, 110, cardY + 200, 200, 40, 20);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('📞  CALL', 210, cardY + 227);
+
+    ctx.fillStyle = '#16A34A';
+    roundRect(ctx, 330, cardY + 200, 250, 40, 20);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText('💬  WHATSAPP', 455, cardY + 227);
+  });
+
+  // Bottom band
+  ctx.fillStyle = '#FF6B1A';
+  ctx.fillRect(0, H - 250, W, 250);
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.font = '900 56px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('📲  INSTALL NOW', W/2, H - 160);
+  ctx.font = '700 26px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('DukanList Android App · Free · 1.8 MB · Play Store', W/2, H - 100);
+  ctx.font = '600 22px "Noto Sans Devanagari", sans-serif';
+  ctx.fillText('अब Google Play पर उपलब्ध · निःशुल्क', W/2, H - 50);
+}
+
+function poster3(canvas){
+  const ctx = canvas.getContext('2d');
+  // Bg deep saffron gradient
+  const bg = gradient(ctx, 0, 0, W, H, [[0,'#E55100'], [0.5,'#FF6B1A'], [1,'#92400E']]);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Top "LIVE NOW" badge
+  ctx.fillStyle = '#16A34A';
+  roundRect(ctx, W/2 - 200, 80, 400, 80, 40);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.font = '900 38px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('🟢  LIVE ON PLAY STORE', W/2, 132);
+
+  // Hero text
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 76px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Find ANY local', W/2, 280);
+  ctx.fillText('business in 3 taps', W/2, 360);
+
+  // Phone mockup (centered)
+  const phoneW = 540, phoneH = 1080;
+  const phoneX = (W - phoneW) / 2;
+  const phoneY = 460;
+
+  // Phone shadow
+  ctx.shadowColor = 'rgba(0,0,0,.4)';
+  ctx.shadowBlur = 50;
+  ctx.shadowOffsetY = 20;
+  // Phone frame
+  ctx.fillStyle = '#0F172A';
+  roundRect(ctx, phoneX, phoneY, phoneW, phoneH, 50);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  // Screen
+  ctx.fillStyle = '#FFFBF5';
+  roundRect(ctx, phoneX + 20, phoneY + 60, phoneW - 40, phoneH - 120, 30);
+  ctx.fill();
+
+  // App header (saffron)
+  ctx.fillStyle = '#FF6B1A';
+  ctx.fillRect(phoneX + 20, phoneY + 60, phoneW - 40, 100);
+  // Logo + text in header
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 32px "Plus Jakarta Sans", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('🏠 DukanList', phoneX + 50, phoneY + 120);
+
+  // Search box
+  ctx.fillStyle = '#fff';
+  roundRect(ctx, phoneX + 50, phoneY + 200, phoneW - 100, 80, 16);
+  ctx.fill();
+  ctx.strokeStyle = '#FF6B1A';
+  ctx.lineWidth = 3;
+  roundRect(ctx, phoneX + 50, phoneY + 200, phoneW - 100, 80, 16);
+  ctx.stroke();
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '500 24px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('🔍 Search businesses…', phoneX + 80, phoneY + 248);
+
+  // Quick pick chips
+  const chips = ['🏥 Doctor', '🔧 Mechanic', '🛒 Grocery', '💇 Salon'];
+  chips.forEach((c, i) => {
+    const cx = phoneX + 60 + (i % 2) * 220;
+    const cy = phoneY + 320 + Math.floor(i / 2) * 90;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, cx, cy, 200, 70, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#FED7AA';
+    ctx.lineWidth = 2;
+    roundRect(ctx, cx, cy, 200, 70, 16);
+    ctx.stroke();
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '700 22px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(c, cx + 16, cy + 42);
+  });
+
+  // 2 listing cards
+  const listings = [
+    {emoji:'🦷', name:'Dr Sachdeva\'s Dental', meta:'Mandi Dabwali · Verified'},
+    {emoji:'🧵', name:'Ajay Handloom', meta:'Mandi Dabwali · Verified'},
+  ];
+  listings.forEach((l, i) => {
+    const ly = phoneY + 540 + i * 200;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, phoneX + 50, ly, phoneW - 100, 170, 18);
+    ctx.fill();
+    ctx.strokeStyle = '#E2E8F0';
+    ctx.lineWidth = 2;
+    roundRect(ctx, phoneX + 50, ly, phoneW - 100, 170, 18);
+    ctx.stroke();
+    // emoji
+    ctx.fillStyle = '#FFF7ED';
+    ctx.fillRect(phoneX + 60, ly + 15, 100, 100);
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '60px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(l.emoji, phoneX + 110, ly + 85);
+    // text
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '800 26px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(l.name, phoneX + 180, ly + 50);
+    ctx.fillStyle = '#92400E';
+    ctx.font = '600 20px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(l.meta, phoneX + 180, ly + 80);
+    // buttons
+    ctx.fillStyle = '#16A34A';
+    roundRect(ctx, phoneX + 180, ly + 100, 130, 50, 25);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('📞 Call', phoneX + 245, ly + 132);
+    ctx.fillStyle = '#1E3A8A';
+    roundRect(ctx, phoneX + 320, ly + 100, 180, 50, 25);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText('💬 WhatsApp', phoneX + 410, ly + 132);
+  });
+
+  // Phone notch
+  ctx.fillStyle = '#0F172A';
+  roundRect(ctx, phoneX + phoneW/2 - 80, phoneY + 30, 160, 30, 15);
+  ctx.fill();
+
+  // Bottom text
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.font = '700 36px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Search · Call · WhatsApp · Maps', W/2, 1620);
+  ctx.font = '600 30px "Noto Sans Devanagari", sans-serif';
+  ctx.fillText('एक tap में सब कुछ', W/2, 1670);
+
+  // Google Play badge
+  drawGooglePlayBadge(ctx, W/2 - 220, 1740, 1.6);
+}
+
+const RENDERERS = [poster1, poster2, poster3];
+
+function downloadCanvas(canvas, name){
+  const link = document.createElement('a');
+  link.download = name;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+document.fonts.ready.then(() => {
+  const grid = document.getElementById('grid');
+  POSTERS.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${p.title}</h3>
+      <div class="desc">${p.desc}</div>
+      <div class="poster-frame"></div>
+      <button class="btn">⬇ Download PNG (1080×1920)</button>
+    `;
+    grid.appendChild(card);
+    const frame = card.querySelector('.poster-frame');
+    const canvas = makeCanvas();
+    RENDERERS[i](canvas);
+    // Display scaled-down preview
+    const preview = document.createElement('canvas');
+    preview.width = W/3; preview.height = H/3;
+    preview.style.width = '100%';
+    preview.style.height = '100%';
+    const pctx = preview.getContext('2d');
+    pctx.drawImage(canvas, 0, 0, W/3, H/3);
+    frame.appendChild(preview);
+    // Download button
+    card.querySelector('.btn').addEventListener('click', () => {
+      downloadCanvas(canvas, `dukanlist-launch-poster-${p.id}.png`);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

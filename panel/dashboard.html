@@ -637,7 +637,7 @@
         <h1 class="title" id="bizNameDisp">—</h1>
         <p class="subtitle" id="bizSubDisp">—</p>
       </div>
-      <span class="status-pill" id="statusPill">—</span> <span id="streakBadge" style="display:none" class="streak-badge"></span>
+      <span class="status-pill" id="statusPill">—</span> <span id="streakBadge" style="display:none !important" class="streak-badge" data-dl-soft-hidden="streak"></span>
     </div>
 
     <div class="verif-badges" id="verifBadges"></div>
@@ -646,10 +646,11 @@
   <div class="dash-main-v2">
 
     <!-- ===== Owner Daily Engagement widgets (mounted by owner-engagement.js) ===== -->
-    <div id="ownerStreakBanner"      style="display:none"></div>
-    <div id="ownerQuickWin"          style="display:none"></div>
-    <div id="ownerYesterdayDigest"   style="display:none"></div>
-    <div id="ownerDigestOptin"       style="display:none"></div>
+    <!-- SOFT-HIDDEN 2026-07: Streak + Morning Digest disabled per owner request. To restore: remove !important + data-dl-soft-hidden attr. -->
+    <div id="ownerStreakBanner"      style="display:none !important" data-dl-soft-hidden="streak"></div>
+    <div id="ownerQuickWin"          style="display:none !important" data-dl-soft-hidden="morning-digest"></div>
+    <div id="ownerYesterdayDigest"   style="display:none !important" data-dl-soft-hidden="morning-digest"></div>
+    <div id="ownerDigestOptin"       style="display:none !important" data-dl-soft-hidden="morning-digest"></div>
 
     <!-- ===== AAJ KA SCORE — Live dopamine hero ===== -->
     <div class="aaj-score-hero" id="aajScoreHero" style="display:none">
@@ -685,7 +686,8 @@
     </div>
 
     <!-- ===== Phase 8.7: Compact Poster Studio highlight card ===== -->
-    <a href="/panel/poster-quick.html" id="aajPosterCard" class="poster-highlight" style="display:flex">
+    <!-- SOFT-HIDDEN 2026-07: Quick Poster Maker disabled per owner request. To restore: change display:none back to display:flex, remove data-dl-soft-hidden. -->
+    <a href="/panel/poster-quick.html" id="aajPosterCard" class="poster-highlight" style="display:none !important" data-dl-soft-hidden="quick-poster-maker">
       <div class="ph-icon">⚡</div>
       <div class="ph-body">
         <div class="ph-label">QUICK POSTER MAKER</div>
@@ -700,7 +702,8 @@
     <div id="smartTipsCard" style="display:none"></div>
     
     <!-- ===== Phase 9: Daily Buzz post widget ===== -->
-    <div id="dailyBuzzWidget"></div>
+    <!-- SOFT-HIDDEN 2026-07: Daily Buzz disabled per owner request. To restore: remove !important + data-dl-soft-hidden. -->
+    <div id="dailyBuzzWidget" style="display:none !important" data-dl-soft-hidden="daily-buzz"></div>
     <div id="loyaltyCard" style="display:none"></div>
     <div id="badgeWallCard"></div>
 
@@ -730,7 +733,8 @@
     <div id="verificationCta" style="margin-top:18px"></div>
 
     <!-- ===== Walk-In Counter — Main Hero (visible on main area) ===== -->
-    <div id="walkInMainCard" class="card" style="margin-bottom:14px;background:linear-gradient(135deg,#FDF2F8 0%,#FBCFE8 60%,#F9A8D4 100%);border:1.5px solid #EC4899;padding:16px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 8px 20px rgba(236,72,153,.18)">
+    <!-- SOFT-HIDDEN 2026-07: Walk-In Counter disabled per owner request. To restore: remove display:none !important and data-dl-soft-hidden attr. -->
+    <div id="walkInMainCard" class="card" data-dl-soft-hidden="walk-in-counter" style="display:none !important;margin-bottom:14px;background:linear-gradient(135deg,#FDF2F8 0%,#FBCFE8 60%,#F9A8D4 100%);border:1.5px solid #EC4899;padding:16px 18px;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 8px 20px rgba(236,72,153,.18)">
       <div style="flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:1.7rem;box-shadow:0 4px 12px rgba(157,23,77,.22)">🚶</div>
       <div style="flex:1 1 200px;min-width:0">
         <div style="font-size:.7rem;letter-spacing:.08em;font-weight:800;color:#9D174D;text-transform:uppercase">
@@ -996,7 +1000,8 @@
     </div>
 
     <!-- Walk-In Counter widget — tap to log a real customer visit -->
-    <div class="side-widget" id="walkInWidget" style="background:linear-gradient(135deg,#FDF2F8,#FBCFE8);border-color:#EC4899">
+    <!-- SOFT-HIDDEN 2026-07: sidebar Walk-In widget disabled per owner request. -->
+    <div class="side-widget" id="walkInWidget" data-dl-soft-hidden="walk-in-counter" style="display:none !important;background:linear-gradient(135deg,#FDF2F8,#FBCFE8);border-color:#EC4899">
       <div class="side-widget-title" style="color:#9D174D">🚶 <span data-i18n-en>Walk-In Counter</span><span data-i18n-hi>दुकान आए ग्राहक</span></div>
       <div style="font-size:.78rem;color:#9D174D;margin-bottom:10px;line-height:1.45"><span data-i18n-en>Tap every time a customer visits in person. Shows live count on your business page = trust + social proof.</span><span data-i18n-hi>हर ग्राहक के आते ही एक tap। आपकी business page पर live count दिखेगा = trust।</span></div>
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
@@ -1039,7 +1044,8 @@
     </div>
 
     <!-- Referral Program widget -->
-    <div class="side-widget referral-widget" style="background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C">
+    <!-- SOFT-HIDDEN 2026-07: Refer & Earn disabled per owner request. To restore: remove display:none !important and data-dl-soft-hidden. -->
+    <div class="side-widget referral-widget" data-dl-soft-hidden="refer-and-earn" style="display:none !important;background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-color:#FB923C">
       <div class="side-widget-title" style="color:#9A3412">🎁 <span data-i18n-en>Refer & Earn</span><span data-i18n-hi>Refer & Earn</span></div>
       <div style="font-size:.84rem;color:#7C2D12;margin-bottom:10px;line-height:1.45">
         <span data-i18n-en>Refer <b>5 owners</b> &mdash; you BOTH get <b>6-month Featured listing FREE</b></span>
