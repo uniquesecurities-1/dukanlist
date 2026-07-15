@@ -956,3 +956,20 @@ label.ss-row:has(.ss-icon) {
 .biz-card [class*="review"] {
   display: none !important;
 }
+
+/* v15: Hide "Add photos to stand out" owner banner + Compare checkbox */
+.owner-photo-cta,
+#ownerPhotoCta,
+[class*="add-photos-cta"],
+[class*="add-photo-banner"],
+.owner-cta-banner:has(.owner-cta-title:has-text("Add photos")),
+.biz-card .biz-usp:empty {
+  display: none !important;
+}
+
+/* Hide Compare checkbox on cards (adds clutter) */
+.biz-card .compare-checkbox,
+.biz-card label:has(input[type="checkbox"][class*="compare"]),
+.biz-meta label:has-text("Compare") {
+  display: none !important;
+}
