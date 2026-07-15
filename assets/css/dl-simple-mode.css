@@ -1009,3 +1009,97 @@ input[data-cmp-id],
 .biz-meta span.rating {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v17: GOLDEN PAGES PIVOT — Homepage = Golden Pages of Dabwali             */
+/* ========================================================================= */
+
+/* 1. Hide separate Golden Pages nav card (main homepage IS golden pages now) */
+#gpHeroCard,
+.gp-hero-card,
+a[href="/golden-pages.html"],
+a[href*="/golden-pages"] {
+  display: none !important;
+}
+
+/* 2. Hide Professional Listing badges/chips (uniform look for all listings) */
+.prof-tier-badge,
+.pro-badge,
+.professional-listing-badge,
+[class*="prof-listing"],
+.biz-card .biz-cat:has-text("Professional Listing"),
+.biz-card [style*="🛡️"],
+.biz-card .ribbon:has-text("PROFESSIONAL"),
+.biz-card .ribbon:has-text("REGULATED"),
+span:has(> span[data-i18n-en="Professional Listing"]),
+.biz-card [class*="pro-strict"],
+.biz-card.prof {
+  border-color: transparent !important; /* Neutralize blue border */
+}
+/* Hide the actual pro badge chip everywhere */
+[data-i18n-en="Professional Listing"],
+.biz-card [style*="Professional"],
+.biz-card [style*="REGULATED"] {
+  display: none !important;
+}
+
+/* 3. GOOGLE FEEL — hide extra homepage sections that add clutter */
+/* Hide "What do you need today?" categories section head */
+#categories .section-head,
+/* Hide trust strip section (Mobile OTP, Pincode match etc badges) */
+.trust-strip-section,
+.trust-strip,
+/* Hide "How it works — 4 Simple Steps" */
+.how,
+section.how,
+/* Hide "Are you a business owner?" giant CTA */
+.cta-strip,
+section.cta-strip,
+/* Hide "Popular searches in your area" */
+section[class*="popular-searches"],
+/* Hide trending searches strip (heavy) */
+#trendingSearches,
+/* Hide browse by area section */
+#browseByArea,
+/* Hide "Live pulse" widget */
+.pulse-widget,
+/* Hide "how do this works" strip (HDTW) */
+.hdtw-strip,
+/* Hide hero register CTA strip */
+.hero-register-strip,
+/* Hide hero stats (Active Listings / Categories / Cities Live / Forever Free) */
+.hero-search-first .hero-stats,
+/* Hide the "Unclaimed businesses waiting for owner" section */
+#unclaimedSection,
+/* Hide "Cities covered" footer strip */
+footer .cities-covered,
+/* Hide "Popular searches" footer link section */
+footer .popular-searches {
+  display: none !important;
+}
+
+/* 4. Simplify header nav — hide non-essential links */
+.nav-links a[href="/pro"],
+.nav-links a[href="/pucho-bhai.html"],
+.nav-links a[href="/pucho-bhai"],
+.nav-links a[href="/discover.html"] {
+  display: none !important;
+}
+
+/* 5. Section-head on Featured Listings — simplify text */
+#featured .section-head p,
+#featured .section-head .eyebrow {
+  display: none !important;
+}
+/* Change #featured heading text to something simpler via CSS content trick */
+#featured .section-head h2 {
+  font-size: 1.4rem !important;
+  color: #64748B !important;
+  font-weight: 700 !important;
+  margin-bottom: 12px !important;
+}
+
+/* 6. Reduce section padding to Google-feel spacing */
+#featured {
+  padding: 20px 0 40px !important;
+}
