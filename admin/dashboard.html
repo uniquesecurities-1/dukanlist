@@ -186,7 +186,7 @@
 <link rel="stylesheet" href="/assets/css/admin-premium.css">
 <!-- Admin error monitor (auto-injected) -->
 <script src="/assets/js/admin-error-monitor.js"></script>
-<link rel="stylesheet" href="/assets/css/dl-admin-simple.css?v=1784104500">
+<link rel="stylesheet" href="/assets/css/dl-admin-simple.css?v=1784106000">
 </head>
 <body>
 
@@ -212,7 +212,6 @@
     <a href="/admin/duplicates.html">🔍 Duplicates</a>
     <a href="/admin/monitoring.html">📡 Monitoring</a>
     <a href="/admin/pucho-moderation.html">💬 Pucho Bhai</a>
-    <a href="/admin/golden-pages-manage.html" class="nav-golden">🥇 Golden Pages</a>
     <a href="/admin/owner-invites.html" style="background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;font-weight:800;padding:8px 12px;border-radius:8px">📧 Owner Invites</a>
     <a href="/admin/admins" id="navAdmins" style="display:none">👥 Admins</a>
     <a href="/admin/test-cleanup" id="navCleanup" style="display:none">🧹 Cleanup</a>
@@ -285,16 +284,6 @@
         <div class="ql-title" style="color:#1E1B4B">Owner Invites</div>
         <div class="ql-desc" style="color:#3730A3">Send email magic link to claim listings · adds email to listings without owner</div>
         <span style="position:absolute;top:8px;right:10px;background:linear-gradient(135deg,#3B82F6,#1E3A8A);color:#fff;font-size:9px;font-weight:900;letter-spacing:.04em;padding:2px 7px;border-radius:99px">NEW</span>
-      </a>
-      <a href="/admin/golden-pages-add" class="quick-link" style="background:linear-gradient(135deg,#DBEAFE 0%,#BFDBFE 100%);border:1.5px solid #1E3A8A;position:relative">
-        <div class="ql-icon">📥</div>
-        <div class="ql-title" style="color:#1E1B4B">Bulk Add Listings</div>
-        <div class="ql-desc" style="color:#1E3A8A">Single or paste 100s · Golden Pages or Main DukanList</div>
-      </a>
-      <a href="/admin/golden-pages-manage" class="quick-link" style="background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);border:1.5px solid #D97706">
-        <div class="ql-icon">🥇</div>
-        <div class="ql-title" style="color:#78350F">Golden Pages Manage</div>
-        <div class="ql-desc" style="color:#92400E">View, edit, promote, delete soft-listed shops</div>
       </a>
       <a href="/admin/spotlight" class="quick-link" style="background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border:1.5px solid #F59E0B;position:relative">
         <div class="ql-icon">⭐</div>
@@ -480,8 +469,7 @@
       <h2 class="section-title" style="margin:0;color:#78350F">🥇 Golden Pages — Recent <span id="gpRecentLabel" style="color:#92400E;font-size:12px;font-weight:500">(latest 10)</span> <span style="background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">SOFT-LISTED ONLY</span></h2>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <a href="/admin/golden-pages-add.html" style="background:linear-gradient(135deg,#D97706,#92400E);color:#fff;text-decoration:none;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">+ Add</a>
-        <a href="/admin/golden-pages-manage.html" style="background:#fff;color:#92400E;text-decoration:none;border:1.5px solid #FCD34D;border-radius:6px;padding:7px 13px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">📋 Manage all →</a>
-      </div>
+        </div>
     </div>
     <div id="gpRecentList">
       <div class="loader" style="color:#92400E">Loading…</div>

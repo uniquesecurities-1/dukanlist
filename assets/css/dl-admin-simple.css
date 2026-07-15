@@ -205,3 +205,10 @@ form:has(#adminRevText),
 form:has(#adminRevRating) {
   display: none !important;
 }
+
+/* v25: Golden Pages completely gone — hide any remaining links */
+a[href*="/admin/golden-pages"],
+a[href*="/golden-pages"],
+.nav-golden {
+  display: none !important;
+}

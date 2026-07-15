@@ -1345,3 +1345,10 @@ select#cityId option[value*="dabwali"],
 select#citySelect option[value*="dabwali"] {
   font-weight: 700 !important;
 }
+
+/* v23: Golden Pages page removed — hide any lingering links to /golden-pages* */
+a[href="/golden-pages.html"],
+a[href^="/golden-pages"],
+a[href*="/golden-pages"] {
+  display: none !important;
+}

@@ -1,0 +1,83 @@
+-- =========================================================================
+-- Migration 191: Drop Golden Pages Data (Permanent Removal)
+-- Created: 2026-07-15
+-- Author:  Deepak Singla / DigiMutual Goals Pvt. Ltd.
+--
+-- Purpose: Remove all Golden Pages (soft-listed) business records from
+--          the database after removing the Golden Pages HTML pages from
+--          the website.
+--
+-- ⚠️⚠️⚠️  IRREVERSIBLE DESTRUCTIVE OPERATION  ⚠️⚠️⚠️
+--
+-- READ EVERY LINE BEFORE RUNNING:
+--
+-- 1. Golden Pages listings had status = 'soft_listed'. These were
+--    reference entries added by admin from local knowledge — the
+--    owners had NOT claimed them yet.
+-- 2. This script DELETES those business rows. Deleted records CANNOT
+--    be recovered. There is no undo.
+-- 3. Any owner who was about to claim their soft-listed entry will
+--    lose that entry — they will need to register fresh from scratch.
+--
+-- SAFER ALTERNATIVE (recommended):
+--   Skip this script. The HTML files are already deleted from the
+--   site, so the Golden Pages UI is gone. The DB records just sit
+--   there unused, doing no harm. You can leave them.
+--
+-- IF YOU STILL WANT TO PROCEED:
+--   a) Take a Supabase backup FIRST:
+--         Supabase Dashboard → Database → Backups → New backup
+--   b) Uncomment the DELETE block below
+--   c) Paste + Run in Supabase SQL Editor
+--
+-- =========================================================================
+
+-- STEP 1: REVIEW WHAT WILL BE DELETED (run this first, does nothing destructive)
+-- ------------------------------------------------------------------------
+-- SELECT status, COUNT(*) FROM businesses GROUP BY status;
+-- SELECT id, name, mobile, status, created_at
+--   FROM businesses
+--   WHERE status = 'soft_listed'
+--   ORDER BY created_at DESC
+--   LIMIT 20;
+
+-- =========================================================================
+-- STEP 2: The actual delete (UNCOMMENT the BEGIN...COMMIT block below
+--         ONLY when you are 100% sure. Leave commented for safety.)
+-- =========================================================================
+
+-- BEGIN;
+--
+--   -- 2a. Delete related child rows first (to avoid FK errors)
+--   DELETE FROM shop_multi_categories
+--     WHERE business_id IN (SELECT id FROM businesses WHERE status = 'soft_listed');
+--   DELETE FROM shop_help_requests
+--     WHERE business_id IN (SELECT id FROM businesses WHERE status = 'soft_listed');
+--   -- (add other related tables here if your schema has more FKs pointing at
+--   --  the businesses.id column — audit via Supabase Dashboard → Tables)
+--
+--   -- 2b. Delete the soft_listed business rows
+--   DELETE FROM businesses WHERE status = 'soft_listed';
+--
+--   -- 2c. Verify
+--   -- SELECT COUNT(*) AS remaining_soft FROM businesses WHERE status = 'soft_listed';
+--
+-- COMMIT;
+
+-- =========================================================================
+-- STEP 3: Optional — drop the Golden Pages admin RPCs (db/170)
+-- =========================================================================
+--
+-- DROP FUNCTION IF EXISTS admin_gp_list_all;
+-- DROP FUNCTION IF EXISTS admin_gp_update_soft;
+-- DROP FUNCTION IF EXISTS admin_gp_delete_soft;
+-- DROP FUNCTION IF EXISTS admin_gp_promote_to_full;
+-- DROP FUNCTION IF EXISTS admin_soft_add_shop;
+--
+-- =========================================================================
+-- ROLLBACK
+-- =========================================================================
+-- If you regret this after running:
+--   - Restore the businesses table from the backup you took (step 2a).
+--   - If you did NOT take a backup, data is permanently lost.
+-- =========================================================================
