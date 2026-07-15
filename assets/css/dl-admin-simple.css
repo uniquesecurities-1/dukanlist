@@ -175,3 +175,33 @@ button[onclick*="adminFlagAsProfessional"],
 button[onclick*="addReviewByAdmin"] {
   display: none !important;
 }
+
+/* ============================================================
+   v24: BELT-AND-SUSPENDERS — direct ID targets for admin shop
+   The card variant WITHOUT Flag buttons (already-flagged state)
+   was not matching :has(button[onclick*=...]) — hide by container.
+============================================================ */
+
+/* 1. Direct container for Professional Listing (any variant, flagged or not) */
+#proFieldsetSlot,
+#proFieldsetSlot > *,
+[id="proFieldsetSlot"] {
+  display: none !important;
+}
+
+/* 2. Reviews list container + parent .card (fallback if :has fails) */
+#reviewsList {
+  display: none !important;
+}
+/* If browser doesn't support :has, try attribute-based parent match */
+.card > #reviewsList,
+.card > *:has(#reviewsList) {
+  display: none !important;
+}
+
+/* 3. Any card that contains admin review inputs (id-based) */
+form:has(#adminRevName),
+form:has(#adminRevText),
+form:has(#adminRevRating) {
+  display: none !important;
+}
