@@ -609,12 +609,13 @@ nav a[href="/panel/recommendations.html"] {
   display: none !important;
 }
 
-/* Hide Social Media card (website, facebook, instagram, youtube, twitter, linkedin) */
-.card:has(#website),
-.card:has(#facebook),
-.card:has(#instagram),
-.card:has(#youtube),
-.card:has(#twitterX) {
+/* Hide Social Media card — use ACTUAL IDs (with Url suffix as in profile.html) */
+.card:has(#websiteUrl),
+.card:has(#facebookUrl),
+.card:has(#instagramUrl),
+.card:has(#youtubeUrl),
+.card:has(#xTwitterUrl),
+.card:has(#linkedinUrl) {
   display: none !important;
 }
 
@@ -638,13 +639,15 @@ nav a[href="/panel/recommendations.html"] {
 }
 
 /* Direct field hides (fallback for browsers without :has support) */
+/* Note: #hoursList removed — Business Hours is REQUIRED for owner profile edit */
 #usp, #uspHi, #simpleUspPicker,
 #aboutText,
 #paymentMethods, #specialFeatures,
 #faqList, #faqCounter,
-#hoursList,
 #askCC, #askWhatsappNum, #askMessage,
-#website, #facebook, #instagram, #youtube, #twitterX, #linkedin {
+#website, #facebook, #instagram, #youtube, #twitterX, #linkedin,
+/* Social Media URL fields (real IDs on profile.html have "Url" suffix) */
+#websiteUrl, #facebookUrl, #instagramUrl, #youtubeUrl, #xTwitterUrl, #linkedinUrl {
   display: none !important;
 }
 
@@ -1702,5 +1705,34 @@ div:has(> b[style*="color:#0EA5E9"]:has-text("REGULATED SERVICE")) {
 /* Also hide the icon-only badge variant */
 .biz-card [style*="color:#0EA5E9"][style*="font-size:.7"],
 .biz-cat[style*="professional"] {
+  display: none !important;
+}
+
+/* ========================================================================= */
+/* v31: FORCE Business Hours visible + kill Social Media card completely   */
+/* ========================================================================= */
+
+/* Business Hours — force visible everywhere */
+#hoursList,
+.card:has(#hoursList),
+.card:has(> .card-title:has(span[data-i18n-en="Business Hours"])) {
+  display: block !important;
+  visibility: visible !important;
+  height: auto !important;
+}
+.hours-row {
+  display: grid !important;
+  visibility: visible !important;
+}
+
+/* Social Media / Website — ENTIRE card hidden (real ID = *Url suffix) */
+.card:has(#websiteUrl),
+.card:has(#facebookUrl),
+.card:has(#instagramUrl),
+.card:has(#youtubeUrl),
+.card:has(#xTwitterUrl),
+.card:has(#linkedinUrl),
+/* Also via card-title text pattern */
+.card:has(.card-title span[data-i18n-en*="Social Media"]) {
   display: none !important;
 }
