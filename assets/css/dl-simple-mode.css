@@ -291,4 +291,122 @@ nav a[href="/panel/recommendations.html"] {
   display: none !important;
 }
 
+/* ============================================================
+   OWNER PROFILE FORM CLEANUP (panel/profile.html)
+   Hide entire cards that contain fields no longer shown publicly.
+   Uses :has() selector — modern browsers only (Chrome 105+, Safari 15.4+,
+   Firefox 121+). Fallback: individual form-group hides below.
+============================================================ */
+
+/* Hide USP card (English + Hindi USP) */
+.card:has(> * #usp),
+.card:has(> * #uspHi),
+.card:has(> .form-group #usp) {
+  display: none !important;
+}
+
+/* Hide About Us card (business story) */
+.card:has(> * #aboutText),
+.card:has(> .form-group #aboutText) {
+  display: none !important;
+}
+
+/* Hide FAQs card */
+.card:has(#faqList),
+.card:has(#faqCounter) {
+  display: none !important;
+}
+
+/* Hide Business Hours card */
+.card:has(#hoursList) {
+  display: none !important;
+}
+
+/* Hide Get More Reviews card (WhatsApp review request) */
+.card:has(#askCC),
+.card:has(#askWhatsappNum) {
+  display: none !important;
+}
+
+/* Hide Social Media card (website, facebook, instagram, youtube, twitter, linkedin) */
+.card:has(#website),
+.card:has(#facebook),
+.card:has(#instagram),
+.card:has(#youtube),
+.card:has(#twitterX) {
+  display: none !important;
+}
+
+/* ===== FALLBACK — hide individual fields if :has() not supported ===== */
+/* Also hides form-groups within kept cards (Trust Signals card keeps
+   establishedYear but drops paymentMethods + specialFeatures groups) */
+
+/* Trust Signals card — keep only Established Year form-row */
+.form-group:has(> #paymentMethods),
+.form-group:has(> #specialFeatures),
+.form-group:has(> #usp),
+.form-group:has(> #uspHi),
+.form-group:has(> #aboutText),
+.form-group:has(> #website),
+.form-group:has(> #facebook),
+.form-group:has(> #instagram),
+.form-group:has(> #youtube),
+.form-group:has(> #twitterX),
+.form-group:has(> #linkedin) {
+  display: none !important;
+}
+
+/* Direct field hides (fallback for browsers without :has support) */
+#usp, #uspHi, #simpleUspPicker,
+#aboutText,
+#paymentMethods, #specialFeatures,
+#faqList, #faqCounter,
+#hoursList,
+#askCC, #askWhatsappNum, #askMessage,
+#website, #facebook, #instagram, #youtube, #twitterX, #linkedin {
+  display: none !important;
+}
+
+/* Also hide labels + card sub-descriptions for hidden fields */
+label:has(+ #usp),
+label:has(+ #uspHi),
+label:has(+ #aboutText),
+label:has(+ #paymentMethods),
+label:has(+ #specialFeatures) {
+  display: none !important;
+}
+
+/* Hide "Browse Templates" template buttons for hidden fields */
+.tpl-btn[onclick*="'usp'"],
+.tpl-btn[onclick*="'about'"],
+.tpl-btn[onclick*="'faq'"] {
+  display: none !important;
+}
+
+/* Hide FAQ counter, custom FAQ button */
+.faq-counter,
+[onclick*="addCustomFaq"] {
+  display: none !important;
+}
+
+/* ============================================================
+   PHOTOS PAGE CLEANUP (panel/photos.html)
+   Limit to 1 photo upload (main shop photo only).
+============================================================ */
+
+/* Hide extra photo slots beyond first */
+.photo-upload-slot:nth-child(n+2),
+.photo-slot:nth-child(n+2),
+#photoSlot2, #photoSlot3, #photoSlot4, #photoSlot5,
+#uploadPhoto2, #uploadPhoto3, #uploadPhoto4, #uploadPhoto5 {
+  display: none !important;
+}
+
+/* Hide "add more photos" prompts */
+.add-more-photos,
+#addMorePhotosBtn,
+.multi-photo-hint {
+  display: none !important;
+}
+
 /* ========================================================================= */
