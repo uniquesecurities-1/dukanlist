@@ -1,58 +1,54 @@
-/* DL ADMIN SHOP CLEAN (2026-07 v21)
-   ---------------------------------------
-   On admin/shop.html: nukes the "Shop Trust Signals" header text +
-   blue info box explaining verified_score. These elements are
-   dynamically inline-styled and can't be targeted via CSS attribute
-   selectors (text content not in style attribute).
-
-   Uses MutationObserver — the shop form is rendered async after data
-   fetch, so we watch for it and clean up on each render.
+/* DL ADMIN SHOP CLEAN (2026-07 v22 SAFE)
+   Safer version — only hides LEAF elements matching exact text
+   to avoid accidentally hiding parent containers.
 */
 (function(){
   'use strict';
   if (!/\/admin\/shop\.html?$|\/admin\/shop$/.test(location.pathname)) return;
-  console.log('[dl-admin-shop]', 'loaded');
+  console.log('[dl-admin-shop] loaded SAFE v22');
 
-  function nukeTrustSignals(){
-    // Find all divs with text starting with "✨ Shop Trust Signals"
+  function ownText(el){
+    // Get only DIRECT text nodes (skip descendant content)
+    var t = '';
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var n = el.childNodes[i];
+      if (n.nodeType === 3) t += n.nodeValue;
+    }
+    return t.trim();
+  }
+
+  function nukeOnce(){
+    // Target header: exact text + no children (leaf)
     var divs = document.querySelectorAll('div');
     for (var i = 0; i < divs.length; i++) {
       var d = divs[i];
-      var txt = (d.textContent || '').trim();
-      // Kill the section header
-      if (txt === '✨ Shop Trust Signals' && d.style.textTransform === 'uppercase') {
+      if (d.dataset.dlNuked) continue;
+
+      var own = ownText(d);
+      var style = d.getAttribute('style') || '';
+
+      // Section header — leaf with exact text + uppercase style
+      if (own === '✨ Shop Trust Signals' && style.indexOf('uppercase') !== -1) {
         d.style.display = 'none';
+        d.dataset.dlNuked = '1';
+        continue;
       }
-      // Kill the blue info box mentioning verified_score
-      if (txt.indexOf('These three fields power the Shop Highlights') !== -1) {
+
+      // Info blue box — starts with ℹ + has F0F9FF background
+      if (own.indexOf('These three fields power') !== -1 && style.indexOf('F0F9FF') !== -1) {
         d.style.display = 'none';
-      }
-    }
-    // Also hide the <hr> that precedes the Trust Signals section
-    var hrs = document.querySelectorAll('hr');
-    for (var j = 0; j < hrs.length; j++) {
-      var hr = hrs[j];
-      var next = hr.nextElementSibling;
-      if (next && (next.textContent || '').trim() === '✨ Shop Trust Signals') {
-        hr.style.display = 'none';
+        d.dataset.dlNuked = '1';
       }
     }
   }
 
   function boot(){
-    nukeTrustSignals();
-    // Watch for the shop form to be rendered
-    if (window.MutationObserver) {
-      var obs = new MutationObserver(function(){ nukeTrustSignals(); });
-      obs.observe(document.body, { childList: true, subtree: true });
-    }
-    // Also retry a few times as safety
     var tries = 0;
     var iv = setInterval(function(){
       tries++;
-      nukeTrustSignals();
-      if (tries > 20) clearInterval(iv);
-    }, 300);
+      nukeOnce();
+      if (tries > 15) clearInterval(iv);
+    }, 400);
   }
 
   if (document.readyState !== 'loading') boot();
