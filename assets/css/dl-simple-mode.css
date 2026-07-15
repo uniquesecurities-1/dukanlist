@@ -1497,3 +1497,71 @@ h3:has(> span[data-i18n-en="Trusted Partners"]),
 .rv-line2 > span[style*="separator"] {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v27: business.html hero box tighter + hide verified/phone/rating chips   */
+/* ========================================================================= */
+
+/* 1. Shrink hero height (was 340px too empty without photo) */
+.prem-hero {
+  min-height: 160px !important;
+  margin-bottom: 16px !important;
+}
+.prem-hero-content {
+  height: auto !important;
+  min-height: 160px !important;
+  padding: 20px 24px 22px !important;
+}
+
+/* 2. Bigger business name so it fills the box nicely */
+.prem-hero-name {
+  font-size: clamp(1.9rem, 5vw, 3.2rem) !important;
+  line-height: 1.05 !important;
+  margin-top: 4px !important;
+}
+
+/* 3. Reduce the darkening overlay (was 90-100% dark, ugly without photo) */
+.prem-hero-overlay {
+  background: linear-gradient(180deg, transparent 0%, rgba(120,53,15,.30) 100%) !important;
+}
+
+/* 4. Hide the top chips row: Verified · Phone Verified · 5.0 (10 reviews) */
+.biz-trust-row,
+.biz-badges-row,
+.biz-hero-badges,
+[class*="verified-chip"],
+[class*="reviews-chip"],
+.prem-meta-chip.prem-verified,
+.prem-meta-chip.prem-rating,
+.prem-meta-chip.prem-phone-verified {
+  display: none !important;
+}
+
+/* 5. Hide any element with (X reviews) style text pattern via specific classes */
+.rating-summary,
+.biz-rating-summary,
+#bizRatingHeader,
+.hero-rating-chip {
+  display: none !important;
+}
+
+/* 6. Reduce hero border-radius + shadow for cleaner Google feel */
+.prem-hero {
+  border-radius: 14px !important;
+  box-shadow: 0 4px 12px rgba(120,53,15,.10) !important;
+}
+
+/* 7. On mobile — even tighter */
+@media (max-width: 640px) {
+  .prem-hero {
+    min-height: 130px !important;
+    margin-bottom: 12px !important;
+  }
+  .prem-hero-content {
+    min-height: 130px !important;
+    padding: 16px 18px 18px !important;
+  }
+  .prem-hero-name {
+    font-size: 1.6rem !important;
+  }
+}
