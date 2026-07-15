@@ -1805,3 +1805,74 @@ main.grid > article > div[style*="border-top:1px dashed"] {
 .sim-meta [class*="rating"] {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v35: Tighten search/local .biz-card layout — kill excessive vertical gap */
+/* ========================================================================= */
+
+/* Root card — tighter padding */
+.biz-card {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+/* Info wrapper — tight vertical stack */
+.biz-card .biz-info {
+  padding: 12px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+/* Every child inside biz-info — kill default margins */
+.biz-card .biz-info > * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Category chip — small top margin */
+.biz-card .biz-cat {
+  margin-bottom: 4px !important;
+  font-size: .78rem !important;
+}
+
+/* Business name — clean bold */
+.biz-card .biz-name {
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  margin-bottom: 4px !important;
+}
+
+/* Hide empty .biz-usp — was reserving vertical space */
+.biz-card .biz-usp:empty,
+.biz-card .biz-usp:not(:empty):empty {
+  display: none !important;
+}
+/* Also target USP with only whitespace */
+.biz-card .biz-usp {
+  min-height: 0 !important;
+}
+
+/* My injected owner/phone/address — tight vertical gap */
+.biz-card .dl-owner,
+.biz-card .dl-phone,
+.biz-card .dl-biz-addr {
+  margin: 2px 0 !important;
+  padding: 0 !important;
+}
+
+/* Meta row — small top gap */
+.biz-card .biz-meta {
+  margin-top: 6px !important;
+  padding-top: 8px !important;
+  border-top: 1px dashed #E2E8F0 !important;
+  gap: 8px !important;
+}
+
+/* Actions row — tight */
+.biz-card .biz-actions,
+.biz-card > div[style*="cta"] {
+  margin-top: 6px !important;
+  gap: 6px !important;
+}
