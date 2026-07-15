@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260528">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784114000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784115000">
 <script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
 <style>
 .cat-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:.84rem;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);text-decoration:none;transition:.15s;animation:catPillIn .25s ease-out}
@@ -1135,6 +1135,25 @@ async function saveProfile(){
   Object.assign(MY_BIZ, payload);
   if (updRes && updRes.status) MY_BIZ.status = updRes.status;
 
+  // Refresh from DB — confirm whatsapp actually saved
+  try {
+    const { data: fresh, error: fErr } = await c.from('businesses')
+      .select('whatsapp, mobile')
+      .eq('id', MY_BIZ.id).maybeSingle();
+    if (!fErr && fresh) {
+      MY_BIZ.whatsapp = fresh.whatsapp;
+      MY_BIZ.mobile = fresh.mobile;
+      const savedPhone = String(fresh.whatsapp || '').replace(/\D/g,'').slice(-10);
+      const wantedPhone = String((payload.whatsapp || '')).replace(/\D/g,'').slice(-10);
+      if (savedPhone && wantedPhone && savedPhone !== wantedPhone) {
+        console.warn('[profile] WhatsApp save mismatch — RPC may have rejected. Wanted:', wantedPhone, 'Got:', savedPhone);
+      }
+      // Update input to show what actually persisted
+      const w = document.getElementById('whatsapp');
+      if (w) w.value = fresh.whatsapp || '';
+    }
+  } catch(rErr){ console.warn('post-save whatsapp refresh:', rErr); }
+
   // ===== POST-SAVE VERIFICATION =====
   // Re-fetch from DB to confirm trust fields actually persisted.
   // If payment_methods don't match what user ticked, the RPC silently
@@ -1380,5 +1399,6 @@ document.addEventListener('keydown', function(e){
 });
 
 </script>
+<script src="/assets/js/dl-simple-mode.js?v=1784115000" defer></script>
 </body>
 </html>

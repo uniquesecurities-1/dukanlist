@@ -353,7 +353,7 @@ export default async function handler(req, res){
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=900, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=300');
     return res.end(renderPage({ city, cat, shops, isParent, subCategories }));
 
   } catch (err){

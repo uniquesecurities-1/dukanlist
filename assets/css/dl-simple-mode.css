@@ -1891,3 +1891,17 @@ main.grid > article > div[style*="border-top:1px dashed"] {
 }
 
 /* Also nuke the review-boost JS API just in case */
+
+/* ========================================================================= */
+/* v40: Stronger dashboard welcome banner hide                              */
+/* ========================================================================= */
+
+/* Any element containing the welcome banner text — target via :has */
+div:has(> span[data-i18n-en*="DukanList ab bilkul simple"]),
+.dashboard-welcome,
+#dashWelcomeBanner,
+[class*="welcome-banner"]:has(span[data-i18n-en*="DukanList"]),
+/* Structural: dashboard welcome banner sits in an orange-gradient div */
+div[style*="linear-gradient"][style*="FFF7ED"]:has(span[data-i18n-en*="simple ho gayi"]) {
+  display: none !important;
+}
