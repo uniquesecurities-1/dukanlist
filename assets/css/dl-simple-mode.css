@@ -88,7 +88,16 @@
 #featuredShopWeek,
 .featured-shop-week,
 [data-section="featured-week"],
-#spotlightShop {
+#spotlightShop,
+
+/* Homepage — "What's New / Just landed on DukanList" feature updates grid */
+#whats-new,
+
+/* Homepage — "Real Customer Voices / 5-star reviews" testimonials */
+#custTest,
+
+/* Homepage — "Spotlight of the Week / Spotlight on a local legend" */
+#fsotw {
   display: none !important;
 }
 
