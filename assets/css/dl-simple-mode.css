@@ -390,16 +390,14 @@ body[data-dl-simple-mode="true"] .dash-side-v2 {
 ============================================================ */
 
 /* 1. Business Hours */
-#hoursCard {
-  display: none !important;
-}
+/* hoursCard un-hidden — user wants Business Hours on profile edit */
 
 /* 2. Before you visit / call — Visit Guide card */
 .visit-guide-card {
   display: none !important;
 }
 
-/* 3. Public Q&A (Questions & Answers) */
+/* 3. Public Q&A */
 #qaCard,
 #qaList,
 #qaEmpty,
@@ -603,9 +601,7 @@ nav a[href="/panel/recommendations.html"] {
 }
 
 /* Hide Business Hours card */
-.card:has(#hoursList) {
-  display: none !important;
-}
+/* .card:has(#hoursList) — un-hidden for owner edit */
 
 /* Hide Get More Reviews card (WhatsApp review request) */
 .card:has(#askCC),
@@ -1621,4 +1617,30 @@ h3:has(> span[data-i18n-en="Trusted Partners"]),
   .sec-content {
     max-width: 720px !important;
   }
+}
+
+/* ========================================================================= */
+/* v29: Hide Professional Mode banner on owner dashboard/business page      */
+/* ========================================================================= */
+#proModeBanner,
+.pro-mode-banner,
+[class*="pro-mode"] {
+  display: none !important;
+}
+
+/* Also hide the "DukanList ab bilkul simple ho gayi hai" welcome banner on dashboard
+   (redundant — dashboard already redirects to profile) */
+.dashboard-welcome-banner,
+[data-i18n-en*="DukanList ab bilkul simple"] {
+  display: none !important;
+}
+
+/* v29b: RE-SHOW #hoursCard on profile edit (user wants Business Hours back) */
+body.editing #hoursCard,
+#hoursCard.editable,
+.panel-profile #hoursCard,
+/* Fallback — always show on /panel/profile.html */
+body[data-page="profile"] #hoursCard {
+  display: block !important;
+  visibility: visible !important;
 }

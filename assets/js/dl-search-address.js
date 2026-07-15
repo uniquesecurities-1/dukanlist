@@ -80,15 +80,6 @@
     if (meta && meta.parentNode) meta.parentNode.insertBefore(frag, meta);
     else if (name && name.nextSibling) name.parentNode.insertBefore(frag, name.nextSibling);
     else info.appendChild(frag);
-
-    if (!card.querySelector('.dl-free-badge')) {
-      var fb = document.createElement('span');
-      fb.className = 'dl-free-badge';
-      fb.textContent = '✓ FREE';
-      fb.style.cssText = 'position:absolute;top:10px;right:10px;background:#10B981;color:#fff;padding:3px 9px;border-radius:99px;font-size:.66rem;font-weight:800;letter-spacing:.04em;z-index:2;pointer-events:none';
-      if (getComputedStyle(card).position === 'static') card.style.position = 'relative';
-      card.appendChild(fb);
-    }
     card.dataset.dlEnriched = '1';
   }
 

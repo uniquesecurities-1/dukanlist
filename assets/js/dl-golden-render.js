@@ -44,10 +44,10 @@
       ? '<a href="tel:+91' + tel + '" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 ' + (lang==='hi'?'Call':'Call') + '</a>'
       : '';
 
-    return '<article style="position:relative;background:#fff;border:2px solid #FED7AA;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 6px rgba(15,23,42,.05)">'
+    return '<article style="position:relative;background:#fff;border:2px solid #FED7AA;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 6px rgba(15,23,42,.05);cursor:pointer" onclick="if(!event.target.closest(\'a,button\')){window.location.href=\'/business.html?slug=' + slug + '\';}">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
       + '<span style="display:inline-flex;align-items:center;gap:5px;background:#FEF3C7;color:#78350F;padding:4px 10px;border-radius:99px;font-size:.72rem;font-weight:800">' + esc(catIcon) + ' ' + esc(catName.toUpperCase()) + '</span>'
-      + '<span style="background:#10B981;color:#fff;padding:3px 9px;border-radius:99px;font-size:.66rem;font-weight:800">✓ FREE</span>'
+      + ''
       + '</div>'
       + '<div style="margin-top:4px"><div style="display:flex;align-items:center;gap:6px;font-family:\'Manrope\',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ' + esc(b.name || '') + '</div>'
       + (b.name_hi ? '<div style="font-family:\'Noto Sans Devanagari\',sans-serif;font-size:.9rem;font-weight:700;color:#64748B;margin-top:2px">' + esc(b.name_hi) + '</div>' : '')
