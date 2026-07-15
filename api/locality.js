@@ -166,7 +166,7 @@ function renderShopCard(b){
     ? `<a href="tel:+91${phone}" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 Call</a>`
     : '';
   return `
-  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer">
+  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer">
     <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
     ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}
     ${phone ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> +91-${phone}</div>` : ''}

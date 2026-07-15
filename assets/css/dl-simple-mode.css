@@ -1759,3 +1759,43 @@ section:has(a[href^="/local/mansa"]),
 section:has(a[href^="/local/muktsar"]) {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v33: Hide Similar businesses photos + tighten card spacing               */
+/* ========================================================================= */
+
+/* 1. Similar Businesses section — hide photo thumbnails */
+.sim-photo,
+.sim-card .sim-photo {
+  display: none !important;
+}
+/* Also collapse card height since photo gone */
+.sim-card {
+  min-height: auto !important;
+}
+.sim-card .sim-info {
+  padding: 12px 14px !important;
+}
+
+/* 2. Recently viewed section — additional safety (was already hidden but reinforce) */
+#similarShopsSection img,
+.sim-card img {
+  display: none !important;
+}
+
+/* 3. Tighten /local/* and golden render article spacing (was too spread) */
+#featuredGrid article,
+main.grid > article {
+  gap: 4px !important;
+  padding: 10px 14px !important;
+}
+#featuredGrid article > div,
+main.grid > article > div {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#featuredGrid article > div[style*="border-top:1px dashed"],
+main.grid > article > div[style*="border-top:1px dashed"] {
+  padding-top: 8px !important;
+  margin-top: 6px !important;
+}
