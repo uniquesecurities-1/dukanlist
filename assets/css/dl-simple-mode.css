@@ -695,3 +695,44 @@ label:has(+ #specialFeatures) {
 }
 
 /* ========================================================================= */
+
+/* ========================================================================= */
+/* NEW HIDES (2026-07 v8): welcome popup + Top 5 leaderboard + LIVE ticker   */
+/* ========================================================================= */
+
+/* 1. Owner login welcome modal (dashboard.html — belt-and-suspenders in
+      case dashboard→profile redirect hasn't kicked in yet on stale cache) */
+#welcomeModalDL,
+.welcome-modal-dl,
+[id^="welcomeModal"],
+.first-time-welcome {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 2. Top 5 of the Month leaderboard on homepage */
+#top10Section,
+#top10Grid,
+.top-10-section,
+.monthly-top-5 {
+  display: none !important;
+}
+
+/* 3. LIVE activity ticker (bottom strip: "5-star review for Bombay Fashion") */
+#actTicker,
+#actMsg,
+.act-ticker,
+.live-activity-ticker,
+[id^="actTicker"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 4. Any lingering "5-star review" style social-proof strips */
+.social-proof-strip,
+.review-ticker,
+.live-review-strip {
+  display: none !important;
+}
