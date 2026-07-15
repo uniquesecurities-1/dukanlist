@@ -1799,3 +1799,9 @@ main.grid > article > div[style*="border-top:1px dashed"] {
   padding-top: 8px !important;
   margin-top: 6px !important;
 }
+
+/* v34: Similar businesses — ensure no rating text pattern shows */
+.sim-meta span[style*="⭐"],
+.sim-meta [class*="rating"] {
+  display: none !important;
+}

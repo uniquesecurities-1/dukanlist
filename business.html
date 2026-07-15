@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784111500">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784112000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -3759,14 +3759,14 @@ async function loadSimilarShops(b){
     const cards = q.data.map(s => {
       const photo = (s.photos && s.photos.length) ? s.photos[0] : null;
       const city = s.geo_cities && s.geo_cities.name ? s.geo_cities.name : '';
-      const rate = s.rating_avg > 0 ? '⭐ ' + Number(s.rating_avg).toFixed(1) : 'New';
+      const rate = '';  // rating hidden — Golden Pages mode
       return `<a class="sim-card" href="/business.html?slug=${encodeURIComponent(s.slug)}">
         ${photo
           ? `<img src="${escapeHTML(photo)}" alt="${escapeHTML(s.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover" loading="lazy">`
           : `<div class="sim-photo">🏪</div>`}
         <div class="sim-info">
           <div class="sim-name">${escapeHTML(s.name)}</div>
-          <div class="sim-meta">${rate} · ${escapeHTML(city)}</div>
+          <div class="sim-meta">${escapeHTML(city)}</div>
         </div>
       </a>`;
     }).join('');
