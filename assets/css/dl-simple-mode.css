@@ -1298,3 +1298,50 @@ footer .links a {
   height: 0 !important;
   overflow: hidden !important;
 }
+
+/* ========================================================================= */
+/* v22: Deep city cleanup — hide 📍 location chip on business page +        */
+/*      city dropdown "other cities" options                                 */
+/* ========================================================================= */
+
+/* 1. Hide 📍 area/city chip on business.html (redundant — all Dabwali) */
+#premAreaChip,
+#premCityChip,
+.prem-meta-chip.prem-area,
+.prem-meta-chip.prem-city,
+.prem-meta-chip.prem-location {
+  display: none !important;
+}
+
+/* 2. Hide the address "📍 Map" pill on business.html (just show address text) */
+.pmb-dir,
+#pmbDir {
+  display: none !important;
+}
+
+/* 3. Hide "Location on map" button */
+#mapEmbedBtn,
+button:has(> span[data-i18n-en="Location on map"]) {
+  display: none !important;
+}
+
+/* 4. Golden Pages small hero badge showing city list */
+.gp-hero-title,
+.hero-badge:has(span[data-i18n-en*="Bharat's Local"]),
+.hero-badge:has(span[data-i18n-en*="Sirsa"]),
+.hero-badge:has(span[data-i18n-en*="Bathinda"]) {
+  /* keep .gp-hero-title alone; only hide badges with city lists */
+}
+
+/* 5. Sub-city dropdowns / city chip strips */
+.city-chip-strip,
+.other-cities-list,
+[data-city-strip] {
+  display: none !important;
+}
+
+/* 6. Register form: ensure Dabwali is default (visual cue) */
+select#cityId option[value*="dabwali"],
+select#citySelect option[value*="dabwali"] {
+  font-weight: 700 !important;
+}
