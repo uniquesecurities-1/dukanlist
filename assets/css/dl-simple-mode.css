@@ -172,6 +172,76 @@ nav a[href*="/panel/favorites"] {
   display: none !important;
 }
 
+/* ============================================================
+   MORE DASHBOARD CLEANUP (2026-07 v4 — owner request)
+   Remove: Verified banner, KPI stats grid, Share my stats,
+   Recent Activity feed, WhatsApp Status Poster, Your Ranking,
+   Your Activity 24h, mini pulse
+============================================================ */
+
+/* Verified Shop Blue Tick banner (dynamically rendered green box) */
+.verified-shop-banner,
+#verifiedShopBanner,
+[data-widget="verified-shop"] {
+  display: none !important;
+}
+
+/* KPI stats grid (Profile Views, Calls+WA, Rating, Trust Score) */
+.dash-grid {
+  display: none !important;
+}
+.dash-grid .kpi,
+.kpi.rating,
+.trust-score-card {
+  display: none !important;
+}
+
+/* "Share my stats" button */
+#shareStatsBtn,
+.share-stats-btn,
+button[onclick*="shareStats"],
+a[onclick*="shareStats"] {
+  display: none !important;
+}
+
+/* WhatsApp Status Poster sidebar widget */
+.side-widget:has(> .side-widget-title span[data-i18n-en="WhatsApp Status Poster"]),
+.side-widget:has(a[href*="/panel/poster-studio"]) {
+  display: none !important;
+}
+
+/* Your Ranking widget */
+#rankWidget,
+.side-widget:has(> .side-widget-title span[data-i18n-en="Your Ranking"]) {
+  display: none !important;
+}
+
+/* Your Activity (24h) widget — with streak/customers contacted/rating */
+.side-widget:has(> .side-widget-title span[data-i18n-en="Your Activity (24h)"]),
+.side-widget:has(#dashActivityFeed) {
+  display: none !important;
+}
+
+/* Recent Activity widget (both variants — sidebar + main area) */
+#dashActivityFeed,
+.recent-activity-widget,
+.card:has(> h3:contains("Recent Activity")),
+.card:has(#dashActivityFeed) {
+  display: none !important;
+}
+
+/* Mini pulse widget */
+.mini-pulse {
+  display: none !important;
+}
+
+/* Fallback for browsers without :has() — hide by specific containers */
+.side-widget[style*="border-color:#16A34A"], /* WhatsApp poster green widget */
+.side-widget[style*="border-color:#9333EA"]  /* Your Ranking purple widget */
+{
+  display: none !important;
+}
+
 /* Hide qa-section-title if section becomes empty after tile hiding */
 .qa-section-title { /* keeps headers like "Manage" — decision retained */ }
 
