@@ -1,28 +1,15 @@
-/* DL SEARCH ADDRESS INJECTOR (2026-07 v15)
-   ---------------------------------------
-   On search.html + browse.html: inject full address into every
-   .biz-card in the results list. Uses MutationObserver so newly
-   rendered cards also get address injected.
-
-   Data source: fetches id/slug/address_line1/address_line2 for
-   ALL active businesses once, then maps by slug from card link.
-*/
+/* DL SEARCH ENRICH v16 — inject owner/phone/address + FREE badge */
 (function(){
   'use strict';
-  var TAG = '[dl-addr]';
-
-  // Only on search + browse pages
+  var TAG = '[dl-enrich]';
   var path = location.pathname;
   if (!(path === '/search.html' || path === '/search' ||
         path === '/browse.html' || path === '/browse' ||
         path === '/discover.html' || path === '/discover' ||
-        path.indexOf('/local/') === 0)) {
-    console.log(TAG, 'not applicable, exiting');
-    return;
-  }
+        path.indexOf('/local/') === 0)) return;
   console.log(TAG, 'loaded on', path);
 
-  var ADDR_BY_SLUG = {};
+  var CACHE = {};
   var loaded = false;
 
   function esc(s){
@@ -31,112 +18,106 @@
     });
   }
 
-  async function loadAddresses(){
+  async function loadData(){
     if (loaded) return;
-    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) {
-      setTimeout(loadAddresses, 300);
-      return;
-    }
+    if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) { setTimeout(loadData, 300); return; }
     try {
       var r = await ShopDB.client.from('businesses')
-        .select('slug,address_line1,address_line2')
-        .eq('status', 'active')
-        .limit(500);
-      if (r.error) { console.warn(TAG, 'fetch err', r.error); return; }
+        .select('slug,owner_name,mobile,whatsapp,address_line1,address_line2')
+        .eq('status', 'active').limit(500);
+      if (r.error) { console.warn(TAG, 'err', r.error); return; }
       (r.data || []).forEach(function(b){
-        var addr = [b.address_line1, b.address_line2].filter(Boolean).join(', ');
-        if (b.slug && addr) ADDR_BY_SLUG[b.slug] = addr;
+        if (!b.slug) return;
+        CACHE[b.slug] = {
+          owner: b.owner_name || '',
+          phone: String(b.mobile || '').replace(/\D/g, '').slice(-10),
+          addr: [b.address_line1, b.address_line2].filter(Boolean).join(', ')
+        };
       });
       loaded = true;
-      console.log(TAG, 'loaded ' + Object.keys(ADDR_BY_SLUG).length + ' addresses');
+      console.log(TAG, 'cached', Object.keys(CACHE).length);
       injectAll();
     } catch(e){ console.warn(TAG, 'ex', e); }
   }
 
-  function extractSlug(card){
-    var link = card.querySelector('a[href*="/business.html?slug="]') ||
-               card.querySelector('a.biz-card-link');
+  function slugFromCard(card){
+    var link = card.querySelector('a[href*="/business.html?slug="]') || card.querySelector('a.biz-card-link');
     if (!link) return null;
-    var href = link.getAttribute('href') || '';
-    var m = href.match(/slug=([^&#]+)/);
+    var m = (link.getAttribute('href') || '').match(/slug=([^&#]+)/);
     return m ? decodeURIComponent(m[1]) : null;
   }
 
-  function injectCard(card){
-    if (card.dataset.addrInjected) return;
-    var slug = extractSlug(card);
-    if (!slug) return;
-    var addr = ADDR_BY_SLUG[slug];
-    if (!addr) return;
-
-    // Find best insertion point: after .biz-name or before .biz-meta or in .biz-info
+  function enrichCard(card){
+    if (card.dataset.dlEnriched) return;
+    var slug = slugFromCard(card);
+    if (!slug || !CACHE[slug]) return;
+    var d = CACHE[slug];
     var info = card.querySelector('.biz-info') || card;
-    var name = info.querySelector('.biz-name');
     var meta = info.querySelector('.biz-meta');
+    var name = info.querySelector('.biz-name');
+    var frag = document.createDocumentFragment();
 
-    var addrDiv = document.createElement('div');
-    addrDiv.className = 'dl-biz-addr';
-    addrDiv.style.cssText = 'font-size:.78rem;color:#475569;margin:6px 0 4px;display:flex;align-items:flex-start;gap:5px;line-height:1.4';
-    addrDiv.innerHTML = '<span style="color:#DC2626;flex-shrink:0">📍</span> <span>' + esc(addr) + '</span>';
-
-    // Prefer inserting BEFORE .biz-meta (which has city + share)
-    if (meta && meta.parentNode) {
-      meta.parentNode.insertBefore(addrDiv, meta);
-    } else if (name && name.nextSibling) {
-      name.parentNode.insertBefore(addrDiv, name.nextSibling);
-    } else {
-      info.appendChild(addrDiv);
+    if (d.owner) {
+      var o = document.createElement('div');
+      o.className = 'dl-owner';
+      o.style.cssText = 'font-size:.82rem;color:#475569;margin:6px 0 3px;display:flex;align-items:center;gap:5px';
+      o.innerHTML = '<span>👤</span> <b style="color:#0F172A">' + esc(d.owner) + '</b>';
+      frag.appendChild(o);
     }
+    if (d.phone && d.phone.length === 10) {
+      var p = document.createElement('div');
+      p.style.cssText = 'font-size:.82rem;color:#475569;margin:0 0 3px;display:flex;align-items:center;gap:5px;font-family:monospace';
+      p.innerHTML = '<span>📱</span> +91-' + d.phone;
+      frag.appendChild(p);
+    }
+    if (d.addr) {
+      var a = document.createElement('div');
+      a.className = 'dl-biz-addr';
+      a.style.cssText = 'font-size:.82rem;color:#475569;margin:0 0 4px;display:flex;align-items:flex-start;gap:5px;line-height:1.4';
+      a.innerHTML = '<span style="color:#DC2626;flex-shrink:0">📍</span> <span>' + esc(d.addr) + '</span>';
+      frag.appendChild(a);
+    }
+    if (meta && meta.parentNode) meta.parentNode.insertBefore(frag, meta);
+    else if (name && name.nextSibling) name.parentNode.insertBefore(frag, name.nextSibling);
+    else info.appendChild(frag);
 
-    card.dataset.addrInjected = '1';
+    if (!card.querySelector('.dl-free-badge')) {
+      var fb = document.createElement('span');
+      fb.className = 'dl-free-badge';
+      fb.textContent = '✓ FREE';
+      fb.style.cssText = 'position:absolute;top:10px;right:10px;background:#10B981;color:#fff;padding:3px 9px;border-radius:99px;font-size:.66rem;font-weight:800;letter-spacing:.04em;z-index:2';
+      if (getComputedStyle(card).position === 'static') card.style.position = 'relative';
+      card.appendChild(fb);
+    }
+    card.dataset.dlEnriched = '1';
   }
 
   function injectAll(){
     var cards = document.querySelectorAll('.biz-card, article.biz-card');
-    console.log(TAG, 'injecting into ' + cards.length + ' cards');
-    for (var i = 0; i < cards.length; i++) injectCard(cards[i]);
+    for (var i = 0; i < cards.length; i++) enrichCard(cards[i]);
   }
 
-  // Watch #results for card additions/replacements
   function observe(){
-    var target = document.getElementById('results') ||
-                 document.getElementById('bizGrid') ||
-                 document.querySelector('.biz-grid') ||
-                 document.body;
-    if (!target) return;
-    var obs = new MutationObserver(function(muts){
+    var target = document.getElementById('results') || document.querySelector('.biz-grid') || document.body;
+    if (!target || !window.MutationObserver) return;
+    new MutationObserver(function(muts){
       if (!loaded) return;
-      var addedCard = false;
       muts.forEach(function(m){
         m.addedNodes && m.addedNodes.forEach(function(n){
           if (n.nodeType !== 1) return;
-          if (n.classList && n.classList.contains('biz-card')) {
-            injectCard(n);
-            addedCard = true;
-          }
+          if (n.classList && n.classList.contains('biz-card')) enrichCard(n);
           if (n.querySelectorAll) {
             var kids = n.querySelectorAll('.biz-card');
-            for (var i = 0; i < kids.length; i++) injectCard(kids[i]);
+            for (var i = 0; i < kids.length; i++) enrichCard(kids[i]);
           }
         });
       });
-    });
-    obs.observe(target, { childList: true, subtree: true });
+    }).observe(target, { childList: true, subtree: true });
   }
 
-  // Boot
-  loadAddresses();
-  if (document.readyState !== 'loading') {
-    observe();
-    setTimeout(injectAll, 500);
-  }
-  window.addEventListener('DOMContentLoaded', function(){
-    observe();
-    setTimeout(injectAll, 500);
-  });
-  window.addEventListener('load', function(){
-    setTimeout(injectAll, 1000);
-  });
-
-  window.dlAddrReload = function(){ loaded = false; ADDR_BY_SLUG = {}; loadAddresses(); };
+  loadData();
+  if (document.readyState !== 'loading') { observe(); setTimeout(injectAll, 500); }
+  window.addEventListener('DOMContentLoaded', function(){ observe(); setTimeout(injectAll, 500); });
+  window.addEventListener('load', function(){ setTimeout(injectAll, 1000); });
+  window.dlEnrichReload = function(){ loaded = false; CACHE = {}; loadData(); };
 })();

@@ -57,7 +57,6 @@
       + (addr ? '<div style="font-size:.82rem;color:#475569;display:flex;align-items:flex-start;gap:5px;line-height:1.4"><span style="color:#DC2626;flex-shrink:0">📍</span> ' + esc(addr) + '</div>' : '')
       + (city ? '<div style="font-size:.78rem;color:#64748B;display:flex;align-items:center;gap:5px"><span>🏙️</span> ' + esc(city) + '</div>' : '')
       + '<div style="display:flex;gap:8px;margin-top:8px;padding-top:10px;border-top:1px dashed #E2E8F0">' + waBtn + callBtn
-      + '<a href="' + report + '" title="Report" style="width:38px;display:inline-flex;align-items:center;justify-content:center;padding:10px 0;border-radius:10px;background:#fff;color:#F59E0B;border:1.5px solid #FCD34D;font-size:.9rem;text-decoration:none">⚠️</a>'
       + '</div></article>';
   }
 
