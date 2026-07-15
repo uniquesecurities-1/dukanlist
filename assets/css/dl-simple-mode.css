@@ -973,3 +973,39 @@ label.ss-row:has(.ss-icon) {
 .biz-meta label:has-text("Compare") {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v16: Kill "No reviews yet" + Compare checkbox + owner CTA banner         */
+/* ========================================================================= */
+
+/* 1. "No reviews yet" text on search/browse cards
+      (span in .biz-meta with inline style color:var(--muted)) */
+.biz-meta > span[style*="color:var(--muted)"],
+.biz-meta > span[style*="color: var(--muted)"],
+.biz-meta > span:not([class]) {
+  display: none !important;
+}
+
+/* 2. Compare checkbox (adds clutter on Golden Pages layout) */
+.cmp-pick,
+label.cmp-pick,
+.compare-checkbox,
+[data-cmp-label-id],
+input[data-cmp-id],
+.cmp-bar,
+#cmpBar {
+  display: none !important;
+}
+
+/* 3. "Are you an owner? Add photos to stand out" banner */
+.owner-cta,
+#ownerCTA,
+[class*="owner-cta"] {
+  display: none !important;
+}
+
+/* 4. Also nuke rating in .biz-meta on cards */
+.biz-meta .rating,
+.biz-meta span.rating {
+  display: none !important;
+}
