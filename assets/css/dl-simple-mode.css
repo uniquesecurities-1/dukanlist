@@ -1565,3 +1565,60 @@ h3:has(> span[data-i18n-en="Trusted Partners"]),
     font-size: 1.6rem !important;
   }
 }
+
+/* ========================================================================= */
+/* v28: business.html trust strip + content layout tightening               */
+/* ========================================================================= */
+
+/* 1. HIDE the top pill row: Verified · Phone Verified · 5.0 (10 reviews) */
+#detailTrustStrip,
+.dt-pill,
+.dt-pill.verified,
+.dt-pill.rating-clickable,
+.detail-trust-strip {
+  display: none !important;
+}
+
+/* 2. Also hide the biz-rating-row (contains hidden rating internally) */
+.biz-rating-row {
+  display: none !important;
+}
+
+/* 3. Full-width content column on mobile — remove excess left/right padding */
+@media (max-width: 760px) {
+  .biz-top,
+  .biz-top .biz-info,
+  .biz-top .biz-content {
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+  }
+  .sec-content {
+    padding: 0 10px !important;
+    max-width: 100% !important;
+    margin: 12px auto !important;
+  }
+  .biz-hero-wrap {
+    padding: 0 10px !important;
+    max-width: 100% !important;
+  }
+  /* Cards inside — tighter padding on mobile */
+  .card-pill,
+  .biz-info > div,
+  .addr-box {
+    padding: 12px 14px !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+/* 4. Desktop — center content nicely with reasonable max-width */
+@media (min-width: 761px) {
+  .biz-top {
+    max-width: 720px !important;
+    margin: 0 auto !important;
+  }
+  .sec-content {
+    max-width: 720px !important;
+  }
+}
