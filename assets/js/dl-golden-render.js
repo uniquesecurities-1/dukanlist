@@ -29,7 +29,7 @@
     var catIcon = cat.icon || '🏪';
     var city = (b.geo_cities && b.geo_cities.name) || '';
     var addr = [b.address_line1, b.address_line2].filter(Boolean).join(', ');
-    var phone = mask(b.whatsapp || b.mobile);
+    var phoneRaw = String(b.mobile || '').replace(/[^0-9]/g, '').slice(-10);
     var wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
     var tel = String(b.mobile || '').replace(/\D/g, '').slice(-10);
     var msg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
@@ -37,11 +37,11 @@
     var report = '/business.html?slug=' + slug + '#report';
 
     var waBtn = wa.length === 10
-      ? '<a href="https://wa.me/91' + wa + '?text=' + msg + '" target="_blank" rel="noopener" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 ' + (lang==='hi'?"मालिक हूं":"I'm the owner") + '</a>'
+      ? '<a href="https://wa.me/91' + wa + '?text=' + msg + '" target="_blank" rel="noopener" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 ' + (lang==='hi'?'WhatsApp':'WhatsApp') + '</a>'
       : '';
 
     var callBtn = tel.length === 10
-      ? '<a href="tel:+91' + tel + '" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 ' + (lang==='hi'?'संपर्क':'Contact owner') + '</a>'
+      ? '<a href="tel:+91' + tel + '" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 ' + (lang==='hi'?'Call':'Call') + '</a>'
       : '';
 
     return '<article style="position:relative;background:#fff;border:2px solid #FED7AA;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 6px rgba(15,23,42,.05)">'
@@ -53,7 +53,7 @@
       + (b.name_hi ? '<div style="font-family:\'Noto Sans Devanagari\',sans-serif;font-size:.9rem;font-weight:700;color:#64748B;margin-top:2px">' + esc(b.name_hi) + '</div>' : '')
       + '</div>'
       + (b.owner_name ? '<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">' + esc(b.owner_name) + '</b></div>' : '')
-      + (phone ? '<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> ' + phone + '</div>' : '')
+      + (phoneRaw ? '<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> +91-' + phoneRaw + '</div>' : '')
       + (addr ? '<div style="font-size:.82rem;color:#475569;display:flex;align-items:flex-start;gap:5px;line-height:1.4"><span style="color:#DC2626;flex-shrink:0">📍</span> ' + esc(addr) + '</div>' : '')
       + (city ? '<div style="font-size:.78rem;color:#64748B;display:flex;align-items:center;gap:5px"><span>🏙️</span> ' + esc(city) + '</div>' : '')
       + '<div style="display:flex;gap:8px;margin-top:8px;padding-top:10px;border-top:1px dashed #E2E8F0">' + waBtn + callBtn
