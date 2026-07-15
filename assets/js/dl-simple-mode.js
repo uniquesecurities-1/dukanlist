@@ -18,6 +18,18 @@
   document.documentElement.setAttribute('data-dl-simple-mode', 'true');
 
   function activate(){
+    // OWNER DASHBOARD REDIRECT — dashboard is now redundant since we
+    // simplified it away. Send owner directly to profile.html (edit form).
+    // This runs BEFORE anything else on page loads.
+    if (location.pathname === '/panel/dashboard.html' ||
+        location.pathname === '/panel/dashboard') {
+      // Small guard: don't loop if already redirected (via ?nodash=1 override)
+      if (location.search.indexOf('nodash') === -1) {
+        location.replace('/panel/profile.html');
+        return; // stop further JS from running
+      }
+    }
+
     // On business.html — trigger prof-strict body class
     // (this uses the page's OWN comprehensive hide CSS)
     if (location.pathname.indexOf('/business') === 0 ||

@@ -303,6 +303,47 @@ a[onclick*="shareStats"] {
   display: none !important;
 }
 
+/* ============================================================
+   FINAL DASHBOARD CLEANUP (2026-07 v7)
+   Dashboard is now redirected to profile.html by dl-simple-mode.js.
+   These are belt-and-suspenders hides in case redirect fails to fire.
+============================================================ */
+
+/* Customer WhatsApp message widget (green box with Copy text / Open WhatsApp) */
+#customerMsgCard,
+.customer-msg-card,
+#customerWhatsappCard,
+.customer-whatsapp-message-widget,
+.card:has(> .card-title:has(span:contains("Your customer-WhatsApp message"))),
+.card:has(#custMsgTextarea),
+.card:has(> * > button:contains("Open in WhatsApp")),
+[data-widget="customer-whatsapp"] {
+  display: none !important;
+}
+
+/* Notifications enabled pill (floating chip) */
+#notifEnabledPill,
+.notifications-enabled-pill,
+.notif-pill,
+[class*="notif-enabled"] {
+  display: none !important;
+}
+
+/* Share my stats floating button */
+#shareStatsBtn,
+#shareStatsFab,
+.share-stats-fab,
+[onclick*="shareMyStats"],
+[onclick*="openShareStats"] {
+  display: none !important;
+}
+
+/* If dashboard renders at all (redirect fails), hide everything except welcome banner */
+body[data-dl-simple-mode="true"] .dash-main-v2 > .card:not(#dlSimpleWelcome ~ *):not(:first-of-type),
+body[data-dl-simple-mode="true"] .dash-side-v2 {
+  /* Extra safety — most content already hidden by individual rules above */
+}
+
 /* Hide qa-section-title if section becomes empty after tile hiding */
 .qa-section-title { /* keeps headers like "Manage" — decision retained */ }
 
