@@ -30,7 +30,7 @@
         if (!b.slug) return;
         CACHE[b.slug] = {
           owner: b.owner_name || '',
-          phone: String(b.mobile || '').replace(/\D/g, '').slice(-10),
+          phone: String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10),
           addr: [b.address_line1, b.address_line2].filter(Boolean).join(', ')
         };
       });

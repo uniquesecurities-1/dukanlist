@@ -29,7 +29,7 @@
     var catIcon = cat.icon || '🏪';
     var city = (b.geo_cities && b.geo_cities.name) || '';
     var addr = [b.address_line1, b.address_line2].filter(Boolean).join(', ');
-    var phoneRaw = String(b.mobile || '').replace(/[^0-9]/g, '').slice(-10);
+    var phoneRaw = String(b.whatsapp || b.mobile || '').replace(/[^0-9]/g, '').slice(-10);
     var wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
     var tel = String(b.mobile || '').replace(/\D/g, '').slice(-10);
     var msg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');

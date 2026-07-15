@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784112500">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784113500">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -2343,7 +2343,7 @@ function injectSchemaOrg(b){
     "description": (b.is_professional_listing && b.professional_tier === 'strict')
       ? ('Professional listing — ' + (cat.name || '') + ' in ' + (b.geo_cities?.name || ''))
       : (b.usp_text || ('Local business — ' + (cat.name || ''))),
-    "telephone": '+91' + (b.mobile || '').replace(/[^\d]/g, ''),
+    "telephone": '+91' + (b.whatsapp || b.mobile || '').replace(/[^\d]/g, ''),
     "address": {
       "@type": "PostalAddress",
       "streetAddress": [b.address_line1, b.address_line2].filter(Boolean).join(', '),
@@ -2755,7 +2755,7 @@ function render(){
     }
 
     // CTA links
-    const fullMobile = String(b.mobile || '').replace(/\D/g, '').slice(-10);
+    const fullMobile = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
     const wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
     const waMsgPrem = encodeURIComponent(`Hello, I found your business "${b.name}" on DukanList. I'd like to know more.`);
     const _waEl = document.getElementById('premCtaWa');
@@ -3137,7 +3137,7 @@ function render(){
   // Normalize phone to 10-digit Indian, then prepend +91 E.164 format.
   // Avoids the bug where stored 12-digit numbers like "919541223377"
   // get dialed as "91 9541223377" (wrong) when used directly.
-  document.getElementById('ctaCall').href = 'tel:+91' + normIndianPhone(b.mobile);
+  document.getElementById('ctaCall').href = 'tel:+91' + normIndianPhone(b.whatsapp || b.mobile);
   document.getElementById('ctaCall').addEventListener('click', () => {
     logLead('call');
     var _proStrictCall = b.is_professional_listing === true && b.professional_tier === 'strict';
@@ -3292,11 +3292,11 @@ function render(){
   const sWa = document.getElementById('mmtStickyWa');
   const sPhone = document.getElementById('stickyPhone');
   const sStatus = document.getElementById('stickyStatus');
-  if (sCall) sCall.href = 'tel:+91' + normIndianPhone(b.mobile);
+  if (sCall) sCall.href = 'tel:+91' + normIndianPhone(b.whatsapp || b.mobile);
   if (sWa)   sWa.href = `https://wa.me/${wa}?text=${waMsg}`;
   // Format phone like +91 95412 23377
-  if (sPhone && b.mobile){
-    const m = String(b.mobile).replace(/\D/g, '').slice(-10);
+  if (sPhone && (b.whatsapp || b.mobile)){
+    const m = String(b.whatsapp || b.mobile).replace(/\D/g, '').slice(-10);
     sPhone.textContent = m.length === 10 ? `+91 ${m.slice(0,5)} ${m.slice(5)}` : '+91 ' + m;
   }
   // Open status text

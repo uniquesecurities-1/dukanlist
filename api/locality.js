@@ -156,7 +156,7 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
 function renderShopCard(b){
   const cityName = b.geo_cities && b.geo_cities.name ? b.geo_cities.name : '';
   const addr = [b.address_line1, b.address_line2].filter(Boolean).join(', ');
-  const phone = String(b.mobile || '').replace(/\D/g, '').slice(-10);
+  const phone = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
   const wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
   const waMsg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
   const waBtn = wa.length === 10
