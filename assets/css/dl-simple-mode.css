@@ -222,14 +222,51 @@ body.prof-strict .rc-card.owner {
   display: none !important;
 }
 
-/* Any GOLD tier badge / trust tier displays */
+/* Any GOLD/SILVER/BRONZE tier badge / trust tier displays */
 .gold-tier-badge,
+.silver-tier-badge,
+.bronze-tier-badge,
 .tier-badge,
+.prof-tier-badge,
 [data-tier="gold"],
 [data-tier="silver"],
 [data-tier="bronze"],
-.trust-tier-display {
+.trust-tier-display,
+/* "Why Shop" highlights row — has all verified/rating/year/area pills */
+.why-shop-row,
+.why-shop-row .wts-pill,
+.wts-pill.verified,
+.wts-pill.rating,
+.wts-pill.year,
+#mmtHighlights,
+/* Standalone Verified · TIER green rectangle badge */
+.verified-tier-inline,
+.biz-verified-tier {
   display: none !important;
+}
+
+/* ============================================================
+   LAYOUT FIX — Collapse 2-column grid to 1-column
+   Gallery has been hidden, but grid still reserves 440px left column
+   creating empty white space. Force single-column layout.
+============================================================ */
+@media (min-width: 760px) {
+  .biz-top {
+    grid-template-columns: 1fr !important;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sec-content {
+    grid-template-columns: 1fr !important;
+    max-width: 800px;
+  }
+
+  /* Sidebar right column also becomes inline instead of floating */
+  .biz-side {
+    max-width: 100%;
+  }
 }
 
 /* Rating chip — header (already hidden but reinforced) */
