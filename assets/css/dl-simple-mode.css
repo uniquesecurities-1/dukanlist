@@ -135,3 +135,54 @@ nav a[href*="/panel/analytics"] {
    This activates page's own hide rules which are more comprehensive.
    See: apply-simple-mode.js
 */
+
+/* ============================================================
+   BUSINESS DETAIL PAGE — Additional card-pill sections to hide
+   (added 2026-07 per owner request — declutter drive)
+============================================================ */
+
+/* 1. Business Hours */
+#hoursCard {
+  display: none !important;
+}
+
+/* 2. Before you visit / call — Visit Guide card */
+.visit-guide-card {
+  display: none !important;
+}
+
+/* 3. Public Q&A (Questions & Answers) */
+#qaCard,
+#qaList,
+#qaEmpty,
+#askQuestionModal {
+  display: none !important;
+}
+
+/* 4. Frequently Asked Questions (FAQ accordion) */
+#faqsCard,
+#faqList,
+.faq-acc {
+  display: none !important;
+}
+
+/* 5. Profile Highlights (contains Payment Accepted + Special Features rows) */
+.shop-highlights {
+  display: none !important;
+}
+
+/* ===== EXPLICITLY KEEP Share this business card ==========================
+   .rc-card.share has data-hide-in-strict="1" which our JS hides via
+   prof-strict. Override that specifically to keep Share button visible.
+=========================================================================== */
+body.prof-strict .rc-card.share,
+.rc-card.share[data-hide-in-strict] {
+  display: block !important;
+}
+
+/* Also keep Owner Register card visible (encourages new signups) */
+body.prof-strict .rc-card.owner {
+  display: block !important;
+}
+
+/* ========================================================================= */
