@@ -1644,3 +1644,63 @@ body[data-page="profile"] #hoursCard {
   display: block !important;
   visibility: visible !important;
 }
+
+/* ========================================================================= */
+/* v30: Cleanup — Popular searches, Regulatory notice, biz-photo placeholder */
+/* ========================================================================= */
+
+/* 1. HIDE the entire "Popular searches in your area" SEO strip on homepage */
+section:has(> div > h3 > span[data-i18n-en*="Popular searches"]),
+section:has(> div > h3 > span[data-i18n-en*="Cities covered"]) {
+  display: none !important;
+}
+/* Fallback via direct child structure — hide any section with the exact H3 text */
+section:has(h3 span[data-i18n-en="Popular searches in your area"]) {
+  display: none !important;
+}
+
+/* 2. Hide Regulatory & Compliance Notice on business.html (AMFI/SEBI disclaimer)
+      WARNING: MFD listings are legally required to show AMFI disclaimer per SEBI.
+      Hiding this is at the owner's own risk. */
+.prof-disclaimer,
+[class*="prof-disclaimer"],
+[class*="regulatory-notice"],
+[class*="compliance-notice"] {
+  display: none !important;
+}
+
+/* 3. Hide "REGULATED SERVICE" + "Practicing since" cyan box on MFD profile */
+.prof-badge-box,
+.prof-service-badge,
+[class*="regulated-service"],
+div:has(> b[style*="color:#0EA5E9"]:has-text("REGULATED SERVICE")) {
+  display: none !important;
+}
+
+/* 4. Hide photo placeholder .biz-photo on search/local pages */
+.biz-card .biz-photo,
+.biz-card .biz-photo .ph-fb,
+.biz-card .biz-photo .ph-label,
+.biz-photo {
+  display: none !important;
+}
+
+/* 5. Collapse card layout since photo gone */
+.biz-card {
+  display: block !important;
+}
+.biz-card .biz-info {
+  padding: 12px 14px !important;
+}
+
+/* 6. Hide "Professional Listing" label text on search cards */
+.biz-card [style*="Professional Listing"],
+.biz-card > div:has-text("Professional Listing"),
+[data-i18n-en="Professional Listing"] {
+  display: none !important;
+}
+/* Also hide the icon-only badge variant */
+.biz-card [style*="color:#0EA5E9"][style*="font-size:.7"],
+.biz-cat[style*="professional"] {
+  display: none !important;
+}
