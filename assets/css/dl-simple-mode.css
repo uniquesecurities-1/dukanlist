@@ -802,3 +802,38 @@ input[name="instagram"],
 input#instagram {
   /* Do NOT hide — Instagram is text-only, keep it as optional field */
 }
+
+/* ========================================================================= */
+/* CRITICAL FIX (2026-07 v10): Real selectors for WhatsApp template widget  */
+/* ========================================================================= */
+
+/* The widget is dynamically injected with ID #waTemplateCard containing
+   a .wat-card div. My earlier hide targeted wrong ID. */
+#waTemplateCard,
+.wat-card,
+.wat-head,
+.wat-title,
+.wat-sub,
+.wat-box,
+.wat-actions,
+.wat-btn,
+.wat-toast,
+#watBox,
+#watCopyBtn,
+#watShareBtn {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Also hide the completeness pill row (✓ Mobile ✓ Address ✓ Photo ✓ Visited) */
+.completeness-pills,
+.dl-completeness-pills,
+.compl-pills,
+[class*="completeness-pill"] {
+  display: none !important;
+}
