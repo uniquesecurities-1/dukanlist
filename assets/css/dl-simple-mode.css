@@ -1103,3 +1103,111 @@ footer .popular-searches {
 #featured {
   padding: 20px 0 40px !important;
 }
+
+/* ========================================================================= */
+/* v18: GOOGLE-FEEL — Dabwali only + tighter hero                           */
+/* ========================================================================= */
+
+/* 1. HERO: reduce padding, tighter Google-feel spacing */
+.hero-search-first,
+.hero.hero-search-first {
+  padding: 20px 20px 30px !important;
+  min-height: auto !important;
+}
+.hero-inner {
+  max-width: 640px !important;
+}
+
+/* 2. Hero badge — muted, small */
+.hero-badge {
+  margin-bottom: 12px !important;
+  padding: 4px 10px !important;
+  font-size: .68rem !important;
+  background: #F8FAFC !important;
+  color: #64748B !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* 3. h1 hero-tag — Google-style clean, less dominant */
+.hero-tag {
+  font-size: clamp(1.6rem, 4vw, 2.4rem) !important;
+  margin-bottom: 6px !important;
+}
+.hero-sub {
+  font-size: .88rem !important;
+  color: #64748B !important;
+  margin-bottom: 20px !important;
+  max-width: 480px !important;
+}
+
+/* 4. Hide the city dropdown showing all cities — filter to Dabwali only */
+.hsc-row-city option:not([value=""]):not([value="mandi-dabwali"]):not([value="dabwali"]),
+select#citySelect option:not([value=""]):not([value*="dabwali"]) {
+  display: none !important;
+}
+
+/* 5. Hide extra hero decorations */
+.hero-search-first::before,
+.hero::before,
+.hero::after {
+  display: none !important;
+}
+
+/* 6. Remove hero gradient background — plain white like Google */
+.hero.hero-search-first {
+  background: #fff !important;
+}
+
+/* 7. Reduce top gap on the whole page */
+main,
+body > section:first-of-type {
+  padding-top: 0 !important;
+}
+
+/* 8. Nav topbar — hide DL logo/text (Google-minimal), keep only lang + register */
+.topbar {
+  padding: 8px 12px !important;
+  background: #fff !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+  border-bottom: 1px solid #E5E7EB !important;
+}
+.topbar .brand,
+.topbar .brand em,
+.topbar .brand span {
+  color: #0F2952 !important;
+}
+.topbar .nav-links a {
+  color: #64748B !important;
+}
+.topbar .lang-toggle {
+  background: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+}
+.topbar .lang-toggle button {
+  color: #475569 !important;
+}
+.topbar .lang-toggle button.active {
+  background: #FF6B1A !important;
+  color: #fff !important;
+}
+.topbar .nav-cta {
+  background: #FF6B1A !important;
+  color: #fff !important;
+}
+
+/* 9. Hide DukanList Android App LIVE banner (already dismissable, but nuke) */
+#appLaunchBanner {
+  display: none !important;
+}
+
+/* 10. Hide "How does this work" (HDTW) 3-step strip if visible */
+.hdtw-strip,
+.hero-search-first .hdtw-strip {
+  display: none !important;
+}
+
+/* 11. City selector — show only 'Mandi Dabwali' as visible option label */
+.hsc-row-city .hsc-ico + select {
+  pointer-events: none;
+}
