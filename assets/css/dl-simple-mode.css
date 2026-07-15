@@ -1211,3 +1211,77 @@ body > section:first-of-type {
 .hsc-row-city .hsc-ico + select {
   pointer-events: none;
 }
+
+/* ========================================================================= */
+/* v19: Dabwali-only cleanup — hide trust strips, city mentions, pro pill   */
+/* ========================================================================= */
+
+/* 1. Trust badges strip: Mobile OTP / Pincode Match / Real Photos / etc */
+.trust,
+div.trust,
+section.trust {
+  display: none !important;
+}
+
+/* 2. "Popular searches in your area" entire section (contains Sirsa/Bathinda links) */
+section:has(h3:has(span[data-i18n-en*="Popular searches"])),
+section:has(.footer-links-row),
+/* Just the cities-covered div inside popular searches */
+div:has(> span[data-i18n-en="Cities covered:"]) {
+  display: none !important;
+}
+
+/* 3. Footer h4 "Made for Bharat. Started in Mandi Dabwali." */
+footer .ftop h4,
+footer h4 {
+  display: none !important;
+}
+
+/* 4. Footer "For Doctors / CAs / Professionals" link */
+footer a[href="/pro"],
+footer a[href="/pro"] + .dot,
+.footer-links-row a[href="/pro"],
+.footer-links-row a[href="/pro"] + .dot {
+  display: none !important;
+}
+
+/* 5. Hero pills: "For Doctors / CA" + "Pucho Bhai" (already hidden but reinforce) */
+.mini-pill.mp-pro,
+.mini-pill.mp-pucho,
+a.mini-pill[href="/pro"],
+a.mini-pill[href="/puchobhai"] {
+  display: none !important;
+}
+
+/* 6. Footer copy paragraph (long about-the-platform block) */
+footer .ftop p:has(span[data-i18n-en*="Pan-India"]),
+footer .ftop > p {
+  display: none !important;
+}
+
+/* 7. About the platform section */
+footer > section,
+footer section {
+  display: none !important;
+}
+
+/* 8. Simplify remaining footer to bare minimum */
+footer {
+  padding: 16px 20px !important;
+  background: #F8FAFC !important;
+  color: #64748B !important;
+  border-top: 1px solid #E5E7EB !important;
+}
+footer .copy {
+  color: #64748B !important;
+  font-size: .78rem !important;
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+footer .links {
+  padding: 0 !important;
+  margin-bottom: 6px !important;
+}
+footer .links a {
+  color: #FF6B1A !important;
+}
