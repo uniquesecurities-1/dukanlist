@@ -30,6 +30,16 @@
       }
     }
 
+    // OWNER PHOTOS PAGE REDIRECT — Golden Pages pivot (2026-07 v9): photos
+    // completely removed from UI. Silently send owner to profile.html.
+    if (location.pathname === '/panel/photos.html' ||
+        location.pathname === '/panel/photos') {
+      if (location.search.indexOf('nophoto') === -1) {
+        location.replace('/panel/profile.html');
+        return;
+      }
+    }
+
     // On business.html — trigger prof-strict body class
     // (this uses the page's OWN comprehensive hide CSS)
     if (location.pathname.indexOf('/business') === 0 ||

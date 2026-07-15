@@ -736,3 +736,69 @@ label:has(+ #specialFeatures) {
 .live-review-strip {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* GOLDEN PAGES PIVOT (2026-07 v9): Photos completely removed from UI       */
+/* ========================================================================= */
+
+/* 1. business.html — hide entire photo gallery column (hero + thumbs) */
+.gallery,
+#galleryMain,
+#galleryThumbs,
+.biz-top .gallery {
+  display: none !important;
+}
+
+/* 1a. Ensure biz-top stays 1-column even at desktop widths (gallery gone) */
+@media (min-width:760px) {
+  .biz-top {
+    grid-template-columns: 1fr !important;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* 2. browse.html / search.html / index.html — hide photo thumbnail column
+      on listing cards, collapse card grid to text-only */
+.biz-card .biz-photo,
+.biz-card .biz-thumb,
+.biz-card img.biz-hero,
+.card-photo,
+.listing-thumb {
+  display: none !important;
+}
+.biz-card {
+  grid-template-columns: 1fr !important;
+  display: block !important;
+}
+.biz-card .biz-info {
+  padding: 14px 16px 16px !important;
+}
+
+/* 3. Owner panel — hide "Photos" nav link + Quick Action tile + prompts */
+nav a[href*="/panel/photos"],
+.nav-links a[href*="/panel/photos"],
+a.qa[href*="/panel/photos"],
+a.qa-tile[href*="/panel/photos"],
+.qa[href*="/panel/photos"],
+.qa-tile[href*="/panel/photos"],
+a[href*="/panel/photos.html#upload"] {
+  display: none !important;
+}
+
+/* 4. Any dashboard card/CTA prompting "Add photos" */
+.add-photos-card,
+.upload-photos-card,
+#addPhotosCta,
+#photoUploadPrompt,
+[data-widget="add-photos"] {
+  display: none !important;
+}
+
+/* 5. profile.html — Instagram field (optional social, no longer needed) */
+.form-group:has(label:has-text("Instagram")),
+label[for="instagram"],
+input[name="instagram"],
+input#instagram {
+  /* Do NOT hide — Instagram is text-only, keep it as optional field */
+}

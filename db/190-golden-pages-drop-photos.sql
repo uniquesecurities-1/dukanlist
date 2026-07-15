@@ -1,0 +1,85 @@
+-- =========================================================================
+-- Migration 190: Golden Pages Pivot — Drop Photos (Permanent)
+-- Created: 2026-07-15
+-- Author:  Deepak Singla / DigiMutual Goals Pvt. Ltd.
+-- Purpose: Remove all business photo records + storage after UI switch to
+--          Golden-Pages-style text-only directory (name, phone, address).
+--
+-- ⚠️⚠️⚠️  IRREVERSIBLE DESTRUCTIVE OPERATION  ⚠️⚠️⚠️
+--
+-- BEFORE RUNNING, READ EVERY LINE:
+--
+--   1. This DELETES all rows from business_photos and drops the table.
+--   2. This EMPTIES the 'business-photos' Supabase Storage bucket.
+--   3. Deleted photos CANNOT be recovered. There is no undo.
+--   4. Existing owners will lose photos they uploaded — you will not be
+--      able to restore them from any backup unless you took one yourself.
+--
+-- SAFER ALTERNATIVE (recommended):
+--   Only apply the UI CSS hide (already done via dl-simple-mode.css v9).
+--   Photos stay in DB + Storage, hidden from all users but recoverable.
+--   To re-enable photos in the future, just remove the CSS block.
+--
+-- IF YOU STILL WANT TO PROCEED:
+--   a) Take a backup of the business_photos table FIRST:
+--         Supabase Dashboard → Database → Backups → New backup
+--   b) Download the 'business-photos' storage bucket contents to local:
+--         Supabase Dashboard → Storage → business-photos → Download all
+--   c) Run this script in Supabase SQL Editor (paste + Run)
+--   d) Manually empty the 'business-photos' Storage bucket via the UI
+--         (SQL cannot delete files from Storage — must be done from UI)
+--
+-- =========================================================================
+
+-- STEP 1: Show what will be deleted (RUN THIS FIRST TO REVIEW)
+-- ----------------------------------------------------------------
+-- SELECT COUNT(*) AS total_photos_to_delete FROM business_photos;
+-- SELECT shop_id, COUNT(*) AS photo_count FROM business_photos GROUP BY shop_id ORDER BY photo_count DESC LIMIT 20;
+
+-- =========================================================================
+-- STEP 2: Actual deletion (UNCOMMENT the block below ONLY when you are 100%
+--         sure you want to proceed. Leave commented for safety.)
+-- =========================================================================
+
+-- BEGIN;
+--
+--   -- 2a. Delete all photo rows
+--   DELETE FROM public.business_photos;
+--
+--   -- 2b. Drop any related indexes / foreign keys
+--   -- (Adjust table/column names below if your schema differs)
+--   -- ALTER TABLE public.shops DROP COLUMN IF EXISTS hero_photo_url;
+--   -- ALTER TABLE public.shops DROP COLUMN IF EXISTS main_photo_url;
+--
+--   -- 2c. Drop the table itself (optional — leave commented if you want
+--   --     to keep the empty table for future re-enable)
+--   -- DROP TABLE IF EXISTS public.business_photos CASCADE;
+--
+--   -- 2d. Verify
+--   -- SELECT COUNT(*) AS remaining FROM public.business_photos;
+--
+-- COMMIT;
+
+-- =========================================================================
+-- STEP 3: Storage bucket cleanup (MUST BE DONE MANUALLY VIA SUPABASE UI)
+-- =========================================================================
+--
+-- SQL cannot delete files from Supabase Storage. After running Step 2:
+--
+--   1. Go to Supabase Dashboard → Storage → business-photos bucket
+--   2. Select all folders/files
+--   3. Delete permanently
+--   4. Empty the trash if applicable
+--
+-- =========================================================================
+-- ROLLBACK NOTE
+-- =========================================================================
+--
+-- If you regret this after running:
+--   - Restore the business_photos table + rows from the backup you took
+--     in step (a) above via Supabase Dashboard → Database → Backups
+--   - Re-upload storage files from your local download
+--
+-- If you did NOT take a backup, the data is permanently lost.
+--
+-- =========================================================================
