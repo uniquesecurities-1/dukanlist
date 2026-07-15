@@ -185,4 +185,110 @@ body.prof-strict .rc-card.owner {
   display: block !important;
 }
 
+/* ============================================================
+   ADDITIONAL HIDES (2026-07 v3 — owner request)
+   - Open/Close status pill and badge
+   - Verified badge (Admin Verified + GOLD tier)
+   - All rating chips (header + Profile Highlights leftover)
+============================================================ */
+
+/* Open/Close status — header pill AND body badge */
+.prem-meta-chip.prem-open,
+#premOpenChip,
+.open-status,
+#openStatus,
+[data-open-status],
+.open-close-pill,
+.hours-status-pill {
+  display: none !important;
+}
+
+/* Verified badge — header pill + full badge + admin verified card */
+.prem-meta-chip.prem-verified,
+#premVerifiedChip,
+#adminVerified,
+.admin-verified-badge,
+.verified-badge,
+[data-badge="verified"] {
+  display: none !important;
+}
+
+/* Any GOLD tier badge / trust tier displays */
+.gold-tier-badge,
+.tier-badge,
+[data-tier="gold"],
+[data-tier="silver"],
+[data-tier="bronze"],
+.trust-tier-display {
+  display: none !important;
+}
+
+/* Rating chip — header (already hidden but reinforced) */
+.prem-meta-chip.prem-rating,
+#premRatingChip,
+.rating-chip,
+.overall-rating-badge {
+  display: none !important;
+}
+
+/* ============================================================
+   OWNER PANEL SIMPLIFICATION (2026-07)
+   Cleanup panel pages to keep only essential editable fields.
+   Applies to: dashboard.html, profile.html, photos.html.
+============================================================ */
+
+/* Hide owner panel sidebar links to killed features */
+.panel-nav a[href*="/panel/reviews"],
+.panel-nav a[href*="/panel/get-reviews"],
+.panel-nav a[href*="/panel/analytics"],
+.panel-nav a[href*="/panel/deals"],
+.panel-nav a[href*="/panel/qr-code"],
+.panel-nav a[href*="/panel/qr-poster"],
+.panel-nav a[href*="/panel/poster-quick"],
+.panel-nav a[href*="/panel/poster-studio"],
+.panel-nav a[href*="/panel/digital-card"],
+.panel-nav a[href*="/panel/favorites"],
+.panel-nav a[href*="/panel/recommendations"] {
+  display: none !important;
+}
+
+/* Also hide top-nav or menu items pointing to these */
+nav a[href="/panel/reviews.html"],
+nav a[href="/panel/get-reviews.html"],
+nav a[href="/panel/analytics.html"],
+nav a[href="/panel/deals.html"],
+nav a[href="/panel/qr-code.html"],
+nav a[href="/panel/qr-poster.html"],
+nav a[href="/panel/poster-quick.html"],
+nav a[href="/panel/poster-studio.html"],
+nav a[href="/panel/digital-card.html"],
+nav a[href="/panel/favorites.html"],
+nav a[href="/panel/recommendations.html"] {
+  display: none !important;
+}
+
+/* Hide profile.html clutter — keep only basic edit form */
+#trustTierUpgrade,
+#loyaltyRewards,
+#profileStrengthMeter,
+#profilePremiumUpsell,
+#gstBadge,
+#certificateBadges,
+.pro-tier-selector,
+.premium-features-list,
+.trust-score-widget-panel,
+#analyticsPanel,
+#reviewsPanel {
+  display: none !important;
+}
+
+/* Hide any owner-panel gamification remnants */
+.owner-streak-widget,
+.owner-badge-widget,
+.owner-level-display,
+.owner-achievement,
+.leaderboard-position {
+  display: none !important;
+}
+
 /* ========================================================================= */
