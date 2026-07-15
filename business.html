@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784113500">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784114000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -3182,7 +3182,7 @@ function render(){
   var _proStrictPrompt = b.is_professional_listing === true && b.professional_tier === 'strict';
   try {
     if (window.DukanReviewBoost && !_proStrictPrompt) {
-      DukanReviewBoost.maybePrompt({ slug: b.slug, name: b.name, id: b.id });
+      /* DukanReviewBoost.maybePrompt disabled — Golden Pages no-review mode */
     }
   } catch(_){}
 
@@ -5058,7 +5058,7 @@ function copyShopUrl(){
 <script src="/assets/js/city-persist.js"></script>
 <script src="/assets/js/trust-tier.js"></script>
 <!-- Business Detail v3: Review prompt modal -->
-<div class="rp-overlay" id="reviewPromptOverlay" role="dialog" aria-hidden="true" aria-labelledby="rpTitle">
+<div class="rp-overlay" id="reviewPromptOverlay" style="display:none !important" role="dialog" aria-hidden="true" aria-labelledby="rpTitle">
   <div class="rp-card" id="reviewPromptCard">
     <button class="rp-close" onclick="closeReviewPrompt()" aria-label="Close">×</button>
     <div id="rpForm">

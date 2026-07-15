@@ -1876,3 +1876,18 @@ main.grid > article > div[style*="border-top:1px dashed"] {
   margin-top: 6px !important;
   gap: 6px !important;
 }
+
+/* ========================================================================= */
+/* v38: Hide review prompt popup (business.html)                            */
+/* ========================================================================= */
+#reviewPromptOverlay,
+#reviewPromptCard,
+.rp-overlay,
+.rp-overlay.show,
+.rp-card {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Also nuke the review-boost JS API just in case */
