@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260528">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784112500">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784113000">
 <script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
 <style>
 .cat-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:.84rem;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);text-decoration:none;transition:.15s;animation:catPillIn .25s ease-out}
@@ -202,11 +202,11 @@
         <div class="form-group">
           <label>
             <span data-i18n-en>WhatsApp / Mobile</span><span data-i18n-hi>WhatsApp / मोबाइल</span>
-            <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:.04em">🔒 LOCKED</span>
+            
           </label>
-          <input id="whatsapp" class="input keep-en" type="tel" maxlength="13" placeholder="91XXXXXXXXXX" readonly style="background:#F8FAFC;color:#475569;cursor:not-allowed">
+          <input id="whatsapp" class="input keep-en" type="tel" maxlength="13" placeholder="91XXXXXXXXXX">
           <div style="font-size:.74rem;color:#64748B;margin-top:4px">
-            Contact number. To change, please contact admin on WhatsApp.
+            Your WhatsApp / mobile number.
           </div>
         </div>
         <div class="form-group">
@@ -1065,7 +1065,10 @@ async function saveProfile(){
     hours_json: collectHours(),
     established_year: establishedYear,
     payment_methods: paymentMethods,
-    special_features: specialFeatures
+    special_features: specialFeatures,
+    // Owner can now edit mobile/whatsapp — sends to backend (may still be rejected by RPC ACL)
+    whatsapp: (document.getElementById('whatsapp').value.trim() || null),
+    mobile: (document.getElementById('whatsapp').value.trim() || null)
   };
 
   // Update business via safe RPC (handles re-review for sensitive fields)
