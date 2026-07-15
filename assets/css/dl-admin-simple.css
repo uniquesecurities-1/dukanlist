@@ -100,10 +100,9 @@ a[href*="/admin/golden-pages-manage"] {
    Since public listing no longer shows these features.         
 ============================================================ */
 
-/* 1. Grid containing Established Year + Payment Methods */
-form .grid-2:has(#adminPaymentBox),
-form .grid-2:has(input[name="established_year"]),
-.grid-2:has(#adminPaymentBox) {
+/* 1. Payment Methods ONLY (keep Established Year visible — user needs it back) */
+form .field:has(#adminPaymentBox),
+.field:has(#adminPaymentBox) {
   display: none !important;
 }
 
@@ -139,5 +138,40 @@ form hr:has(+ div[style*="Shop Trust Signals"]) {
 #adminPaymentBox,
 .adm-pm,
 label.adm-pm {
+  display: none !important;
+}
+
+/* ============================================================
+   v23: admin/shop.html — hide Professional Listing flag block
+   + Customer Reviews block (both irrelevant post-Golden pivot)
+============================================================ */
+
+/* 1. Professional Listing flag/enable card (Flag as STRICT / PARTIAL buttons) */
+.card:has(button[onclick*="adminFlagAsProfessional"]),
+.card:has(> h2:has(> span[class="subtle"])):has(button[onclick*="Flag as"]),
+.card:has(h2:has-text("Professional Listing")),
+/* Fallback IDs */
+#proListingSlot,
+#professionalListingCard {
+  display: none !important;
+}
+
+/* 2. Customer Reviews admin block (Add offline review) */
+.card:has(> h2:has-text("Customer Reviews")),
+.card:has(#reviewsList),
+.card:has(#adminRevName),
+.card:has(#adminRevText),
+.card:has(#adminRevRating),
+.card:has(button[onclick*="addReviewByAdmin"]),
+#reviewsList,
+#adminRevName,
+#adminRevText,
+#adminRevRating {
+  display: none !important;
+}
+
+/* 3. Any button referencing review-add or professional-flag operations */
+button[onclick*="adminFlagAsProfessional"],
+button[onclick*="addReviewByAdmin"] {
   display: none !important;
 }
