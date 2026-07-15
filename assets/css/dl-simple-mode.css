@@ -135,9 +135,45 @@ nav a[href*="/panel/qr"],
 nav a[href*="/panel/digital-card"],
 nav a[href*="/panel/get-reviews"],
 nav a[href*="/panel/deals"],
-nav a[href*="/panel/analytics"] {
+nav a[href*="/panel/analytics"],
+nav a[href*="/panel/reviews"],
+nav a[href*="/panel/services"],
+nav a[href*="/panel/favorites"] {
   display: none !important;
 }
+
+/* Quick Actions grid cards (dashboard.html) — hide killed feature tiles */
+.qa[href*="/panel/analytics"],
+.qa[href*="/panel/deals"],
+.qa[href*="/panel/get-reviews"],
+.qa[href*="/panel/reviews"],
+.qa[href*="/panel/qr"],
+.qa[href*="/panel/poster"],
+.qa[href*="/panel/digital-card"],
+.qa[href*="/panel/services"],
+.qa[href*="/panel/favorites"],
+.qa[href*="/panel/recommendations"],
+/* Sidebar Quick Actions widget tiles */
+.qa-tile[href*="/panel/analytics"],
+.qa-tile[href*="/panel/deals"],
+.qa-tile[href*="/panel/get-reviews"],
+.qa-tile[href*="/panel/reviews"],
+.qa-tile[href*="/panel/qr"],
+.qa-tile[href*="/panel/poster"],
+.qa-tile[href*="/panel/digital-card"],
+.qa-tile[href*="/panel/services"],
+.qa-tile[href*="/panel/favorites"],
+.qa-tile[href*="/panel/recommendations"] {
+  display: none !important;
+}
+
+/* Hide USP display card on dashboard (USP is no longer public) */
+.card:has(#uspDisp) {
+  display: none !important;
+}
+
+/* Hide qa-section-title if section becomes empty after tile hiding */
+.qa-section-title { /* keeps headers like "Manage" — decision retained */ }
 
 /* ===== APPLY prof-strict CLASS via JS (built-in mode that hides everything) ===== */
 /* Instead of relying on CSS alone, add prof-strict body class on business.html.
