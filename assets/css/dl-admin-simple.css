@@ -1,0 +1,95 @@
+/* ============================================================
+   DL ADMIN SIMPLE MODE (2026-07 v20)
+   ------------------------------------------------------------
+   Golden Pages of Dabwali admin cleanup — hides obsolete tools
+   from admin nav + dashboard tiles. Everything is reversible
+   by deleting this stylesheet reference.
+
+   Now hidden (no longer used after Golden Pages pivot):
+     • Reviews moderation (no reviews visible publicly)
+     • Professional Verify (no Pro badges)
+     • Pro Legal Notify (no Pro focus)
+     • Spotlight (hidden from public)
+     • Featured (hidden from public)
+     • Deals (hidden from public)
+     • Pucho Bhai moderation (feature removed)
+
+   Kept (still relevant for Golden Pages):
+     • Dashboard, Moderation, Bulk Add, Golden Pages Add/Manage
+     • Owner Invites, Incomplete, Suspicious, Duplicates
+     • Announcements, Broadcast, Monitoring, Health, Activity
+     • Admins, Cleanup, Settings, Categories, Cities
+============================================================ */
+
+/* 1. Nav links — hide obsolete tools */
+.admin-nav a[href*="/admin/reviews"],
+.admin-nav a[href*="/admin/professional-verify"],
+.admin-nav a[href*="/admin/pro-legal-notify"],
+.admin-nav a[href*="/admin/spotlight"],
+.admin-nav a[href*="/admin/featured"],
+.admin-nav a[href*="/admin/deals"],
+.admin-nav a[href*="/admin/pucho-moderation"],
+nav a[href*="/admin/reviews"],
+nav a[href*="/admin/professional-verify"],
+nav a[href*="/admin/pro-legal-notify"],
+nav a[href*="/admin/spotlight"],
+nav a[href*="/admin/featured"],
+nav a[href*="/admin/deals"],
+nav a[href*="/admin/pucho-moderation"],
+a.nav-tool[href*="/admin/reviews"],
+a.nav-tool[href*="/admin/professional-verify"],
+a.nav-tool[href*="/admin/pro-legal-notify"],
+a.nav-tool[href*="/admin/spotlight"],
+a.nav-tool[href*="/admin/featured"],
+a.nav-tool[href*="/admin/deals"],
+a.nav-tool[href*="/admin/pucho-moderation"] {
+  display: none !important;
+}
+
+/* 2. Dashboard tool grid links — hide same obsolete tools */
+.tool-link[href*="/admin/reviews"],
+.tool-link[href*="/admin/professional-verify"],
+.tool-link[href*="/admin/pro-legal-notify"],
+.tool-link[href*="/admin/spotlight"],
+.tool-link[href*="/admin/featured"],
+.tool-link[href*="/admin/deals"],
+.tool-link[href*="/admin/pucho-moderation"],
+.quick-link[href*="/admin/spotlight"],
+.quick-link[href*="/admin/featured"],
+.quick-link[href*="/admin/deals"],
+.quick-link[href*="/admin/reviews"] {
+  display: none !important;
+}
+
+/* 3. Dashboard KPI tiles for hidden features */
+[data-tile="reviews-pending"],
+[data-tile="pucho-pending"],
+[data-tile="professional-pending"],
+[data-tile="spotlight"],
+[data-tile="featured"],
+[data-tile="deals-active"] {
+  display: none !important;
+}
+
+/* 4. Highlight Golden Pages tools as the primary workflow */
+a[href*="/admin/golden-pages-add"],
+a[href*="/admin/golden-pages-manage"] {
+  border-color: #F59E0B !important;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%) !important;
+  color: #78350F !important;
+  font-weight: 800 !important;
+}
+
+/* 5. Update admin dashboard heading to reflect Golden Pages focus */
+.admin-tagline,
+.page-subtitle {
+  display: none !important;
+}
+
+/* 6. Hide "Today's Focus" widgets that reference removed features */
+[data-focus="review-approvals"],
+[data-focus="pucho-approvals"],
+[data-focus="pro-verifications"],
+[data-focus="spotlight-picks"] {
+  display: none !important;
+}
