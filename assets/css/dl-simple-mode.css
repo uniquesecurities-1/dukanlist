@@ -268,6 +268,41 @@ a[onclick*="shareStats"] {
   display: none !important;
 }
 
+/* ============================================================
+   MORE DASHBOARD REMOVALS (2026-07 v6 — owner request)
+============================================================ */
+
+/* Verified Shop — Blue Tick Earned banner (green box) */
+#verificationCta {
+  display: none !important;
+}
+
+/* Level up your trust tier widget (yellow gradient card, Silver→Gold roadmap) */
+#tierRoadmapHost,
+.tier-roadmap {
+  display: none !important;
+}
+
+/* Suggested Next Actions card (Reply to reviews / Post deal) */
+#smartActionsCard,
+#smartActionsList,
+.smart-actions-card {
+  display: none !important;
+}
+
+/* Profile Completeness widget (67% Good + Boost Your Score list) */
+#completenessWidget,
+.completeness-widget,
+.profile-completeness-card {
+  display: none !important;
+}
+
+/* Add These to Boost Your Score — hide even if rendered separately */
+[class*="boost-score"],
+[class*="score-boost"] {
+  display: none !important;
+}
+
 /* Hide qa-section-title if section becomes empty after tile hiding */
 .qa-section-title { /* keeps headers like "Manage" — decision retained */ }
 
