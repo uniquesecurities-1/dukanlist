@@ -1285,3 +1285,16 @@ footer .links {
 footer .links a {
   color: #FF6B1A !important;
 }
+
+/* ========================================================================= */
+/* v20: Register page — hide Professional Information Required panel        */
+/* ========================================================================= */
+#professionalPanel,
+.professional-info-box,
+.prof-panel,
+[id^="professionalPanel"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
