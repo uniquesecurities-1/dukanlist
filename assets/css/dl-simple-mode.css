@@ -837,3 +837,81 @@ input#instagram {
 [class*="completeness-pill"] {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v11: Hide Trusted Partners feature entirely                              */
+/* ========================================================================= */
+
+/* 1. business.html — Trusted Partners card on shop page */
+#recsAnchor,
+#recsList,
+#recsByLine,
+.trusted-partners-card,
+.card-pill:has(> h3:has(span[data-i18n-en="Trusted Partners"])) {
+  display: none !important;
+}
+
+/* 2. Owner panel — Trusted Partners nav link + Quick Action tile */
+nav a[href*="/panel/recommendations"],
+.nav-links a[href*="/panel/recommendations"],
+a.qa[href*="/panel/recommendations"],
+a.qa-tile[href*="/panel/recommendations"],
+.qa[href*="/panel/recommendations"],
+.qa-tile[href*="/panel/recommendations"] {
+  display: none !important;
+}
+
+/* 3. Homepage — Trusted Partners Network card (inside .wn-card) */
+.wn-card:has(h3:has(span[data-i18n-en="Trusted Partners Network"])),
+.wn-card:has(.wn-badge:has-text("PARTNERS")) {
+  display: none !important;
+}
+
+/* 4. Recommended By badge on public listing (green trust card) */
+.recommended-by-card,
+#recommendedByCard,
+.rec-by-badge {
+  display: none !important;
+}
+
+/* ========================================================================= */
+/* v12: HOMEPAGE + DEALS grid — hide inline-styled photo columns            */
+/* ========================================================================= */
+
+/* 1. #featuredGrid — homepage listing cards <article> (inline-styled).
+      Photo container is direct child <div style="position:relative"> containing img
+      or fallback div with aspect-ratio. Content column has "padding" in style. */
+#featuredGrid article > div:has(> img),
+#featuredGrid article > div:has(> div[style*="aspect-ratio"]),
+#featuredGrid article img[width="400"],
+#featuredGrid article [style*="aspect-ratio:16/10"],
+#featuredGrid article [style*="aspect-ratio: 16/10"] {
+  display: none !important;
+}
+
+/* 2. #dealsGrid — deals cards also have photo tops */
+#dealsGrid a > div:has(> img),
+#dealsGrid a img[height="120"],
+#dealsGrid [style*="height:120px"] {
+  display: none !important;
+}
+
+/* 3. Any remaining <img> inside cards site-wide (fallback safety net) */
+.wn-card img,
+.wn-card [style*="aspect-ratio"],
+article > div > img[width="400"][height="250"] {
+  display: none !important;
+}
+
+/* 4. Top-10 grid photos (in case that section ever re-appears) */
+#top10Grid a > div:has(> img),
+#top10Grid img,
+#top10Grid [style*="aspect-ratio"] {
+  display: none !important;
+}
+
+/* 5. Featured of the week card photo (in case it re-appears) */
+.fsotw-photo,
+#fsotwCard img {
+  display: none !important;
+}
