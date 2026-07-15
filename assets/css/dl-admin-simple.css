@@ -93,3 +93,51 @@ a[href*="/admin/golden-pages-manage"] {
 [data-focus="spotlight-picks"] {
   display: none !important;
 }
+
+/* ============================================================
+   v21: admin/shop.html — hide Shop Trust Signals block         
+   (Established Year, Payment Methods, Special Features)        
+   Since public listing no longer shows these features.         
+============================================================ */
+
+/* 1. Grid containing Established Year + Payment Methods */
+form .grid-2:has(#adminPaymentBox),
+form .grid-2:has(input[name="established_year"]),
+.grid-2:has(#adminPaymentBox) {
+  display: none !important;
+}
+
+/* 2. Special Features field */
+form .field:has(#adminFeaturesRaw),
+.field:has(#adminFeaturesRaw),
+input#adminFeaturesRaw {
+  display: none !important;
+}
+
+/* 3. "Shop Trust Signals" header div + info blue box directly before the
+      hidden grid. These are inline-styled divs after an <hr>, so target
+      them structurally. */
+form hr + div[style*="Shop Trust Signals"],
+form hr + div[style*="TEXT-TRANSFORM:UPPERCASE"],
+form hr + div[style*="text-transform:uppercase"] {
+  display: none !important;
+}
+
+/* 4. The blue info box explaining verified_score / Trust badge */
+form div[style*="F0F9FF"][style*="verified_score"],
+form div[style*="F0F9FF"][style*="Trust badge"],
+form div[style*="Shop Highlights"] {
+  display: none !important;
+}
+
+/* 5. The hr divider preceding it (only if it's followed by "Shop Trust Signals") */
+form hr:has(+ div[style*="Shop Trust Signals"]) {
+  display: none !important;
+}
+
+/* 6. Also hide the input for adminPaymentBox individually as safety */
+#adminPaymentBox,
+.adm-pm,
+label.adm-pm {
+  display: none !important;
+}
