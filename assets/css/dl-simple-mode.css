@@ -1736,3 +1736,26 @@ div:has(> b[style*="color:#0EA5E9"]:has-text("REGULATED SERVICE")) {
 .card:has(.card-title span[data-i18n-en*="Social Media"]) {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v32: STRONGER Popular searches hide + fallback selectors                 */
+/* ========================================================================= */
+
+/* Direct span attribute — hide + collapse parent (works even without :has) */
+h3 span[data-i18n-en="Popular searches in your area"],
+h3 span[data-i18n-en*="Popular searches"] {
+  display: none !important;
+}
+
+/* Multiple parent selectors for maximum coverage */
+section:has(h3 span[data-i18n-en*="Popular searches"]),
+section[style*="border-top:1px solid #E2E8F0"]:has(h3),
+main > section:has(> div h3 span[data-i18n-en*="Popular"]),
+body > section:has(h3 span[data-i18n-en*="Popular"]),
+/* Also target by unique inner content — a[href^="/local/sirsa"] etc */
+section:has(a[href^="/local/sirsa"]),
+section:has(a[href^="/local/bathinda"]),
+section:has(a[href^="/local/mansa"]),
+section:has(a[href^="/local/muktsar"]) {
+  display: none !important;
+}

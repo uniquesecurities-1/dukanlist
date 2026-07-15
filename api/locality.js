@@ -143,7 +143,7 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
     orClauses.push('id.in.(' + linkedIds.join(',') + ')');
   }
 
-  const q = 'businesses?select=id,slug,name,name_hi,mobile,whatsapp,address_line1,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name)'
+  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name)'
     + '&status=eq.active'
     + '&city_id=eq.' + cityId
     + '&or=(' + orClauses.join(',') + ')'
@@ -155,37 +155,25 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
 
 function renderShopCard(b){
   const cityName = b.geo_cities && b.geo_cities.name ? b.geo_cities.name : '';
-  const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
-  // Professional listing flags drive what's hidden (per ICAI/NMC/BCI etc. rules)
-  const isProfStrict  = b.is_professional_listing === true && b.professional_tier === 'strict';
-  const isProfPartial = b.is_professional_listing === true && b.professional_tier === 'partial';
-  const rating = isProfStrict
-    ? '<span style="color:#0EA5E9;font-weight:700">🛡 Professional Listing</span>'
-    : (b.rating_avg > 0
-        ? `<span style="color:#0F172A;font-weight:700">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:#64748b">(${b.rating_count || 0})</span></span>`
-        : '<span style="color:#94a3b8">No reviews yet</span>');
-  const since = b.established_year && b.established_year > 1900
-    ? `<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">Since ${b.established_year}</span>`
+  const addr = [b.address_line1, b.address_line2].filter(Boolean).join(', ');
+  const phone = String(b.mobile || '').replace(/\D/g, '').slice(-10);
+  const wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
+  const waMsg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
+  const waBtn = wa.length === 10
+    ? `<a href="https://wa.me/91${wa}?text=${waMsg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 WhatsApp</a>`
     : '';
-  const featuredBadge = b.featured
-    ? `<span style="background:linear-gradient(135deg,#FFC93D,#FF8C00);color:#1A1A1A;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.03em">★ FEATURED</span>`
+  const callBtn = phone.length === 10
+    ? `<a href="tel:+91${phone}" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 Call</a>`
     : '';
   return `
-  <a href="${ORIGIN}/business.html?slug=${esc(b.slug)}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:transform .2s,box-shadow .2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 14px 30px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(15,23,42,.04)'">
-    ${photo
-      ? `<img src="${esc(photo)}" alt="${esc(b.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover" loading="lazy">`
-      : `<div style="width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#FAFAFA,#F1F5F9);display:grid;place-items:center;font-size:3rem;opacity:.5">🏪</div>`
-    }
-    <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${featuredBadge}${since}</div>
-      <div style="font-weight:700;font-size:1.05rem;color:#0F172A;line-height:1.3;letter-spacing:-.01em">${esc(b.name)}</div>
-      ${b.usp_text ? `<div style="font-size:.85rem;color:#5A6573;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(b.usp_text)}</div>` : ''}
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:#64748b;margin-top:6px;padding-top:8px;border-top:1px solid #f1f5f9">
-        ${rating}
-        <span>📍 ${esc(cityName)}</span>
-      </div>
-    </div>
-  </a>`;
+  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer">
+    <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
+    ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}
+    ${phone ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> +91-${phone}</div>` : ''}
+    ${addr ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:flex-start;gap:5px;line-height:1.4"><span style="color:#DC2626;flex-shrink:0">📍</span> ${esc(addr)}</div>` : ''}
+    ${cityName ? `<div style="font-size:.78rem;color:#64748B;display:flex;align-items:center;gap:5px"><span>🏙️</span> ${esc(cityName)}</div>` : ''}
+    <div style="display:flex;gap:8px;margin-top:8px;padding-top:10px;border-top:1px dashed #E2E8F0">${waBtn}${callBtn}</div>
+  </article>`;
 }
 
 function renderPage(opts){
