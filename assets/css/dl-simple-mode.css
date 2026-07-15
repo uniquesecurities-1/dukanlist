@@ -1461,3 +1461,39 @@ h3:has(> span[data-i18n-en="Trusted Partners"]),
 .card-pill h3 span[data-i18n-en="Trusted Partners"] {
   /* Handled by parent hide above but reinforce */
 }
+
+/* ========================================================================= */
+/* v26: Recently viewed widget — hide photo/rating/verified                  */
+/* ========================================================================= */
+
+/* 1. Photo thumbnail — hide (Golden Pages no-photo mode) */
+.rv-thumb,
+.rv-clickable > .rv-thumb {
+  display: none !important;
+}
+
+/* 2. Collapse the grid layout since photo is gone (was 72px + 1fr) */
+.rv-clickable {
+  grid-template-columns: 1fr !important;
+}
+.rv-row {
+  grid-template-columns: 1fr auto !important;
+}
+
+/* 3. Rating star (⭐ 5.0) — hide */
+.rv-rate,
+.rv-line2 .rv-rate {
+  display: none !important;
+}
+
+/* 4. Verified badge (✓ Verified) — hide */
+.rv-verify,
+.rv-line2 .rv-verify {
+  display: none !important;
+}
+
+/* 5. Also hide the ' · ' separator dots left over when rate/verify gone */
+.rv-line2 > span:empty,
+.rv-line2 > span[style*="separator"] {
+  display: none !important;
+}
