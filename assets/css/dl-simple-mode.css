@@ -1,0 +1,207 @@
+/* ============================================================
+   DL SIMPLE MODE — 2026-07
+   ------------------------------------------------------------
+   Global CSS that soft-hides features across all pages during
+   the "radically simple directory" pivot.
+
+   REVERSIBILITY: To restore any feature, comment out the
+   relevant block below and push. Data + backend intact.
+
+   HIDDEN FEATURES:
+   - Reviews (customer + owner reply)
+   - Star ratings (all displays)
+   - Photo galleries (keep only first photo)
+   - Discover feed link
+   - Featured Shop of the Week
+   - Top 10 rankings
+   - Trust score displays
+   - Owner poster tools
+   - Deals section (public-facing)
+   - Owner-facing analytics displays
+   ============================================================ */
+
+/* ===== REVIEWS (public + owner) ===== */
+/* Business detail page review section */
+#reviewsSection,
+#reviewsContainer,
+.reviews-section,
+.review-card,
+.review-list,
+#customerReviews,
+.customer-reviews,
+[data-section="reviews"],
+#addReviewBtn,
+#writeReviewForm,
+.write-review-cta,
+#reviewFormModal {
+  display: none !important;
+}
+
+/* Homepage "5-star review" ticker / featured reviews */
+#featuredReviews,
+.featured-reviews,
+#realCustomerVoices,
+#voiceOfCustomers,
+[data-section="voice-of-customers"] {
+  display: none !important;
+}
+
+/* Owner panel reviews management */
+#reviewsWidget,
+.reviews-widget,
+#ownerReviewsPanel,
+[data-owner-feature="reviews"] {
+  display: none !important;
+}
+
+/* ===== STAR RATINGS ===== */
+.star-rating,
+.rating-stars,
+.stars-display,
+.avg-rating,
+.rating-badge,
+[data-rating],
+.shop-rating,
+.rating-pill,
+#ratingCount,
+.rating-count-label,
+.overall-rating {
+  display: none !important;
+}
+
+/* Homepage stats card that shows "5.0 RATING" */
+.kpi-rating,
+.stat-rating,
+[data-kpi="rating"] {
+  display: none !important;
+}
+
+/* ===== PHOTO GALLERY (keep only first photo) ===== */
+/* Second, third, fourth... photos in shop gallery */
+.photo-gallery .photo-item:nth-child(n+2),
+.shop-photos .photo:nth-child(n+2),
+#photoGallery > *:nth-child(n+2),
+.gallery-grid > *:nth-child(n+2) {
+  display: none !important;
+}
+
+/* Full photo gallery viewer / lightbox trigger */
+.gallery-viewer,
+#photoLightbox,
+.photo-count-badge,
+.view-all-photos {
+  display: none !important;
+}
+
+/* ===== DISCOVER FEED ===== */
+a[href*="/discover"],
+a[href="/discover.html"],
+#discoverNavLink,
+.nav-discover,
+.discover-card,
+#discoverPill {
+  display: none !important;
+}
+
+/* ===== FEATURED SHOP OF THE WEEK ===== */
+#featuredShopWeek,
+.featured-shop-week,
+[data-section="featured-week"],
+#spotlightShop {
+  display: none !important;
+}
+
+/* ===== TOP 10 RANKINGS ===== */
+#topRankings,
+.top-10-section,
+.top-rankings,
+[data-section="top-rankings"],
+#mostLovedSection,
+.medal-badge,
+.rank-position {
+  display: none !important;
+}
+
+/* ===== TRUST SCORE (in shop page) ===== */
+.trust-score,
+#trustScoreDisplay,
+[data-metric="trust-score"] {
+  display: none !important;
+}
+
+/* ===== DEALS / OFFERS (public-facing) ===== */
+#dealsSection,
+.deals-section,
+[data-section="deals"],
+#todaysOffers,
+.today-offers-section,
+.deal-card {
+  display: none !important;
+}
+
+/* ===== OWNER PANEL — dashboard analytics widgets ===== */
+#profileViewsKpi,
+#callsKpi,
+#whatsappKpi,
+.owner-analytics-widget,
+[data-owner-feature="analytics"],
+#trustScoreCard,
+#profileCompletenessCard {
+  display: none !important;
+}
+
+/* ===== OWNER POSTER TOOLS ===== */
+a[href*="/panel/poster-studio"],
+a[href*="/panel/poster-quick"],
+a[href*="/panel/qr-poster"],
+a[href*="/panel/qr-code"],
+a[href*="/panel/digital-card"],
+a[href*="/panel/get-reviews"],
+a[href*="/panel/deals"],
+a[href*="/panel/analytics"],
+a[href*="/panel/favorites"],
+a[href*="/panel/recommendations"],
+#quickActionsGrid,
+.quick-actions,
+[data-owner-feature="poster"],
+[data-owner-feature="qr"],
+[data-owner-feature="deals"] {
+  display: none !important;
+}
+
+/* Panel nav links to hidden pages */
+nav a[href*="/panel/poster"],
+nav a[href*="/panel/qr"],
+nav a[href*="/panel/digital-card"],
+nav a[href*="/panel/get-reviews"],
+nav a[href*="/panel/deals"],
+nav a[href*="/panel/analytics"] {
+  display: none !important;
+}
+
+/* ===== HOMEPAGE "TRENDING" / STATS clutter ===== */
+#realCustomerVoices,
+#5starReviewTicker,
+.pulse-widget .pulse-stat-num {
+  /* Keep basic pulse widget but hide fake-looking stats */
+}
+
+/* Homepage "1000+ users" style stats — keep for now, decision per-metric */
+/* (Not adding blanket hide here — user can decide per-stat later) */
+
+/* ===== VERIFIED BADGE (soften language, not remove) ===== */
+/* Verified badge still shows but re-labels via ::after */
+/* Keeping this OFF for now — verified badge is legit if OTP done */
+
+/* ===== FESTIVAL BANNER — keep, low priority ===== */
+/* Not touching festival banner — it's dismissible and seasonal */
+
+/* ===== SIMPLE MODE MARKER (for JS to detect) ===== */
+html[data-dl-simple-mode="true"]::before {
+  content: "";
+  display: none;
+}
+
+/* Set via inline script in <head>:
+   document.documentElement.setAttribute('data-dl-simple-mode', 'true');
+*/

@@ -14,3 +14,12 @@ npm-debug.log*
 *service-role*
 *service_role*
 secrets.json
+
+# Never commit — contains keystore password + SHA-256 + credentials
+PROJECT-HANDOFF.md
+signing.keystore
+signing-key-info.txt
+*.jks
+*.keystore
+DukanList*.aab
+DukanList*.apk
