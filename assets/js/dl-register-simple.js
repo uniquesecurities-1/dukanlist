@@ -67,7 +67,15 @@
         waitForOptions('districtId', function(){
           lockDropdown('districtId', 'sirsa', function(){
             waitForOptions('cityId', function(){
-              lockDropdown('cityId', 'dabwali');
+              lockDropdown('cityId', 'dabwali', function(){
+                // Auto-fill pincode 125104 (Mandi Dabwali)
+                var pin = document.getElementById('pincode');
+                if (pin && !pin.value) {
+                  pin.value = '125104';
+                  try { pin.dispatchEvent(new Event('input', { bubbles: true })); } catch(_){}
+                  try { pin.dispatchEvent(new Event('change', { bubbles: true })); } catch(_){}
+                }
+              });
             });
           });
         });
