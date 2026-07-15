@@ -242,6 +242,32 @@ a[onclick*="shareStats"] {
   display: none !important;
 }
 
+/* ============================================================
+   MORE DASHBOARD REMOVALS (2026-07 v5 — owner request)
+============================================================ */
+
+/* Recent Activity notification widget (bell + card list) */
+#notifWidget {
+  display: none !important;
+}
+
+/* AAJ KA SCORE hero — dark card with "LIVE" pulse and today's stats */
+#aajScoreHero,
+.aaj-score-hero {
+  display: none !important;
+}
+
+/* Today's Quick Wins - HIGHEST PAYOFF (actionable boxes at bottom) */
+#smartTipsCard {
+  display: none !important;
+}
+
+/* Extra safety — any card with the pulse-live style dark background */
+[class*="live-pulse"],
+.live-pulse-container {
+  display: none !important;
+}
+
 /* Hide qa-section-title if section becomes empty after tile hiding */
 .qa-section-title { /* keeps headers like "Manage" — decision retained */ }
 
