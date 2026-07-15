@@ -123,7 +123,7 @@
   async function renderGoldenPagesHomepage(){
     if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) {
       // Try again after ShopDB loads
-      setTimeout(renderGoldenPagesHomepage, 500);
+      setTimeout(renderGoldenPagesHomepage, 100);
       return;
     }
 
@@ -157,10 +157,10 @@
 
   // Run after homepage.js has finished
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(renderGoldenPagesHomepage, 800);
+    setTimeout(renderGoldenPagesHomepage, 100);
   } else {
     window.addEventListener('DOMContentLoaded', function(){
-      setTimeout(renderGoldenPagesHomepage, 800);
+      setTimeout(renderGoldenPagesHomepage, 100);
     });
   }
 

@@ -915,3 +915,44 @@ article > div > img[width="400"][height="250"] {
 #fsotwCard img {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v13: NUKE reviews/ratings from EVERY card + search filters                */
+/* ========================================================================= */
+
+/* 1. Homepage cards — hide any span containing rating stars or "No reviews yet"
+      (fallback in case Golden render is delayed) */
+#featuredGrid article span[style*="color:var(--muted)"],
+#featuredGrid article .rating,
+#featuredGrid [class*="rating"] {
+  display: none !important;
+}
+
+/* 2. Search + browse cards — hide rating spans */
+.biz-card .rating,
+.biz-card .rating-chip,
+.biz-card .biz-rating,
+.biz-card [class*="rating"],
+.biz-card .ribbon.top,
+.biz-card .featured-ribbon.top-rated {
+  display: none !important;
+}
+
+/* 3. Search page — hide "⭐ 4.0+" filter chip + rating sort filter modal rows */
+.filter-chip[data-i18n-en*="4.0"],
+.filter-chip:has(span[data-i18n-en*="4.0+"]),
+.chip:has(span[data-i18n-en*="4.0+"]),
+button[onclick*="Rating"],
+.ss-row:has(input[name="ssRating"]),
+label.ss-row:has(.ss-icon) {
+  display: none !important;
+}
+
+/* 4. Universal: any element with a class containing "rating" or "review"
+      inside listing containers (defense in depth) */
+#featuredGrid [class*="review"],
+#dealsGrid [class*="review"],
+.biz-grid [class*="review"],
+.biz-card [class*="review"] {
+  display: none !important;
+}
