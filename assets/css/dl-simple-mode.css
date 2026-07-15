@@ -1419,3 +1419,45 @@ html {
     flex-wrap: wrap !important;
   }
 }
+
+/* ========================================================================= */
+/* v25: Trusted Partners + Rating stars on business.html — hide all         */
+/* ========================================================================= */
+
+/* 1. Trusted Partners section — all known containers + fallback text hide */
+#recsAnchor,
+#recsList,
+#recsByLine,
+#trustedPartners,
+.trusted-partners,
+.trusted-partners-card,
+.recs-card,
+.recs-list,
+[class*="trusted-partner"],
+[id*="trustedPartner"],
+[id*="TrustedPartner"] {
+  display: none !important;
+}
+
+/* 2. Card containing recsList (parent hide) */
+.card-pill:has(#recsAnchor),
+.card-pill:has(#recsList),
+.card:has(#recsList),
+.card:has(.trusted-partners) {
+  display: none !important;
+}
+
+/* 3. Any ⭐ rating badge inside recommendation cards or elsewhere on business page */
+.recommendation-item .rating,
+.rec-card .rating,
+.rec-item [class*="rating"],
+.trusted-partners [class*="rating"] {
+  display: none !important;
+}
+
+/* 4. Belt-and-suspenders — hide any h2/h3 whose text starts with "🤝 Trusted Partners" */
+h2:has(> span[data-i18n-en="Trusted Partners"]),
+h3:has(> span[data-i18n-en="Trusted Partners"]),
+.card-pill h3 span[data-i18n-en="Trusted Partners"] {
+  /* Handled by parent hide above but reinforce */
+}

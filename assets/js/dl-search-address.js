@@ -60,20 +60,20 @@
     if (d.owner) {
       var o = document.createElement('div');
       o.className = 'dl-owner';
-      o.style.cssText = 'font-size:.82rem;color:#475569;margin:6px 0 3px;display:flex;align-items:center;gap:5px';
+      o.style.cssText = 'font-size:.82rem;color:#475569;margin:6px 0 3px;display:flex;align-items:center;gap:5px;pointer-events:none';
       o.innerHTML = '<span>👤</span> <b style="color:#0F172A">' + esc(d.owner) + '</b>';
       frag.appendChild(o);
     }
     if (d.phone && d.phone.length === 10) {
       var p = document.createElement('div');
-      p.style.cssText = 'font-size:.82rem;color:#475569;margin:0 0 3px;display:flex;align-items:center;gap:5px;font-family:monospace';
+      p.style.cssText = 'font-size:.82rem;color:#475569;margin:0 0 3px;display:flex;align-items:center;gap:5px;font-family:monospace;pointer-events:none';
       p.innerHTML = '<span>📱</span> +91-' + d.phone;
       frag.appendChild(p);
     }
     if (d.addr) {
       var a = document.createElement('div');
       a.className = 'dl-biz-addr';
-      a.style.cssText = 'font-size:.82rem;color:#475569;margin:0 0 4px;display:flex;align-items:flex-start;gap:5px;line-height:1.4';
+      a.style.cssText = 'font-size:.82rem;color:#475569;margin:0 0 4px;display:flex;align-items:flex-start;gap:5px;line-height:1.4;pointer-events:none';
       a.innerHTML = '<span style="color:#DC2626;flex-shrink:0">📍</span> <span>' + esc(d.addr) + '</span>';
       frag.appendChild(a);
     }
@@ -85,7 +85,7 @@
       var fb = document.createElement('span');
       fb.className = 'dl-free-badge';
       fb.textContent = '✓ FREE';
-      fb.style.cssText = 'position:absolute;top:10px;right:10px;background:#10B981;color:#fff;padding:3px 9px;border-radius:99px;font-size:.66rem;font-weight:800;letter-spacing:.04em;z-index:2';
+      fb.style.cssText = 'position:absolute;top:10px;right:10px;background:#10B981;color:#fff;padding:3px 9px;border-radius:99px;font-size:.66rem;font-weight:800;letter-spacing:.04em;z-index:2;pointer-events:none';
       if (getComputedStyle(card).position === 'static') card.style.position = 'relative';
       card.appendChild(fb);
     }
