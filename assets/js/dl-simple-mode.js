@@ -23,10 +23,34 @@
     if (location.pathname.indexOf('/business') === 0 ||
         location.pathname === '/business.html') {
       document.body.classList.add('prof-strict');
+
+      // Move the Report block to the very bottom of the page
+      // (was prominently displayed under photo — moved down for cleaner layout)
+      moveReportBlockToBottom();
     }
 
     // Also mark body for any body-scoped hiding
     document.body.setAttribute('data-dl-simple-mode', 'true');
+  }
+
+  function moveReportBlockToBottom(){
+    // Try immediately + retry a few times (in case Supabase re-renders it)
+    var tries = 0;
+    var interval = setInterval(function(){
+      var block = document.getElementById('shopReportBlock');
+      tries++;
+      if (block) {
+        // Style it to appear muted at bottom
+        block.style.cssText += ';margin:32px auto 20px;max-width:600px;padding:10px 14px;background:#F8FAFC;border:1px dashed #CBD5E1;border-radius:10px;opacity:.75;font-size:.85rem;text-align:center';
+        // Move to end of main content or body
+        var target = document.querySelector('main') || document.querySelector('.container') || document.body;
+        if (target && block.parentNode !== target) {
+          target.appendChild(block);
+        }
+        clearInterval(interval);
+      }
+      if (tries > 25) clearInterval(interval); // ~5 sec max wait
+    }, 200);
   }
 
   if (document.body) {

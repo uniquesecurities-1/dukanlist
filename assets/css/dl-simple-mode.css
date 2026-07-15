@@ -175,6 +175,37 @@ nav a[href*="/panel/favorites"] {
 /* Hide qa-section-title if section becomes empty after tile hiding */
 .qa-section-title { /* keeps headers like "Manage" — decision retained */ }
 
+/* ============================================================
+   Report block relocation (business.html)
+   JS moves #shopReportBlock to bottom of main content.
+   During move, keep it visible but with muted styling.
+   dl-simple-mode.js styles it with dashed border + reduced opacity.
+============================================================ */
+#shopReportBlock {
+  /* Ensure it's visible even in prof-strict — override any [data-hide-in-strict] */
+  display: block !important;
+}
+#shopReportBlock .srb-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#shopReportBlock .srb-text {
+  color: #64748B;
+  font-size: .82rem;
+}
+#shopReportBlock .srb-link {
+  color: #DC2626;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .82rem;
+}
+#shopReportBlock .srb-link:hover {
+  text-decoration: underline;
+}
+
 /* ===== APPLY prof-strict CLASS via JS (built-in mode that hides everything) ===== */
 /* Instead of relying on CSS alone, add prof-strict body class on business.html.
    This activates page's own hide rules which are more comprehensive.
