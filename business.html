@@ -2210,6 +2210,20 @@ async function loadBusiness(){
   if (!data.categories) data.categories = { slug:'', name:'', icon:'🏪' };
 
   BIZ = data;
+
+  // Pre-fetch Cloudinary photos (parallel — non-blocking for render)
+  try {
+    const { data: cp } = await c
+      .from('business_photos')
+      .select('cloudinary_url, is_featured, uploaded_at')
+      .eq('business_id', BIZ.id)
+      .order('is_featured', { ascending: false })
+      .order('uploaded_at', { ascending: true });
+    BIZ._cloudPhotos = (cp || [])
+      .filter(p => p.cloudinary_url)
+      .map(p => p.cloudinary_url.replace('/upload/', '/upload/w_1200,q_auto,f_auto/'));
+  } catch (e) { console.warn('[business] cloud photos load failed', e); BIZ._cloudPhotos = []; }
+
   try { renderOwnerCredit(); } catch(_){}
   try { renderSocialRow(); } catch(_){}
   render();
@@ -2617,20 +2631,9 @@ function render(){
   // Schema.org LocalBusiness JSON-LD (rich Google snippets)
   injectSchemaOrg(b);
 
-  // Gallery — merge legacy (businesses.photos array) + new (business_photos Cloudinary)
+  // Gallery — merge legacy (businesses.photos array) + new (business_photos Cloudinary, pre-fetched in loadBusiness)
   const legacyPhotos = (b.photos || []).filter(u => typeof u === 'string' && u.length > 0);
-  let cloudPhotos = [];
-  try {
-    const { data: cp } = await ShopDB.client
-      .from('business_photos')
-      .select('cloudinary_url, is_featured, uploaded_at')
-      .eq('business_id', b.id)
-      .order('is_featured', { ascending: false })
-      .order('uploaded_at', { ascending: true });
-    cloudPhotos = (cp || [])
-      .filter(p => p.cloudinary_url)
-      .map(p => p.cloudinary_url.replace('/upload/', '/upload/w_1200,q_auto,f_auto/'));
-  } catch (e) { console.warn('[business] cloud photos load failed', e); }
+  const cloudPhotos = Array.isArray(b._cloudPhotos) ? b._cloudPhotos : [];
   const photos = [...cloudPhotos, ...legacyPhotos];
   const mainEl = document.getElementById('galleryMain');
   const thEl   = document.getElementById('galleryThumbs');
