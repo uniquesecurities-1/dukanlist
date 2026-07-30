@@ -1925,3 +1925,242 @@ div[style*="linear-gradient"][style*="FFF7ED"]:has(span[data-i18n-en*="simple ho
   border-color: rgba(14,165,233,.15) !important;
 }
 
+
+/* ========================================================================= */
+/* v43 CORPORATE-GRADE LAYOUT — business.html single-column focused design  */
+/* Inspired by Stripe/Linear/Notion company pages. Mobile-first, no gaps.   */
+/* ========================================================================= */
+
+/* Force single-column, centered, focused layout — kill the asymmetry */
+.biz-top {
+  display: block !important;
+  max-width: 820px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  grid-template-columns: none !important;
+}
+
+/* Gallery becomes clean top hero card */
+.biz-top .gallery {
+  position: relative !important;
+  top: auto !important;
+  width: 100% !important;
+  margin-bottom: 24px !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(15,23,42,.06) !important;
+  box-shadow: 0 4px 16px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04) !important;
+}
+
+/* Bigger, more impactful main photo */
+.biz-top .gallery .main {
+  aspect-ratio: 16/9 !important;
+  max-height: 480px !important;
+}
+
+/* Thumbnails: horizontal scroll, smaller */
+.biz-top .gallery .thumbs {
+  display: flex !important;
+  gap: 8px !important;
+  padding: 10px 14px !important;
+  overflow-x: auto !important;
+  background: linear-gradient(180deg, #FFF 0%, #FAFAFA 100%) !important;
+  border-top: 1px solid rgba(15,23,42,.05) !important;
+}
+.biz-top .gallery .thumbs img {
+  width: 68px !important;
+  height: 68px !important;
+  aspect-ratio: 1/1 !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  opacity: 0.6 !important;
+  transition: all 0.2s cubic-bezier(.22,.61,.36,1) !important;
+  border: 2px solid transparent !important;
+  flex-shrink: 0 !important;
+}
+.biz-top .gallery .thumbs img:hover {
+  opacity: 0.95 !important;
+  transform: translateY(-1px) !important;
+}
+.biz-top .gallery .thumbs img.active {
+  opacity: 1 !important;
+  border-color: #FF6B1A !important;
+  box-shadow: 0 4px 12px rgba(255,107,26,.3) !important;
+}
+
+/* Meta card (right column) — now flows below gallery, full width */
+.biz-top .biz-meta-card {
+  background: #fff !important;
+  border: 1px solid rgba(15,23,42,.06) !important;
+  border-radius: 16px !important;
+  padding: 28px 30px !important;
+  box-shadow: 0 4px 16px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04) !important;
+  margin-bottom: 20px !important;
+}
+
+/* Category pill — refined */
+.biz-top .biz-meta-card .biz-cat-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A) !important;
+  color: #78350F !important;
+  padding: 6px 14px !important;
+  border-radius: 99px !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  border: 1px solid rgba(120,53,15,.08) !important;
+}
+
+/* Business name — bigger, tighter */
+.biz-top .biz-meta-card .biz-title {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.1 !important;
+  color: #0F172A !important;
+  margin: 12px 0 8px !important;
+}
+
+/* Address box — refined */
+.biz-top .biz-meta-card .addr-box {
+  background: #F8FAFC !important;
+  border: 1px solid rgba(15,23,42,.05) !important;
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
+  margin: 18px 0 !important;
+}
+.biz-top .biz-meta-card .addr-box .a-label {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  color: #64748B !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 6px !important;
+}
+.biz-top .biz-meta-card .addr-box .a-text {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+}
+
+/* Google Maps link in address — better button */
+.biz-top .biz-meta-card .a-map-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #fff !important;
+  color: #0F2952 !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  border: 1.5px solid rgba(15,41,82,.15) !important;
+  text-decoration: none !important;
+  margin-top: 10px !important;
+  transition: all 0.15s ease !important;
+}
+.biz-top .biz-meta-card .a-map-link:hover {
+  background: #0F2952 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(15,41,82,.2) !important;
+}
+
+/* CTA button row — cleaner professional look */
+.biz-top .biz-meta-card .cta-row {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 20px !important;
+  padding-top: 18px !important;
+  border-top: 1px solid rgba(15,23,42,.05) !important;
+}
+.biz-top .biz-meta-card .cta-btn {
+  padding: 12px 14px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 1px 3px rgba(15,23,42,.06) !important;
+}
+.biz-top .biz-meta-card .cta-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(15,23,42,.12) !important;
+}
+
+/* Professional Card (Financial Services, Regulated Service, etc.) — corporate polish */
+.prof-card,
+#professionalCardSlot > .prof-card {
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%) !important;
+  border: 1px solid rgba(14,165,233,.18) !important;
+  border-radius: 14px !important;
+  padding: 20px 22px !important;
+  margin: 18px 0 !important;
+  box-shadow: 0 2px 8px rgba(14,165,233,.06) !important;
+}
+.prof-card .prof-card-head {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  color: #075985 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 14px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid rgba(14,165,233,.15) !important;
+}
+
+/* Report link — muted */
+.flag-link,
+a.flag-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  color: #94A3B8 !important;
+  font-size: 0.8rem !important;
+  text-decoration: none !important;
+  margin-top: 20px !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  border: 1px dashed rgba(15,23,42,.1) !important;
+  transition: all 0.15s ease !important;
+}
+.flag-link:hover {
+  color: #DC2626 !important;
+  border-color: rgba(220,38,38,.3) !important;
+  background: rgba(220,38,38,.04) !important;
+}
+
+/* Ensure shop highlights, map card, report block sit BELOW meta card cleanly */
+.biz-top .gallery .shop-report-block,
+.biz-top .gallery .biz-map-card,
+.biz-top .gallery .shop-highlights {
+  margin-top: 0 !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(15,23,42,.05) !important;
+  box-shadow: none !important;
+}
+
+/* Also constrain the OUTER container so nothing goes edge-to-edge */
+.biz-page,
+main.biz-container,
+section.biz-section {
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  padding: 0 18px !important;
+}
+
+/* Below biz-top (mmtStatStrip, other sections) — same width */
+#mmtStatStrip,
+.biz-sec,
+section[class*="biz"] {
+  max-width: 820px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
