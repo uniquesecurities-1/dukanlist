@@ -621,24 +621,27 @@ html[data-lang="hi"] .biz-title{ font-family:'Noto Sans Devanagari',sans-serif; 
   margin-bottom:12px; letter-spacing:-.005em;
 }
 /* ============================================================
-   PROFESSIONAL LISTING MODE — Compliance with ICAI/NMC/BCI/ICSI/ICMAI/AMFI/SEBI/IRDAI rules
-   When body has .prof-strict class: hide reviews, ratings, Top Rated, Featured, Compare,
-   USP text. Show membership + qualification + practice areas + disclaimer.
-   When body has .prof-partial class: keep reviews/ratings but hide promotional badges,
-   show disclaimer modal/banner.
-============================================================ */
-body.prof-strict #reviewsAnchor,
-body.prof-strict .biz-rating-row,
-body.prof-strict #bizRating,
-body.prof-strict .biz-usp,
-body.prof-strict #uspBox,
-body.prof-strict #mmtStatStrip,
-body.prof-strict #ratingBreakdown,
-body.prof-strict .sh-tile.rating,
-body.prof-strict .biz-rating,
-body.prof-strict [data-hide-in-strict]{ display:none !important }
+   PROFESSIONAL LISTING MODE — v46 RELAUNCH
+   ============================================================
+   Reviews + ratings are NOW ENABLED for professionals too
+   (industry standard — Google Maps, JustDial, Practo all show
+   reviews for CAs/Doctors/Advocates).
 
-/* Hide promotional "Top rated" pill in highlights row even when other pills remain (partial mode) */
+   Prof-strict class NO LONGER hides reviews/ratings/USP.
+   It ONLY hides promotional badges (Top Rated, Featured)
+   which could be construed as advertising claims by regulators.
+   Professional card + disclaimer remain visible.
+============================================================ */
+
+/* Only hide PROMOTIONAL badges for strict professionals, NOT reviews */
+body.prof-strict [data-hide-in-strict="promo"],
+body.prof-strict .featured-badge,
+body.prof-strict .top-rated-pill,
+body.prof-strict .sh-tile.top-rated {
+  display: none !important;
+}
+
+/* Hide promotional "Top rated" pill in highlights row */
 body.prof-strict #mmtHighlights span:has(span:contains("Top rated")){ display:none !important }
 
 body.prof-partial [data-hide-in-partial]{ display:none !important }
