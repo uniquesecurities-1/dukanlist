@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785700000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785800000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -3857,6 +3857,53 @@ function renderHours(h){
     }
     return `<div class="day ${i===todayIdx?'today':''}"><span class="d">${labels[d]}</span><span class="t">${timeStr}</span></div>`;
   }).join('');
+}
+
+/* v46: Render social media + website links on public shop page.
+   Reads b.website_url, b.facebook_url, b.instagram_url, b.youtube_url,
+   b.x_twitter_url, b.linkedin_url from BIZ. Auto-hides card if all empty. */
+function renderSocialRow(){
+  const b = (typeof BIZ !== 'undefined' && BIZ) ? BIZ : window.BIZ;
+  if (!b) return;
+  const container = document.getElementById('socialRow');
+  const wrap = document.getElementById('socialCardWrap');
+  if (!container || !wrap) return;
+
+  // Build list of {url, icon, label, color}
+  const links = [];
+  const push = (raw, icon, label, color) => {
+    if (!raw) return;
+    let url = String(raw).trim();
+    if (!url) return;
+    // Ensure protocol
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    links.push({ url, icon, label, color });
+  };
+
+  push(b.website_url,   '🌐', 'Website',   '#0F172A');
+  push(b.facebook_url,  '📘', 'Facebook',  '#1877F2');
+  push(b.instagram_url, '📷', 'Instagram', '#E4405F');
+  push(b.youtube_url,   '▶️', 'YouTube',   '#FF0000');
+  push(b.x_twitter_url, '🐦', 'Twitter',   '#000000');
+  push(b.linkedin_url,  '💼', 'LinkedIn',  '#0A66C2');
+
+  if (!links.length) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = links.map(l =>
+    `<a href="${escapeHTML(l.url)}" target="_blank" rel="noopener nofollow"
+        style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;
+               background:#fff;border:1.5px solid ${l.color}22;color:${l.color};
+               border-radius:99px;text-decoration:none;font-weight:700;font-size:.86rem;
+               margin:4px 6px 4px 0;transition:all .15s ease"
+        onmouseover="this.style.background='${l.color}';this.style.color='#fff';this.style.borderColor='${l.color}'"
+        onmouseout="this.style.background='#fff';this.style.color='${l.color}';this.style.borderColor='${l.color}22'">
+      <span style="font-size:1rem">${l.icon}</span><span>${escapeHTML(l.label)}</span>
+    </a>`
+  ).join('');
+  wrap.style.display = '';
 }
 
 function renderServices(svcs){
