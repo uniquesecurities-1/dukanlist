@@ -120,13 +120,13 @@ a[href="/discover.html"],
 
 /* Panel nav links to hidden pages */
 nav a[href*="/panel/poster"],
-nav a[href*="/panel/qr"],
-/* v41: digital-card restored — link no longer hidden */
+/* v45: qr-code restored (owner QR generator) */
+/* v41: digital-card restored */
 nav a[href*="/panel/get-reviews"],
 nav a[href*="/panel/deals"],
 nav a[href*="/panel/analytics"],
 nav a[href*="/panel/reviews"],
-nav a[href*="/panel/services"],
+/* v45: services restored (owner adds services list) */
 nav a[href*="/panel/favorites"] {
   display: none !important;
 }
@@ -136,10 +136,10 @@ nav a[href*="/panel/favorites"] {
 .qa[href*="/panel/deals"],
 .qa[href*="/panel/get-reviews"],
 .qa[href*="/panel/reviews"],
-.qa[href*="/panel/qr"],
+/* v45: qr restored */
 .qa[href*="/panel/poster"],
 /* v41: digital-card restored */
-.qa[href*="/panel/services"],
+/* v45: services restored */
 .qa[href*="/panel/favorites"],
 .qa[href*="/panel/recommendations"],
 /* Sidebar Quick Actions widget tiles */
@@ -147,10 +147,10 @@ nav a[href*="/panel/favorites"] {
 .qa-tile[href*="/panel/deals"],
 .qa-tile[href*="/panel/get-reviews"],
 .qa-tile[href*="/panel/reviews"],
-.qa-tile[href*="/panel/qr"],
+/* v45: qr-tile restored */
 .qa-tile[href*="/panel/poster"],
 /* v41: digital-card restored */
-.qa-tile[href*="/panel/services"],
+/* v45: services-tile restored */
 .qa-tile[href*="/panel/favorites"],
 .qa-tile[href*="/panel/recommendations"] {
   display: none !important;
@@ -386,7 +386,7 @@ body[data-dl-simple-mode="true"] .dash-side-v2 {
   display: none !important;
 }
 
-/* 3. Public Q&A */
+/* 3. Public Q&A — kept hidden (different from FAQs; needs community moderation) */
 #qaCard,
 #qaList,
 #qaEmpty,
@@ -394,17 +394,11 @@ body[data-dl-simple-mode="true"] .dash-side-v2 {
   display: none !important;
 }
 
-/* 4. Frequently Asked Questions (FAQ accordion) */
-#faqsCard,
-#faqList,
-.faq-acc {
-  display: none !important;
-}
+/* 4. Frequently Asked Questions — v45: RESTORED (owner-managed FAQs) */
+/* Removed FAQ hide. Owner adds Q&A from profile edit; displays on shop page. */
 
-/* 5. Profile Highlights (contains Payment Accepted + Special Features rows) */
-.shop-highlights {
-  display: none !important;
-}
+/* 5. Profile Highlights — v45: RESTORED (Payment methods + Special features) */
+/* Removed hide. Owner-managed pills show trust signals. */
 
 /* ===== EXPLICITLY KEEP Share this business card ==========================
    .rc-card.share has data-hide-in-strict="1" which our JS hides via
@@ -598,67 +592,39 @@ nav a[href="/panel/recommendations.html"] {
   display: none !important;
 }
 
-/* Hide Social Media card — use ACTUAL IDs (with Url suffix as in profile.html) */
-.card:has(#websiteUrl),
-.card:has(#facebookUrl),
-.card:has(#instagramUrl),
-.card:has(#youtubeUrl),
-.card:has(#xTwitterUrl),
-.card:has(#linkedinUrl) {
-  display: none !important;
-}
+/* v45: Social Media card KEPT VISIBLE (owner needs youtubeUrl for video embed) */
+/* Card is visible; individual non-video fields hidden below */
 
-/* ===== FALLBACK — hide individual fields if :has() not supported ===== */
-/* Also hides form-groups within kept cards (Trust Signals card keeps
-   establishedYear but drops paymentMethods + specialFeatures groups) */
+/* ===== v45 RESTORED FIELDS: paymentMethods, specialFeatures, aboutText,
+   FAQs are back — owner needs these editors on profile page ===== */
 
-/* Trust Signals card — keep only Established Year form-row */
-.form-group:has(> #paymentMethods),
-.form-group:has(> #specialFeatures),
+/* Only hide fields that are truly dead: USP + social URLs (except video) */
 .form-group:has(> #usp),
 .form-group:has(> #uspHi),
-.form-group:has(> #aboutText),
-.form-group:has(> #website),
 .form-group:has(> #facebook),
 .form-group:has(> #instagram),
-.form-group:has(> #youtube),
 .form-group:has(> #twitterX),
 .form-group:has(> #linkedin) {
   display: none !important;
 }
 
 /* Direct field hides (fallback for browsers without :has support) */
-/* Note: #hoursList removed — Business Hours is REQUIRED for owner profile edit */
 #usp, #uspHi, #simpleUspPicker,
-#aboutText,
-#paymentMethods, #specialFeatures,
-#faqList, #faqCounter,
 #askCC, #askWhatsappNum, #askMessage,
-#website, #facebook, #instagram, #youtube, #twitterX, #linkedin,
-/* Social Media URL fields (real IDs on profile.html have "Url" suffix) */
-#websiteUrl, #facebookUrl, #instagramUrl, #youtubeUrl, #xTwitterUrl, #linkedinUrl {
+#facebook, #instagram, #twitterX, #linkedin,
+/* Social Media URL fields — hide non-essential, keep youtube for video embed */
+#facebookUrl, #instagramUrl, #xTwitterUrl, #linkedinUrl {
   display: none !important;
 }
 
-/* Also hide labels + card sub-descriptions for hidden fields */
+/* Also hide labels for the still-hidden fields */
 label:has(+ #usp),
-label:has(+ #uspHi),
-label:has(+ #aboutText),
-label:has(+ #paymentMethods),
-label:has(+ #specialFeatures) {
+label:has(+ #uspHi) {
   display: none !important;
 }
 
-/* Hide "Browse Templates" template buttons for hidden fields */
-.tpl-btn[onclick*="'usp'"],
-.tpl-btn[onclick*="'about'"],
-.tpl-btn[onclick*="'faq'"] {
-  display: none !important;
-}
-
-/* Hide FAQ counter, custom FAQ button */
-.faq-counter,
-[onclick*="addCustomFaq"] {
+/* Hide "Browse Templates" template buttons for USP only */
+.tpl-btn[onclick*="'usp'"] {
   display: none !important;
 }
 

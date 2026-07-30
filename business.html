@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785500000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785600000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -1892,6 +1892,18 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
         <h3>🛠 <span data-i18n-en>Services Offered</span><span data-i18n-hi>सेवाएं</span></h3>
         <ul class="services-list" id="servicesList"></ul>
       </div>
+      <!-- Video (YouTube embed) -->
+      <div class="card-pill" id="videoCard" style="display:none;margin-top:18px">
+        <h3>▶ <span data-i18n-en>Watch Shop Video</span><span data-i18n-hi>दुकान का वीडियो</span></h3>
+        <div id="videoFrameWrap" style="position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:12px;background:#000;margin-top:10px">
+          <iframe id="videoEmbed" src="" title="Shop video"
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+        </div>
+      </div>
       <!-- About Us -->
       <div class="card-pill" id="aboutCard" style="display:none;margin-top:18px">
         <h3>📖 <span data-i18n-en>About Us</span><span data-i18n-hi>हमारे बारे में</span></h3>
@@ -3295,6 +3307,22 @@ function render(){
     renderServices(b.services_json);
     document.getElementById('servicesCard').style.display = '';
   }
+
+  // Video (YouTube embed) — v45: detect YouTube URL from youtube_url or video_url
+  try {
+    const rawUrl = String(b.youtube_url || b.video_url || '').trim();
+    if (rawUrl) {
+      const vid = extractYouTubeId(rawUrl);
+      if (vid) {
+        const iframe = document.getElementById('videoEmbed');
+        const card = document.getElementById('videoCard');
+        if (iframe && card) {
+          iframe.src = 'https://www.youtube-nocookie.com/embed/' + vid + '?rel=0&modestbranding=1';
+          card.style.display = '';
+        }
+      }
+    }
+  } catch(e) { console.warn('[video] render failed', e); }
 
   // About Us
   if (b.about_text && b.about_text.trim()){
@@ -4802,6 +4830,25 @@ async function submitReport(){
 }
 
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+
+/* Extract YouTube video ID from various URL formats
+   - youtube.com/watch?v=XXXX
+   - youtu.be/XXXX
+   - youtube.com/embed/XXXX
+   - youtube.com/shorts/XXXX
+   Returns 11-char video ID or null. */
+function extractYouTubeId(url){
+  if (!url || typeof url !== 'string') return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m && m[1]) return m[1];
+  }
+  return null;
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   setLang(localStorage.getItem('shop_lang') || 'en');
