@@ -876,8 +876,10 @@ function buildUpiSection(d){
 }
 
 // v48: Build "Share this card via WhatsApp" viral section
+// NOTE: Uses `/card?slug=...` (guaranteed-working URL) instead of `/c/:slug`
+// which had Vercel rewrite issue returning 404.
 function buildShareSection(d){
-  var cardUrl = location.origin + '/c/' + encodeURIComponent(d.slug || '');
+  var cardUrl = location.origin + '/card?slug=' + encodeURIComponent(d.slug || '');
   var shareMsg = encodeURIComponent(
     '📇 ' + (d.business_name || 'Digital Card') +
     '\n' + (d.displayName || '') +
@@ -1119,7 +1121,8 @@ async function loadCard(){
     if (data.mobile)        descBits.push('📞 ' + data.mobile);
     if (data.upi_id)        descBits.push('💳 UPI ready');
     var descText = descBits.slice(0, 4).join(' · ');
-    var cardUrl = location.origin + '/c/' + encodeURIComponent(data.slug || '');
+    // Use /card?slug=... URL (guaranteed-working, /c/ rewrite has issue)
+    var cardUrl = location.origin + '/card?slug=' + encodeURIComponent(data.slug || '');
     var previewImg = data.photo_url || (location.origin + '/assets/icons/logo-og.png');
 
     if (ogTitleEl) ogTitleEl.setAttribute('content', displayTitle);
