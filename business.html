@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785800000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785900000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -3904,6 +3904,40 @@ function renderSocialRow(){
     </a>`
   ).join('');
   wrap.style.display = '';
+
+  // v46 PROMINENT PLACEMENT: also inject a compact icon-only row in the
+  // biz-meta-card, right after the CTA row. This way users see the links
+  // WITHOUT scrolling to the bottom "Follow" card.
+  try {
+    const metaCard = document.querySelector('.biz-meta-card');
+    const ctaRow = metaCard ? metaCard.querySelector('.cta-row') : null;
+    if (metaCard && !document.getElementById('quickSocialTop')) {
+      const quickRow = document.createElement('div');
+      quickRow.id = 'quickSocialTop';
+      quickRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px dashed #E2E8F0';
+      quickRow.innerHTML = '<div style="width:100%;font-size:.72rem;font-weight:800;color:#64748B;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">🌐 Follow / Visit</div>' +
+        links.map(l =>
+          `<a href="${escapeHTML(l.url)}" target="_blank" rel="noopener nofollow"
+              title="${escapeHTML(l.label)}"
+              style="display:inline-flex;align-items:center;justify-content:center;
+                     width:40px;height:40px;background:#fff;
+                     border:1.5px solid ${l.color}33;color:${l.color};
+                     border-radius:50%;text-decoration:none;font-size:1.1rem;
+                     transition:all .15s ease;box-shadow:0 1px 3px rgba(15,23,42,.06)"
+              onmouseover="this.style.background='${l.color}';this.style.color='#fff';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 14px ${l.color}44'"
+              onmouseout="this.style.background='#fff';this.style.color='${l.color}';this.style.transform='translateY(0)';this.style.boxShadow='0 1px 3px rgba(15,23,42,.06)'">
+            ${l.icon}
+          </a>`
+        ).join('');
+
+      // Insert right after CTA row, or fall back to end of meta card
+      if (ctaRow && ctaRow.parentNode) {
+        ctaRow.parentNode.insertBefore(quickRow, ctaRow.nextSibling);
+      } else {
+        metaCard.appendChild(quickRow);
+      }
+    }
+  } catch(e) { console.warn('[social] quick top injection failed', e); }
 }
 
 function renderServices(svcs){
