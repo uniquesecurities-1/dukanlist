@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785900000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786000000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -3905,39 +3905,49 @@ function renderSocialRow(){
   ).join('');
   wrap.style.display = '';
 
-  // v46 PROMINENT PLACEMENT: also inject a compact icon-only row in the
-  // biz-meta-card, right after the CTA row. This way users see the links
-  // WITHOUT scrolling to the bottom "Follow" card.
+  // v47 PLACEMENT: inject compact icon row into LEFT column (inside .gallery)
+  // just BEFORE #shopReportBlock — fills the empty space on left, balances
+  // the taller right sidebar, saves vertical space overall.
   try {
-    const metaCard = document.querySelector('.biz-meta-card');
-    const ctaRow = metaCard ? metaCard.querySelector('.cta-row') : null;
-    if (metaCard && !document.getElementById('quickSocialTop')) {
+    // Remove any previous injection (in case renderSocialRow runs twice)
+    const oldQuick = document.getElementById('quickSocialTop');
+    if (oldQuick) oldQuick.remove();
+
+    const reportBlock = document.getElementById('shopReportBlock');
+    const gallery = document.querySelector('.biz-top .gallery') || document.querySelector('.gallery');
+    if (gallery) {
       const quickRow = document.createElement('div');
       quickRow.id = 'quickSocialTop';
-      quickRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px dashed #E2E8F0';
-      quickRow.innerHTML = '<div style="width:100%;font-size:.72rem;font-weight:800;color:#64748B;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">🌐 Follow / Visit</div>' +
+      quickRow.style.cssText = 'margin:14px 14px 4px 14px;padding:14px 16px;background:#F8FAFC;border:1px solid rgba(15,23,42,.06);border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,.04)';
+      quickRow.innerHTML = '<div style="font-size:.72rem;font-weight:800;color:#64748B;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">🌐 Follow / Visit</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
         links.map(l =>
           `<a href="${escapeHTML(l.url)}" target="_blank" rel="noopener nofollow"
               title="${escapeHTML(l.label)}"
               style="display:inline-flex;align-items:center;justify-content:center;
-                     width:40px;height:40px;background:#fff;
+                     width:42px;height:42px;background:#fff;
                      border:1.5px solid ${l.color}33;color:${l.color};
-                     border-radius:50%;text-decoration:none;font-size:1.1rem;
+                     border-radius:50%;text-decoration:none;font-size:1.15rem;
                      transition:all .15s ease;box-shadow:0 1px 3px rgba(15,23,42,.06)"
               onmouseover="this.style.background='${l.color}';this.style.color='#fff';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 14px ${l.color}44'"
               onmouseout="this.style.background='#fff';this.style.color='${l.color}';this.style.transform='translateY(0)';this.style.boxShadow='0 1px 3px rgba(15,23,42,.06)'">
             ${l.icon}
           </a>`
-        ).join('');
+        ).join('') + '</div>';
 
-      // Insert right after CTA row, or fall back to end of meta card
-      if (ctaRow && ctaRow.parentNode) {
-        ctaRow.parentNode.insertBefore(quickRow, ctaRow.nextSibling);
+      // Insert BEFORE #shopReportBlock (so it appears above "Report this listing")
+      // Fallback: append to gallery
+      if (reportBlock && reportBlock.parentNode) {
+        reportBlock.parentNode.insertBefore(quickRow, reportBlock);
       } else {
-        metaCard.appendChild(quickRow);
+        gallery.appendChild(quickRow);
       }
+
+      // Also hide the redundant bottom "Follow this business" card now that
+      // we have prominent left-column placement.
+      wrap.style.display = 'none';
     }
-  } catch(e) { console.warn('[social] quick top injection failed', e); }
+  } catch(e) { console.warn('[social] left column injection failed', e); }
 }
 
 function renderServices(svcs){
