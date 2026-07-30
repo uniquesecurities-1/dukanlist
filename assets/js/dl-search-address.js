@@ -91,8 +91,8 @@
     if (d.thumb && !card.querySelector('.biz-photo img') && !card.querySelector('.dl-thumb')) {
       var thumbWrap = document.createElement('div');
       thumbWrap.className = 'dl-thumb';
-      thumbWrap.style.cssText = 'width:100%;aspect-ratio:16/10;overflow:hidden;background:#F1F5F9;margin:-14px -16px 10px;';
-      thumbWrap.innerHTML = '<img src="' + d.thumb + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">';
+      thumbWrap.style.cssText = 'width:calc(100% + 32px);position:relative;padding-bottom:60%;overflow:hidden;background:#F1F5F9;margin:-14px -16px 10px;';
+      thumbWrap.innerHTML = '<img src="' + d.thumb + '" alt="" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block">';
       // Insert BEFORE info block so it sits at top of card
       if (info && info.parentNode) info.parentNode.insertBefore(thumbWrap, info);
       else card.insertBefore(thumbWrap, card.firstChild);

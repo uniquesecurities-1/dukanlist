@@ -57,7 +57,7 @@
       : '';
 
     return '<article style="position:relative;background:#fff;border:2px solid #FED7AA;border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 6px rgba(15,23,42,.05);cursor:pointer;overflow:hidden" onclick="if(!event.target.closest(\'a,button\')){window.location.href=\'/business.html?slug=' + slug + '\';}">'
-      + (thumb ? '<div style="width:100%;aspect-ratio:16/10;overflow:hidden;background:#F1F5F9"><img src="' + esc(thumb) + '" alt="' + esc(b.name || '') + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>' : '')
+      + (thumb ? '<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:#F1F5F9"><img src="' + esc(thumb) + '" alt="' + esc(b.name || '') + '" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block"></div>' : '')
       + '<div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
       + '<span style="display:inline-flex;align-items:center;gap:5px;background:#FEF3C7;color:#78350F;padding:4px 10px;border-radius:99px;font-size:.72rem;font-weight:800">' + esc(catIcon) + ' ' + esc(catName.toUpperCase()) + '</span>'

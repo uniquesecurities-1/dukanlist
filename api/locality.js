@@ -199,7 +199,7 @@ function renderShopCard(b){
     : '';
   return `
   <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer;overflow:hidden">
-    ${thumb ? `<div style="width:100%;aspect-ratio:16/10;overflow:hidden;background:#F1F5F9"><img src="${esc(thumb)}" alt="${esc(b.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>` : ''}
+    ${thumb ? `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:#F1F5F9"><img src="${esc(thumb)}" alt="${esc(b.name)}" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block"></div>` : ''}
     <div style="padding:10px 14px;display:flex;flex-direction:column;gap:4px">
       <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
       ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}
