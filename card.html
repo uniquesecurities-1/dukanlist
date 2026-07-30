@@ -6,9 +6,14 @@
 <meta name="theme-color" content="#0B1E3F">
 <title>Digital Business Card — DukanList</title>
 <meta name="description" content="Save this contact to your phone in one tap. Powered by DukanList.">
-<meta property="og:title" content="Digital Business Card">
-<meta property="og:description" content="Tap to save this contact to your phone.">
+<meta property="og:title" content="Digital Business Card" id="ogTitle">
+<meta property="og:description" content="Tap to save this contact to your phone." id="ogDesc">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://dukanlist.com/assets/icons/logo-og.png" id="ogImage">
+<meta property="og:url" content="https://dukanlist.com/" id="ogUrl">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Digital Business Card" id="twTitle">
+<meta name="twitter:description" content="Tap to save this contact to your phone." id="twDesc">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -317,10 +322,44 @@
     .quick-actions{ gap:8px }
     .qa{ padding:11px 6px; font-size:.78rem }
   }
+
+  /* ============================================================
+     v48 ANIMATED ENTRANCE — card slides in, buttons pulse
+  ============================================================ */
+  @keyframes cardSlideIn {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 6px 16px rgba(37,211,102,.35); transform: scale(1); }
+    50%      { box-shadow: 0 10px 28px rgba(37,211,102,.55); transform: scale(1.03); }
+  }
+  @keyframes saveCtaPulse {
+    0%, 100% { box-shadow: 0 6px 16px rgba(15,23,42,.30); }
+    50%      { box-shadow: 0 10px 26px rgba(255,107,26,.55); }
+  }
+  .card {
+    animation: cardSlideIn .55s cubic-bezier(.22,.61,.36,1) both;
+  }
+  .save-cta {
+    animation: saveCtaPulse 2.5s ease-in-out infinite;
+  }
+  .quick-actions {
+    animation: fadeInUp .5s .25s both;
+  }
+  .save-hint {
+    animation: fadeInUp .5s .15s both;
+  }
 </style>
 
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+<!-- v48: QRCode.js library for UPI QR generation -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="/assets/js/photo-fit.js" defer></script>
 </head>
 <body>
@@ -796,9 +835,63 @@ function render(d){
     + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
     + (mapsUrl ? '<a class="qa" href="' + escapeHtml(mapsUrl) + '" target="_blank"><span class="qa-ico">📍</span>Directions</a>' : '')
     + '<a class="qa" href="' + escapeHtml('/business.html?slug=' + encodeURIComponent(d.slug || '')) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
-    + '</div>';
+    + '</div>'
+    // v48: UPI Payment QR (India-specific killer feature)
+    + (d.upi_id ? buildUpiSection(d) : '')
+    // v48: Share to WhatsApp button (viral growth)
+    + buildShareSection(d);
 
   document.getElementById('content').innerHTML = html;
+
+  // v48: Render UPI QR if UPI ID present (uses QRCode library already loaded)
+  if (d.upi_id && typeof QRCode !== 'undefined') {
+    setTimeout(function(){
+      var upiTarget = document.getElementById('upiQrBox');
+      if (upiTarget) {
+        var upiUrl = 'upi://pay?pa=' + encodeURIComponent(d.upi_id) +
+                     '&pn=' + encodeURIComponent(d.business_name || 'DukanList Shop') +
+                     '&cu=INR';
+        try {
+          new QRCode(upiTarget, {
+            text: upiUrl,
+            width: 180, height: 180,
+            colorDark: '#000000', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } catch(e) { console.warn('[upi-qr] failed', e); }
+      }
+    }, 200);
+  }
+}
+
+// v48: Build UPI QR section HTML
+function buildUpiSection(d){
+  return '<div class="upi-section" style="margin-top:18px;background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);border:2px solid #16A34A;border-radius:16px;padding:18px;text-align:center;animation:fadeInUp .5s .3s both">' +
+    '<div style="font-size:.72rem;font-weight:800;color:#166534;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">💳 Pay via UPI</div>' +
+    '<div style="font-size:.98rem;font-weight:700;color:#0F172A;margin-bottom:14px">Scan with GPay / PhonePe / Paytm</div>' +
+    '<div id="upiQrBox" style="display:inline-block;background:#fff;padding:10px;border-radius:12px;box-shadow:0 4px 12px rgba(22,163,74,.15)"></div>' +
+    '<div style="margin-top:12px;font-family:monospace;font-size:.88rem;color:#475569;background:#fff;padding:8px 12px;border-radius:8px;display:inline-block;user-select:all">' + escapeHtml(d.upi_id) + '</div>' +
+    '<div style="margin-top:8px;font-size:.72rem;color:#64748B">📌 UPI ID copy karo ya QR scan karo</div>' +
+    '</div>';
+}
+
+// v48: Build "Share this card via WhatsApp" viral section
+function buildShareSection(d){
+  var cardUrl = location.origin + '/c/' + encodeURIComponent(d.slug || '');
+  var shareMsg = encodeURIComponent(
+    '📇 ' + (d.business_name || 'Digital Card') +
+    '\n' + (d.displayName || '') +
+    '\n\n📞 ' + (d.mobile || '') +
+    (d.upi_id ? '\n💳 UPI: ' + d.upi_id : '') +
+    '\n\n' + cardUrl +
+    '\n\n— Shared via DukanList Digital Card'
+  );
+  return '<div style="margin-top:16px;text-align:center">' +
+    '<a href="https://wa.me/?text=' + shareMsg + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-weight:800;font-size:.92rem;border-radius:99px;text-decoration:none;box-shadow:0 6px 16px rgba(37,211,102,.35);animation:pulseGlow 2s ease-in-out infinite">' +
+      '<span style="font-size:1.1rem">📤</span> Share this Card on WhatsApp' +
+    '</a>' +
+    '<div style="margin-top:8px;font-size:.72rem;color:rgba(255,255,255,.7)">Card link + shop details WhatsApp par bhejo</div>' +
+    '</div>';
 }
 
 async function saveContact(){
@@ -912,7 +1005,7 @@ async function loadCard(){
   // separately if needed (faster + safer pattern, same as dashboard).
   // Pull all card data in one query. No FK joins (avoids 400 ambiguity).
   var query = c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, geo_cities(name), is_professional_listing, professional_tier, membership_no, membership_authority, professional_qualification, practice_areas, prof_verified_at');
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, upi_id, geo_cities(name), is_professional_listing, professional_tier, membership_no, membership_authority, professional_qualification, practice_areas, prof_verified_at');
   if (slug) query = query.eq('slug', slug);
   else      query = query.eq('id', id);
 
@@ -990,6 +1083,7 @@ async function loadCard(){
       linkedin:  b.linkedin_url   || '',
       website:   b.website_url    || ''
     },
+    upi_id: (b.upi_id || '').toString().trim(),  // v48: UPI QR
     // ---- Professional Listing fields (db/145 onwards) ----
     is_pro:                b.is_professional_listing === true,
     pro_tier:              (b.professional_tier || '').toString().toLowerCase(),
@@ -1008,6 +1102,33 @@ async function loadCard(){
   document.title = (data.displayName || data.business_name) + ' · Digital Business Card';
   var topTag = document.getElementById('topTag');
   if (topTag) topTag.innerHTML = '<em>📇 ' + escapeHtml(data.business_name) + '</em> · Digital Card';
+
+  // v48: Update OG tags for rich WhatsApp/Social preview when card is shared
+  try {
+    var ogTitleEl = document.getElementById('ogTitle');
+    var ogDescEl  = document.getElementById('ogDesc');
+    var ogImgEl   = document.getElementById('ogImage');
+    var ogUrlEl   = document.getElementById('ogUrl');
+    var twTitleEl = document.getElementById('twTitle');
+    var twDescEl  = document.getElementById('twDesc');
+    var displayTitle = (data.displayName || data.business_name) + ' — Digital Card';
+    var descBits = [];
+    if (data.role)          descBits.push(data.role);
+    if (data.business_name && data.business_name !== data.displayName) descBits.push(data.business_name);
+    if (data.city)          descBits.push('📍 ' + data.city);
+    if (data.mobile)        descBits.push('📞 ' + data.mobile);
+    if (data.upi_id)        descBits.push('💳 UPI ready');
+    var descText = descBits.slice(0, 4).join(' · ');
+    var cardUrl = location.origin + '/c/' + encodeURIComponent(data.slug || '');
+    var previewImg = data.photo_url || (location.origin + '/assets/icons/logo-og.png');
+
+    if (ogTitleEl) ogTitleEl.setAttribute('content', displayTitle);
+    if (ogDescEl)  ogDescEl.setAttribute('content', descText || 'Save this contact — Powered by DukanList');
+    if (ogImgEl)   ogImgEl.setAttribute('content', previewImg);
+    if (ogUrlEl)   ogUrlEl.setAttribute('content', cardUrl);
+    if (twTitleEl) twTitleEl.setAttribute('content', displayTitle);
+    if (twDescEl)  twDescEl.setAttribute('content', descText || 'Save this contact — Powered by DukanList');
+  } catch(e) { console.warn('[og] update failed', e); }
 
   render(data);
 }

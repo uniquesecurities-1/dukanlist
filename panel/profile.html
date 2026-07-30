@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260528">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786200000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786300000">
 <script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
 <style>
 .cat-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:.84rem;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);text-decoration:none;transition:.15s;animation:catPillIn .25s ease-out}
@@ -217,6 +217,22 @@
           <input id="email" class="input keep-en" type="email" placeholder="shop@example.com" readonly style="background:#F8FAFC;color:#475569;cursor:not-allowed">
           <div style="font-size:.74rem;color:#64748B;margin-top:4px">
             Login email. To change, please contact admin on WhatsApp.
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== v48: UPI ID (for Digital Card UPI QR) ===== -->
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>
+            <span data-i18n-en>UPI ID (for payment QR on digital card)</span><span data-i18n-hi>UPI ID (डिजिटल कार्ड पर payment QR के लिए)</span>
+            <span style="background:linear-gradient(135deg,#8B5CF6,#EC4899);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px;letter-spacing:.04em">🆕 NEW</span>
+          </label>
+          <input id="upiId" class="input keep-en" type="text" maxlength="100" placeholder="yourname@paytm  or  9876543210@ybl">
+          <div style="font-size:.74rem;color:#64748B;margin-top:4px;line-height:1.5">
+            💡 <b>Kaisa dikhega:</b> Aap ke digital card pe UPI QR aayega. Customer scan karke direct pay kar sakta hai via GPay/PhonePe/Paytm.<br>
+            📌 <b>Format examples:</b> <code>deepak@paytm</code>, <code>9876543210@ybl</code>, <code>yourshop@okhdfcbank</code><br>
+            🔒 <b>Safe hai:</b> UPI ID public dikhti hai, but paisa aap ke bank pe hi aayega. Same jaise dukan me QR poster lagate ho.
           </div>
         </div>
       </div>
@@ -684,6 +700,7 @@ function populateFields(){
     setSoc('youtubeUrl',   MY_BIZ.youtube_url);
     setSoc('xTwitterUrl',  MY_BIZ.x_twitter_url);
     setSoc('linkedinUrl',  MY_BIZ.linkedin_url);
+    setSoc('upiId',        MY_BIZ.upi_id);  // v48: UPI ID for digital card
   document.getElementById('bizNameHi').value = MY_BIZ.name_hi || '';
   // Trust signals
   document.getElementById('establishedYear').value = MY_BIZ.established_year || '';
@@ -1068,7 +1085,9 @@ async function saveProfile(){
     special_features: specialFeatures,
     // Owner can now edit mobile/whatsapp — sends to backend (may still be rejected by RPC ACL)
     whatsapp: (document.getElementById('whatsapp').value.trim() || null),
-    mobile: (document.getElementById('whatsapp').value.trim() || null)
+    mobile: (document.getElementById('whatsapp').value.trim() || null),
+    // v48: UPI ID for digital card UPI QR
+    upi_id: ((document.getElementById('upiId') || {}).value || '').trim() || null
   };
 
   // Update business via safe RPC (handles re-review for sensitive fields)
