@@ -20,7 +20,7 @@
 <link rel="canonical" id="canonicalLink" href="">
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786100000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786200000">
 <script src="/assets/js/dl-simple-mode.js?v=1784107000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
@@ -2259,6 +2259,13 @@ async function loadBusiness(){
   try { renderSocialRow(); } catch(_){}
   render();
 
+  // v48: Balance left+right columns — move heavy right-side cards to left
+  // when left column has empty space. Runs after render + a small delay
+  // so all dynamically-injected cards (prof-card, USP, etc.) are present.
+  setTimeout(function(){ try { balanceColumns(); } catch(e){ console.warn('[balance] failed', e); } }, 400);
+  // Re-balance again after Cloudinary photos may have altered heights
+  setTimeout(function(){ try { balanceColumns(); } catch(_){} }, 1200);
+
   // Log view (fire and forget)
   try { c.rpc('log_lead', { p_business_id: BIZ.id, p_action: 'view' }); } catch(_) {}
 
@@ -3948,6 +3955,58 @@ function renderSocialRow(){
       wrap.style.display = 'none';
     }
   } catch(e) { console.warn('[social] left column injection failed', e); }
+}
+
+/* v48: Balance left+right columns of .biz-top by moving heavy right-side
+   cards into the left column when left is significantly shorter.
+   Runs only on desktop (2-col layout). Idempotent — safe to call multiple times. */
+function balanceColumns(){
+  if (window.innerWidth < 900) return; // Mobile is single-column already
+  const biz = document.querySelector('.biz-top');
+  const gallery = document.querySelector('.biz-top .gallery');
+  const metaCard = document.querySelector('.biz-top .biz-meta-card');
+  if (!biz || !gallery || !metaCard) return;
+
+  // Candidates to move: heavy cards from right side that read well in left column too.
+  // Order matters — most important stays in right; supplementary content moves left.
+  const moveCandidates = [
+    '#professionalCardSlot',           // Regulated Service card
+    '.prof-disclaimer',                 // Regulatory Compliance Notice
+    '#uspBox',                          // USP text (SIP · Lumpsum · ELSS...)
+    '.prof-review-disclaimer'          // Small disclaimer if any
+  ];
+
+  const leftH  = gallery.offsetHeight;
+  const rightH = metaCard.offsetHeight;
+  if (rightH <= leftH + 60) return; // Already balanced enough
+
+  // Ensure gallery accepts overflow items as normal-flow children
+  // (some items are direct children of .biz-top .gallery already)
+  moveCandidates.forEach(function(sel){
+    const el = document.querySelector(sel);
+    if (!el || el.dataset.dlMoved === '1') return;
+    // Only move if within .biz-meta-card
+    if (!metaCard.contains(el)) return;
+
+    // Recheck balance after each move
+    const curLeft  = gallery.offsetHeight;
+    const curRight = metaCard.offsetHeight;
+    if (curRight <= curLeft + 60) return; // Balanced now
+
+    // Move to left column — insert BEFORE shopReportBlock so it flows above report link
+    const reportBlock = gallery.querySelector('#shopReportBlock');
+    if (el.style) {
+      el.style.marginLeft  = '14px';
+      el.style.marginRight = '14px';
+      el.style.marginBottom = '14px';
+    }
+    el.dataset.dlMoved = '1';
+    if (reportBlock && reportBlock.parentNode) {
+      reportBlock.parentNode.insertBefore(el, reportBlock);
+    } else {
+      gallery.appendChild(el);
+    }
+  });
 }
 
 function renderServices(svcs){
