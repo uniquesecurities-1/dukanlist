@@ -515,13 +515,13 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   transition:.2s cubic-bezier(.22,.61,.36,1);
 }
 .biz-back:hover{ color:var(--ink); background:#fff; transform:translateX(-3px); box-shadow:0 4px 14px rgba(15,23,42,.05) }
-.biz-top{ display:grid; grid-template-columns:1fr; gap:28px; align-items:start }
-@media (min-width:760px){ .biz-top{ grid-template-columns:440px 1fr; gap:40px } }
+.biz-top{ display:grid; grid-template-columns:1fr; gap:24px; align-items:start }
+@media (min-width:900px){ .biz-top{ grid-template-columns:minmax(0,520px) 1fr; gap:36px } }
 .gallery{
-  background:#fff; border:1px solid rgba(15,23,42,.04); border-radius:22px;
-  overflow:hidden; box-shadow:0 20px 50px rgba(15,23,42,.06);
+  background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:18px;
+  overflow:hidden; box-shadow:0 8px 24px rgba(15,23,42,.06), 0 2px 4px rgba(15,23,42,.03);
 }
-@media (min-width:760px){
+@media (min-width:900px){
   .gallery{ position:sticky; top:80px }
 }
 .gallery .main{
@@ -571,10 +571,25 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   margin-top:12px; font-style:italic;
   max-width:240px; line-height:1.4;
 }
-.gallery .thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px; padding:8px }
-.gallery .thumbs img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:7px; cursor:pointer; opacity:.65; transition:.18s; border:2px solid transparent }
-.gallery .thumbs img:hover{ opacity:.9 }
-.gallery .thumbs img.active{ opacity:1; border-color:var(--saffron); box-shadow:0 2px 8px rgba(255,107,26,.3) }
+.gallery .thumbs{
+  display:flex; gap:8px; padding:10px 12px; overflow-x:auto;
+  scroll-snap-type:x mandatory; scrollbar-width:thin;
+  background:linear-gradient(180deg,#FFF 0%,#FAFAFA 100%);
+  border-top:1px solid rgba(15,23,42,.04);
+}
+.gallery .thumbs::-webkit-scrollbar{ height:4px }
+.gallery .thumbs::-webkit-scrollbar-thumb{ background:rgba(15,23,42,.15); border-radius:99px }
+.gallery .thumbs img{
+  width:72px; height:72px; aspect-ratio:1/1; object-fit:cover; border-radius:9px;
+  cursor:pointer; opacity:.6; transition:all .2s cubic-bezier(.22,.61,.36,1);
+  border:2px solid transparent; flex-shrink:0; scroll-snap-align:start;
+}
+.gallery .thumbs img:hover{ opacity:.95; transform:translateY(-1px) }
+.gallery .thumbs img.active{
+  opacity:1; border-color:var(--saffron);
+  box-shadow:0 4px 12px rgba(255,107,26,.28);
+  transform:translateY(-1px);
+}
 
 .biz-meta-card{
   background:rgba(255,255,255,.92);
@@ -2211,17 +2226,18 @@ async function loadBusiness(){
 
   BIZ = data;
 
-  // Pre-fetch Cloudinary photos (parallel — non-blocking for render)
+  // Pre-fetch Cloudinary photos (single order to avoid RLS quirks; sort featured-first in JS)
   try {
-    const { data: cp } = await c
+    const { data: cp, error: cpErr } = await c
       .from('business_photos')
       .select('cloudinary_url, is_featured, uploaded_at')
       .eq('business_id', BIZ.id)
-      .order('is_featured', { ascending: false })
       .order('uploaded_at', { ascending: true });
-    BIZ._cloudPhotos = (cp || [])
-      .filter(p => p.cloudinary_url)
-      .map(p => p.cloudinary_url.replace('/upload/', '/upload/w_1200,q_auto,f_auto/'));
+    if (cpErr) throw cpErr;
+    const raw = (cp || []).filter(p => p.cloudinary_url);
+    // Featured first, then chronological
+    raw.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+    BIZ._cloudPhotos = raw.map(p => p.cloudinary_url.replace('/upload/', '/upload/w_1400,q_auto,f_auto/'));
   } catch (e) { console.warn('[business] cloud photos load failed', e); BIZ._cloudPhotos = []; }
 
   try { renderOwnerCredit(); } catch(_){}

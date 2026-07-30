@@ -45,25 +45,14 @@
   display: none !important;
 }
 
-/* Photo gallery — keep MAIN photo, hide thumbnail row */
-#galleryThumbs,
-.gallery-thumbs,
-.gallery-thumbnails {
-  display: none !important;
-}
+/* v42: Photos + Thumbnails RESTORED — full gallery with Cloudinary CDN
+   Previous #galleryThumbs hide removed. Multi-photo strip works again. */
 
-/* Individual thumbnails beyond first (fallback if #galleryThumbs missing) */
-#galleryThumbs > *:nth-child(n+2),
-.gallery-thumbs > *:nth-child(n+2) {
-  display: none !important;
-}
-
-/* Full photo gallery viewer / lightbox trigger */
+/* Optionally keep lightbox trigger hidden if you don't want fullscreen viewer */
 .gallery-viewer,
-#photoLightbox,
-.photo-count-badge,
-.view-all-photos {
-  display: none !important;
+#photoLightbox {
+  /* Un-hidden — enable if you want the lightbox popup back
+     Remove this block entirely to enable. */
 }
 
 /* ===== HOMEPAGE (index.html) — reviews ticker, top rankings, deals ===== */
@@ -1844,3 +1833,95 @@ div:has(> span[data-i18n-en*="DukanList ab bilkul simple"]),
 div[style*="linear-gradient"][style*="FFF7ED"]:has(span[data-i18n-en*="simple ho gayi"]) {
   display: none !important;
 }
+
+/* ========================================================================= */
+/* v42 CORPORATE POLISH — business.html professional grade layout           */
+/* ========================================================================= */
+
+/* Sidebar cards: consistent spacing, refined shadows, tighter rhythm */
+.biz-content > .card,
+.biz-content .card,
+.biz-top ~ * .card {
+  border-radius: 14px !important;
+  box-shadow: 0 1px 3px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04) !important;
+  border: 1px solid rgba(15,23,42,.06) !important;
+  padding: 20px 22px !important;
+  margin-bottom: 14px !important;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.biz-content > .card:hover,
+.biz-top ~ * .card:hover {
+  box-shadow: 0 4px 8px rgba(15,23,42,.05), 0 10px 24px rgba(15,23,42,.06) !important;
+}
+
+/* Card title consistency */
+.card > h2,
+.card > h3,
+.card-title {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: .95rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  color: #0F172A !important;
+  margin: 0 0 14px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid rgba(15,23,42,.05) !important;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Ensure biz-top uses widened gallery column on desktop */
+@media (min-width: 900px) {
+  .biz-top {
+    grid-template-columns: minmax(0, 520px) 1fr !important;
+    gap: 36px !important;
+    align-items: start !important;
+  }
+}
+
+/* Larger, punchier main gallery image */
+.gallery .main {
+  aspect-ratio: 4/3 !important;
+}
+.gallery .main img {
+  transition: transform .4s cubic-bezier(.22,.61,.36,1) !important;
+}
+
+/* Softer card entrance */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.biz-content .card { animation: cardIn .35s ease both; }
+.biz-content .card:nth-child(2) { animation-delay: .05s; }
+.biz-content .card:nth-child(3) { animation-delay: .10s; }
+.biz-content .card:nth-child(4) { animation-delay: .15s; }
+
+/* Address card: refine buttons */
+.card .btn,
+.card a[href*="google.com/maps"],
+.card a[href*="/local/"] {
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: transform .15s ease, box-shadow .15s ease !important;
+}
+
+/* Financial/Insurance service pills — refined */
+.svc-pill,
+[class*="service-pill"],
+.card a[href*="/local/"][style*="border-radius"] {
+  transition: transform .15s ease, box-shadow .15s ease !important;
+}
+
+/* Better spacing between h2/h3 section headers on scroll */
+.sec {
+  scroll-margin-top: 100px;
+}
+
+/* Tighter regulated service badge */
+.card:has(> [class*="REGULATED"]),
+.card:has(> b:contains("Practicing since")) {
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%) !important;
+  border-color: rgba(14,165,233,.15) !important;
+}
+
