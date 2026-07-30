@@ -143,7 +143,7 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
     orClauses.push('id.in.(' + linkedIds.join(',') + ')');
   }
 
-  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name)'
+  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name),categories(name,icon)'
     + '&status=eq.active'
     + '&city_id=eq.' + cityId
     + '&or=(' + orClauses.join(',') + ')'
@@ -191,6 +191,12 @@ function renderShopCard(b){
   const wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
   const waMsg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
   const thumb = pickCardThumb(b);
+  // Fallback placeholder — saffron gradient + category icon + shop name
+  const catIcon = (b.categories && b.categories.icon) || '🏪';
+  const catName = (b.categories && b.categories.name) || 'Business';
+  const thumbHTML = thumb
+    ? `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:#F1F5F9"><img src="${esc(thumb)}" alt="${esc(b.name)}" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block"></div>`
+    : `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:linear-gradient(135deg,#FFF7ED 0%,#FED7AA 40%,#FFB870 100%)"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.5), transparent 45%),radial-gradient(circle at 80% 80%, rgba(255,107,26,.15), transparent 55%)"><div style="font-size:2.4rem;line-height:1;margin-bottom:4px">${esc(catIcon)}</div><div style="font-family:'Manrope',sans-serif;font-size:.92rem;font-weight:900;color:#7C2D12;letter-spacing:-.01em;line-height:1.15;text-shadow:0 1px 2px rgba(255,255,255,.5);max-width:90%">${esc(b.name)}</div><div style="font-size:.66rem;font-weight:800;color:#9A3412;margin-top:4px;letter-spacing:.08em;text-transform:uppercase;opacity:.85">${esc(catName)}</div></div></div>`;
   const waBtn = wa.length === 10
     ? `<a href="https://wa.me/91${wa}?text=${waMsg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 WhatsApp</a>`
     : '';
@@ -199,7 +205,7 @@ function renderShopCard(b){
     : '';
   return `
   <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer;overflow:hidden">
-    ${thumb ? `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:#F1F5F9"><img src="${esc(thumb)}" alt="${esc(b.name)}" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block"></div>` : ''}
+    ${thumbHTML}
     <div style="padding:10px 14px;display:flex;flex-direction:column;gap:4px">
       <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
       ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}

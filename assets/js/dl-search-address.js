@@ -23,7 +23,7 @@
     if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) { setTimeout(loadData, 300); return; }
     try {
       var r = await ShopDB.client.from('businesses')
-        .select('id,slug,owner_name,mobile,whatsapp,address_line1,address_line2,photos')
+        .select('id,slug,name,owner_name,mobile,whatsapp,address_line1,address_line2,photos,category_id,categories(name,icon)')
         .eq('status', 'active').limit(500);
       if (r.error) { console.warn(TAG, 'err', r.error); return; }
       var bizIds = [];
@@ -31,12 +31,16 @@
         if (!b.slug) return;
         bizIds.push(b.id);
         var legacyThumb = (Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string') ? b.photos[0] : '';
+        var catInfo = b.categories || {};
         CACHE[b.slug] = {
           id: b.id,
+          name: b.name || '',
           owner: b.owner_name || '',
           phone: String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10),
           addr: [b.address_line1, b.address_line2].filter(Boolean).join(', '),
-          thumb: legacyThumb
+          thumb: legacyThumb,
+          catIcon: catInfo.icon || '🏪',
+          catName: catInfo.name || 'BUSINESS'
         };
       });
 
@@ -87,12 +91,24 @@
     var name = info.querySelector('.biz-name');
     var frag = document.createDocumentFragment();
 
-    // Inject photo thumbnail at top of card if we have one and card has no image yet
-    if (d.thumb && !card.querySelector('.biz-photo img') && !card.querySelector('.dl-thumb')) {
+    // Inject photo thumbnail at top of card (real photo OR branded placeholder)
+    if (!card.querySelector('.biz-photo img') && !card.querySelector('.dl-thumb')) {
       var thumbWrap = document.createElement('div');
       thumbWrap.className = 'dl-thumb';
       thumbWrap.style.cssText = 'width:calc(100% + 32px);position:relative;padding-bottom:60%;overflow:hidden;background:#F1F5F9;margin:-14px -16px 10px;';
-      thumbWrap.innerHTML = '<img src="' + d.thumb + '" alt="" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block">';
+      if (d.thumb) {
+        thumbWrap.innerHTML = '<img src="' + d.thumb + '" alt="" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block">';
+      } else {
+        // Branded fallback — saffron gradient with category icon + shop name
+        thumbWrap.style.background = 'linear-gradient(135deg,#FFF7ED 0%,#FED7AA 40%,#FFB870 100%)';
+        thumbWrap.innerHTML =
+          '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;' +
+          'background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.5), transparent 45%),radial-gradient(circle at 80% 80%, rgba(255,107,26,.15), transparent 55%)">' +
+          '<div style="font-size:2.2rem;line-height:1;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(120,53,15,.15))">' + esc(d.catIcon || '🏪') + '</div>' +
+          '<div style="font-family:\'Manrope\',sans-serif;font-size:.9rem;font-weight:900;color:#7C2D12;letter-spacing:-.01em;line-height:1.15;text-shadow:0 1px 2px rgba(255,255,255,.5);max-width:90%">' + esc(d.name || '') + '</div>' +
+          '<div style="font-size:.62rem;font-weight:800;color:#9A3412;margin-top:4px;letter-spacing:.08em;text-transform:uppercase;opacity:.85">' + esc(d.catName || '') + '</div>' +
+          '</div>';
+      }
       // Insert BEFORE info block so it sits at top of card
       if (info && info.parentNode) info.parentNode.insertBefore(thumbWrap, info);
       else card.insertBefore(thumbWrap, card.firstChild);
