@@ -8,117 +8,48 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260528">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1784115000">
-<script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1785400000">
+
+<!-- Cloudinary Upload Widget -->
+<script src="https://upload-widget.cloudinary.com/global/all.js" async></script>
+
 <style>
-.photo-guide-card{background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);border:2px solid #F59E0B;border-radius:16px;padding:18px 20px;margin-top:18px}
-.pg-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
-.pg-head-ico{width:50px;height:50px;background:linear-gradient(135deg,#F59E0B,#DC2626);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;color:#fff}
-.pg-title{font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;margin-bottom:2px;letter-spacing:-.01em}
-.pg-sub{color:#92400E;font-size:.85rem;font-weight:600}
-.pg-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px}
-.pg-rule{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:10px;padding:10px 12px;font-size:.82rem;border:1px solid #FCD34D}
+.pg-card{background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);border:2px solid #F59E0B;border-radius:16px;padding:18px 20px;margin-top:14px}
+.pg-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.pg-head-ico{width:46px;height:46px;background:linear-gradient(135deg,#F59E0B,#DC2626);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;color:#fff}
+.pg-title{font-family:'Manrope',sans-serif;font-size:1.05rem;font-weight:900;color:#0F172A;margin-bottom:2px}
+.pg-sub{color:#92400E;font-size:.82rem;font-weight:600}
+.pg-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:10px}
+.pg-rule{display:flex;gap:8px;align-items:flex-start;background:#fff;border-radius:10px;padding:9px 11px;font-size:.8rem;border:1px solid #FCD34D}
 .pg-rule-ico{width:22px;height:22px;border-radius:50%;background:#16A34A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;flex-shrink:0}
-.pg-rule-text b{color:#0F172A;display:block;margin-bottom:2px}
-.pg-rule-text div{color:#64748B;font-size:.76rem;line-height:1.4}
-.pg-tip{background:#FFF;border-left:4px solid #F59E0B;padding:10px 14px;border-radius:0 10px 10px 0;font-size:.86rem;color:#92400E;line-height:1.5}
-.pg-tip b{color:#0F172A;margin-right:4px}
-.upload-item{display:flex;align-items:center;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:.85rem}
-.upload-item-ico{font-size:1.2rem;flex-shrink:0;width:24px;text-align:center}
-.upload-item-info{flex:1;min-width:0}
-.upload-item-name{font-weight:700;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.upload-item-status{font-size:.78rem;color:#64748B;margin-top:2px}
-.upload-item-status.ok{color:#16A34A;font-weight:700}
-.upload-item-status.err{color:#DC2626;font-weight:700}
-.upload-item-progress{width:80px;height:6px;background:#E2E8F0;border-radius:99px;overflow:hidden;flex-shrink:0}
-.upload-item-bar{height:100%;background:linear-gradient(90deg,#FF6B1A,#FFB200);transition:width .3s ease-out;border-radius:99px}
+.pg-rule-text b{color:#0F172A;display:block;margin-bottom:1px;font-size:.82rem}
+.pg-rule-text div{color:#64748B;font-size:.72rem;line-height:1.35}
+
+.upload-btn{display:block;width:100%;background:linear-gradient(135deg,#FF6B1A,#F97316);color:#fff;padding:16px 20px;border-radius:14px;font-weight:800;font-size:1rem;text-align:center;cursor:pointer;box-shadow:0 4px 14px rgba(249,115,22,.35);border:none;font-family:inherit;transition:transform .1s ease;}
+.upload-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(249,115,22,.45)}
+.upload-btn:active{transform:translateY(0)}
+.upload-btn:disabled{background:#94A3B8;cursor:not-allowed;box-shadow:none;opacity:.7}
+.upload-btn-hint{font-size:.78rem;color:#64748B;text-align:center;margin-top:8px;font-weight:600}
+
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:10px}
+.photo-thumb{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#F1F5F9;border:2px solid #E2E8F0;box-shadow:0 2px 6px rgba(15,23,42,.06)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb .x{position:absolute;top:6px;right:6px;background:rgba(220,38,38,.95);color:#fff;border:0;width:32px;height:32px;border-radius:50%;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:3;padding:0;line-height:1;font-family:sans-serif;font-weight:700;transition:transform .15s ease,background .15s ease}
+.photo-thumb .x:hover{transform:scale(1.1);background:#DC2626}
+.photo-thumb .x:active{transform:scale(.92)}
+.photo-thumb .hero-pill{position:absolute;bottom:8px;left:8px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:3px 9px;border-radius:99px;font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,.25);z-index:2}
+.photo-thumb .set-hero-btn{position:absolute;bottom:8px;right:8px;background:rgba(15,23,42,.85);color:#fff;border:0;padding:5px 11px;border-radius:99px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(8px)}
+.photo-thumb .set-hero-btn:hover{background:#FF6B1A}
+
+.count-pill{display:inline-flex;align-items:center;gap:6px;background:#F0FDF4;color:#166534;padding:5px 12px;border-radius:99px;font-size:.82rem;font-weight:800;border:1.5px solid #BBF7D0}
+.count-pill.warn{background:#FEF3C7;color:#92400E;border-color:#FCD34D}
+.count-pill.full{background:#FEE2E2;color:#991B1B;border-color:#FCA5A5}
 </style>
 
-<!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
-<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
-
-<!-- Photo thumbnail grid styling — bulletproof, mobile-first -->
-<style>
-.photo-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:12px;
-  margin-top:10px;
-}
-.photo-thumb{
-  position:relative;
-  aspect-ratio:1/1;
-  background:#F1F5F9;
-  border-radius:12px;
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(15,23,42,0.08);
-  border:1.5px solid #E2E8F0;
-  cursor:default;
-}
-.photo-thumb img{
-  width:100%; height:100%;
-  object-fit:cover;
-  display:block;
-}
-.photo-thumb .x{
-  position:absolute; top:8px; right:8px;
-  width:32px; height:32px;
-  border-radius:50%;
-  background:rgba(239,68,68,0.95);
-  color:#fff;
-  border:2px solid #fff;
-  font-size:18px; font-weight:900;
-  line-height:1;
-  cursor:pointer;
-  display:grid; place-items:center;
-  z-index:2;
-  box-shadow:0 4px 12px rgba(239,68,68,0.5);
-  transition:transform .12s ease, background .12s ease;
-  font-family:inherit;
-  -webkit-tap-highlight-color:transparent;
-  padding:0;
-}
-.photo-thumb .x:hover{ transform:scale(1.1); background:#DC2626 }
-.photo-thumb .x:active{ transform:scale(.92) }
-.photo-thumb .hero-pill{
-  position:absolute; bottom:8px; left:8px;
-  background:linear-gradient(135deg,#F59E0B,#D97706);
-  color:#fff;
-  padding:3px 9px;
-  border-radius:99px;
-  font-size:.7rem; font-weight:800;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  box-shadow:0 2px 6px rgba(0,0,0,0.25);
-  z-index:2;
-}
-.photo-thumb .set-hero-btn{
-  position:absolute; bottom:8px; right:8px;
-  background:rgba(15,23,42,0.85);
-  color:#fff;
-  border:0;
-  padding:5px 11px;
-  border-radius:99px;
-  font-size:.72rem;
-  font-weight:700;
-  cursor:pointer;
-  display:none;
-  font-family:inherit;
-  -webkit-tap-highlight-color:transparent;
-  backdrop-filter:blur(8px);
-}
-.photo-thumb:hover .set-hero-btn,
-.photo-thumb:focus-within .set-hero-btn{ display:inline-block }
-.photo-thumb .set-hero-btn:hover{ background:#FF6B1A }
-@media (max-width:520px){
-  .photo-thumb .set-hero-btn{ display:inline-block } /* always visible on mobile */
-}
-</style>
-<!-- Admin error monitor (auto-injected) -->
+<script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
 <script src="/assets/js/admin-error-monitor.js"></script>
 </head>
 <body>
-<!-- Impersonation banner -->
 <script src="/assets/js/impersonation-banner.js"></script>
 <script src="/assets/js/email-verify-banner.js"></script>
 
@@ -134,14 +65,6 @@
       <a href="/panel/profile.html"><span data-i18n-en>Profile</span><span data-i18n-hi>प्रोफाइल</span></a>
       <a href="/panel/photos.html"><span data-i18n-en>Photos</span><span data-i18n-hi>फोटो</span></a>
       <a href="/panel/digital-card.html"><span data-i18n-en>📇 Digital Card</span><span data-i18n-hi>📇 डिजिटल कार्ड</span></a>
-      <a href="/panel/reviews.html"><span data-i18n-en>⭐ My Reviews</span><span data-i18n-hi>⭐ मेरे रिव्यू</span></a>
-      <a href="/panel/get-reviews.html" style="color:#FBBF24;font-weight:800"><span data-i18n-en>🌟 Get Reviews</span><span data-i18n-hi>🌟 रिव्यू लाएँ</span></a>
-      <a href="/panel/favorites.html"><span data-i18n-en>♥ Favorites</span><span data-i18n-hi>♥ पसंदीदा</span></a>
-      <a href="/panel/deals.html"><span data-i18n-en>🎁 Deals</span><span data-i18n-hi>🎁 डील्स</span></a>
-      <a href="/panel/analytics.html"><span data-i18n-en>📊 Analytics</span><span data-i18n-hi>📊 आँकड़े</span></a>
-      <a href="/panel/services.html"><span data-i18n-en>🛠️ Services</span><span data-i18n-hi>🛠️ सेवाएँ</span></a>
-      <a href="/panel/poster-studio.html"><span data-i18n-en>✨ Poster Studio</span><span data-i18n-hi>📲 WA पोस्टर</span></a>
-      <a href="/pucho-bhai.html"><span data-i18n-en>💬 Pucho Bhai</span><span data-i18n-hi>💬 पूछो भाई</span></a>
       <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support" target="_blank" rel="noopener"><span data-i18n-en>🆘 Get Help</span><span data-i18n-hi>🆘 सहायता</span></a>
       <a href="#" onclick="ShopDB.signOut()" class="keep-en" style="color:#FCA5A5">Logout</a>
     </nav>
@@ -150,97 +73,72 @@
 
 <div class="page-narrow">
 
-  <a href="/panel/dashboard.html" style="font-size:.85rem;color:var(--muted);font-weight:600;text-decoration:none">← <span data-i18n-en>Back to Dashboard</span><span data-i18n-hi>डैशबोर्ड पर वापस</span></a>
+  <a href="/panel/profile.html" style="font-size:.85rem;color:var(--muted);font-weight:600;text-decoration:none">← <span data-i18n-en>Back to Profile</span><span data-i18n-hi>प्रोफाइल पर वापस</span></a>
 
   <h1 class="title" style="margin-top:10px">
     <span data-i18n-en>📸 Shop <span class="grad">Photos</span></span>
     <span data-i18n-hi>📸 दुकान की <span class="grad">फोटो</span></span>
   </h1>
   <p class="subtitle">
-    <span data-i18n-en>Upload up to 5 photos. At least 1 photo activates your listing.</span>
-    <span data-i18n-hi>5 तक फोटो अपलोड करें। 1 फोटो से लिस्टिंग चालू हो जाएगी।</span>
+    <span data-i18n-en>Upload up to 5 photos. Photos help customers trust your shop.</span>
+    <span data-i18n-hi>5 तक फोटो अपलोड करें। फोटो से customer trust बढ़ता है।</span>
   </p>
 
   <div id="loading" style="text-align:center;padding:30px 0;color:var(--muted)">⏳ Loading...</div>
 
   <div id="content" style="display:none">
 
-    <div class="alert info" id="statusAlert">
-      <span class="a-icon">📋</span>
-      <div id="statusText"></div>
-    </div>
-
-    <div class="photo-guide-card">
+    <div class="pg-card">
       <div class="pg-head">
         <div class="pg-head-ico">📸</div>
         <div>
-          <div class="pg-title"><span data-i18n-en>Photo Guidelines — Read First!</span><span data-i18n-hi>फोटो दिशानिर्देश — पहले पढ़ें!</span></div>
+          <div class="pg-title"><span data-i18n-en>Photo Guidelines</span><span data-i18n-hi>फोटो दिशानिर्देश</span></div>
           <div class="pg-sub"><span data-i18n-en>Clear photos = 3x more customer calls</span><span data-i18n-hi>साफ़ फोटो = 3x ज़्यादा कॉल</span></div>
         </div>
       </div>
       <div class="pg-rules">
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Max 2 MB</span><span data-i18n-hi>अधिकतम 2 MB</span></b><div><span data-i18n-en>Auto-compresses bigger photos</span><span data-i18n-hi>बड़ी photos auto-compress होंगी</span></div></div></div>
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>JPG, PNG, WebP, or HEIC</span><span data-i18n-hi>JPG, PNG, WebP, या HEIC</span></b><div><span data-i18n-en>iPhone HEIC photos auto-convert. Android &amp; phone camera photos work great.</span><span data-i18n-hi>iPhone HEIC photos auto-convert होंगी। Android &amp; phone camera से ली photos best।</span></div></div></div>
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Bright lighting</span><span data-i18n-hi>अच्छी रोशनी</span></b><div><span data-i18n-en>Day time, no shadows on subject</span><span data-i18n-hi>दिन में, बिना shadow</span></div></div></div>
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>3 angles best</span><span data-i18n-hi>3 angles best</span></b><div><span data-i18n-en>Outside · Inside · Product</span><span data-i18n-hi>बाहर · अंदर · प्रोडक्ट</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Up to 5 photos</span><span data-i18n-hi>5 तक photos</span></b><div><span data-i18n-en>Outside · Inside · Products</span><span data-i18n-hi>बाहर · अंदर · Products</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Max 5 MB each</span><span data-i18n-hi>अधिकतम 5 MB</span></b><div><span data-i18n-en>Auto-optimized to fast-load size</span><span data-i18n-hi>Auto-optimize होंगी</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>JPG, PNG, WebP</span><span data-i18n-hi>JPG, PNG, WebP</span></b><div><span data-i18n-en>Phone camera works great</span><span data-i18n-hi>Phone camera OK</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Good lighting</span><span data-i18n-hi>अच्छी रोशनी</span></b><div><span data-i18n-en>Day time preferred</span><span data-i18n-hi>दिन में लें</span></div></div></div>
       </div>
-      <div class="pg-tip"><b>💡 <span data-i18n-en>Pro tip:</span><span data-i18n-hi>Pro tip:</span></b><span data-i18n-en>Photo bada hai? Don't worry — hum automatic resize kar denge upload ke samay. Aapko kuch nahi karna.</span><span data-i18n-hi>Photo बड़ी है? चिंता न करें — हम upload के समय auto resize कर देंगे।</span></div>
     </div>
 
     <div class="card" style="margin-top:18px">
-      <div class="card-title"><span data-i18n-en>📤 Upload Photo</span><span data-i18n-hi>📤 फोटो अपलोड करें</span></div>
-
-      <!-- PRIMARY: Gallery picker (works on ALL phones — Android, iPhone, etc.) -->
-      <label class="uploader" id="dropzone">
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-        <span class="ico">🖼️</span>
-        <div class="uploader-label"><span data-i18n-en>Choose photos from your phone gallery</span><span data-i18n-hi>अपने फोन की gallery से फोटो चुनें</span></div>
-        <div class="uploader-help"><span data-i18n-en>iPhone HEIC + Android JPG · all formats supported · auto-compressed if &gt;2MB</span><span data-i18n-hi>iPhone HEIC + Android JPG · हर format चलेगा · 2MB से बड़ी photos auto-compress होंगी</span></div>
-      </label>
-
-      <!-- Divider with "OR" -->
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px">
-        <div style="flex:1;height:1px;background:#e5e7eb"></div>
-        <div style="font-size:.7rem;font-weight:700;color:#94a3b8;letter-spacing:.1em">OR</div>
-        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span><span data-i18n-en>📤 Upload Photos</span><span data-i18n-hi>📤 फोटो अपलोड करें</span></span>
+        <span id="photoCountPill" class="count-pill">0 / 5</span>
       </div>
 
-      <!-- ALTERNATIVE: Direct camera capture (always outputs JPEG, useful if iPhone HEIC fails) -->
-      <div style="padding:12px 14px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;border-radius:10px">
-        <div style="font-size:.82rem;color:#78350F;font-weight:700;margin-bottom:4px">📸 <span data-i18n-en>Take Fresh Photo (skip gallery)</span><span data-i18n-hi>अभी नई Photo लें (gallery skip)</span></div>
-        <div style="font-size:.74rem;color:#92400E;line-height:1.5;margin-bottom:8px"><span data-i18n-en>If gallery photo fails (iPhone HEIC), use this — opens camera directly, always JPG, never fails.</span><span data-i18n-hi>अगर gallery photo fail ho (iPhone HEIC), तो इसे use करें — camera खुलेगा, हमेशा JPG, कभी fail नहीं होगा।</span></div>
-        <label style="display:block;width:100%;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:11px;border-radius:8px;font-weight:800;font-size:.92rem;text-align:center;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,.3)">
-          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
-          📷 <span data-i18n-en>Open Camera Now</span><span data-i18n-hi>Camera खोलें</span>
-        </label>
+      <button id="uploadBtn" class="upload-btn" disabled>
+        <span data-i18n-en>+ Choose Photo (Gallery or Camera)</span>
+        <span data-i18n-hi>+ फोटो चुनें (Gallery या Camera)</span>
+      </button>
+      <div class="upload-btn-hint">
+        <span data-i18n-en>Widget will open — pick from gallery, take fresh photo, or drag &amp; drop</span>
+        <span data-i18n-hi>Widget खुलेगा — gallery से चुनें, camera से लें, या drag करें</span>
       </div>
-
-      <div id="uploadQueue" style="display:none;margin-top:14px"></div>
 
       <div class="alert error" id="uploadErr" style="display:none;margin-top:14px"></div>
       <div class="alert success" id="uploadOk" style="display:none;margin-top:14px"></div>
     </div>
 
-    <!-- Photo Progress Badge — gamified milestone tracker -->
-    <div id="photoProgressBadge" style="display:none;margin-top:18px"></div>
-
     <div class="card" style="margin-top:18px">
       <div class="card-title">
         <span data-i18n-en>Your Photos</span><span data-i18n-hi>आपकी फोटो</span>
-        <span id="photoCount" style="font-weight:600;color:var(--muted);font-size:.82rem;margin-left:6px"></span>
       </div>
       <div class="photo-grid" id="photoGrid">
-        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.88rem">
-          <span data-i18n-en>No photos uploaded yet</span>
-          <span data-i18n-hi>अभी कोई फोटो नहीं</span>
+        <div id="emptyState" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.88rem">
+          <span data-i18n-en>No photos uploaded yet — click above to add your first!</span>
+          <span data-i18n-hi>अभी कोई फोटो नहीं — पहली फोटो add करने के लिए ऊपर click करें!</span>
         </div>
       </div>
     </div>
 
     <div style="margin-top:18px;text-align:center">
-      <a href="/panel/dashboard.html" class="btn btn-pri">
-        <span data-i18n-en>← Back to Dashboard</span>
-        <span data-i18n-hi>← डैशबोर्ड पर वापस</span>
+      <a href="/panel/profile.html" class="btn btn-pri">
+        <span data-i18n-en>← Back to Profile</span>
+        <span data-i18n-hi>← प्रोफाइल पर वापस</span>
       </a>
     </div>
 
@@ -254,795 +152,356 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/nav.js" defer></script>
+
 <script>
+/* ==========================================================================
+   DL PHOTOS v42 — Cloudinary CDN integration
+   - Unsigned upload preset: dukanlist_shops
+   - Cloud name: jqh6qwxr
+   - Max 5 photos per shop (DB trigger backup)
+   - Delete via Cloudinary delete_token (browser can delete without secret)
+   ========================================================================== */
+
+const CLOUDINARY_CLOUD_NAME = 'jqh6qwxr';
+const CLOUDINARY_UPLOAD_PRESET = 'dukanlist_shops';
+const MAX_PHOTOS = 5;
+
+let STATE = {
+  businessId: null,
+  photos: [],
+  widget: null
+};
+
 function setLang(lang){
-  if (lang!=='en'&&lang!=='hi') lang='en';
-  document.documentElement.setAttribute('data-lang',lang);
-  document.documentElement.setAttribute('lang',lang);
-  localStorage.setItem('shop_lang',lang);
-  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
-  document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+  document.documentElement.setAttribute('data-lang', lang);
+  try { localStorage.setItem('dl_lang', lang); } catch(e){}
+  document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('langBtnHi').classList.toggle('active', lang === 'hi');
 }
 
-const MAX_PHOTOS  = 5;
-const MAX_BYTES   = 2 * 1024 * 1024; // 2 MB
-
-let MY_BIZ = null;
-
-async function loadMyBusiness(){
-  // 12-second safety timeout so the page never stays stuck on Loading...
-  var timeoutHandle = setTimeout(function(){
-    var el = document.getElementById('loading');
-    if (el && el.innerHTML.indexOf('Loading') !== -1){
-      el.innerHTML = '<div style="text-align:center;padding:18px">'+
-        '<div style="font-size:1.4rem;margin-bottom:8px">⏱️</div>'+
-        '<div style="font-weight:800;color:#0F172A;margin-bottom:6px">Taking too long...</div>'+
-        '<div style="font-size:.88rem;color:#64748B;margin-bottom:14px">Network may be slow. Please refresh.</div>'+
-        '<button onclick="location.reload()" style="background:#FF6B1A;color:#fff;border:0;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer">🔄 Refresh</button>'+
-      '</div>';
-    }
-  }, 12000);
-
+/* Initialize on page load */
+async function boot(){
   try {
-    const user = await ShopDB.requireAuth();
-    if (!user){ clearTimeout(timeoutHandle); return; }
-    const c = ShopDB.client;
+    // Restore language pref
+    const savedLang = (function(){try{return localStorage.getItem('dl_lang');}catch(e){return null;}})();
+    if (savedLang) setLang(savedLang);
 
-    // SECURITY: use safe RPC to avoid non-deterministic .limit(1) cross-user leak
-    let owners = null;
-    try {
-      const safeRes = await c.rpc('get_my_business_safe');
-      if (!safeRes.error && safeRes.data && safeRes.data.length){
-        owners = safeRes.data.map(r => ({ business_id: r.business_id }));
-      }
-    } catch(e){ console.warn('[photos] get_my_business_safe failed:', e); }
-
-    if (!owners){
-      const fb = await c.from('business_owners')
-        .select('business_id').eq('auth_user_id', user.id).limit(1);
-      owners = fb.data;
-    }
-    if (!owners || !owners.length){
-      clearTimeout(timeoutHandle);
-      document.getElementById('loading').innerHTML = '⚠ No business found. <a href="/register.html">Register your business →</a>';
+    // Wait for Supabase ShopDB to be ready
+    if (typeof ShopDB === 'undefined' || !ShopDB.client) {
+      setTimeout(boot, 200);
       return;
     }
 
-    const { data: biz, error: bizErr } = await c.from('businesses')
-      .select('id, slug, name, status, photos, verified_photo')
-      .eq('id', owners[0].business_id).maybeSingle();
-
-    if (bizErr || !biz){
-      clearTimeout(timeoutHandle);
-      console.error('[photos] biz fetch error:', bizErr);
-      document.getElementById('loading').innerHTML =
-        '<div style="text-align:center;padding:18px">'+
-        '<div style="font-size:1.4rem;margin-bottom:8px">⚠</div>'+
-        '<div style="font-weight:800;color:#991B1B;margin-bottom:6px">Could not load your business</div>'+
-        '<div style="font-size:.85rem;color:#64748B;margin-bottom:14px">'+
-        (bizErr ? String(bizErr.message || bizErr) : 'Shop record not found.') +
-        '</div>'+
-        '<button onclick="location.reload()" style="background:#FF6B1A;color:#fff;border:0;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer">🔄 Retry</button>'+
-        '</div>';
+    // Require authenticated user
+    const { data: { user }, error } = await ShopDB.client.auth.getUser();
+    if (error || !user) {
+      window.location.href = '/login.html?next=/panel/photos.html';
       return;
     }
 
-    clearTimeout(timeoutHandle);
-    MY_BIZ = biz;
+    // Resolve business_id via business_owners
+    const { data: link, error: linkErr } = await ShopDB.client
+      .from('business_owners')
+      .select('business_id')
+      .eq('auth_user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (linkErr || !link) {
+      showError('No business linked to this account. Please contact support.');
+      return;
+    }
+
+    STATE.businessId = link.business_id;
+
+    // Load existing photos
+    await loadPhotos();
+
+    // Initialize Cloudinary widget (waits for script to load)
+    initCloudinaryWidget();
+
+    // Show content
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = '';
-    renderState();
-  } catch (err){
-    clearTimeout(timeoutHandle);
-    console.error('[photos] loadMyBusiness fatal error:', err);
-    document.getElementById('loading').innerHTML =
-      '<div style="text-align:center;padding:18px">'+
-      '<div style="font-size:1.4rem;margin-bottom:8px">⚠</div>'+
-      '<div style="font-weight:800;color:#991B1B;margin-bottom:6px">Something went wrong</div>'+
-      '<div style="font-size:.85rem;color:#64748B;margin-bottom:14px">'+ String(err && err.message || err) +'</div>'+
-      '<button onclick="location.reload()" style="background:#FF6B1A;color:#fff;border:0;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer">🔄 Refresh</button>'+
-      '</div>';
+    document.getElementById('content').style.display = 'block';
+
+  } catch (e) {
+    console.error('[photos] boot failed', e);
+    showError('Failed to load. Please refresh and try again.');
   }
 }
 
-function renderState(){
-  // Status alert
-  const alertEl = document.getElementById('statusAlert');
-  const txt = document.getElementById('statusText');
-  if (MY_BIZ.status === 'active'){
-    alertEl.className = 'alert success';
-    txt.innerHTML = '<b>✓ Listing Active</b> — Your business is visible to customers.';
-  } else if (MY_BIZ.status === 'pending'){
-    alertEl.className = 'alert warning';
-    txt.innerHTML = '<b>⏳ Pending Activation</b> — Upload at least 1 photo to go live.';
-  } else {
-    alertEl.className = 'alert error';
-    txt.innerHTML = `<b>Status: ${MY_BIZ.status}</b> — Contact support if this looks wrong.`;
-  }
+async function loadPhotos(){
+  const { data, error } = await ShopDB.client
+    .from('business_photos')
+    .select('id, cloudinary_url, cloudinary_public_id, delete_token, is_featured, uploaded_at')
+    .eq('business_id', STATE.businessId)
+    .order('is_featured', { ascending: false })
+    .order('uploaded_at', { ascending: true });
 
-  // Photo grid
+  if (error) {
+    console.warn('[photos] load err', error);
+    STATE.photos = [];
+  } else {
+    STATE.photos = (data || []).filter(p => p.cloudinary_url);
+  }
+  renderPhotos();
+  updateCountPill();
+}
+
+function renderPhotos(){
   const grid = document.getElementById('photoGrid');
-  const photos = MY_BIZ.photos || [];
-  document.getElementById('photoCount').textContent = `(${photos.length}/${MAX_PHOTOS})`;
+  const emptyState = document.getElementById('emptyState');
 
-  // -------- Photo Progress Badge (gamified milestone) --------
-  try {
-    const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
-    const n = photos.length;
-    // Milestones: 0 → "Add your first" · 1-2 → "Reach 3" · 3-4 → "Reach 5" · 5+ → done
-    let milestone, target, color, payoffEn, payoffHi, emoji, headlineEn, headlineHi;
-    if (n === 0){
-      target = 1; milestone = 0; color = '#EF4444'; emoji = '⚠️';
-      headlineEn = 'Listing not yet activated';
-      headlineHi = 'लिस्टिंग अभी सक्रिय नहीं';
-      payoffEn = 'Upload your <b>first photo</b> to activate your listing and start receiving customer leads.';
-      payoffHi = '<b>पहली फोटो</b> अपलोड करते ही लिस्टिंग सक्रिय होगी और customer leads आना शुरू हो जाएँगी।';
-    } else if (n < 3){
-      target = 3; milestone = n; color = '#F59E0B'; emoji = '🎯';
-      headlineEn = `${3 - n} more to unlock <b>Trust Tier bonus</b>`;
-      headlineHi = `<b>Trust Tier bonus</b> के लिए ${3 - n} और फोटो चाहिए`;
-      payoffEn = 'Shops with <b>3+ photos</b> get a photo-quality bonus and rank higher in search.';
-      payoffHi = '<b>3+ फोटो</b> वाली दुकानों को फोटो-क्वालिटी बोनस और search में बढ़त मिलती है।';
-    } else if (n < 5){
-      target = 5; milestone = n; color = '#3B82F6'; emoji = '🚀';
-      headlineEn = `${5 - n} more to reach <b>Excellent</b> tier`;
-      headlineHi = `<b>Excellent tier</b> तक पहुँचने के लिए ${5 - n} और फोटो जोड़ें`;
-      payoffEn = '<b>5+ photos</b> means customers see your business properly. Featured chance opens up.';
-      payoffHi = '<b>5+ फोटो</b> से ग्राहक दुकान बेहतर तरीके से देख पाते हैं। Featured का अवसर खुलता है।';
-    } else if (n < 8){
-      target = 8; milestone = n; color = '#10B981'; emoji = '✨';
-      headlineEn = `Strong gallery! ${8 - n} more for <b>Platinum</b>`;
-      headlineHi = `मज़बूत gallery! <b>Platinum</b> के लिए ${8 - n} और`;
-      payoffEn = 'Top shops have <b>8+ photos</b>. Variety helps customers decide faster.';
-      payoffHi = 'Top shops में <b>8+ फोटो</b> होती हैं। विविधता से ग्राहक जल्दी निर्णय लेते हैं।';
-    } else {
-      target = n; milestone = n; color = '#10B981'; emoji = '🏆';
-      headlineEn = 'Platinum gallery — fantastic!';
-      headlineHi = 'Platinum gallery — उत्कृष्ट!';
-      payoffEn = 'You have the maximum photo trust score. Your listing is top-tier.';
-      payoffHi = 'आपको अधिकतम photo trust score मिल चुका है। आपकी लिस्टिंग top-tier पर है।';
-    }
-    const pct = Math.min(100, Math.round((milestone / target) * 100));
-    const badge = document.getElementById('photoProgressBadge');
-    if (badge){
-      badge.innerHTML = `
-        <style>
-          .ppb-card{ background:#fff; border:1.5px solid ${color}33; border-left:4px solid ${color}; border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(15,23,42,.04); display:flex; align-items:center; gap:16px; flex-wrap:wrap }
-          .ppb-icon{ font-size:2rem; flex-shrink:0 }
-          .ppb-body{ flex:1; min-width:200px }
-          .ppb-head{ font-size:.95rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; margin-bottom:3px }
-          .ppb-head b{ color:${color}; font-weight:900 }
-          .ppb-sub{ font-size:.82rem; color:#475569; font-weight:500; line-height:1.45 }
-          .ppb-sub b{ color:#0F172A; font-weight:700 }
-          .ppb-progress{ flex:0 0 140px; min-width:140px }
-          .ppb-bar{ height:8px; background:#F1F5F9; border-radius:6px; overflow:hidden }
-          .ppb-bar > div{ height:100%; background:linear-gradient(90deg, ${color}, ${color}cc); border-radius:6px; transition:width .6s cubic-bezier(.4,0,.2,1); width:${pct}%; box-shadow:0 0 6px ${color}66 }
-          .ppb-num{ font-size:.78rem; color:${color}; font-weight:800; margin-top:5px; text-align:right; letter-spacing:.02em }
-          @media(max-width:480px){
-            .ppb-progress{ flex:0 0 100%; min-width:auto }
-          }
-        </style>
-        <div class="ppb-card">
-          <div class="ppb-icon">${emoji}</div>
-          <div class="ppb-body">
-            <div class="ppb-head">${lang==='hi' ? headlineHi : headlineEn}</div>
-            <div class="ppb-sub">${lang==='hi' ? payoffHi : payoffEn}</div>
-          </div>
-          <div class="ppb-progress">
-            <div class="ppb-bar"><div></div></div>
-            <div class="ppb-num">${milestone} / ${target} photos · ${pct}%</div>
-          </div>
-        </div>
-      `;
-      badge.style.display = '';
-    }
-  } catch(e){ console.warn('Photo progress badge:', e); }
-  if (!photos.length){
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.88rem">No photos uploaded yet</div>`;
+  if (STATE.photos.length === 0) {
+    if (emptyState) emptyState.style.display = 'block';
+    grid.querySelectorAll('.photo-thumb').forEach(el => el.remove());
+    return;
+  }
+
+  if (emptyState) emptyState.style.display = 'none';
+  grid.querySelectorAll('.photo-thumb').forEach(el => el.remove());
+
+  STATE.photos.forEach(p => {
+    const thumbUrl = p.cloudinary_url.replace('/upload/', '/upload/w_400,h_400,c_fill,q_auto,f_auto/');
+    const fullUrl = p.cloudinary_url.replace('/upload/', '/upload/w_1200,q_auto,f_auto/');
+
+    const div = document.createElement('div');
+    div.className = 'photo-thumb';
+    div.innerHTML = `
+      <a href="${fullUrl}" target="_blank" rel="noopener" style="display:block;width:100%;height:100%">
+        <img src="${thumbUrl}" alt="Shop photo" loading="lazy" />
+      </a>
+      <button class="x" title="Delete photo" data-id="${p.id}" data-token="${p.delete_token || ''}">×</button>
+      ${p.is_featured ? '<div class="hero-pill">⭐ Featured</div>' : `<button class="set-hero-btn" data-id="${p.id}">Set Featured</button>`}
+    `;
+    grid.appendChild(div);
+  });
+
+  // Wire up delete + featured buttons
+  grid.querySelectorAll('.x').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = btn.dataset.id;
+      const token = btn.dataset.token;
+      deletePhoto(id, token);
+    });
+  });
+  grid.querySelectorAll('.set-hero-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      setFeatured(btn.dataset.id);
+    });
+  });
+}
+
+function updateCountPill(){
+  const pill = document.getElementById('photoCountPill');
+  const btn = document.getElementById('uploadBtn');
+  const n = STATE.photos.length;
+  pill.textContent = `${n} / ${MAX_PHOTOS}`;
+  pill.classList.remove('warn', 'full');
+  if (n >= MAX_PHOTOS) {
+    pill.classList.add('full');
+    btn.disabled = true;
+    btn.innerHTML = '<span data-i18n-en>✓ Maximum 5 photos reached</span><span data-i18n-hi>✓ अधिकतम 5 photos पूरी</span>';
+  } else if (n >= 3) {
+    pill.classList.add('warn');
+    btn.disabled = false;
   } else {
-    grid.innerHTML = photos.map((p, i) => `
-      <div class="photo-thumb">
-        <img src="${p}" alt="Business photo ${i+1}" loading="lazy">
-        ${i === 0 ? '<div class="hero-pill">⭐ Hero</div>' : '<button type="button" class="set-hero-btn" data-idx="' + i + '" title="Make this the first photo">Set as 1st</button>'}
-        <button type="button" class="x" data-idx="${i}" title="Remove photo" aria-label="Remove photo ${i+1}">×</button>
-      </div>
-    `).join('');
-
-    // Wire up handlers via event delegation (more reliable than inline onclick)
-    grid.querySelectorAll('.x').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const idx = parseInt(btn.getAttribute('data-idx'), 10);
-        removePhoto(idx);
-      });
-    });
-    grid.querySelectorAll('.set-hero-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const idx = parseInt(btn.getAttribute('data-idx'), 10);
-        setHero(idx);
-      });
-    });
+    btn.disabled = false;
   }
 }
 
-// ============================================================
-// UPLOAD
-// ============================================================
-const dz = document.getElementById('dropzone');
-const fi = document.getElementById('fileInput');
-// Mobile bug fix: <label> for hidden input fires native click + our JS click = picker opens TWICE.
-// First click → user picks photo → change event fires.
-// Second queued click → picker re-opens after selection (the bug).
-// Fix: preventDefault on the label click so ONLY our JS fi.click() runs.
-// NO JS click handler needed — the <label id="dropzone"> natively triggers
-// the wrapped <input id="fileInput"> on click/tap on ALL browsers.
-// Adding a JS click handler causes a double-fire (native + JS) which on
-// mobile reopens the gallery after photo selection. Removed entirely.
-// Reference held for drag-drop handlers below.
-fi.addEventListener('change', async () => {
-  if (fi.files && fi.files.length){
-    // CRITICAL: snapshot files into a real Array BEFORE clearing fi.value.
-    // fi.files is a LIVE FileList — setting fi.value = '' empties it,
-    // making the previously-captured reference appear empty too.
-    const filesArr = Array.from(fi.files);
-    fi.value = '';  // Now safe to clear so same photo can be re-picked
-    await handleFiles(filesArr);
-  }
-});
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('dragover');
-  if (e.dataTransfer.files && e.dataTransfer.files.length){
-    handleFiles(e.dataTransfer.files);
-  }
-});
-
-// iPhone-friendly camera capture — always outputs JPEG, never HEIC
-const cam = document.getElementById('cameraInput');
-if (cam){
-  cam.addEventListener('change', async () => {
-    if (cam.files && cam.files.length){
-      const filesArr = Array.from(cam.files);
-      cam.value = '';
-      await handleFiles(filesArr);
-    }
-  });
-}
-
-// ============================================================
-// Progress overlay — shows while upload is in progress
-// ============================================================
-function showProgress(msg){
-  let el = document.getElementById('uploadProgress');
-  if (!el){
-    el = document.createElement('div');
-    el.id = 'uploadProgress';
-    el.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);color:#fff;padding:24px 30px;border-radius:18px;font-weight:700;font-size:.95rem;z-index:10000;box-shadow:0 20px 60px rgba(0,0,0,0.40);backdrop-filter:blur(10px);text-align:center;min-width:260px;font-family:Manrope,Inter,sans-serif;letter-spacing:-.01em';
-    el.innerHTML = '<div style="font-size:2rem;margin-bottom:10px" class="spin">⏳</div><div id="uploadProgressMsg"></div><div style="margin-top:8px;font-size:.78rem;color:#FBBF24;opacity:.9">Please don\'t close this page</div>';
-    document.body.appendChild(el);
-    if (!document.getElementById('upProgStyle')){
-      const s = document.createElement('style');
-      s.id = 'upProgStyle';
-      s.textContent = '@keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}.spin{display:inline-block;animation:spinSlow 1.4s linear infinite}';
-      document.head.appendChild(s);
-    }
-  }
-  document.getElementById('uploadProgressMsg').textContent = msg;
-  el.style.display = 'block';
-}
-function hideProgress(){
-  const el = document.getElementById('uploadProgress');
-  if (el) el.style.display = 'none';
-}
-
-// Detect HEIC/HEIF (iPhone default format)
-function isHeicFile(file){
-  const t = (file && file.type || '').toLowerCase();
-  const n = (file && file.name || '').toLowerCase();
-  return /heic|heif/.test(t) || /\.(heic|heif)$/i.test(n);
-}
-function isiPhoneFormat(file){
-  if (isHeicFile(file)) return true;
-  const t = (file && file.type || '').toLowerCase();
-  const n = (file && file.name || '').toLowerCase();
-  return (!t && !/\.(jpg|jpeg|png|webp)$/i.test(n));
-}
-
-// Lazy-load heic2any (only when needed) — runtime polyfill for HEIC → JPEG
-let _heic2anyPromise = null;
-function loadHeic2Any(){
-  if (window.heic2any) return Promise.resolve(window.heic2any);
-  if (_heic2anyPromise) return _heic2anyPromise;
-  _heic2anyPromise = new Promise(function(resolve, reject){
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
-    s.async = true;
-    s.onload = function(){
-      if (window.heic2any) resolve(window.heic2any);
-      else reject(new Error('heic2any loaded but not exposed'));
-    };
-    s.onerror = function(){ reject(new Error('Failed to load HEIC converter')); };
-    document.head.appendChild(s);
-  });
-  return _heic2anyPromise;
-}
-
-// STRATEGY 1: Native browser decode — iOS Safari 11+ natively decodes HEIC into <img>
-// This works WITHOUT any external library when the user is on iPhone Safari.
-async function convertHeicNative(file){
-  return new Promise((resolve, reject) => {
-    let url = null;
-    try { url = URL.createObjectURL(file); }
-    catch(e){ reject(new Error('createObjectURL failed: ' + (e.message||e))); return; }
-
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    const cleanup = () => { try { URL.revokeObjectURL(url); } catch(_){} };
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('Image load timed out (>15s) — browser cannot decode HEIC natively'));
-    }, 15000);
-
-    img.onload = () => {
-      clearTimeout(timeout);
-      try {
-        let { naturalWidth: width, naturalHeight: height } = img;
-        if (!width || !height){ cleanup(); reject(new Error('Image loaded but has 0 dimensions')); return; }
-        const maxDim = 1600;
-        if (width > maxDim || height > maxDim){
-          const ratio = Math.min(maxDim / width, maxDim / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        cleanup();
-        canvas.toBlob((blob) => {
-          if (!blob){
-            // Final fallback: dataURL
-            try {
-              const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-              if (!dataUrl || dataUrl === 'data:,'){ reject(new Error('canvas.toBlob and toDataURL both returned empty')); return; }
-              fetch(dataUrl).then(r => r.blob()).then(b => {
-                const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
-                resolve(new File([b], newName, { type: 'image/jpeg', lastModified: Date.now() }));
-              }).catch(reject);
-            } catch(e){ reject(new Error('toDataURL fallback failed: ' + (e.message||e))); }
-            return;
-          }
-          const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
-          resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() }));
-        }, 'image/jpeg', 0.85);
-      } catch(e){ cleanup(); reject(new Error('Canvas draw failed: ' + (e.message||e))); }
-    };
-    img.onerror = () => {
-      clearTimeout(timeout);
-      cleanup();
-      reject(new Error('Browser cannot decode this HEIC file natively'));
-    };
-    img.src = url;
-  });
-}
-
-// STRATEGY 2: heic2any library (works on all browsers including non-Safari)
-async function convertHeicWithLib(file){
-  const heic2any = await loadHeic2Any();
-  const blob = await heic2any({
-    blob: file,
-    toType: 'image/jpeg',
-    quality: 0.85
-  });
-  // heic2any may return Blob or Blob[]
-  const finalBlob = Array.isArray(blob) ? blob[0] : blob;
-  if (!finalBlob || !finalBlob.size){ throw new Error('heic2any returned empty blob'); }
-  const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
-  return new File([finalBlob], newName, { type: 'image/jpeg', lastModified: Date.now() });
-}
-
-// COMBINED: Try native first (fast, no download), fall back to heic2any library.
-// Returns the converted File AND throws a detailed error listing BOTH strategy failures.
-async function convertHeicToJpeg(file){
-  let nativeErr = null, libErr = null;
-  try {
-    const out = await convertHeicNative(file);
-    if (out && out.size && /^image\/(jpeg|jpg)$/i.test(out.type)){
-      console.log('[HEIC] native decode succeeded:', out.size, 'bytes');
-      return out;
-    }
-    throw new Error('Native produced invalid output');
-  } catch(e){
-    nativeErr = e;
-    console.warn('[HEIC] native decode failed:', e && e.message);
-  }
-  // Fallback: heic2any library
-  try {
-    const out = await convertHeicWithLib(file);
-    console.log('[HEIC] heic2any succeeded:', out.size, 'bytes');
-    return out;
-  } catch(e){
-    libErr = e;
-    console.error('[HEIC] heic2any also failed:', e && e.message);
-  }
-  // Both strategies failed — throw a combined error
-  const err = new Error('Native: ' + (nativeErr && nativeErr.message || 'unknown') + ' | Library: ' + (libErr && libErr.message || 'unknown'));
-  err.nativeError = nativeErr;
-  err.libError = libErr;
-  throw err;
-}
-
-// ============================================================
-// WATERMARK — subtle "DukanList.com" bottom-right on every owner photo.
-// Anti-scraping + brand reinforcement. Sized proportionally so it stays
-// readable on a phone-cropped 480px-wide image AND a full 1600px banner.
-// ============================================================
-function drawDukanListWatermark(ctx, w, h){
-  try {
-    // Size: ~3% of the longer edge, clamped to a sensible range
-    var longEdge = Math.max(w, h);
-    var fontSize = Math.max(13, Math.min(28, Math.round(longEdge * 0.028)));
-    var padX = Math.round(longEdge * 0.018);    // right padding
-    var padY = Math.round(longEdge * 0.018);    // bottom padding
-    var text = 'DukanList.com';
-
-    ctx.save();
-    ctx.font = '700 ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    ctx.textBaseline = 'bottom';
-    ctx.textAlign = 'right';
-
-    // Measure for a soft semi-transparent pill behind text so it stays
-    // legible over both light and dark photos.
-    var metrics = ctx.measureText(text);
-    var textW = Math.ceil(metrics.width);
-    var pillH = Math.round(fontSize * 1.6);
-    var pillW = textW + Math.round(fontSize * 1.4);
-    var pillX = w - padX - pillW;
-    var pillY = h - padY - pillH;
-
-    // Pill background (dark, semi-transparent — never shouts)
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
-    var r = Math.round(fontSize * 0.4);  // corner radius
-    ctx.beginPath();
-    if (typeof ctx.roundRect === 'function'){
-      ctx.roundRect(pillX, pillY, pillW, pillH, r);
-    } else {
-      // Fallback for older browsers without roundRect
-      ctx.moveTo(pillX + r, pillY);
-      ctx.lineTo(pillX + pillW - r, pillY);
-      ctx.quadraticCurveTo(pillX + pillW, pillY, pillX + pillW, pillY + r);
-      ctx.lineTo(pillX + pillW, pillY + pillH - r);
-      ctx.quadraticCurveTo(pillX + pillW, pillY + pillH, pillX + pillW - r, pillY + pillH);
-      ctx.lineTo(pillX + r, pillY + pillH);
-      ctx.quadraticCurveTo(pillX, pillY + pillH, pillX, pillY + pillH - r);
-      ctx.lineTo(pillX, pillY + r);
-      ctx.quadraticCurveTo(pillX, pillY, pillX + r, pillY);
-      ctx.closePath();
-    }
-    ctx.fill();
-
-    // Text on top — white, slight shadow for crispness
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
-    ctx.shadowBlur = 2;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 1;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-    // textAlign='right' means x is the right edge of the text
-    var textX = pillX + pillW - Math.round(fontSize * 0.7);
-    var textY = pillY + pillH - Math.round(fontSize * 0.3);
-    ctx.fillText(text, textX, textY);
-    ctx.restore();
-  } catch(_){ /* never fail upload because watermark drawing errored */ }
-}
-
-// Client-side image compression to <2MB
-// ALWAYS converts through canvas → outputs JPEG (handles iPhone HEIC → JPG natively in Safari)
-// Also stamps a subtle "DukanList.com" watermark in the bottom-right corner.
-async function compressImage(file, maxBytes, forceConvert){
-  if (!forceConvert && file.size <= maxBytes && /^image\/(jpeg|jpg|png|webp)$/i.test(file.type)) return file;
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      img.onload = () => {
-        let { width, height } = img;
-        if (!width || !height){ resolve(file); return; }
-        const maxDim = 1600;
-        if (width > maxDim || height > maxDim){
-          const ratio = Math.min(maxDim / width, maxDim / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        // White bg for any transparency
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        try { ctx.drawImage(img, 0, 0, width, height); }
-        catch(drawErr){ resolve(file); return; }
-        // Stamp watermark AFTER the photo is drawn so it sits on top of the image
-        drawDukanListWatermark(ctx, width, height);
-        let q = 0.85;
-        let attempts = 0;
-        function tryQuality(){
-          attempts++;
-          if (attempts > 8){ resolve(file); return; }
-          try {
-            canvas.toBlob((blob) => {
-              if (!blob){
-                // iOS Safari sometimes returns null on toBlob with HEIC source — try dataURL fallback
-                try {
-                  const dataUrl = canvas.toDataURL('image/jpeg', q);
-                  if (!dataUrl || dataUrl === 'data:,'){ resolve(file); return; }
-                  fetch(dataUrl).then(r => r.blob()).then(b => {
-                    const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
-                    resolve(new File([b], newName, { type: 'image/jpeg', lastModified: Date.now() }));
-                  }).catch(() => resolve(file));
-                } catch(_){ resolve(file); }
-                return;
-              }
-              if (blob.size <= maxBytes || q <= 0.4){
-                const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
-                resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() }));
-              } else { q -= 0.1; tryQuality(); }
-            }, 'image/jpeg', q);
-          } catch(blobErr){ resolve(file); }
-        }
-        tryQuality();
-      };
-      img.onerror = function(){ resolve(file); };
-      img.src = e.target.result;
-    };
-    reader.onerror = function(){ resolve(file); };
-    reader.readAsDataURL(file);
-  });
-}
-
-// ============================================================
-// FILE HANDLING — main entry point
-// ============================================================
-async function handleFiles(files){
-  if (!MY_BIZ){ alert('Shop not loaded yet. Please wait or refresh.'); return; }
-  if (!files || !files.length) {
-    console.warn('[photos] handleFiles called with empty files list');
-    return;
-  }
-  // Expose to window for debugging
-  window.MY_BIZ = MY_BIZ;
-  console.log('[photos] handleFiles called with', files.length, 'file(s)');
-
-  var existing = (MY_BIZ.photos || []).length;
-  var slots = MAX_PHOTOS - existing;
-  if (slots <= 0){
-    alert('You already have ' + MAX_PHOTOS + ' photos. Delete one to upload another.');
+function initCloudinaryWidget(){
+  // Wait for Cloudinary script to load
+  if (typeof cloudinary === 'undefined') {
+    setTimeout(initCloudinaryWidget, 300);
     return;
   }
 
-  var toUpload = Array.from(files).slice(0, slots);
-  showProgress('⏳ Preparing your photo...');
-
-  var okCount = 0, failCount = 0;
-  for (var i = 0; i < toUpload.length; i++){
-    var f = toUpload[i];
-    showProgress('📸 Processing photo ' + (i+1) + ' of ' + toUpload.length + '...');
-    try {
-      var processed = f;
-      var fname = (f.name || '').toLowerCase();
-      var isHeic = fname.endsWith('.heic') || fname.endsWith('.heif') || (f.type || '').toLowerCase().indexOf('heic') >= 0;
-      if (isHeic){
-        showProgress('🔄 Converting iPhone HEIC photo...');
-        try { processed = await convertHeicToJpeg(f); }
-        catch(heicErr){ console.warn('[photos] HEIC conversion failed:', heicErr); }
+  STATE.widget = cloudinary.createUploadWidget({
+    cloudName: CLOUDINARY_CLOUD_NAME,
+    uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+    folder: `businesses/${STATE.businessId}`,
+    sources: ['local', 'camera'],
+    multiple: false,   // one at a time — enforces limit accurately
+    maxFiles: 1,
+    maxFileSize: 5000000,   // 5 MB
+    clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+    cropping: false,
+    showAdvancedOptions: false,
+    showPoweredBy: false,
+    styles: {
+      palette: {
+        window: '#FFFFFF',
+        sourceBg: '#F8FAFC',
+        windowBorder: '#E2E8F0',
+        tabIcon: '#FF6B1A',
+        inactiveTabIcon: '#94A3B8',
+        menuIcons: '#0F172A',
+        link: '#FF6B1A',
+        action: '#FF6B1A',
+        inProgress: '#F59E0B',
+        complete: '#16A34A',
+        error: '#DC2626',
+        textDark: '#0F172A',
+        textLight: '#FFFFFF'
       }
-
-      showProgress('🗜 Compressing photo ' + (i+1) + '...');
-      try {
-        processed = await compressImage(processed, MAX_BYTES, true);
-      } catch(compErr){
-        console.warn('[photos] compression failed, will try raw upload:', compErr);
-      }
-
-      if (processed.size > 3 * 1024 * 1024){
-        throw new Error('Photo size ' + (processed.size/1024/1024).toFixed(1) + 'MB exceeds server limit (3MB). Try a smaller photo.');
-      }
-
-      showProgress('☁️ Uploading photo ' + (i+1) + '...');
-      await uploadOne(processed);
-      okCount++;
-    } catch(err){
-      console.error('[photos] upload failed for', f.name, err);
-      failCount++;
-      var msg = err && (err.message || err.error || err.statusText) || String(err);
-      window._lastUploadError = msg;
-    }
-  }
-
-  hideProgress();
-
-  if (okCount > 0){
-    showToast(okCount + ' photo' + (okCount>1?'s':'') + ' uploaded ✓');
-  }
-  if (failCount > 0){
-    var reason = window._lastUploadError || 'Unknown error';
-    var userMsg = 'Could not upload ' + failCount + ' photo' + (failCount>1?'s':'') + '.\n\n';
-    if (/schema is invalid|incompatible|schema cache/i.test(reason)){
-      userMsg += 'This photo format could not be processed.\n\n' +
-                 'TRY THIS:\n' +
-                 '  1. Use the orange "Open Camera Now" button below\n' +
-                 '  2. Or pick a different photo (WhatsApp photos work great)\n' +
-                 '  3. Or save the photo to gallery first, then upload\n\n' +
-                 'Already-uploaded photos are saved ✓';
-    } else if (/payload too large|413/i.test(reason)){
-      userMsg += 'Photo too large even after compression. Try a smaller image.';
-    } else if (/duplicate|already exists|409/i.test(reason)){
-      userMsg += 'Same photo already uploaded. Try a different one.';
-    } else if (/network|fetch|timeout/i.test(reason)){
-      userMsg += 'Network slow or offline. Please check connection and retry.';
-    } else if (/auth|jwt|token|unauthorized|401/i.test(reason)){
-      userMsg += 'Login session expired. Please log out and log in again.';
-    } else if (/permission|denied|policy|rls|403/i.test(reason)){
-      userMsg += 'Permission denied. WhatsApp +91 95412 23377 for help.';
-    } else if (/not.found|404/i.test(reason)){
-      userMsg += 'Storage bucket missing. Contact support at +91 95412 23377.';
-    } else {
-      userMsg += 'Reason: ' + reason + '\n\nTry: (1) Open Camera Now, (2) a different image, or (3) log out + back in.';
-    }
-    alert(userMsg);
-  }
-  await refreshBiz();
-}
-
-async function uploadOne(file){
-  // SERVER-SIDE upload via /api/upload-shop-photo.
-  // Bypasses Supabase Storage RLS (which has been flaky with "schema invalid"
-  // errors). Server-side endpoint:
-  //   - verifies JWT
-  //   - self-heals broken business_owners link via RPC
-  //   - uploads with service-role key (no RLS conflicts)
-  //   - atomically appends URL to businesses.photos
-  //   - auto-activates pending shops after first photo
-  var c = ShopDB.client;
-  var sessRes = await c.auth.getSession();
-  var session = sessRes && sessRes.data && sessRes.data.session;
-  if (!session || !session.access_token){
-    throw new Error('Not authenticated. Please log out and log in again.');
-  }
-
-  // Convert File to base64 data URL
-  var dataUrl = await new Promise(function(resolve, reject){
-    var reader = new FileReader();
-    reader.onload = function(){ resolve(reader.result); };
-    reader.onerror = function(){ reject(new Error('Could not read file from disk')); };
-    reader.readAsDataURL(file);
-  });
-
-  var resp = await fetch('/api/upload-shop-photo', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + session.access_token,
-      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      file: dataUrl,
-      filename: file.name || 'photo.jpg'
-    })
+    text: {
+      en: {
+        or: 'or',
+        menu: { files: 'My Files', camera: 'Camera' },
+        local: { browse: 'Browse Gallery', dd_title_single: 'Drop your shop photo here' }
+      }
+    }
+  }, async (error, result) => {
+    if (error) {
+      console.warn('[cloudinary] error', error);
+      showError('Upload failed. Please try again.');
+      return;
+    }
+    if (result && result.event === 'success') {
+      await handleUploadSuccess(result.info);
+    }
   });
 
-  var resBody = null;
-  try { resBody = await resp.json(); } catch(_){ resBody = { error: 'Invalid server response' }; }
-
-  if (!resp.ok || !resBody.ok){
-    var msg = (resBody && (resBody.message || resBody.error || resBody.detail)) || ('HTTP ' + resp.status);
-    var err = new Error(msg);
-    err.serverResponse = resBody;
-    throw err;
-  }
-
-  // Server returned the new photo URL — update local state
-  if (Array.isArray(resBody.photos_now)){
-    MY_BIZ.photos = resBody.photos_now;
-  } else if (resBody.url){
-    MY_BIZ.photos = (MY_BIZ.photos || []).concat([resBody.url]);
-  }
-}
-
-async function removePhoto(idx){
-  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]){
-    console.warn('[photos] removePhoto invalid idx:', idx);
-    return;
-  }
-  if (!confirm('Remove this photo?')) return;
-  try {
-    var c = ShopDB.client;
-    var remaining = MY_BIZ.photos.filter(function(_, i){ return i !== idx; });
-    var dbRes = await c.from('businesses').update({ photos: remaining }).eq('id', MY_BIZ.id);
-    if (dbRes.error){
-      console.error('[photos] removePhoto error:', dbRes.error);
-      alert('Could not remove photo: ' + (dbRes.error.message || 'unknown'));
+  // Wire up button
+  document.getElementById('uploadBtn').addEventListener('click', () => {
+    if (STATE.photos.length >= MAX_PHOTOS) {
+      showError('Maximum 5 photos reached. Delete one to upload another.');
       return;
     }
-    MY_BIZ.photos = remaining;
-    renderState();
-    showToast('Photo removed ✓');
-    refreshBiz();
-  } catch(err){
-    console.error('[photos] removePhoto fatal:', err);
-    alert('Could not remove photo. Please refresh and try again.');
-  }
+    STATE.widget.open();
+  });
 }
 
-async function setHero(idx){
-  if (!MY_BIZ || !MY_BIZ.photos || !MY_BIZ.photos[idx]){
-    console.warn('[photos] setHero invalid idx:', idx);
-    return;
-  }
-  if (idx === 0){ showToast('Already the first photo'); return; }
+async function handleUploadSuccess(info){
+  const url = info.secure_url;
+  const publicId = info.public_id;
+  const deleteToken = info.delete_token || null;
+  const isFirstPhoto = STATE.photos.length === 0;
+
   try {
-    var c = ShopDB.client;
-    var arr = MY_BIZ.photos.slice();
-    var hero = arr.splice(idx, 1)[0];
-    arr.unshift(hero);
-    var dbRes = await c.from('businesses').update({ photos: arr }).eq('id', MY_BIZ.id);
-    if (dbRes.error){
-      console.error('[photos] setHero error:', dbRes.error);
-      alert('Could not set as first: ' + (dbRes.error.message || 'unknown'));
+    const { data: user } = await ShopDB.client.auth.getUser();
+    const { error } = await ShopDB.client.from('business_photos').insert({
+      business_id: STATE.businessId,
+      cloudinary_url: url,
+      cloudinary_public_id: publicId,
+      delete_token: deleteToken,
+      uploaded_by: user?.user?.id,
+      is_featured: isFirstPhoto
+    });
+
+    if (error) {
+      // Likely the 5-photo trigger fired
+      if (error.message && error.message.includes('Photo limit')) {
+        showError('Photo limit reached — max 5 photos per shop.');
+      } else {
+        showError('Save failed: ' + error.message);
+      }
+      // Try to clean up Cloudinary orphan via delete_token
+      if (deleteToken) tryCloudinaryDelete(deleteToken);
       return;
     }
-    MY_BIZ.photos = arr;
-    renderState();
-    showToast('Set as first photo ✓');
-    refreshBiz();
-  } catch(err){
-    console.error('[photos] setHero fatal:', err);
-    alert('Could not set as first photo. Please refresh and try again.');
+
+    showSuccess('Photo uploaded successfully!');
+    await loadPhotos();
+
+  } catch (e) {
+    console.error('[photos] handleUploadSuccess failed', e);
+    showError('Save failed. Please try again.');
+    if (deleteToken) tryCloudinaryDelete(deleteToken);
   }
 }
 
-async function refreshBiz(){
+async function deletePhoto(photoId, deleteToken){
+  const confirmMsg = document.documentElement.getAttribute('data-lang') === 'hi'
+    ? 'क्या आप यह photo delete करना चाहते हैं?'
+    : 'Delete this photo?';
+  if (!confirm(confirmMsg)) return;
+
   try {
-    var c = ShopDB.client;
-    var res = await c.from('businesses')
-      .select('id, slug, name, status, photos, verified_photo')
-      .eq('id', MY_BIZ.id).maybeSingle();
-    if (res.data){ MY_BIZ = res.data; renderState(); }
-  } catch(e){ console.warn('[photos] refresh failed', e); }
-}
+    // Delete from Supabase DB
+    const { error } = await ShopDB.client
+      .from('business_photos')
+      .delete()
+      .eq('id', photoId);
 
-function showToast(msg){
-  var t = document.getElementById('photoToast');
-  if (!t){
-    t = document.createElement('div');
-    t.id = 'photoToast';
-    t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10B981;color:#fff;padding:11px 22px;border-radius:12px;font-weight:700;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,0.30);z-index:9999;font-family:Manrope,Inter,sans-serif;opacity:0;transition:opacity .25s ease';
-    document.body.appendChild(t);
+    if (error) {
+      showError('Delete failed: ' + error.message);
+      return;
+    }
+
+    // Delete from Cloudinary (best-effort, uses browser delete token)
+    if (deleteToken) tryCloudinaryDelete(deleteToken);
+
+    showSuccess('Photo deleted.');
+    await loadPhotos();
+  } catch (e) {
+    console.error('[photos] delete failed', e);
+    showError('Delete failed.');
   }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 2400);
 }
 
-// ============================================================
-// INIT
-// ================
-window.addEventListener('DOMContentLoaded', function(){
-  setLang(localStorage.getItem('shop_lang') || 'en');
-  loadMyBusiness();
-});
+function tryCloudinaryDelete(token){
+  // Cloudinary delete-by-token API (works from browser, no secret needed)
+  // Token expires 10 minutes after upload
+  fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/delete_by_token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }).catch(() => {
+    // Silent fail — token may have expired; orphan will remain in Cloudinary
+    // Not critical: 25 GB free storage is huge; admin can bulk-purge later
+  });
+}
+
+async function setFeatured(photoId){
+  try {
+    // Unset all featured flags
+    await ShopDB.client
+      .from('business_photos')
+      .update({ is_featured: false })
+      .eq('business_id', STATE.businessId);
+
+    // Set this one as featured
+    const { error } = await ShopDB.client
+      .from('business_photos')
+      .update({ is_featured: true })
+      .eq('id', photoId);
+
+    if (error) {
+      showError('Failed to set featured photo.');
+      return;
+    }
+    showSuccess('Featured photo updated!');
+    await loadPhotos();
+  } catch (e) {
+    console.error('[photos] setFeatured failed', e);
+    showError('Failed. Please try again.');
+  }
+}
+
+function showError(msg){
+  const el = document.getElementById('uploadErr');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('uploadOk').style.display = 'none';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function showSuccess(msg){
+  const el = document.getElementById('uploadOk');
+  el.textContent = '✓ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('uploadErr').style.display = 'none';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+document.addEventListener('DOMContentLoaded', boot);
+if (document.readyState !== 'loading') boot();
 </script>
 
-<script src="/assets/js/owner-notifications.js" defer></script>
-<script src="/assets/js/error-reporter.js" defer></script>
-
-<script src="/assets/js/dl-simple-mode.js?v=1784115000" defer></script>
 </body>
 </html>
