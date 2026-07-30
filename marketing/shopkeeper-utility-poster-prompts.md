@@ -136,7 +136,7 @@ Aspect: 1080x1920.
 > DukanList par har listing me owner ka naam dikhta hai — isse customer ko trust hota hai.
 >
 > ✅ "Deepak Bhaiya ki dukaan" — customer yaad rakhega
-> ✅ Review ya complaint ho — direct aap tak
+> ✅ Direct WhatsApp/Call — koi middleman nahi
 > ✅ Local trust > Amazon anonymous
 >
 > 👉 dukanlist.com — 30 second, FREE forever

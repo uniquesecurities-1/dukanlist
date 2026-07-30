@@ -132,7 +132,7 @@ a[href="/discover.html"],
 /* Panel nav links to hidden pages */
 nav a[href*="/panel/poster"],
 nav a[href*="/panel/qr"],
-nav a[href*="/panel/digital-card"],
+/* v41: digital-card restored — link no longer hidden */
 nav a[href*="/panel/get-reviews"],
 nav a[href*="/panel/deals"],
 nav a[href*="/panel/analytics"],
@@ -149,7 +149,7 @@ nav a[href*="/panel/favorites"] {
 .qa[href*="/panel/reviews"],
 .qa[href*="/panel/qr"],
 .qa[href*="/panel/poster"],
-.qa[href*="/panel/digital-card"],
+/* v41: digital-card restored */
 .qa[href*="/panel/services"],
 .qa[href*="/panel/favorites"],
 .qa[href*="/panel/recommendations"],
@@ -160,7 +160,7 @@ nav a[href*="/panel/favorites"] {
 .qa-tile[href*="/panel/reviews"],
 .qa-tile[href*="/panel/qr"],
 .qa-tile[href*="/panel/poster"],
-.qa-tile[href*="/panel/digital-card"],
+/* v41: digital-card restored */
 .qa-tile[href*="/panel/services"],
 .qa-tile[href*="/panel/favorites"],
 .qa-tile[href*="/panel/recommendations"] {
@@ -529,7 +529,7 @@ body.prof-strict .rc-card.owner {
 .panel-nav a[href*="/panel/qr-poster"],
 .panel-nav a[href*="/panel/poster-quick"],
 .panel-nav a[href*="/panel/poster-studio"],
-.panel-nav a[href*="/panel/digital-card"],
+/* v41: digital-card restored */
 .panel-nav a[href*="/panel/favorites"],
 .panel-nav a[href*="/panel/recommendations"] {
   display: none !important;
@@ -544,7 +544,7 @@ nav a[href="/panel/qr-code.html"],
 nav a[href="/panel/qr-poster.html"],
 nav a[href="/panel/poster-quick.html"],
 nav a[href="/panel/poster-studio.html"],
-nav a[href="/panel/digital-card.html"],
+/* v41: digital-card restored */
 nav a[href="/panel/favorites.html"],
 nav a[href="/panel/recommendations.html"] {
   display: none !important;
