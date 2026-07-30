@@ -2617,8 +2617,21 @@ function render(){
   // Schema.org LocalBusiness JSON-LD (rich Google snippets)
   injectSchemaOrg(b);
 
-  // Gallery
-  const photos = b.photos || [];
+  // Gallery — merge legacy (businesses.photos array) + new (business_photos Cloudinary)
+  const legacyPhotos = (b.photos || []).filter(u => typeof u === 'string' && u.length > 0);
+  let cloudPhotos = [];
+  try {
+    const { data: cp } = await ShopDB.client
+      .from('business_photos')
+      .select('cloudinary_url, is_featured, uploaded_at')
+      .eq('business_id', b.id)
+      .order('is_featured', { ascending: false })
+      .order('uploaded_at', { ascending: true });
+    cloudPhotos = (cp || [])
+      .filter(p => p.cloudinary_url)
+      .map(p => p.cloudinary_url.replace('/upload/', '/upload/w_1200,q_auto,f_auto/'));
+  } catch (e) { console.warn('[business] cloud photos load failed', e); }
+  const photos = [...cloudPhotos, ...legacyPhotos];
   const mainEl = document.getElementById('galleryMain');
   const thEl   = document.getElementById('galleryThumbs');
   if (photos.length){

@@ -483,12 +483,12 @@ body.prof-strict .rc-card.owner {
 }
 
 /* ============================================================
-   LAYOUT FIX — Collapse 2-column grid to 1-column
-   Gallery has been hidden, but grid still reserves 440px left column
-   creating empty white space. Force single-column layout.
+   LAYOUT — v42: Restored 2-column when gallery has photos
+   Auto-collapse only if gallery is empty (no photos uploaded yet).
 ============================================================ */
 @media (min-width: 760px) {
-  .biz-top {
+  /* Only collapse when gallery has no image */
+  .biz-top:has(#galleryMain:not(:has(img))) {
     grid-template-columns: 1fr !important;
     max-width: 800px;
     margin-left: auto;
