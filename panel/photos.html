@@ -235,7 +235,6 @@ async function loadPhotos(){
     .from('business_photos')
     .select('id, cloudinary_url, cloudinary_public_id, delete_token, is_featured, uploaded_at')
     .eq('business_id', STATE.businessId)
-    .order('is_featured', { ascending: false })
     .order('uploaded_at', { ascending: true });
 
   if (error) {
