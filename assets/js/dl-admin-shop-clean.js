@@ -41,12 +41,8 @@
       }
     }
 
-    // 2. Photos card — .card containing .photos-strip
-    var strips = document.querySelectorAll('.photos-strip');
-    for (var j = 0; j < strips.length; j++) {
-      var card = strips[j].closest('.card');
-      if (card) hideEl(card);
-    }
+    // 2. v42: Photos card RESTORED — admin can see + delete legacy shop photos
+    // (Cloudinary photos managed by owner from panel/photos.html; admin oversight only)
 
     // 3. Customer Reviews card — .card containing #reviewsList
     var rl = document.getElementById('reviewsList');

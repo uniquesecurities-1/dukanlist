@@ -150,7 +150,38 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
     + '&order=featured.desc.nullslast,verified_score.desc.nullslast,rating_avg.desc.nullslast'
     + '&limit=40';
 
-  return (await sb(q)) || [];
+  const shops = (await sb(q)) || [];
+
+  // Bulk-fetch Cloudinary photos for all these shops
+  if (shops.length) {
+    try {
+      const bizIds = shops.map(s => s.id).join(',');
+      const pq = 'business_photos?select=business_id,cloudinary_url,is_featured'
+        + '&business_id=in.(' + bizIds + ')'
+        + '&cloudinary_url=not.is.null';
+      const photos = (await sb(pq)) || [];
+      const map = {};
+      photos.forEach(p => {
+        if (!p.cloudinary_url) return;
+        if (p.is_featured || !map[p.business_id]) {
+          map[p.business_id] = p.cloudinary_url;
+        }
+      });
+      shops.forEach(s => { s._cloudPhoto = map[s.id] || null; });
+    } catch(pe) { console.warn('[locality] photos fetch skipped', pe); }
+  }
+
+  return shops;
+}
+
+function pickCardThumb(b){
+  if (b._cloudPhoto) {
+    return b._cloudPhoto.replace('/upload/', '/upload/w_400,h_240,c_fill,q_auto,f_auto/');
+  }
+  if (Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string') {
+    return b.photos[0];
+  }
+  return null;
 }
 
 function renderShopCard(b){
@@ -159,6 +190,7 @@ function renderShopCard(b){
   const phone = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
   const wa = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
   const waMsg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
+  const thumb = pickCardThumb(b);
   const waBtn = wa.length === 10
     ? `<a href="https://wa.me/91${wa}?text=${waMsg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 WhatsApp</a>`
     : '';
@@ -166,13 +198,16 @@ function renderShopCard(b){
     ? `<a href="tel:+91${phone}" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 Call</a>`
     : '';
   return `
-  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer">
-    <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
-    ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}
-    ${phone ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> +91-${phone}</div>` : ''}
-    ${addr ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:flex-start;gap:5px;line-height:1.4"><span style="color:#DC2626;flex-shrink:0">📍</span> ${esc(addr)}</div>` : ''}
-    ${cityName ? `<div style="font-size:.78rem;color:#64748B;display:flex;align-items:center;gap:5px"><span>🏙️</span> ${esc(cityName)}</div>` : ''}
-    <div style="display:flex;gap:8px;margin-top:8px;padding-top:10px;border-top:1px dashed #E2E8F0">${waBtn}${callBtn}</div>
+  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer;overflow:hidden">
+    ${thumb ? `<div style="width:100%;aspect-ratio:16/10;overflow:hidden;background:#F1F5F9"><img src="${esc(thumb)}" alt="${esc(b.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>` : ''}
+    <div style="padding:10px 14px;display:flex;flex-direction:column;gap:4px">
+      <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
+      ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}
+      ${phone ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> +91-${phone}</div>` : ''}
+      ${addr ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:flex-start;gap:5px;line-height:1.4"><span style="color:#DC2626;flex-shrink:0">📍</span> ${esc(addr)}</div>` : ''}
+      ${cityName ? `<div style="font-size:.78rem;color:#64748B;display:flex;align-items:center;gap:5px"><span>🏙️</span> ${esc(cityName)}</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:8px;padding-top:10px;border-top:1px dashed #E2E8F0">${waBtn}${callBtn}</div>
+    </div>
   </article>`;
 }
 
