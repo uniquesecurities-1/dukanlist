@@ -116,28 +116,33 @@
     var name = info.querySelector('.biz-name');
     var frag = document.createDocumentFragment();
 
-    // Inject photo thumbnail at top of card (real photo OR branded placeholder)
-    if (!card.querySelector('.biz-photo img') && !card.querySelector('.dl-thumb')) {
-      var thumbWrap = document.createElement('div');
-      thumbWrap.className = 'dl-thumb';
-      // v48: Match search.html .biz-photo aspect (60% padding-bottom).
-      // Full card width via negative margins to bleed to edges.
-      thumbWrap.style.cssText = 'width:calc(100% + 40px);position:relative;padding-bottom:60%;overflow:hidden;background:#F1F5F9;margin:-18px -20px 12px;min-height:200px;';
-      if (d.thumb) {
-        thumbWrap.innerHTML = '<img src="' + d.thumb + '" alt="" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block">';
-      } else {
-        // Branded fallback — icon-only saffron gradient (name shown below in card)
-        thumbWrap.style.background = 'linear-gradient(135deg,#FFF7ED 0%,#FED7AA 40%,#FFB870 100%)';
-        thumbWrap.innerHTML =
-          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
-          'background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.5), transparent 45%),radial-gradient(circle at 80% 80%, rgba(255,107,26,.15), transparent 55%)">' +
-          '<div style="font-size:2.8rem;line-height:1;filter:drop-shadow(0 3px 6px rgba(120,53,15,.20))">' + esc(d.catIcon || '🏪') + '</div>' +
-          '</div>' +
-          '<div style="position:absolute;bottom:6px;right:10px;font-size:.58rem;font-weight:800;color:#9A3412;letter-spacing:.1em;text-transform:uppercase;opacity:.6">dukanlist</div>';
-      }
-      // Insert BEFORE info block so it sits at top of card
-      if (info && info.parentNode) info.parentNode.insertBefore(thumbWrap, info);
-      else card.insertBefore(thumbWrap, card.firstChild);
+    // v48.2: FILL the empty .biz-photo container (don't inject sibling).
+    // Search.html already renders .biz-photo with correct sizing/aspect.
+    // For cards WITHOUT real photo, .biz-photo has no <img> — we inject
+    // our branded saffron placeholder INSIDE it (not as separate element).
+    var bizPhoto = card.querySelector('.biz-photo');
+    var hasRealImg = bizPhoto ? bizPhoto.querySelector('img') : null;
+    var alreadyEnriched = bizPhoto ? bizPhoto.querySelector('.dl-inner-placeholder') : null;
+
+    if (bizPhoto && !hasRealImg && !alreadyEnriched && !d.thumb) {
+      // Empty biz-photo + no cache thumb → inject saffron placeholder INSIDE
+      var placeholder = document.createElement('div');
+      placeholder.className = 'dl-inner-placeholder';
+      placeholder.style.cssText = 'position:absolute;inset:0;background:linear-gradient(135deg,#FFF7ED 0%,#FED7AA 40%,#FFB870 100%);display:flex;align-items:center;justify-content:center';
+      placeholder.innerHTML =
+        '<div style="position:absolute;inset:0;background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.5), transparent 45%),radial-gradient(circle at 80% 80%, rgba(255,107,26,.15), transparent 55%);pointer-events:none"></div>' +
+        '<div style="font-size:3rem;line-height:1;filter:drop-shadow(0 3px 6px rgba(120,53,15,.20));position:relative;z-index:1">' + esc(d.catIcon || '🏪') + '</div>' +
+        '<div style="position:absolute;bottom:8px;right:10px;font-size:.6rem;font-weight:800;color:#9A3412;letter-spacing:.1em;text-transform:uppercase;opacity:.6">dukanlist</div>';
+      bizPhoto.appendChild(placeholder);
+    } else if (bizPhoto && !hasRealImg && !alreadyEnriched && d.thumb) {
+      // Empty biz-photo but we have a cached thumb URL → inject as img
+      var imgEl = document.createElement('img');
+      imgEl.src = d.thumb;
+      imgEl.alt = d.name || '';
+      imgEl.loading = 'lazy';
+      imgEl.className = 'dl-inner-placeholder';
+      imgEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block';
+      bizPhoto.appendChild(imgEl);
     }
 
     if (d.owner) {
