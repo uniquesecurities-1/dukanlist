@@ -325,8 +325,11 @@
 .biz-card-link:focus-visible{ outline:2px solid var(--saffron); outline-offset:-2px }
 .biz-card .biz-meta, .biz-card .biz-actions{ position:relative; z-index:2 }
 
-/* Quick action buttons — MMT-style WhatsApp + Call CTA row */
-.biz-actions{ display:flex; gap:8px; margin-top:10px }
+/* Quick action buttons — MMT-style WhatsApp + Call CTA row.
+   v48 fix: margin-top:auto pushes buttons to bottom of .biz-info flex column,
+   so cards in a grid row look balanced (no big empty space when content varies). */
+.biz-actions{ display:flex; gap:8px; margin-top:auto; padding-top:10px }
+.biz-info > .biz-actions{ margin-top:auto }
 .biz-act{
   flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px;
   padding:9px 12px; border-radius:11px; font-size:.84rem; font-weight:700;
