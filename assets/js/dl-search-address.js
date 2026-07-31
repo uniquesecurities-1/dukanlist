@@ -120,7 +120,9 @@
     if (!card.querySelector('.biz-photo img') && !card.querySelector('.dl-thumb')) {
       var thumbWrap = document.createElement('div');
       thumbWrap.className = 'dl-thumb';
-      thumbWrap.style.cssText = 'width:calc(100% + 32px);position:relative;padding-bottom:60%;overflow:hidden;background:#F1F5F9;margin:-14px -16px 10px;';
+      // v48: Match search.html .biz-photo aspect (60% padding-bottom).
+      // Full card width via negative margins to bleed to edges.
+      thumbWrap.style.cssText = 'width:calc(100% + 40px);position:relative;padding-bottom:60%;overflow:hidden;background:#F1F5F9;margin:-18px -20px 12px;min-height:200px;';
       if (d.thumb) {
         thumbWrap.innerHTML = '<img src="' + d.thumb + '" alt="" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block">';
       } else {
