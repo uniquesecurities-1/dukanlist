@@ -310,16 +310,16 @@ function render(){
         + '<h2>✏️ Edit Shop Details <span class="subtle">save below</span></h2>'
         + '<form id="editForm" onsubmit="saveShop(event)">'
           + '<div class="grid-2">'
-            + field('text', 'name', 'Shop Name', s.name)
-            + field('tel',  'mobile', 'Mobile (10 digit)', s.mobile)
+            + field('text', 'name', 'Shop Name (English)', s.name)
+            + field('text', 'name_hi', 'Shop Name (Hindi) — शॉप का नाम', s.name_hi)
           + '</div>'
           + '<div class="grid-2">'
-            + field('text', 'owner_name', 'Owner Name', s.owner_name)
+            + field('tel',  'mobile', 'Mobile (10 digit)', s.mobile)
             + field('tel',  'whatsapp', 'WhatsApp (10 digit)', s.whatsapp)
           + '</div>'
           + '<div class="grid-2">'
+            + field('text', 'owner_name', 'Owner Name', s.owner_name)
             + field('tel',  'alt_mobile', 'Alternative Mobile (optional)', s.alt_mobile)
-            + '<div></div>'
           + '</div>'
           + '<div class="grid-2">'
             // Shop Email editability rule:
@@ -735,7 +735,7 @@ async function saveShop(e){
   e.preventDefault();
   var f = document.getElementById('editForm');
   var patch = {};
-  ['name','mobile','whatsapp','alt_mobile','owner_name','usp_text','usp_hi','about_text','address_line1','address_line2','pincode'].forEach(function(k){
+  ['name','name_hi','mobile','whatsapp','alt_mobile','owner_name','usp_text','usp_hi','about_text','address_line1','address_line2','pincode'].forEach(function(k){
     var v = f.querySelector('[name="' + k + '"]')?.value;
     if (v !== undefined && v !== SHOP[k]) patch[k] = v;
   });
