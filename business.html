@@ -2673,6 +2673,10 @@ function render(){
   const legacyPhotos = (b.photos || []).filter(u => typeof u === 'string' && u.length > 0);
   const cloudPhotos = Array.isArray(b._cloudPhotos) ? b._cloudPhotos : [];
   const photos = [...cloudPhotos, ...legacyPhotos];
+  // v48: Merge into BIZ.photos so swapImg() + openLightbox() + lightboxPrev/Next
+  // can access all photos (they read from BIZ.photos, not local var).
+  // Without this, clicking thumbnail #2 tries photos[2] which was undefined → 404 broken image.
+  BIZ.photos = photos;
   const mainEl = document.getElementById('galleryMain');
   const thEl   = document.getElementById('galleryThumbs');
   if (photos.length){
@@ -3417,8 +3421,15 @@ function render(){
 }
 
 function swapImg(idx, el){
-  const photos = BIZ.photos || [];
-  document.getElementById('mainImg').src = photos[idx];
+  const photos = (BIZ && BIZ.photos) || [];
+  const mainImg = document.getElementById('mainImg');
+  // v48: Fallback — if BIZ.photos is empty but thumbnail has valid src,
+  // use the thumbnail's own src (this handles edge case where cached DOM
+  // has thumbnails but BIZ.photos state is stale).
+  let src = photos[idx];
+  if (!src && el && el.src) src = el.src;
+  if (!src || !mainImg) return;
+  mainImg.src = src;
   document.querySelectorAll('.gallery .thumbs img').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
 }
