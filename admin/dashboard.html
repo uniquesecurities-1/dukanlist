@@ -466,11 +466,32 @@
   <!-- Golden Pages — dedicated panel so it's never confused with main DukanList -->
   <div class="section" style="background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 100%);border:1.5px solid #FCD34D;border-radius:14px;padding:18px 18px 14px;margin-bottom:18px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-      <h2 class="section-title" style="margin:0;color:#78350F">🥇 Golden Pages — Recent <span id="gpRecentLabel" style="color:#92400E;font-size:12px;font-weight:500">(latest 10)</span> <span style="background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">SOFT-LISTED ONLY</span></h2>
+      <h2 class="section-title" style="margin:0;color:#78350F">🥇 Golden Pages <span id="gpRecentLabel" style="color:#92400E;font-size:12px;font-weight:500">(latest 10)</span> <span style="background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">SOFT-LISTED ONLY</span></h2>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="gpShowAllBtn" onclick="gpToggleShowAll()" style="background:#F1F5F9;color:#78350F;border:1.5px solid #FCD34D;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👁 Show All</button>
         <a href="/admin/golden-pages-add.html" style="background:linear-gradient(135deg,#D97706,#92400E);color:#fff;text-decoration:none;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">+ Add</a>
         </div>
     </div>
+
+    <!-- v48: Filters (mirrors main DukanList search) -->
+    <div style="background:#fff;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="gpSearchInput" type="text" placeholder="🔍 Search by name, phone, category, city..."
+          style="flex:1;min-width:250px;padding:9px 14px;border:1.5px solid #FCD34D;border-radius:8px;font-size:14px;font-family:inherit;outline:none">
+        <button onclick="document.getElementById('gpSearchInput').value='';gpApplyFilters();"
+          style="background:#F1F5F9;color:#475569;border:none;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✕ Clear</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;font-weight:800;color:#92400E;letter-spacing:.08em;text-transform:uppercase;margin-right:2px">QUICK:</span>
+        <button data-gp-filter="all" class="gp-chip gp-chip-active" onclick="gpSetFilter('all')" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#78350F;color:#fff;border:none">All</button>
+        <button data-gp-filter="unclaimed" class="gp-chip" onclick="gpSetFilter('unclaimed')" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#78350F;border:1.5px solid #FCD34D">🔓 Unclaimed</button>
+        <button data-gp-filter="claimed" class="gp-chip" onclick="gpSetFilter('claimed')" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#78350F;border:1.5px solid #FCD34D">✓ Claimed</button>
+        <button data-gp-filter="hasmobile" class="gp-chip" onclick="gpSetFilter('hasmobile')" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#78350F;border:1.5px solid #FCD34D">📞 Has Mobile</button>
+        <button data-gp-filter="nomobile" class="gp-chip" onclick="gpSetFilter('nomobile')" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#78350F;border:1.5px solid #FCD34D">🚫 No Mobile</button>
+        <span id="gpCountLabel" style="margin-left:auto;font-size:12px;font-weight:700;color:#92400E"></span>
+      </div>
+    </div>
+
     <div id="gpRecentList">
       <div class="loader" style="color:#92400E">Loading…</div>
     </div>
@@ -488,6 +509,114 @@
     return null;
   }
 
+  // v48: Global state for Golden Pages filtering
+  window.GP_ALL_ROWS = [];
+  window.GP_SHOW_LIMIT = 10;
+  window.GP_SHOW_ALL = false;
+  window.GP_FILTER = 'all';
+
+  function gpEscHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+  function gpAgo(ts){ if(!ts)return''; try{const d=new Date(ts); const m=Math.floor((Date.now()-d.getTime())/60000); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago';}catch(e){return''} }
+
+  function gpSetFilter(f){
+    window.GP_FILTER = f;
+    document.querySelectorAll('.gp-chip').forEach(b => {
+      const active = b.getAttribute('data-gp-filter') === f;
+      b.style.background = active ? '#78350F' : '#fff';
+      b.style.color = active ? '#fff' : '#78350F';
+      b.style.border = active ? 'none' : '1.5px solid #FCD34D';
+      if (active) b.classList.add('gp-chip-active'); else b.classList.remove('gp-chip-active');
+    });
+    gpApplyFilters();
+  }
+
+  function gpToggleShowAll(){
+    window.GP_SHOW_ALL = !window.GP_SHOW_ALL;
+    const btn = document.getElementById('gpShowAllBtn');
+    const lbl = document.getElementById('gpRecentLabel');
+    if (window.GP_SHOW_ALL) {
+      if (btn) btn.innerHTML = '📉 Show Latest 10';
+      if (lbl) lbl.textContent = '(all ' + window.GP_ALL_ROWS.length + ')';
+    } else {
+      if (btn) btn.innerHTML = '👁 Show All';
+      if (lbl) lbl.textContent = '(latest 10)';
+    }
+    gpApplyFilters();
+  }
+
+  function gpApplyFilters(){
+    const q = (document.getElementById('gpSearchInput')?.value || '').toLowerCase().trim();
+    let filtered = window.GP_ALL_ROWS.slice();
+
+    // Quick filter
+    if (window.GP_FILTER === 'unclaimed') filtered = filtered.filter(r => !r.has_owner_account);
+    if (window.GP_FILTER === 'claimed') filtered = filtered.filter(r => r.has_owner_account);
+    if (window.GP_FILTER === 'hasmobile') filtered = filtered.filter(r => r.mobile && String(r.mobile).replace(/\D/g,'').length >= 10);
+    if (window.GP_FILTER === 'nomobile') filtered = filtered.filter(r => !r.mobile || String(r.mobile).replace(/\D/g,'').length < 10);
+
+    // Search
+    if (q) {
+      filtered = filtered.filter(r => {
+        const hay = [
+          r.name, r.name_hi, r.primary_cat, r.city_name, r.mobile, r.slug,
+          r.owner_name, r.address_line1, r.address_line2, r.pincode
+        ].map(x => String(x || '').toLowerCase()).join(' ');
+        return hay.indexOf(q) !== -1;
+      });
+    }
+
+    // Limit unless Show All
+    const displayList = window.GP_SHOW_ALL ? filtered : filtered.slice(0, window.GP_SHOW_LIMIT);
+
+    // Update count label
+    const cntEl = document.getElementById('gpCountLabel');
+    if (cntEl) {
+      if (q || window.GP_FILTER !== 'all') {
+        cntEl.textContent = filtered.length + ' match' + (filtered.length === 1 ? '' : 'es') + ' of ' + window.GP_ALL_ROWS.length;
+      } else {
+        cntEl.textContent = window.GP_ALL_ROWS.length + ' total';
+      }
+    }
+
+    gpRenderList(displayList, filtered.length);
+  }
+
+  function gpRenderList(rows, totalMatches){
+    const host = document.getElementById('gpRecentList');
+    if (!host) return;
+    if (!rows.length){
+      if (totalMatches === 0 && window.GP_ALL_ROWS.length > 0) {
+        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">🔍 No matches for your filter. <button onclick="gpSetFilter(\'all\');document.getElementById(\'gpSearchInput\').value=\'\';gpApplyFilters();" style="color:#78350F;background:none;border:none;font-weight:800;cursor:pointer;text-decoration:underline">Reset filters</button></div>';
+      } else {
+        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/golden-pages-add.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
+      }
+      return;
+    }
+
+    const html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">' +
+      rows.map(r => {
+        const claimedBadge = r.has_owner_account
+          ? '<span style="background:#D1FAE5;color:#065F46;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:4px">✓ CLAIMED</span>'
+          : '<span style="background:#FEE2E2;color:#991B1B;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:4px">UNCLAIMED</span>';
+        const editLink = r.slug ? '<a href="/admin/shop.html?id=' + gpEscHtml(r.id || '') + '" style="font-size:.7rem;color:#78350F;font-weight:800;text-decoration:none;margin-left:6px">✏️ Edit</a>' : '';
+        return '<div style="background:#fff;border:1px solid #FDE68A;border-radius:10px;padding:11px 13px">' +
+          '<div style="font-size:.92rem;font-weight:800;color:#0F172A;line-height:1.25;margin-bottom:3px">🏪 ' + gpEscHtml(r.name) +
+            (r.name_hi ? '<span style="font-weight:600;color:#78350F;font-size:.78rem;margin-left:5px">' + gpEscHtml(r.name_hi) + '</span>' : '') + '</div>' +
+          '<div style="font-size:.74rem;color:#78350F;font-weight:600;line-height:1.5">' +
+            gpEscHtml(r.primary_cat || '—') +
+            (r.city_name ? ' · ' + gpEscHtml(r.city_name) : '') +
+            (r.mobile ? ' · 📞 ' + gpEscHtml(r.mobile) : '') +
+            ' · ' + gpEscHtml(gpAgo(r.pre_listed_at)) +
+          '</div>' +
+          '<div style="margin-top:6px;display:flex;align-items:center">' +
+            claimedBadge + editLink +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+    host.innerHTML = html;
+  }
+
   (async function loadGoldenPagesRecent(){
     const c = await _waitForShopDB(8000);
     const host = document.getElementById('gpRecentList');
@@ -497,37 +626,29 @@
       return;
     }
     try {
-      const { data, error } = await c.rpc('admin_recent_soft_listed', { p_limit: 10 });
+      // v48: Fetch up to 500 rows so we can filter/search client-side
+      const { data, error } = await c.rpc('admin_recent_soft_listed', { p_limit: 500 });
       if (error) throw error;
-      const rows = data || [];
-      if (!rows.length){
+      window.GP_ALL_ROWS = data || [];
+
+      if (!window.GP_ALL_ROWS.length){
         host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/golden-pages-add.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
+        const cntEl = document.getElementById('gpCountLabel');
+        if (cntEl) cntEl.textContent = '';
         return;
       }
-      function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
-      function ago(ts){ if(!ts)return''; try{const d=new Date(ts); const m=Math.floor((Date.now()-d.getTime())/60000); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago';}catch(e){return''} }
 
-      const html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">' +
-        rows.map(r => {
-          const claimedBadge = r.has_owner_account
-            ? '<span style="background:#D1FAE5;color:#065F46;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:4px">✓ CLAIMED</span>'
-            : '<span style="background:#FEE2E2;color:#991B1B;font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:4px">UNCLAIMED</span>';
-          return '<div style="background:#fff;border:1px solid #FDE68A;border-radius:10px;padding:11px 13px">' +
-            '<div style="font-size:.92rem;font-weight:800;color:#0F172A;line-height:1.25;margin-bottom:3px">🏪 ' + esc(r.name) +
-              (r.name_hi ? '<span style="font-weight:600;color:#78350F;font-size:.78rem;margin-left:5px">' + esc(r.name_hi) + '</span>' : '') + '</div>' +
-            '<div style="font-size:.74rem;color:#78350F;font-weight:600;line-height:1.5">' +
-              esc(r.primary_cat || '—') +
-              (r.city_name ? ' · ' + esc(r.city_name) : '') +
-              (r.mobile ? ' · 📞 ' + esc(r.mobile) : '') +
-              ' · ' + esc(ago(r.pre_listed_at)) +
-            '</div>' +
-            '<div style="margin-top:6px">' +
-              claimedBadge +
-            '</div>' +
-          '</div>';
-        }).join('') +
-      '</div>';
-      host.innerHTML = html;
+      // Wire up search input
+      const inp = document.getElementById('gpSearchInput');
+      if (inp) {
+        let t;
+        inp.addEventListener('input', function(){
+          clearTimeout(t);
+          t = setTimeout(gpApplyFilters, 150);
+        });
+      }
+
+      gpApplyFilters();
     } catch(e){
       host.innerHTML = '<div style="padding:12px;color:#991B1B;font-size:.85rem;font-weight:600">⚠️ Could not load Golden Pages: ' + (e.message || e) + '</div>';
     }
