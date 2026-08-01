@@ -346,7 +346,7 @@ ${otherCats}
 <footer>
   <div style="max-width:680px;margin:0 auto">
     <strong style="color:#fff">DukanList</strong> · Bharat ka local shop directory · हर दुकान, एक पहचान<br>
-    DigiMutual Goals Pvt. Ltd. · Mandi Dabwali, Haryana ·
+    An initiative by Deepak Singla · Mandi Dabwali, Haryana ·
     <a href="${ORIGIN}/about">About</a> · <a href="${ORIGIN}/contact">Contact</a> · <a href="${ORIGIN}/privacy">Privacy</a>
   </div>
 </footer>

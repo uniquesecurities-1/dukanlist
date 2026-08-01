@@ -248,7 +248,7 @@ function renderDigestHTML(d, owner){
         + '<div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:11px;line-height:1.5;text-align:center">'
           + 'You\'re receiving this because you registered ' + esc(d.name) + ' on DukanList.<br>'
           + 'To stop these emails, go to <a href="' + SITE + '/panel/profile.html" style="color:#94a3b8">your profile</a> and turn off Weekly Digest.<br><br>'
-          + '<a href="' + SITE + '" style="color:#94a3b8">dukanlist.com</a> · Mandi Dabwali · DigiMutual Goals Pvt. Ltd.'
+          + '<a href="' + SITE + '" style="color:#94a3b8">dukanlist.com</a> · Mandi Dabwali · An initiative by Deepak Singla'
         + '</div>'
       + '</div>'
     + '</div></body></html>';

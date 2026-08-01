@@ -15,7 +15,7 @@
  *     ownerName: 'Suresh Sharma',
  *     mobile: '9876543210',
  *     city: 'Mandi Dabwali',
- *     locality: 'Chotala Road',
+ *     locality: 'Chautala Road',
  *     ratingAvg: 4.7,
  *     ratingCount: 23,
  *     categoryIcon: '💊',
