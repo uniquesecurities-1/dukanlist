@@ -41,7 +41,7 @@
 </script>
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786800000">
+<link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786900000">
 <script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
@@ -1429,13 +1429,11 @@ function renderCard(b){
     }
   }
   // Strict mode: hide rating display entirely (no ratings allowed for CAs/Doctors/Lawyers per their regulator)
-  // Partial mode: keep rating
-  // Default: existing behaviour
-  const rating = isProfStrict
-    ? '<span style="color:var(--saffron-deep);font-weight:700;font-size:.78rem">🛡️ Professional Listing</span>'
-    : (b.rating_avg > 0
-        ? `<span class="rating">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>`
-        : '<span style="color:var(--muted)">No reviews yet</span>');
+  // v48: Reviews now allowed on all listings (including strict professionals — same as Google Maps model)
+  // Show star rating if any; else show "No reviews yet"
+  const rating = (b.rating_avg > 0)
+    ? `<span class="rating">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:var(--muted)">(${b.rating_count})</span></span>`
+    : '<span style="color:var(--muted)">No reviews yet</span>';
 
   // Quick-action CTAs — WhatsApp + Call
   const rawWa  = String(b.whatsapp || b.mobile || '').replace(/\D/g, '');
