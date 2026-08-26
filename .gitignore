@@ -23,3 +23,8 @@ signing-key-info.txt
 *.keystore
 DukanList*.aab
 DukanList*.apk
+
+# Pre-release backup files
+*.PRE-RELAUNCH-BAK
+*.bak
+*.backup

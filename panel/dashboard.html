@@ -1240,7 +1240,9 @@ let MY_BUSINESS = null;
 
 // ============================================================
 // Professional Mode banner — informs owner that their listing
-// runs in compliance mode (no reviews/ratings/Top Rated/Featured).
+// runs in compliance mode (no paid Top Rated / Featured badges,
+// no self-solicitation of reviews). User-generated reviews and
+// ratings remain permitted (Google Maps / JustDial / Practo model).
 // Fetches is_professional_listing + verification status for their biz.
 // ============================================================
 async function checkProfessionalMode(){
@@ -1279,14 +1281,14 @@ async function checkProfessionalMode(){
       ico = '🛡️';
       title = 'Professional Mode — Verified ✓';
       body = (tier === 'strict'
-        ? 'Your listing runs in <b>compliance mode</b> per ' + auth + ' rules — reviews, ratings, Top Rated badges, and Featured promotion are disabled (regulator does not permit advertising). Customers see your membership number, qualification, and areas of practice instead.'
-        : 'Your listing runs with <b>regulatory disclaimers</b> per ' + auth + ' rules — Top Rated and Featured promotion are disabled, but reviews and ratings remain visible.');
+        ? 'Your listing runs in <b>compliance mode</b> per ' + auth + ' rules — paid "Top Rated" / "Featured" badges are disabled, and you cannot solicit reviews (regulator prohibits self-advertising). <b>User-generated reviews and ratings from patients / clients remain visible</b> (same as Google Maps / JustDial / Practo). Customers also see your membership number, qualification, and areas of practice.'
+        : 'Your listing runs with <b>regulatory disclaimers</b> per ' + auth + ' rules — Top Rated and Featured badges are disabled. Reviews and ratings remain visible.');
     } else {
       bg = 'linear-gradient(135deg,#FEF3C7,#FDE68A)';
       accent = '#78350F';
       ico = '⏳';
       title = 'Professional Mode — Pending Verification';
-      body = 'Your listing has been auto-flagged as a regulated profession. Our admin team will verify your membership number with ' + auth + ' shortly (usually within 24-48 hours). Until then your listing is in <b>compliance mode</b> — no reviews, ratings, or promotional features.';
+      body = 'Your listing has been auto-flagged as a regulated profession. Our admin team will verify your membership number with ' + auth + ' shortly (usually within 24-48 hours). Meanwhile your listing runs in <b>compliance mode</b> — no paid Top Rated / Featured badges, no self-authored promotional copy. User-generated reviews from clients remain permitted (same as Google Maps / JustDial).';
     }
 
     // Find dashboard root (try multiple selectors)
