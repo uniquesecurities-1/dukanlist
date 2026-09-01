@@ -235,13 +235,19 @@ window.markVerified = markVerified;
 
 // Initial load
 (async () => {
-  if (typeof requireAdmin === 'function'){
-    await requireAdmin();
-  }
   if (!C){
     document.getElementById('loading').innerHTML = '<div class="err">Supabase client missing — please re-login.</div>';
     return;
   }
+  // v212 FIX: old gate checked `typeof requireAdmin` (bare global that never
+  // exists — it's AdminCommon.requireAdmin), so the check silently skipped.
+  try {
+    const u = await C.auth.getUser();
+    if (!u || !u.data || !u.data.user){ window.location.href = '/admin/login.html'; return; }
+    const ia = await C.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); window.location.href = '/admin/login.html'; return; }
+  } catch(e){ window.location.href = '/admin/login.html'; return; }
+
   loadQueue();
 })();
 </script>

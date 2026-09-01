@@ -364,8 +364,8 @@
         <span class="sub">Bulk add · invite · claim</span>
       </div>
       <div class="tool-grid">
-        <a class="tool-link" href="/admin/golden-pages-add"><span class="em">📥</span> Bulk Add (GP/Main)</a>
-        <a class="tool-link" href="/admin/golden-pages-manage"><span class="em">📋</span> Manage Golden Pages</a>
+        <a class="tool-link" href="/admin/quick-add-shop.html"><span class="em">📥</span> Quick Add Shop</a>
+        <a class="tool-link" href="/admin/bulk-upload.html"><span class="em">📋</span> Bulk Upload (CSV)</a>
         <a class="tool-link" href="/admin/owner-invites"><span class="em">📧</span> Owner Invites <span class="new-pill">NEW</span></a>
         <a class="tool-link" href="/admin/quick-add-shop"><span class="em">+</span> Quick Add Shop</a>
       </div>
@@ -430,7 +430,6 @@
         <a class="tool-link" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/auth/users" target="_blank" rel="noopener"><span class="em">🔐</span> Supabase Auth Users</a>
         <a class="tool-link" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/functions" target="_blank" rel="noopener"><span class="em">⚡</span> Edge Functions</a>
         <a class="tool-link" href="/" target="_blank"><span class="em">🌐</span> Public DukanList</a>
-        <a class="tool-link" href="/golden-pages" target="_blank"><span class="em">🥇</span> Public Golden Pages</a>
         <a class="tool-link" href="/panel/login" target="_blank"><span class="em">🏪</span> Owner Panel Login</a>
       </div>
     </div>
@@ -469,7 +468,7 @@
       <h2 class="section-title" style="margin:0;color:#78350F">🥇 Golden Pages <span id="gpRecentLabel" style="color:#92400E;font-size:12px;font-weight:500">(latest 10)</span> <span style="background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">SOFT-LISTED ONLY</span></h2>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button id="gpShowAllBtn" onclick="gpToggleShowAll()" style="background:#F1F5F9;color:#78350F;border:1.5px solid #FCD34D;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👁 Show All</button>
-        <a href="/admin/golden-pages-add.html" style="background:linear-gradient(135deg,#D97706,#92400E);color:#fff;text-decoration:none;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">+ Add</a>
+        <a href="/admin/quick-add-shop.html" style="background:linear-gradient(135deg,#D97706,#92400E);color:#fff;text-decoration:none;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">+ Add</a>
         </div>
     </div>
 
@@ -588,7 +587,7 @@
       if (totalMatches === 0 && window.GP_ALL_ROWS.length > 0) {
         host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">🔍 No matches for your filter. <button onclick="gpSetFilter(\'all\');document.getElementById(\'gpSearchInput\').value=\'\';gpApplyFilters();" style="color:#78350F;background:none;border:none;font-weight:800;cursor:pointer;text-decoration:underline">Reset filters</button></div>';
       } else {
-        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/golden-pages-add.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
+        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/quick-add-shop.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
       }
       return;
     }
@@ -632,7 +631,7 @@
       window.GP_ALL_ROWS = data || [];
 
       if (!window.GP_ALL_ROWS.length){
-        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/golden-pages-add.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
+        host.innerHTML = '<div style="padding:18px;text-align:center;color:#92400E;font-weight:600;font-size:.92rem">📭 No soft-listed shops yet. <a href="/admin/quick-add-shop.html" style="color:#78350F;font-weight:800">Add the first one →</a></div>';
         const cntEl = document.getElementById('gpCountLabel');
         if (cntEl) cntEl.textContent = '';
         return;

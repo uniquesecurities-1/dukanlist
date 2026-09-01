@@ -116,8 +116,8 @@
   <div class="brand">📧 Owner Invites <span class="badge">ADMIN</span></div>
   <nav>
     <a href="/admin/dashboard.html">← Dashboard</a>
-    <a href="/admin/golden-pages-add.html">+ Add Listing</a>
-    <a href="/admin/golden-pages-manage.html">📋 Manage GP</a>
+    <a href="/admin/quick-add-shop.html">+ Add Listing</a>
+    <a href="/admin/dashboard.html">📊 Dashboard</a>
     <a href="/admin/owner-invites.html" class="active">📧 Invites</a>
   </nav>
 </header>
@@ -222,6 +222,14 @@ async function init(){
     document.getElementById('listing').innerHTML = '<div class="empty"><div class="emoji">⚠️</div><h3>Supabase not loaded</h3><p>Refresh the page.</p></div>';
     return;
   }
+  // v212 FIX: auth gate was missing — this page can send real emails (signInWithOtp)
+  try {
+    const u = await C.auth.getUser();
+    if (!u || !u.data || !u.data.user){ window.location.href = '/admin/login.html'; return; }
+    const ia = await C.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); window.location.href = '/admin/login.html'; return; }
+  } catch(e){ window.location.href = '/admin/login.html'; return; }
+
   await Promise.all([loadCities(), load()]);
 
   // wire STATUS filter chips (row 1) — toggle within their group only

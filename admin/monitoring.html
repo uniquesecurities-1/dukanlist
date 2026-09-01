@@ -76,7 +76,7 @@
     <a href="/admin/pro-legal-notify.html">📨 Legal Notify</a>
     <a href="/admin/health.html" style="background:linear-gradient(135deg,#FF6B1A,#EA580C);color:#fff;font-weight:800;border-radius:8px">🛡 Health</a>
     <a href="/admin/monitoring.html" class="active">🚨 Monitoring</a>
-    <a href="/admin/login.html" style="color:#94A3B8;font-size:.7rem">Logout</a>
+    <a href="#" onclick="monLogout();return false" style="color:#94A3B8;font-size:.7rem">Logout</a>
   </nav>
 </header>
 
@@ -147,6 +147,17 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script>
 (async function init(){
+  // v212 FIX: auth gate was missing on this page
+  try {
+    const c = window.ShopDB && window.ShopDB.client;
+    if (c) {
+      const u = await c.auth.getUser();
+      if (!u || !u.data || !u.data.user){ window.location.href = '/admin/login.html'; return; }
+      const ia = await c.rpc('is_admin');
+      if (ia.error || !ia.data){ alert('Admin only.'); window.location.href = '/admin/login.html'; return; }
+    }
+  } catch(e){ window.location.href = '/admin/login.html'; return; }
+
   // Health check
   refreshHealth();
   setInterval(refreshHealth, 60000);
@@ -155,6 +166,12 @@
   document.getElementById('hoursSelect').addEventListener('change', loadErrors);
   await loadErrors();
 })();
+
+// v212 FIX: real logout (old nav link just navigated without signing out)
+async function monLogout(){
+  try { const c = window.ShopDB && window.ShopDB.client; if (c) await c.auth.signOut(); } catch(e){}
+  window.location.href = '/admin/login.html';
+}
 
 async function refreshHealth(){
   const dot = document.getElementById('healthDot');

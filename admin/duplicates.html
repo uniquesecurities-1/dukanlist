@@ -123,6 +123,16 @@
 <script src="/assets/js/supabase-init.js"></script>
 <script>
 (async function init(){
+  // v212 FIX: auth gate was completely missing on this page
+  try {
+    const c = window.ShopDB && window.ShopDB.client;
+    if (!c) { document.getElementById('results').innerHTML = '<div class="empty">Supabase not ready — reload.</div>'; return; }
+    const u = await c.auth.getUser();
+    if (!u || !u.data || !u.data.user){ window.location.href = '/admin/login.html'; return; }
+    const ia = await c.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); window.location.href = '/admin/login.html'; return; }
+  } catch(e){ window.location.href = '/admin/login.html'; return; }
+
   document.getElementById('simSelect').addEventListener('change', loadDuplicates);
   document.getElementById('limitSelect').addEventListener('change', loadDuplicates);
   await loadDuplicates();
