@@ -323,6 +323,17 @@ async function nuclearDelete(kind){
   else if (kind === 'banned'){ label = 'ALL BANNED'; query = C.from('businesses').select('id').eq('status','banned'); }
   else { label = 'EVERY SINGLE BUSINESS'; query = C.from('businesses').select('id'); }
 
+  // v213 GUARD: the "delete everything" branch requires an explicit URL param.
+  // Prevents a mis-tap from wiping the live directory — deliberate use still
+  // possible via /admin/test-cleanup.html?enable-nuke=1
+  if (kind !== 'pending' && kind !== 'banned') {
+    const params = new URLSearchParams(location.search);
+    if (params.get('enable-nuke') !== '1') {
+      alert('☢️ Full-directory delete is LOCKED.\n\nTo enable, reopen this page with ?enable-nuke=1 in the URL.\n\n(Pending-only and Banned-only cleanup work without this.)');
+      return;
+    }
+  }
+
   if (!confirm('☢️ NUCLEAR DELETE\n\nThis will delete ' + label + '. Photos, reviews, leads, analytics — all gone. This CANNOT be undone.\n\nAre you absolutely sure?')) return;
   const second = prompt('Type NUKE in capitals to confirm:');
   if (second !== 'NUKE'){ toast('Aborted', 'error'); return; }
