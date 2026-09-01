@@ -1728,6 +1728,11 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
               <span class="cta-icon" id="favIcon">♡</span>
               <span class="cta-label"><span data-i18n-en>Save</span><span data-i18n-hi>सेव</span></span>
             </button>
+            <!-- v214: 🔥 Love button — surfaces shop_likes publicly (was Discover-only) -->
+            <button class="cta-btn" onclick="window.shopLoveToggle && shopLoveToggle()" id="loveBtn" title="Love this shop" style="display:none">
+              <span class="cta-icon" id="loveIcon">🔥</span>
+              <span class="cta-label"><span id="loveCount">0</span></span>
+            </button>
           </div>
           <a class="flag-link" onclick="reportBiz()">
             🚩 <span data-i18n-en>Report this listing</span><span data-i18n-hi>इसकी रिपोर्ट करें</span>
@@ -2180,6 +2185,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <script src="/assets/js/hours.js"></script>
 <script src="/assets/js/nav.js" defer></script>
 <script src="/assets/js/shortlist.js" defer></script>
+<script src="/assets/js/shop-love.js?v=20260901" defer></script>
 <script src="/assets/js/review-boost.js" defer></script>
 <script src="/assets/js/pwa.js" defer></script>
 <script>
@@ -2215,7 +2221,7 @@ async function loadBusiness(){
       established_year, payment_methods, special_features,
       facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url,
       verified_mobile, verified_address, verified_photo, verified_visit, verified_score,
-      rating_avg, rating_count, view_count,
+      rating_avg, rating_count, view_count, likes_count,
       category_id, sub_category_id,
       is_professional_listing, professional_tier, membership_no, membership_authority,
       professional_qualification, practice_areas, prof_verified_at,
