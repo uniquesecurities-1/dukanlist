@@ -2021,7 +2021,12 @@ async function handleSubmit(){
   }
 
   const usp = document.getElementById('usp').value.trim();
-  if (usp.length < 20) return showErr(errEl, 'USP must be at least 20 characters — tell us why customers choose you');
+  // v215 FIX: strict-tier professionals have the USP field HIDDEN (compliance —
+  // no self-authored promotional copy), so the 20-char check must not run for
+  // them. Practice areas are collected via the Professional Panel instead.
+  if (STATE.data.profTier !== 'strict' && usp.length < 20) {
+    return showErr(errEl, 'USP must be at least 20 characters — tell us why customers choose you');
+  }
 
   // NEW: Email + password validation
   const loginEmail = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
