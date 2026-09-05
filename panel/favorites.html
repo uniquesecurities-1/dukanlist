@@ -175,7 +175,7 @@ function renderCard(s){
   return `
   <div style="position:relative">
     <button class="unfav" onclick="unfav('${esc(s.business_id)}', this)" title="Remove from favorites" aria-label="Remove from favorites">♥</button>
-    <a class="fav-card" href="/business.html?slug=${esc(s.slug)}">
+    <a class="fav-card" href="/${esc(s.slug)}">
       <div class="fav-photo">${photo
         ? `<img src="${esc(photo)}" alt="${esc(s.name)}" loading="lazy">`
         : '🏪'}</div>
@@ -259,7 +259,7 @@ async function loadFavoritesFeed(){
       const ts = it.activity_at ? new Date(it.activity_at) : null;
       const timeStr = ts ? niceTime(ts) : '';
       const photo = it.shop_photo ? '<img src="'+escAttr(it.shop_photo)+'" alt="">' : ico;
-      return '<a class="feed-row" href="/business.html?slug='+encodeURIComponent(it.shop_slug||'')+'">'+
+      return '<a class="feed-row" href="/'+encodeURIComponent(it.shop_slug||'')+'">'+
              '<div class="feed-row-ico">'+photo+'</div>'+
              '<div class="feed-row-body">'+
                '<div class="feed-row-title">'+escHtml(it.title||'Activity')+'</div>'+

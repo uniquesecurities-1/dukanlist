@@ -330,8 +330,14 @@ async function loadBiz(){
       }
     } catch(_){ /* non-fatal */ }
   }
-  PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
-  REVIEW_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id) + '&review=1&src=qr-poster';
+  // v218: clean short URLs when slug exists (smaller QR = easier scans)
+  if (MY_BIZ.slug) {
+    PROFILE_URL = 'https://dukanlist.com/' + encodeURIComponent(MY_BIZ.slug);
+    REVIEW_URL  = 'https://dukanlist.com/' + encodeURIComponent(MY_BIZ.slug) + '?review=1&src=qr-poster';
+  } else {
+    PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.id);
+    REVIEW_URL  = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.id) + '&review=1&src=qr-poster';
+  }
 
   // Honor ?mode= URL param to deep-link from get-reviews page
   try {

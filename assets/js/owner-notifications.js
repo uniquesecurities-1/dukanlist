@@ -25,10 +25,16 @@
   }
 
   function init() {
-    // Wait until window.c (supabase client) is available
+    // v218 FIX: window.c was NEVER set anywhere in the codebase, so this
+    // script has been dead on all 10 pages since it shipped. The actual
+    // client lives at ShopDB.client (supabase-init.js). We now adopt it
+    // into window.c so the rest of this file works unchanged.
     var tries = 0;
     var poll = setInterval(function() {
       tries++;
+      if (!window.c && window.ShopDB && window.ShopDB.client) {
+        window.c = window.ShopDB.client;
+      }
       if (window.c && window.c.auth) {
         clearInterval(poll);
         boot();

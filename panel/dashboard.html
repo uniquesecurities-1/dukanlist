@@ -1140,7 +1140,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
 <script src="/assets/js/og-card-generator.js"></script>
-<script src="/assets/js/completeness.js"></script>
+<!-- v218: completeness.js removed — dead code (DukanCompleteness never called;
+     the live widget is inline renderProfileCompleteness). Was render-blocking 7.8KB. -->
 <script src="/assets/js/push.js"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanPush) DukanPush.attachButton('enableNotifBtn', { audience: 'owner' }); });</script>
 <script>
@@ -1987,7 +1988,7 @@ function renderTierRoadmap(b){
 function shareProfile(e){
   e.preventDefault();
   if (!MY_BUSINESS) return;
-  const url = location.origin + '/business.html?slug=' + encodeURIComponent(MY_BUSINESS.slug);
+  const url = location.origin + '/' + encodeURIComponent(MY_BUSINESS.slug); // v218: clean URL (vercel rewrite)
   const msg = `🏪 ${MY_BUSINESS.name}\n${MY_BUSINESS.usp_text || ''}\n\nFind us on DukanList: ${url}`;
   if (navigator.share) {
     navigator.share({ title: MY_BUSINESS.name, text: msg, url });
@@ -3257,11 +3258,10 @@ function shareReferralWhatsApp(){
 </script>
 
 <!-- Daily Poster Engine (2026-06-05) — 7-day theme rotation for Aaj ka Poster card -->
-<script src="/assets/js/daily-poster-engine.js" defer></script>
+<!-- v218: poster engines removed from dashboard (~70KB) — they only fed the
+     hidden Quick Poster card. poster-studio.html loads them itself. -->
 <!-- Festival Engine (2026-06-05): Auto-override poster theme on festival days -->
-<script src="/assets/js/festival-engine.js" defer></script>
 <!-- Template Mega Pack (2026-06-05): 30+ designs -->
-<script src="/assets/js/template-mega-pack.js" defer></script>
 <!-- Daily Buzz Stories (Phase 9) -->
 <script src="/assets/js/daily-buzz.js" defer></script>
 <!-- Engagement Engine (2026-06-05) -->
@@ -3273,6 +3273,6 @@ function shareReferralWhatsApp(){
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js" defer></script>
-<script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
+<!-- v218: dl-simple-mode.js removed — documented no-op since simple-mode retirement. -->
 </body>
 </html>

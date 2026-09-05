@@ -333,7 +333,7 @@ async function loadBiz(){
     return;
   }
   MY_BIZ = res.data;
-  document.getElementById('viewPublicLink').href = '/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
+  document.getElementById('viewPublicLink').href = MY_BIZ.slug ? '/' + encodeURIComponent(MY_BIZ.slug) : '/business.html?slug=' + encodeURIComponent(MY_BIZ.id); // v218
   await loadRecommendations();
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = '';
@@ -381,7 +381,7 @@ function renderRecommendations(){
       '<div class="rc-emoji">' + esc(r.recommended_icon || '🏪') + '</div>' +
       '<div class="rc-info">' +
         '<div class="rc-name">' +
-          '<a href="/business.html?slug=' + encodeURIComponent(r.recommended_slug) + '" target="_blank" style="color:inherit;text-decoration:none">' + esc(r.recommended_name) + '</a>' +
+          '<a href="/' + encodeURIComponent(r.recommended_slug) + '" target="_blank" style="color:inherit;text-decoration:none">' + esc(r.recommended_name) + '</a>' +
         '</div>' +
         '<div class="rc-meta">' + meta + '</div>' +
         labelHtml +
@@ -466,7 +466,7 @@ function renderIncoming(){
       '<div class="rc-emoji">' + esc(r.recommender_icon || '🏪') + '</div>' +
       '<div class="rc-info">' +
         '<div class="rc-name">' +
-          '<a href="/business.html?slug=' + encodeURIComponent(r.recommender_slug) + '" target="_blank" style="color:inherit;text-decoration:none">' + esc(r.recommender_name) + '</a>' +
+          '<a href="/' + encodeURIComponent(r.recommender_slug) + '" target="_blank" style="color:inherit;text-decoration:none">' + esc(r.recommender_name) + '</a>' +
           verifiedBadge +
         '</div>' +
         '<div class="rc-meta">' + esc(meta) + '</div>' +

@@ -249,7 +249,7 @@ async function loadServices(){
   MY_BIZ = biz;
   SERVICES = Array.isArray(biz.services_json) ? biz.services_json : [];
 
-  document.getElementById('viewPublicLink').href = '/business.html?slug=' + encodeURIComponent(biz.slug);
+  document.getElementById('viewPublicLink').href = '/' + encodeURIComponent(biz.slug); // v218: clean URL
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = '';
 

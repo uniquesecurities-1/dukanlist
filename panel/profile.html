@@ -149,7 +149,7 @@
   <div id="content" style="display:none">
 
     <!-- ===== BUSINESS DETAILS ===== -->
-    <div class="card">
+    <div class="card" id="owner">
       <div class="card-title">
         🏪 <span data-i18n-en>Business Details</span><span data-i18n-hi>दुकान की जानकारी</span>
       </div>
@@ -301,7 +301,7 @@
 
     <!-- ===== ABOUT US ===== -->
     <div class="card" style="margin-top:18px">
-      <div class="card-title">
+      <div class="card-title" id="about" style="scroll-margin-top:90px">
         📖 <span data-i18n-en>About Us</span><span data-i18n-hi>हमारे बारे में</span>
       </div>
       <div class="card-sub">
@@ -322,7 +322,7 @@
 
     <!-- ===== TRUST SIGNALS (structured fields shown on business page) ===== -->
     <div class="card" style="margin-top:18px">
-      <div class="card-title">
+      <div class="card-title" id="trust" style="scroll-margin-top:90px">
         ✨ <span data-i18n-en>Shop Trust Signals</span><span data-i18n-hi>विश्वास के संकेत</span>
       </div>
       <div class="card-sub">
@@ -362,7 +362,7 @@
 
     <!-- ===== FAQs ===== -->
     <div class="card" style="margin-top:18px">
-      <div class="card-title">
+      <div class="card-title" id="faqs" style="scroll-margin-top:90px">
         ❓ <span data-i18n-en>Frequently Asked Questions</span><span data-i18n-hi>आम सवाल-जवाब</span>
         <span id="faqCounter" class="faq-counter">0/10</span>
       </div>
@@ -383,7 +383,7 @@
 
     <!-- ===== BUSINESS HOURS ===== -->
     <div class="card" style="margin-top:18px">
-      <div class="card-title">
+      <div class="card-title" id="hours" style="scroll-margin-top:90px">
         🕒 <span data-i18n-en>Business Hours</span><span data-i18n-hi>दुकान का समय</span>
       </div>
       <div class="card-sub">
@@ -454,7 +454,7 @@
       <div class="spacer"></div>
     <!-- ===== SOCIAL MEDIA & WEBSITE ===== -->
     <div class="card">
-      <div class="card-title">
+      <div class="card-title" id="social" style="scroll-margin-top:90px">
         🌐 <span data-i18n-en>Social Media & Website</span><span data-i18n-hi>सोशल मीडिया & वेबसाइट</span>
         <span style="font-weight:500;color:var(--muted);font-size:.78rem;margin-left:6px">(optional)</span>
       </div>
@@ -684,7 +684,7 @@ async function loadProfile(){
   ALL_CATS = all || [];
 
   // Public profile link
-  document.getElementById('viewPublicLink').href = '/business.html?slug=' + encodeURIComponent(biz.slug);
+  document.getElementById('viewPublicLink').href = '/' + encodeURIComponent(biz.slug); // v218: clean URL
 
   populateFields();
   document.getElementById('loading').style.display = 'none';
@@ -1237,7 +1237,7 @@ function escapeHTML(s){
 function profilePublicUrl(){
   const slug = MY_BIZ && MY_BIZ.slug ? MY_BIZ.slug : '';
   if (!slug) return location.origin + '/';
-  return 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(slug);
+  return 'https://dukanlist.com/' + encodeURIComponent(slug); // v218: clean URL
 }
 
 function defaultAskMessage(){

@@ -188,7 +188,10 @@ async function loadBiz(){
     return;
   }
   MY_BIZ = res.data;
-  PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.slug || MY_BIZ.id);
+  // v218: clean short URL when slug exists (smaller QR = easier scans); id fallback keeps old form
+  PROFILE_URL = MY_BIZ.slug
+    ? 'https://dukanlist.com/' + encodeURIComponent(MY_BIZ.slug)
+    : 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.id);
 
   document.getElementById('qrShopName').textContent = MY_BIZ.name || 'Your Business';
   document.getElementById('qrUrl').textContent = PROFILE_URL;
