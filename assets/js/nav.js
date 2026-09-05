@@ -127,4 +127,30 @@
   } else {
     init();
   }
+
+  // ============================================================
+  // v219: Offline banner — panel pages previously showed a blank
+  // half-rendered screen on 2G dropouts with no message at all.
+  // Every page that loads nav.js now gets this for free.
+  // ============================================================
+  (function netBanner(){
+    var el = null;
+    function show(){
+      if (el) return;
+      el = document.createElement('div');
+      el.id = 'dlNetBanner';
+      el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#B91C1C;color:#fff;text-align:center;padding:9px 14px;font-size:.85rem;font-weight:700;font-family:inherit;box-shadow:0 2px 10px rgba(0,0,0,.25)';
+      el.innerHTML = '📡 Internet नहीं चल रहा — connection आते ही अपने-आप ठीक हो जाएगा। / No internet — will recover automatically.';
+      document.body.appendChild(el);
+    }
+    function hide(){
+      if (!el) return;
+      el.style.background = '#15803D';
+      el.innerHTML = '✓ Internet वापस आ गया! / Back online.';
+      setTimeout(function(){ if (el){ el.remove(); el = null; } }, 2000);
+    }
+    window.addEventListener('offline', show);
+    window.addEventListener('online', hide);
+    if (navigator.onLine === false) show();
+  })();
 })();
