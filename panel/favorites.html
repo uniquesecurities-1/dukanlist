@@ -113,7 +113,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
-<script src="/assets/js/mobile-nav.js"></script>
+<!-- v217 FIX: was mobile-nav.js (public-site bottom bar whose "Account" sent
+     logged-in owners to the login page). nav.js injects the proper hamburger. -->
+<script src="/assets/js/nav.js" defer></script>
 <script>
 function setLang(lang){
   if (lang !== 'en' && lang !== 'hi') lang = 'en';

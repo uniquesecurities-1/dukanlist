@@ -1869,7 +1869,10 @@ function renderVerificationCta(biz, c){
       btn.disabled = true;
       btn.textContent = 'Sending request...';
       try{
-        const { data, error } = await c.rpc('owner_request_verification');
+        // v217 FIX: was 'owner_request_verification' — that RPC never existed
+        // (correct name is shopkeeper_request_verification, db/84). Every tap
+        // on this button used to show a raw Postgres error alert.
+        const { data, error } = await c.rpc('shopkeeper_request_verification');
         if (error){
           alert('Error: ' + (error.message || 'Could not submit request. Please try again.'));
           btn.disabled = false; btn.textContent = 'Request Verification Visit'; return;

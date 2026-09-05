@@ -153,17 +153,29 @@ async function handleClaim(){
   // Step 2: If session exists (no email confirmation required), claim now
   if (signUpRes.data.session){
     btn.innerHTML = '<span>⏳ Linking your business...</span>';
-    try {
-      await c.rpc('claim_business_by_phone', { p_mobile: mobile });
-      // Success — redirect to dashboard
-      document.getElementById('formBlock').style.display = 'none';
-      document.getElementById('successBlock').style.display = '';
-      setTimeout(() => location.href = '/panel/dashboard.html', 1500);
-    } catch(claimErr){
+    // v217 FIX: supabase-js .rpc() RESOLVES with {data,error} — it never throws,
+    // so the old try/catch was unreachable and a failed claim (wrong number /
+    // already claimed) showed the SUCCESS screen + redirected to an empty
+    // dashboard. Now we branch on the actual error.
+    const claimRes = await c.rpc('claim_business_by_phone', { p_mobile: mobile });
+    if (claimRes.error){
       btn.disabled = false; btn.innerHTML = '<span>Create Login & Claim Shop →</span>';
-      err.textContent = (claimErr && claimErr.message) || 'No shop found with that mobile number, or already claimed. Login to dashboard if it\'s yours.';
+      let cmsg = claimRes.error.message || '';
+      if (/No shop found|already claimed/i.test(cmsg)){
+        cmsg = 'Is mobile number se koi shop nahi mili, ya pehle se claimed hai. Agar aapki hi shop hai to login karke dekhein.';
+      } else if (/Multiple shops/i.test(cmsg)){
+        cmsg = 'Is number par ek se zyada shops hain — admin se WhatsApp par contact karein (9541223377).';
+      } else if (!cmsg){
+        cmsg = 'Claim nahi ho paya. Dobara try karein.';
+      }
+      err.textContent = cmsg;
       err.style.display = 'flex';
+      return;
     }
+    // Genuine success — show success screen + redirect
+    document.getElementById('formBlock').style.display = 'none';
+    document.getElementById('successBlock').style.display = '';
+    setTimeout(() => location.href = '/panel/dashboard.html', 1500);
   } else {
     // Email confirmation required — save mobile so login.html can claim later
     localStorage.setItem('shop_pending_mobile', mobile);

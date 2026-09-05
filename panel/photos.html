@@ -393,8 +393,31 @@ function updateCountPill(){
 }
 
 function initCloudinaryWidget(){
-  // Wait for Cloudinary script to load
+  // v217 FIX: previously retried FOREVER with no user feedback — if the
+  // Cloudinary script was slow/blocked, the Upload button silently did
+  // nothing. Now: cap ~15s of retries, then show a clear bilingual error
+  // with a reload button. Also wire the button IMMEDIATELY so early taps
+  // get a "loading" message instead of dead silence.
+  window._cwRetries = (window._cwRetries || 0);
   if (typeof cloudinary === 'undefined') {
+    // Wire an interim handler on first attempt so taps aren't silent
+    if (window._cwRetries === 0) {
+      const b = document.getElementById('uploadBtn');
+      if (b && !b._interimWired) {
+        b._interimWired = true;
+        b.addEventListener('click', function interimTap(){
+          if (STATE.widget) return; // real handler will take over
+          showError('Photo upload service load ho rahi hai — 5 second baad dobara try karein. / फोटो सेवा लोड हो रही है — 5 सेकंड बाद फिर कोशिश करें।');
+        });
+      }
+    }
+    window._cwRetries++;
+    if (window._cwRetries > 50) {  // ~15 seconds
+      showError('Photo upload service nahi khul rahi — internet check karke page reload karein. / फोटो सेवा नहीं खुल रही — इंटरनेट check करके page reload करें। 🔄');
+      const b = document.getElementById('uploadBtn');
+      if (b) { b.textContent = '🔄 Reload page'; b.onclick = () => location.reload(); }
+      return;
+    }
     setTimeout(initCloudinaryWidget, 300);
     return;
   }
