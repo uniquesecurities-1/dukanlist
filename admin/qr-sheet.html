@@ -115,7 +115,8 @@
       <div id="results" class="results" style="display:none"></div>
       <div class="slots" id="slots" style="margin-top:12px"></div>
       <div class="hint">The same shop can be added more than once — handy for one Review card and one Profile card.
-        Each card below has its own ⭐/🏪 switch, so changing one never touches the others.</div>
+        Each card below has its own ⭐/🏪 switch, so changing one never touches the others.
+        <br><b>⬇ Download PNG</b> saves just that one card (A6, print quality) — good for WhatsApping it to the shopkeeper.</div>
     </div>
 
     <!-- STEP 3 — print -->
@@ -229,6 +230,7 @@ function renderSlots(){
           '<button class="' + (s.type === 'profile' ? 'on' : '') + '" onclick="setSlotType(' + i + ',\'profile\')">🏪 Profile</button>' +
         '</div>' +
         '<a class="test" href="' + esc(url) + '" target="_blank" rel="noopener">Test this link ↗</a>' +
+        ' &nbsp;·&nbsp; <a class="test" href="#" onclick="downloadCardPNG(' + i + ');return false">⬇ Download PNG</a>' +
       '</div>' +
       '<button class="x" onclick="removeSlot(' + i + ')" title="Remove">×</button>' +
     '</div>';
@@ -264,6 +266,116 @@ function addShop(b){
   renderSlots(); renderSheet();
   document.getElementById('q').value = '';
   document.getElementById('results').style.display = 'none';
+}
+
+/* ---------- v224b: single-card PNG download (A6 @ 300 DPI) ----------
+   Drawn directly on a canvas — no external library, print-quality output,
+   safe to WhatsApp straight to the shopkeeper.                           */
+function wrapLines(ctx, text, maxW){
+  var words = String(text).split(' ');
+  var lines = [], cur = '';
+  for (var i = 0; i < words.length; i++){
+    var t = cur ? cur + ' ' + words[i] : words[i];
+    if (ctx.measureText(t).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+    else { cur = t; }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+async function downloadCardPNG(i){
+  var s = SLOTS[i];
+  if (!s){ return; }
+  if (typeof qrcode !== 'function'){ alert('QR library not loaded — reload the page.'); return; }
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+
+  var b = s.biz, isReview = (s.type === 'review');
+  var W = 1240, H = 1754;                 // A6 at 300 DPI
+  var PX_MM = W / 105;                    // px per mm
+  var cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  var x = cv.getContext('2d');
+
+  x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+  x.textAlign = 'center'; x.textBaseline = 'top';
+
+  var F = 'Manrope, "Plus Jakarta Sans", Arial, sans-serif';
+  var pad     = 7 * PX_MM;
+  var maxW    = W - pad * 2;
+  var kicker  = isReview ? 'RATE US ON DUKANLIST' : 'FIND US ON DUKANLIST';
+  var line    = isReview
+    ? 'Loved your visit? Scan and leave us 5 stars in 10 seconds. Your review helps our business grow.'
+    : 'Scan to see our photos, timings, services and contact — all in one place.';
+  var url     = isReview ? reviewURL(b.slug) : profileURL(b.slug);
+  var qrSize  = 46 * PX_MM;
+
+  // --- measure so the whole block sits vertically centred ---
+  x.font = '900 62px ' + F;
+  var nameLines = wrapLines(x, b.name || '', maxW);
+  x.font = '500 35px ' + F;
+  var lineLines = wrapLines(x, line, 78 * PX_MM);
+
+  var gap = 8 * PX_MM;
+  var total = 33 + 2 * PX_MM
+    + nameLines.length * 72 + 1.5 * PX_MM
+    + (isReview ? 54 + 2 * PX_MM : 0)
+    + lineLines.length * 48 + 3 * PX_MM
+    + qrSize + 2.5 * PX_MM
+    + 35 + 3 * PX_MM
+    + 28;
+  var y = Math.max(pad, (H - total) / 2);
+
+  // --- kicker ---
+  x.fillStyle = '#C2410C'; x.font = '900 33px ' + F;
+  x.fillText(kicker, W / 2, y); y += 33 + 2 * PX_MM;
+
+  // --- shop name ---
+  x.fillStyle = '#0F172A'; x.font = '900 62px ' + F;
+  nameLines.forEach(function(t){ x.fillText(t, W / 2, y); y += 72; });
+  y += 1.5 * PX_MM;
+
+  // --- stars (review only) ---
+  if (isReview){
+    x.font = '54px ' + F;
+    x.fillText('⭐⭐⭐⭐⭐', W / 2, y);
+    y += 54 + 2 * PX_MM;
+  }
+
+  // --- description ---
+  x.fillStyle = '#475569'; x.font = '500 35px ' + F;
+  lineLines.forEach(function(t){ x.fillText(t, W / 2, y); y += 48; });
+  y += 3 * PX_MM;
+
+  // --- QR ---
+  await new Promise(function(res){
+    var img = new Image();
+    img.onload = function(){
+      x.imageSmoothingEnabled = false;
+      x.drawImage(img, (W - qrSize) / 2, y, qrSize, qrSize);
+      res();
+    };
+    img.onerror = res;
+    img.src = qrDataURL(url);
+  });
+  y += qrSize + 2.5 * PX_MM;
+
+  // --- scan line ---
+  x.fillStyle = '#0F172A'; x.font = '800 35px ' + F;
+  x.fillText('Open phone camera & scan', W / 2, y);
+  y += 35 + 3 * PX_MM;
+
+  // --- footer ---
+  x.strokeStyle = '#FDBA74'; x.lineWidth = 2; x.setLineDash([6, 6]);
+  x.beginPath(); x.moveTo(pad, y); x.lineTo(W - pad, y); x.stroke(); x.setLineDash([]);
+  y += 2 * PX_MM;
+  x.fillStyle = '#9A3412'; x.font = '800 28px ' + F;
+  x.fillText('DUKANLIST.COM · MANDI DABWALI’S LOCAL DIRECTORY', W / 2, y);
+
+  // --- save ---
+  var a = document.createElement('a');
+  a.download = (b.slug || 'shop') + '-' + s.type + '-qr.png';
+  a.href = cv.toDataURL('image/png');
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 /* ---------- search ---------- */
