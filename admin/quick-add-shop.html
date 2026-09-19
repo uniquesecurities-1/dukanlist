@@ -195,6 +195,18 @@
         <input type="text" id="f_area" placeholder="School Road, Mandi Dabwali" autocomplete="off">
       </div>
 
+      <!-- v225: email at pre-list time, so the claim invite can go out immediately -->
+      <div class="field">
+        <label>📧 Email (optional)</label>
+        <input type="email" id="f_email" placeholder="owner@gmail.com" autocomplete="off" inputmode="email">
+        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:8px;font-weight:600;font-size:.84rem;cursor:pointer">
+          <input type="checkbox" id="f_sendInvite" checked style="margin-top:3px;width:17px;height:17px;flex-shrink:0;accent-color:#FF6B1A">
+          <span>Send claim + verification email turant<br>
+            <span class="hint" style="margin:0">Owner ko magic link jayega — click karte hi email verify ho jayega aur listing unke account se jud jayegi.</span>
+          </span>
+        </label>
+      </div>
+
       <div class="field">
         <label>🏷️ Categories <span style="color:#94A3B8;font-weight:600;text-transform:none;font-size:.7rem">(max 5 — pehli wali primary hoti hai)</span></label>
         <input type="text" id="f_category_search" placeholder="🔍 Search aur add karo (gas, doctor, kirana...)" autocomplete="off" style="margin-bottom:8px">
@@ -753,6 +765,12 @@ async function submitSingle(){
   if (!/^[6789]\d{9}$/.test(mobile)){
     return showErr('Mobile invalid — must be 10 digits, start with 6/7/8/9');
   }
+  // v225: optional email + invite
+  const email = (document.getElementById('f_email').value || '').trim().toLowerCase();
+  const wantInvite = document.getElementById('f_sendInvite').checked;
+  if (email && !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email)){
+    return showErr('Email format galat hai — dobara check karein');
+  }
 
   const btn = document.getElementById('singleSubmitBtn');
   btn.disabled = true;
@@ -769,7 +787,8 @@ async function submitSingle(){
       p_city_id:                cityId,
       p_source:                 source,
       p_consent_method:         consent,
-      p_notes:                  notes || null
+      p_notes:                  notes || null,
+      p_email:                  email || null      // v225
     });
     if (error) throw error;
     if (!data || !data.success) throw new Error('Failed to add');
@@ -779,8 +798,33 @@ async function submitSingle(){
       name:        name,
       mobile:      mobile,
       area:        area,
-      claim_url:   data.claim_url
+      claim_url:   data.claim_url,
+      email:       email || null,
+      inviteMsg:   ''
     };
+
+    // v225: fire the claim + verification magic link right away
+    if (email && wantInvite){
+      btn.textContent = '📧 Sending invite...';
+      try {
+        const logRes = await C.rpc('admin_log_email_invite', {
+          p_business_id: data.business_id,
+          p_email:       email,
+          p_notes:       'Sent from Quick Add',
+          p_sent_via:    'magic-link'
+        });
+        const claimUrl = (logRes && logRes.data && logRes.data.claim_url) || data.claim_url;
+        const otp = await C.auth.signInWithOtp({
+          email: email,
+          options: { emailRedirectTo: claimUrl, shouldCreateUser: true }
+        });
+        LAST_RESULT.inviteMsg = otp.error
+          ? '⚠️ Shop add ho gayi, par invite email nahi gayi: ' + otp.error.message
+          : '📧 Claim + verification email bhej di gayi — ' + email;
+      } catch(ie){
+        LAST_RESULT.inviteMsg = '⚠️ Shop add ho gayi, par invite email nahi gayi: ' + (ie.message || ie);
+      }
+    }
 
     showSuccess();
     refreshStats();
@@ -804,6 +848,28 @@ function showSuccess(){
   document.getElementById('successCard').classList.add('show');
   document.getElementById('successShopName').textContent = '🏪 ' + LAST_RESULT.name;
   document.getElementById('successClaimUrl').textContent = LAST_RESULT.claim_url;
+  // v225: show whether the invite email actually went out
+  var inv = document.getElementById('inviteStatus');
+  if (!inv){
+    inv = document.createElement('div');
+    inv.id = 'inviteStatus';
+    inv.style.cssText = 'margin:12px 0;padding:10px 14px;border-radius:9px;font-size:.86rem;font-weight:700;line-height:1.5';
+    var nameEl = document.getElementById('successShopName');
+    if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(inv, nameEl.nextSibling);
+  }
+  if (LAST_RESULT.inviteMsg){
+    var bad = LAST_RESULT.inviteMsg.indexOf('⚠️') === 0;
+    inv.style.background = bad ? '#FEF3C7' : '#DCFCE7';
+    inv.style.color      = bad ? '#92400E' : '#166534';
+    inv.textContent = LAST_RESULT.inviteMsg;
+    inv.style.display = '';
+  } else if (LAST_RESULT.email){
+    inv.style.background = '#EFF6FF'; inv.style.color = '#1E40AF';
+    inv.textContent = '📧 Email saved (' + LAST_RESULT.email + ') — invite nahi bheji gayi.';
+    inv.style.display = '';
+  } else {
+    inv.style.display = 'none';
+  }
   updateWaButton();
   window.scrollTo({ top:0, behavior:'smooth' });
 }
@@ -812,6 +878,7 @@ function resetSingleForm(){
   document.getElementById('f_name').value = '';
   document.getElementById('f_mobile').value = '';
   document.getElementById('f_area').value = '';
+  document.getElementById('f_email').value = '';   // v225
   document.getElementById('f_notes').value = '';
   // Clear selected categories so next entry starts fresh
   SELECTED_CATEGORIES = [];
