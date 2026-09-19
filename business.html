@@ -2201,7 +2201,17 @@ function setLang(lang){
 let BIZ = null;
 
 async function loadBusiness(){
-  const slug = new URLSearchParams(location.search).get('slug');
+  // v222: support BOTH /business?slug=x and the clean /x URL.
+  // Vercel rewrites are internal — the browser URL stays /x with NO query
+  // string — so reading location.search alone breaks every clean/QR link.
+  let slug = new URLSearchParams(location.search).get('slug');
+  if (!slug){
+    const seg = location.pathname.replace(/^\/+|\/+$/g, '');
+    // single path segment, slug-shaped, and not one of our real pages
+    if (seg && !seg.includes('/') && /^[a-z][a-z0-9-]{4,}$/.test(seg) && seg !== 'business'){
+      slug = seg;
+    }
+  }
   if (!slug){ showNotFound(); return; }
 
   const c = ShopDB.client;

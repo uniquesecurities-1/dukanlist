@@ -154,14 +154,19 @@
 
 <script>
 (async function(){
-  function qs(name){
-    const u = new URLSearchParams(location.search);
-    const v = u.get(name);
+  function clean(v){
     return (v || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 60) || null;
   }
+  function qs(name){
+    return clean(new URLSearchParams(location.search).get(name));
+  }
+  // v222: support the clean /top/<cat>[/<city>] URLs — Vercel rewrites are
+  // internal, so the browser URL keeps no query string.
+  const pathParts = location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+  const fromPath  = (pathParts[0] === 'top') ? pathParts.slice(1) : [];
 
-  const catSlug  = qs('cat');
-  const citySlug = qs('city');
+  const catSlug  = qs('cat')  || clean(fromPath[0]);
+  const citySlug = qs('city') || clean(fromPath[1]);
 
   if (!window.ShopDB || !ShopDB.client){
     // Wait and retry

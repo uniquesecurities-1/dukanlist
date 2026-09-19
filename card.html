@@ -997,6 +997,12 @@ async function loadCard(){
   var qs = new URLSearchParams(location.search);
   var slug = qs.get('slug') || qs.get('s');
   var id   = qs.get('id');
+  // v222: support the clean /c/<slug> URL — Vercel rewrites are internal, so
+  // the browser URL keeps no query string and location.search is empty.
+  if (!slug && !id){
+    var m = location.pathname.match(/^\/c\/([a-z0-9-]+)\/?$/i);
+    if (m) slug = m[1];
+  }
   if (!slug && !id){
     document.getElementById('content').innerHTML = '<div class="state"><div class="ico">❌</div><div>No card specified.<br><small>Open via your DukanList listing link.</small></div></div>';
     return;
