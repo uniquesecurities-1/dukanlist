@@ -5,19 +5,19 @@
   "rewrites": [
     {
       "source": "/top/:cat([a-z][a-z0-9-]+)/:city([a-z][a-z0-9-]+)/",
-      "destination": "/top.html?cat=:cat&city=:city"
+      "destination": "/top?cat=:cat&city=:city"
     },
     {
       "source": "/top/:cat([a-z][a-z0-9-]+)/:city([a-z][a-z0-9-]+)",
-      "destination": "/top.html?cat=:cat&city=:city"
+      "destination": "/top?cat=:cat&city=:city"
     },
     {
       "source": "/top/:cat([a-z][a-z0-9-]+)/",
-      "destination": "/top.html?cat=:cat"
+      "destination": "/top?cat=:cat"
     },
     {
       "source": "/top/:cat([a-z][a-z0-9-]+)",
-      "destination": "/top.html?cat=:cat"
+      "destination": "/top?cat=:cat"
     },
     {
       "source": "/sitemap.xml",
@@ -53,11 +53,11 @@
     },
     {
       "source": "/c/:slug",
-      "destination": "/card.html?slug=:slug"
+      "destination": "/card?slug=:slug"
     },
     {
       "source": "/:slug([a-z][a-z0-9-][a-z0-9-][a-z0-9-][a-z0-9-]+)",
-      "destination": "/business.html?slug=:slug"
+      "destination": "/business?slug=:slug"
     }
   ],
   "headers": [
