@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Sheet (4-up A4) — DukanList Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box }
+  body{ font-family:'Manrope',sans-serif; background:#F8FAFC; color:#0F172A; margin:0 }
+  .nav{ background:linear-gradient(135deg,#0F172A,#1E3A8A); color:#fff; padding:12px 24px; display:flex; align-items:center; gap:18px; flex-wrap:wrap }
+  .nav a{ color:#FCD34D; text-decoration:none; font-weight:700; font-size:14px }
+  .nav .brand{ font-weight:900; font-size:16px; color:#fff }
+  .wrap{ max-width:1180px; margin:24px auto; padding:0 20px }
+  h1{ font-size:22px; font-weight:900; margin:0 0 4px }
+  .sub{ font-size:13px; color:#64748b; margin-bottom:22px }
+  .card{ background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:18px; margin-bottom:18px }
+  .card-h{ font-weight:900; font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px }
+  input[type=text]{ width:100%; padding:11px 13px; border:1.5px solid #CBD5E1; border-radius:9px; font:inherit; font-size:14px }
+  .btn{ border:0; border-radius:9px; padding:11px 20px; font:inherit; font-weight:800; font-size:14px; cursor:pointer }
+  .btn-pri{ background:linear-gradient(135deg,#FF6B1A,#EA580C); color:#fff }
+  .btn-sec{ background:#F1F5F9; color:#334155; border:1px solid #CBD5E1 }
+  .btn:disabled{ opacity:.5; cursor:not-allowed }
+  .results{ margin-top:10px; border:1px solid #E2E8F0; border-radius:9px; overflow:hidden }
+  .res-row{ padding:10px 13px; border-bottom:1px solid #F1F5F9; cursor:pointer; display:flex; justify-content:space-between; gap:10px; align-items:center }
+  .res-row:last-child{ border-bottom:0 }
+  .res-row:hover{ background:#FFF7ED }
+  .res-name{ font-weight:800; font-size:14px }
+  .res-meta{ font-size:12px; color:#64748b }
+  .pill{ font-size:11px; font-weight:800; padding:2px 8px; border-radius:99px; background:#DCFCE7; color:#166534 }
+  .pill.pending{ background:#FEF3C7; color:#92400E }
+  .slots{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px }
+  .slot{ border:1.5px dashed #CBD5E1; border-radius:10px; padding:11px 13px; min-height:62px; display:flex; align-items:center; justify-content:space-between; gap:8px }
+  .slot.filled{ border-style:solid; border-color:#FF6B1A; background:#FFF7ED }
+  .slot-empty{ color:#94A3B8; font-size:13px; font-weight:700 }
+  .x{ background:#FEE2E2; color:#991B1B; border:0; border-radius:50%; width:26px; height:26px; font-weight:900; cursor:pointer; flex-shrink:0 }
+  .modes{ display:flex; gap:8px; flex-wrap:wrap }
+  .mode{ padding:9px 16px; border:1.5px solid #CBD5E1; border-radius:99px; font-weight:800; font-size:13px; cursor:pointer; background:#fff }
+  .mode.active{ background:#0F172A; color:#fff; border-color:#0F172A }
+  .hint{ font-size:12px; color:#64748b; margin-top:8px; line-height:1.5 }
+  .tiny{ font-size:11px; color:#94A3B8 }
+  a.test{ font-size:11px; color:#1D4ED8; text-decoration:none; font-weight:700 }
+
+  /* ===== A4 SHEET (2x2) — real mm units so print is exact ===== */
+  .sheet-scroll{ overflow-x:auto; padding-bottom:10px }
+  #sheet{
+    width:210mm; height:297mm; background:#fff; margin:0 auto;
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+    box-shadow:0 4px 24px rgba(15,23,42,.14);
+  }
+  .cell{
+    border:1px dashed #CBD5E1;          /* cut guide */
+    padding:9mm 7mm; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    overflow:hidden;
+  }
+  .cell.blank{ background:#FAFAFA }
+  .c-kicker{ font-size:8pt; font-weight:900; letter-spacing:.09em; color:#C2410C; text-transform:uppercase; margin-bottom:2mm }
+  .c-name{ font-size:15pt; font-weight:900; line-height:1.15; margin-bottom:1.5mm; word-break:break-word }
+  .c-stars{ font-size:13pt; letter-spacing:2px; margin-bottom:2mm }
+  .c-line{ font-size:8.5pt; color:#475569; line-height:1.45; margin-bottom:3mm; max-width:78mm }
+  .c-qr{ width:46mm; height:46mm; image-rendering:pixelated; display:block }
+  .c-qr.dual{ width:33mm; height:33mm }
+  .c-duo{ display:flex; gap:6mm; align-items:flex-start; justify-content:center }
+  .c-duo-lbl{ font-size:7.5pt; font-weight:900; margin-top:1mm; color:#0F172A }
+  .c-scan{ font-size:8.5pt; font-weight:800; margin-top:2.5mm }
+  .c-scan b{ color:#EA580C }
+  .c-foot{ font-size:6.8pt; font-weight:800; color:#9A3412; letter-spacing:.05em; margin-top:3mm; border-top:1px dotted #FDBA74; padding-top:2mm; width:100%; text-transform:uppercase }
+
+  @page { size:A4 portrait; margin:0 }
+  @media print{
+    .no-print{ display:none !important }
+    body{ background:#fff }
+    .wrap{ margin:0; padding:0; max-width:none }
+    .sheet-scroll{ overflow:visible; padding:0 }
+    #sheet{ box-shadow:none; margin:0 }
+    .cell{ border-color:#E2E8F0 }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav no-print">
+  <span class="brand">🛡 DukanList Admin</span>
+  <a href="/admin/dashboard">📊 Dashboard</a>
+  <a href="/admin/moderation">⚖️ Moderation</a>
+  <a href="/admin/quick-add-shop.html">📥 Quick Add</a>
+  <a href="#" onclick="doLogout();return false" style="margin-left:auto;color:#94A3B8;font-size:12px">Logout</a>
+</div>
+
+<div class="wrap">
+  <div class="no-print">
+    <h1>🖨 QR Sheet — 4 shops on one A4</h1>
+    <div class="sub">Pick up to 4 shops, choose the QR type, print one A4 and cut into 4 cards. No paper wasted.</div>
+
+    <!-- STEP 1 — pick shops -->
+    <div class="card">
+      <div class="card-h">1️⃣ Pick shops <span class="tiny" id="slotCount">0 / 4</span></div>
+      <input type="text" id="q" placeholder="Search shop by name or mobile…" autocomplete="off">
+      <div id="results" class="results" style="display:none"></div>
+      <div class="slots" id="slots" style="margin-top:12px"></div>
+    </div>
+
+    <!-- STEP 2 — QR type -->
+    <div class="card">
+      <div class="card-h">2️⃣ QR type</div>
+      <div class="modes">
+        <button class="mode active" data-mode="review">⭐ Review QR</button>
+        <button class="mode" data-mode="profile">🏪 Profile QR</button>
+        <button class="mode" data-mode="both">⭐+🏪 Both</button>
+      </div>
+      <div class="hint" id="modeHint">Scanning opens the shop page with the review box already open — best for the billing counter.</div>
+    </div>
+
+    <!-- STEP 3 — print -->
+    <div class="card">
+      <div class="card-h">3️⃣ Print</div>
+      <button class="btn btn-pri" onclick="window.print()">🖨 Print A4 sheet</button>
+      <button class="btn btn-sec" onclick="clearAll()" style="margin-left:8px">Clear all</button>
+      <div class="hint">
+        In the print dialog set <b>Margins: None</b> and <b>Scale: 100%</b> (uncheck “Fit to page”), and turn
+        <b>Background graphics ON</b>. Cut along the dashed lines — each card is A6 (105 × 148 mm).
+        <br>Empty slots print blank, so you can reuse that part of the sheet later.
+      </div>
+    </div>
+
+    <div class="sub" style="margin-top:22px;font-weight:800;color:#0F172A">Preview — this is exactly what prints</div>
+  </div>
+
+  <div class="sheet-scroll">
+    <div id="sheet"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+var C = null;
+var SLOTS = [null, null, null, null];
+var MODE = 'review';
+var BASE = 'https://dukanlist.com';
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(ch){
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch];
+  });
+}
+async function doLogout(){
+  try { if (C) await C.auth.signOut(); } catch(e){}
+  location.href = '/admin/login.html';
+}
+
+/* ---------- QR rendering (canvas → dataURL, print-quality) ---------- */
+function qrDataURL(text){
+  if (typeof qrcode !== 'function') return '';
+  var qr = qrcode(0, 'H');           // high error correction — survives ink bleed
+  qr.addData(text);
+  qr.make();
+  var cell = 10, quiet = 4;
+  var mods = qr.getModuleCount();
+  var size = (mods + quiet * 2) * cell;
+  var cv = document.createElement('canvas');
+  cv.width = size; cv.height = size;
+  var x = cv.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, size, size);
+  x.fillStyle = '#0F172A';
+  for (var r = 0; r < mods; r++){
+    for (var c = 0; c < mods; c++){
+      if (qr.isDark(r, c)) x.fillRect((c + quiet) * cell, (r + quiet) * cell, cell, cell);
+    }
+  }
+  return cv.toDataURL('image/png');
+}
+function profileURL(slug){ return BASE + '/' + encodeURIComponent(slug); }
+function reviewURL(slug){  return BASE + '/' + encodeURIComponent(slug) + '?review=1'; }
+
+/* ---------- sheet render ---------- */
+function renderSheet(){
+  var sheet = document.getElementById('sheet');
+  if (typeof qrcode !== 'function'){
+    sheet.innerHTML = '<div class="cell" style="grid-column:1/-1;grid-row:1/-1;color:#991B1B;font-weight:800">' +
+      'QR library did not load.<br><span style="font-weight:600;font-size:9pt">Check your internet and reload this page before printing.</span></div>';
+    return;
+  }
+  sheet.innerHTML = SLOTS.map(function(b){
+    if (!b) return '<div class="cell blank"></div>';
+
+    var name = esc(b.name || '');
+    var qrBlock, kicker, line;
+
+    if (MODE === 'both'){
+      kicker = 'Find us on DukanList';
+      line   = 'Scan the left QR to see our full profile, or the right QR to leave a review.';
+      qrBlock =
+        '<div class="c-duo">' +
+          '<div><img class="c-qr dual" src="' + qrDataURL(profileURL(b.slug)) + '" alt=""><div class="c-duo-lbl">🏪 Profile</div></div>' +
+          '<div><img class="c-qr dual" src="' + qrDataURL(reviewURL(b.slug))  + '" alt=""><div class="c-duo-lbl">⭐ Review</div></div>' +
+        '</div>';
+    } else if (MODE === 'profile'){
+      kicker = 'Find us on DukanList';
+      line   = 'Scan to see our photos, timings, services and contact — all in one place.';
+      qrBlock = '<img class="c-qr" src="' + qrDataURL(profileURL(b.slug)) + '" alt="">';
+    } else {
+      kicker = 'Rate us on DukanList';
+      line   = 'Loved your visit? Scan and leave us 5 stars in 10 seconds. Your review helps our business grow.';
+      qrBlock = '<img class="c-qr" src="' + qrDataURL(reviewURL(b.slug)) + '" alt="">';
+    }
+
+    return '<div class="cell">' +
+      '<div class="c-kicker">' + kicker + '</div>' +
+      '<div class="c-name">' + name + '</div>' +
+      (MODE === 'review' ? '<div class="c-stars">⭐⭐⭐⭐⭐</div>' : '') +
+      '<div class="c-line">' + line + '</div>' +
+      qrBlock +
+      '<div class="c-scan">Open phone <b>camera</b> & scan</div>' +
+      '<div class="c-foot">dukanlist.com · Mandi Dabwali’s Local Directory</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ---------- slots ---------- */
+function renderSlots(){
+  var host = document.getElementById('slots');
+  host.innerHTML = SLOTS.map(function(b, i){
+    if (!b) return '<div class="slot"><span class="slot-empty">Slot ' + (i + 1) + ' — empty</span></div>';
+    var url = (MODE === 'profile') ? profileURL(b.slug) : reviewURL(b.slug);
+    return '<div class="slot filled">' +
+      '<div style="min-width:0">' +
+        '<div class="res-name">' + esc(b.name) + '</div>' +
+        '<div class="res-meta">' + esc(b.city_name || '') + '</div>' +
+        '<a class="test" href="' + esc(url) + '" target="_blank" rel="noopener">Test this link ↗</a>' +
+      '</div>' +
+      '<button class="x" onclick="removeSlot(' + i + ')" title="Remove">×</button>' +
+    '</div>';
+  }).join('');
+  document.getElementById('slotCount').textContent =
+    SLOTS.filter(Boolean).length + ' / 4';
+}
+function removeSlot(i){ SLOTS[i] = null; renderSlots(); renderSheet(); }
+function clearAll(){ SLOTS = [null,null,null,null]; renderSlots(); renderSheet(); }
+function addShop(b){
+  if (SLOTS.some(function(s){ return s && s.id === b.id; })) { alert('Already added.'); return; }
+  var i = SLOTS.indexOf(null);
+  if (i < 0){ alert('All 4 slots are full — remove one first.'); return; }
+  SLOTS[i] = b;
+  renderSlots(); renderSheet();
+  document.getElementById('q').value = '';
+  document.getElementById('results').style.display = 'none';
+}
+
+/* ---------- search ---------- */
+var searchTimer = null;
+async function runSearch(){
+  var q = document.getElementById('q').value.trim();
+  var box = document.getElementById('results');
+  if (q.length < 2){ box.style.display = 'none'; return; }
+  var r = await C.rpc('admin_global_search', { p_query: q, p_limit: 10 });
+  if (r.error){
+    box.innerHTML = '<div class="res-row"><span class="res-meta">Search failed: ' + esc(r.error.message) + '</span></div>';
+    box.style.display = ''; return;
+  }
+  var rows = r.data || [];
+  if (!rows.length){
+    box.innerHTML = '<div class="res-row"><span class="res-meta">No shops found</span></div>';
+    box.style.display = ''; return;
+  }
+  box.innerHTML = rows.map(function(b, i){
+    return '<div class="res-row" data-i="' + i + '">' +
+      '<div style="min-width:0">' +
+        '<div class="res-name">' + esc(b.name || '') + '</div>' +
+        '<div class="res-meta">' + esc(b.city_name || '') + ' · ' + esc(b.mobile || '') + '</div>' +
+      '</div>' +
+      '<span class="pill' + (b.status === 'active' ? '' : ' pending') + '">' + esc(b.status || '') + '</span>' +
+    '</div>';
+  }).join('');
+  box.style.display = '';
+  box.querySelectorAll('.res-row').forEach(function(row){
+    row.addEventListener('click', function(){
+      var b = rows[+row.dataset.i];
+      if (!b || !b.slug){ alert('This shop has no slug yet — open it in Admin and save once.'); return; }
+      addShop(b);
+    });
+  });
+}
+
+/* ---------- init ---------- */
+(async function init(){
+  C = window.ShopDB && window.ShopDB.client;
+  if (!C){ alert('Supabase not ready — reload the page.'); return; }
+  try {
+    var u = await C.auth.getUser();
+    if (!u || !u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
+    var ia = await C.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); location.href = '/admin/login.html'; return; }
+  } catch(e){ location.href = '/admin/login.html'; return; }
+
+  document.getElementById('q').addEventListener('input', function(){
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(runSearch, 280);
+  });
+
+  document.querySelectorAll('.mode').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.mode').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      MODE = btn.dataset.mode;
+      document.getElementById('modeHint').textContent =
+        MODE === 'review'  ? 'Scanning opens the shop page with the review box already open — best for the billing counter.' :
+        MODE === 'profile' ? 'Scanning opens the full shop profile — best for a visiting card or shop board.' :
+                             'Two QRs per card: left opens the profile, right opens the review box.';
+      renderSlots(); renderSheet();
+    });
+  });
+
+  renderSlots();
+  renderSheet();
+})();
+</script>
+</body>
+</html>
