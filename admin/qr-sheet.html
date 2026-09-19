@@ -39,6 +39,9 @@
   .mode{ padding:9px 16px; border:1.5px solid #CBD5E1; border-radius:99px; font-weight:800; font-size:13px; cursor:pointer; background:#fff }
   .mode.active{ background:#0F172A; color:#fff; border-color:#0F172A }
   .hint{ font-size:12px; color:#64748b; margin-top:8px; line-height:1.5 }
+  .stype{ display:flex; gap:4px; margin-top:5px }
+  .stype button{ font-size:10px; font-weight:800; padding:3px 9px; border-radius:99px; border:1px solid #CBD5E1; background:#fff; cursor:pointer; font-family:inherit }
+  .stype button.on{ background:#0F172A; color:#fff; border-color:#0F172A }
   .tiny{ font-size:11px; color:#94A3B8 }
   a.test{ font-size:11px; color:#1D4ED8; text-decoration:none; font-weight:700 }
 
@@ -94,23 +97,25 @@
     <h1>🖨 QR Sheet — 4 shops on one A4</h1>
     <div class="sub">Pick up to 4 shops, choose the QR type, print one A4 and cut into 4 cards. No paper wasted.</div>
 
-    <!-- STEP 1 — pick shops -->
+    <!-- STEP 1 — which QR type to use when adding -->
     <div class="card">
-      <div class="card-h">1️⃣ Pick shops <span class="tiny" id="slotCount">0 / 4</span></div>
-      <input type="text" id="q" placeholder="Search shop by name or mobile…" autocomplete="off">
-      <div id="results" class="results" style="display:none"></div>
-      <div class="slots" id="slots" style="margin-top:12px"></div>
-    </div>
-
-    <!-- STEP 2 — QR type -->
-    <div class="card">
-      <div class="card-h">2️⃣ QR type</div>
+      <div class="card-h">1️⃣ QR type to add</div>
       <div class="modes">
         <button class="mode active" data-mode="review">⭐ Review QR</button>
         <button class="mode" data-mode="profile">🏪 Profile QR</button>
-        <button class="mode" data-mode="both">⭐+🏪 Both</button>
+        <button class="mode" data-mode="both">⭐+🏪 Both — 2 cards</button>
       </div>
       <div class="hint" id="modeHint">Scanning opens the shop page with the review box already open — best for the billing counter.</div>
+    </div>
+
+    <!-- STEP 2 — pick shops -->
+    <div class="card">
+      <div class="card-h">2️⃣ Pick shops <span class="tiny" id="slotCount">0 / 4</span></div>
+      <input type="text" id="q" placeholder="Search shop by name or mobile…" autocomplete="off">
+      <div id="results" class="results" style="display:none"></div>
+      <div class="slots" id="slots" style="margin-top:12px"></div>
+      <div class="hint">The same shop can be added more than once — handy for one Review card and one Profile card.
+        Each card below has its own ⭐/🏪 switch, so changing one never touches the others.</div>
     </div>
 
     <!-- STEP 3 — print -->
@@ -184,36 +189,24 @@ function renderSheet(){
       'QR library did not load.<br><span style="font-weight:600;font-size:9pt">Check your internet and reload this page before printing.</span></div>';
     return;
   }
-  sheet.innerHTML = SLOTS.map(function(b){
-    if (!b) return '<div class="cell blank"></div>';
+  // v224: each slot carries its OWN type — one QR per card, always.
+  sheet.innerHTML = SLOTS.map(function(s){
+    if (!s) return '<div class="cell blank"></div>';
+    var b = s.biz;
+    var isReview = (s.type === 'review');
 
-    var name = esc(b.name || '');
-    var qrBlock, kicker, line;
-
-    if (MODE === 'both'){
-      kicker = 'Find us on DukanList';
-      line   = 'Scan the left QR to see our full profile, or the right QR to leave a review.';
-      qrBlock =
-        '<div class="c-duo">' +
-          '<div><img class="c-qr dual" src="' + qrDataURL(profileURL(b.slug)) + '" alt=""><div class="c-duo-lbl">🏪 Profile</div></div>' +
-          '<div><img class="c-qr dual" src="' + qrDataURL(reviewURL(b.slug))  + '" alt=""><div class="c-duo-lbl">⭐ Review</div></div>' +
-        '</div>';
-    } else if (MODE === 'profile'){
-      kicker = 'Find us on DukanList';
-      line   = 'Scan to see our photos, timings, services and contact — all in one place.';
-      qrBlock = '<img class="c-qr" src="' + qrDataURL(profileURL(b.slug)) + '" alt="">';
-    } else {
-      kicker = 'Rate us on DukanList';
-      line   = 'Loved your visit? Scan and leave us 5 stars in 10 seconds. Your review helps our business grow.';
-      qrBlock = '<img class="c-qr" src="' + qrDataURL(reviewURL(b.slug)) + '" alt="">';
-    }
+    var kicker = isReview ? 'Rate us on DukanList' : 'Find us on DukanList';
+    var line   = isReview
+      ? 'Loved your visit? Scan and leave us 5 stars in 10 seconds. Your review helps our business grow.'
+      : 'Scan to see our photos, timings, services and contact — all in one place.';
+    var url    = isReview ? reviewURL(b.slug) : profileURL(b.slug);
 
     return '<div class="cell">' +
       '<div class="c-kicker">' + kicker + '</div>' +
-      '<div class="c-name">' + name + '</div>' +
-      (MODE === 'review' ? '<div class="c-stars">⭐⭐⭐⭐⭐</div>' : '') +
+      '<div class="c-name">' + esc(b.name || '') + '</div>' +
+      (isReview ? '<div class="c-stars">⭐⭐⭐⭐⭐</div>' : '') +
       '<div class="c-line">' + line + '</div>' +
-      qrBlock +
+      '<img class="c-qr" src="' + qrDataURL(url) + '" alt="">' +
       '<div class="c-scan">Open phone <b>camera</b> & scan</div>' +
       '<div class="c-foot">dukanlist.com · Mandi Dabwali’s Local Directory</div>' +
     '</div>';
@@ -223,13 +216,18 @@ function renderSheet(){
 /* ---------- slots ---------- */
 function renderSlots(){
   var host = document.getElementById('slots');
-  host.innerHTML = SLOTS.map(function(b, i){
-    if (!b) return '<div class="slot"><span class="slot-empty">Slot ' + (i + 1) + ' — empty</span></div>';
-    var url = (MODE === 'profile') ? profileURL(b.slug) : reviewURL(b.slug);
+  host.innerHTML = SLOTS.map(function(s, i){
+    if (!s) return '<div class="slot"><span class="slot-empty">Slot ' + (i + 1) + ' — empty</span></div>';
+    var b = s.biz;
+    var url = (s.type === 'review') ? reviewURL(b.slug) : profileURL(b.slug);
     return '<div class="slot filled">' +
       '<div style="min-width:0">' +
         '<div class="res-name">' + esc(b.name) + '</div>' +
         '<div class="res-meta">' + esc(b.city_name || '') + '</div>' +
+        '<div class="stype">' +
+          '<button class="' + (s.type === 'review'  ? 'on' : '') + '" onclick="setSlotType(' + i + ',\'review\')">⭐ Review</button>' +
+          '<button class="' + (s.type === 'profile' ? 'on' : '') + '" onclick="setSlotType(' + i + ',\'profile\')">🏪 Profile</button>' +
+        '</div>' +
         '<a class="test" href="' + esc(url) + '" target="_blank" rel="noopener">Test this link ↗</a>' +
       '</div>' +
       '<button class="x" onclick="removeSlot(' + i + ')" title="Remove">×</button>' +
@@ -238,13 +236,31 @@ function renderSlots(){
   document.getElementById('slotCount').textContent =
     SLOTS.filter(Boolean).length + ' / 4';
 }
+// v224: changes ONLY this card — other cards keep their own type
+function setSlotType(i, t){
+  if (!SLOTS[i]) return;
+  SLOTS[i].type = t;
+  renderSlots(); renderSheet();
+}
 function removeSlot(i){ SLOTS[i] = null; renderSlots(); renderSheet(); }
 function clearAll(){ SLOTS = [null,null,null,null]; renderSlots(); renderSheet(); }
-function addShop(b){
-  if (SLOTS.some(function(s){ return s && s.id === b.id; })) { alert('Already added.'); return; }
+
+function freeSlots(){ return SLOTS.filter(function(s){ return !s; }).length; }
+function placeOne(biz, type){
   var i = SLOTS.indexOf(null);
-  if (i < 0){ alert('All 4 slots are full — remove one first.'); return; }
-  SLOTS[i] = b;
+  if (i < 0) return false;
+  SLOTS[i] = { biz: biz, type: type };   // v224: duplicates allowed on purpose
+  return true;
+}
+function addShop(b){
+  if (MODE === 'both'){
+    if (freeSlots() < 2){ alert('“Both” needs 2 free slots — remove a card first.'); return; }
+    placeOne(b, 'profile');
+    placeOne(b, 'review');
+  } else {
+    if (freeSlots() < 1){ alert('All 4 slots are full — remove one first.'); return; }
+    placeOne(b, MODE);
+  }
   renderSlots(); renderSheet();
   document.getElementById('q').value = '';
   document.getElementById('results').style.display = 'none';
@@ -309,7 +325,7 @@ async function runSearch(){
       document.getElementById('modeHint').textContent =
         MODE === 'review'  ? 'Scanning opens the shop page with the review box already open — best for the billing counter.' :
         MODE === 'profile' ? 'Scanning opens the full shop profile — best for a visiting card or shop board.' :
-                             'Two QRs per card: left opens the profile, right opens the review box.';
+                             'Adds TWO cards for the shop — one Profile card and one Review card, in separate quarters.';
       renderSlots(); renderSheet();
     });
   });
