@@ -146,7 +146,7 @@ export default async function handler(req, res){
     // 5. Business profiles (highest SEO value)
     businesses.forEach(b => {
       urls.push(urlBlock(
-        ORIGIN + '/business.html?slug=' + encodeURIComponent(b.slug),
+        ORIGIN + '/' + encodeURIComponent(b.slug),   // v228: clean URL — the old form 308-redirects, and Google drops redirecting sitemap entries
         '0.8',
         'weekly',
         b.updated_at || b.created_at

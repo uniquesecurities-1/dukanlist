@@ -1,32 +1,24 @@
 # robots.txt for dukanlist.com
-# Bharat's local business directory · DigiMutual Goals Pvt. Ltd.
+# Mandi Dabwali · Sirsa · Bathinda · Mansa · Muktsar — local business directory
+# An initiative by Deepak Singla
 
 User-agent: *
 Allow: /
-Allow: /browse.html
-Allow: /search.html
-Allow: /business.html
-Allow: /register.html
-Allow: /about.html
-Allow: /contact.html
-Allow: /privacy.html
-Allow: /terms.html
 
-# Don't index admin or shopkeeper panel
+# Owner panel, admin and raw API are not for search engines
 Disallow: /admin/
 Disallow: /panel/
 Disallow: /api/
 
-# Don't index search result variations (causes duplicate-content issues)
-Disallow: /search.html?q=
-Disallow: /search.html?city=
+# Search-result permutations create near-duplicate pages
+Disallow: /search.html?
+Disallow: /search?
+Disallow: /compare.html
+Disallow: /shortlist.html
 
-# Sitemap location
+# One-time links — never useful in search results
+Disallow: /claim.html
+Disallow: /claim-complete.html
+Disallow: /claim-success.html
+
 Sitemap: https://dukanlist.com/sitemap.xml
-
-# Crawl-delay for politeness (1 second)
-Crawl-delay: 1
-
-# Professional listings landing pages (high-priority SEO targets)
-Allow: /welcome-pro.html
-Allow: /pro.html

@@ -2398,7 +2398,7 @@ function showNotFound(){
 
 // ====== Schema.org LocalBusiness JSON-LD for rich Google snippets ======
 function injectSchemaOrg(b){
-  const url = location.origin + '/business.html?slug=' + b.slug;
+  const url = location.origin + '/' + b.slug;   // v228: clean canonical URL in JSON-LD
   const photos = (b.photos && b.photos.length) ? b.photos : [];
   const cat = b.categories || {};
 
@@ -2680,7 +2680,7 @@ function render(){
   const _twT   = document.getElementById('twTitle'); if (_twT) _twT.content = _title;
   const _twD   = document.getElementById('twDesc');  if (_twD) _twD.content = _desc;
   const _twI   = document.getElementById('twImage'); if (_twI) _twI.content = _img;
-  document.getElementById('canonicalLink').href = location.origin + '/business.html?slug=' + b.slug;
+  document.getElementById('canonicalLink').href = location.origin + '/' + b.slug;   // v228: clean canonical (was /business.html?slug=, which itself 308-redirects under cleanUrls)
 
   // Schema.org LocalBusiness JSON-LD (rich Google snippets)
   injectSchemaOrg(b);
