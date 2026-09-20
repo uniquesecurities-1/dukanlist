@@ -119,7 +119,19 @@ BEGIN
       'mobile',           s.mobile,
       'whatsapp',         s.whatsapp,
       'photo',            s.photos[1],
-      'usp',              LEFT(COALESCE(s.usp_text, ''), 140),
+      -- LEFT(...,140) chopped mid-word ("Family business — perso"). Cut back to
+      -- the last space inside the limit and add an ellipsis instead.
+      'usp',              CASE
+                            WHEN length(COALESCE(s.usp_text, '')) <= 140
+                              THEN COALESCE(s.usp_text, '')
+                            ELSE rtrim(
+                                   COALESCE(
+                                     substring(LEFT(s.usp_text, 140) from '^.*\s'),
+                                     LEFT(s.usp_text, 140)
+                                   ),
+                                   ' ,.;:·-'
+                                 ) || '…'
+                          END,
       'address',          LEFT(COALESCE(s.address, ''), 200),
       'rating_avg',       COALESCE(s.rating_avg, 0),
       'rating_count',     COALESCE(s.rating_count, 0),
