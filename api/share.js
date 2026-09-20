@@ -223,7 +223,7 @@ export default async function handler(req, res){
       return res.end(renderNotFound());
     }
 
-    const target = '/business.html?slug=' + encodeURIComponent(biz.slug || '') +
+    const target = '/business?slug=' + encodeURIComponent(biz.slug || '') +
                    '&utm_source=share&utm_medium=link' +
                    (isReview ? '&review=1' : '');
     res.statusCode = 200;

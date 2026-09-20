@@ -121,7 +121,7 @@ module.exports = async (req, res) => {
     // Template unavailable — fall back to a plain redirect so the page
     // still works for humans even if SSR is broken.
     res.statusCode = 302;
-    res.setHeader('Location', '/business.html?slug=' + encodeURIComponent(slug));
+    res.setHeader('Location', '/business?slug=' + encodeURIComponent(slug));
     res.end();
     return;
   }

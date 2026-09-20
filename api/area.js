@@ -53,7 +53,7 @@ function renderShopCard(b){
     ? `<span style="background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.03em">✓ VERIFIED</span>`
     : '';
   return `
-  <a href="${ORIGIN}/business.html?slug=${esc(b.slug)}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,23,42,.04)">
+  <a href="${ORIGIN}/${esc(b.slug)}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,23,42,.04)">
     ${photo
       ? `<img src="${esc(photo)}" alt="${esc(b.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover" loading="lazy">`
       : `<div style="width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#FAFAFA,#F1F5F9);display:grid;place-items:center;font-size:3rem;opacity:.5">${esc(b.category_icon || '🏪')}</div>`
@@ -103,7 +103,7 @@ function renderPage(opts){
       "item": {
         "@type": "LocalBusiness",
         "name": s.name,
-        "url": `${ORIGIN}/business.html?slug=${s.slug}`,
+        "url": `${ORIGIN}/${s.slug}`,
         "telephone": s.mobile || undefined,
         "address": { "@type": "PostalAddress", "addressLocality": cityName, "streetAddress": localityName },
         "aggregateRating": s.rating_count > 0

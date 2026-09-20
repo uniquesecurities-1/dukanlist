@@ -63,7 +63,14 @@ async function sb(path){
       'Accept': 'application/json'
     }
   });
-  if (!r.ok) return null;
+  if (!r.ok){
+    // Returning null silently is how a PGRST201 ambiguous-embed error hid for
+    // months: every /local/ page rendered "0 shops" and looked like empty data
+    // rather than a broken query. Log it so the next one shows up in Vercel.
+    console.error('[api/locality] Supabase ' + r.status + ' for ' + path.slice(0, 200) +
+                  ' — ' + (await r.text().catch(() => '')).slice(0, 300));
+    return null;
+  }
   return r.json();
 }
 
@@ -143,7 +150,7 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
     orClauses.push('id.in.(' + linkedIds.join(',') + ')');
   }
 
-  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name),categories(name,icon)'
+  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name),categories:category_id(name,icon)'
     + '&status=eq.active'
     + '&city_id=eq.' + cityId
     + '&or=(' + orClauses.join(',') + ')'
@@ -204,7 +211,7 @@ function renderShopCard(b){
     ? `<a href="tel:+91${phone}" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 Call</a>`
     : '';
   return `
-  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/business.html?slug=${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer;overflow:hidden">
+  <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer;overflow:hidden">
     ${thumbHTML}
     <div style="padding:10px 14px;display:flex;flex-direction:column;gap:4px">
       <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
@@ -222,8 +229,15 @@ function renderPage(opts){
   const cityName = city.name;
   const catName  = cat.name;
   const url = `${ORIGIN}/local/${cityName.toLowerCase().replace(/ /g,'-')}/${cat.slug}`;
-  const title = `${catName} in ${cityName} — Top ${shops.length}+ Verified Shops · DukanList`;
-  const desc  = `Find the best ${catName.toLowerCase()} in ${cityName}. ${shops.length} verified local shops with reviews, ratings, contact details. Real reviews from local people. Updated daily on DukanList — Bharat ka local shop directory.`;
+  // An empty page must never advertise itself as a listing page — "Top 0+
+  // Verified Shops" is exactly what Google files under Soft 404.
+  const isEmpty = !shops.length;
+  const title = isEmpty
+    ? `${catName} in ${cityName} · DukanList`
+    : `${catName} in ${cityName} — Top ${shops.length}+ Verified Shops · DukanList`;
+  const desc  = isEmpty
+    ? `No ${catName.toLowerCase()} listed in ${cityName} yet. Register your shop free on DukanList and be the first in your area.`
+    : `Find the best ${catName.toLowerCase()} in ${cityName}. ${shops.length} verified local shops with reviews, ratings, contact details. Real reviews from local people. Updated daily on DukanList — Bharat ka local shop directory.`;
 
   // Schema.org ItemList for SEO
   const itemListSchema = {
@@ -235,7 +249,7 @@ function renderPage(opts){
       "item": {
         "@type": "LocalBusiness",
         "name": s.name,
-        "url": `${ORIGIN}/business.html?slug=${s.slug}`,
+        "url": `${ORIGIN}/${s.slug}`,
         "telephone": s.mobile || undefined,
         "address": { "@type": "PostalAddress", "addressLocality": cityName, "postalCode": s.pincode },
         "aggregateRating": (s.rating_count > 0 && !(s.is_professional_listing === true && s.professional_tier === 'strict')) ? { "@type": "AggregateRating", "ratingValue": s.rating_avg, "reviewCount": s.rating_count } : undefined
@@ -273,6 +287,7 @@ function renderPage(opts){
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(url)}">
+${isEmpty ? '<meta name="robots" content="noindex, follow">' : ''}
 <link rel="alternate" hreflang="en-IN" href="${esc(url)}">
 <link rel="alternate" hreflang="hi-IN" href="${esc(url)}?lang=hi">
 <meta property="og:type" content="website">
