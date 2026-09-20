@@ -136,10 +136,16 @@ async function run(){
       throw new Error((data && data.error) || 'Claim failed');
     }
 
+    // v226 FIX: claim_register_owner only sets claim_status='claimed_pending',
+    // which business.html renders as "claim-locked" — mobile and WhatsApp stay
+    // hidden forever. This promotes it now that the email is verified.
+    try { await C.rpc('auto_approve_after_email_verify'); } catch(_){}
+
     showState(
       '🎉',
       'Welcome to DukanList!',
-      '<div class="biz"><b>🏪 ' + esc(data.business_name || 'Your listing') + '</b>Linked to <b>' + esc(session.user.email) + '</b></div>' +
+      // v226: the RPC returns shop_name, not business_name
+      '<div class="biz"><b>🏪 ' + esc(data.shop_name || data.business_name || 'Your listing') + '</b>Linked to <b>' + esc(session.user.email) + '</b></div>' +
       '<p>Your email is verified and you can now manage your listing. Add photos, hours, description, and respond to enquiries.</p>',
       '<a class="btn" href="/panel/dashboard.html">→ Go to Owner Panel</a>' +
       '<a class="btn btn-2" href="/browse.html">View Directory</a>'

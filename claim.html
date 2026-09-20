@@ -438,6 +438,7 @@ async function signupAndClaim(){
       options: {
         data: {
           claim_token: TOKEN,
+          owner_name: ownerName || null,   // v226: used by email-verified.html to finish the claim
           mobile: SHOP.full_mobile || null,
           source: 'claim_flow'
         },

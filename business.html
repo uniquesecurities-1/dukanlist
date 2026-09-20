@@ -1462,7 +1462,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
 
-<script src="/assets/js/error-reporter.js" defer></script>
+<script src="/assets/js/error-reporter.js?v=20260920" defer></script>
 <style>
 /* Daily Buzz strip + viewer */
 .db-strip{ background:#fff; border:1px solid #E5E7EB; border-radius:14px; padding:14px 16px; margin:12px 0 }
@@ -2175,19 +2175,19 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js"></script>
-<script src="/assets/js/daily-buzz.js" defer></script>
+<script src="/assets/js/daily-buzz.js?v=20260920" defer></script>
 <script src="/assets/js/share.js"></script>
 <script src="/assets/js/mobile-nav.js"></script>
-<script src="/assets/js/breadcrumbs.js"></script>
-<script src="/assets/js/announcements.js"></script>
-<script src="/assets/js/recently-viewed.js"></script>
+<script src="/assets/js/breadcrumbs.js?v=20260920"></script>
+<script src="/assets/js/announcements.js?v=20260920"></script>
+<script src="/assets/js/recently-viewed.js?v=20260920"></script>
 <script src="/assets/js/login-modal.js"></script>
-<script src="/assets/js/hours.js"></script>
+<script src="/assets/js/hours.js?v=20260920"></script>
 <script src="/assets/js/nav.js" defer></script>
-<script src="/assets/js/shortlist.js" defer></script>
+<script src="/assets/js/shortlist.js?v=20260920" defer></script>
 <script src="/assets/js/shop-love.js?v=20260901" defer></script>
-<script src="/assets/js/review-boost.js" defer></script>
-<script src="/assets/js/pwa.js" defer></script>
+<script src="/assets/js/review-boost.js?v=20260920" defer></script>
+<script src="/assets/js/pwa.js?v=20260920" defer></script>
 <script>
 function setLang(lang){
   if (lang!=='en'&&lang!=='hi') lang='en';
@@ -5315,8 +5315,8 @@ function copyShopUrl(){
 }
 </script>
 
-<script src="/assets/js/city-persist.js"></script>
-<script src="/assets/js/trust-tier.js"></script>
+<script src="/assets/js/city-persist.js?v=20260920"></script>
+<script src="/assets/js/trust-tier.js?v=20260920"></script>
 <!-- Business Detail v3: Review prompt modal -->
 <div class="rp-overlay" id="reviewPromptOverlay" style="display:none !important" role="dialog" aria-hidden="true" aria-labelledby="rpTitle">
   <div class="rp-card" id="reviewPromptCard">
@@ -5348,7 +5348,7 @@ function copyShopUrl(){
   </div>
 </div>
 
-<script src="/assets/js/install-banner.js"></script>
+<script src="/assets/js/install-banner.js?v=20260920"></script>
 <script>
 // ============= Customer Review Auto-Prompt =============
 (function(){
@@ -5443,21 +5443,27 @@ async function reportReview(reviewId, btnEl){
     if (btnEl){ btnEl.disabled = true; btnEl.innerHTML = '⏳ Reporting...'; }
     const c = (typeof ShopDB !== 'undefined') && ShopDB.client;
     if (!c){ throw new Error('Backend not available'); }
+    // v226: was a guessing loop over three RPCs that never existed, plus an
+    // insert into a table that was never created — so reporting always failed.
+    // Real backend now lives in db/218.
     let ok = false;
-    // Try multiple RPCs in priority order — admin moderation pipeline expects 'flag_review' or similar
-    for (const rpc of ['flag_review_public', 'report_review', 'flag_review']){
-      try {
-        const r = await c.rpc(rpc, { p_review_id: reviewId });
-        if (!r.error){ ok = true; break; }
-      } catch(_){}
-    }
-    // Fallback: direct insert into review_flags table if RPC missing
-    if (!ok){
-      try {
-        const res = await c.from('review_flags').insert({ review_id: reviewId, reason: 'inappropriate' });
-        if (!res.error) ok = true;
-      } catch(_){}
-    }
+    let sid = '';
+    try {
+      sid = localStorage.getItem('dl_flag_sid_v1') || '';
+      if (!sid){
+        sid = 'fs_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem('dl_flag_sid_v1', sid);
+      }
+    } catch(_){}
+    try {
+      const r = await c.rpc('flag_review_public', {
+        p_review_id:  reviewId,
+        p_reason:     'inappropriate',
+        p_session_id: sid || null
+      });
+      if (!r.error) ok = true;
+      else console.warn('[reportReview]', r.error.message);
+    } catch(e){ console.warn('[reportReview]', e); }
     if (btnEl){
       btnEl.disabled = false;
       if (ok){

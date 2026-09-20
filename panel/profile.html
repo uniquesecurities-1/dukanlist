@@ -665,6 +665,29 @@ async function loadProfile(){
   }
   MY_BIZ = biz;
 
+  // v226 FIX — strict-tier professionals (Doctor / CA / Advocate…) must not
+  // be shown a USP box. The DB trigger trg_block_usp_on_strict_professional
+  // silently NULLs whatever they type, but this page still said
+  // "✅ Profile saved. Changes are live" — so they believed it saved.
+  // register.html already gates this; profile.html never did.
+  try {
+    if (MY_BIZ.is_professional_listing && MY_BIZ.professional_tier === 'strict'){
+      ['usp', 'uspHi'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        var grp = el.closest('.form-group') || el.parentNode;
+        if (grp) grp.style.display = 'none';
+      });
+      var pick = document.getElementById('simpleUspPicker');
+      if (pick) pick.style.display = 'none';
+      var note = document.createElement('div');
+      note.style.cssText = 'background:#F0F9FF;border:1.5px solid #7DD3FC;border-radius:10px;padding:11px 14px;margin:10px 0;font-size:.85rem;color:#075985;line-height:1.5;font-weight:600';
+      note.innerHTML = '🛡 <b>Compliance mode</b> — your regulator does not permit self-authored promotional text, so the USP field is not available on your listing. Your qualification, membership number and areas of practice are shown instead.';
+      var anchor = document.getElementById('about') || document.querySelector('.card');
+      if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(note, anchor);
+    }
+  } catch(e){ console.warn('[profile] strict-pro USP gating:', e); }
+
   // ===== Merge pending_edits over live values so the form shows what the owner last typed =====
   // (Sensitive edits live in pending_edits JSONB until admin approves them.)
   if (MY_BIZ.pending_edits && typeof MY_BIZ.pending_edits === 'object'){
@@ -1331,7 +1354,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
 <script src="/assets/js/owner-notifications.js" defer></script>
 
-<script src="/assets/js/error-reporter.js" defer>
+<script src="/assets/js/error-reporter.js?v=20260920" defer>
 // =============================================================
 // ACCOUNT DELETION FLOW (Play Store compliance — required UI)
 // =============================================================

@@ -18,13 +18,16 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.66.0';
+const VERSION = 'dukan-v3.67.0';
 const CACHE_NAME = VERSION;
 
+// v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
+// '/search.html' 308-redirect, and a cached redirected response cannot be
+// replayed for a navigation ("a redirected response was used…") — which
+// broke the offline fallback instead of providing it.
 const PRECACHE = [
   '/',
-  '/index.html',
-  '/search.html',
+  '/search',
   '/offline.html',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-96.png',
@@ -59,6 +62,13 @@ function shouldHandle(req) {
   if (url.pathname.startsWith('/admin')) return false;
   if (url.pathname.startsWith('/panel')) return false;
   if (url.pathname.startsWith('/api/')) return false;
+  // v226: these clean paths are REWRITTEN to /api/* server-side, so the
+  // browser path never starts with /api/ — but the responses are dynamic
+  // (no-store) and must not be cached.
+  if (url.pathname === '/share' || url.pathname.startsWith('/share/')) return false;
+  if (url.pathname.startsWith('/local/')) return false;
+  if (url.pathname.startsWith('/area/')) return false;
+  if (url.pathname === '/sitemap.xml') return false;
   if (url.hostname.endsWith('supabase.co')) return false;
   return true;
 }
@@ -77,7 +87,11 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          if (res && res.ok) {
+          // v226: never cache a REDIRECTED response against a navigation
+          // request — replaying it later throws "a redirected response was
+          // used for a request whose redirect mode is not follow", which
+          // turned the offline fallback into a hard error.
+          if (res && res.ok && !res.redirected) {
             const copy = res.clone();
             caches.open(CACHE_NAME).then((c) => c.put(req, copy)).catch(() => null);
           }

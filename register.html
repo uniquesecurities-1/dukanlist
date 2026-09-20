@@ -1219,7 +1219,7 @@ function updateCharCount(inputEl, counterId, max){
 window.updateCharCount = updateCharCount;
 </script>
 <script src="/assets/js/nav.js" defer></script>
-<script src="/assets/js/geo.js"></script>
+<script src="/assets/js/geo.js?v=20260920"></script>
 <script src="/assets/js/templates.js"></script>
 <script src="/assets/js/usp-simple.js"></script>
 <script>
@@ -2132,9 +2132,25 @@ async function handleSubmit(){
   }
 
   let data, error;
+
+  // v226 FIX — orphan recovery.
+  // If a previous attempt created the business but the auth signUp failed,
+  // the old code told the user "Press Submit again to create your login" —
+  // but a second submit re-ran register_business_public, which raises
+  // "A shop with this mobile is already pending review", burned one of the
+  // 3-per-hour rate-limit slots, and after 3 tries locked them out for 2
+  // hours. The shopkeeper was permanently stranded with an ownerless
+  // listing. Now we skip straight to creating the login.
+  let orphanId = '';
+  try { orphanId = localStorage.getItem('shop_orphan_id') || ''; } catch(_){}
+  if (orphanId){
+    data = orphanId;
+    error = null;
+  }
+
   let attempts = 0;
   const MAX_ATTEMPTS = 3;
-  while (attempts < MAX_ATTEMPTS){
+  while (!orphanId && attempts < MAX_ATTEMPTS){
     attempts++;
     try {
       const result = await doRegister();
@@ -2226,6 +2242,10 @@ async function handleSubmit(){
     return;  // ← do NOT show success card on orphan state
   }
   localStorage.setItem('shop_pending_mobile', STATE.phone);
+  // v226: the login was created, so the orphan is resolved — clear the flag
+  // (it was never cleared before, so it would have hijacked a genuine
+  // second registration from the same device).
+  try { localStorage.removeItem('shop_orphan_id'); } catch(_){}
 
   // ==== Success — build WhatsApp verify link + show pending screen ====
   const ADMIN_WA = '919541223377';
@@ -2798,7 +2818,7 @@ async function runHindiAutoFill(){
 })();
 </script>
 
-<script src="/assets/js/error-reporter.js" defer></script>
+<script src="/assets/js/error-reporter.js?v=20260920" defer></script>
 <script src="/assets/js/dl-register-simple.js?v=1786200000" defer></script>
 </body>
 </html>

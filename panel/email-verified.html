@@ -422,6 +422,39 @@ let autoRedirectTimer = null;
   }
 
   // ============================================================
+  // v226 FIX — finish the TOKEN claim here.
+  // claim.html calls claim_register_owner right after signUp, but with
+  // email confirmation ON that signUp returns NO session, so the RPC
+  // ("Must be authenticated") failed every time and the error was
+  // swallowed — the shopkeeper verified their email and landed on an
+  // empty dashboard with the listing still unclaimed.
+  // We stashed the token in user_metadata.claim_token at signUp, so we
+  // can redeem it HERE, where a real session exists.
+  // ============================================================
+  try {
+    const pendingToken = (user && user.user_metadata && user.user_metadata.claim_token) || '';
+    if (pendingToken){
+      const { data: cd, error: ce } = await sb.rpc('claim_register_owner', {
+        p_token:       pendingToken,
+        p_owner_name:  (user.user_metadata && user.user_metadata.owner_name) || null,
+        p_owner_email: user.email || null
+      });
+      if (ce){
+        // Already claimed by this same user is a success for our purposes.
+        if (!/already/i.test(ce.message || '')) {
+          console.warn('[email-verified] claim_register_owner failed:', ce.message);
+        }
+      } else if (cd && cd.success){
+        console.log('[email-verified] token claim completed:', cd.shop_name || '');
+      }
+      // Clear the token so a later visit does not retry a spent one.
+      try { await sb.auth.updateUser({ data: { claim_token: null } }); } catch(_){}
+    }
+  } catch(e){
+    console.warn('[email-verified] token claim step failed (non-fatal):', e);
+  }
+
+  // ============================================================
   // Option B claim flow — auto-approve any pre-listed businesses
   // owned by this user now that their email is verified.
   // Idempotent: harmless to call for normal-flow signups.
