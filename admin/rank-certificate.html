@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rank Certificate — DukanList Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box }
+  body{ font-family:'Manrope',sans-serif; background:#F8FAFC; color:#0F172A; margin:0 }
+  .nav{ background:linear-gradient(135deg,#0F172A,#1E3A8A); color:#fff; padding:12px 24px; display:flex; align-items:center; gap:18px; flex-wrap:wrap }
+  .nav a{ color:#FCD34D; text-decoration:none; font-weight:700; font-size:14px }
+  .nav .brand{ font-weight:900; font-size:16px; color:#fff }
+  .wrap{ max-width:1180px; margin:24px auto; padding:0 20px }
+  h1{ font-size:22px; font-weight:900; margin:0 0 4px }
+  .sub{ font-size:13px; color:#64748b; margin-bottom:22px }
+  .card{ background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:18px; margin-bottom:18px }
+  .card-h{ font-weight:900; font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px }
+  input[type=text]{ width:100%; padding:11px 13px; border:1.5px solid #CBD5E1; border-radius:9px; font:inherit; font-size:14px }
+  .btn{ border:0; border-radius:9px; padding:11px 20px; font:inherit; font-weight:800; font-size:14px; cursor:pointer }
+  .btn-pri{ background:linear-gradient(135deg,#FF6B1A,#EA580C); color:#fff }
+  .btn-sec{ background:#F1F5F9; color:#334155; border:1px solid #CBD5E1 }
+  .btn:disabled{ opacity:.5; cursor:not-allowed }
+  .results{ margin-top:10px; border:1px solid #E2E8F0; border-radius:9px; overflow:hidden }
+  .res-row{ padding:10px 13px; border-bottom:1px solid #F1F5F9; cursor:pointer; display:flex; justify-content:space-between; gap:10px; align-items:center }
+  .res-row:last-child{ border-bottom:0 }
+  .res-row:hover{ background:#FFF7ED }
+  .res-name{ font-weight:800; font-size:14px }
+  .res-meta{ font-size:12px; color:#64748b }
+  .pill{ background:#DCFCE7; color:#166534; border-radius:99px; padding:2px 9px; font-size:11px; font-weight:800 }
+  .pill.pending{ background:#FEF3C7; color:#92400E }
+  .note{ background:#FFF7ED; border:1px solid #FED7AA; color:#9A3412; border-radius:9px; padding:11px 13px; font-size:13px; line-height:1.5; margin-bottom:14px }
+
+  /* ---------- the certificate: A5 landscape at 96dpi ---------- */
+  .cert-stage{ display:flex; justify-content:center; padding:10px 0 }
+  .cert{
+    width:794px; height:559px;            /* A5 landscape */
+    background:
+      radial-gradient(circle at 12% 12%, rgba(253,230,138,.55), transparent 42%),
+      radial-gradient(circle at 88% 88%, rgba(255,107,26,.16), transparent 46%),
+      linear-gradient(160deg,#FFFDF7 0%,#FFF8EC 100%);
+    border:2px solid #D97706; border-radius:6px; position:relative;
+    padding:34px 44px; display:flex; flex-direction:column; color:#3F2A0B;
+  }
+  .cert::after{ content:''; position:absolute; inset:11px; border:1px solid rgba(217,119,6,.38); border-radius:3px; pointer-events:none }
+  .cert-top{ display:flex; align-items:center; justify-content:space-between; gap:16px }
+  .cert-brand{ display:flex; align-items:center; gap:9px; font-weight:900; font-size:17px; color:#7C2D12; letter-spacing:-.01em }
+  .cert-brand .dot{ width:26px; height:26px; border-radius:7px; background:linear-gradient(135deg,#FF6B1A,#EA580C); display:grid; place-items:center; color:#fff; font-size:14px }
+  .cert-date{ font-size:11px; font-weight:700; color:#A16207; letter-spacing:.04em }
+  .cert-mid{ flex:1; display:flex; align-items:center; gap:30px; margin-top:6px }
+  .cert-left{ flex:1; min-width:0 }
+  .cert-kicker{ font-size:11px; font-weight:800; letter-spacing:.17em; color:#A16207; margin-bottom:8px }
+  .cert-rank{ font-size:82px; line-height:.92; font-weight:900; color:#B45309; letter-spacing:-.05em }
+  .cert-rank small{ font-size:23px; font-weight:800; color:#A16207; letter-spacing:0 }
+  .cert-in{ font-size:19px; font-weight:800; color:#78350F; margin-top:8px; line-height:1.3 }
+  .cert-city{ font-size:14px; font-weight:700; color:#A16207; margin-top:2px }
+  .cert-name{ font-size:27px; font-weight:900; color:#1C1207; margin-top:16px; line-height:1.2;
+              overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical }
+  .cert-right{ width:188px; text-align:center; flex:0 0 auto }
+  .cert-qr{ width:168px; height:168px; background:#fff; border:1px solid #E7D3AE; border-radius:9px; padding:8px; margin:0 auto }
+  .cert-qr img, .cert-qr canvas{ width:100%; height:100%; display:block; image-rendering:pixelated }
+  .cert-qr-cap{ font-size:10.5px; font-weight:800; color:#92400E; margin-top:7px; line-height:1.35 }
+  .cert-foot{ border-top:1px solid rgba(217,119,6,.3); padding-top:11px; display:flex; justify-content:space-between; align-items:flex-end; gap:14px }
+  .cert-foot-l{ font-size:10.5px; color:#8A6A2F; line-height:1.45; max-width:470px }
+  .cert-foot-r{ font-size:11px; font-weight:800; color:#B45309; text-align:right; white-space:nowrap }
+
+  @media print{
+    @page { size:A5 landscape; margin:0 }
+    body{ background:#fff }
+    .no-print{ display:none !important }
+    .cert-stage{ padding:0 }
+    .cert{ border-radius:0; border-width:1.5px; box-shadow:none }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav no-print">
+  <span class="brand">🛡 DukanList Admin</span>
+  <a href="/admin/dashboard">📊 Dashboard</a>
+  <a href="/admin/moderation">⚖️ Moderation</a>
+  <a href="/admin/quick-add-shop.html">📥 Quick Add</a>
+  <a href="/admin/qr-sheet.html">🖨 QR Sheet</a>
+  <a href="/admin/rank-certificate.html" style="background:linear-gradient(135deg,#FBBF24,#D97706);color:#fff;font-weight:800;padding:6px 11px;border-radius:7px;text-decoration:none">🏆 Certificate</a>
+  <a href="#" onclick="doLogout();return false" style="margin-left:auto;color:#94A3B8;font-size:12px">Logout</a>
+</div>
+
+<div class="wrap">
+  <div class="no-print">
+    <h1>🏆 Rank Certificate</h1>
+    <div class="sub">Print a shop's rank on A5. The owner puts it on the counter, and the next shopkeeper who walks in asks where his is.</div>
+
+    <div class="note">
+      The rank comes from the same score that decides <b>/top</b> and the owner's panel — it is never typed by hand,
+      so a certificate can't claim a position the site doesn't show. A shop ranked below the top half prints
+      without a number (it shows "Verified Listing" instead) rather than advertising a weak position.
+    </div>
+
+    <div class="card">
+      <div class="card-h">🔍 Find the shop</div>
+      <input type="text" id="q" placeholder="Shop name, owner or mobile — type at least 2 letters" autocomplete="off">
+      <div class="results" id="results" style="display:none"></div>
+    </div>
+
+    <div class="card" id="actions" style="display:none">
+      <div class="card-h">🖨 Print</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+        <button class="btn btn-pri" onclick="window.print()">🖨 Print A5</button>
+        <button class="btn btn-sec" onclick="downloadPNG()">⬇ Download PNG</button>
+        <button class="btn btn-sec" onclick="clearCert()">✕ Clear</button>
+        <span id="rankInfo" style="font-size:13px;color:#64748b;margin-left:4px"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cert-stage" id="stage" style="display:none">
+    <div class="cert" id="cert">
+      <div class="cert-top">
+        <div class="cert-brand"><span class="dot">🏪</span> DukanList</div>
+        <div class="cert-date" id="cDate"></div>
+      </div>
+
+      <div class="cert-mid">
+        <div class="cert-left">
+          <div class="cert-kicker" id="cKicker">RANKED ON DUKANLIST</div>
+          <div class="cert-rank" id="cRank">#1</div>
+          <div class="cert-in" id="cCat">Category</div>
+          <div class="cert-city" id="cCity">City</div>
+          <div class="cert-name" id="cName">Shop name</div>
+        </div>
+        <div class="cert-right">
+          <div class="cert-qr" id="cQr"></div>
+          <div class="cert-qr-cap">Scan to see this listing<br>लिस्टिंग देखने के लिए scan करें</div>
+        </div>
+      </div>
+
+      <div class="cert-foot">
+        <div class="cert-foot-l" id="cFoot"></div>
+        <div class="cert-foot-r">dukanlist.com</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+var C = null, searchTimer = null, CURRENT = null;
+
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+async function doLogout(){
+  try { await C.auth.signOut(); } catch(e){}
+  location.href = '/admin/login.html';
+}
+function qrImg(text, px){
+  if (typeof qrcode !== 'function') return '';
+  var qr = qrcode(0, 'H');           // high error correction — survives ink bleed
+  qr.addData(text);
+  qr.make();
+  return qr.createImgTag(Math.max(2, Math.floor(px / qr.getModuleCount())), 0);
+}
+
+function clearCert(){
+  CURRENT = null;
+  document.getElementById('stage').style.display = 'none';
+  document.getElementById('actions').style.display = 'none';
+  document.getElementById('q').value = '';
+}
+
+async function pickShop(b){
+  if (!b || !b.slug){ alert('This shop has no slug yet — open it in Admin and save once.'); return; }
+
+  // The rank is read from the same RPC the public page and the owner panel use.
+  // Nothing here is typed by hand, so a certificate can never claim a position
+  // the site itself does not show.
+  var rk = null;
+  try {
+    var r = await C.rpc('get_shop_rank', { p_business_id: b.id });
+    if (r.error) throw r.error;
+    rk = r.data;
+  } catch(e){
+    alert('Could not read the rank: ' + (e.message || e) + '\nRun db/221 in Supabase if you have not yet.');
+    return;
+  }
+  if (!rk || !rk.found){ alert('No rank for this shop — is the listing active?'); return; }
+
+  CURRENT = { biz: b, rank: rk };
+
+  var url  = 'https://dukanlist.com/' + b.slug;
+  var showRank = rk.public_ok && rk.rank;
+
+  document.getElementById('cDate').textContent =
+    new Date().toLocaleDateString('en-IN', { month:'long', year:'numeric' }).toUpperCase();
+
+  if (showRank){
+    document.getElementById('cKicker').textContent = 'RANKED ON DUKANLIST';
+    document.getElementById('cRank').innerHTML = '#' + rk.rank +
+      ' <small>of ' + rk.total + '</small>';
+    document.getElementById('cCat').textContent  = rk.category_name || '';
+    document.getElementById('cCity').textContent = rk.city_name || '';
+  } else {
+    // Below the top half: print a certificate that is still true and still worth
+    // displaying, without broadcasting a weak position to the owner's customers.
+    document.getElementById('cKicker').textContent = 'LISTED ON DUKANLIST';
+    document.getElementById('cRank').innerHTML = '<span style="font-size:44px">✓ Verified</span>';
+    document.getElementById('cCat').textContent  = rk.category_name || '';
+    document.getElementById('cCity').textContent = rk.city_name || '';
+  }
+
+  document.getElementById('cName').textContent = b.name || '';
+  document.getElementById('cQr').innerHTML = qrImg(url, 152);
+  document.getElementById('cFoot').textContent =
+    showRank
+      ? 'Ranked by customer ratings, review count, verification and listing completeness, on ' +
+        new Date().toLocaleDateString('en-IN') + '. Position changes as listings improve.'
+      : 'This business is verified and listed on DukanList, the local directory for Mandi Dabwali, Sirsa, Bathinda, Mansa and Muktsar.';
+
+  document.getElementById('stage').style.display = '';
+  document.getElementById('actions').style.display = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('rankInfo').textContent =
+    'Rank #' + rk.rank + ' of ' + rk.total + ' · ' + (rk.category_name || '') +
+    (showRank ? '' : ' — below top half, printing without a number');
+}
+
+/* ---------- PNG download: A5 landscape at 300 DPI ---------- */
+async function downloadPNG(){
+  if (!CURRENT){ alert('Pick a shop first.'); return; }
+  var W = 1748, H = 1240;                       // A5 landscape @ 300dpi
+  var src = document.getElementById('cert');
+  var scale = W / src.offsetWidth;
+
+  var cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  var ctx = cv.getContext('2d');
+
+  // Rasterise the live certificate through an SVG foreignObject, so the PNG is
+  // exactly what the print preview shows instead of a second hand-drawn copy
+  // that could drift out of sync with it.
+  var clone = src.cloneNode(true);
+  clone.style.margin = '0';
+  var html = new XMLSerializer().serializeToString(clone);
+  var svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '">' +
+      '<foreignObject width="100%" height="100%">' +
+        '<div xmlns="http://www.w3.org/1999/xhtml" style="transform:scale(' + scale + ');transform-origin:top left">' +
+          html +
+        '</div>' +
+      '</foreignObject>' +
+    '</svg>';
+
+  var img = new Image();
+  img.onload = function(){
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(img, 0, 0);
+    cv.toBlob(function(blob){
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'dukanlist-rank-' + (CURRENT.biz.slug || 'shop') + '.png';
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    }, 'image/png');
+  };
+  img.onerror = function(){
+    alert('PNG export failed in this browser. Use "Print A5" and choose "Save as PDF" instead.');
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ---------- search (same RPC the QR sheet uses) ---------- */
+async function runSearch(){
+  var q = document.getElementById('q').value.trim();
+  var box = document.getElementById('results');
+  if (q.length < 2){ box.style.display = 'none'; return; }
+  var r = await C.rpc('admin_global_search', { p_query: q, p_limit: 10 });
+  if (r.error){
+    box.innerHTML = '<div class="res-row"><span class="res-meta">Search failed: ' + esc(r.error.message) + '</span></div>';
+    box.style.display = ''; return;
+  }
+  var rows = r.data || [];
+  if (!rows.length){
+    box.innerHTML = '<div class="res-row"><span class="res-meta">No shops found</span></div>';
+    box.style.display = ''; return;
+  }
+  box.innerHTML = rows.map(function(b, i){
+    return '<div class="res-row" data-i="' + i + '">' +
+      '<div style="min-width:0">' +
+        '<div class="res-name">' + esc(b.name || '') + '</div>' +
+        '<div class="res-meta">' + esc(b.city_name || '') + ' · ' + esc(b.mobile || '') + '</div>' +
+      '</div>' +
+      '<span class="pill' + (b.status === 'active' ? '' : ' pending') + '">' + esc(b.status || '') + '</span>' +
+    '</div>';
+  }).join('');
+  box.style.display = '';
+  box.querySelectorAll('.res-row').forEach(function(row){
+    row.addEventListener('click', function(){ pickShop(rows[+row.dataset.i]); });
+  });
+}
+
+/* ---------- init ---------- */
+(async function init(){
+  C = window.ShopDB && window.ShopDB.client;
+  if (!C){ alert('Supabase not ready — reload the page.'); return; }
+  try {
+    var u = await C.auth.getUser();
+    if (!u || !u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
+    var ia = await C.rpc('is_admin');
+    if (ia.error || !ia.data){ alert('Admin only.'); location.href = '/admin/login.html'; return; }
+  } catch(e){ location.href = '/admin/login.html'; return; }
+
+  document.getElementById('q').addEventListener('input', function(){
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(runSearch, 280);
+  });
+})();
+</script>
+</body>
+</html>

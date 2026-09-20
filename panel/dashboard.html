@@ -3045,74 +3045,87 @@ async function loadRankingBattle(b){
   const c = ShopDB.client;
   if (!c) return;
 
-  // Get this business's primary category + city
-  const catId = b.sub_category_id || b.category_id;
-  const cityId = b.city_id;
-  if (!catId || !cityId) return;
+  const widget = document.getElementById('rankWidget');
+  const body   = document.getElementById('rankBody');
+  if (!widget || !body) return;
 
+  // This widget used to compute its own score:
+  //   rating_count * rating_avg + verified_score*10 + photos*2
+  // while /top ranked on a completely different formula. A shopkeeper could
+  // read "#1" here and then find himself at #5 on the public page. One wrong
+  // number destroys trust in every number we show, so both now call the same
+  // RPC (db/221 get_shop_rank), which /top's scoring also uses.
   try {
-    const { data: peers, error } = await c.from('businesses')
-      .select('id, name, slug, verified_score, rating_count, rating_avg, photos')
-      .eq('city_id', cityId)
-      .eq('status', 'active')
-      .or(`sub_category_id.eq.${catId},category_id.eq.${catId}`)
-      .limit(200);
+    const { data: rk, error } = await c.rpc('get_shop_rank', { p_business_id: b.id });
     if (error) throw error;
-    if (!peers || peers.length < 2){
-      const widget = document.getElementById('rankWidget');
-      widget.style.display = '';
-      document.getElementById('rankBody').innerHTML = '<div style="text-align:center;padding:8px;color:#6B21A8;font-weight:600">' +
-        '<div style="font-size:1.4rem;margin-bottom:4px">🌟</div>' +
-        '<div data-i18n-en>You\'re the first in your category here!</div>' +
-        '<div data-i18n-hi>आप यहाँ अपनी category में पहले हैं!</div>' +
-        '<div style="font-size:.74rem;opacity:.7;margin-top:6px" data-i18n-en>Be the local leader. Keep your listing fresh.</div>' +
-        '<div style="font-size:.74rem;opacity:.7;margin-top:6px" data-i18n-hi>स्थानीय leader बनें। profile fresh रखें।</div></div>';
+    if (!rk || !rk.found) return;
+
+    const lang  = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+    const rank  = rk.rank, total = rk.total, gap = Number(rk.gap_to_next) || 0;
+    const tips  = Array.isArray(rk.tips) ? rk.tips : [];
+    widget.style.display = '';
+
+    if (total < 2){
+      body.innerHTML =
+        '<div style="text-align:center;padding:8px;color:#6B21A8;font-weight:600">' +
+        '<div style="font-size:1.4rem;margin-bottom:4px">\u{1F31F}</div>' +
+        (lang === 'hi' ? '<div>आप यहाँ अपनी category में पहले हैं!</div>'
+                       : '<div>You’re the first in your category here!</div>') +
+        '<div style="font-size:.74rem;opacity:.7;margin-top:6px">' +
+        (lang === 'hi' ? 'यही जगह बनाए रखें — profile पूरी रखें।'
+                       : 'Hold the spot — keep your listing complete.') +
+        '</div></div>';
       return;
     }
 
-    // Score formula: (rating_count * rating_avg) + (verified_score * 10) + (photos.length * 2)
-    const scored = peers.map(p => ({
-      ...p,
-      _score: (Number(p.rating_count) || 0) * (Number(p.rating_avg) || 0) +
-              (Number(p.verified_score) || 0) * 10 +
-              ((Array.isArray(p.photos) ? p.photos.length : 0)) * 2
-    }));
-    scored.sort((a, x) => x._score - a._score);
+    const medal = rank === 1 ? '\u{1F947}' : rank === 2 ? '\u{1F948}' : rank === 3 ? '\u{1F949}' : '\u{1F3C5}';
+    let html = '<div style="text-align:center;padding:4px">' +
+      '<div style="font-size:1.8rem;margin-bottom:2px">' + medal + '</div>' +
+      '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">#' + rank +
+        ' <span style="font-weight:600;opacity:.75">' + (lang === 'hi' ? 'में से' : 'of') + ' ' + total + '</span></div>' +
+      '<div style="font-size:.74rem;color:#6B21A8;opacity:.8;margin-top:2px">' +
+        escHtmlRank(rk.category_name || '') + (rk.city_name ? ', ' + escHtmlRank(rk.city_name) : '') + '</div>';
 
-    const myIdx = scored.findIndex(p => p.id === b.id);
-    const myRank = myIdx + 1;
-    const total = scored.length;
-    const myScore = scored[myIdx] ? scored[myIdx]._score : 0;
-    const aboveMe = myIdx > 0 ? scored[myIdx - 1] : null;
-    const gap = aboveMe ? Math.ceil(aboveMe._score - myScore) : 0;
-
-    const isTop = myRank === 1;
-    const isPodium = myRank <= 3;
-    const widget = document.getElementById('rankWidget');
-    widget.style.display = '';
-
-    const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-    let html = '';
-    if (isTop) {
-      html = '<div style="text-align:center;padding:4px"><div style="font-size:2rem;margin-bottom:4px">🥇</div>' +
-        '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">' + (lang === 'hi' ? '#1 — आप टॉप पर हैं!' : '#1 — You\'re the top!') + '</div>' +
-        '<div style="font-size:.78rem;color:#6B21A8;opacity:.8;margin-top:4px">' + (lang === 'hi' ? 'आपकी category में ' + total + ' shops में सबसे आगे' : 'Leading ' + total + ' listings in your category') + '</div></div>';
+    if (rank === 1){
+      html += '<div style="font-size:.78rem;color:#6B21A8;margin-top:8px;font-weight:700">' +
+        (lang === 'hi' ? 'आप सबसे आगे हैं \u{1F389}' : 'You’re leading \u{1F389}') + '</div>';
     } else {
-      const medal = myRank === 2 ? '🥈' : (myRank === 3 ? '🥉' : '🏅');
-      html = '<div style="text-align:center;padding:4px">' +
-        '<div style="font-size:1.8rem;margin-bottom:4px">' + medal + '</div>' +
-        '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">#' + myRank + ' ' + (lang === 'hi' ? 'में से' : 'of') + ' ' + total + '</div>' +
-        '<div style="font-size:.78rem;color:#6B21A8;opacity:.85;margin-top:6px">' +
-        (lang === 'hi' ? 'अगला rank तक: <b>' + gap + '</b> points' : 'To next rank: <b>' + gap + '</b> points') +
-        '</div>' +
-        '<div style="font-size:.72rem;color:#6B21A8;opacity:.65;margin-top:8px;line-height:1.4">' +
-        (lang === 'hi' ? '💡 Score = reviews × rating + verification × 10 + photos × 2' : '💡 Score = reviews × rating + verification × 10 + photos × 2') +
-        '</div></div>';
+      html += '<div style="font-size:.8rem;color:#6B21A8;margin-top:8px">' +
+        (lang === 'hi' ? 'अगली rank से <b>' + gap + '</b> points पीछे'
+                       : '<b>' + gap + '</b> points behind #' + (rank - 1)) + '</div>';
     }
-    document.getElementById('rankBody').innerHTML = html;
+
+    // The gap only motivates if the way to close it is right there. Each tip
+    // carries the points it is actually worth, so the advice is checkable.
+    if (tips.length){
+      html += '<div style="margin-top:10px;text-align:left;border-top:1px solid rgba(147,51,234,.22);padding-top:8px">' +
+        '<div style="font-size:.72rem;font-weight:800;color:#6B21A8;opacity:.8;margin-bottom:5px">' +
+        (lang === 'hi' ? 'आगे बढ़ने का रास्ता' : 'How to move up') + '</div>';
+      tips.slice(0, 3).forEach(function(t){
+        html += '<a href="' + escAttrRank(t.href || '#') + '" style="display:flex;align-items:center;gap:6px;' +
+          'justify-content:space-between;padding:5px 7px;margin-bottom:4px;border-radius:8px;background:rgba(255,255,255,.65);' +
+          'text-decoration:none;color:#581C87;font-size:.76rem;font-weight:600">' +
+          '<span>' + escHtmlRank(t.label || '') + '</span>' +
+          '<span style="font-weight:800;color:#7E22CE;white-space:nowrap">+' + (t.points || 0) + '</span></a>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    body.innerHTML = html;
   } catch(e){
     console.warn('Rank widget error:', e);
+    widget.style.display = 'none';
   }
+}
+
+function escHtmlRank(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttrRank(s){
+  var v = String(s == null ? '' : s);
+  return /^\/[A-Za-z0-9\/_.#?=-]*$/.test(v) ? v : '#';
 }
 
 // ============= Referral Program =============

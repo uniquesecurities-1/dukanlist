@@ -44,8 +44,14 @@ async function siblingLocalities(citySlug, excludeSlug){
   return all.filter(l => l.slug !== excludeSlug).slice(0, 12);
 }
 
-function renderShopCard(b){
+function renderShopCard(b, idx){
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
+  // A shopkeeper measures himself against the shop across the road long before
+  // he measures himself against the whole city, so the street gets numbered too.
+  // Same dl_shop_score the /top page and the owner panel use — one formula.
+  const rank = (typeof idx === 'number') ? idx + 1 : null;
+  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+  const rankRibbon = rank ? `<div style="position:absolute;top:10px;left:10px;z-index:2;display:flex;align-items:center;gap:4px;background:${rank<=3?'linear-gradient(135deg,#FEF3C7,#FDE68A)':'rgba(15,23,42,.72)'};color:${rank<=3?'#92400E':'#fff'};border:${rank<=3?'1px solid #FCD34D':'none'};padding:3px 9px;border-radius:99px;font-size:.72rem;font-weight:800;backdrop-filter:blur(4px)">${medal} #${rank}</div>` : '';
   const rating = b.rating_avg > 0
     ? `<span style="color:#0F172A;font-weight:700">⭐ ${Number(b.rating_avg).toFixed(1)} <span style="font-weight:500;color:#64748b">(${b.rating_count || 0})</span></span>`
     : '<span style="color:#94a3b8;font-size:.8rem">New listing</span>';
@@ -53,7 +59,8 @@ function renderShopCard(b){
     ? `<span style="background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.03em">✓ VERIFIED</span>`
     : '';
   return `
-  <a href="${ORIGIN}/${esc(b.slug)}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,23,42,.04)">
+  <a href="${ORIGIN}/${esc(b.slug)}" style="position:relative;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,23,42,.04)">
+    ${rankRibbon}
     ${photo
       ? `<img src="${esc(photo)}" alt="${esc(b.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover" loading="lazy">`
       : `<div style="width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#FAFAFA,#F1F5F9);display:grid;place-items:center;font-size:3rem;opacity:.5">${esc(b.category_icon || '🏪')}</div>`
@@ -250,16 +257,40 @@ module.exports = async (req, res) => {
       return res.end('<h1>Bad request</h1><p>Missing city or locality slug.</p>');
     }
 
-    // Fetch shops + sibling areas in parallel
-    const [shops, siblings] = await Promise.all([
+    // Fetch shops + sibling areas in parallel.
+    // get_locality_ranked (db/221) returns them already ordered by the SAME
+    // dl_shop_score that decides /top and the owner panel's rank, so the #1 on
+    // this street is the same #1 everywhere else. get_shops_by_locality is the
+    // fallback: it returns the right shops in an unranked order.
+    const [ranked, legacy, siblings] = await Promise.all([
+      rpc('get_locality_ranked', { p_city_slug: citySlug, p_locality_slug: localitySlug, p_limit: 50 }),
       rpc('get_shops_by_locality', { p_city_slug: citySlug, p_locality_slug: localitySlug, p_limit: 50 }),
       siblingLocalities(citySlug, localitySlug)
     ]);
 
+    // The legacy RPC carries locality_name / full photo array, so keep it as the
+    // base record and take only the ORDER from the ranked call.
+    const legacyRows = Array.isArray(legacy) ? legacy : [];
+    let shops = legacyRows;
+    if (Array.isArray(ranked) && ranked.length){
+      const byId = new Map(legacyRows.map(r => [r.id, r]));
+      shops = ranked
+        .map(r => Object.assign({}, byId.get(r.id) || {}, {
+          id: r.id, slug: r.slug, name: r.name,
+          usp_text: r.usp_text,
+          photos: (byId.get(r.id) || {}).photos || (r.photo ? [r.photo] : []),
+          rating_avg: r.rating_avg, rating_count: r.rating_count,
+          verified_score: r.verified_score,
+          category_name: r.category_name, category_icon: r.category_icon
+        }))
+        .filter(r => r.slug);
+      if (!shops.length) shops = legacyRows;   // never blank the page over ranking
+    }
+
     const html = renderPage({
       citySlug,
       localitySlug,
-      shops: Array.isArray(shops) ? shops : [],
+      shops,
       siblings: Array.isArray(siblings) ? siblings : []
     });
 

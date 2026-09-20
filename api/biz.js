@@ -250,6 +250,44 @@ module.exports = async (req, res) => {
     ogImage = b.photos[0];
   }
 
+  // ---------- rank badge ----------
+  // db/221 returns the honest rank plus `public_ok`, which is false when the
+  // position would embarrass the shop. A listing at #14 of 15 must never have
+  // that printed on its own page — DukanList is supposed to bring the owner
+  // customers, not cost them any. The owner sees the true number in the panel.
+  let rankBadge = '';
+  let rankLine  = '';
+  try {
+    const rr = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_shop_rank', {
+      method: 'POST',
+      headers: { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY,
+                 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_business_id: b.id })
+    });
+    if (rr.ok){
+      const rk = await rr.json();
+      if (rk && rk.found && rk.public_ok && rk.rank && rk.category_name){
+        const medal = rk.rank === 1 ? '🥇' : rk.rank === 2 ? '🥈' : rk.rank === 3 ? '🥉' : '▲';
+        rankBadge =
+          '<a href="/top/' + encodeURIComponent(rk.category_slug || '') + '/' +
+          encodeURIComponent(String(rk.city_name || '').toLowerCase().replace(/\s+/g, '-')) + '"' +
+          ' class="biz-rank-pill" style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;' +
+          'background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E;border:1px solid #FCD34D;' +
+          'padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:800;text-decoration:none;' +
+          'vertical-align:middle;white-space:nowrap">' +
+          medal + ' #' + rk.rank + ' in ' + esc(rk.category_name) + '</a>';
+        rankLine = 'Ranked #' + rk.rank + ' of ' + rk.total + ' in ' +
+                   esc(rk.category_name) + ', ' + esc(rk.city_name) + ' on DukanList';
+      }
+    } else {
+      console.error('[api/biz] get_shop_rank ' + rr.status + ': ' +
+                    (await rr.text().catch(() => '')).slice(0, 200));
+    }
+  } catch (e) {
+    // A ranking hiccup must never take the listing page down with it.
+    console.error('[api/biz] get_shop_rank threw:', e && e.message);
+  }
+
   // ---------- inject ----------
   html = html
     .replace('<title>Business Details — dukanlist.com</title>',
@@ -276,7 +314,7 @@ module.exports = async (req, res) => {
     .replace('<h1 class="biz-title" id="bizName"></h1>',
              '<h1 class="biz-title" id="bizName">' + esc(b.name) + '</h1>')
     .replace('<span class="biz-cat-pill" id="bizCatPill"></span>',
-             '<span class="biz-cat-pill" id="bizCatPill">' + esc(cat) + '</span>');
+             '<span class="biz-cat-pill" id="bizCatPill">' + esc(cat) + '</span>' + rankBadge);
 
   // A crawlable summary of the same facts the page renders. It sits at the
   // END of <body> in normal flow (NOT hidden with CSS — hidden text can read
@@ -286,6 +324,7 @@ module.exports = async (req, res) => {
     '<div id="ssrSeoSummary" style="max-width:1100px;margin:0 auto;padding:16px;color:#475569;font:14px/1.6 system-ui,sans-serif">' +
       '<h2>' + esc(b.name) + (b.name_hi ? ' / ' + esc(b.name_hi) : '') + '</h2>' +
       '<p>' + esc(cat) + ' in ' + esc(city) + (locality ? ', ' + esc(locality) : '') + '</p>' +
+      (rankLine ? '<p>' + rankLine + '</p>' : '') +
       (addr ? '<p>Address: ' + esc(addr) + '</p>' : '') +
       (rcount > 0 ? '<p>Rating ' + rating.toFixed(1) + ' out of 5 from ' + rcount + ' reviews</p>' : '') +
       (b.usp_text ? '<p>' + esc(b.usp_text) + '</p>' : '') +

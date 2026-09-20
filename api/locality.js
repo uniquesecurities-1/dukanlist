@@ -322,6 +322,19 @@ ${isEmpty ? '<meta name="robots" content="noindex, follow">' : ''}
   .crumbs a{color:#FF6B1A;text-decoration:none;font-weight:600}
   .grid{max-width:1180px;margin:0 auto;padding:24px 20px 64px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
   @media (max-width:560px){ .grid{grid-template-columns:1fr;gap:14px;padding:16px 14px 48px} .hero{padding:36px 16px 24px} }
+  /* The empty state used to read like an apology. 261 of Mandi Dabwali's 353
+     leaf categories have nobody in them, so this page is seen far more often
+     than the full one — it should read like an open position, not a dead end. */
+  .throne{ background:linear-gradient(160deg,#FFFBEB 0%,#FEF3C7 100%); border:1.5px solid #FCD34D;
+           border-radius:18px; padding:44px 26px; text-align:center; max-width:640px; margin:0 auto;
+           box-shadow:0 10px 30px rgba(180,83,9,.10) }
+  .throne-crown{ font-size:3.2rem; line-height:1; margin-bottom:10px }
+  .throne-kicker{ display:inline-block; background:#92400E; color:#FEF3C7; font-size:.68rem; font-weight:800;
+           letter-spacing:.09em; padding:5px 12px; border-radius:99px; margin-bottom:14px }
+  .throne h2{ font-size:1.5rem; font-weight:800; color:#78350F; margin-bottom:10px; letter-spacing:-.02em }
+  .throne p{ color:#92400E; line-height:1.6; max-width:470px; margin:0 auto 10px; font-size:.95rem }
+  .throne .throne-hi{ color:#B45309; font-size:.9rem; margin-bottom:20px }
+  .throne .btn{ background:#B45309; border-color:#B45309 }
   .empty{max-width:560px;margin:48px auto;padding:36px 24px;text-align:center;background:#fff;border:1px dashed #cbd5e1;border-radius:14px}
   .empty h2{font-size:1.2rem;font-weight:800;margin-bottom:8px}
   .empty p{color:#5A6573;margin-bottom:16px;font-size:.95rem}
@@ -350,10 +363,14 @@ ${isEmpty ? '<meta name="robots" content="noindex, follow">' : ''}
 
 ${shops.length > 0
   ? `<main class="grid">${shops.map(renderShopCard).join('')}</main>`
-  : `<div class="empty">
-       <h2>No ${esc(catName)} listed yet in ${esc(cityName)}</h2>
-       <p>Be the first — register your shop free in 2 minutes and rank #1 in your area.</p>
-       <a class="btn" href="${ORIGIN}/register.html?city=${esc(cityName.toLowerCase().replace(/ /g,'-'))}&cat=${esc(cat.slug)}">Register your shop</a>
+  : `<div class="throne">
+       <div class="throne-crown">👑</div>
+       <div class="throne-kicker">#1 SPOT IS OPEN · यह जगह खाली है</div>
+       <h2>No ${esc(catName)} in ${esc(cityName)} yet</h2>
+       <p>Whoever registers first holds the top spot on this page — and this is the
+          page people land on when they search for ${esc(catName.toLowerCase())} here.</p>
+       <p class="throne-hi">जो पहले register करेगा, वही इस page पर #1 पर रहेगा। फ्री है, 2 मिनट लगते हैं।</p>
+       <a class="btn" href="${ORIGIN}/register.html?city=${esc(cityName.toLowerCase().replace(/ /g,'-'))}&cat=${esc(cat.slug)}">👑 Claim the #1 spot — free</a>
        <a class="btn-sec" href="${ORIGIN}/browse">Browse all categories</a>
      </div>`
 }
