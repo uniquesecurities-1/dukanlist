@@ -175,7 +175,7 @@ export default async function handler(req, res) {
 
   // 7. Log to admin_audit_log (best-effort)
   try {
-    await sb('/rest/v1/rpc/admin_log_action', {
+    await sb('/rest/v1/rpc/log_admin_action', {
       method: 'POST',
       body: JSON.stringify({
         p_action: 'shop_email_change',

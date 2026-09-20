@@ -33,9 +33,16 @@ export default async function handler(req, res){
 
   // ---------- Auth gate ----------
   // Allow if: (a) Vercel cron header present, (b) secret matches, (c) admin token
-  const isVercelCron = !!req.headers['x-vercel-cron'];
-  const secret = req.headers['x-cron-secret'] || (req.query && req.query.secret);
-  const authed = isVercelCron || (secret && secret === process.env.DIGEST_CRON_SECRET);
+  // v227 SECURITY FIX: the mere PRESENCE of x-vercel-cron used to authorise
+  // this — anyone could send that header and trigger a mass email run to
+  // every opted-in owner (Resend quota burn + reputation damage). A real
+  // secret is now required. Vercel Cron sends Authorization: Bearer $CRON_SECRET.
+  const authHeader = req.headers['authorization'] || '';
+  const cronSecret = process.env.CRON_SECRET || '';
+  const secret     = req.headers['x-cron-secret'] || '';   // header only, never ?secret=
+  const authed =
+    (cronSecret && authHeader === ('Bearer ' + cronSecret)) ||
+    (process.env.DIGEST_CRON_SECRET && secret === process.env.DIGEST_CRON_SECRET);
   if (!authed){
     return res.status(401).json({ error: 'Unauthorized' });
   }

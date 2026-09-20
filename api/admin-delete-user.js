@@ -62,6 +62,12 @@ export default async function handler(req, res) {
   if (!auth_user_id) {
     return res.status(400).json({ error: 'auth_user_id required' });
   }
+  // v227: this value is interpolated into an admin API path — a '../'-laden
+  // string could escape the /auth/v1/admin/users/ namespace and issue an
+  // arbitrary service-role DELETE. Only a real UUID is acceptable.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(auth_user_id))) {
+    return res.status(400).json({ error: 'auth_user_id must be a UUID' });
+  }
 
   // 1. Remove admin_users row via RPC (logs the action)
   const remove = await sb('/rest/v1/rpc/admin_remove_admin', {

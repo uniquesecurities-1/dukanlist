@@ -200,8 +200,15 @@ export default async function handler(req, res){
       },
       body: '{}'
     });
-    const isSuperBody = await adminCheck.json().catch(() => false);
-    if (!isSuperBody){ res.status(403).json({ error: 'super-admin only' }); return; }
+    // v227 SECURITY FIX: adminCheck.ok was never tested. On a bad/expired/
+    // missing JWT, PostgREST answers 401 with a JSON error BODY — a truthy
+    // object — so `!isSuperBody` was false and execution fell through to the
+    // broadcast. Any stranger could push an arbitrary title/body/url to every
+    // subscribed device. Require a genuine boolean true from the RPC.
+    const isSuperBody = await adminCheck.json().catch(() => null);
+    if (!adminCheck.ok || isSuperBody !== true){
+      res.status(403).json({ error: 'super-admin only' }); return;
+    }
 
     const b = req.body || {};
     const message = {

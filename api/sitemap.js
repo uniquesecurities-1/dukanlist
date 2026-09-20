@@ -22,9 +22,8 @@ const STATIC_PAGES = [
   { path: '/contact.html', priority: '0.7', freq: 'monthly' },
   { path: '/privacy.html', priority: '0.4', freq: 'yearly'  },
   { path: '/terms.html',   priority: '0.4', freq: 'yearly'  },
-,
-  { path: '/welcome-pro.html', priority: '0.9', changefreq: 'weekly' },
-  { path: '/pro.html', priority: '0.85', changefreq: 'weekly' }
+  { path: '/welcome-pro.html', priority: '0.9', freq: 'weekly' },
+  { path: '/pro.html', priority: '0.85', freq: 'weekly' }
 ];
 
 

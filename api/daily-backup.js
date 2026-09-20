@@ -84,14 +84,18 @@ async function runBackup(req, res){
   const xCronSec   = req.headers['x-cron-secret'] || '';
   const querySec   = (req.query && req.query.secret) || '';
 
-  const isVercelCronUA  = userAgent.indexOf('vercel-cron') !== -1;
-  const isVercelCronHdr = !!req.headers['x-vercel-cron'];
-  const isBearerCron    = cronSecret && authHeader === ('Bearer ' + cronSecret);
-  const isManualSecret  = SECRET && (xCronSec === SECRET || querySec === SECRET);
+  // v227 SECURITY FIX: User-Agent and the x-vercel-cron header are both
+  // fully client-controlled. `curl -A vercel-cron <url>` ran a full dump of
+  // 17 tables (admin_users, business_owners, push_subscriptions, reviews…)
+  // and overwrote the day's backup object. Only a real shared secret counts
+  // now — Vercel Cron sends `Authorization: Bearer $CRON_SECRET`.
+  const isBearerCron   = cronSecret && authHeader === ('Bearer ' + cronSecret);
+  const isManualSecret = SECRET && xCronSec === SECRET;   // header only, never ?secret=
 
-  if (!isVercelCronUA && !isVercelCronHdr && !isBearerCron && !isManualSecret){
+  if (!isBearerCron && !isManualSecret){
     return res.status(401).json({ error: 'Unauthorized' });
   }
+  void userAgent; void querySec;   // deliberately no longer trusted
 
   if (!SUPABASE_URL || !SERVICE_KEY){
     return res.status(500).json({ error: 'Server not configured' });

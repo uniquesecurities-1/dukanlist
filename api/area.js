@@ -227,6 +227,20 @@ module.exports = async (req, res) => {
     const citySlug     = (url.searchParams.get('city')     || '').toLowerCase().trim();
     const localitySlug = (url.searchParams.get('locality') || '').toLowerCase().trim();
 
+    // v227 SECURITY FIX: citySlug was interpolated into the HTML and into a
+    // JSON-LD <script> block WITHOUT escaping, so
+    //   /api/area?city="><img src=x onerror=...>&locality=y
+    // executed attacker JS (reflected XSS; CSP allows unsafe-inline).
+    // A slug can only ever be lowercase letters, digits and hyphens.
+    const SLUG_RE = /^[a-z0-9-]{1,60}$/;
+    if (!SLUG_RE.test(citySlug) || !SLUG_RE.test(localitySlug)){
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      res.end('<!doctype html><meta charset="utf-8"><title>Bad request</title><p>Invalid area link.</p>');
+      return;
+    }
+
     if (!citySlug || !localitySlug){
       res.statusCode = 400;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');

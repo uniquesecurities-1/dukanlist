@@ -179,7 +179,7 @@ export default async function handler(req, res){
         p_ip_hash: ipH,
         p_window: '1 minute'
       });
-      if (typeof count === 'number' && count > 3){
+      if (typeof count === 'number' && count >= 3){   // v227: was >3, allowing 4 per window
         return res.status(429).json({ error: 'Rate limited' });
       }
     } catch(_){}
