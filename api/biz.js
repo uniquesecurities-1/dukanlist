@@ -133,7 +133,7 @@ module.exports = async (req, res) => {
       '&status=eq.active&limit=1' +
       '&select=id,name,name_hi,slug,usp_text,about_text,address_line1,address_line2,pincode,' +
       'mobile,whatsapp,photos,rating_avg,rating_count,established_year,hours_json,lat,lng,' +
-      'claim_status,is_professional_listing,professional_tier,' +
+      'claim_status,is_professional_listing,professional_tier,og_image_url,' +
       'categories:category_id(name,name_hi,slug),geo_cities(name,name_hi),geo_localities(name)');
   } catch (e) {
     rows = null;
@@ -237,6 +237,16 @@ module.exports = async (req, res) => {
   // JSON-LD must not be able to break out of the <script> block
   const ldJson = JSON.stringify([ld, breadcrumb]).replace(/</g, '\\u003c');
 
+  // Social preview image. Same priority share.js uses: shopkeeper-set og_image_url,
+  // then the shop's own first photo, else the branded PNG default. WhatsApp's
+  // crawler cannot render SVG, so an SVG og_image_url is skipped here.
+  let ogImage = 'https://dukanlist.com/assets/og-default.png';
+  if (b.og_image_url && typeof b.og_image_url === 'string' && !/\.svg(\?|$)/i.test(b.og_image_url)){
+    ogImage = b.og_image_url;
+  } else if (Array.isArray(b.photos) && typeof b.photos[0] === 'string' && b.photos[0]){
+    ogImage = b.photos[0];
+  }
+
   // ---------- inject ----------
   html = html
     .replace('<title>Business Details — dukanlist.com</title>',
@@ -249,6 +259,16 @@ module.exports = async (req, res) => {
              '<meta property="og:title" id="ogTitle" content="' + attr(title) + '">')
     .replace('<meta property="og:description" id="ogDesc" content="Discover this business on DukanList — Mandi Dabwali ka local listings directory.">',
              '<meta property="og:description" id="ogDesc" content="' + attr(desc) + '">')
+    .replace('<meta property="og:image" id="ogImage" content="https://dukanlist.com/assets/og-default.png">',
+             '<meta property="og:image" id="ogImage" content="' + attr(ogImage) + '">')
+    // Twitter reads its own tags before falling back to og:*, and ours carried
+    // the generic site copy — so a shared link showed "Every Business, One Identity".
+    .replace('<meta name="twitter:title" id="twTitle" content="DukanList — Every Business, One Identity">',
+             '<meta name="twitter:title" id="twTitle" content="' + attr(title) + '">')
+    .replace('<meta name="twitter:description" id="twDesc" content="Discover this business on DukanList.">',
+             '<meta name="twitter:description" id="twDesc" content="' + attr(desc) + '">')
+    .replace('<meta name="twitter:image" id="twImage" content="https://dukanlist.com/assets/og-default.png">',
+             '<meta name="twitter:image" id="twImage" content="' + attr(ogImage) + '">')
     // fill the heading the crawler currently sees empty
     .replace('<h1 class="biz-title" id="bizName"></h1>',
              '<h1 class="biz-title" id="bizName">' + esc(b.name) + '</h1>')
