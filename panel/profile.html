@@ -1376,18 +1376,25 @@ async function confirmAccountDeletion(){
     }
     // Soft-delete via RPC. If RPC doesn't exist yet (DB migration pending),
     // fall back to direct UPDATE on businesses status='deleted' + sign out.
-    let rpcOk = false;
+    // v226 FIX: request_account_deletion has no definition in db/, and the old
+    // fallback wrote status='deletion_requested' — a value the status CHECK
+    // rejects, reverted by trg_biz_protect anyway. Both failures were swallowed
+    // and the user was told "deletion accepted". Now failure is shown honestly.
+    let rpcOk = false, rpcErr = '';
     try {
       const r = await c.rpc('request_account_deletion');
-      if (!r.error){ rpcOk = true; }
-    } catch(_){}
+      if (r.error) rpcErr = r.error.message || 'RPC failed'; else rpcOk = true;
+    } catch(e){ rpcErr = e.message || String(e); }
+
     if (!rpcOk){
-      // Fallback: mark business status to 'deletion_requested' and sign out auth
-      try {
-        if (typeof MY_BIZ !== 'undefined' && MY_BIZ && MY_BIZ.id){
-          await c.from('businesses').update({ status: 'deletion_requested' }).eq('id', MY_BIZ.id);
-        }
-      } catch(_){}
+      const waMsg = encodeURIComponent('Hi DukanList team, please delete my listing and account. Shop: ' +
+        ((typeof MY_BIZ !== 'undefined' && MY_BIZ && MY_BIZ.name) || '') );
+      res.style.cssText = 'display:block;margin-top:14px;padding:12px;border-radius:8px;font-size:.88rem;line-height:1.5;background:#FEF3C7;border:1.5px solid #FCD34D;color:#92400E';
+      res.innerHTML = (lang === 'hi')
+        ? '<b>⚠️ Request अपने-आप process नहीं हो payi.</b><br>Delete karne ke liye hume WhatsApp par likhein — hum 48 ghante mein kar denge.<br><a href="https://wa.me/919541223377?text=' + waMsg + '" target="_blank" rel="noopener" style="color:#1D4ED8;font-weight:800">💬 WhatsApp par request bhejein →</a>'
+        : '<b>⚠️ We could not process this automatically.</b><br>Please message us on WhatsApp and we will delete your listing and account within 48 hours.<br><a href="https://wa.me/919541223377?text=' + waMsg + '" target="_blank" rel="noopener" style="color:#1D4ED8;font-weight:800">💬 Send the request on WhatsApp →</a>';
+      if (btn){ btn.disabled = false; }
+      return;
     }
     // Sign out the user regardless
     try { await c.auth.signOut(); } catch(_){}

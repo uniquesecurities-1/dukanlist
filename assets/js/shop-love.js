@@ -34,6 +34,12 @@
       localStorage.setItem(LS_LOVED, JSON.stringify(m));
     } catch (e) {}
   }
+  function unmarkLoved(id) {        // v226: needed for the un-like path
+    try {
+      var m = lovedMap(); delete m[id];
+      localStorage.setItem(LS_LOVED, JSON.stringify(m));
+    } catch (e) {}
+  }
   function isLoved(id) { return !!lovedMap()[id]; }
 
   function paint(count, loved) {
@@ -83,9 +89,13 @@
         p_session_id: sid()
       });
       if (!r.error && r.data != null) {
-        // Server returns authoritative count (INT) or {count, liked}
+        // v226 FIX: this RPC is a real TOGGLE — a second tap UNLIKES and
+        // returns {liked:false}. We used to force liked=true always, so the
+        // 🔥 stayed lit while the count went down. Trust the server now.
         var serverCount = (typeof r.data === 'object') ? parseInt(r.data.count, 10) : parseInt(r.data, 10);
-        if (!isNaN(serverCount)) paint(serverCount, true);
+        var serverLiked = (typeof r.data === 'object' && 'liked' in r.data) ? !!r.data.liked : true;
+        if (serverLiked) markLoved(biz.id); else unmarkLoved(biz.id);
+        paint(isNaN(serverCount) ? 0 : serverCount, serverLiked);
       }
     } catch (e) { console.warn('shop-love toggle:', e); }
   };

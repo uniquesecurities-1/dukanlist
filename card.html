@@ -9,7 +9,7 @@
 <meta property="og:title" content="Digital Business Card" id="ogTitle">
 <meta property="og:description" content="Tap to save this contact to your phone." id="ogDesc">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://dukanlist.com/assets/icons/logo-og.png" id="ogImage">
+<meta property="og:image" content="https://dukanlist.com/assets/og-default.png" id="ogImage">
 <meta property="og:url" content="https://dukanlist.com/" id="ogUrl">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Digital Business Card" id="twTitle">
@@ -988,7 +988,7 @@ async function saveContact(){
   // Track save action
   try {
     if (window.ShopDB && ShopDB.client && d.id) {
-      ShopDB.client.rpc('log_lead', { p_business_id: d.id, p_action: 'card_save' }).catch(function(){});
+      ShopDB.client.rpc('log_lead', { p_business_id: d.id, p_action: 'view' }).catch(function(){}); // v226: 'card_save' violated the action CHECK
     }
   } catch(_){}
 }
@@ -1129,7 +1129,7 @@ async function loadCard(){
     var descText = descBits.slice(0, 4).join(' · ');
     // Use /card?slug=... URL (guaranteed-working, /c/ rewrite has issue)
     var cardUrl = location.origin + '/card?slug=' + encodeURIComponent(data.slug || '');
-    var previewImg = data.photo_url || (location.origin + '/assets/icons/logo-og.png');
+    var previewImg = data.photo_url || (location.origin + '/assets/og-default.png');
 
     if (ogTitleEl) ogTitleEl.setAttribute('content', displayTitle);
     if (ogDescEl)  ogDescEl.setAttribute('content', descText || 'Save this contact — Powered by DukanList');

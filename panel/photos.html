@@ -209,7 +209,7 @@ async function boot(){
     // Require authenticated user
     const { data: { user }, error } = await ShopDB.client.auth.getUser();
     if (error || !user) {
-      window.location.href = '/login.html?next=/panel/photos.html';
+      window.location.href = '/panel/login.html?next=/panel/photos.html';
       return;
     }
 

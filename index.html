@@ -369,7 +369,7 @@
     </form>
 
     <!-- ⭐ GOLDEN PAGES — main attraction (moved up, made dominant) -->
-    <a href="/golden-pages.html" class="gp-hero-card" id="gpHeroCard" title="Free local business directory — anyone can list, anyone can find">
+    <a href="/browse.html" class="gp-hero-card" id="gpHeroCard" title="Free local business directory — anyone can list, anyone can find">
       <span class="gp-hero-icon">🥇</span>
       <span class="gp-hero-body">
         <span class="gp-hero-title"><span data-i18n-en>Golden Pages</span><span data-i18n-hi>गोल्डन पेजेस</span></span>
@@ -671,7 +671,7 @@
     <div id="unclaimedGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"></div>
     <div id="unclaimedViewAll" style="text-align:center;margin-top:18px;display:none">
       <span style="font-size:.82rem;color:#92400E;font-weight:600"><span data-i18n-en>And <b id="unclaimedExtra">0</b> more — </span><span data-i18n-hi>और <b>0</b> — </span></span>
-      <a href="/golden-pages.html" style="color:#78350F;font-weight:800;text-decoration:underline">browse Golden Pages →</a>
+      <a href="/browse.html" style="color:#78350F;font-weight:800;text-decoration:underline">browse Golden Pages →</a>
     </div>
   </div>
   <style>
@@ -717,7 +717,7 @@
 
       <!-- ===== JUNE 2026 DROPS ===== -->
 
-      <a href="/admin/professional-verify.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#7DD3FC !important;background:linear-gradient(135deg,#F0F9FF 0%,#E0F2FE 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(14,165,233,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <a href="/welcome-pro.html" class="wn-card" style="text-decoration:none;color:inherit;display:block;border-color:#7DD3FC !important;background:linear-gradient(135deg,#F0F9FF 0%,#E0F2FE 100%)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 28px rgba(14,165,233,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div class="wn-head"><div class="wn-ico" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);color:#fff">🛡️</div><span class="wn-badge new" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);color:#fff;animation:pulseGlow 2.4s ease-in-out infinite">JUST DROPPED</span></div>
         <h3><span data-i18n-en>Professional Listings — Full Compliance Mode</span><span data-i18n-hi>पेशेवर लिस्टिंग — पूर्ण अनुपालन</span></h3>
         <p><span data-i18n-en>CA, Doctor, Lawyer, CS, ICMAI listings now run in ICAI/NMC/BCI compliant mode — no ratings, no Top Rated badges, no promotional content. MFD/Stock Broker/Insurance get partial mode with regulatory disclaimers. Admin verifies membership numbers via regulator's public lookup.</span><span data-i18n-hi>CA, Doctor, Lawyer के लिए ICAI/NMC/BCI अनुपालन mode। MFD/Stock Broker/Insurance के लिए disclaimer। Admin membership verify करता है।</span></p>
@@ -1256,7 +1256,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
   // Single source of truth for the WhatsApp claim number — same constant
   // pattern as /golden-pages.html so admin can change in one place later.
-  const CLAIM_WHATSAPP = '919876543210';   // TODO: replace with real team WhatsApp
+  const CLAIM_WHATSAPP = '919541223377';   // v226: was a placeholder number
   const CLAIM_BRAND    = 'DukanList Team';
 
   function esc(s){
@@ -1266,7 +1266,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
   function buildClaimUrl(name, slug){
     const msg = 'Hi ' + CLAIM_BRAND + ',\n\nI am the owner of:\n' +
                 '🏪 ' + (name || '') + '\n' +
-                (slug ? '🔗 https://dukanlist.com/shop/' + slug + '\n' : '') +
+                (slug ? '🔗 https://dukanlist.com/' + slug + '\n' : '') +
                 '\nPlease verify and help me claim this listing. Thanks!';
     return 'https://wa.me/' + CLAIM_WHATSAPP + '?text=' + encodeURIComponent(msg);
   }

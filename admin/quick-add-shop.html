@@ -787,8 +787,9 @@ async function submitSingle(){
       p_city_id:                cityId,
       p_source:                 source,
       p_consent_method:         consent,
-      p_notes:                  notes || null,
-      p_email:                  email || null      // v225
+      p_notes:                  notes || null
+      // v226: p_email REMOVED — db/215's 10-arg overload made this call
+      // ambiguous and broke every submit. Email is set separately below.
     });
     if (error) throw error;
     if (!data || !data.success) throw new Error('Failed to add');
@@ -803,8 +804,21 @@ async function submitSingle(){
       inviteMsg:   ''
     };
 
-    // v225: fire the claim + verification magic link right away
-    if (email && wantInvite){
+    // v226: save the email via its own RPC (no overload → no ambiguity)
+    if (email){
+      try {
+        const em = await C.rpc('admin_set_business_email', {
+          p_business_id: data.business_id,
+          p_email:       email
+        });
+        if (em.error) LAST_RESULT.inviteMsg = '⚠️ Shop add ho gayi, par email save nahi hui: ' + em.error.message;
+      } catch(ee){
+        LAST_RESULT.inviteMsg = '⚠️ Shop add ho gayi, par email save nahi hui: ' + (ee.message || ee);
+      }
+    }
+
+    // v226: fire the claim + verification magic link right away
+    if (email && wantInvite && !LAST_RESULT.inviteMsg){
       btn.textContent = '📧 Sending invite...';
       try {
         const logRes = await C.rpc('admin_log_email_invite', {
@@ -813,7 +827,11 @@ async function submitSingle(){
           p_notes:       'Sent from Quick Add',
           p_sent_via:    'magic-link'
         });
-        const claimUrl = (logRes && logRes.data && logRes.data.claim_url) || data.claim_url;
+        if (logRes.error) throw logRes.error;   // v226: was unchecked
+        // v226: always land on claim-complete.html — claim.html does not read
+        // the magic-link session and dead-ends an already-signed-in owner.
+        var claimUrl = (logRes.data && logRes.data.claim_url) || data.claim_url || '';
+        claimUrl = claimUrl.replace('/claim.html?', '/claim-complete.html?');
         const otp = await C.auth.signInWithOtp({
           email: email,
           options: { emailRedirectTo: claimUrl, shouldCreateUser: true }
