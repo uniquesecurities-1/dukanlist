@@ -271,10 +271,10 @@ module.exports = async (req, res) => {
         rankBadge =
           '<a href="/top/' + encodeURIComponent(rk.category_slug || '') + '/' +
           encodeURIComponent(String(rk.city_name || '').toLowerCase().replace(/\s+/g, '-')) + '"' +
-          ' class="biz-rank-pill" style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;' +
+          ' class="biz-rank-pill" style="display:inline-flex;align-items:center;gap:5px;margin:8px 0 0;' +
           'background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E;border:1px solid #FCD34D;' +
           'padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:800;text-decoration:none;' +
-          'vertical-align:middle;white-space:nowrap">' +
+          'white-space:nowrap;box-shadow:0 2px 8px rgba(120,53,15,.25)">' +
           medal + ' #' + rk.rank + ' in ' + esc(rk.category_name) + '</a>';
         rankLine = 'Ranked #' + rk.rank + ' of ' + rk.total + ' in ' +
                    esc(rk.category_name) + ', ' + esc(rk.city_name) + ' on DukanList';
@@ -310,11 +310,14 @@ module.exports = async (req, res) => {
              '<meta name="twitter:description" id="twDesc" content="' + attr(desc) + '">')
     .replace('<meta name="twitter:image" id="twImage" content="https://dukanlist.com/assets/og-default.png">',
              '<meta name="twitter:image" id="twImage" content="' + attr(ogImage) + '">')
-    // fill the heading the crawler currently sees empty
-    .replace('<h1 class="biz-title" id="bizName"></h1>',
-             '<h1 class="biz-title" id="bizName">' + esc(b.name) + '</h1>')
+    // (the <h1> is filled below, together with the rank badge)
     .replace('<span class="biz-cat-pill" id="bizCatPill"></span>',
-             '<span class="biz-cat-pill" id="bizCatPill">' + esc(cat) + '</span>' + rankBadge);
+             '<span class="biz-cat-pill" id="bizCatPill">' + esc(cat) + '</span>')
+    // #bizCatPill sits in the right-hand sidebar card, where the badge was easy
+    // to miss. The hero, directly under the shop name, is where a visitor and
+    // the owner both actually look.
+    .replace('<h1 class="biz-title" id="bizName"></h1>',
+             '<h1 class="biz-title" id="bizName">' + esc(b.name) + '</h1>' + rankBadge);
 
   // A crawlable summary of the same facts the page renders. It sits at the
   // END of <body> in normal flow (NOT hidden with CSS — hidden text can read
