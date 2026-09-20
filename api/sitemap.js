@@ -10,20 +10,23 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const ORIGIN = 'https://dukanlist.com';
 
-// Static high-priority pages
+// Static high-priority pages.
+// NOTE: no ".html" suffixes. vercel.json sets cleanUrls:true, so "/about.html"
+// 308-redirects to "/about" — and Google drops sitemap entries that redirect
+// rather than following them ("Page with redirect" in the indexing report).
 const STATIC_PAGES = [
-  { path: '/',             priority: '1.0', freq: 'daily'   },
-  { path: '/browse.html',  priority: '0.9', freq: 'daily'   },
-  { path: '/top.html',     priority: '0.9', freq: 'daily'   },
-  { path: '/search.html',  priority: '0.9', freq: 'daily'   },
-  { path: '/pucho-bhai.html', priority: '0.9', freq: 'hourly' },
-  { path: '/register.html',priority: '0.8', freq: 'monthly' },
-  { path: '/about.html',   priority: '0.7', freq: 'monthly' },
-  { path: '/contact.html', priority: '0.7', freq: 'monthly' },
-  { path: '/privacy.html', priority: '0.4', freq: 'yearly'  },
-  { path: '/terms.html',   priority: '0.4', freq: 'yearly'  },
-  { path: '/welcome-pro.html', priority: '0.9', freq: 'weekly' },
-  { path: '/pro.html', priority: '0.85', freq: 'weekly' }
+  { path: '/',            priority: '1.0',  freq: 'daily'   },
+  { path: '/browse',      priority: '0.9',  freq: 'daily'   },
+  { path: '/top',         priority: '0.9',  freq: 'daily'   },
+  { path: '/search',      priority: '0.9',  freq: 'daily'   },
+  { path: '/pucho-bhai',  priority: '0.9',  freq: 'hourly'  },
+  { path: '/register',    priority: '0.8',  freq: 'monthly' },
+  { path: '/about',       priority: '0.7',  freq: 'monthly' },
+  { path: '/contact',     priority: '0.7',  freq: 'monthly' },
+  { path: '/privacy',     priority: '0.4',  freq: 'yearly'  },
+  { path: '/terms',       priority: '0.4',  freq: 'yearly'  },
+  { path: '/welcome-pro', priority: '0.9',  freq: 'weekly'  },
+  { path: '/pro',         priority: '0.85', freq: 'weekly'  }
 ];
 
 
@@ -44,7 +47,9 @@ async function fetchSeoTopUrls(){
     const arr = await res.json();
     if (!Array.isArray(arr)) return [];
     return arr.map(x => ({
-      path: `/top/${x.category_slug}/${x.city_slug}/`,
+      // no trailing slash — vercel.json sets trailingSlash:false, so "/top/a/b/"
+      // 308-redirects to "/top/a/b" and Google discards the sitemap entry
+      path: `/top/${x.category_slug}/${x.city_slug}`,
       priority: '0.8',
       freq: 'weekly'
     }));
@@ -80,14 +85,27 @@ function urlBlock(loc, priority, freq, lastmod){
 
 export default async function handler(req, res){
   try {
-    // Fetch live data in parallel
-    const [categories, businesses, cities, localities] = await Promise.all([
-      fetchFromSupabase('categories?active=eq.true&select=slug,sort_order&order=sort_order'),
-      fetchFromSupabase('businesses?status=eq.active&select=slug,updated_at,created_at'),
-      fetchFromSupabase('geo_cities?active=eq.true&select=name'),
-      // Hyperlocal landing pages: every locality is a SEO long-tail page
-      fetchFromSupabase('geo_localities?select=slug,city_id,geo_cities(name)').catch(() => []),
-    ]);
+    // One query carries everything: each active business brings its own city,
+    // category and locality with it, so the landing pages below are derived
+    // from real listings instead of being multiplied out blindly.
+    const businesses = await fetchFromSupabase(
+      'businesses?status=eq.active' +
+      '&select=slug,updated_at,created_at,categories:category_id(slug),' +
+      'geo_cities(name),geo_localities(slug)'
+    );
+
+    const citySlug = n => String(n || '').toLowerCase().replace(/\s+/g, '-');
+
+    // Only the combinations that actually have at least one listing.
+    const localCombos = new Set();   // "city/category"
+    const areaCombos  = new Set();   // "city/locality"
+    businesses.forEach(b => {
+      const cat  = b.categories && b.categories.slug;
+      const city = b.geo_cities && citySlug(b.geo_cities.name);
+      const loc  = b.geo_localities && b.geo_localities.slug;
+      if (city && cat) localCombos.add(city + '/' + cat);
+      if (city && loc) areaCombos.add(city + '/' + loc);
+    });
 
     const urls = [];
 
@@ -105,43 +123,37 @@ export default async function handler(req, res){
     } catch(_){}
 
     // 2. Hometown landing
-    urls.push(urlBlock(ORIGIN + '/dabwali.html', '0.9', 'weekly'));
+    urls.push(urlBlock(ORIGIN + '/dabwali', '0.9', 'weekly'));
 
-    // 3. Categories — each as a search filter URL
-    categories.forEach(c => {
+    // 3. NOTE: /search.html?cat=... used to be listed here — one URL per
+    // category. robots.txt disallows "/search.html?", so we were handing Google
+    // 368 URLs and blocking every one of them in the same breath. Category
+    // browsing is covered by /local/:city/:cat below, which is server-rendered.
+
+    // 4. Category landing pages — ONLY where a listing actually exists.
+    // This used to be every city x every category: 33 x 368 = 12,144 URLs, of
+    // which 12,125 were empty pages. Google crawled a sample, found nothing,
+    // and stopped trusting the sitemap ("Crawled - currently not indexed").
+    [...localCombos].sort().forEach(combo => {
+      const [city, cat] = combo.split('/');
       urls.push(urlBlock(
-        ORIGIN + '/search.html?cat=' + encodeURIComponent(c.slug),
-        '0.6',
+        ORIGIN + '/local/' + encodeURIComponent(city) + '/' + encodeURIComponent(cat),
+        '0.7',
         'weekly'
       ));
     });
 
-    // 4. Locality landing pages — city × category combinations (huge SEO surface)
-    const citySlugs = cities.map(c => String(c.name || '').toLowerCase().replace(/\s+/g, '-'));
-    citySlugs.forEach(citySlug => {
-      categories.forEach(cat => {
-        urls.push(urlBlock(
-          ORIGIN + '/local/' + encodeURIComponent(citySlug) + '/' + encodeURIComponent(cat.slug),
-          '0.7',
-          'weekly'
-        ));
-      });
-    });
-
     // 4b. Hyperlocal AREA landing pages — /area/:city/:locality
-    // Highest long-tail SEO value: "meena bazaar mandi dabwali", "chotala road dukan"
-    try {
-      (localities || []).forEach(l => {
-        const cityName = l.geo_cities && l.geo_cities.name;
-        if (!cityName || !l.slug) return;
-        const citySlug = String(cityName).toLowerCase().replace(/\s+/g, '-');
-        urls.push(urlBlock(
-          ORIGIN + '/area/' + encodeURIComponent(citySlug) + '/' + encodeURIComponent(l.slug),
-          '0.7',
-          'weekly'
-        ));
-      });
-    } catch(_){}
+    // Long-tail value ("chotala road dukan"), but again only for localities
+    // that have a listing to show.
+    [...areaCombos].sort().forEach(combo => {
+      const [city, loc] = combo.split('/');
+      urls.push(urlBlock(
+        ORIGIN + '/area/' + encodeURIComponent(city) + '/' + encodeURIComponent(loc),
+        '0.7',
+        'weekly'
+      ));
+    });
 
     // 5. Business profiles (highest SEO value)
     businesses.forEach(b => {

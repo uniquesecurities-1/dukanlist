@@ -10,15 +10,21 @@ Disallow: /admin/
 Disallow: /panel/
 Disallow: /api/
 
-# Search-result permutations create near-duplicate pages
+# Search-result permutations create near-duplicate pages.
+# cleanUrls is on, so every page answers at both /x and /x.html — block both.
 Disallow: /search.html?
 Disallow: /search?
+Disallow: /compare
 Disallow: /compare.html
+Disallow: /shortlist
 Disallow: /shortlist.html
 
 # One-time links — never useful in search results
+Disallow: /claim
 Disallow: /claim.html
+Disallow: /claim-complete
 Disallow: /claim-complete.html
+Disallow: /claim-success
 Disallow: /claim-success.html
 
 Sitemap: https://dukanlist.com/sitemap.xml
