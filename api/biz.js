@@ -31,8 +31,12 @@
 // Wired up in vercel.json:  /:slug  ->  /api/biz?slug=:slug
 // =====================================================
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const ANON_KEY     = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Same fallbacks api/share.js uses — the anon key is public by design (it is
+// already shipped to every browser in assets/js/supabase-init.js). Without
+// these, an unset env var in Vercel silently made every page a 404.
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qazuyygrpqopwygxmvwq.supabase.co';
+const ANON_KEY     = process.env.SUPABASE_ANON_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I';
 const ORIGIN       = process.env.PUBLIC_SITE_URL || 'https://dukanlist.com';
 
 // Template cached per cold start (277 KB — fetched once, not per request)
@@ -56,11 +60,14 @@ async function getTemplate(){
   return TEMPLATE;
 }
 
+// Returns an array on success. THROWS on transport/HTTP failure so the
+// caller can tell "this slug does not exist" (real 404) apart from "our
+// backend hiccuped" (must NOT be reported to Google as a 404).
 async function sb(path){
   const r = await fetch(SUPABASE_URL + '/rest/v1' + path, {
     headers: { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY }
   });
-  if (!r.ok) return null;
+  if (!r.ok) throw new Error('supabase ' + r.status + ': ' + (await r.text()).slice(0, 200));
   return r.json();
 }
 
@@ -120,6 +127,7 @@ module.exports = async (req, res) => {
   }
 
   let rows = null;
+  let backendFailed = false;
   try {
     rows = await sb('/businesses?slug=eq.' + encodeURIComponent(slug) +
       '&status=eq.active&limit=1' +
@@ -127,12 +135,28 @@ module.exports = async (req, res) => {
       'mobile,whatsapp,photos,rating_avg,rating_count,established_year,hours_json,lat,lng,' +
       'claim_status,is_professional_listing,professional_tier,' +
       'categories:category_id(name,name_hi,slug),geo_cities(name,name_hi),geo_localities(name)');
-  } catch (e) { rows = null; }
+  } catch (e) {
+    rows = null;
+    backendFailed = true;
+    console.error('[api/biz] supabase lookup failed for', slug, '-', e && e.message);
+  }
 
   const b = Array.isArray(rows) && rows[0] ? rows[0] : null;
 
+  // If OUR backend broke, serve the normal client-rendered page with a 200.
+  // The visitor's browser will fetch the data itself and the page works as
+  // before. Critically, we must never answer 404 for a live listing just
+  // because Supabase blipped — Google would deindex it.
+  if (!b && backendFailed){
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    res.end(html);
+    return;
+  }
+
   if (!b){
-    // Real 404 status so Google drops dead slugs instead of indexing them
+    // Genuinely no such active listing → real 404 so Google drops dead slugs
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300');
