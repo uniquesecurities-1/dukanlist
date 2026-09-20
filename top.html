@@ -9,7 +9,7 @@
 <meta name="robots" content="index,follow">
 
 <link rel="icon" href="/assets/icons/icon-96.png">
-<link rel="canonical" id="pageCanonical" href="https://dukanlist.com/top.html">
+<link rel="canonical" id="pageCanonical" href="https://dukanlist.com/top">
 
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20260605">
@@ -325,7 +325,7 @@
       const combos = (r2.data || []).filter(x => x.category_slug === catSlug && x.city_slug !== citySlug).slice(0, 8);
       if (combos.length){
         const pills = combos.map(function(c){
-          return '<a class="seo-pill" href="/top/' + encodeURIComponent(c.category_slug) + '/' + encodeURIComponent(c.city_slug) + '/">' +
+          return '<a class="seo-pill" href="/top/' + encodeURIComponent(c.category_slug) + '/' + encodeURIComponent(c.city_slug) + '">' +
             escHtml(c.category_name) + ' in ' + escHtml(c.city_name) + '</a>';
         }).join('');
         document.getElementById('otherCitiesPills').innerHTML = pills;

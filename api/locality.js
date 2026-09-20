@@ -264,9 +264,11 @@ function renderPage(opts){
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",       "item": `${ORIGIN}/` },
-      { "@type": "ListItem", "position": 2, "name": "Browse",     "item": `${ORIGIN}/browse.html` },
-      { "@type": "ListItem", "position": 3, "name": catName,      "item": `${ORIGIN}/search.html?cat=${cat.slug}` },
-      { "@type": "ListItem", "position": 4, "name": cityName,     "item": url }
+      // /search.html?... is disallowed in robots.txt and /browse.html 308-redirects,
+      // so these crumbs used to point at URLs Google cannot or will not follow.
+      // /browse is crawlable, real, and the honest parent of all of these.
+      { "@type": "ListItem", "position": 2, "name": "Browse",  "item": `${ORIGIN}/browse` },
+      { "@type": "ListItem", "position": 3, "name": `${catName} in ${cityName}`, "item": url }
     ]
   };
 

@@ -8,11 +8,14 @@
 <!-- Short URL alias for /welcome-pro.html. Vercel rewrite for
      /pro has been flaky (same issue as /puchobhai), so we serve a
      static redirect file that always works. -->
-<meta http-equiv="refresh" content="0;url=/welcome-pro.html">
-<link rel="canonical" href="https://dukanlist.com/welcome-pro.html">
-<script>location.replace('/welcome-pro.html' + (location.search || '') + (location.hash || ''));</script>
+<!-- Point at the clean URL: cleanUrls:true makes /welcome-pro.html 308-redirect
+     to /welcome-pro, so the old target cost every visitor an extra hop and gave
+     Google a canonical that redirects. -->
+<meta http-equiv="refresh" content="0;url=/welcome-pro">
+<link rel="canonical" href="https://dukanlist.com/welcome-pro">
+<script>location.replace('/welcome-pro' + (location.search || '') + (location.hash || ''));</script>
 </head>
 <body>
-<p>Redirecting to <a href="/welcome-pro.html">DukanList for Professionals</a>…</p>
+<p>Redirecting to <a href="/welcome-pro">DukanList for Professionals</a>…</p>
 </body>
 </html>

@@ -25,8 +25,11 @@ const STATIC_PAGES = [
   { path: '/contact',     priority: '0.7',  freq: 'monthly' },
   { path: '/privacy',     priority: '0.4',  freq: 'yearly'  },
   { path: '/terms',       priority: '0.4',  freq: 'yearly'  },
-  { path: '/welcome-pro', priority: '0.9',  freq: 'weekly'  },
-  { path: '/pro',         priority: '0.85', freq: 'weekly'  }
+  { path: '/welcome-pro', priority: '0.9',  freq: 'weekly'  }
+  // '/pro' is deliberately NOT here: pro.html is a 757-byte noindex stub that
+  // redirects to /welcome-pro. Listing a noindex redirect in the sitemap is a
+  // contradiction, and it is what the "Excluded by 'noindex' tag" row in the
+  // indexing report was counting.
 ];
 
 
@@ -43,7 +46,15 @@ async function fetchSeoTopUrls(){
       },
       body: JSON.stringify({ p_limit: 200 })
     });
-    if (!res.ok) return [];
+    if (!res.ok){
+      // db/111 shipped this RPC referencing columns that do not exist, and
+      // this function swallowed the 400 for months — /top/ silently produced
+      // zero sitemap URLs and nobody could tell. db/220 fixes the SQL; this
+      // log makes sure the next breakage is visible.
+      console.error('[api/sitemap] list_seo_combinations ' + res.status + ': ' +
+                    (await res.text().catch(() => '')).slice(0, 300));
+      return [];
+    }
     const arr = await res.json();
     if (!Array.isArray(arr)) return [];
     return arr.map(x => ({
@@ -53,7 +64,10 @@ async function fetchSeoTopUrls(){
       priority: '0.8',
       freq: 'weekly'
     }));
-  } catch(_){ return []; }
+  } catch(e){
+    console.error('[api/sitemap] fetchSeoTopUrls threw:', e && e.message);
+    return [];
+  }
 }
 
 async function fetchFromSupabase(endpoint){
@@ -120,7 +134,7 @@ export default async function handler(req, res){
       seoUrls.forEach(u => {
         urls.push(urlBlock(ORIGIN + u.path, u.priority, u.freq));
       });
-    } catch(_){}
+    } catch(e){ console.error('[api/sitemap] /top block failed:', e && e.message); }
 
     // 2. Hometown landing
     urls.push(urlBlock(ORIGIN + '/dabwali', '0.9', 'weekly'));

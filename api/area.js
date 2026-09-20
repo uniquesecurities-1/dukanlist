@@ -89,7 +89,10 @@ function renderPage(opts){
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",     "item": `${ORIGIN}/` },
-      { "@type": "ListItem", "position": 2, "name": cityName,   "item": `${ORIGIN}/search.html?city=${citySlug}` },
+      // /search.html?... is disallowed in robots.txt and /browse.html 308-redirects,
+      // so these crumbs used to point at URLs Google cannot or will not follow.
+      // /browse is crawlable, real, and the honest parent of all of these.
+      { "@type": "ListItem", "position": 2, "name": "Browse", "item": `${ORIGIN}/browse` },
       { "@type": "ListItem", "position": 3, "name": localityName, "item": url }
     ]
   };
@@ -184,14 +187,14 @@ ${itemListSchema ? `<script type="application/ld+json">${JSON.stringify(itemList
 <header class="topbar">
   <a class="brand" href="${ORIGIN}/">DukanList<span class="badge">LOCAL</span></a>
   <div class="actions">
-    <a href="${ORIGIN}/search.html?city=${citySlug}">Search ${esc(cityName)}</a>
+    <a href="${ORIGIN}/search?city=${citySlug}">Search ${esc(cityName)}</a>
     <a href="${ORIGIN}/register.html">+ List Free</a>
   </div>
 </header>
 
 <nav class="crumb" aria-label="Breadcrumb">
   <a href="${ORIGIN}/">Home</a> ›
-  <a href="${ORIGIN}/search.html?city=${citySlug}">${esc(cityName)}</a> ›
+  <a href="${ORIGIN}/search?city=${citySlug}">${esc(cityName)}</a> ›
   <span style="color:#0F172A;font-weight:600">${esc(localityName)}</span>
 </nav>
 

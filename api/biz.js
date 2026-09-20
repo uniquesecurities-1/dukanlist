@@ -229,7 +229,10 @@ module.exports = async (req, res) => {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type':'ListItem', position:1, name:'DukanList', item: ORIGIN },
-      { '@type':'ListItem', position:2, name: city, item: ORIGIN + '/search.html?city=' + encodeURIComponent(city) },
+      // /search.html?... is disallowed in robots.txt and /browse.html 308-redirects,
+      // so these crumbs used to point at URLs Google cannot or will not follow.
+      // /browse is crawlable, real, and the honest parent of all of these.
+      { '@type':'ListItem', position:2, name:'Browse', item: ORIGIN + '/browse' },
       { '@type':'ListItem', position:3, name: b.name, item: canon }
     ]
   };
