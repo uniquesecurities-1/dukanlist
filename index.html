@@ -182,6 +182,38 @@
     .hero-search-first .hero-stats{ gap:14px; font-size:.86rem }
   }
 </style>
+
+<style>
+/* ===========================================================
+   v258 — vertical rhythm. NO shop is removed by this block.
+   -----------------------------------------------------------
+   Measured on the live page at 1280x860 before writing it:
+   section padding came to 1256px and section headers to 1117px,
+   together 22% of the page carrying no content at all. The worst
+   was .cta-strip — 240px of padding wrapped around 271px of text.
+
+   Deliberately NOT done here: cutting cards. The four showcase
+   sections turned out to hold 32 DISTINCT shops between them, not
+   the same handful repeated, and #featuredGrid already caps itself
+   at 8 visible on desktop (nth-child(n+9)) while keeping all 24
+   links in the DOM. Removing any of it would undo the crawlable
+   links added in v256/v257 to buy a little scroll.
+
+   Desktop only — the <=560px rules are already tight and were
+   fought over in v247/v249.
+   =========================================================== */
+@media (min-width:761px){
+  section{ padding:56px 24px }
+  .section-head{ margin-bottom:32px }
+  .section-head h2{ font-size:clamp(1.6rem,3.2vw,2.4rem); margin-bottom:8px }
+  .section-head .eyebrow{ margin-bottom:8px }
+  .section-head p{ font-size:1rem }
+  .cta-strip{ padding:64px 24px }
+  .cta-strip h2{ font-size:clamp(1.8rem,4vw,2.6rem); margin-bottom:12px }
+  .cta-strip p{ margin-bottom:24px }
+  .how-step{ padding:22px 20px }
+}
+</style>
 </head>
 <body>
 
