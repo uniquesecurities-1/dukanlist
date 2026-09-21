@@ -148,7 +148,7 @@ async function init(){
 
   // Fetch both shops
   const { data, error } = await c.from('businesses')
-    .select('id, slug, name, mobile, whatsapp, photos, rating_avg, rating_count, verified_score, featured, featured_until, hours_json, payment_methods, special_features, established_year, address_line, pincode, services, usp_text, lat, lng, is_professional_listing, professional_tier')
+    .select('id, slug, name, mobile, whatsapp, photos, rating_avg, rating_count, verified_score, featured, featured_until, hours_json, payment_methods, special_features, established_year, address_line1, address_line2, pincode, services_json, usp_text, lat, lng, is_professional_listing, professional_tier')
     .in('id', ids);
 
   if (error){
@@ -217,8 +217,11 @@ function render(shops){
     return f.map(x => '<span class="cmp-pill">' + esc(x) + '</span>').join(' ');
   }
 
+  // v262: was s.services. The column is services_json — business.html has
+  // always read it under that name (business.html:3400). Same array shape,
+  // so nothing else in here changes.
   function services(s){
-    const sv = Array.isArray(s.services) ? s.services : [];
+    const sv = Array.isArray(s.services_json) ? s.services_json : [];
     if (!sv.length) return null;
     return sv.slice(0, 6).map(x => '<span class="cmp-pill">' + esc(typeof x === 'string' ? x : (x.name || x)) + '</span>').join(' ');
   }
@@ -249,7 +252,12 @@ function render(shops){
           ? '<img src="' + esc(photo) + '" alt="">'
           : '<div class="ph">🏪</div>')
       + '<div class="name">' + esc(s.name) + '</div>'
-      + (s.address_line ? '<div class="cat">📍 ' + esc(s.address_line) + '</div>' : '')
+      + (function(){ /* v262: address_line does not exist; the columns are
+           address_line1 and address_line2, joined the same way api/sitemap.js
+           and db/220 join them. */
+          var addr = [s.address_line1, s.address_line2].filter(Boolean).join(', ');
+          return addr ? '<div class="cat">📍 ' + esc(addr) + '</div>' : '';
+        })()
       + '<a class="view-btn" href="/' + esc(s.slug) + '">' + L('View Listing →','विवरण देखें →') + '</a>'
       + '</div>';
   }
