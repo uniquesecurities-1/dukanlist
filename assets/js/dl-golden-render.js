@@ -85,12 +85,49 @@
     } catch(e){ console.warn(TAG, 'cats ex', e); }
   }
 
-  async function render(){
-    console.log(TAG, 'render attempt, ShopDB=', typeof ShopDB);
+  // ---------------------------------------------------------------
+  // v264 — this used to run THREE times on every page load.
+  //
+  // The three triggers at the bottom of this file (readyState,
+  // DOMContentLoaded, load) each called render(), and nothing stopped
+  // a second or third run. Measured on the live homepage at 430px,
+  // counting identical full URLs:
+  //
+  //     businesses?select=id,slug,name,name_hi,owner_name,...   3x
+  //     business_photos?select=...&business_id=in.(...)         3x
+  //     categories?select=id,name,name_hi,icon,color            2x
+  //
+  // Exactly what three overlapping runs produce — the third run found
+  // CATS already populated and skipped the category fetch, which is
+  // why that one is 2x and not 3x. Six wasted round trips out of the
+  // homepage's thirty, and the whole featured grid was built, thrown
+  // away and rebuilt three times: three lots of DOM work and image
+  // decoding on a phone that can least afford it.
+  //
+  // RENDERED   a full render finished — do not do it again
+  // RUNNING    one is in flight right now
+  // RETRY_WAIT a ShopDB-not-ready retry is already queued, so the
+  //            other triggers must not start their own retry chain
+  // ---------------------------------------------------------------
+  var RENDERED = false, RUNNING = false, RETRY_WAIT = false, RETRIES = 0;
+
+  async function render(force){
+    if (force) RENDERED = false;
+    if (RENDERED || RUNNING) return;
+
     if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) {
-      setTimeout(render, 200);
+      if (RETRY_WAIT) return;
+      if (++RETRIES > 40) { console.warn(TAG, 'ShopDB never arrived; giving up'); return; }
+      RETRY_WAIT = true;
+      setTimeout(function(){ RETRY_WAIT = false; render(); }, 200);
       return;
     }
+    RUNNING = true;
+    try { await doRender(); RENDERED = true; }
+    finally { RUNNING = false; }
+  }
+
+  async function doRender(){
     var grid = document.getElementById('featuredGrid');
     if (!grid) { console.warn(TAG, 'no #featuredGrid'); return; }
 
@@ -139,8 +176,13 @@
     } catch(e){ console.error(TAG, 'render fail', e); }
   }
 
-  if (document.readyState !== 'loading') setTimeout(render, 300);
-  window.addEventListener('DOMContentLoaded', function(){ setTimeout(render, 300); });
-  window.addEventListener('load', function(){ setTimeout(render, 800); });
-  window.dlGoldenReload = render;
+  // All three triggers stay: whichever fires first does the work and the
+  // guard above makes the rest free. The 'load' one is the safety net for a
+  // slow ShopDB. They are no longer three separate renders.
+  if (document.readyState !== 'loading') setTimeout(function(){ render(); }, 300);
+  window.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ render(); }, 300); });
+  window.addEventListener('load', function(){ setTimeout(function(){ render(); }, 800); });
+
+  // Public hook — an explicit reload is meant to re-render, so it forces.
+  window.dlGoldenReload = function(){ return render(true); };
 })();
