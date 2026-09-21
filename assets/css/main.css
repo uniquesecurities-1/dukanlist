@@ -105,7 +105,7 @@ html[data-lang="hi"] [data-i18n-en].block{ display:none !important }
 @media (min-width:760px){
   .topbar{ position:sticky; top:0 }
 }
-.topbar-inner{ max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap }
+.topbar-inner{ max-width:var(--page-w, 1180px); margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap }
 .brand{ display:flex; align-items:center; gap:10px; font-family:'Manrope',sans-serif; font-weight:800; font-size:1.08rem; color:#fff; letter-spacing:-.022em }
 .brand .logo{ width:36px; height:36px; background:linear-gradient(135deg,var(--saffron),var(--saffron-deep)); border-radius:9px; display:grid; place-items:center; font-size:1.15rem; box-shadow:0 2px 8px rgba(255,107,26,.4) }
 .brand em{ font-style:normal; color:var(--saffron-light); font-weight:600; font-size:.9rem; font-family:'Inter',sans-serif }

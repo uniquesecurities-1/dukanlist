@@ -504,7 +504,20 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   background:radial-gradient(circle, rgba(255,107,26,.05), transparent 70%);
   pointer-events:none;
 }
-.biz-hero-wrap{ max-width:1080px; margin:0 auto; position:relative; z-index:1 }
+/* ONE page grid.
+   This page had six different container widths stacked vertically — header
+   1180, breadcrumb 1180, hero 1080, main content 980, and two sections at
+   1140 — so every band started at a different left edge. That mismatch, more
+   than the absolute width, is what made the page read as homemade. Everything
+   now hangs off the same two variables.
+   1200 is deliberate, not "as wide as possible": with a 340px sidebar the
+   reading column lands near 790px, which is about 75 characters a line. Wider
+   than that and body text gets tiring to read. */
+:root{ --page-w: 1200px; --page-pad: 24px; }
+@media (min-width:1600px){ :root{ --page-w: 1320px } }
+@media (max-width:640px){  :root{ --page-pad: 16px } }
+
+.biz-hero-wrap{ max-width:var(--page-w); margin:0 auto; position:relative; z-index:1; padding:0 var(--page-pad) }
 .biz-back{
   display:inline-flex; align-items:center; gap:5px;
   font-size:.85rem; color:var(--muted); font-weight:500;
@@ -517,6 +530,9 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
 .biz-back:hover{ color:var(--ink); background:#fff; transform:translateX(-3px); box-shadow:0 4px 14px rgba(15,23,42,.05) }
 .biz-top{ display:grid; grid-template-columns:1fr; gap:24px; align-items:start }
 @media (min-width:900px){ .biz-top{ grid-template-columns:minmax(0,520px) 1fr; gap:36px } }
+/* With the wider page grid the photo panel can take its share of the extra
+   room instead of leaving it all to the text column. */
+@media (min-width:1280px){ .biz-top{ grid-template-columns:minmax(0,600px) 1fr; gap:40px } }
 .gallery{
   background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:18px;
   overflow:hidden; box-shadow:0 8px 24px rgba(15,23,42,.06), 0 2px 4px rgba(15,23,42,.03);
@@ -804,7 +820,7 @@ body.prof-partial #reviewsAnchor::before{
 .cta-share{ background:#F8FAFC; color:var(--ink-2); border:1.5px solid var(--line) }
 .cta-share:hover{ background:#E2E8F0; text-decoration:none; transform:translateY(-2px) }
 
-.sec-content{ max-width:980px; margin:24px auto; padding:0 16px; display:grid; grid-template-columns:1fr; gap:18px }
+.sec-content{ max-width:var(--page-w); margin:24px auto; padding:0 var(--page-pad); display:grid; grid-template-columns:1fr; gap:24px }
 @media (min-width:760px){
   /* The right column is much shorter than the left, and grid was stretching it
      to match — leaving a tall dead area beside the main content. align-items:start
@@ -812,6 +828,12 @@ body.prof-partial #reviewsAnchor::before{
      that space is occupied by something useful instead of sitting empty. */
   .sec-content{ grid-template-columns:2fr 1fr; align-items:start }
   .sec-content > *:last-child{ position:sticky; top:14px }
+}
+@media (min-width:1080px){
+  /* A fixed sidebar instead of a ratio: the contact rail needs a constant,
+     predictable width, and every extra pixel of screen should go to the
+     content rather than stretching the rail. */
+  .sec-content{ grid-template-columns:minmax(0,1fr) 340px }
 }
 
 .card-pill h3{
@@ -865,7 +887,12 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .svc-desc{ font-size:.8rem; color:var(--muted); margin-top:3px; line-height:1.45 }
 
 /* About Us */
-.about-body{ white-space:pre-wrap }
+/* Cards should fill the widened column — photos, review rows and grids all
+   use the room. Running PROSE that wide does not read well, though: at 900px
+   a line runs to roughly 100 characters and the eye loses its place coming
+   back to the left. Cap the measure on long-form text only. */
+.about-body{ white-space:pre-wrap; max-width:72ch }
+.card-pill > p, .rc-card p{ max-width:72ch }
 
 /* FAQ accordion */
 .faq-acc{ display:flex; flex-direction:column; gap:8px }
@@ -1480,7 +1507,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .db-strip-item:hover{ transform:translateY(-2px); filter:brightness(1.08) }
 .db-strip-text{ font-size:.84rem; line-height:1.3; font-weight:700; max-height:3.4em; overflow:hidden; margin-bottom:6px }
 .db-strip-age{ font-size:.66rem; opacity:.85; font-weight:700 }
-.db-home{ max-width:1180px; margin:0 auto 24px; padding:0 20px }
+.db-home{ max-width:var(--page-w); margin:0 auto 24px; padding:0 var(--page-pad) }
 .db-home-label{ display:flex; align-items:center; gap:8px; margin-bottom:10px }
 .db-home-emoji{ font-size:1.3rem }
 .db-home-label > span:nth-child(2){ font-family:'Manrope',sans-serif; font-weight:800; font-size:.94rem; color:#0F172A; letter-spacing:-.015em; flex:1 }
@@ -1565,7 +1592,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <div id="bizContent" style="display:none">
 
   <!-- Breadcrumbs -->
-  <div style="max-width:1180px;margin:0 auto;padding:6px 24px 0">
+  <div style="max-width:var(--page-w);margin:0 auto;padding:6px var(--page-pad) 0">
     <div id="breadcrumbsSlot"></div>
   </div>
 
@@ -1750,7 +1777,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   </section>
 
   <!-- MMT-STYLE STAT STRIP: rating breakdown + shop highlights -->
-  <section style="max-width:1140px;margin:24px auto 0;padding:0 18px">
+  <section style="max-width:var(--page-w);margin:24px auto 0;padding:0 var(--page-pad)">
     <div id="mmtStatStrip" style="display:none;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:18px 22px;box-shadow:0 1px 3px rgba(15,23,42,.04)">
       <div id="ratingBreakdown" style="display:flex;align-items:center;gap:16px;padding-bottom:16px;border-bottom:1px solid rgba(15,23,42,.06);margin-bottom:16px;flex-wrap:wrap">
         <div style="background:linear-gradient(135deg,#1E40AF,#1E3A8A);color:#fff;padding:10px 16px;border-radius:10px;font-size:1.4rem;font-weight:800;letter-spacing:-.02em">
@@ -2001,7 +2028,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </div>
 
 <!-- MMT-style Similar Shops carousel -->
-<section id="similarShopsSection" style="display:none;max-width:1140px;margin:32px auto;padding:0 18px">
+<section id="similarShopsSection" style="display:none;max-width:var(--page-w);margin:32px auto;padding:0 var(--page-pad)">
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
     <h2 style="font-size:1.25rem;font-weight:800;color:#0F172A;letter-spacing:-.015em">
       <span data-i18n-en>Similar businesses nearby</span><span data-i18n-hi>आस-पास की समान लिस्टिंग</span>
@@ -2033,7 +2060,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </div>
 
 <!-- Recently viewed widget -->
-<section style="max-width:1140px;margin:24px auto;padding:0 18px">
+<section style="max-width:var(--page-w);margin:24px auto;padding:0 var(--page-pad)">
   <div id="recentlyViewedSlot" style="display:none"></div>
 </section>
 
