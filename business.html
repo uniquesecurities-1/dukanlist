@@ -3594,17 +3594,45 @@ function bindLightbox(){
 // ====== Animated number counter ======
 function animateNumber(el, target, duration){
   if (!el) return;
+  target = Number(target) || 0;
+
+  // The markup ships with a placeholder of "0.0" and this function counts up
+  // to the real rating. But browsers do not run requestAnimationFrame in a
+  // background tab — so a page opened in one (middle-click, "open in new
+  // tab", or a WhatsApp link that opens behind the chat) never ticked once,
+  // and a 5.0 shop sat there advertising itself as "⭐ 0.0" until the visitor
+  // happened to focus the tab. Verified live: document.hidden === true,
+  // zero rAF callbacks in 1.5s, #ratingNum still reading 0.0.
+  //
+  // So: when there will be no animation, just show the number.
+  const noMotion = window.matchMedia &&
+                   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.hidden || noMotion){
+    el.textContent = target.toFixed(1);
+    return;
+  }
+
   duration = duration || 1000;
   const start = 0;
   const startTime = performance.now();
+  let finished = false;
   function tick(now){
     const elapsed = Math.min((now - startTime) / duration, 1);
     const eased = 1 - Math.pow(1 - elapsed, 3); // ease-out cubic
     const current = start + (target - start) * eased;
     el.textContent = current.toFixed(1);
     if (elapsed < 1) requestAnimationFrame(tick);
-    else el.textContent = target.toFixed(1);
+    else { el.textContent = target.toFixed(1); finished = true; }
   }
+  // If the tab is hidden PART WAY through, rAF pauses mid-count and the
+  // number freezes at whatever it had reached. Snap it to the truth instead.
+  document.addEventListener('visibilitychange', function onHide(){
+    if (document.hidden && !finished){
+      el.textContent = target.toFixed(1);
+      finished = true;
+      document.removeEventListener('visibilitychange', onHide);
+    }
+  });
   requestAnimationFrame(tick);
 }
 
