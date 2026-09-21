@@ -79,6 +79,15 @@
   .seo-intro{ background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:18px 22px; margin-bottom:20px; color:#475569; line-height:1.55; font-size:.95rem }
   .seo-intro h2{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1.1rem; color:#0F172A; margin-bottom:8px; letter-spacing:-.015em }
 
+  .cat-picker{ background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:16px 18px; margin-bottom:18px }
+  .cat-picker-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:.95rem; color:#0F172A; margin-bottom:11px }
+  .cat-pill{ display:inline-flex; align-items:center; gap:7px; background:#fff; border:1px solid #CBD5E1; color:#334155;
+             padding:7px 13px; border-radius:99px; font-size:.85rem; font-weight:700; text-decoration:none; transition:.15s }
+  .cat-pill:hover{ background:#1E3A8A; color:#fff; border-color:#1E3A8A; text-decoration:none }
+  .cat-pill .n{ background:#F1F5F9; color:#475569; border-radius:99px; padding:1px 7px; font-size:.74rem; font-weight:800 }
+  .cat-pill:hover .n{ background:rgba(255,255,255,.22); color:#fff }
+  .cat-pill.is-all{ background:#FEF3C7; border-color:#FCD34D; color:#92400E }
+  .cat-pill.is-all:hover{ background:#B45309; border-color:#B45309; color:#fff }
   .seo-other-cities{ margin-top:34px; padding-top:24px; border-top:1px solid #E5E7EB }
   .seo-other-cities-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1rem; color:#0F172A; margin-bottom:12px }
   .seo-pill-list{ display:flex; flex-wrap:wrap; gap:8px }
@@ -130,6 +139,13 @@
   <div class="seo-intro" id="seoIntro" style="display:none">
     <h2 id="introHead">Why this list</h2>
     <p id="introBody">These businesses are ranked using a transparent score based on customer rating, number of reviews, verification status, photo completeness, and information quality. Reviews are from real customers in the area.</p>
+  </div>
+
+  <!-- Category picker. /top/<cat>/<city> pages existed but there was no way to
+       reach one: the whole of /top was a single mixed list. -->
+  <div class="cat-picker" id="catPicker" style="display:none">
+    <div class="cat-picker-title" id="catPickerTitle">Top rated by category</div>
+    <div class="seo-pill-list" id="catPickerPills"></div>
   </div>
 
   <div id="loading" style="text-align:center;padding:50px 0;color:#64748B">⏳ Loading top businesses…</div>
@@ -333,6 +349,39 @@
     s.textContent = JSON.stringify(ld, null, 2);
     document.head.appendChild(s);
   } catch(_){}
+
+  // ─── Category picker ──────────────────────────────────────
+  // list_seo_combinations returns every category+city that has at least 3
+  // listings — i.e. exactly the /top/<cat>/<city> pages worth visiting.
+  // Without this the category pages were unreachable from anywhere.
+  try {
+    const rc = await ShopDB.client.rpc('list_seo_combinations', { p_limit: 200 });
+    if (rc.error) throw rc.error;
+    const combos = rc.data || [];
+    if (combos.length){
+      let pills = '';
+      if (catSlug){
+        // On a category page, offer the way back to the mixed list first.
+        pills += '<a class="cat-pill is-all" href="/top">← All categories</a>';
+      }
+      pills += combos
+        .filter(function(c){ return !(c.category_slug === catSlug && c.city_slug === citySlug); })
+        .map(function(c){
+          return '<a class="cat-pill" href="/top/' + encodeURIComponent(c.category_slug) +
+                 '/' + encodeURIComponent(c.city_slug) + '">' +
+                 escHtml(c.category_name) +
+                 '<span class="n">' + (c.shop_count || 0) + '</span></a>';
+        }).join('');
+
+      document.getElementById('catPickerPills').innerHTML = pills;
+      document.getElementById('catPickerTitle').textContent =
+        catSlug ? 'Browse another category' : 'Top rated by category';
+      document.getElementById('catPicker').style.display = '';
+    }
+  } catch(e){
+    // A picker that fails must not take the rankings down with it.
+    console.warn('category picker failed', e);
+  }
 
   // ─── "Same category, other cities" pill list ──────────────
   if (catSlug){
