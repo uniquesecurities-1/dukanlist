@@ -178,6 +178,28 @@
         </p>
       </div>
 
+      <!-- Whose name gets the big type. A shop usually wants the firm
+           there; a doctor or advocate wants their own name. Owner-first
+           stays the default so no card already shared changes. -->
+      <div class="panel" style="margin-top:18px">
+        <h2>🔠 <span data-i18n-en>Big name on the card</span><span data-i18n-hi>कार्ड पर बड़ा नाम</span></h2>
+        <div class="theme-row" id="nameRow">
+          <span class="theme-chip theme-navy active" data-namemode="owner" onclick="setNameMode('owner')"
+                id="nameChipOwner">Owner's name</span>
+          <span class="theme-chip theme-navy" data-namemode="firm" onclick="setNameMode('firm')"
+                id="nameChipFirm">Firm's name</span>
+        </div>
+        <p style="color:#64748b;font-size:.78rem;margin:0;line-height:1.5">
+          <span data-i18n-en>Whichever you pick goes in the big type; the other one sits just below it. Watch the preview change.</span>
+          <span data-i18n-hi>जो आप चुनेंगे वो बड़े अक्षरों में आएगा, दूसरा उसके ठीक नीचे। नीचे preview में तुरंत दिख जाएगा।</span>
+        </p>
+        <p id="nameModeNote" style="color:#92400E;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;
+           padding:8px 10px;font-size:.76rem;margin:10px 0 0;line-height:1.5;display:none">
+          <span data-i18n-en>Your listing has no separate owner name yet, so both would read the same. Add it in your Profile to use this.</span>
+          <span data-i18n-hi>आपकी listing में अलग से owner का नाम नहीं है, इसलिए दोनों एक जैसे ही दिखेंगे। Profile में जोड़ दीजिए।</span>
+        </p>
+      </div>
+
       <div class="panel" style="margin-top:18px">
         <h2>🚀 Share your card</h2>
         <button class="share-cta wa" onclick="shareWhatsApp()">
@@ -248,8 +270,23 @@ function pickAutoTheme(role, catName){
 
 function setTheme(t){
   CURRENT_THEME = t;
-  document.querySelectorAll('.theme-chip').forEach(function(c){
+  // Scoped to #themeRow: the name-mode chips below reuse .theme-chip for
+  // styling, and an unscoped query would strip their active state too.
+  document.querySelectorAll('#themeRow .theme-chip').forEach(function(c){
     c.classList.toggle('active', c.dataset.theme === t);
+  });
+  refreshPreview();
+}
+
+// Owner-first is the default on card.html, so the parameter is only added
+// for 'firm'. That keeps the shared link short and, more importantly, means
+// every card already out in the world keeps rendering exactly as it does now.
+var CURRENT_NAME_MODE = 'owner';
+
+function setNameMode(m){
+  CURRENT_NAME_MODE = (m === 'firm') ? 'firm' : 'owner';
+  document.querySelectorAll('#nameRow .theme-chip').forEach(function(c){
+    c.classList.toggle('active', c.dataset.namemode === CURRENT_NAME_MODE);
   });
   refreshPreview();
 }
@@ -262,6 +299,7 @@ function getCardUrl(){
   if (CURRENT_THEME && CURRENT_THEME !== pickAutoTheme(BIZ.owner_role, BIZ.cat_name)){
     url += '&theme=' + CURRENT_THEME;
   }
+  if (CURRENT_NAME_MODE === 'firm') url += '&name=firm';
   return url;
 }
 
@@ -402,9 +440,24 @@ async function init(){
 
   // Auto-pick theme
   CURRENT_THEME = pickAutoTheme(BIZ.owner_role, BIZ.cat_name);
-  document.querySelectorAll('.theme-chip').forEach(function(c){
+  document.querySelectorAll('#themeRow .theme-chip').forEach(function(c){
     c.classList.toggle('active', c.dataset.theme === CURRENT_THEME);
   });
+
+  // The owner/firm switch only means something when the two names differ.
+  // When the listing has no separate owner name, owner_name falls back to the
+  // business name, so both settings would render the same card. Say so
+  // instead of offering a button that appears to do nothing.
+  var ownerNm = (BIZ.owner_name || '').trim().toLowerCase();
+  var firmNm  = (BIZ.name || '').trim().toLowerCase();
+  if (!ownerNm || !firmNm || ownerNm === firmNm){
+    var note = document.getElementById('nameModeNote');
+    if (note) note.style.display = '';
+    document.querySelectorAll('#nameRow .theme-chip').forEach(function(c){
+      c.style.opacity = '0.4';
+      c.style.pointerEvents = 'none';
+    });
+  }
 
   refreshPreview();
 }

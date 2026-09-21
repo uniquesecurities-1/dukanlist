@@ -445,6 +445,54 @@ function openStatus(hours){
   return { open: isOpen, text: isOpen ? ('Open · closes ' + fmt(cl)) : ('Closed · opens ' + fmt(o)) };
 }
 
+// ============================================================
+// WHOSE NAME LEADS THE CARD — owner or firm
+// ------------------------------------------------------------
+// A shop like "Regal foods" usually wants the firm in the big type; a
+// doctor or an advocate wants their own name there. Both are right, so
+// the owner picks, in panel/digital-card.html.
+//
+// The choice rides in the share URL (?name=firm), exactly the way
+// ?theme= already does — no column, no migration, and nothing to grant
+// to anon (after db/225 a new column would not have been readable by
+// the public card anyway).
+//
+// Owner-first is the DEFAULT, so every card already printed, shared or
+// stuck on a QR poster looks exactly as it does today. Only a link
+// built with ?name=firm changes.
+//
+// Shared by the card body AND by the <title> / share-preview text, so a
+// shopkeeper who picks "firm" does not then see his own name in the
+// WhatsApp link preview.
+// ============================================================
+function buildNameBlock(d){
+  var owner = (d.displayName || '').trim();
+  var firm  = (d.business_name || '').trim();
+  var role  = (d.role || '').trim();
+
+  // With no separate owner name, displayName falls back to the business
+  // name upstream, so the two lines would say the same thing.
+  var sameName = !owner || !firm || owner.toLowerCase() === firm.toLowerCase();
+
+  if (new URLSearchParams(location.search).get('name') === 'firm' && !sameName){
+    return {
+      headline: firm,
+      subline : '',                     // the role belongs to the person, not the firm
+      business: role ? (owner + ' \u00B7 ' + role) : owner
+    };
+  }
+
+  // Pre-existing, surfaced while building this switch: when the names
+  // matched, the card printed the same name twice — once big, once small
+  // right beneath it. Drop the second line instead.
+  var headline = owner || firm;
+  return {
+    headline: headline,
+    subline : role,
+    business: (firm.toLowerCase() === headline.toLowerCase()) ? '' : firm
+  };
+}
+
 // Pick theme based on category/role
 function pickTheme(role, catName, urlTheme){
   if (urlTheme && ['navy','medical','legal','finance','vibrant'].indexOf(urlTheme) >= 0) return urlTheme;
@@ -645,6 +693,24 @@ function render(d){
 
   var theme = pickTheme(d.role, d.category_name, new URLSearchParams(location.search).get('theme'));
 
+  // ============================================================
+  // WHOSE NAME LEADS THE CARD — owner or firm
+  // ------------------------------------------------------------
+  // A shop like "Regal foods" usually wants the firm in the big
+  // type; a doctor or an advocate wants their own name there. Both
+  // are right, so the owner picks, from panel/digital-card.html.
+  //
+  // The choice rides in the share URL (?name=firm), exactly the way
+  // ?theme= already does — no column, no migration, and nothing to
+  // grant to anon (after db/225 a new column would not have been
+  // readable by the public card anyway).
+  //
+  // Owner-first stays the DEFAULT, so every card already printed,
+  // shared or stuck on a QR poster looks exactly as it does today.
+  // Only a link built with ?name=firm changes.
+  // ============================================================
+  var nameBlock = buildNameBlock(d);
+
   var photoHtml = d.photo_url
     ? '<img src="' + escapeHtml(d.photo_url) + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + (d.displayName || 'X').charAt(0).toUpperCase() + '\'">'
     : escapeHtml((d.displayName || d.business_name || 'X').charAt(0).toUpperCase());
@@ -798,12 +864,12 @@ function render(d){
     +   '<div class="c-top">'
     +     '<div class="c-photo">' + photoHtml + '</div>'
     +     '<div class="c-title-block">'
-    +       '<div class="c-name">' + escapeHtml(d.displayName || d.business_name) + '</div>'
-    +       (d.role ? '<div class="c-title-line">' + escapeHtml(d.role) + '</div>' : '')
+    +       '<div class="c-name">' + escapeHtml(nameBlock.headline) + '</div>'
+    +       (nameBlock.subline ? '<div class="c-title-line">' + escapeHtml(nameBlock.subline) + '</div>' : '')
     +     '</div>'
     +     topRightBadge
     +   '</div>'
-    +   '<div class="c-business">' + escapeHtml(d.business_name) + '</div>'
+    +   (nameBlock.business ? '<div class="c-business">' + escapeHtml(nameBlock.business) + '</div>' : '')
     +   (bizMeta.length ? '<div class="c-business-meta">' + bizMeta.map(function(x){ return '<span>' + escapeHtml(x) + '</span>'; }).join('') + '</div>' : '')
     +   statRow
     +   uspHtml
@@ -1104,7 +1170,7 @@ async function loadCard(){
   data.pro_verified   = data.is_pro && !!data.pro_verified_at;
 
   // Page title + meta
-  document.title = (data.displayName || data.business_name) + ' · Digital Business Card';
+  document.title = buildNameBlock(data).headline + ' \u00B7 Digital Business Card';
   var topTag = document.getElementById('topTag');
   if (topTag) topTag.innerHTML = '<em>📇 ' + escapeHtml(data.business_name) + '</em> · Digital Card';
 
@@ -1116,7 +1182,7 @@ async function loadCard(){
     var ogUrlEl   = document.getElementById('ogUrl');
     var twTitleEl = document.getElementById('twTitle');
     var twDescEl  = document.getElementById('twDesc');
-    var displayTitle = (data.displayName || data.business_name) + ' — Digital Card';
+    var displayTitle = buildNameBlock(data).headline + ' \u2014 Digital Card';
     var descBits = [];
     if (data.role)          descBits.push(data.role);
     if (data.business_name && data.business_name !== data.displayName) descBits.push(data.business_name);
