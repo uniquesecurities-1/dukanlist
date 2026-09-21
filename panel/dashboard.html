@@ -1937,6 +1937,17 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderSmartActions(b){
+  /* v251: stands down.
+     Three widgets were answering the same question — this one, renderQuickWins
+     (#smartTipsCard) and renderProfileCompleteness — and all three told the
+     owner to "add photos" and "write your USP". The rank widget now answers it
+     better: its tips come from get_shop_rank, are ordered by how much each one
+     actually moves the rank, and each carries the points it is worth, so the
+     advice can be checked against the score instead of taken on faith.
+     Four lists of overlapping advice is not four times the guidance; it is a
+     shopkeeper not knowing which one to believe.
+     Left in place rather than deleted so it is one line to bring back. */
+  return;
   const list = document.getElementById('smartActionsList');
   const card = document.getElementById('smartActionsCard');
   if (!list || !card || !b) return;
@@ -2737,6 +2748,9 @@ function renderProfileCompleteness(b){
 // Each card shows: icon · what to do · expected payoff · CTA button.
 // Skips items that are already done. Hides if shop is fully complete.
 function renderQuickWins(b){
+  /* v251: stands down for the same reason as renderSmartActions above —
+     duplicate advice. The rank widget's tips are the single source now. */
+  return;
   if (!b) return;
   const lang = (document.documentElement.dataset.lang === 'hi') ? 'hi' : 'en';
   const host = document.getElementById('smartTipsCard');
