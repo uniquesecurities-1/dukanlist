@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css?v=20260921">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260921b">
 <style>
   body{font-family:'Plus Jakarta Sans','Manrope',-apple-system,sans-serif}
   .rev-hero{text-align:center;margin:18px 0 24px}
@@ -126,7 +126,7 @@
 <script src="/assets/js/supabase-init.js"></script>
 <!-- v217 FIX: was mobile-nav.js (public-site bottom bar whose "Account" sent
      logged-in owners to the login page). nav.js injects the proper hamburger. -->
-<script src="/assets/js/nav.js" defer></script>
+<script src="/assets/js/nav.js?v=20260921b" defer></script>
 <script>
 function setLang(lang){ if (lang!=='en'&&lang!=='hi') lang='en'; document.documentElement.setAttribute('data-lang', lang); localStorage.setItem('shop_lang', lang); }
 async function logout(e){ if(e) e.preventDefault(); if (window.ShopDB && ShopDB.signOut) await ShopDB.signOut(); else location.href='/panel/login.html'; }

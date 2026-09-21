@@ -28,7 +28,13 @@
       const s = document.createElement('style');
       s.id = 'nav-shortlist-css';
       s.textContent = '.nsp-count{ background:#DC2626; color:#fff; font-size:.66rem; font-weight:800; padding:1px 7px; border-radius:99px; letter-spacing:.02em; min-width:18px; text-align:center; line-height:1.4 }'
-        + '@media (max-width:520px){ .nav-shortlist-pill .nsp-label{ display:none } .nav-shortlist-pill{ padding:6px 10px !important } }';
+        + '@media (max-width:520px){'
+        /* Hide the word "Shortlist" only while the pill is squeezed into the
+           collapsed topbar. Inside the OPEN drawer there is a full row of
+           space, and hiding it there left a wide bar showing just a heart. */
+        + '  .nav-links:not(.open) .nav-shortlist-pill .nsp-label{ display:none }'
+        + '  .nav-links:not(.open) .nav-shortlist-pill{ padding:6px 10px !important }'
+        + '}';
       document.head.appendChild(s);
     }
 

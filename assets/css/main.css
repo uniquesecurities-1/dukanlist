@@ -94,14 +94,18 @@ html[data-lang="hi"] [data-i18n-en].block{ display:none !important }
   background:linear-gradient(135deg,var(--indigo-deep) 0%, var(--indigo) 50%, #312E81 100%);
   color:#fff;
   padding:11px 16px;
-  z-index:50;
+  position:relative;          /* z-index only applies to POSITIONED elements */
+  z-index:1000;
   box-shadow:var(--shadow-sm);
 }
-/* This was written as sticky but never behaved that way, because overflow-x:hidden
-   on html/body had turned them into scroll containers. Now that public-premium.css
-   uses `clip` instead, sticky actually works — so scope it to tablet and up: on a
-   phone the bottom Call/WhatsApp bar is already fixed, and a sticky header too
-   would eat the little vertical space a shop listing has. */
+/* v240 scoped `position:sticky` to >=760px so a phone would not lose vertical
+   space to a fixed header. That removed `position` from .topbar on mobile — and
+   without a position, its z-index:50 stopped applying, so the header no longer
+   sat above the page. The open nav drawer lives inside this header, so page
+   content started painting over it: the Login row was crossed by the stepper
+   bar and taps landed on the page behind instead of the link.
+   The header is now always positioned. Sticky is still desktop-only — that part
+   was fine, it was dropping `position` entirely that broke it. */
 @media (min-width:760px){
   .topbar{ position:sticky; top:0 }
 }
@@ -475,7 +479,8 @@ body{ animation: fadeIn .25s ease-out }
     transform: translateX(100%);
     transition: transform .25s ease;
     box-shadow: -8px 0 30px rgba(0,0,0,.4);
-    z-index: 49;
+    /* Above every sticky/positioned thing on a page, not just above static flow. */
+    z-index: 1002;
     overflow-y: auto;
   }
   .nav-links.open{ transform: translateX(0) }
@@ -486,6 +491,18 @@ body{ animation: fadeIn .25s ease-out }
     display: flex; align-items: center;
   }
   .nav-links a:hover{ background: rgba(255,255,255,.10) }
+  /* nav.js gives this pill an inline style (light pink, inline-flex) built for
+     the desktop topbar. Inline styles beat the stylesheet, so inside the dark
+     drawer it rendered as a wide pale bar. Override it for the drawer. */
+  .nav-links.open .nav-shortlist-pill{
+    background: rgba(255,255,255,.08) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    border-radius: 10px !important;
+    padding: 14px 16px !important;
+    width: 100%; justify-content: flex-start;
+    font-size: 1rem !important; min-height: 48px;
+  }
   .nav-cta{ margin-top: 12px; text-align: center; justify-content: center }
   .lang-toggle{ margin: 0 0 16px; align-self: center }
 
@@ -493,7 +510,11 @@ body{ animation: fadeIn .25s ease-out }
   .nav-backdrop{
     display: none;
     position: fixed; inset: 60px 0 0 0;
-    background: rgba(0,0,0,.5); z-index: 48;
+    /* nav.js appends this to <body>, NOT inside .topbar. The header is a
+       stacking context at 1000, so anything on body at 1001+ would paint OVER
+       the drawer and swallow its taps. 990 keeps it above page content and
+       safely below the header. */
+    background: rgba(0,0,0,.6); z-index: 990;
     animation: fadeIn .2s ease;
   }
   .nav-backdrop.show{ display: block }
