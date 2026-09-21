@@ -25,7 +25,8 @@ const STATIC_PAGES = [
   { path: '/contact',     priority: '0.7',  freq: 'monthly' },
   { path: '/privacy',     priority: '0.4',  freq: 'yearly'  },
   { path: '/terms',       priority: '0.4',  freq: 'yearly'  },
-  { path: '/welcome-pro', priority: '0.9',  freq: 'weekly'  }
+  { path: '/welcome-pro', priority: '0.9',  freq: 'weekly'  },
+  { path: '/how-ranking-works', priority: '0.7', freq: 'monthly' }
   // '/pro' is deliberately NOT here: pro.html is a 757-byte noindex stub that
   // redirects to /welcome-pro. Listing a noindex redirect in the sitemap is a
   // contradiction, and it is what the "Excluded by 'noindex' tag" row in the

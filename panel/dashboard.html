@@ -3079,12 +3079,39 @@ async function loadRankingBattle(b){
     }
 
     const medal = rank === 1 ? '\u{1F947}' : rank === 2 ? '\u{1F948}' : rank === 3 ? '\u{1F949}' : '\u{1F3C5}';
+
+    // Movement (db/224). A standing number never shows whether the work paid
+    // off; the change does. Losing a place is called out plainly, because
+    // that is the message that actually gets someone to act on it.
+    var mv = '';
+    if (rk.movement === 'up' && rk.rank_change > 0){
+      mv = '<div style="margin-top:6px;font-size:.84rem;font-weight:800;color:#15803D">' +
+           '\u25B2 ' + (lang === 'hi'
+              ? rk.rank_change + ' sthaan upar is hafte'
+              : 'Up ' + rk.rank_change + ' place' + (rk.rank_change > 1 ? 's' : '') + ' this week') +
+           '</div>';
+    } else if (rk.movement === 'down' && rk.rank_change < 0){
+      mv = '<div style="margin-top:6px;font-size:.84rem;font-weight:800;color:#B91C1C">' +
+           '\u25BC ' + (lang === 'hi'
+              ? Math.abs(rk.rank_change) + ' sthaan neeche \u2014 koi aage nikal gaya'
+              : 'Down ' + Math.abs(rk.rank_change) + ' \u2014 someone passed you') +
+           '</div>';
+    } else if (rk.movement === 'same'){
+      mv = '<div style="margin-top:6px;font-size:.8rem;color:#6B21A8;opacity:.75">' +
+           (lang === 'hi' ? 'Pichhle hafte se wahi jagah' : 'Same as last week') + '</div>';
+    } else {
+      mv = '<div style="margin-top:6px;font-size:.78rem;color:#6B21A8;opacity:.65">' +
+           (lang === 'hi' ? 'Agle hafte se badlav dikhega' : 'Movement shows from next week') + '</div>';
+    }
+
     let html = '<div style="text-align:center;padding:4px">' +
       '<div style="font-size:1.8rem;margin-bottom:2px">' + medal + '</div>' +
       '<div style="font-size:1.05rem;font-weight:800;color:#6B21A8">#' + rank +
         ' <span style="font-weight:600;opacity:.75">' + (lang === 'hi' ? 'में से' : 'of') + ' ' + total + '</span></div>' +
       '<div style="font-size:.74rem;color:#6B21A8;opacity:.8;margin-top:2px">' +
         escHtmlRank(rk.category_name || '') + (rk.city_name ? ', ' + escHtmlRank(rk.city_name) : '') + '</div>';
+
+    html += mv;
 
     if (rank === 1){
       html += '<div style="font-size:.78rem;color:#6B21A8;margin-top:8px;font-weight:700">' +
@@ -3110,6 +3137,12 @@ async function loadRankingBattle(b){
       });
       html += '</div>';
     }
+
+    // A rank nobody can check is a rank nobody trusts — and a number you do
+    // not trust is not a reason to do anything differently.
+    html += '<div style="margin-top:9px;text-align:center">' +
+      '<a href="/how-ranking-works" target="_blank" style="font-size:.72rem;color:#6B21A8;opacity:.8;text-decoration:underline">' +
+      (lang === 'hi' ? 'Ranking kaise banti hai?' : 'How is this calculated?') + '</a></div>';
 
     html += '</div>';
     body.innerHTML = html;

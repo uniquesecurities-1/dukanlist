@@ -206,6 +206,10 @@
     {
       "path": "/api/daily-backup",
       "schedule": "30 21 * * *"
+    },
+    {
+      "path": "/api/rank-snapshot",
+      "schedule": "0 3 * * 1"
     }
   ]
 }
