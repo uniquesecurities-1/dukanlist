@@ -2322,7 +2322,15 @@ async function loadBusiness(){
     // Featured first, then chronological
     raw.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
     BIZ._cloudPhotos = raw.map(p => p.cloudinary_url.replace('/upload/', '/upload/w_1400,q_auto,f_auto/'));
-  } catch (e) { console.warn('[business] cloud photos load failed', e); BIZ._cloudPhotos = []; }
+    // v266: the SAME w_1400 array was feeding both the main photo and the
+    // 56x56 thumbnail strip, so every thumbnail downloaded a 1400px image —
+    // measured on a phone: 25x wider than it is displayed, ~150 KB each, five
+    // of them, 745 KB of images on one shop page. A second array at w_160
+    // (2x for retina on a 56px box) costs 13 KB per thumb instead of 244.
+    // Deliberately a SEPARATE array: BIZ.photos keeps the full-size URLs, so
+    // swapImg(), openLightbox() and the prev/next buttons are untouched.
+    BIZ._cloudThumbs = raw.map(p => p.cloudinary_url.replace('/upload/', '/upload/w_160,h_160,c_fill,q_auto,f_auto/'));
+  } catch (e) { console.warn('[business] cloud photos load failed', e); BIZ._cloudPhotos = []; BIZ._cloudThumbs = []; }
 
   try { renderOwnerCredit(); } catch(_){}
   try { renderSocialRow(); } catch(_){}
@@ -2746,6 +2754,11 @@ function render(){
   const legacyPhotos = (b.photos || []).filter(u => typeof u === 'string' && u.length > 0);
   const cloudPhotos = Array.isArray(b._cloudPhotos) ? b._cloudPhotos : [];
   const photos = [...cloudPhotos, ...legacyPhotos];
+  // Same order and length as photos[], so thumbs[i] always matches photos[i].
+  // Legacy Supabase-storage URLs cannot be transformed, so they fall back to
+  // the original — those are the older listings and there are few of them.
+  const cloudThumbs = Array.isArray(b._cloudThumbs) ? b._cloudThumbs : [];
+  const thumbs = [...(cloudThumbs.length === cloudPhotos.length ? cloudThumbs : cloudPhotos), ...legacyPhotos];
   // v48: Merge into BIZ.photos so swapImg() + openLightbox() + lightboxPrev/Next
   // can access all photos (they read from BIZ.photos, not local var).
   // Without this, clicking thumbnail #2 tries photos[2] which was undefined → 404 broken image.
@@ -2756,7 +2769,7 @@ function render(){
     mainEl.innerHTML = `<img id="mainImg" src="${photos[0]}" alt="${escapeHTML(b.name)}">`;
     if (photos.length > 1){
       thEl.innerHTML = photos.map((p, i) =>
-        `<img src="${p}" class="${i===0?'active':''}" onclick="swapImg(${i}, this)" alt="Photo ${i+1}">`
+        `<img src="${thumbs[i] || p}" class="${i===0?'active':''}" onclick="swapImg(${i}, this)" alt="Photo ${i+1}" loading="lazy" width="56" height="56">`
       ).join('');
       thEl.style.display = '';
     } else {
