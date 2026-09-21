@@ -46,7 +46,7 @@
     var tel = String(b.mobile || '').replace(/\D/g, '').slice(-10);
     var msg = encodeURIComponent('Hi ' + (b.name || 'there') + ', I found you on DukanList.');
     var slug = encodeURIComponent(b.slug || '');
-    var report = '/business.html?slug=' + slug + '#report';
+    var report = '/' + slug + '#report';
 
     var waBtn = wa.length === 10
       ? '<a href="https://wa.me/91' + wa + '?text=' + msg + '" target="_blank" rel="noopener" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 ' + (lang==='hi'?'WhatsApp':'WhatsApp') + '</a>'
@@ -56,7 +56,7 @@
       ? '<a href="tel:+91' + tel + '" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 ' + (lang==='hi'?'Call':'Call') + '</a>'
       : '';
 
-    return '<article style="position:relative;background:#fff;border:2px solid #FED7AA;border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 6px rgba(15,23,42,.05);cursor:pointer;overflow:hidden" onclick="if(!event.target.closest(\'a,button\')){window.location.href=\'/business.html?slug=' + slug + '\';}">'
+    return '<article style="position:relative;background:#fff;border:2px solid #FED7AA;border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 6px rgba(15,23,42,.05);cursor:pointer;overflow:hidden" onclick="if(!event.target.closest(\'a,button\')){window.location.href=\'/' + slug + '\';}">'
       + (thumb
           ? '<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:#F1F5F9"><img src="' + esc(thumb) + '" alt="' + esc(b.name || '') + '" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block"></div>'
           : '<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:linear-gradient(135deg,#FFF7ED 0%,#FED7AA 40%,#FFB870 100%)"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.5), transparent 45%),radial-gradient(circle at 80% 80%, rgba(255,107,26,.15), transparent 55%)"><div style="font-size:3.4rem;line-height:1;filter:drop-shadow(0 3px 6px rgba(120,53,15,.20))">' + esc(catIcon) + '</div><div style="position:absolute;bottom:8px;right:10px;font-size:.62rem;font-weight:800;color:#9A3412;letter-spacing:.1em;text-transform:uppercase;opacity:.6">dukanlist</div></div></div>')
@@ -65,7 +65,7 @@
       + '<span style="display:inline-flex;align-items:center;gap:5px;background:#FEF3C7;color:#78350F;padding:4px 10px;border-radius:99px;font-size:.72rem;font-weight:800">' + esc(catIcon) + ' ' + esc(catName.toUpperCase()) + '</span>'
       + ''
       + '</div>'
-      + '<div style="margin-top:4px"><div style="display:flex;align-items:center;gap:6px;font-family:\'Manrope\',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ' + esc(b.name || '') + '</div>'
+      + '<div style="margin-top:4px"><div style="display:flex;align-items:center;gap:6px;font-family:\'Manrope\',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> <a href="/' + esc(slug) + '" style="color:inherit;text-decoration:none">' + esc(b.name || '') + '</a></div>'
       + (b.name_hi ? '<div style="font-family:\'Noto Sans Devanagari\',sans-serif;font-size:.9rem;font-weight:700;color:#64748B;margin-top:2px">' + esc(b.name_hi) + '</div>' : '')
       + '</div>'
       + (b.owner_name ? '<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">' + esc(b.owner_name) + '</b></div>' : '')
