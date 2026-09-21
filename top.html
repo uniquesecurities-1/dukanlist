@@ -329,7 +329,6 @@
   // category, a "why this rank" strip and a share button. Fields
   // photo_count / cat_rank / rank_change arrive from db/228; if the RPC is
   // older they are simply undefined and those pieces degrade to nothing.
-  const shareCity = cityName || 'DukanList';
   listEl.innerHTML = items.map(function(b, i){
     const rank = i + 1;
     const photo = b.photo
@@ -344,8 +343,17 @@
     // Share: the shop's rank, in words a shopkeeper will forward. Uses the
     // category rank when we have it (that is the number on his certificate),
     // the list position otherwise.
-    const shownRank = b.cat_rank || rank;
-    const shareTxt  = '🏆 #' + shownRank + ' ' + (catName ? 'in ' + catName : 'Top Rated') + ', ' + shareCity +
+    // Which rank, and in what? On a CATEGORY view the category rank is the
+    // honest number (it is the one on his certificate). On the all-categories
+    // view the RPC labels the category "Local Businesses", which is not a
+    // category — and cat_rank there belongs to a category the card does not
+    // name (Goyal saree: list #4, cat_rank 2 in Retail). So on that view we
+    // share the LIST position as "Top Rated", which is true as stated.
+    const realCat   = catName && catName !== 'Local Businesses' ? catName : '';
+    const shownRank = realCat ? (b.cat_rank || rank) : rank;
+    const where     = realCat ? 'in ' + realCat : 'Top Rated';
+    const place     = cityName ? ', ' + cityName : '';
+    const shareTxt  = '🏆 #' + shownRank + ' ' + where + place +
                       ' — ' + b.name + ' on DukanList\nhttps://dukanlist.com/' + (b.slug || '');
     const shareBtn  = '<a class="seo-btn share" href="https://wa.me/?text=' + encodeURIComponent(shareTxt) + '" target="_blank" rel="noopener" title="Share this rank on WhatsApp">↗ Share</a>';
 
