@@ -171,9 +171,16 @@
         text-align: center; font-size: 11px; color: #94A3B8;
         background: #FAFBFD; border-radius: 0 0 14px 14px;
       }
+      /* v271: this pre-existing block was the real cause of the bell landing
+         ON the hamburger. It sets right:10px (the corner — exactly where the
+         hamburger is), and being LATER in source than the v263 720px/560px
+         blocks it won the cascade at every width <=640px, silently undoing the
+         fix. That is why the phone still showed the overlap after v263.
+         Now it clears the hamburger too, and the panel drops below the 60px
+         header instead of overlapping it. The dropdown stays full-width. */
       @media (max-width: 640px){
-        #ownerNotifBell{ top: 10px; right: 10px; width: 38px; height: 38px; font-size: 16px; }
-        #ownerNotifPanel{ top: 56px; right: 10px; left: 10px; width: auto; }
+        #ownerNotifBell{ top: 9px; right: 62px; width: 40px; height: 40px; font-size: 16px; }
+        #ownerNotifPanel{ top: 60px; right: 10px; left: 10px; width: auto; }
       }
     `;
     var style = document.createElement('style');
