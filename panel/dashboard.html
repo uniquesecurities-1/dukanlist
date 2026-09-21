@@ -901,13 +901,16 @@
           <div class="qa-tile-ico">🤝</div>
           <div class="qa-tile-lbl" style="color:#991B1B"><span data-i18n-en>Trusted Partners</span><span data-i18n-hi>साझेदार</span></div>
         </a>
-        <a href="/panel/qr-poster.html" class="qa-tile" style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#FBBF24">
-          <div class="qa-tile-ico">🖨️</div>
-          <div class="qa-tile-lbl" style="color:#92400E"><span data-i18n-en>QR Poster</span><span data-i18n-hi>QR पोस्टर</span></div>
-        </a>
-        <a href="/panel/qr-code.html" class="qa-tile">
+        <!-- v261: was TWO tiles side by side, "QR Poster" and "Simple QR",
+             which asked the shopkeeper to know the difference before he had
+             seen either one. One door now. qr-code.html is the page already in
+             the panel nav on every screen, and it opens with a primary button
+             reading "Beautiful Printable Poster →" that hands off to
+             qr-poster.html — so the poster is not lost, it is simply reached
+             after a look at the QR rather than instead of it. -->
+        <a href="/panel/qr-code.html" class="qa-tile" style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#FBBF24">
           <div class="qa-tile-ico">📱</div>
-          <div class="qa-tile-lbl"><span data-i18n-en>Simple QR</span><span data-i18n-hi>साधारण QR</span></div>
+          <div class="qa-tile-lbl" style="color:#92400E"><span data-i18n-en>QR &amp; Poster</span><span data-i18n-hi>QR और पोस्टर</span></div>
         </a>
         <a href="#" id="qaViewListing" class="qa-tile">
           <div class="qa-tile-ico">👁️</div>
