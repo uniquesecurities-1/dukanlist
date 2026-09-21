@@ -1,139 +1,133 @@
 -- ============================================================
--- db/227 — READ-ONLY. Reports the true state of every db/219 and
---          db/225 item. Changes nothing. Safe to run any time.
+-- db/227 — READ-ONLY security report. Changes nothing.
 -- ============================================================
+--
+-- Paste the whole thing into the Supabase SQL Editor and Run.
+-- It returns a TABLE of checks. Every row should say PASS.
+--
+-- v2: the first version used \echo, which is a psql meta-command.
+-- The Supabase SQL Editor talks to Postgres directly and has no idea
+-- what a backslash command is, so it failed at line 28 with
+-- "42601: syntax error at or near \". It also swallows RAISE NOTICE
+-- output, so a DO block would have run and shown Deepak nothing.
+-- Rewritten as a plain SELECT, because the editor renders rows.
 --
 -- WHY THIS EXISTS
---   db/219 said it had hardened six things. It ran without error.
---   Checking from the browser today found that its column locks had
---   silently done nothing (db/225 explains and fixes that), while
---   other parts of it HAD applied. "It ran" told us nothing.
+--   db/219 claimed six fixes and ran without error. Checking today
+--   showed its column locks had silently done nothing, while other
+--   parts HAD applied. "It ran" meant nothing.
 --
---   And from the client there is a limit to what can be known:
---   PostgREST filters rows by RLS before returning them, so an empty
---   result means EITHER "RLS is protecting this" OR "the table is
---   simply empty". I could not tell those apart from outside, and I
---   have guessed wrong on exactly that before (leads_log).
+--   And from a browser there is a hard limit: PostgREST applies RLS
+--   before returning rows, so an empty result means EITHER "RLS is
+--   protecting this" OR "the table is empty". Those cannot be told
+--   apart from outside. Inside the database, policies are visible.
 --
---   Inside the database the policies are visible. So this asks
---   Postgres directly, and prints PASS or FAIL per item.
---
--- WHAT IT DOES NOT COVER
 --   §1 below is the most serious item in db/219 — a logged-in user
 --   making themselves owner of any shop — and it is the one thing
---   that could not be tested from a browser without an account.
---   This settles it.
+--   that could not be tested without an account. This settles it.
 -- ============================================================
 
-\echo ''
-\echo '=== db/219 + db/225 — actual state ==================='
-\echo ''
+SELECT * FROM (
 
-DO $$
-DECLARE
-  v_fail INT := 0;
-  v_n    INT;
-  c      TEXT;
-BEGIN
-  ---------------------------------------------------------------
-  -- 1. CRITICAL: ownership self-grant (db/219 §1)
-  --    p_owners_self_insert let any authenticated user INSERT a row
-  --    into business_owners for ANY business_id.
-  ---------------------------------------------------------------
-  SELECT count(*) INTO v_n FROM pg_policies
-   WHERE schemaname='public' AND tablename='business_owners'
-     AND policyname='p_owners_self_insert';
-  IF v_n > 0 THEN
-    v_fail := v_fail + 1;
-    RAISE WARNING 'FAIL  §1  p_owners_self_insert STILL EXISTS — any logged-in user can claim any shop';
-  ELSE
-    RAISE NOTICE 'PASS  §1  ownership self-insert policy is gone';
-  END IF;
+  -- §1  CRITICAL: could any logged-in user claim any shop?
+  SELECT 1 AS n,
+         'ownership self-insert policy is gone' AS item,
+         CASE WHEN EXISTS (
+                SELECT 1 FROM pg_policies
+                 WHERE schemaname='public' AND tablename='business_owners'
+                   AND policyname='p_owners_self_insert')
+              THEN 'FAIL — any logged-in user can still claim ANY shop'
+              ELSE 'PASS' END AS result
 
-  ---------------------------------------------------------------
-  -- 2. Secret columns must not be granted to anon (db/219 §2 / db/225)
-  ---------------------------------------------------------------
-  FOR c IN SELECT unnest(ARRAY['claim_token','canonical_mobile','notes_internal',
-                               'admin_notes','consent_notes','pre_listed_by',
-                               'pending_edits','email'])
-  LOOP
-    IF EXISTS (SELECT 1 FROM information_schema.column_privileges
-                WHERE table_schema='public' AND table_name='businesses'
-                  AND column_name=c AND grantee='anon' AND privilege_type='SELECT') THEN
-      v_fail := v_fail + 1;
-      RAISE WARNING 'FAIL  §2  anon can still SELECT businesses.%', c;
-    END IF;
-  END LOOP;
-  IF v_fail = 0 OR TRUE THEN
-    RAISE NOTICE 'PASS/FAIL §2 reported above (silence = all eight columns locked)';
-  END IF;
+  UNION ALL
+  -- §2  the eight secret columns must not be granted to anon
+  SELECT 2,
+         'businesses: 8 secret columns hidden from anon',
+         CASE WHEN count(*) = 0 THEN 'PASS'
+              ELSE 'FAIL — anon can still read: ' || string_agg(column_name, ', ') END
+  FROM information_schema.column_privileges
+  WHERE table_schema='public' AND table_name='businesses'
+    AND grantee='anon' AND privilege_type='SELECT'
+    AND column_name IN ('claim_token','canonical_mobile','notes_internal','admin_notes',
+                        'consent_notes','pre_listed_by','pending_edits','email')
 
-  -- alt_mobile must STILL be public — it is the owner's backup number
-  IF NOT EXISTS (SELECT 1 FROM information_schema.column_privileges
-                  WHERE table_schema='public' AND table_name='businesses'
-                    AND column_name='alt_mobile' AND grantee='anon' AND privilege_type='SELECT') THEN
-    v_fail := v_fail + 1;
-    RAISE WARNING 'FAIL  §2  alt_mobile is NOT readable by anon — the click-to-call chip will be blank';
-  ELSE
-    RAISE NOTICE 'PASS  §2  alt_mobile still public, as intended';
-  END IF;
+  UNION ALL
+  -- §2b alt_mobile must STAY public — the owner's own backup number,
+  --     rendered as a click-to-call chip on every listing page.
+  SELECT 3,
+         'businesses.alt_mobile is still PUBLIC (must be)',
+         CASE WHEN EXISTS (
+                SELECT 1 FROM information_schema.column_privileges
+                 WHERE table_schema='public' AND table_name='businesses'
+                   AND column_name='alt_mobile' AND grantee='anon' AND privilege_type='SELECT')
+              THEN 'PASS'
+              ELSE 'FAIL — the click-to-call chip will be blank everywhere' END
 
-  ---------------------------------------------------------------
-  -- 3 + 4. Always-true write policies (db/219 §3/§4)
-  ---------------------------------------------------------------
-  FOR c IN SELECT unnest(ARRAY['push_delete_own','push_insert_any',
-                               'shop_likes_anon_insert','search_log_anon_insert',
-                               'reports_insert_anon'])
-  LOOP
-    SELECT count(*) INTO v_n FROM pg_policies WHERE schemaname='public' AND policyname=c;
-    IF v_n > 0 THEN
-      v_fail := v_fail + 1;
-      RAISE WARNING 'FAIL  §3/4  open write policy still present: %', c;
-    END IF;
-  END LOOP;
-  RAISE NOTICE 'PASS/FAIL §3/4 reported above (silence = all five open policies dropped)';
+  UNION ALL
+  -- §3/§4  the always-true write policies
+  SELECT 4,
+         'open write policies dropped (push/likes/search/reports)',
+         CASE WHEN count(*) = 0 THEN 'PASS'
+              ELSE 'FAIL — still present: ' || string_agg(policyname, ', ') END
+  FROM pg_policies
+  WHERE schemaname='public'
+    AND policyname IN ('push_delete_own','push_insert_any','shop_likes_anon_insert',
+                       'search_log_anon_insert','reports_insert_anon')
 
-  ---------------------------------------------------------------
-  -- 5. Phone hashes hidden from anon AND authenticated (db/225)
-  --    Unsalted SHA-256 over ten digits is not a one-way door.
-  ---------------------------------------------------------------
-  IF EXISTS (SELECT 1 FROM information_schema.column_privileges
-              WHERE table_schema='public' AND table_name='reviews'
-                AND column_name='customer_phone_hash'
-                AND grantee IN ('anon','authenticated') AND privilege_type='SELECT') THEN
-    v_fail := v_fail + 1;
-    RAISE WARNING 'FAIL  §5  reviews.customer_phone_hash is still readable';
-  ELSE
-    RAISE NOTICE 'PASS  §5  reviewer phone hash is hidden';
-  END IF;
+  UNION ALL
+  -- §5  reviewer phone hash: unsalted SHA-256 over 10 digits is reversible
+  SELECT 5,
+         'reviews.customer_phone_hash hidden from anon + authenticated',
+         CASE WHEN count(*) = 0 THEN 'PASS'
+              ELSE 'FAIL — readable by: ' || string_agg(DISTINCT grantee, ', ') END
+  FROM information_schema.column_privileges
+  WHERE table_schema='public' AND table_name='reviews'
+    AND column_name='customer_phone_hash'
+    AND grantee IN ('anon','authenticated') AND privilege_type='SELECT'
 
-  ---------------------------------------------------------------
-  -- 6. The spam keyword list stays private (db/219 §5)
-  ---------------------------------------------------------------
-  SELECT count(*) INTO v_n FROM pg_policies
-   WHERE schemaname='public' AND tablename='blocked_keywords' AND policyname='bk_read_all';
-  IF v_n > 0 THEN
-    v_fail := v_fail + 1;
-    RAISE WARNING 'FAIL  §6  bk_read_all still exposes the spam filter list';
-  ELSE
-    RAISE NOTICE 'PASS  §6  blocked_keywords is private';
-  END IF;
+  UNION ALL
+  SELECT 6,
+         'shop_questions.asker_phone_hash hidden from anon + authenticated',
+         CASE WHEN count(*) = 0 THEN 'PASS'
+              ELSE 'FAIL — readable by: ' || string_agg(DISTINCT grantee, ', ') END
+  FROM information_schema.column_privileges
+  WHERE table_schema='public' AND table_name='shop_questions'
+    AND column_name='asker_phone_hash'
+    AND grantee IN ('anon','authenticated') AND privilege_type='SELECT'
 
-  ---------------------------------------------------------------
-  RAISE NOTICE '';
-  IF v_fail = 0 THEN
-    RAISE NOTICE '================ ALL CHECKS PASSED ================';
-  ELSE
-    RAISE NOTICE '================ % CHECK(S) FAILED — see WARNINGs above ================', v_fail;
-  END IF;
-END $$;
+  UNION ALL
+  -- §6  the spam-filter keyword list must stay private
+  SELECT 7,
+         'blocked_keywords spam list is private',
+         CASE WHEN EXISTS (
+                SELECT 1 FROM pg_policies
+                 WHERE schemaname='public' AND tablename='blocked_keywords'
+                   AND policyname='bk_read_all')
+              THEN 'FAIL — bk_read_all still exposes the spam filter'
+              ELSE 'PASS' END
 
-\echo ''
-\echo '--- every policy currently on the sensitive tables ---'
-SELECT tablename, policyname, cmd, roles::text
-FROM pg_policies
-WHERE schemaname = 'public'
-  AND tablename IN ('business_owners','businesses','push_subscriptions',
-                    'shop_likes','search_log','business_reports',
-                    'blocked_keywords','reviews','shop_questions','rank_snapshots')
-ORDER BY tablename, policyname;
+  UNION ALL
+  -- rank history is the shop's own business (db/224)
+  SELECT 8,
+         'rank_snapshots not granted to anon/authenticated',
+         CASE WHEN count(*) = 0 THEN 'PASS'
+              ELSE 'FAIL — readable by: ' || string_agg(DISTINCT grantee, ', ') END
+  FROM information_schema.table_privileges
+  WHERE table_schema='public' AND table_name='rank_snapshots'
+    AND grantee IN ('anon','authenticated') AND privilege_type='SELECT'
+
+) AS report
+ORDER BY n;
+
+
+-- ============================================================
+-- OPTIONAL — run this separately if anything above says FAIL.
+-- It lists every policy currently on the sensitive tables.
+-- ============================================================
+-- SELECT tablename, policyname, cmd, roles::text, qual
+-- FROM pg_policies
+-- WHERE schemaname = 'public'
+--   AND tablename IN ('business_owners','businesses','push_subscriptions',
+--                     'shop_likes','search_log','business_reports',
+--                     'blocked_keywords','reviews','shop_questions','rank_snapshots')
+-- ORDER BY tablename, policyname;
