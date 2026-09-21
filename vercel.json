@@ -56,7 +56,6 @@
       "destination": "/card?slug=:slug"
     },
     {
-      "_comment": "v265: the first character was [a-z], so any slug starting with a digit never matched this rewrite and 404'd. Found by walking all 271 sitemap URLs: 786-cosmetic-mandi-dabwali was the single failure — an active shop, listed in the sitemap, whose page did not exist on the web. Now [a-z0-9]. Safe: the pattern still needs 5+ chars of [a-z0-9-] only, so /404 (3 chars) and anything with a dot cannot match, and Vercel checks the filesystem before rewrites anyway.",
       "source": "/:slug([a-z0-9][a-z0-9-][a-z0-9-][a-z0-9-][a-z0-9-]+)",
       "destination": "/api/biz?slug=:slug"
     }
