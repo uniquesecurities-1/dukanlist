@@ -46,7 +46,13 @@ DECLARE
   c TEXT;
   cols TEXT[] := ARRAY[
     'claim_token', 'canonical_mobile', 'notes_internal', 'admin_notes',
-    'consent_notes', 'pre_listed_by', 'pending_edits', 'email', 'alt_mobile'
+    'consent_notes', 'pre_listed_by', 'pending_edits', 'email'
+    -- alt_mobile was in this list and has been REMOVED on purpose.
+    -- It is not a secret: it is the owner's backup number, which he sets
+    -- himself in panel/profile.html precisely so a customer can reach him
+    -- when the main number does not answer, and business.html renders it
+    -- as a public click-to-call chip. Revoking it would have blanked that
+    -- chip on every listing page while protecting nothing.
   ];
 BEGIN
   FOREACH c IN ARRAY cols LOOP

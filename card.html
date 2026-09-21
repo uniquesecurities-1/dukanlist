@@ -472,9 +472,8 @@ function buildVCard(d){
   if (d.whatsapp && d.whatsapp !== d.mobile){
     lines.push('TEL;TYPE=WORK,VOICE:+91' + esc(d.whatsapp));
   }
-  if (d.email){
-    lines.push('EMAIL;TYPE=WORK,INTERNET:' + esc(d.email));
-  }
+  // No EMAIL line: businesses.email is the owner's LOGIN email (panel shows it
+  // as "LOCKED - Login email"), never something they chose to publish on a card.
   if (d.address_line1 || d.city){
     lines.push('ADR;TYPE=WORK:;;' + esc(d.address_line1 || '') + (d.address_line2 ? ', ' + esc(d.address_line2) : '') + ';' + esc(d.city || '') + ';' + esc(d.state || '') + ';' + esc(d.pincode || '') + ';India');
   }
@@ -653,7 +652,6 @@ function render(d){
   var metaRows = [];
   if (d.mobile)    metaRows.push({ ico:'📞', val: '+91 ' + d.mobile });
   if (d.whatsapp && d.whatsapp !== d.mobile) metaRows.push({ ico:'💬', val: '+91 ' + d.whatsapp + ' (WhatsApp)' });
-  if (d.email)     metaRows.push({ ico:'✉️', val: d.email });
   if (d.website)   metaRows.push({ ico:'🌐', val: d.website.replace(/^https?:\/\//, '') });
   var addr = [d.address_line1, d.address_line2, d.city, d.pincode].filter(Boolean).join(', ');
   if (addr) metaRows.push({ ico:'📍', val: addr });
@@ -1013,7 +1011,7 @@ async function loadCard(){
   // separately if needed (faster + safer pattern, same as dashboard).
   // Pull all card data in one query. No FK joins (avoids 400 ambiguity).
   var query = c.from('businesses')
-    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, email, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, upi_id, geo_cities(name), is_professional_listing, professional_tier, membership_no, membership_authority, professional_qualification, practice_areas, prof_verified_at');
+    .select('id, slug, name, owner_name, owner_role, mobile, whatsapp, address_line1, address_line2, pincode, photos, verified_score, status, sub_category_id, category_id, city_id, rating_avg, rating_count, hours_json, established_year, usp_text, payment_methods, special_features, facebook_url, instagram_url, youtube_url, x_twitter_url, linkedin_url, website_url, upi_id, geo_cities(name), is_professional_listing, professional_tier, membership_no, membership_authority, professional_qualification, practice_areas, prof_verified_at');
   if (slug) query = query.eq('slug', slug);
   else      query = query.eq('id', id);
 
@@ -1066,7 +1064,6 @@ async function loadCard(){
     category_name: catName,
     mobile:        b.mobile,
     whatsapp:      b.whatsapp,
-    email:         b.email,
     address_line1: b.address_line1,
     address_line2: b.address_line2,
     city:          b.geo_cities ? b.geo_cities.name : '',

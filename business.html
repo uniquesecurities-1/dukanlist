@@ -2277,7 +2277,7 @@ async function loadBusiness(){
     .from('businesses')
     .select(`
       id, slug, name, name_hi, owner_name, owner_role,
-      mobile, whatsapp, email, alt_mobile, mobile_verified_at,
+      mobile, whatsapp, alt_mobile, mobile_verified_at,
       address_line1, address_line2, pincode, lat, lng,
       hours_json, usp_text, usp_hi, about_text, photos, video_url,
       services_json, faqs_json, status, claim_status, pre_listed_at,
@@ -2478,7 +2478,11 @@ function injectSchemaOrg(b){
     schema.geo = { "@type": "GeoCoordinates", "latitude": b.lat, "longitude": b.lng };
   }
   if (photos.length) schema.image = photos;
-  if (b.email) schema.email = b.email;
+  // businesses.email is the OWNER'S LOGIN EMAIL, not a public contact address —
+  // panel/profile.html shows it as "🔒 LOCKED · Login email". Publishing it in
+  // JSON-LD put 201 owners' login addresses into Google's structured data, which
+  // is an account-enumeration list for password-reset spam. Removed, and anon's
+  // SELECT on the column is revoked in db/219.
 
   // Aggregate rating (only if has reviews)
   if (b.rating_avg > 0 && b.rating_count > 0){
