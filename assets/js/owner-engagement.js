@@ -152,7 +152,14 @@
     { id:'set-hours',       icon:'🕐', title:'Set your business hours', payoff:'Required to appear in the "Open Now" filter.', href:'/panel/profile.html#hours', test: b => !(b.hours_json && Object.keys(b.hours_json || {}).length) },
     { id:'write-usp',       icon:'✨', title:'Write your USP / tagline', payoff:'A sharp tagline is the #1 driver of first-impression clicks.', href:'/panel/profile.html#usp', test: b => !(b.usp_text && b.usp_text.trim().length > 10) },
     { id:'about-section',   icon:'📝', title:'Add an About section', payoff:'Customers compare 3 shops before calling — strong About wins.', href:'/panel/profile.html#about', test: b => !(b.about_text && b.about_text.trim().length > 50) },
-    { id:'share-poster',    icon:'⚡', title:'Share a poster on WhatsApp Status', payoff:'30 sec of effort = visibility to 50-200 contacts.', href:'/panel/poster-quick.html', test: () => true },
+    // href was /panel/poster-quick.html — the Quick Poster Maker, which Deepak
+    // had switched off in 2026-07 (dashboard.html:718 carries the soft-hide and
+    // the note "disabled per owner request"). That hid the dashboard card but
+    // not this widget, so the tip still walked shopkeepers into a tool the
+    // owner had retired. test:()=>true means it is always eligible, so it came
+    // up regularly. Points at Poster Studio, which is the live tool and is in
+    // the panel nav on every page.
+    { id:'share-poster',    icon:'⚡', title:'Share a poster on WhatsApp Status', payoff:'30 sec of effort = visibility to 50-200 contacts.', href:'/panel/poster-studio.html', test: () => true },
     { id:'reply-reviews',   icon:'💬', title:'Reply to a customer review', payoff:'Replying lifts your trust score and shows you care.', href:'/panel/reviews.html', test: b => (b.rating_count || 0) > 0 },
     { id:'get-reviews',     icon:'⭐', title:'Ask 3 customers for a review', payoff:'New reviews this month = better ranking.', href:'/panel/get-reviews.html', test: () => true },
     { id:'add-social',      icon:'📱', title:'Link 1 social media account', payoff:'Cross-platform presence = customer trust.', href:'/panel/profile.html#social', test: b => !(b.facebook_url || b.instagram_url || b.youtube_url || b.x_twitter_url || b.linkedin_url || b.website_url) },
