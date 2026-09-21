@@ -23,9 +23,11 @@
 <link rel="stylesheet" href="/assets/css/dl-simple-mode.css?v=1786900000">
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
 <script>document.documentElement.setAttribute("data-dl-simple-mode","true")</script>
-<link rel="stylesheet" href="/assets/css/dl-simple-mode.css">
-<script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
-<script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
+<!-- v248: a SECOND, UNVERSIONED copy of dl-simple-mode.css + .js used to load
+     here. vercel.json caches /assets/*.css|js as immutable for a year, so the
+     unversioned URL froze on every device that ever loaded it — and being the
+     later stylesheet, that stale copy won the cascade. That is why a phone in
+     the field could show a different layout from a fresh browser. -->
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <style>body,.biz-title,h1,h2,h3,.biz-cat-pill{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
@@ -1576,7 +1578,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .db-v-tap-left, .db-v-tap-right{ position:absolute; top:0; bottom:0; width:30%; cursor:pointer; z-index:5 }
 .db-v-tap-left{ left:0 } .db-v-tap-right{ right:0 }
 </style>
-<script src="/assets/js/photo-fit.js" defer></script>
+<script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
 </head>
 <body>
 <div id="businessBuzzStrip" style="display:none"></div>
@@ -2225,14 +2227,14 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script src="/assets/js/daily-buzz.js?v=20260920" defer></script>
-<script src="/assets/js/share.js"></script>
-<script src="/assets/js/mobile-nav.js"></script>
+<script src="/assets/js/share.js?v=20260921e"></script>
+<script src="/assets/js/mobile-nav.js?v=20260921e"></script>
 <script src="/assets/js/breadcrumbs.js?v=20260920"></script>
 <script src="/assets/js/announcements.js?v=20260920"></script>
 <script src="/assets/js/recently-viewed.js?v=20260920"></script>
-<script src="/assets/js/login-modal.js"></script>
+<script src="/assets/js/login-modal.js?v=20260921e"></script>
 <script src="/assets/js/hours.js?v=20260920"></script>
 <script src="/assets/js/nav.js?v=20260921b" defer></script>
 <script src="/assets/js/shortlist.js?v=20260920" defer></script>

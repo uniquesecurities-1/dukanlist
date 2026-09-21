@@ -60,7 +60,7 @@
 <!-- Premium polish layer (shared with public pages). Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=20260921">
 <!-- Admin error monitor (auto-injected) -->
-<script src="/assets/js/admin-error-monitor.js"></script>
+<script src="/assets/js/admin-error-monitor.js?v=20260921e"></script>
 </head>
 <body>
 
@@ -68,9 +68,9 @@
      over, hidden features are restored (v214), so this banner no longer applies. -->
 
 <!-- Impersonation banner -->
-<script src="/assets/js/impersonation-banner.js"></script>
+<script src="/assets/js/impersonation-banner.js?v=20260921e"></script>
 <!-- Email verification reminder banner — shows if email not yet confirmed -->
-<script src="/assets/js/email-verify-banner.js"></script>
+<script src="/assets/js/email-verify-banner.js?v=20260921e"></script>
 <!-- Welcome Onboarding Wizard (first-time login only) -->
 <!-- Replaced Hinglish tips modal with a clean, action-focused wizard
      that deep-links each step to the specific page that completes it. -->
@@ -1075,11 +1075,11 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase-init.js"></script>
-<script src="/assets/js/og-card-generator.js"></script>
+<script src="/assets/js/supabase-init.js?v=20260921e"></script>
+<script src="/assets/js/og-card-generator.js?v=20260921e"></script>
 <!-- v218: completeness.js removed — dead code (DukanCompleteness never called;
      the live widget is inline renderProfileCompleteness). Was render-blocking 7.8KB. -->
-<script src="/assets/js/push.js"></script>
+<script src="/assets/js/push.js?v=20260921e"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanPush) DukanPush.attachButton('enableNotifBtn', { audience: 'owner' }); });</script>
 <script>
 // Lead notifications widget (loads independently — doesn't block dashboard if RPC missing)
@@ -3229,11 +3229,11 @@ function shareReferralWhatsApp(){
 <!-- Daily Buzz Stories (Phase 9) -->
 <script src="/assets/js/daily-buzz.js?v=20260920" defer></script>
 <!-- Engagement Engine (2026-06-05) -->
-<script src="/assets/js/engagement-engine.js" defer></script>
+<script src="/assets/js/engagement-engine.js?v=20260921e" defer></script>
 
 <!-- Shared notification bell widget — mounts a fixed-position bell with dropdown. Auto-loads via DOMContentLoaded. -->
-<script src="/assets/js/owner-notifications.js" defer></script>
-<script src="/assets/js/owner-engagement.js" defer></script>
+<script src="/assets/js/owner-notifications.js?v=20260921e" defer></script>
+<script src="/assets/js/owner-engagement.js?v=20260921e" defer></script>
 
 <!-- Monitoring: client error capture + Vercel Analytics (defer-loaded, zero impact on first paint) -->
 <script src="/assets/js/error-reporter.js?v=20260920" defer></script>

@@ -68,9 +68,9 @@ label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:6
 <style>body,h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:"Plus Jakarta Sans","Manrope","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important}</style>
 
 <!-- Premium banking-class polish — shared CSS file applied site-wide. Load LAST so it overrides earlier inline styles. -->
-<link rel="stylesheet" href="/assets/css/admin-premium.css">
+<link rel="stylesheet" href="/assets/css/admin-premium.css?v=20260921e">
 <!-- Admin error monitor (auto-injected) -->
-<script src="/assets/js/admin-error-monitor.js"></script>
+<script src="/assets/js/admin-error-monitor.js?v=20260921e"></script>
 <link rel="stylesheet" href="/assets/css/dl-admin-simple.css?v=1784106000">
 </head>
 <body>
@@ -177,7 +177,7 @@ Enter email + password. Account is created &amp; ready immediately.
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase-init.js"></script>
+<script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script>
 var C = ShopDB.client;
 var MY_SCOPE = null;
@@ -614,6 +614,6 @@ async function logout(){ await C.auth.signOut(); window.location.href = '/admin/
 
 init();
 </script>
-<script src="/assets/js/admin-auto-logout.js"></script>
+<script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>
 </body>
 </html>

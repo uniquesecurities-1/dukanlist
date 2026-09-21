@@ -63,9 +63,9 @@
 </style>
 
 <!-- Premium banking-class polish — shared CSS file applied site-wide. Load LAST so it overrides earlier inline styles. -->
-<link rel="stylesheet" href="/assets/css/admin-premium.css">
+<link rel="stylesheet" href="/assets/css/admin-premium.css?v=20260921e">
 <!-- Admin error monitor (auto-injected) -->
-<script src="/assets/js/admin-error-monitor.js"></script>
+<script src="/assets/js/admin-error-monitor.js?v=20260921e"></script>
 <link rel="stylesheet" href="/assets/css/dl-admin-simple.css?v=1784106000">
 </head>
 <body>
@@ -158,8 +158,8 @@
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase-init.js"></script>
-<script src="/assets/js/admin-common.js"></script>
+<script src="/assets/js/supabase-init.js?v=20260921e"></script>
+<script src="/assets/js/admin-common.js?v=20260921e"></script>
 <script>AdminCommon.requireAdmin();</script>
 <script>
 async function logout(e){ if(e) e.preventDefault(); if (window.ShopDB && ShopDB.signOut) await ShopDB.signOut(); else location.href='/admin/login.html'; }
@@ -385,6 +385,6 @@ function copyAllClaimLinks(){
 
 init();
 </script>
-<script src="/assets/js/admin-auto-logout.js"></script>
+<script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>
 </body>
 </html>
