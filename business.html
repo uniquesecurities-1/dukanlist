@@ -507,6 +507,13 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
 :root{ --page-w: 1200px; --page-pad: 24px; }
 @media (min-width:1600px){ :root{ --page-w: 1320px } }
 @media (max-width:640px){  :root{ --page-pad: 16px } }
+/* Cards were sitting on a 12-13px gutter, which reads as pinched against the
+   screen edge. 16px is the standard mobile gutter and matches --page-pad, so
+   the card edges line up with the header and breadcrumb above them. */
+@media (max-width:640px){
+  .sec-content, .biz-hero-wrap{ padding-left:16px; padding-right:16px }
+  .card-pill{ padding:16px }
+}
 
 .biz-hero-wrap{ max-width:var(--page-w); margin:0 auto; position:relative; z-index:1; padding:0 var(--page-pad) }
 .biz-back{
@@ -1388,6 +1395,16 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
   text-align:center;
   padding:28px 16px 20px;
 }
+/* On a phone this empty state ran to 266px — a big grey star with a lot of
+   air — on the very card a visitor is most likely to scroll past. Tighten it
+   and shrink the icon; the invitation still reads clearly at half the height. */
+@media (max-width:640px){
+  .rev-clean-empty{ padding:16px 12px 10px }
+  .rev-clean-empty .rce-icon{ width:32px; height:32px; margin-bottom:8px }
+  .rev-clean-empty .rce-icon svg{ width:32px; height:32px }
+  .rev-clean-empty .rce-title{ font-size:.94rem; margin-bottom:3px }
+  .rev-clean-empty .rce-sub{ font-size:.78rem; line-height:1.4 }
+}
 .rce-icon{
   margin:0 auto 14px;
   width:48px; height:48px;
@@ -2194,7 +2211,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <script src="/assets/js/shortlist.js?v=20260920" defer></script>
 <script src="/assets/js/shop-love.js?v=20260901" defer></script>
 <script src="/assets/js/review-boost.js?v=20260920" defer></script>
-<script src="/assets/js/pwa.js?v=20260920" defer></script>
+<script src="/assets/js/pwa.js?v=20260921c" defer></script>
 <script>
 function setLang(lang){
   if (lang!=='en'&&lang!=='hi') lang='en';
@@ -2930,7 +2947,14 @@ function render(){
   // Wire sticky mobile bottom bar (same destinations as premium hero CTAs)
   try {
     const _mb = document.getElementById('premMobileBar');
-    if (_mb){
+    // TWO bottom bars were being shown at once: this one (WhatsApp/Call/Map)
+    // and #mmtStickyCta, which does the same job but also carries the phone
+    // number and the open/closed status. Together with the install banner they
+    // covered 37% of a 375x812 phone. Keep the richer one; if it is on the
+    // page, this bar stays hidden.
+    const _mmt = document.getElementById('mmtStickyCta');
+    if (_mb && _mmt){ _mb.style.display = 'none'; _mb.setAttribute('aria-hidden','true'); }
+    if (_mb && !_mmt){
       const _mbWa = document.getElementById('pmbWa');
       const _mbCall = document.getElementById('pmbCall');
       const _mbDir = document.getElementById('pmbDir');
@@ -5355,7 +5379,7 @@ function copyShopUrl(){
   </div>
 </div>
 
-<script src="/assets/js/install-banner.js?v=20260920"></script>
+<script src="/assets/js/install-banner.js?v=20260921c"></script>
 <script>
 // ============= Customer Review Auto-Prompt =============
 (function(){

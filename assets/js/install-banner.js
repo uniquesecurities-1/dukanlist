@@ -16,6 +16,19 @@
 (function(){
   'use strict';
 
+  /* Only ONE install prompt per page.
+     pwa.js also renders an install banner (#pwaBanner) and it is the better of
+     the two: it listens for `beforeinstallprompt`, so its button can actually
+     trigger the native install, and it remembers dismissal. Both scripts are
+     loaded together on index, business, browse and search — which put TWO
+     install banners on screen at once, stacked above the sticky call bar. On a
+     375x812 phone that was 178px of install prompts alone.
+     If pwa.js is present, stand down. */
+  if (document.querySelector('script[src*="pwa.js"]') || window.__dlPwaBannerOwner){
+    return;
+  }
+  window.__dlPwaBannerOwner = 'install-banner';
+
   var KEY_COUNT = 'dl_page_views';
   var KEY_DISMISSED_AT = 'dl_install_dismissed_at';
   var MIN_VIEWS = 3;
@@ -59,6 +72,15 @@
       + '</div>'
       + '<button id="dukanInstallYes" style="background:#FF6B1A;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0;letter-spacing:.01em"><span data-i18n-en>Install</span><span data-i18n-hi>इंस्टॉल</span></button>'
       + '<button id="dukanInstallNo" aria-label="Dismiss" style="background:transparent;color:rgba(255,255,255,.55);border:none;font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;flex-shrink:0">×</button>';
+    /* Re-check at SHOW time, not just at load time. On index.html and
+       search.html this script's tag comes before pwa.js in the document, so at
+       parse time the pwa.js tag does not exist yet and the early guard above
+       cannot see it. By the time this runs (a few seconds in) pwa.js has loaded
+       and may already own the screen. */
+    if (document.getElementById('pwaBanner') ||
+        document.querySelector('script[src*="pwa.js"]')){
+      return;
+    }
     document.body.appendChild(bar);
 
     // Animate in
