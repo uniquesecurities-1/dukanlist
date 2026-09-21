@@ -335,7 +335,14 @@ async function handleLogin(){
   // Check MFA enrollment status
   const { data: aalData } = await c.auth.mfa.getAuthenticatorAssuranceLevel();
   const { data: factorsData } = await c.auth.mfa.listFactors();
-  const totpFactor = (factorsData.totp || [])[0];
+
+  // listFactors().totp is the VERIFIED list. If more than one is enrolled, the
+  // old code silently challenged whichever came first — and if the phone's
+  // authenticator holds a different one, every code reads as "wrong" with no
+  // way to tell why. Remember the count so the verify screen can say it.
+  const verifiedTotp = (factorsData && factorsData.totp) || [];
+  ENROLLED_FACTOR_COUNT = verifiedTotp.length;
+  const totpFactor = verifiedTotp[0];
 
   if (!totpFactor){
     // No factor enrolled yet → first-time setup flow
@@ -447,6 +454,8 @@ async function handleEnroll(){
 // =========================================================
 // STEP 2B: Verify existing factor (return visit)
 // =========================================================
+var ENROLLED_FACTOR_COUNT = 0;
+
 async function startMfaChallenge(){
   showStep('stepVerify');
   const { data, error } = await c.auth.mfa.challenge({ factorId: CURRENT_FACTOR_ID });
@@ -480,8 +489,42 @@ async function handleVerify(){
   if (error){
     btn.disabled = false; btn.textContent = 'Verify →';
     try { await c.rpc('record_admin_login_attempt', { p_email: LOGIN_EMAIL, p_success: false }); } catch(e){}
-    errEl.textContent = 'Wrong code. Try again.';
-    errEl.style.display = 'flex'; return;
+
+    // Every failure used to read "Wrong code. Try again." — an expired
+    // challenge, a rate limit and a genuinely wrong digit were impossible to
+    // tell apart, so a login that failed for a fixable reason looked like a
+    // lost authenticator.
+    const raw = (error.message || '').toLowerCase();
+    let msg;
+
+    if (raw.indexOf('expired') !== -1 || raw.indexOf('not found') !== -1 ||
+        raw.indexOf('challenge') !== -1){
+      // Supabase challenges are short-lived. Quietly start a fresh one so the
+      // next code the app shows will work.
+      msg = 'That login attempt timed out. A new attempt has been started — ' +
+            'enter the code your app is showing NOW.';
+      document.getElementById('verifyCode').value = '';
+      try {
+        const again = await c.auth.mfa.challenge({ factorId: CURRENT_FACTOR_ID });
+        if (again && again.data) CURRENT_CHALLENGE_ID = again.data.id;
+      } catch(_){}
+    } else if (raw.indexOf('rate') !== -1 || raw.indexOf('too many') !== -1){
+      msg = 'Too many attempts. Wait about a minute, then try once more.';
+    } else if (raw.indexOf('invalid') !== -1 || raw.indexOf('incorrect') !== -1){
+      msg = 'That code was not accepted. Wait for your app to show the NEXT ' +
+            'code and enter that one — a code can only be used once.' +
+            (ENROLLED_FACTOR_COUNT > 1
+              ? ' Note: this account has ' + ENROLLED_FACTOR_COUNT +
+                ' authenticators enrolled, so make sure you are reading the DukanList one.'
+              : '');
+    } else {
+      msg = error.message || 'Verification failed.';
+    }
+
+    errEl.textContent = msg;
+    errEl.style.display = 'flex';
+    console.warn('[admin-login] MFA verify failed:', error);
+    return;
   }
 
   try { await c.rpc('record_admin_login_attempt', { p_email: LOGIN_EMAIL, p_success: true }); } catch(e){}
