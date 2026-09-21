@@ -194,6 +194,7 @@ ${itemListSchema ? `<script type="application/ld+json">${JSON.stringify(itemList
 <header class="topbar">
   <a class="brand" href="${ORIGIN}/">DukanList<span class="badge">LOCAL</span></a>
   <div class="actions">
+    <a href="${ORIGIN}/top">🏆 Top Rated</a>
     <a href="${ORIGIN}/search?city=${citySlug}">Search ${esc(cityName)}</a>
     <a href="${ORIGIN}/register.html">+ List Free</a>
   </div>

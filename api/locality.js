@@ -350,6 +350,7 @@ ${isEmpty ? '<meta name="robots" content="noindex, follow">' : ''}
   <a href="${ORIGIN}/" class="brand"><span class="logo">🏪</span><span>Dukan<em style="font-style:normal;color:#FFB088">List</em></span></a>
   <nav>
     <a href="${ORIGIN}/browse">Browse</a>
+    <a href="${ORIGIN}/top">🏆 Top Rated</a>
     <a href="${ORIGIN}/search">Search</a>
     <a href="${ORIGIN}/register.html">Register Shop</a>
   </nav>
