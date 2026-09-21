@@ -252,7 +252,7 @@ function renderShopRow(b){
   const phoneBtn = phone ? '<a class="ony-act call" href="tel:+91' + escAttr(phone) + '">📞 Call</a>' : '';
   const waBtn   = wa    ? '<a class="ony-act wa" href="https://wa.me/91' + escAttr(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '';
   return '' +
-    '<a class="ony-row" href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '">' +
+    '<a class="ony-row" href="/' + encodeURIComponent(b.slug || '') + '">' +
     '  <div class="ony-row-photo">' + photo + '</div>' +
     '  <div class="ony-row-body">' +
     '    <div class="ony-row-name">' + escHtml(b.name || '') + '</div>' +

@@ -822,7 +822,7 @@ function renderPendingEditCard(b){
     <div class="biz-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="approvePendingEdits('${b.business_id}', this)">✓ Approve & Apply Changes</button>
       <button class="btn" style="background:#EF4444;color:#fff" onclick="rejectPendingEdits('${b.business_id}', this)">✗ Reject Changes</button>
-      <a class="btn btn-secondary" href="/business.html?slug=${b.slug}" target="_blank">🌐 Public View (live)</a>
+      <a class="btn btn-secondary" href="/${b.slug}" target="_blank">🌐 Public View (live)</a>
       <a class="btn btn-secondary" href="/admin/shop.html?id=${b.business_id}">⚖ Full Admin View</a>
     </div>
   </div>`;
@@ -984,7 +984,7 @@ function bizCard(b, kind){
         <a class="btn btn-secondary" href="tel:+${(b.mobile||'').replace(/[^\\d]/g,'')}" title="Call shopkeeper">📞 Call</a>
         <button class="btn btn-reject" onclick="rejectBusiness('${b.id}','${escapeJs(b.name)}')">✕ Reject / Ban</button>
         <button class="btn btn-danger-hard" onclick="deleteBusiness('${b.id}','${escapeJs(b.name)}')" title="Permanently delete shop + all data">🗑️ Delete Permanently</button>
-        <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(b.slug)}" target="_blank">👁️ View Public Profile</a>
+        <a class="btn btn-secondary" href="/${encodeURIComponent(b.slug)}" target="_blank">👁️ View Public Profile</a>
         <a class="btn" style="background:#1E3A8A;color:#fff" href="/admin/shop?id=${b.id}" title="Comprehensive admin view + edit + verification toggles">🛡️ Admin View</a>
         <a class="btn btn-secondary" href="https://supabase.com/dashboard/project/qazuyygrpqopwygxmvwq/editor?table=businesses&filter=id::eq::${b.id}" target="_blank">🗄️ Edit in DB</a>
       </div>
@@ -1006,7 +1006,7 @@ function flagItem(f){
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
         <button class="btn btn-approve" onclick="resolveFlag('${f.id}','resolved')">✓ Mark Resolved</button>
         <button class="btn btn-secondary" onclick="resolveFlag('${f.id}','dismissed')">🚫 Dismiss</button>
-        <a class="btn btn-secondary" href="/business.html?slug=${encodeURIComponent(f.business_slug)}" target="_blank">👁️ View Business</a>
+        <a class="btn btn-secondary" href="/${encodeURIComponent(f.business_slug)}" target="_blank">👁️ View Business</a>
       </div>
     </div>
   `;

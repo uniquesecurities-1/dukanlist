@@ -198,7 +198,7 @@ function render(){
       + '<td>' + (d.is_active ? '<span class="status-active">● Active</span>' : '<span class="status-expired">● Expired</span>') + '</td>'
       + '<td><b>' + (d.view_count || 0) + '</b> · ' + (d.click_count || 0) + '</td>'
       + '<td><div class="actions">'
-      +   '<a class="btn" href="/business.html?slug=' + esc(d.business_slug) + '" target="_blank">View shop</a>'
+      +   '<a class="btn" href="/' + esc(d.business_slug) + '" target="_blank">View shop</a>'
       +   (d.is_active
             ? '<button class="btn btn-warn" data-act="hide"    data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">Hide</button>'
             : '<button class="btn btn-good" data-act="restore" data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">Restore</button>')

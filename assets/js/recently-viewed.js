@@ -155,7 +155,7 @@
           // the card on a separate row with empty space (the bug shown in screenshot).
           // The clickable area is now a separate inner <a class="rv-clickable">.
           return `<div class="rv-row">
-            <a class="rv-clickable" href="/business.html?slug=${encodeURIComponent(b.slug)}">
+            <a class="rv-clickable" href="/${encodeURIComponent(b.slug)}">
               <div class="rv-thumb">${b.photo ? '<img src="'+esc(b.photo)+'" alt="" loading="lazy">' : (b.category_icon || '🏪')}</div>
               <div class="rv-mid">
                 <div class="rv-name">${esc(b.name)}</div>

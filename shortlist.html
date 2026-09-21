@@ -168,12 +168,12 @@
         +   '<div class="card-photo">' + photoHTML + '</div>'
         +   '<div class="card-body">'
         +     cat
-        +     '<a class="card-name" href="/business.html?slug=' + encodeURIComponent(it.slug) + '">' + esc(it.name) + '</a>'
+        +     '<a class="card-name" href="/' + encodeURIComponent(it.slug) + '">' + esc(it.name) + '</a>'
         +     city
         +     '<div class="card-ts">Saved ' + esc(fmtAgo(it.ts)) + '</div>'
         +   '</div>'
         +   '<div class="card-acts">'
-        +     '<a class="ca-view" href="/business.html?slug=' + encodeURIComponent(it.slug) + '">Open →</a>'
+        +     '<a class="ca-view" href="/' + encodeURIComponent(it.slug) + '">Open →</a>'
         +   '</div>'
         + '</div>';
     }).join('');

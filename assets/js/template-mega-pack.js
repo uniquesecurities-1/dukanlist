@@ -483,7 +483,7 @@ async function loadQrImage(text, size){
 }
 
 async function drawQrCorner(ctx, shop, size){
-  const qrText = 'https://dukanlist.com/business.html?slug=' + (shop.slug || '');
+  const qrText = 'https://dukanlist.com/' + (shop.slug || '');
   const qrSize = Math.floor(size * 0.13);
   const qrImg = await loadQrImage(qrText, 220);
   const padding = Math.floor(size * 0.025);
@@ -849,7 +849,7 @@ async function drawQrHero(ctx, s, t, sz, lang){
 
   // Big QR centered
   const qrSize = sz * 0.50;
-  const qrText = 'https://dukanlist.com/business.html?slug=' + (s.slug || '');
+  const qrText = 'https://dukanlist.com/' + (s.slug || '');
   const qrImg = await loadQrImage(qrText, 400);
   // White bg square
   ctx.fillStyle = '#fff';
@@ -1285,7 +1285,7 @@ async function drawPremiumCard(ctx, s, t, sz, lang, opts){
     try {
       const qrSize = sz * 0.080;
       const qrPad = sz * 0.020;
-      const qrText = 'https://dukanlist.com/business.html?slug=' + s.slug;
+      const qrText = 'https://dukanlist.com/' + s.slug;
       const qrImg = await loadQrImage(qrText, 150);
       if (qrImg) {
         ctx.save();
@@ -1342,7 +1342,7 @@ async function downloadPoster(shop, tmpl, opts){
 async function shareToPlatform(platform, shop, tmpl, opts){
   const blob = await renderToBlob(shop, tmpl, opts);
   const file = new File([blob], 'dukanlist.jpg', { type: 'image/jpeg' });
-  const url = 'https://dukanlist.com/business.html?slug=' + (shop.slug || '');
+  const url = 'https://dukanlist.com/' + (shop.slug || '');
   const caption = shop.name + '\n📞 ' + (shop.mobile || '') + '\n' + url + '\n\n— DukanList';
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {

@@ -255,7 +255,7 @@ function renderCard(b){
     areasHTML +
     acceptedHTML +
     '<div class="actions">' +
-      '<a class="btn btn-view" href="/business.html?slug=' + esc(b.slug) + '" target="_blank">👁 View Public</a>' +
+      '<a class="btn btn-view" href="/' + esc(b.slug) + '" target="_blank">👁 View Public</a>' +
       '<a class="btn btn-view" href="/admin/shop.html?id=' + esc(b.id) + '" target="_blank">⚙ Open in Admin</a>' +
       '<div style="flex:1"></div>' +
       '<button class="btn btn-reject" onclick="rejectListing(\'' + esc(b.id) + '\')">✕ Reject</button>' +

@@ -37,7 +37,7 @@
           ? '<div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#EF4444,#B91C1C);color:#fff;padding:4px 10px;border-radius:99px;font-size:.72rem;font-weight:900;box-shadow:0 3px 10px rgba(239,68,68,.4)">🔥 #' + (i + 1) + '</div>'
           : '';
         return ''
-          + '<a href="/business.html?slug=' + encodeURIComponent(b.slug || '') + '" '
+          + '<a href="/' + encodeURIComponent(b.slug || '') + '" '
           +   'style="background:#fff;border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 3px rgba(15,23,42,.04);transition:.2s" '
           +   'onmouseover="this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 10px 24px rgba(239,68,68,0.14)\'" '
           +   'onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 1px 3px rgba(15,23,42,.04)\'">'

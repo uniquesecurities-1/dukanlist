@@ -158,7 +158,7 @@ async function shareAchievements(b, unlocked){
     'Achievements unlocked:',
     ...unlocked.slice(0, 8).map(u => `${u.icon} ${u.label}`),
     '',
-    `View profile: https://dukanlist.com/business.html?slug=${b.slug || ''}`,
+    `View profile: https://dukanlist.com/${b.slug || ''}`,
     '',
     '— DukanList'
   ].join('\n');

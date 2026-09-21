@@ -898,7 +898,7 @@ function render(d){
     + (d.mobile ? '<a class="qa" href="tel:+91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.mobile) + '"><span class="qa-ico">📞</span>Call</a>' : '<span></span>')
     + (d.whatsapp ? '<a class="qa qa-wa" href="https://wa.me/91' + (function(r){var x=String(r||'').replace(/[^0-9]/g,'');if(x.length===12&&x.slice(0,2)==='91')x=x.slice(2);else if(x.length===11&&x[0]==='0')x=x.slice(1);return x.slice(-10);})(d.whatsapp) + '?text=' + encodeURIComponent('Hi, I got your digital card from DukanList. Could you help me with…') + '" target="_blank"><span class="qa-ico">💬</span>WhatsApp</a>' : '<span></span>')
     + (mapsUrl ? '<a class="qa" href="' + escapeHtml(mapsUrl) + '" target="_blank"><span class="qa-ico">📍</span>Directions</a>' : '')
-    + '<a class="qa" href="' + escapeHtml('/business.html?slug=' + encodeURIComponent(d.slug || '')) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
+    + '<a class="qa" href="' + escapeHtml('/' + encodeURIComponent(d.slug || '')) + '" target="_blank"><span class="qa-ico">🌐</span>Profile</a>'
     + '</div>'
     // v48: UPI Payment QR (India-specific killer feature)
     + (d.upi_id ? buildUpiSection(d) : '')

@@ -273,7 +273,7 @@ function openViewer(items, startIdx, supaClient){
       '  </div>' +
       '</div>' +
       '<div class="db-v-text">' + esc(s.text) + '</div>' +
-      (s.shop_slug ? '<a class="db-v-cta" href="/business.html?slug=' + encodeURIComponent(s.shop_slug) + '">Open shop →</a>' : '');
+      (s.shop_slug ? '<a class="db-v-cta" href="/' + encodeURIComponent(s.shop_slug) + '">Open shop →</a>' : '');
 
     // Animate progress bar
     const activeBar = progressEl.querySelectorAll('.db-v-bar-fill')[idx];

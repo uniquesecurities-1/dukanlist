@@ -632,7 +632,7 @@ async function loadBiz(){
   MY_BIZ = biz;
   // Route through /api/share so the preview card shows SHOP'S OWN PHOTO
   // (not DukanList branding). /api/share preserves r=1 and redirects to
-  // /business.html?slug=X&review=1 — same destination, cleaner card.
+  // /X&review=1 — same destination, cleaner card.
   SHOP_URL_BASE = 'https://dukanlist.com/api/share?slug=' + encodeURIComponent(biz.slug || biz.id);
   SHOP_URL = SHOP_URL_BASE + '&r=1';
 

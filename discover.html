@@ -1640,7 +1640,7 @@ function renderFiltered(){
         (waHref(b.whatsapp || b.mobile) ? '<a class="act wa" href="'+esc(waHref(b.whatsapp || b.mobile))+'" target="_blank" rel="noopener">💬<span class="lbl">Chat</span></a>' : '')+
       '</div>'+
       '<div class="cta-row">'+
-        '<a class="cta primary" href="/business.html?slug='+esc(b.slug||'')+'">View Listing →</a>'+
+        '<a class="cta primary" href="/'+esc(b.slug||'')+'">View Listing →</a>'+
       '</div>'+
       // HOT v2 Phase 2 — Quick reactions row
       '<div class="reaction-row" data-bid="'+esc(b.id)+'">'+
@@ -1739,7 +1739,7 @@ function renderFiltered(){
       e.preventDefault();
       var name = btn.getAttribute('data-name') || '';
       var slug = btn.getAttribute('data-slug') || '';
-      var url  = location.origin + '/business.html?slug=' + slug;
+      var url  = location.origin + '/' + slug;
       var msg  = name + '\n' + url + '\n\nFound on DukanList — Mandi Dabwali ki local directory.';
       if (navigator.share){
         navigator.share({ title:name, text:msg, url:url }).catch(function(){});

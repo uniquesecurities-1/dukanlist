@@ -376,7 +376,7 @@ function composeCaption(shopData, theme){
   const lines = [];
   if (shopData.name)   lines.push('🏪 ' + shopData.name);
   if (shopData.mobile) lines.push('📞 ' + shopData.mobile);
-  if (shopData.slug)   lines.push('🔗 https://dukanlist.com/business.html?slug=' + shopData.slug);
+  if (shopData.slug)   lines.push('🔗 https://dukanlist.com/' + shopData.slug);
   lines.push('');
   lines.push((theme.cta || 'Your trusted local business'));
   lines.push('');

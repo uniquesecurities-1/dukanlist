@@ -158,7 +158,7 @@
           if (!r.error && Array.isArray(r.data)){
             bizMatches = r.data.map(b => ({
               kind: 'biz', name: b.name, icon: b.category_icon || '\u{1F3EA}', city: b.city_name,
-              href: '/business.html?slug=' + encodeURIComponent(b.slug)
+              href: '/' + encodeURIComponent(b.slug)
             }));
           }
         }

@@ -364,7 +364,7 @@ async function commitImport(){
       const claimUrl = location.origin + '/panel/claim-account.html?mobile=' + encodeURIComponent(src._mobile);
       const msg = encodeURIComponent('🏪 Welcome to DukanList!\n\n' + src.name + ' aapka shop pre-list ho gaya hai. Account claim karne ke liye:\n\n' + claimUrl + '\n\n— DukanList Team');
       const wa = 'https://wa.me/91' + src._mobile + '?text=' + msg;
-      items.push('<div class="result-row"><div class="meta"><div class="name">✓ ' + esc(src.name) + '</div><div style="color:#64748b;font-size:11px">📞 ' + esc(src._mobile) + ' · ' + esc(src._city?.name || '') + '</div><div style="font-size:11px;color:#94a3b8;margin-top:3px"><a href="/business.html?slug=' + esc(r.slug || '') + '" target="_blank" style="color:#94a3b8">/business.html?slug=' + esc(r.slug || '') + '</a></div></div><a class="copy-btn" href="' + wa + '" target="_blank" rel="noopener">💬 Send claim link</a></div>');
+      items.push('<div class="result-row"><div class="meta"><div class="name">✓ ' + esc(src.name) + '</div><div style="color:#64748b;font-size:11px">📞 ' + esc(src._mobile) + ' · ' + esc(src._city?.name || '') + '</div><div style="font-size:11px;color:#94a3b8;margin-top:3px"><a href="/' + esc(r.slug || '') + '" target="_blank" style="color:#94a3b8">/' + esc(r.slug || '') + '</a></div></div><a class="copy-btn" href="' + wa + '" target="_blank" rel="noopener">💬 Send claim link</a></div>');
     } else {
       items.push('<div class="result-row"><div class="meta"><div class="name" style="color:#DC2626">✗ ' + esc(src.name || '(unknown)') + '</div><div style="color:#DC2626;font-size:11px">' + esc(r.error || 'error') + '</div></div></div>');
     }

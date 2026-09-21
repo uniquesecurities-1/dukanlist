@@ -99,10 +99,26 @@
     } catch(e){ console.warn(TAG, 'ex', e); }
   }
 
+  // This does NOT build a link — it READS one, to work out which shop a card
+  // is for. That made it the one dangerous file in the v257 URL cleanup: every
+  // other occurrence of /business.html?slug= was a link to rewrite, this one
+  // was a dependency ON that shape. Rewriting the links without touching this
+  // would have left the selector matching nothing AND the /slug=/ regex
+  // finding nothing in "/regal-foods-mandi-dabwali" — so address enrichment on
+  // /search would have gone quietly dead, with no error anywhere.
+  //
+  // Handles both shapes, so it keeps working for anything still on the old
+  // form (an open tab, a cached page, a link someone saved).
   function slugFromCard(card){
-    var link = card.querySelector('a[href*="/business.html?slug="]') || card.querySelector('a.biz-card-link');
+    var link = card.querySelector('a.biz-card-link')
+            || card.querySelector('a[href*="/business.html?slug="]');
     if (!link) return null;
-    var m = (link.getAttribute('href') || '').match(/slug=([^&#]+)/);
+    var href = link.getAttribute('href') || '';
+
+    var m = href.match(/[?&]slug=([^&#]+)/);           // old: /business.html?slug=X
+    if (m) return decodeURIComponent(m[1]);
+
+    m = href.match(/^\/([A-Za-z0-9][A-Za-z0-9-]*)(?:[?#]|$)/);  // new: /X
     return m ? decodeURIComponent(m[1]) : null;
   }
 

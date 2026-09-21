@@ -2228,12 +2228,12 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
-<script src="/assets/js/daily-buzz.js?v=20260920" defer></script>
+<script src="/assets/js/daily-buzz.js?v=20260921g" defer></script>
 <script src="/assets/js/share.js?v=20260921e"></script>
 <script src="/assets/js/mobile-nav.js?v=20260921e"></script>
 <script src="/assets/js/breadcrumbs.js?v=20260920"></script>
 <script src="/assets/js/announcements.js?v=20260920"></script>
-<script src="/assets/js/recently-viewed.js?v=20260920"></script>
+<script src="/assets/js/recently-viewed.js?v=20260921g"></script>
 <script src="/assets/js/login-modal.js?v=20260921e"></script>
 <script src="/assets/js/hours.js?v=20260920"></script>
 <script src="/assets/js/nav.js?v=20260921b" defer></script>
@@ -2737,7 +2737,7 @@ function render(){
   const _twT   = document.getElementById('twTitle'); if (_twT) _twT.content = _title;
   const _twD   = document.getElementById('twDesc');  if (_twD) _twD.content = _desc;
   const _twI   = document.getElementById('twImage'); if (_twI) _twI.content = _img;
-  document.getElementById('canonicalLink').href = location.origin + '/' + b.slug;   // v228: clean canonical (was /business.html?slug=, which itself 308-redirects under cleanUrls)
+  document.getElementById('canonicalLink').href = location.origin + '/' + b.slug;   // v228: clean canonical (was /, which itself 308-redirects under cleanUrls)
 
   // Schema.org LocalBusiness JSON-LD (rich Google snippets)
   injectSchemaOrg(b);
@@ -3949,7 +3949,7 @@ async function loadSimilarShops(b){
       const photo = (s.photos && s.photos.length) ? s.photos[0] : null;
       const city = s.geo_cities && s.geo_cities.name ? s.geo_cities.name : '';
       const rate = '';  // rating hidden — Golden Pages mode
-      return `<a class="sim-card" href="/business.html?slug=${encodeURIComponent(s.slug)}">
+      return `<a class="sim-card" href="/${encodeURIComponent(s.slug)}">
         ${photo
           ? `<img src="${escapeHTML(photo)}" alt="${escapeHTML(s.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover" loading="lazy">`
           : `<div class="sim-photo">🏪</div>`}
@@ -4228,7 +4228,7 @@ async function loadRecommenders(slug){
       const labelHtml = r.relationship_label
         ? '<div style="margin-top:3px;color:#15803D;font-size:.72rem;font-style:italic">"' + escapeHTML(r.relationship_label) + '"</div>'
         : '';
-      return '<a href="/business.html?slug=' + encodeURIComponent(r.recommender_slug) + '" style="display:flex;gap:10px;align-items:center;padding:9px 11px;background:#fff;border:1px solid #BBF7D0;border-radius:10px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#10B981\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#BBF7D0\';this.style.transform=\'\'">' +
+      return '<a href="/' + encodeURIComponent(r.recommender_slug) + '" style="display:flex;gap:10px;align-items:center;padding:9px 11px;background:#fff;border:1px solid #BBF7D0;border-radius:10px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#10B981\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#BBF7D0\';this.style.transform=\'\'">' +
         '<div style="font-size:1.4rem;flex-shrink:0">' + escapeHTML(r.recommender_icon || '🏪') + '</div>' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:800;font-size:.88rem;color:#0F172A;line-height:1.2">' + escapeHTML(r.recommender_name) + verifiedBadge + '</div>' +
@@ -4267,7 +4267,7 @@ async function loadRecommendations(slug){
       const labelHtml = r.relationship_label
         ? '<div style="margin-top:5px;display:inline-block;background:#FFF8F0;color:#9A3412;padding:3px 10px;border-radius:99px;font-size:.74rem;font-weight:700">' + escapeHTML(r.relationship_label) + '</div>'
         : '';
-      return '<a href="/business.html?slug=' + encodeURIComponent(r.recommended_slug) + '" style="display:flex;gap:11px;align-items:center;padding:11px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#FF6B1A\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 8px 22px rgba(255,107,26,.10)\'" onmouseout="this.style.borderColor=\'#E2E8F0\';this.style.transform=\'\';this.style.boxShadow=\'\'">' +
+      return '<a href="/' + encodeURIComponent(r.recommended_slug) + '" style="display:flex;gap:11px;align-items:center;padding:11px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;text-decoration:none;color:inherit;transition:.15s" onmouseover="this.style.borderColor=\'#FF6B1A\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 8px 22px rgba(255,107,26,.10)\'" onmouseout="this.style.borderColor=\'#E2E8F0\';this.style.transform=\'\';this.style.boxShadow=\'\'">' +
         photoBlock +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:800;font-size:.94rem;color:#0F172A;line-height:1.25">' + escapeHTML(r.recommended_name) + '</div>' +

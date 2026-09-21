@@ -297,7 +297,7 @@
     // and WhatsApp buttons are anchors, and an <a> inside an <a> is invalid —
     // the parser closed the card anchor early and left an empty one behind,
     // which is what rendered as a blank pill next to the buttons.
-    // Clean /:slug too; /business.html?slug= 308-redirects under cleanUrls.
+    // Clean /:slug too; / 308-redirects under cleanUrls.
     const href = '/' + encodeURIComponent(b.slug || '');
     return '' +
       '<div class="seo-item' + topCls + '">' +

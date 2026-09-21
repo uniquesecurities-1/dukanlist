@@ -335,6 +335,11 @@ async function loadBiz(){
     PROFILE_URL = 'https://dukanlist.com/' + encodeURIComponent(MY_BIZ.slug);
     REVIEW_URL  = 'https://dukanlist.com/' + encodeURIComponent(MY_BIZ.slug) + '?review=1&src=qr-poster';
   } else {
+    // Fallback when the listing has no slug yet: the ID goes through the
+    // ?slug= query, which business.html resolves. NOT rewritten to /<id> in
+    // v257 — an ID is not a slug, and '/<id>' + '&review=1' would have made
+    // a URL with no '?' at all. This one prints onto a QR code that gets
+    // stuck on a shop wall, so a broken URL here is expensive to undo.
     PROFILE_URL = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.id);
     REVIEW_URL  = 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.id) + '&review=1&src=qr-poster';
   }

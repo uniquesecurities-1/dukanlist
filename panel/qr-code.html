@@ -191,6 +191,8 @@ async function loadBiz(){
   // v218: clean short URL when slug exists (smaller QR = easier scans); id fallback keeps old form
   PROFILE_URL = MY_BIZ.slug
     ? 'https://dukanlist.com/' + encodeURIComponent(MY_BIZ.slug)
+    // ID fallback (no slug yet): keep the ?slug= query form. An ID is not
+    // a slug, so '/<id>' would 404. Not rewritten in v257.
     : 'https://dukanlist.com/business.html?slug=' + encodeURIComponent(MY_BIZ.id);
 
   document.getElementById('qrShopName').textContent = MY_BIZ.name || 'Your Business';

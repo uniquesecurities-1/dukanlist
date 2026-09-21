@@ -1459,7 +1459,7 @@ async function openDetail(qid){
                     </button>
                   </div>
                   ${r.replier_name ? `<b>${escapeHtml(r.replier_name)}</b>` : 'Anonymous'}
-                  ${r.business_name ? `<a class="biz-link" href="/business.html?slug=${encodeURIComponent(r.business_slug||'')}" target="_blank">🏪 ${escapeHtml(r.business_name)}</a>` : ''}
+                  ${r.business_name ? `<a class="biz-link" href="/${encodeURIComponent(r.business_slug||'')}" target="_blank">🏪 ${escapeHtml(r.business_name)}</a>` : ''}
                   <span>· ${timeAgo(r.created_at)}</span>
                   <button class="pb-report-btn-inline" onclick="openReportModal('reply','${r.id}')" title="Report this reply">🚩</button>
                 </div>
