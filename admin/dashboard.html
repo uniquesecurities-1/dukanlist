@@ -453,12 +453,12 @@
   <!-- Recent Registrations -->
   <div class="section">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-      <h2 class="section-title" style="margin:0">🏪 Main DukanList — Recent <span id="recentLabel" style="color:#94a3b8;font-size:12px;font-weight:500">(latest 25)</span> <span style="background:#DBEAFE;color:#1E40AF;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">EXCLUDES GOLDEN PAGES</span></h2>
+      <h2 class="section-title" style="margin:0">🏪 Main DukanList — Recent <span id="recentLabel" style="color:#94a3b8;font-size:12px;font-weight:500">(loading…)</span> <span style="background:#DBEAFE;color:#1E40AF;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.04em;margin-left:4px">EXCLUDES GOLDEN PAGES</span></h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button id="showAllBtn" onclick="toggleShowAll()"
           style="background:#7C3AED;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
-          title="Show all listings in the table below">
-          👁 Show All
+          title="Toggle between all listings and just the latest 25">
+          🔽 Show Latest 25
         </button>
         <button id="csvBtn10" onclick="downloadCSV(false)"
           style="background:#10B981;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
@@ -513,6 +513,7 @@
 
   <!-- GP recent panel loader -->
   <script>
+var __showingAll = false;
   // Wait for ShopDB to be ready (Supabase JS may not be loaded yet at this point)
   async function _waitForShopDB(maxMs){
     const start = Date.now();
@@ -819,10 +820,22 @@ async function runDashboard(){
       })
       .catch(e => console.warn('Scope load:', e.message));
 
+    // Load ALL listings up front, not the latest 25. The search box below
+    // filters what is already loaded, so with a 25-row window a search for a
+    // shop registered earlier came back empty and read as "this shop is not on
+    // DukanList" — the single most confusing thing this table could do.
     withTimeout(c.rpc('admin_list_businesses', {
-      p_status: null, p_limit: 25, p_offset: 0, p_sort: 'newest'
-    }), 10000, 'recent')
-      .then(({ data: recent }) => renderRecent(recent || []))
+      p_status: null, p_limit: 2000, p_offset: 0, p_sort: 'newest'
+    }), 20000, 'recent')
+      .then(({ data: recent }) => {
+        const rows = recent || [];
+        renderRecent(rows);
+        __showingAll = true;
+        const lbl = document.getElementById('recentLabel');
+        if (lbl) lbl.textContent = '(showing all ' + rows.length + ')';
+        const b = document.getElementById('showAllBtn');
+        if (b){ b.innerHTML = '🔽 Show Latest 25'; b.style.background = '#0F172A'; }
+      })
       .catch(e => {
         console.warn('Recent load:', e.message);
         document.getElementById('recentBiz').innerHTML = '<div class="err">Recent registrations took too long. <a href="javascript:location.reload()">Retry</a></div>';
@@ -1627,8 +1640,8 @@ function deleteView(i){
 }
 
 
-// Toggle Show All / Show Latest 10
-let __showingAll = false;
+// Toggle Show All / Show Latest 25
+// (declared with var and assigned at initial load, which runs before this point)
 async function toggleShowAll(){
   const btn = document.getElementById('showAllBtn');
   const label = document.getElementById('recentLabel');
@@ -1638,12 +1651,12 @@ async function toggleShowAll(){
     try {
       const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
       const { data, error } = await c.rpc('admin_list_businesses', {
-        p_status: null, p_limit: 500, p_offset: 0, p_sort: 'newest'
+        p_status: null, p_limit: 2000, p_offset: 0, p_sort: 'newest'
       });
       if (error) throw error;
       renderRecent(data || []);
       __showingAll = true;
-      btn.innerHTML = '🔽 Show Latest 10';
+      btn.innerHTML = '🔽 Show Latest 25';
       btn.style.background = '#0F172A';
       label.textContent = '(showing all ' + (data || []).length + ')';
     } catch(e){
@@ -1651,7 +1664,7 @@ async function toggleShowAll(){
       box.insertAdjacentHTML('beforebegin', '<div class="err">Failed: ' + (e.message || e) + '</div>');
     } finally { btn.disabled = false; }
   } else {
-    // Switch back to latest 25
+    // Switch back to the latest 25
     btn.disabled = true; btn.innerHTML = '⏳ Loading...';
     try {
       const c = (typeof ShopDB !== 'undefined') ? ShopDB.client : window.supabase;
