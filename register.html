@@ -430,6 +430,21 @@
   color: #16A34A;
   font-weight: 900;
 }
+/* A selected tile has to LOOK removable, or people assume the choice is final
+   and hunt for an undo that isn't there. On hover / touch it turns red and the
+   tick becomes a cross. */
+.cat-tile.selected:hover,
+.cat-tile.selected:active {
+  background: #FEE2E2;
+  border-color: #EF4444;
+  color: #991B1B;
+  transform: none;
+}
+.cat-tile.selected:hover::after,
+.cat-tile.selected:active::after {
+  content: '✕';
+  color: #DC2626;
+}
 .cat-tile-ico { font-size: 1.2rem; flex-shrink: 0 }
 .cat-tile-text { flex: 1; min-width: 0; overflow: hidden }
 .cat-tile-name { font-size: 0.86rem; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
@@ -2639,7 +2654,8 @@ function renderCatTiles(query){
         ${g.items.map(c => `
           <button type="button" class="cat-tile${selectedSet.has(String(c.id)) ? ' selected' : ''}"
             onclick="pickCatFromModal(${c.id})"
-            ${selectedSet.has(String(c.id)) ? 'disabled' : ''}>
+            aria-pressed="${selectedSet.has(String(c.id)) ? 'true' : 'false'}"
+            title="${selectedSet.has(String(c.id)) ? 'Tap to remove / हटाने के लिए टैप करें' : 'Tap to select / चुनने के लिए टैप करें'}">
             <span class="cat-tile-ico">${c.icon || '📂'}</span>
             <span class="cat-tile-text">
               <div class="cat-tile-name">${escapeHTML(c.name)}</div>
@@ -2653,6 +2669,18 @@ function renderCatTiles(query){
 }
 
 function pickCatFromModal(id){
+  // The chosen tile used to be rendered `disabled`, so a mis-tap could only be
+  // undone by closing the modal and hunting for the chip underneath. With 158
+  // categories on a tablet, mis-taps are the normal case, not the exception.
+  // Tapping a selected tile now removes it.
+  if (CAT_STATE && Array.isArray(CAT_STATE.selected) && CAT_STATE.selected.includes(id)){
+    removeCat(id);
+    const inpR = document.getElementById('catSearchInput');
+    renderCatTiles((inpR && inpR.value || '').toLowerCase().trim());
+    updateCatModalDoneCount();
+    return;
+  }
+
   // Simulate select change for compatibility with existing handleAddCategory
   const sel = document.getElementById('catSelect');
   if (sel){
