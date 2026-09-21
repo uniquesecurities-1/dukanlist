@@ -167,6 +167,21 @@
 
 <script src="/assets/js/error-reporter.js?v=20260920" defer></script>
 <script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
+
+<style>
+  /* v252 hero trim.
+     The headline was 83px of brand name on a page whose job is to answer
+     "can I find a plumber here?". It still carries the brand for search
+     engines, at a size that leaves room for the thing people came for. */
+  .hero-tag-tight{ font-size:clamp(1.6rem, 4vw, 2.6rem) !important; line-height:1.15 !important; margin-bottom:8px !important }
+  .hero-search-first .hero-sub{ font-size:.98rem; margin-bottom:16px }
+  /* Numbers sit right under the search now — one quiet line, not a band. */
+  .hero-search-first .hero-stats{ margin:14px 0 4px; gap:20px }
+  @media (max-width:640px){
+    .hero-tag-tight{ font-size:1.5rem !important }
+    .hero-search-first .hero-stats{ gap:14px; font-size:.86rem }
+  }
+</style>
 </head>
 <body>
 
@@ -330,11 +345,11 @@
 <!-- ===== HERO (search-first) ===== -->
 <section class="hero hero-search-first">
   <div class="hero-inner">
-    <span class="hero-badge">
-      <span data-i18n-en>📍 Mandi Dabwali · Golden Pages</span>
-      <span data-i18n-hi>📍 मंडी डबवाली · Golden Pages</span>
-    </span>
-    <h1 class="hero-tag">
+    <!-- v252: "Mandi Dabwali · Golden Pages" pill removed. The same words were
+         on screen three times above the fold — this pill, the 83px headline
+         right below it, and the gold card further down. Three copies is not
+         three times the message. -->
+    <h1 class="hero-tag hero-tag-tight">
       <span data-i18n-en><span class="grad">Golden Pages</span> of Dabwali</span>
       <span data-i18n-hi>Dabwali की <span class="grad">Golden Pages</span></span>
     </h1>
@@ -375,15 +390,110 @@
       </div>
     </form>
 
-    <!-- ⭐ GOLDEN PAGES — main attraction (moved up, made dominant) -->
-    <a href="/browse.html" class="gp-hero-card" id="gpHeroCard" title="Free local business directory — anyone can list, anyone can find">
-      <span class="gp-hero-icon">🥇</span>
-      <span class="gp-hero-body">
-        <span class="gp-hero-title"><span data-i18n-en>Golden Pages</span><span data-i18n-hi>गोल्डन पेजेस</span></span>
-        <span class="gp-hero-sub"><span data-i18n-en>Free local directory · Find or list any business in 30 seconds</span><span data-i18n-hi>फ्री लोकल डायरेक्टरी · कोई भी दुकान खोजें या लिस्ट करें</span></span>
-      </span>
-      <span class="gp-hero-arrow">→</span>
-    </a>
+    <div class="hero-stats">
+      <div class="hero-stat"><b id="stat-shops">—</b><span data-i18n-en>Active Listings</span><span data-i18n-hi>लाइव दुकानें</span></div>
+      <div class="hero-stat"><b id="stat-cats">—</b><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></div>
+      <div class="hero-stat"><b id="stat-cities">—</b><span data-i18n-en>Cities Live</span><span data-i18n-hi>शहर</span></div>
+      <div class="hero-stat"><b>₹0</b><span data-i18n-en>Forever Free</span><span data-i18n-hi>हमेशा फ्री</span></div>
+    </div>
+
+    <!-- v252: REAL SHOPS, above the fold.
+         Measured before building this: the first actual listing on the page
+         sat 995px down — a full screen of scrolling past a banner, a nav, a
+         headline, a search box and a card before a visitor saw a single shop.
+         A directory's most attractive asset is the thing it is a directory OF.
+         These come from get_top_for_seo, the same ranking as /top, so the
+         shops shown here are the ones that earned the position. -->
+    <div id="heroTopShops" class="hts-wrap" style="display:none">
+      <div class="hts-head">
+        <span class="hts-title"><span data-i18n-en>Top rated in Mandi Dabwali</span><span data-i18n-hi>मंडी डबवाली की टॉप दुकानें</span></span>
+        <a href="/top" class="hts-all"><span data-i18n-en>See all →</span><span data-i18n-hi>सभी देखें →</span></a>
+      </div>
+      <div class="hts-row" id="htsRow"></div>
+    </div>
+
+    <style>
+      .hts-wrap{ margin:18px 0 6px; text-align:left }
+      .hts-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:9px }
+      .hts-title{ font-family:'Manrope',sans-serif; font-weight:800; font-size:.95rem; color:#0F172A }
+      .hts-all{ font-size:.82rem; font-weight:700; color:#EA580C; text-decoration:none; white-space:nowrap }
+      .hts-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px }
+      @media (max-width:900px){ .hts-row{ grid-template-columns:repeat(2,1fr) } }
+      /* Phone: two cards, ONE row. Four would wrap to a second row and push
+         everything below it half a screen down — the opposite of the point,
+         and this page has already been fought over for vertical space twice. */
+      @media (max-width:640px){
+        .hts-row{ gap:8px }
+        .hts-card:nth-child(n+3){ display:none }
+        .hts-wrap{ margin:14px 0 4px }
+      }
+      .hts-card{ display:block; background:#fff; border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; text-decoration:none; color:inherit; transition:border-color .15s, transform .15s }
+      .hts-card:hover{ border-color:#FB923C; transform:translateY(-2px); text-decoration:none }
+      .hts-img{ width:100%; aspect-ratio:16/11; object-fit:cover; display:block; background:linear-gradient(135deg,#FFF7ED,#FED7AA) }
+      .hts-ph{ width:100%; aspect-ratio:16/11; display:grid; place-items:center; font-size:1.8rem; background:linear-gradient(135deg,#FFF7ED,#FED7AA) }
+      .hts-body{ padding:8px 10px 10px }
+      .hts-rank{ display:inline-block; background:#FEF3C7; color:#92400E; border-radius:99px; padding:1px 7px; font-size:.66rem; font-weight:800; margin-bottom:4px }
+      .hts-name{ font-weight:800; font-size:.86rem; color:#0F172A; line-height:1.25; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical }
+      .hts-meta{ font-size:.74rem; color:#64748B; margin-top:3px }
+    </style>
+
+    <script>
+    (function(){
+      // Fails silently and stays hidden: an empty strip is better than a
+      // broken one on the page every visitor lands on first.
+      function esc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+      // This block sits high in the document; supabase-init.js loads near the
+      // bottom. So we wait for the client — but a bounded number of times, not
+      // a timer that keeps firing forever on a page that never loaded it.
+      var tries = 0;
+      async function load(){
+        try{
+          if (!(window.ShopDB && ShopDB.client)){
+            if (++tries > 25) return;            // ~10s, then give up quietly
+            return setTimeout(load, 400);
+          }
+          var r = await ShopDB.client.rpc('get_top_for_seo', {
+            p_category_slug: null, p_city_slug: 'mandi-dabwali', p_limit: 4
+          });
+          if (r.error) throw r.error;
+          var items = (r.data && r.data.items) || [];
+          if (!items.length) return;
+          document.getElementById('htsRow').innerHTML = items.map(function(b, i){
+            // data-fit-skip: photo-fit.js letterboxes tall portraits so a
+            // signboard is never cropped — right for the big photo on a
+            // profile page, wrong here. Two of the four top shops upload
+            // portrait photos, and side by side with two landscape ones the
+            // row came out ragged: two full-bleed cards next to two with
+            // cream bars down both edges. Checked on the live page before
+            // choosing: at this size the signboards still read fine cropped,
+            // and four matching cards is the whole point of the strip.
+            var img = b.photo
+              ? '<img class="hts-img" data-fit-skip="1" src="' + esc(b.photo) + '" alt="' + esc(b.name) + '" loading="lazy">'
+              : '<div class="hts-ph">\u{1F3EA}</div>';
+            var rating = (b.rating_count > 0)
+              ? '\u2605 ' + Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ')'
+              : 'New listing';
+            return '<a class="hts-card" href="/' + encodeURIComponent(b.slug || '') + '">' +
+              img +
+              '<div class="hts-body">' +
+                '<span class="hts-rank">#' + (i + 1) + '</span>' +
+                '<div class="hts-name">' + esc(b.name) + '</div>' +
+                '<div class="hts-meta">' + rating + '</div>' +
+              '</div></a>';
+          }).join('');
+          document.getElementById('heroTopShops').style.display = '';
+        }catch(e){ console.warn('[hero-top-shops]', e && e.message); }
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+      else load();
+    })();
+    </script>
+
+
+
+    <!-- v252: gold "Golden Pages" card removed — third copy of the headline,
+     and it only pointed at /browse, which is already in the nav and in the
+     "→ All" quick-pick chip below. -->
     <style>
       .gp-hero-card{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#78350F 0%,#92400E 35%,#D97706 70%,#FBBF24 100%);background-size:200% 200%;color:#fff!important;border-radius:18px;padding:18px 20px;margin:14px auto 18px;max-width:620px;text-decoration:none!important;box-shadow:0 10px 30px rgba(217,119,6,.35),0 0 0 2px rgba(251,191,36,.4),inset 0 1px 0 rgba(255,255,255,.18);position:relative;border:2px solid #FBBF24;animation:gpHeroShine 3.5s ease-in-out infinite;transition:.25s;font-family:'Manrope',sans-serif}
       .gp-hero-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(217,119,6,.5),0 0 0 2px rgba(251,191,36,.7);background-position:100% 100%;text-decoration:none}
@@ -491,12 +601,11 @@
       }
     </style>
 
-    <div class="hero-stats">
-      <div class="hero-stat"><b id="stat-shops">—</b><span data-i18n-en>Active Listings</span><span data-i18n-hi>लाइव दुकानें</span></div>
-      <div class="hero-stat"><b id="stat-cats">—</b><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></div>
-      <div class="hero-stat"><b id="stat-cities">—</b><span data-i18n-en>Cities Live</span><span data-i18n-hi>शहर</span></div>
-      <div class="hero-stat"><b>₹0</b><span data-i18n-en>Forever Free</span><span data-i18n-hi>हमेशा फ्री</span></div>
-    </div>
+    <!-- v252: the trust numbers moved UP, to just under the search box.
+         "202 listings · 368 categories · 4 cities · free" is what tells a
+         first-time visitor the directory is not empty, and it was sitting
+         below the fold where nobody arriving for the first time saw it. -->
+
 
     <div class="hero-register-strip">
       <span>
