@@ -2200,7 +2200,14 @@ async function handleSubmit(){
       password: STATE.data.loginPassword,
       options: {
         data: { mobile: STATE.phone, business_id: data, role: 'business owner' },
-        emailRedirectTo: window.location.origin + '/panel/email-verified.html'
+        // /* Clean URL, no .html: cleanUrls:true makes /panel/email-verified.html
+        //    308-redirect to /panel/email-verified, and a redirect hop is exactly
+        //    where the #access_token fragment can be dropped — in-app webviews
+        //    (the Gmail app, which is where a verification link is opened) are the
+        //    usual offenders. It also has to match the Supabase Redirect URLs
+        //    allow-list exactly, or Supabase silently falls back to the Site URL,
+        //    which is the home page. */
+        emailRedirectTo: window.location.origin + '/panel/email-verified'
       }
     });
     if (signUpRes.error){

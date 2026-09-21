@@ -1394,5 +1394,37 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 <script src="/assets/js/dl-golden-render.js?v=1786600000" defer></script>
 <script src="/assets/js/dl-city-cleanup.js?v=20260921" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
+<script>
+/* ============================================================
+   Auth-token rescue.
+   Supabase only honours an emailRedirectTo that is listed in its Redirect URLs
+   allow-list. If it is not listed, Supabase silently falls back to the project
+   Site URL — which is this page — and the shopkeeper who just clicked "verify"
+   lands on the home page with no idea whether it worked. That is what was
+   happening in the field.
+   The verification tokens still arrive here, in the URL. So if this page is
+   loaded carrying auth tokens that clearly belong to the panel, forward them,
+   fragment and all, to the page that knows what to do with them. This works
+   even while the allow-list is still wrong, so nobody is stranded.
+   ============================================================ */
+(function(){
+  try {
+    var hash = location.hash || '';
+    var qs   = location.search || '';
+    var isRecovery = /type=recovery/.test(hash) || /type=recovery/.test(qs);
+    var hasToken = /access_token=|refresh_token=/.test(hash) ||
+                   /[?&]code=/.test(qs) ||
+                   /[?&]token_hash=/.test(qs);
+    var isError  = /error=|error_description=/.test(hash) || /[?&]error=/.test(qs);
+    if (!hasToken && !isError) return;
+
+    // A password-recovery link must land on the reset screen, not the
+    // verified screen, or the visitor is told "verified" and given no way
+    // to set the password they came here to set.
+    var target = isRecovery ? '/panel/reset-password' : '/panel/email-verified';
+    location.replace(target + qs + hash);
+  } catch(_){ /* never let this stop the home page rendering */ }
+})();
+</script>
 </body>
 </html>

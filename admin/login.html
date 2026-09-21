@@ -265,7 +265,7 @@ async function handleForgot(){
   btn.disabled = true; btn.textContent = 'Sending...';
   try {
     const { error } = await c.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/panel/reset-password.html'
+      redirectTo: window.location.origin + '/panel/reset-password'
     });
     btn.disabled = false; btn.textContent = 'Send Reset Link →';
     if (error){
