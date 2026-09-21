@@ -92,6 +92,40 @@
         flex-direction: column;
       }
       #ownerNotifPanel.show{ display: flex; }
+
+      /* ---------------------------------------------------------------
+         v263 — the bell was landing ON the hamburger.
+
+         This bell is position:fixed at top:14px right:16px with
+         z-index 9990. On a phone the nav hamburger appears inside
+         .topbar-inner at that exact spot (main.css: .hamburger becomes
+         display:flex at <=720px, 40px wide, at the right edge), and the
+         topbar's stacking context is only z-index 1000 — so the bell
+         painted over the menu button and swallowed the taps meant for
+         it. Deepak's shopkeeper could not open the menu.
+
+         Desktop never showed it because .hamburger is display:none
+         there, which is why this survived.
+
+         Fix is geometry, not z-index: on phones the bell steps to the
+         LEFT of the hamburger and matches its 40px box, so the two sit
+         side by side. Nothing is hidden and no tap target shrinks.
+         --------------------------------------------------------------- */
+      @media (max-width: 720px){
+        #ownerNotifBell{
+          /* hamburger: 40px wide at right:16px, so it ends at 56px.
+             8px gap puts this at 64px. Heights matched to line up. */
+          top: 11px; right: 64px;
+          width: 40px; height: 40px;
+          font-size: 17px;
+        }
+        /* The drawer opens below a 60px header; keep the dropdown clear of it. */
+        #ownerNotifPanel{ top: 60px; right: 12px; }
+      }
+      @media (max-width: 560px){
+        /* topbar tightens to 9px 14px here, so the hamburger ends at 54px. */
+        #ownerNotifBell{ top: 9px; right: 60px; }
+      }
       .onp-head{
         padding: 14px 18px; border-bottom: 1px solid #EEF1F6;
         display: flex; align-items: center; justify-content: space-between;
