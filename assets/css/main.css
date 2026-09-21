@@ -94,8 +94,16 @@ html[data-lang="hi"] [data-i18n-en].block{ display:none !important }
   background:linear-gradient(135deg,var(--indigo-deep) 0%, var(--indigo) 50%, #312E81 100%);
   color:#fff;
   padding:11px 16px;
-  position:sticky; top:0; z-index:50;
+  z-index:50;
   box-shadow:var(--shadow-sm);
+}
+/* This was written as sticky but never behaved that way, because overflow-x:hidden
+   on html/body had turned them into scroll containers. Now that public-premium.css
+   uses `clip` instead, sticky actually works — so scope it to tablet and up: on a
+   phone the bottom Call/WhatsApp bar is already fixed, and a sticky header too
+   would eat the little vertical space a shop listing has. */
+@media (min-width:760px){
+  .topbar{ position:sticky; top:0 }
 }
 .topbar-inner{ max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap }
 .brand{ display:flex; align-items:center; gap:10px; font-family:'Manrope',sans-serif; font-weight:800; font-size:1.08rem; color:#fff; letter-spacing:-.022em }

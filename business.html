@@ -250,7 +250,7 @@ body.claim-locked #stickyCtaBar{
   display:none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/css/main.css?v=20260531">
+<link rel="stylesheet" href="/assets/css/main.css?v=20260921">
 <style>
 .biz-hero{
   background:
@@ -805,7 +805,14 @@ body.prof-partial #reviewsAnchor::before{
 .cta-share:hover{ background:#E2E8F0; text-decoration:none; transform:translateY(-2px) }
 
 .sec-content{ max-width:980px; margin:24px auto; padding:0 16px; display:grid; grid-template-columns:1fr; gap:18px }
-@media (min-width:760px){ .sec-content{ grid-template-columns:2fr 1fr } }
+@media (min-width:760px){
+  /* The right column is much shorter than the left, and grid was stretching it
+     to match — leaving a tall dead area beside the main content. align-items:start
+     lets it be its own height, and sticky keeps it travelling with the reader so
+     that space is occupied by something useful instead of sitting empty. */
+  .sec-content{ grid-template-columns:2fr 1fr; align-items:start }
+  .sec-content > *:last-child{ position:sticky; top:14px }
+}
 
 .card-pill h3{
   font-family:'Manrope',sans-serif;
@@ -1460,7 +1467,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </style>
 
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
-<link rel="stylesheet" href="/assets/css/public-premium.css?v=5">
+<link rel="stylesheet" href="/assets/css/public-premium.css?v=20260921">
 
 <script src="/assets/js/error-reporter.js?v=20260920" defer></script>
 <style>

@@ -322,6 +322,18 @@ html, body{
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }
+/* overflow-x:hidden forces the other axis to compute as `auto`, which turns
+   html/body into scroll containers — and that silently kills every
+   `position:sticky` on the page, because sticky then resolves against a
+   scrollport that never scrolls. `clip` blocks the same horizontal panning
+   without creating a scroll container, so sticky sidebars work again.
+   Kept behind @supports; browsers without `clip` keep the old behaviour. */
+@supports (overflow: clip){
+  html, body{
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+}
 /* Defensive: any top-level wrapper wider than viewport gets clipped */
 body > *{
   max-width: 100vw;
