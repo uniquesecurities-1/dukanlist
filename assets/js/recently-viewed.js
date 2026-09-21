@@ -23,6 +23,16 @@
     try { localStorage.setItem(KEY, JSON.stringify(arr.slice(0, MAX))); } catch(_){}
   }
 
+  // v269: the stored photo is whatever the shop page had — usually the full
+  // w_1400 main image (~150-250 KB) — and this widget shows it in a 72px box.
+  // Ask Cloudinary for 144px (2x for retina) at render time instead. Stored
+  // URLs are untouched, so nothing already saved in a visitor's browser
+  // needs migrating; Supabase-storage URLs pass through unchanged.
+  function thumbUrl(u){
+    if (!/res\.cloudinary\.com\/[^/]+\/image\/upload\//.test(u || '')) return u;
+    return u.replace(/\/upload\/(?:[^/]*\/)?(v\d+\/)/, '/upload/w_144,h_144,c_fill,q_auto,f_auto/$1');
+  }
+
   function track(biz){
     if (!biz || !biz.slug) return;
     const items = load().filter(b => b.slug !== biz.slug);
@@ -156,7 +166,7 @@
           // The clickable area is now a separate inner <a class="rv-clickable">.
           return `<div class="rv-row">
             <a class="rv-clickable" href="/${encodeURIComponent(b.slug)}">
-              <div class="rv-thumb">${b.photo ? '<img src="'+esc(b.photo)+'" alt="" loading="lazy">' : (b.category_icon || '🏪')}</div>
+              <div class="rv-thumb">${b.photo ? '<img src="'+esc(thumbUrl(b.photo))+'" alt="" loading="lazy" width="72" height="72">' : (b.category_icon || '🏪')}</div>
               <div class="rv-mid">
                 <div class="rv-name">${esc(b.name)}</div>
                 <div class="rv-line2">${catStr}${rateStr ? '<span>·</span>'+rateStr : ''}${verify ? '<span>·</span>'+verify : ''}</div>

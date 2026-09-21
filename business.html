@@ -2233,7 +2233,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 <script src="/assets/js/mobile-nav.js?v=20260921e"></script>
 <script src="/assets/js/breadcrumbs.js?v=20260920"></script>
 <script src="/assets/js/announcements.js?v=20260920"></script>
-<script src="/assets/js/recently-viewed.js?v=20260921g"></script>
+<script src="/assets/js/recently-viewed.js?v=20260921k"></script>
 <script src="/assets/js/login-modal.js?v=20260921e"></script>
 <script src="/assets/js/hours.js?v=20260920"></script>
 <script src="/assets/js/nav.js?v=20260921b" defer></script>
@@ -2758,7 +2758,15 @@ function render(){
   // Legacy Supabase-storage URLs cannot be transformed, so they fall back to
   // the original — those are the older listings and there are few of them.
   const cloudThumbs = Array.isArray(b._cloudThumbs) ? b._cloudThumbs : [];
-  const thumbs = [...(cloudThumbs.length === cloudPhotos.length ? cloudThumbs : cloudPhotos), ...legacyPhotos];
+  // v269: legacy photos (the businesses.photos array) can be Cloudinary too —
+  // the 5th thumbnail on Regal Foods was one, arriving at 960x1200 for a 56px
+  // box. If the URL has an /upload/ segment it gets the same w_160 treatment;
+  // anything else (Supabase storage) is left alone as before.
+  const legacyThumbs = legacyPhotos.map(u =>
+    /res\.cloudinary\.com\/[^/]+\/image\/upload\//.test(u)
+      ? u.replace(/\/upload\/(?:[^/]*\/)?(v\d+\/)/, '/upload/w_160,h_160,c_fill,q_auto,f_auto/$1')
+      : u);
+  const thumbs = [...(cloudThumbs.length === cloudPhotos.length ? cloudThumbs : cloudPhotos), ...legacyThumbs];
   // v48: Merge into BIZ.photos so swapImg() + openLightbox() + lightboxPrev/Next
   // can access all photos (they read from BIZ.photos, not local var).
   // Without this, clicking thumbnail #2 tries photos[2] which was undefined → 404 broken image.
@@ -3869,7 +3877,42 @@ function initPhotoAutoCarousel(){
     else if (!paused) start();
   });
 
-  start();
+  // ---------------------------------------------------------------
+  // v269 — this used to call start() unconditionally.
+  //
+  // Measured on a phone: the rotation swaps mainImg.src every 3.5s
+  // through the FULL-SIZE w_1400 array, so within ~14s of landing all
+  // four big photos (~570 KB) had downloaded whether or not the visitor
+  // ever looked at them — and on a slow connection that background
+  // stream is exactly what makes the page feel sluggish while they are
+  // trying to scroll and tap. The v266 thumbnail fix cut 1 MB and the
+  // total went UP, because this was still running underneath.
+  //
+  // So the slideshow now runs only where it is cheap and wanted:
+  //   - not on phones: the thumbnail strip is the control there, and
+  //     a tap on it already stops the rotation anyway
+  //   - not when the visitor asked for less data or less motion
+  //   - not on a 2G/3G connection
+  //   - and only while the gallery is actually on screen
+  // Desktop on a decent connection keeps it exactly as before.
+  // ---------------------------------------------------------------
+  const conn = navigator.connection || {};
+  const cheapEnough =
+       !window.matchMedia('(max-width: 600px)').matches
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    && !conn.saveData
+    && !/(^|-)(2g|3g)$/.test(conn.effectiveType || '');
+
+  if (!cheapEnough) return;   // thumbnails still work; nothing else changes
+
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => { if (en.isIntersecting){ if (!paused) start(); } else stop(); });
+    }, { threshold: 0.4 });
+    io.observe(mainImg.parentElement);
+  } else {
+    start();
+  }
 }
 
 function renderMmtStatStrip(b){
