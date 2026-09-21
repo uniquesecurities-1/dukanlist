@@ -613,6 +613,33 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
 }
+/* ---- Phones: drop one whole nesting level ----
+   This card had no mobile override, so its desktop 28px side padding applied at
+   375px too. Stacked with the hero's 12px and the inner boxes' own padding, the
+   ADDRESS text began 58px from the screen edge — about a third of the width
+   lost to padding before a single character, on both sides.
+   The deeper problem is that on a phone this is a white card sitting on a
+   near-white page, holding MORE white cards. The inner boxes already carry the
+   border and the background, so on small screens this one stops being a card
+   and becomes a plain container. One level of nesting disappears and the text
+   starts near the screen edge where it belongs. */
+@media (max-width:640px){
+  .biz-meta-card{
+    background:transparent;
+    border:0;
+    border-radius:0;
+    padding:0;
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  /* Children that are NOT boxed would otherwise sit flush against the edge,
+     so give the bare ones a small gutter of their own. */
+  .biz-meta-card > *:not(.addr-box):not([class*="card"]):not([class*="box"]){
+    padding-left:2px; padding-right:2px;
+  }
+  .addr-box{ padding:13px !important }
+}
 .biz-cat-pill{
   display:inline-flex; align-items:center; gap:5px;
   background:rgba(255,107,26,.08); color:var(--saffron-deep);
