@@ -101,16 +101,7 @@
 .shop-report-block .srb-text{ flex:1; min-width:140px; line-height:1.4 }
 .shop-report-block .srb-link{ color:#1E40AF; font-weight:800; text-decoration:none; font-size:.82rem; white-space:nowrap; padding:6px 10px; border-radius:7px; background:#EFF6FF; border:1px solid #BFDBFE }
 .shop-report-block .srb-link:hover{ background:#DBEAFE; text-decoration:none }
-.visit-guide-card{ background:linear-gradient(135deg,#F8FAFC 0%,#FFFFFF 100%); border:1px solid rgba(15,23,42,.06); border-left:3px solid #1E40AF }
-.visit-guide-card h3{ color:#0F172A; margin-bottom:14px !important }
-.visit-guide-card .vg-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
-@media (max-width:560px){ .visit-guide-card .vg-grid{ grid-template-columns:1fr; gap:10px } }
-.visit-guide-card .vg-row{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:#fff; border:1px solid rgba(15,23,42,.05); border-radius:10px; transition:.15s }
-.visit-guide-card .vg-row:hover{ border-color:#C7D2FE; box-shadow:0 4px 12px rgba(30,64,175,.06) }
-.visit-guide-card .vg-ico{ width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,#DBEAFE,#BFDBFE); display:grid; place-items:center; font-size:.95rem; flex-shrink:0 }
-.visit-guide-card .vg-text{ min-width:0; flex:1 }
-.visit-guide-card .vg-t-main{ font-family:'Manrope',sans-serif; font-size:.84rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.25; margin-bottom:3px }
-.visit-guide-card .vg-t-sub{ font-size:.72rem; color:#64748b; line-height:1.4; font-weight:600 }
+/* .visit-guide-card CSS removed with its markup in v243 — see the note further down. */
 
 /* === Public deals card (business detail page) === */
 .deals-card{ background:linear-gradient(135deg,#FEF2F2 0%,#FFE4E6 100%); border:1.5px solid #FCA5A5 !important; border-left:4px solid #DC2626 !important }
@@ -846,13 +837,21 @@ body.prof-partial #reviewsAnchor::before{
   border-bottom:2px solid var(--line);
 }
 html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-serif }
+/* ONE surface for the whole page.
+   Ten stacked cards each with its own shadow is what made this feel busy —
+   a shadow says "this floats above the page", and when everything floats,
+   nothing stands out and the eye has nowhere to rest. Card radii were also
+   inconsistent (16 / 14 / 13px). A single flat surface with one clear border
+   and one radius is what reads as considered rather than assembled.
+   Elevation is now reserved for things that genuinely sit above the page:
+   modals, the sticky bars, the hero. */
 .card-pill{
   background:#fff; border:1px solid var(--line);
-  border-radius:16px; padding:22px;
-  box-shadow:0 4px 18px rgba(15,23,42,.05);
-  transition:box-shadow .2s;
+  border-radius:14px; padding:22px;
+  box-shadow:none;
+  transition:border-color .18s;
 }
-.card-pill:hover{ box-shadow:0 8px 30px rgba(15,23,42,.08) }
+.card-pill:hover{ border-color:#D7DCE5 }
 
 .hours-list{ font-size:.88rem; color:var(--ink-2); line-height:1.65 }
 .hours-list .day{ display:flex; justify-content:space-between; padding:3px 0 }
@@ -1843,47 +1842,13 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
       </div>
 
       <!-- Visit Guide card (fills left column space) -->
-      <div class="card-pill visit-guide-card" style="margin-top:18px">
-        <h3 style="font-size:1rem">🧭 <span data-i18n-en>Before you visit / call</span><span data-i18n-hi>जाने / call करने से पहले</span></h3>
-        <div class="vg-grid">
-          <div class="vg-row">
-            <div class="vg-ico">⏰</div>
-            <div class="vg-text">
-              <div class="vg-t-main" data-i18n-en>Best time to reach</div>
-              <div class="vg-t-main" data-i18n-hi>संपर्क का सही समय</div>
-              <div class="vg-t-sub" id="vgBestTime" data-i18n-en>10:00 AM – 6:00 PM works for most businesses</div>
-              <div class="vg-t-sub" data-i18n-hi>10:00 AM – 6:00 PM ज़्यादातर businesses के लिए सही</div>
-            </div>
-          </div>
-          <div class="vg-row">
-            <div class="vg-ico">💬</div>
-            <div class="vg-text">
-              <div class="vg-t-main" data-i18n-en>WhatsApp is fastest</div>
-              <div class="vg-t-main" data-i18n-hi>WhatsApp सबसे तेज़</div>
-              <div class="vg-t-sub" data-i18n-en>Most owners reply within 30 minutes</div>
-              <div class="vg-t-sub" data-i18n-hi>ज़्यादातर मालिक 30 minutes में जवाब देते हैं</div>
-            </div>
-          </div>
-          <div class="vg-row">
-            <div class="vg-ico">📍</div>
-            <div class="vg-text">
-              <div class="vg-t-main" data-i18n-en>Use Google Maps</div>
-              <div class="vg-t-main" data-i18n-hi>Google Maps इस्तेमाल करें</div>
-              <div class="vg-t-sub" data-i18n-en>One tap above to get exact directions</div>
-              <div class="vg-t-sub" data-i18n-hi>ऊपर एक tap से सीधा रास्ता मिलेगा</div>
-            </div>
-          </div>
-          <div class="vg-row">
-            <div class="vg-ico">🛒</div>
-            <div class="vg-text">
-              <div class="vg-t-main" data-i18n-en>Mention DukanList</div>
-              <div class="vg-t-main" data-i18n-hi>DukanList का नाम लें</div>
-              <div class="vg-t-sub" data-i18n-en>Owner will know you found them here — better service</div>
-              <div class="vg-t-sub" data-i18n-hi>मालिक समझेगा कि आप यहाँ से आए हैं — बेहतर service</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- "Before you visit / call" removed (v243).
+           Its four tips — best time to reach, WhatsApp is fastest, use Google Maps,
+           mention DukanList — were byte-identical on all 199 listings. It cost 248px
+           of prime space above the fold-and-a-half while saying nothing about THIS
+           shop, and 199 pages carrying the same paragraph is duplicate content that
+           works against the SEO work rather than for it.
+           Kept in git history; restore from v242 if it is ever wanted back. -->
 
       <!-- Social Media row (auto-hides if no links) -->
       <div class="card-pill" id="socialCardWrap" style="margin-top:18px;display:none">
@@ -1959,8 +1924,13 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
       <!-- Compact engagement cards (always shown, polished + tight typography) -->
       <style>
-        .rc-card{ margin-top:14px; padding:14px 16px; border-radius:13px; background:#fff; border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.03); transition:.2s }
-        .rc-card:hover{ box-shadow:0 6px 18px rgba(15,23,42,.06) }
+        /* These were three separate 131-173px cards holding 299 characters
+           between them. Merged into one bordered block with hairline dividers:
+           same content, one box instead of three, ~200px shorter. */
+        .rc-stack{ margin-top:14px; background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden }
+        .rc-card{ padding:14px 16px; background:transparent; border:0; border-radius:0 }
+        .rc-card + .rc-card{ border-top:1px solid #EEF1F5 }
+        .rc-card:hover{ background:#FAFBFC }
         .rc-card .rc-head{ display:flex; align-items:center; gap:8px; margin-bottom:6px }
         .rc-card .rc-ico{ width:30px; height:30px; border-radius:8px; display:grid; place-items:center; font-size:.95rem; flex-shrink:0 }
         .rc-card .rc-ttl{ font-family:'Manrope',sans-serif; font-size:.86rem; font-weight:800; color:#0F172A; letter-spacing:-.01em; line-height:1.25 }
@@ -1982,6 +1952,8 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
       <!-- 1. Share this business (compact) -- HIDDEN in strict professional mode (CSS hide list)
            Reason: "Help a local owner get more customers" is solicitation copy, prohibited
            for ICAI/NMC/BCI/ICSI/ICMAI strict-tier listings. Visible for partial tier & normal. -->
+      <!-- one block, hairline dividers: was three separate cards -->
+      <div class="rc-stack">
       <div class="rc-card share" data-hide-in-strict="1">
         <div class="rc-head">
           <div class="rc-ico">📣</div>
@@ -2021,6 +1993,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             <span data-i18n-en>View all →</span><span data-i18n-hi>सभी देखें →</span>
           </a>
         </div>
+      </div>
       </div>
     </div>
 
@@ -5521,5 +5494,26 @@ async function reportReview(reviewId, btnEl){
 
 </script>
 <script src="/assets/js/dl-city-cleanup.js?v=20260921" defer></script>
+<script>
+/* The three promo cards now share one bordered block. Each can still be hidden
+   on its own — the share card is suppressed for strict-tier professional
+   listings, and "More like this" only appears when there are similar shops. If
+   every child ends up hidden the wrapper would draw an empty box, so check
+   after render and drop it. Runs twice: once when the DOM is ready and once
+   after the async card population has had time to finish. */
+(function(){
+  function pruneRcStack(){
+    document.querySelectorAll('.rc-stack').forEach(function(st){
+      var anyVisible = [].some.call(st.querySelectorAll('.rc-card'), function(c){
+        return c.offsetParent !== null && c.getBoundingClientRect().height > 4;
+      });
+      st.style.display = anyVisible ? '' : 'none';
+    });
+  }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ pruneRcStack(); setTimeout(pruneRcStack, 1500); });
+  } else { pruneRcStack(); setTimeout(pruneRcStack, 1500); }
+})();
+</script>
 </body>
 </html>
