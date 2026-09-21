@@ -1,19 +1,33 @@
-/* DL REGISTER SIMPLE (2026-07 v24)
+/* DL REGISTER SIMPLE (2026-09 v25)
    - Hides #professionalPanel + nullifies STATE.data.profTier
-   - LOCKS State=Haryana, District=Sirsa, City=Mandi Dabwali
-   - Hides all other state/district/city options + prevents change
+   - Pre-selects Haryana / Sirsa / Mandi Dabwali as a CONVENIENCE default,
+     because that is where most registrations come from — but leaves every
+     dropdown fully usable.
+
+   v25 — what changed and why
+   --------------------------
+   v24 did not default to Haryana, it LOCKED it:
+     * CSS put `pointer-events:none` on #stateId/#districtId/#cityId, so the
+       dropdowns could not even be opened;
+     * every option except Haryana / Sirsa / Mandi Dabwali was set to
+       display:none AND disabled;
+     * a setInterval ran every 1.5s and snapped the selection back if it
+       ever changed.
+   The database has always had Punjab active with Bathinda, Mansa and Muktsar
+   and 33 towns under them, and there are already live listings in Bathinda
+   and Sangat. This script was the only thing standing between a Punjab
+   shopkeeper and registering, and because the lock was in a separate file it
+   looked from the page source as though everything was fine.
 */
 (function(){
   'use strict';
   if (!/\/register\.html?$|\/register$/.test(location.pathname)) return;
-  console.log('[dl-register] loaded v24');
+  console.log('[dl-register] loaded v25 — geography unlocked (HR + PB)');
 
-  // 1. Hide professional panel
+  // Professional panel stays hidden. That is a separate product decision and
+  // is deliberately left exactly as it was.
   var style = document.createElement('style');
-  style.textContent = '#professionalPanel { display: none !important; }' +
-    'select#stateId, select#districtId, select#cityId {' +
-    ' background: #F0FDF4 !important; border-color: #10B981 !important;' +
-    ' pointer-events: none !important; cursor: not-allowed !important; }';
+  style.textContent = '#professionalPanel { display: none !important; }';
   (document.head || document.documentElement).appendChild(style);
 
   function keepPanelHidden(){
@@ -31,22 +45,19 @@
     return -1;
   }
 
-  function lockDropdown(selId, matchStr, cb){
+  // Select a default WITHOUT hiding or disabling anything else.
+  // Returns true if it selected something, false if the option wasn't there.
+  function presetDefault(selId, matchStr, cb){
     var sel = document.getElementById(selId);
-    if (!sel) return;
+    if (!sel) return false;
+    // Never override a choice the visitor has already made.
+    if (sel.value) { if (cb) setTimeout(cb, 0); return true; }
     var idx = findOption(sel, matchStr);
-    if (idx === -1) return;
+    if (idx === -1) return false;
     sel.selectedIndex = idx;
-    // Hide + disable all other options
-    for (var i = 0; i < sel.options.length; i++) {
-      if (i === idx) continue;
-      var opt = sel.options[i];
-      if (!opt.value) continue; // keep placeholder
-      opt.style.display = 'none';
-      opt.disabled = true;
-    }
     try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch(_){}
     if (cb) setTimeout(cb, 300);
+    return true;
   }
 
   function waitForOptions(selId, cb){
@@ -61,20 +72,26 @@
     }, 200);
   }
 
-  function cascadeAndLock(){
+  // Runs ONCE. No enforcement loop — if the shopkeeper picks Punjab, it stays
+  // Punjab.
+  var defaultsApplied = false;
+  function applyDefaultsOnce(){
+    if (defaultsApplied) return;
+    defaultsApplied = true;
+
     waitForOptions('stateId', function(){
-      lockDropdown('stateId', 'haryana', function(){
+      presetDefault('stateId', 'haryana', function(){
         waitForOptions('districtId', function(){
-          lockDropdown('districtId', 'sirsa', function(){
+          presetDefault('districtId', 'sirsa', function(){
             waitForOptions('cityId', function(){
-              lockDropdown('cityId', 'dabwali', function(){
-                // Auto-fill pincode 125104 (Mandi Dabwali)
+              presetDefault('cityId', 'dabwali', function(){
                 var pin = document.getElementById('pincode');
                 if (pin && !pin.value) {
                   pin.value = '125104';
-                  try { pin.dispatchEvent(new Event('input', { bubbles: true })); } catch(_){}
+                  try { pin.dispatchEvent(new Event('input',  { bubbles: true })); } catch(_){}
                   try { pin.dispatchEvent(new Event('change', { bubbles: true })); } catch(_){}
                 }
+                watchCityChanges();
               });
             });
           });
@@ -83,43 +100,25 @@
     });
   }
 
-  // Enforce every second — if user somehow changes, snap back
-  function enforceLoop(){
-    setInterval(function(){
-      var stateSel = document.getElementById('stateId');
-      var distSel = document.getElementById('districtId');
-      var citySel = document.getElementById('cityId');
-      if (stateSel && stateSel.options.length > 1) {
-        var stateOpt = stateSel.options[stateSel.selectedIndex];
-        var stateTxt = (stateOpt && stateOpt.textContent || '').toLowerCase();
-        if (stateTxt.indexOf('haryana') === -1) {
-          var hIdx = findOption(stateSel, 'haryana');
-          if (hIdx !== -1) {
-            stateSel.selectedIndex = hIdx;
-            try { stateSel.dispatchEvent(new Event('change', { bubbles: true })); } catch(_){}
-          }
-        }
+  // Mandi Dabwali has two pincodes, so register.html's own auto-fill does not
+  // overwrite 125104 when the city changes. Left alone, a shop in Bathinda
+  // would carry a Dabwali pincode into validation and be rejected with a
+  // message that explains nothing. Clear it and let the city's own pincode
+  // (or the shopkeeper) fill it.
+  function watchCityChanges(){
+    var city = document.getElementById('cityId');
+    if (!city || city.dataset.pinWatch) return;
+    city.dataset.pinWatch = '1';
+    city.addEventListener('change', function(){
+      var opt = city.options[city.selectedIndex];
+      var isDabwali = opt && /dabwali/i.test(opt.textContent || '');
+      var pin = document.getElementById('pincode');
+      if (!pin || isDabwali) return;
+      if (pin.value === '125104') {
+        pin.value = '';
+        try { pin.dispatchEvent(new Event('input', { bubbles: true })); } catch(_){}
       }
-      if (distSel && distSel.options.length > 1) {
-        var distOpt = distSel.options[distSel.selectedIndex];
-        var distTxt = (distOpt && distOpt.textContent || '').toLowerCase();
-        if (distTxt.indexOf('sirsa') === -1) {
-          var sIdx = findOption(distSel, 'sirsa');
-          if (sIdx !== -1) {
-            distSel.selectedIndex = sIdx;
-            try { distSel.dispatchEvent(new Event('change', { bubbles: true })); } catch(_){}
-          }
-        }
-      }
-      if (citySel && citySel.options.length > 1) {
-        var cityOpt = citySel.options[citySel.selectedIndex];
-        var cityTxt = (cityOpt && cityOpt.textContent || '').toLowerCase();
-        if (cityTxt.indexOf('dabwali') === -1) {
-          var dIdx = findOption(citySel, 'dabwali');
-          if (dIdx !== -1) citySel.selectedIndex = dIdx;
-        }
-      }
-    }, 1500);
+    });
   }
 
   function boot(){
@@ -135,8 +134,7 @@
       } catch(_){}
     }, 500);
 
-    cascadeAndLock();
-    enforceLoop();
+    applyDefaultsOnce();
   }
 
   if (document.readyState !== 'loading') boot();
