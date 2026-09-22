@@ -77,6 +77,7 @@
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=20260921">
 <script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
+<script src="/assets/js/image-opt.js?v=20260922a"></script><!-- v288: resize card photos at the CDN -->
 </head>
 <body>
 
@@ -249,7 +250,7 @@ function render(shops){
     const photo = (s.photos && s.photos.length) ? s.photos[0] : null;
     return '<div class="cmp-header">'
       + (photo
-          ? '<img src="' + esc(photo) + '" alt="">'
+          ? '<img src="' + esc(window.DukanImg?DukanImg.opt(photo,{width:240,height:240,crop:"fill"}):photo) + '" alt="">'
           : '<div class="ph">🏪</div>')
       + '<div class="name">' + esc(s.name) + '</div>'
       + (function(){ /* v262: address_line does not exist; the columns are

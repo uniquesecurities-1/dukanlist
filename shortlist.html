@@ -63,6 +63,7 @@
   }
 </style>
 <script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
+<script src="/assets/js/image-opt.js?v=20260922a"></script><!-- v288: resize card photos at the CDN -->
 </head>
 <body>
 
@@ -158,7 +159,7 @@
 
     var cards = items.map(function(it){
       var photoHTML = it.photo
-        ? '<img src="' + esc(it.photo) + '" alt="' + esc(it.name) + '" loading="lazy">'
+        ? '<img src="' + esc(window.DukanImg?DukanImg.opt(it.photo,{width:400,height:250,crop:"fill"}):it.photo) + '" alt="' + esc(it.name) + '" loading="lazy">'
         : (esc(it.icon) || '🏪');
       var city = it.city ? '<div class="card-city">📍 ' + esc(it.city) + '</div>' : '';
       var cat  = it.category ? '<div class="card-cat">' + esc(it.icon || '') + ' ' + esc(it.category) + '</div>' : '';

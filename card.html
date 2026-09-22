@@ -361,6 +361,7 @@
 <!-- v48: QRCode.js library for UPI QR generation -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
+<script src="/assets/js/image-opt.js?v=20260922a"></script><!-- v288: resize card photos at the CDN -->
 </head>
 <body>
 
@@ -1134,7 +1135,9 @@ async function loadCard(){
     address_line2: b.address_line2,
     city:          b.geo_cities ? b.geo_cities.name : '',
     pincode:       b.pincode,
-    photo_url:     firstPhoto,
+    /* v288: the card renders this at 56px and also base64-embeds it for the
+       downloadable image — a full-size original was pointless on both counts. */
+    photo_url:     (window.DukanImg && firstPhoto) ? DukanImg.opt(firstPhoto,{width:240,height:240,crop:"fill"}) : firstPhoto,
     website:       'https://dukanlist.com/' + b.slug,
     verified:      (b.verified_score || 0) >= 3,
     verified_score: b.verified_score || 0,

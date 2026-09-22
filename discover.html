@@ -875,6 +875,7 @@
   html[data-lang="hi"] body, html[data-lang="hi"] .card h2, html[data-lang="hi"] .card .meta{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
 </style>
 <script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
+<script src="/assets/js/image-opt.js?v=20260922a"></script><!-- v288: resize card photos at the CDN -->
 <!-- "For You" smart ranking algorithm + Daily Themes (privacy-first, localStorage only).
      Version query busts SW cache so old algo (without getDailyTheme) isn't served. -->
 <script src="/assets/js/discover-algo.js?v=v3.5.0"></script>
@@ -1603,7 +1604,7 @@ function renderFiltered(){
 
     return ''+
     '<div class="card '+(photo?'':'no-photo')+'" data-id="'+b.id+'" data-idx="'+idx+'" data-cats="'+esc(allCatIds)+'" data-why="'+esc(whyData)+'">'+
-      '<div class="bg" style="'+(photo?'background-image:url('+esc(photo)+')':'')+'"></div>'+
+      '<div class="bg" style="'+(photo?'background-image:url('+esc(window.DukanImg?DukanImg.opt(photo,{width:900,crop:"limit"}):photo)+')':'')+'"></div>'+
       '<div class="gradient-top"></div>'+
       '<div class="gradient"></div>'+
       // "Why am I seeing this?" floating button (top-right, below the chips row)

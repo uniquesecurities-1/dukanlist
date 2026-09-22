@@ -1400,7 +1400,7 @@ function renderCard(b){
 
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
   const photoHTML = photo
-    ? `<img src="${photo}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
+    ? `<img src="${(window.DukanImg?DukanImg.opt(photo,{width:400,height:240,crop:"fill"}):photo)}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
     : `<div class="ph-fb">${b.category_icon || '🏪'}</div><span class="ph-label">${escapeHTML(b.category_name || 'Business')}</span>`;
   const noPhotoClass = photo ? '' : ' no-photo';
   // Verified badge: hide tier badge in strict mode (replaced with profession badge below)

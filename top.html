@@ -161,6 +161,7 @@
   }
 </style>
 <script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
+<script src="/assets/js/image-opt.js?v=20260922a"></script><!-- v288: resize card photos at the CDN -->
 </head>
 <body>
 
@@ -332,7 +333,7 @@
   listEl.innerHTML = items.map(function(b, i){
     const rank = i + 1;
     const photo = b.photo
-      ? '<img src="' + escAttr(b.photo) + '" alt="' + escAttr(b.name) + '" loading="lazy" width="96" height="96">'
+      ? '<img src="' + escAttr(window.DukanImg?DukanImg.thumb(b.photo):b.photo) + '" alt="' + escAttr(b.name) + '" loading="lazy" width="96" height="96">'
       : '<span>🏪</span>';
     const _norm = function(r){var d=String(r||'').replace(/[^0-9]/g,'');if(d.length===12&&d.slice(0,2)==='91')d=d.slice(2);else if(d.length===11&&d.charAt(0)==='0')d=d.slice(1);return d.length===10?d:'';};
     const phone = _norm(b.mobile);
