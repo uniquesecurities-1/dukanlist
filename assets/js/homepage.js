@@ -59,6 +59,8 @@ try {
 async function fsotwAlreadyShown(){
   function grab(){
     var out = new Set();
+    /* v287: DLShown also knows the Featured grid, which this DOM scrape never saw — Spotlight was picking shops already sitting in Featured. */
+    if (window.DLShown) DLShown.all().forEach(function(s){ out.add(s); });
     document.querySelectorAll('.hts-card, #top10Section a[href^="/"]').forEach(function(a){
       var h = a.getAttribute('href') || '';
       var m = h.match(/^\/([A-Za-z0-9][A-Za-z0-9-]*)(?:[?#]|$)/);
