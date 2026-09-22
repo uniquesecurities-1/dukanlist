@@ -489,6 +489,8 @@
           if (r.error) throw r.error;
           var items = (r.data && r.data.items) || [];
           if (!items.length) return;
+          /* v282: tell the Featured feed which shops this ranking already used */
+          if (window.DLShown) DLShown.claim(items.map(function(x){ return x.slug; }));
           document.getElementById('htsRow').innerHTML = items.map(function(b, i){
             // data-fit-skip: photo-fit.js letterboxes tall portraits so a
             // signboard is never cropped — right for the big photo on a
@@ -1137,6 +1139,8 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/dl-core.js?v=a2b7ac4c20"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
+<script src="/assets/js/dl-shown.js?v=20260922b"></script><!-- v282: shared "already on screen" list (hero strip, Top 5, Trending claim; Featured fills around them) -->
+<script>if(window.DLShown){DLShown.expect(3);}</script>
 <script src="/assets/js/daily-buzz.js?v=20260921g" defer></script>
 <!-- geo-nearby.js disabled — open-near-you RPC was failing intermittently -->
 <!-- <script src="/assets/js/geo-nearby.js?v=20260921g" defer></script> -->
@@ -1286,8 +1290,8 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20260922a" defer></script>
-<script src="/assets/js/trending.js?v=20260921g" defer></script>
+<script src="/assets/js/homepage.js?v=20260922b" defer></script>
+<script src="/assets/js/trending.js?v=20260922b" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260921j" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
 <script>

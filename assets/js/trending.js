@@ -28,6 +28,7 @@
 
       var isHi = document.documentElement.dataset.lang === 'hi';
 
+      /* v282 */ if (window.DLShown) DLShown.claim(r.data.map(function(x){ return x.slug; }));
       grid.innerHTML = r.data.map(function (b, i) {
         var photo = b.photo
           ? (window.DukanImg ? DukanImg.card(b.photo) : b.photo)
