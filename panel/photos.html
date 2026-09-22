@@ -93,8 +93,8 @@
     <span data-i18n-hi>📸 दुकान की <span class="grad">फोटो</span></span>
   </h1>
   <p class="subtitle">
-    <span data-i18n-en>Upload up to 5 photos. Photos help customers trust your shop.</span>
-    <span data-i18n-hi>5 तक फोटो अपलोड करें। फोटो से customer trust बढ़ता है।</span>
+    <span data-i18n-en>Upload up to 8 photos. Photos help customers trust your shop.</span>
+    <span data-i18n-hi>8 तक फोटो अपलोड करें। फोटो से customer trust बढ़ता है।</span>
   </p>
 
   <div id="loading" style="text-align:center;padding:30px 0;color:var(--muted)">⏳ Loading...</div>
@@ -110,7 +110,7 @@
         </div>
       </div>
       <div class="pg-rules">
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Up to 5 photos</span><span data-i18n-hi>5 तक photos</span></b><div><span data-i18n-en>Outside · Inside · Products</span><span data-i18n-hi>बाहर · अंदर · Products</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Up to 8 photos</span><span data-i18n-hi>8 तक photos</span></b><div><span data-i18n-en>Outside · Inside · Products</span><span data-i18n-hi>बाहर · अंदर · Products</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Max 5 MB each</span><span data-i18n-hi>अधिकतम 5 MB</span></b><div><span data-i18n-en>Auto-optimized to fast-load size</span><span data-i18n-hi>Auto-optimize होंगी</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>JPG, PNG, WebP</span><span data-i18n-hi>JPG, PNG, WebP</span></b><div><span data-i18n-en>Phone camera works great</span><span data-i18n-hi>Phone camera OK</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Good lighting</span><span data-i18n-hi>अच्छी रोशनी</span></b><div><span data-i18n-en>Day time preferred</span><span data-i18n-hi>दिन में लें</span></div></div></div>
@@ -171,13 +171,13 @@
    DL PHOTOS v42 — Cloudinary CDN integration
    - Unsigned upload preset: dukanlist_shops
    - Cloud name: jqh6qwxr
-   - Max 5 photos per shop (DB trigger backup)
+   - Max 8 photos per shop (DB trigger backup, db/231)
    - Delete via Cloudinary delete_token (browser can delete without secret)
    ========================================================================== */
 
 const CLOUDINARY_CLOUD_NAME = 'dukanlist';
 const CLOUDINARY_UPLOAD_PRESET = 'dukanlist_shops';
-const MAX_PHOTOS = 5;
+const MAX_PHOTOS = 8;   // v273: raised from 5 to 8 (client + db/231 trigger)
 
 let STATE = {
   businessId: null,
@@ -307,16 +307,33 @@ function renderPhotos(){
     grid.appendChild(div);
   });
 
-  // Render legacy photos (old Supabase Storage URLs from businesses.photos array)
+  // Render legacy photos (old URLs from the businesses.photos array).
+  // v273: these can now be made the MAIN photo — but ONLY when the shop has
+  // no Cloudinary photos. On the public page the order is
+  // [...cloudPhotos, ...legacyPhotos], so a cloud photo always shows first;
+  // offering "Set as Main" on a legacy photo while cloud photos exist would
+  // be a button that changes nothing. When there ARE cloud photos, the
+  // featured control stays on those, and legacy photos keep the "Old Photo"
+  // tag. For a legacy-only shop (Unique Securities, etc.) the first item in
+  // the array IS the public main, so reordering the array controls it.
+  const legacyControlsMain = STATE.photos.length === 0;
   STATE.legacyPhotos.forEach((url, idx) => {
     const div = document.createElement('div');
     div.className = 'photo-thumb';
+    let corner;
+    if (legacyControlsMain){
+      corner = (idx === 0)
+        ? '<div class="hero-pill">⭐ Main</div>'
+        : '<button class="set-hero-btn" data-legacy-main="' + idx + '">Set as Main</button>';
+    } else {
+      corner = '<div class="hero-pill" style="background:linear-gradient(135deg,#64748B,#475569)">Old Photo</div>';
+    }
     div.innerHTML = `
       <a href="${url}" target="_blank" rel="noopener" style="display:block;width:100%;height:100%">
         <img src="${url}" alt="Legacy shop photo" loading="lazy" />
       </a>
       <button class="x" title="Delete photo" data-legacy-idx="${idx}">×</button>
-      <div class="hero-pill" style="background:linear-gradient(135deg,#64748B,#475569)">Old Photo</div>
+      ${corner}
     `;
     grid.appendChild(div);
   });
@@ -338,6 +355,12 @@ function renderPhotos(){
   });
 
   // Wire up legacy delete buttons
+  grid.querySelectorAll('.set-hero-btn[data-legacy-main]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      setLegacyMain(parseInt(btn.dataset.legacyMain, 10));
+    });
+  });
   grid.querySelectorAll('.x[data-legacy-idx]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -345,6 +368,29 @@ function renderPhotos(){
       deleteLegacyPhoto(idx);
     });
   });
+}
+
+// v273 — make a legacy photo the MAIN one by moving it to the front of the
+// businesses.photos array. The public page uses photos[0] as the main image
+// for a legacy-only shop, so front = main. Same update path (and the same
+// owner RLS) that deleteLegacyPhoto already uses, so nothing new to permit.
+async function setLegacyMain(idx){
+  if (idx <= 0 || idx >= STATE.legacyPhotos.length) return;   // already main / bad index
+  try {
+    const arr = STATE.legacyPhotos.slice();
+    const [chosen] = arr.splice(idx, 1);   // pull it out
+    arr.unshift(chosen);                    // put it first
+    const { error } = await ShopDB.client
+      .from('businesses')
+      .update({ photos: arr })
+      .eq('id', STATE.businessId);
+    if (error){ showError('Could not set main photo: ' + error.message); return; }
+    showSuccess('Main photo updated!');
+    await loadPhotos();
+  } catch (e) {
+    console.error('[photos] setLegacyMain failed', e);
+    showError('Failed. Please try again.');
+  }
 }
 
 async function deleteLegacyPhoto(idx){
@@ -383,7 +429,7 @@ function updateCountPill(){
   if (n >= MAX_PHOTOS) {
     pill.classList.add('full');
     btn.disabled = true;
-    btn.innerHTML = '<span data-i18n-en>✓ Maximum 5 photos reached</span><span data-i18n-hi>✓ अधिकतम 5 photos पूरी</span>';
+    btn.innerHTML = '<span data-i18n-en>✓ Maximum 8 photos reached</span><span data-i18n-hi>✓ अधिकतम 8 photos पूरी</span>';
   } else if (n >= 3) {
     pill.classList.add('warn');
     btn.disabled = false;
@@ -471,8 +517,8 @@ function initCloudinaryWidget(){
 
   // Wire up button
   document.getElementById('uploadBtn').addEventListener('click', () => {
-    if (STATE.photos.length >= MAX_PHOTOS) {
-      showError('Maximum 5 photos reached. Delete one to upload another.');
+    if ((STATE.photos.length + STATE.legacyPhotos.length) >= MAX_PHOTOS) {
+      showError('Maximum ' + MAX_PHOTOS + ' photos reached. Delete one to upload another.');
       return;
     }
     STATE.widget.open();
@@ -499,7 +545,7 @@ async function handleUploadSuccess(info){
     if (error) {
       // Likely the 5-photo trigger fired
       if (error.message && error.message.includes('Photo limit')) {
-        showError('Photo limit reached — max 5 photos per shop.');
+        showError('Photo limit reached — max ' + MAX_PHOTOS + ' photos per shop.');
       } else {
         showError('Save failed: ' + error.message);
       }
