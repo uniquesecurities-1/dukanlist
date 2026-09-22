@@ -117,7 +117,7 @@ async function cloudinaryUpload(legacyUrl, businessId){
     const legacy = b.photos.filter(isLegacy);
     const keepCloud = b.photos.filter(isCloud);              // shops with both: keep existing cloud ones first
     console.log(`\n${b.slug}  (${legacy.length} legacy${keepCloud.length ? ', ' + keepCloud.length + ' already cloud' : ''})`);
-    if (!APPLY){ legacy.forEach(u => console.log('   would upload  ' + u.split('/').pop())); doneShops++; continue; }
+    if (!APPLY){ legacy.forEach(u => console.log('   would upload  ' + u.split('/').pop())); doneShops++; donePhotos += legacy.length; continue; }
 
     const newUrls = [];
     let ok = true;
