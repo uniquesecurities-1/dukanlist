@@ -28,3 +28,6 @@ DukanList*.apk
 *.PRE-RELAUNCH-BAK
 *.bak
 *.backup
+
+# local migration progress — never commit
+tools/.migrate-legacy-photos.state.json
