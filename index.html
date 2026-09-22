@@ -1056,7 +1056,12 @@
       <span data-i18n-en>Popular searches in your area</span>
       <span data-i18n-hi>आपके क्षेत्र में लोकप्रिय खोजें</span>
     </h3>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:.84rem">
+    <!-- v285: these hand-written links stay as the no-JS / first-paint set;
+         homepage.js swaps in the combinations that actually have shops (with
+         counts) and moves the empty ones to the "be the first" line below,
+         where they are a pitch to shopkeepers instead of a dead end for
+         customers. If the RPC fails, what is written here is what shows. -->
+    <div id="seoCombos" style="display:flex;gap:8px;flex-wrap:wrap;font-size:.84rem">
       <a href="/local/mandi-dabwali/doctor" style="background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;padding:7px 13px;border-radius:99px;text-decoration:none;font-weight:600">Doctors in Mandi Dabwali</a>
       <a href="/local/mandi-dabwali/mutual-fund-distributor" style="background:#EFF6FF;border:1px solid #BFDBFE;color:#1E3A8A;padding:7px 13px;border-radius:99px;text-decoration:none;font-weight:600">Mutual Fund Distributors in Mandi Dabwali</a>
       <a href="/local/sirsa/pharmacy" style="background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;padding:7px 13px;border-radius:99px;text-decoration:none;font-weight:600">Medical Stores in Sirsa</a>
@@ -1070,6 +1075,7 @@
       <a href="/local/sirsa/plumber" style="background:#FFFBEB;border:1px solid #FDE68A;color:#78350F;padding:7px 13px;border-radius:99px;text-decoration:none;font-weight:600">Plumbers in Sirsa</a>
       <a href="/local/mandi-dabwali/stock-broker" style="background:#F5F3FF;border:1px solid #C4B5FD;color:#4C1D95;padding:7px 13px;border-radius:99px;text-decoration:none;font-weight:600">Stock Brokers in Mandi Dabwali</a>
     </div>
+    <div id="seoOpenSpots" style="display:none;margin-top:12px;font-size:.8rem;color:#64748B;align-items:center;gap:8px;flex-wrap:wrap"></div>
     <div style="margin-top:14px;font-size:.78rem;color:#64748B">
       <span data-i18n-en>Cities covered:</span>
       <span data-i18n-hi>शामिल शहर:</span>
@@ -1290,7 +1296,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20260922d" defer></script>
+<script src="/assets/js/homepage.js?v=20260922e" defer></script>
 <script src="/assets/js/trending.js?v=20260922b" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260921j" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>

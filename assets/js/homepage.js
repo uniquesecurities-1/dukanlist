@@ -119,3 +119,76 @@ try {
 try {
 !function(){"use strict";function initStickySearch(){var mini=document.getElementById("stickyMiniSearch"),input=document.getElementById("stickyMiniInput"),btn=document.getElementById("stickyMiniBtn"),heroEl=document.querySelector(".hero-search-card");if(mini&&input&&btn&&heroEl){try{var lang=document.documentElement.getAttribute("data-lang")||"en";input.placeholder="hi"===lang?input.dataset.phHi||input.placeholder:input.dataset.phEn||input.placeholder}catch(_){}var threshold=0;recalc(),window.addEventListener("resize",recalc,{passive:!0});var lastShown=!1;window.addEventListener("scroll",function(){var shouldShow=window.scrollY>threshold+40;shouldShow!==lastShown&&(mini.classList.toggle("show",shouldShow),lastShown=shouldShow)},{passive:!0}),btn.addEventListener("click",doSearch),input.addEventListener("keydown",function(e){"Enter"===e.key&&(e.preventDefault(),doSearch())})}function recalc(){var rect=heroEl.getBoundingClientRect();threshold=window.scrollY+rect.bottom}function doSearch(){var q=(input.value||"").trim();if(q){var url="/search.html?q="+encodeURIComponent(q);try{var citySel=document.getElementById("citySelect");citySel&&citySel.value&&(url+="&city="+encodeURIComponent(citySel.value))}catch(_){}location.href=url}else input.focus()}}var CHIP_TO_SLUGS={doctor:["doctor","dentist","ayurveda","homeopathy","hospital","physiotherapist","eye-care","gynecologist","pediatrician"],mechanic:["mechanic-2w","mechanic-4w","car-service","tyre-shop","spare-parts","cycle-shop","puncture-shop","tractor-parts","battery-shop","car-ac-repair","denting-painting"],grocery:["kirana-grocery","general-store","wholesale-dealer"],salon:["salon-beauty","unisex-salon","mens-salon","beauty-parlour","salon","spa"],tutor:["tuition-coaching","coaching-institute","training-institute","skill-vocational","english-speaking","computer-classes","computer-class","art-craft-class"],medical:["pharmacy"],bakery:["bakery-cake"]};async function loadChipCounts(){try{if("undefined"==typeof ShopDB||!ShopDB||!ShopDB.client)return;var c=ShopDB.client,bizP=c.from("businesses").select("id, category_id, sub_category_id").eq("status","active"),catP=c.from("categories").select("id, slug"),bcP=c.from("business_categories").select("business_id, category_id"),[bizR,catR,bcR]=await Promise.all([bizP,catP,bcP]);if(bizR.error||catR.error)return;var idToSlug={};(catR.data||[]).forEach(function(r){idToSlug[r.id]=r.slug});var bizToSlugs={};(bizR.data||[]).forEach(function(b){var set={};if(b.category_id&&idToSlug[b.category_id])set[idToSlug[b.category_id]]=1;if(b.sub_category_id&&idToSlug[b.sub_category_id])set[idToSlug[b.sub_category_id]]=1;bizToSlugs[b.id]=set});(bcR&&bcR.data||[]).forEach(function(r){var s=idToSlug[r.category_id];if(s&&bizToSlugs[r.business_id])bizToSlugs[r.business_id][s]=1});var slugCount={};Object.keys(bizToSlugs).forEach(function(bid){Object.keys(bizToSlugs[bid]).forEach(function(s){slugCount[s]=(slugCount[s]||0)+1})}),document.querySelectorAll("[data-chip]").forEach(function(chip){var key=chip.getAttribute("data-chip"),slugs=CHIP_TO_SLUGS[key]||[],total=0;slugs.forEach(function(s){total+=slugCount[s]||0});var badge=chip.querySelector("[data-chip-count]");badge&&total>0&&(badge.textContent=total,badge.classList.add("show"))})}catch(e){console.warn("loadChipCounts:",e)}}function boot(){initStickySearch(),setTimeout(loadChipCounts,800)}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",boot):boot()}();
 } catch(e) { console.warn('[homepage.js chunk 11]', e); }
+
+/* ============================================================
+   v285 — "Popular searches in your area", from the real data
+   ============================================================
+   The twelve links under this heading were written by hand months ago.
+   Checked on 2026-09-22: seven of them (Medical Stores in Sirsa,
+   Restaurants in Bathinda, Electricians in Mansa, Grocery in Muktsar…)
+   led to pages with no shops at all, because 213 of the 217 listings
+   are in Mandi Dabwali. For a customer that is a dead end.
+
+   list_seo_combinations already knows which city+category pairs have
+   shops and how many. So: the chips are rebuilt from it, each showing
+   its count, and the empty ones move to a second line addressed to
+   shopkeepers — "#1 spot is open" is a good pitch, just not to someone
+   looking for a chemist.
+
+   Anything goes wrong — RPC error, no rows, no ShopDB — and the
+   hand-written links are left exactly as they are.
+   ============================================================ */
+!function(){
+  var PALETTE = [
+    ['#FFF7ED','#FED7AA','#9A3412'], ['#EFF6FF','#BFDBFE','#1E3A8A'],
+    ['#F0FDF4','#BBF7D0','#14532D'], ['#FDF2F8','#FBCFE8','#831843'],
+    ['#FEFCE8','#FDE68A','#713F12'], ['#FAF5FF','#DDD6FE','#5B21B6'],
+    ['#ECFDF5','#A7F3D0','#064E3B'], ['#F0F9FF','#BAE6FD','#075985']
+  ];
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+
+  async function build(){
+    var host = document.getElementById('seoCombos');
+    if (!host || typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
+
+    // Remember the hand-written links: the empty ones become the
+    // "be the first" line, so nothing written here is thrown away.
+    var written = Array.prototype.map.call(host.querySelectorAll('a'), function(a){
+      return { href: a.getAttribute('href'), text: (a.textContent || '').trim() };
+    });
+
+    var r = await ShopDB.client.rpc('list_seo_combinations', { p_limit: 12 });
+    var rows = (r && !r.error && Array.isArray(r.data)) ? r.data.filter(function(x){
+      return x && x.city_slug && x.category_slug && (x.shop_count || 0) > 0;
+    }) : [];
+    if (!rows.length) return;                      // leave the page as it was
+
+    var live = {};
+    host.innerHTML = rows.map(function(x, i){
+      var p = PALETTE[i % PALETTE.length];
+      var href = '/local/' + encodeURIComponent(x.city_slug) + '/' + encodeURIComponent(x.category_slug);
+      live[href] = true;
+      return '<a href="' + href + '" style="background:' + p[0] + ';border:1px solid ' + p[1] + ';color:' + p[2] +
+        ';padding:7px 13px;border-radius:99px;text-decoration:none;font-weight:600">' +
+        esc(x.category_name) + ' in ' + esc(x.city_name) +
+        ' <span style="opacity:.65;font-weight:700">' + (x.shop_count || 0) + '</span></a>';
+    }).join('');
+
+    var openSpots = written.filter(function(w){ return w.href && !live[w.href]; }).slice(0, 5);
+    var spotHost = document.getElementById('seoOpenSpots');
+    if (spotHost && openSpots.length){
+      var lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
+      spotHost.innerHTML = '<span style="font-weight:700;color:#9A3412">' +
+        (lang === 'hi' ? '👑 यहाँ पहली दुकान बनिए:' : '👑 Be the first here:') + '</span> ' +
+        openSpots.map(function(w){
+          return '<a href="' + esc(w.href) + '" style="color:#B45309;text-decoration:underline;text-underline-offset:3px;font-weight:600">' +
+            esc(w.text) + '</a>';
+        }).join(' · ');
+      spotHost.style.display = 'flex';
+    }
+  }
+
+  function start(){ setTimeout(function(){ build().catch(function(e){ console.warn('[seo strip]', e && e.message); }); }, 1200); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+}();
