@@ -210,6 +210,15 @@
     {
       "path": "/api/rank-snapshot",
       "schedule": "0 3 * * 1"
+    },
+    {
+      "path": "/api/smoke-test",
+      "schedule": "15 3 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/smoke-test.js": {
+      "maxDuration": 60
+    }
+  }
 }
