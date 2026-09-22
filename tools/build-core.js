@@ -31,7 +31,7 @@ const JS   = path.join(ROOT, 'assets', 'js');
 
 // Order matters inside each bundle: same relative order the pages used.
 const BUNDLES = {
-  'dl-core.js':       { attr: '',       files: ['supabase-init.js', 'hours.js', 'city-persist.js', 'mobile-nav.js'] },
+  'dl-core.js':       { attr: '',       files: ['dl-config.js', 'supabase-init.js', 'hours.js', 'city-persist.js', 'mobile-nav.js'] },
   'dl-core-defer.js': { attr: ' defer', files: ['error-reporter.js', 'photo-fit.js', 'nav.js', 'pwa.js', 'dl-city-cleanup.js'] },
 };
 const PAGES = ['index.html', 'business.html', 'search.html', 'browse.html'];

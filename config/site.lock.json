@@ -1,0 +1,28 @@
+{
+  "brand.name": "DukanList",
+  "brand.domain": "dukanlist.com",
+  "brand.url": "https://dukanlist.com",
+  "support.whatsapp": "9541223377",
+  "support.owner_name": "Deepak Singla",
+  "emails.privacy": "privacy@dukanlist.com",
+  "emails.noreply": "noreply@dukanlist.com",
+  "emails.legal": "legal@dukanlist.com",
+  "emails.support": "support@dukanlist.com",
+  "emails.moderation": "moderation@dukanlist.com",
+  "emails.partner": "partner@dukanlist.com",
+  "emails.hello": "hello@dukanlist.com",
+  "emails.contact": "contact@dukanlist.com",
+  "emails.admin": "admin@dukanlist.com",
+  "cities_fallback.list": [
+    "Mandi Dabwali",
+    "Sirsa",
+    "Bathinda",
+    "Kalanwali",
+    "Rori",
+    "Sangat",
+    "Goniana"
+  ],
+  "limits.max_photos": 8,
+  "supabase.url": "https://qazuyygrpqopwygxmvwq.supabase.co",
+  "supabase.anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I"
+}

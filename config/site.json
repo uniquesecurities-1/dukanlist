@@ -1,0 +1,43 @@
+{
+  "_readme": "Single source of truth for values that are repeated across the site. Change a value here, then run: node tools/apply-config.js — it rewrites every occurrence of the OLD value (from config/site.lock.json) with the new one across html/js/json/md, regenerates assets/js/dl-config.js (window.DL_CONFIG) and rebuilds the core bundle. Never edit the lock file by hand.",
+
+  "brand": {
+    "name": "DukanList",
+    "domain": "dukanlist.com",
+    "url": "https://dukanlist.com"
+  },
+
+  "support": {
+    "_note": "10 digits, no +91. The tool also rewrites the spaced form '95412 23377' and 'wa.me/91…'. The DB copy (is_admin / verify_mobile in db/*.sql) is NOT touched — change it with a migration.",
+    "whatsapp": "9541223377",
+    "owner_name": "Deepak Singla"
+  },
+
+  "emails": {
+    "privacy": "privacy@dukanlist.com",
+    "noreply": "noreply@dukanlist.com",
+    "legal": "legal@dukanlist.com",
+    "support": "support@dukanlist.com",
+    "moderation": "moderation@dukanlist.com",
+    "partner": "partner@dukanlist.com",
+    "hello": "hello@dukanlist.com",
+    "contact": "contact@dukanlist.com",
+    "admin": "admin@dukanlist.com"
+  },
+
+  "cities_fallback": {
+    "_note": "Used by register.html and panel/login.html when the DB city list has not loaded. Live list is geo_cities.",
+    "list": ["Mandi Dabwali", "Sirsa", "Bathinda", "Kalanwali", "Rori", "Sangat", "Goniana"]
+  },
+
+  "limits": {
+    "_note": "max_photos must match the DB trigger enforce_photo_limit (db/231). Change both.",
+    "max_photos": 8
+  },
+
+  "supabase": {
+    "_note": "Public values (anon key is safe to ship; RLS + db/225 column grants are the real lock). api/*.js read env vars first and fall back to these.",
+    "url": "https://qazuyygrpqopwygxmvwq.supabase.co",
+    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I"
+  }
+}

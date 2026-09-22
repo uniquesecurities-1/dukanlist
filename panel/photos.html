@@ -93,8 +93,8 @@
     <span data-i18n-hi>📸 दुकान की <span class="grad">फोटो</span></span>
   </h1>
   <p class="subtitle">
-    <span data-i18n-en>Upload up to 8 photos. Photos help customers trust your shop.</span>
-    <span data-i18n-hi>8 तक फोटो अपलोड करें। फोटो से customer trust बढ़ता है।</span>
+    <span data-i18n-en>Upload up to <span data-cfg="max_photos">8</span> photos. Photos help customers trust your shop.</span>
+    <span data-i18n-hi><span data-cfg="max_photos">8</span> तक फोटो अपलोड करें। फोटो से customer trust बढ़ता है।</span>
   </p>
 
   <div id="loading" style="text-align:center;padding:30px 0;color:var(--muted)">⏳ Loading...</div>
@@ -110,7 +110,7 @@
         </div>
       </div>
       <div class="pg-rules">
-        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Up to 8 photos</span><span data-i18n-hi>8 तक photos</span></b><div><span data-i18n-en>Outside · Inside · Products</span><span data-i18n-hi>बाहर · अंदर · Products</span></div></div></div>
+        <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Up to <span data-cfg="max_photos">8</span> photos</span><span data-i18n-hi><span data-cfg="max_photos">8</span> तक photos</span></b><div><span data-i18n-en>Outside · Inside · Products</span><span data-i18n-hi>बाहर · अंदर · Products</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Max 5 MB each</span><span data-i18n-hi>अधिकतम 5 MB</span></b><div><span data-i18n-en>Auto-optimized to fast-load size</span><span data-i18n-hi>Auto-optimize होंगी</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>JPG, PNG, WebP</span><span data-i18n-hi>JPG, PNG, WebP</span></b><div><span data-i18n-en>Phone camera works great</span><span data-i18n-hi>Phone camera OK</span></div></div></div>
         <div class="pg-rule"><div class="pg-rule-ico">✓</div><div class="pg-rule-text"><b><span data-i18n-en>Good lighting</span><span data-i18n-hi>अच्छी रोशनी</span></b><div><span data-i18n-en>Day time preferred</span><span data-i18n-hi>दिन में लें</span></div></div></div>
@@ -177,7 +177,9 @@
 
 const CLOUDINARY_CLOUD_NAME = 'dukanlist';
 const CLOUDINARY_UPLOAD_PRESET = 'dukanlist_shops';
-const MAX_PHOTOS = 8;   // v273: raised from 5 to 8 (client + db/231 trigger)
+const MAX_PHOTOS = 8;   // config/site.json limits.max_photos — change there, run tools/apply-config.js (DB trigger db/231 must match)
+// v277: every visible copy of the number is filled from MAX_PHOTOS, so it lives in one place.
+document.querySelectorAll("[data-cfg=max_photos]").forEach(function(el){ el.textContent = MAX_PHOTOS; });
 
 let STATE = {
   businessId: null,
@@ -429,7 +431,7 @@ function updateCountPill(){
   if (n >= MAX_PHOTOS) {
     pill.classList.add('full');
     btn.disabled = true;
-    btn.innerHTML = '<span data-i18n-en>✓ Maximum 8 photos reached</span><span data-i18n-hi>✓ अधिकतम 8 photos पूरी</span>';
+    btn.innerHTML = '<span data-i18n-en>✓ Maximum ' + MAX_PHOTOS + ' photos reached</span><span data-i18n-hi>✓ अधिकतम ' + MAX_PHOTOS + ' photos पूरी</span>';
   } else if (n >= 3) {
     pill.classList.add('warn');
     btn.disabled = false;
