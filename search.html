@@ -567,7 +567,6 @@
 
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=20260921">
-<script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
 </head>
 <body class="search-page-desktop">
 <div class="sticky-search" id="stickySearch" aria-hidden="true">
@@ -760,12 +759,11 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase-init.js?v=20260921e"></script>
+<script src="/assets/js/dl-core.js?v=1d884d39d3"></script><!-- v276: supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script src="/assets/js/share.js?v=20260921e"></script>
 <script src="/assets/js/filter-chips.js?v=20260920"></script>
 <script src="/assets/js/autocomplete.js?v=20260921g"></script>
 <script src="/assets/js/skeleton.js?v=20260920"></script>
-<script src="/assets/js/install-banner.js?v=20260921c"></script>
 <script src="/assets/js/ptr.js?v=20260920"></script>
 <script src="/assets/js/share-app.js?v=20260920"></script>
 <script src="/assets/js/compare.js?v=20260920"></script>
@@ -773,13 +771,9 @@
 <script src="/assets/js/announcements.js?v=20260920"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanAutocomplete) DukanAutocomplete.attach('q'); });</script>
 <script src="/assets/js/voice.js?v=20260920"></script>
-<script src="/assets/js/mobile-nav.js?v=20260921e"></script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (window.DukanVoice && DukanVoice.supported()){ const inp = document.getElementById('q'); if (inp){ const b = document.createElement('span'); b.innerHTML = DukanVoice.btn('q', { size: 'md' }); b.style.cssText = 'position:absolute;right:14px;top:50%;transform:translateY(-50%)'; const parent = inp.parentElement; if (parent){ parent.style.position = 'relative'; inp.style.paddingRight = '54px'; parent.appendChild(b); } } } });</script>
-<script src="/assets/js/hours.js?v=20260920"></script>
-<script src="/assets/js/nav.js?v=20260921b" defer></script>
 <script src="/assets/js/shortlist.js?v=20260920" defer></script>
 <script src="/assets/js/recently-viewed.js?v=20260921k" defer></script>
-<script src="/assets/js/pwa.js?v=20260921c" defer></script>
 <script src="/assets/js/geo.js?v=20260920"></script>
 <script>
 function setLang(lang){
@@ -2028,9 +2022,8 @@ if (window.DukanPTR){
 window.addEventListener('popstate', runSearch);
 </script>
 
-<script src="/assets/js/city-persist.js?v=20260920"></script>
 
-<script src="/assets/js/error-reporter.js?v=20260920" defer></script>
+<script src="/assets/js/dl-core-defer.js?v=973867257a" defer></script><!-- v276: error-reporter + photo-fit + nav + pwa + dl-city-cleanup (tools/build-core.js) -->
 
 <script>
 // === VIRAL: Recently-viewed strip + Share search results ===
@@ -2098,6 +2091,5 @@ window.addEventListener('popstate', runSearch);
 })();
 </script>
 <script src="/assets/js/dl-search-address.js?v=20260921g" defer></script>
-<script src="/assets/js/dl-city-cleanup.js?v=20260921" defer></script>
 </body>
 </html>

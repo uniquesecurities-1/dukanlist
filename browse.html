@@ -210,7 +210,6 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
 
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=20260921">
-<script src="/assets/js/photo-fit.js?v=20260921e" defer></script>
 </head>
 <body>
 
@@ -296,11 +295,7 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase-init.js?v=20260921e"></script>
-<script src="/assets/js/mobile-nav.js?v=20260921e"></script>
-<script src="/assets/js/hours.js?v=20260920"></script>
-<script src="/assets/js/nav.js?v=20260921b" defer></script>
-<script src="/assets/js/pwa.js?v=20260921c" defer></script>
+<script src="/assets/js/dl-core.js?v=1d884d39d3"></script><!-- v276: supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script>
 function setLang(lang){
   if (lang!=='en'&&lang!=='hi') lang='en';
@@ -454,14 +449,11 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<script src="/assets/js/city-persist.js?v=20260920"></script>
 <script src="/assets/js/compare.js?v=20260920"></script>
-<script src="/assets/js/install-banner.js?v=20260921c"></script>
 <script src="/assets/js/share-app.js?v=20260920"></script>
 <script src="/assets/js/trust-tier.js?v=20260920"></script>
 
-<script src="/assets/js/error-reporter.js?v=20260920" defer></script>
+<script src="/assets/js/dl-core-defer.js?v=973867257a" defer></script><!-- v276: error-reporter + photo-fit + nav + pwa + dl-city-cleanup (tools/build-core.js) -->
 <script src="/assets/js/dl-search-address.js?v=20260921g" defer></script>
-<script src="/assets/js/dl-city-cleanup.js?v=20260921" defer></script>
 </body>
 </html>
