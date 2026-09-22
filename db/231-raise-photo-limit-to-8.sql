@@ -42,7 +42,9 @@ $$;
 COMMIT;
 
 -- Confirm the new limit is in the live function body.
+-- (pg_proc.prosrc, not ::regprocedure — the cast needs '()' and errored 22P02.)
 SELECT
-  CASE WHEN pg_get_functiondef('public.enforce_photo_limit'::regprocedure) LIKE '%>= 8%'
+  CASE WHEN prosrc LIKE '%>= 8%'
        THEN 'OK — limit is now 8'
-       ELSE 'CHECK — still not 8' END AS photo_limit_status;
+       ELSE 'CHECK — still not 8' END AS photo_limit_status
+FROM pg_proc WHERE proname = 'enforce_photo_limit';
