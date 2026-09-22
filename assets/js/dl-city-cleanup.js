@@ -34,6 +34,7 @@
       if (sel.options.length < 2) continue;                  // not populated yet
       citySelectsSeeded.push(sel);
       if (sel.value) continue;                               // visitor already chose
+      if (window.DukanCity && DukanCity.chosen()) continue; // v278: picked 'all' on purpose — leave it blank
       var opts = sel.options;
       for (var j = 0; j < opts.length; j++){
         var v = (opts[j].value || '').toLowerCase();

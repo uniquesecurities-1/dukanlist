@@ -677,7 +677,7 @@
 })();
 ;
 
-/* ---- dl-city-cleanup.js (3e541bb3c8) ---- */
+/* ---- dl-city-cleanup.js (c1b5f54181) ---- */
 /* DL CITY CLEANUP (2026-09 v23)
    --------------------------------
    Left over from the "Golden Pages of Dabwali" phase, when the site was
@@ -714,6 +714,7 @@
       if (sel.options.length < 2) continue;                  // not populated yet
       citySelectsSeeded.push(sel);
       if (sel.value) continue;                               // visitor already chose
+      if (window.DukanCity && DukanCity.chosen()) continue; // v278: picked 'all' on purpose — leave it blank
       var opts = sel.options;
       for (var j = 0; j < opts.length; j++){
         var v = (opts[j].value || '').toLowerCase();

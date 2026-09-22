@@ -165,7 +165,7 @@
 <!-- Premium polish layer — loads after main.css. Safe to delete file to revert. -->
 <link rel="stylesheet" href="/assets/css/public-premium.css?v=20260921">
 
-<script src="/assets/js/dl-core-defer.js?v=973867257a" defer></script><!-- v276: error-reporter + photo-fit + nav + pwa + dl-city-cleanup (tools/build-core.js) -->
+<script src="/assets/js/dl-core-defer.js?v=8f1fd5563b" defer></script><!-- v276: error-reporter + photo-fit + nav + pwa + dl-city-cleanup (tools/build-core.js) -->
 
 <style>
   /* v252 hero trim.
@@ -484,7 +484,7 @@
             return setTimeout(load, 400);
           }
           var r = await ShopDB.client.rpc('get_top_for_seo', {
-            p_category_slug: null, p_city_slug: 'mandi-dabwali', p_limit: 4
+            p_category_slug: null, p_city_slug: (window.DukanCity ? DukanCity.slugOrDefault('mandi-dabwali') : 'mandi-dabwali'), p_limit: 4
           });
           if (r.error) throw r.error;
           var items = (r.data && r.data.items) || [];
@@ -1136,7 +1136,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/dl-core.js?v=b1b8d5ecf3"></script><!-- v276: dl-config + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
+<script src="/assets/js/dl-core.js?v=3b9d6e921c"></script><!-- v276: dl-config + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script src="/assets/js/daily-buzz.js?v=20260921g" defer></script>
 <!-- geo-nearby.js disabled — open-near-you RPC was failing intermittently -->
 <!-- <script src="/assets/js/geo-nearby.js?v=20260921g" defer></script> -->
@@ -1244,8 +1244,9 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== LOCALITY SELECTOR (first-visit modal) ===== -->
 <div id="localityModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:10001;align-items:center;justify-content:center;padding:20px;animation:locFade .3s ease-out">
-  <div style="background:#fff;border-radius:20px;max-width:520px;width:100%;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:locSlide .3s ease-out">
+  <div style="background:#fff;border-radius:20px;max-width:520px;width:100%;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:locSlide .3s ease-out;position:relative">
     <div style="text-align:center;margin-bottom:20px">
+      <button type="button" onclick="dismissLocalityPicker()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:#F1F5F9;border:none;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;color:#475569">✕</button>
       <div style="font-size:2.6rem;margin-bottom:8px">📍</div>
       <h2 style="font-size:1.4rem;font-weight:900;color:#0F172A;margin-bottom:6px;letter-spacing:-.01em;font-family:'Manrope',sans-serif">
         <span data-i18n-en>Pick your area</span><span data-i18n-hi>अपना इलाका चुनें</span>
@@ -1255,15 +1256,15 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
         <span data-i18n-hi>आस-पास के व्यवसाय देखें। कभी भी बदल सकते हैं।</span>
       </p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">
-      <button onclick="pickLocality('mandi-dabwali','Mandi Dabwali')" class="loc-btn">🏪 Mandi Dabwali</button>
-      <button onclick="pickLocality('sirsa','Sirsa')" class="loc-btn">🏪 Sirsa</button>
-      <button onclick="pickLocality('bathinda','Bathinda')" class="loc-btn">🏪 Bathinda</button>
-      <button onclick="pickLocality('goniana','Goniana')" class="loc-btn">🏪 Goniana</button>
-      <button onclick="pickLocality('rori','Rori')" class="loc-btn">🏪 Rori</button>
-      <button onclick="pickLocality('kalanwali','Kalanwali')" class="loc-btn">🏪 Kalanwali</button>
+    <div data-loc-grid style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">
+      <button onclick="pickLocality('mandi-dabwali')" class="loc-btn">🏪 Mandi Dabwali</button>
+      <button onclick="pickLocality('sirsa')" class="loc-btn">🏪 Sirsa</button>
+      <button onclick="pickLocality('bathinda')" class="loc-btn">🏪 Bathinda</button>
+      <button onclick="pickLocality('goniana')" class="loc-btn">🏪 Goniana</button>
+      <button onclick="pickLocality('rori')" class="loc-btn">🏪 Rori</button>
+      <button onclick="pickLocality('kalanwali')" class="loc-btn">🏪 Kalanwali</button>
     </div>
-    <button onclick="pickLocality('all','All 4 districts (Sirsa, Bathinda, Mansa, Muktsar)')" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3)">
+    <button onclick="pickLocality('all')" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FFB200);color:#fff;border:none;padding:13px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.96rem;letter-spacing:.02em;box-shadow:0 4px 14px rgba(255,107,26,0.3)">
       🌐 <span data-i18n-en>Show me ALL listings</span><span data-i18n-hi>सभी लिस्टिंग दिखाओ</span>
     </button>
   </div>
@@ -1286,7 +1287,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
 <script src="/assets/js/image-opt.js?v=20260615-fix" defer></script>
-<script src="/assets/js/homepage.js?v=20260921h" defer></script>
+<script src="/assets/js/homepage.js?v=20260922a" defer></script>
 <script src="/assets/js/trending.js?v=20260921g" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260921j" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
