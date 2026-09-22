@@ -2748,20 +2748,36 @@ function render(){
   // Gallery — merge legacy (businesses.photos array) + new (business_photos Cloudinary, pre-fetched in loadBusiness)
   const legacyPhotos = (b.photos || []).filter(u => typeof u === 'string' && u.length > 0);
   const cloudPhotos = Array.isArray(b._cloudPhotos) ? b._cloudPhotos : [];
-  const photos = [...cloudPhotos, ...legacyPhotos];
-  // Same order and length as photos[], so thumbs[i] always matches photos[i].
-  // Legacy Supabase-storage URLs cannot be transformed, so they fall back to
-  // the original — those are the older listings and there are few of them.
+  // v280: the two lists used to be disjoint — businesses.photos held raw
+  // Supabase-storage URLs, business_photos held Cloudinary ones — so merging
+  // them was safe. After the 2026-09-22 migration businesses.photos holds the
+  // SAME Cloudinary photos, and every picture showed up twice in the strip.
+  // Two URLs are the same picture when the part from /upload/ onward matches
+  // once the transformation segment (w_1400,q_auto,f_auto etc.) is dropped.
+  const photoKey = (u) => {
+    const m = String(u).match(/\/image\/upload\/(?:[^/]*,[^/]*\/)?(v\d+\/.+)$/);
+    return m ? m[1] : String(u);
+  };
+  // thumbs[] is built in step with photos[], so thumbs[i] always matches
+  // photos[i] however many were dropped as duplicates.
+  // v269: a legacy URL can be Cloudinary too, and then it gets the same w_160
+  // treatment; a Supabase-storage URL cannot be transformed and is left alone.
   const cloudThumbs = Array.isArray(b._cloudThumbs) ? b._cloudThumbs : [];
-  // v269: legacy photos (the businesses.photos array) can be Cloudinary too —
-  // the 5th thumbnail on Regal Foods was one, arriving at 960x1200 for a 56px
-  // box. If the URL has an /upload/ segment it gets the same w_160 treatment;
-  // anything else (Supabase storage) is left alone as before.
-  const legacyThumbs = legacyPhotos.map(u =>
+  const thumbFor = (u) =>
     /res\.cloudinary\.com\/[^/]+\/image\/upload\//.test(u)
       ? u.replace(/\/upload\/(?:[^/]*\/)?(v\d+\/)/, '/upload/w_160,h_160,c_fill,q_auto,f_auto/$1')
-      : u);
-  const thumbs = [...(cloudThumbs.length === cloudPhotos.length ? cloudThumbs : cloudPhotos), ...legacyThumbs];
+      : u;
+  const seenPhoto = new Set();
+  const photos = [], thumbs = [];
+  const add = (url, thumb) => {
+    const k = photoKey(url);
+    if (seenPhoto.has(k)) return;
+    seenPhoto.add(k);
+    photos.push(url);
+    thumbs.push(thumb || url);
+  };
+  cloudPhotos.forEach((u, i) => add(u, cloudThumbs.length === cloudPhotos.length ? cloudThumbs[i] : u));
+  legacyPhotos.forEach(u => add(u, thumbFor(u)));
   // v48: Merge into BIZ.photos so swapImg() + openLightbox() + lightboxPrev/Next
   // can access all photos (they read from BIZ.photos, not local var).
   // Without this, clicking thumbnail #2 tries photos[2] which was undefined → 404 broken image.
