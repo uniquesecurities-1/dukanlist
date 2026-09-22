@@ -24,12 +24,12 @@
 
   function pickThumb(b){
     // Prefer Cloudinary featured/first, fallback to first legacy photo
-    if (b._cloudPhoto) {
-      return b._cloudPhoto.replace('/upload/', '/upload/w_400,h_240,c_fill,q_auto,f_auto/');
-    }
-    if (Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string') {
-      return b.photos[0];
-    }
+    // v281: both branches are Cloudinary now — resize either way, so the
+    // legacy fallback stops shipping a full-size original into a small card.
+    var src = b._cloudPhoto ||
+      ((Array.isArray(b.photos) && b.photos.length && typeof b.photos[0] === 'string') ? b.photos[0] : null);
+    if (src) return window.DukanImg ? DukanImg.opt(src, { width: 400, height: 240, crop: 'fill' })
+                                    : src.replace('/upload/', '/upload/w_400,h_240,c_fill,q_auto,f_auto/');
     return null;
   }
 

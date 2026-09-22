@@ -499,7 +499,7 @@
             // choosing: at this size the signboards still read fine cropped,
             // and four matching cards is the whole point of the strip.
             var img = b.photo
-              ? '<img class="hts-img" data-fit-skip="1" src="' + esc(b.photo) + '" alt="' + esc(b.name) + '" loading="lazy">'
+              ? '<img class="hts-img" data-fit-skip="1" width="250" height="156" src="' + esc(window.DukanImg ? DukanImg.strip(b.photo) : b.photo) + '" alt="' + esc(b.name) + '" loading="lazy">'
               : '<div class="hts-ph">\u{1F3EA}</div>';
             var rating = (b.rating_count > 0)
               ? '\u2605 ' + Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ')'
@@ -1136,7 +1136,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/dl-core.js?v=3b9d6e921c"></script><!-- v276: dl-config + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
+<script src="/assets/js/dl-core.js?v=a2b7ac4c20"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script src="/assets/js/daily-buzz.js?v=20260921g" defer></script>
 <!-- geo-nearby.js disabled — open-near-you RPC was failing intermittently -->
 <!-- <script src="/assets/js/geo-nearby.js?v=20260921g" defer></script> -->
@@ -1286,7 +1286,6 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/image-opt.js?v=20260615-fix" defer></script>
 <script src="/assets/js/homepage.js?v=20260922a" defer></script>
 <script src="/assets/js/trending.js?v=20260921g" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260921j" defer></script>

@@ -30,7 +30,7 @@
 
       grid.innerHTML = r.data.map(function (b, i) {
         var photo = b.photo
-          ? (window.DukanImg ? DukanImg.opt(b.photo, { width: 400, quality: 75 }) : b.photo)
+          ? (window.DukanImg ? DukanImg.card(b.photo) : b.photo)
           : null;
         var name = (isHi && b.name_hi) ? b.name_hi : b.name;
         var flameRank = i < 3
