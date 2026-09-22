@@ -400,7 +400,8 @@
       <div class="hsc-row hsc-row-c">
         <span class="hsc-ico">📍</span>
         <select name="city" id="citySelect">
-          <option value="" data-i18n-en="Select city" data-i18n-hi="शहर चुनें">Select city</option>
+          <!-- v286: blank means "every town", not "nothing picked" — search.html has said "All cities" here for months and a visitor who taps "Show me ALL listings" in the area modal lands on exactly this value. -->
+          <option value="" data-i18n-en="All cities" data-i18n-hi="सभी शहर">All cities</option>
           <option value="mandi-dabwali" selected>Mandi Dabwali</option>
           <option value="sirsa">Sirsa</option>
           <option value="ellenabad">Ellenabad</option>
@@ -1298,7 +1299,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 <!-- Bundled inline scripts extracted to external file for caching -->
 <script src="/assets/js/homepage.js?v=20260922e" defer></script>
 <script src="/assets/js/trending.js?v=20260922b" defer></script>
-<script src="/assets/js/dl-golden-render.js?v=20260921j" defer></script>
+<script src="/assets/js/dl-golden-render.js?v=20260922a" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
 <script>
 /* ============================================================
