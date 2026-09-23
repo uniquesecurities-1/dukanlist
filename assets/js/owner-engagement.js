@@ -99,11 +99,14 @@
     const now = new Date();
     const yesterdayStart = new Date(now); yesterdayStart.setDate(yesterdayStart.getDate() - 1); yesterdayStart.setHours(0,0,0,0);
     const yesterdayEnd = new Date(yesterdayStart); yesterdayEnd.setHours(23,59,59,999);
+    // v291: this read 'leads'. The table is leads_log (db/01-schema). The
+    // whole block sat inside a try/catch that returned null, so the owner's
+    // "kal kya hua" card has been silently empty since it shipped.
     try {
       const [{ count: viewC }, { count: callC }, { count: waC }, { count: revC }] = await Promise.all([
-        c.from('leads').select('id', { count:'exact', head:true }).eq('business_id', biz.id).eq('action', 'view').gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString()),
-        c.from('leads').select('id', { count:'exact', head:true }).eq('business_id', biz.id).eq('action', 'call').gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString()),
-        c.from('leads').select('id', { count:'exact', head:true }).eq('business_id', biz.id).in('action', ['whatsapp', 'wa']).gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString()),
+        c.from('leads_log').select('id', { count:'exact', head:true }).eq('business_id', biz.id).eq('action', 'view').gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString()),
+        c.from('leads_log').select('id', { count:'exact', head:true }).eq('business_id', biz.id).eq('action', 'call').gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString()),
+        c.from('leads_log').select('id', { count:'exact', head:true }).eq('business_id', biz.id).in('action', ['whatsapp', 'wa']).gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString()),
         c.from('reviews').select('id', { count:'exact', head:true }).eq('business_id', biz.id).gte('created_at', yesterdayStart.toISOString()).lte('created_at', yesterdayEnd.toISOString())
       ]);
       return { views: viewC || 0, calls: callC || 0, wa: waC || 0, reviews: revC || 0 };

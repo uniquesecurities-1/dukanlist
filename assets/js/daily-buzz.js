@@ -251,7 +251,8 @@ function openViewer(items, startIdx, supaClient){
 
     // Bump view count
     if (supaClient) {
-      try { supaClient.rpc('story_inc_view', { p_story_id: s.id }); } catch(_){}
+      // v291: .then() or the request is never sent (supabase-js v2 builders are lazy)
+      try { supaClient.rpc('story_inc_view', { p_story_id: s.id }).then(null, function(){}); } catch(_){}
     }
 
     // Progress bars

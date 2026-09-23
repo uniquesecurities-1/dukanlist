@@ -2227,7 +2227,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/dl-core.js?v=a2b7ac4c20"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
-<script src="/assets/js/daily-buzz.js?v=20260921g" defer></script>
+<script src="/assets/js/daily-buzz.js?v=20260923a" defer></script>
 <script src="/assets/js/share.js?v=20260921e"></script>
 <script src="/assets/js/breadcrumbs.js?v=20260920"></script>
 <script src="/assets/js/announcements.js?v=20260920"></script>
@@ -2338,8 +2338,12 @@ async function loadBusiness(){
   // Re-balance again after Cloudinary photos may have altered heights
   setTimeout(function(){ try { balanceColumns(); } catch(_){} }, 1200);
 
-  // Log view (fire and forget)
-  try { c.rpc('log_lead', { p_business_id: BIZ.id, p_action: 'view' }); } catch(_) {}
+  // Log view. v291: supabase-js v2 only sends the request when the builder is
+  // awaited or .then()'d — a bare c.rpc(...) statement builds the query and
+  // throws it away. This line has been here for months and every shop still
+  // read view_count = 0; the call/WhatsApp logger three thousand lines below
+  // does await, which is why 107 of those were recorded and not one view.
+  try { c.rpc('log_lead', { p_business_id: BIZ.id, p_action: 'view' }).then(null, function(){}); } catch(_) {}
 
   // Load all categories (multi-cat badges), reviews and deals in parallel
   loadCategoryBadges(BIZ.id);
@@ -2392,7 +2396,7 @@ async function loadDealsForShop(slug){
       item.addEventListener('click', () => {
         const dealId = item.getAttribute('data-deal-id');
         if (dealId) {
-          try { c.rpc('track_deal_click', { p_deal_id: dealId }); } catch(_){}
+          try { c.rpc('track_deal_click', { p_deal_id: dealId }).then(null, function(){}); } catch(_){}   // v291: see note on the view log — needs .then() to be sent
         }
       });
     });
