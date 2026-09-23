@@ -110,6 +110,46 @@ async function checkHomepage(fails){
   if (html.length < 40000)                   fails.push({ check: 'homepage', msg: '/ is only ' + html.length + ' bytes — page shell, not the site' });
 }
 
+// v289: on 15 Jul 2026 an automated stylesheet stamp wrote a <link> into
+// the middle of a JS string in admin/quick-add-shop.html. The string never
+// closed, that page's whole inline script failed to parse, and every button
+// on the field team's main tool was dead for ten weeks before anyone
+// noticed. A page can return a healthy 200 and still be broken, so check
+// that the inline scripts on the pages that matter actually parse.
+const PARSE_PAGES = [
+  '/admin/quick-add-shop.html',
+  '/panel/photos.html',
+  '/panel/dashboard.html',
+  '/register.html',
+  '/business.html',
+];
+
+async function checkInlineScripts(fails){
+  let checked = 0;
+  for (const p of PARSE_PAGES){
+    try {
+      const r = await fetch(ORIGIN + p);
+      if (!r.ok){ fails.push({ check: 'parse', msg: p + ' returned ' + r.status }); continue; }
+      const html = await r.text();
+      const re = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g;
+      let m, block = 0;
+      while ((m = re.exec(html))){
+        block++;
+        const body = m[1];
+        if (!body.trim()) continue;
+        try { new Function(body); }
+        catch (e) {
+          fails.push({ check: 'parse', msg: p + ' inline script #' + block + ' does not parse — ' + (e.message || e) });
+        }
+      }
+      checked++;
+    } catch (e) {
+      fails.push({ check: 'parse', msg: p + ' THREW ' + (e && e.message || e) });
+    }
+  }
+  return { pages: PARSE_PAGES.length, checked };
+}
+
 async function checkSecurity(fails){
   // Every one of these must be 401/403 for anon. A 200 means db/225's
   // lock was undone (a table-level GRANT re-applied, most likely).
@@ -161,6 +201,7 @@ module.exports = async (req, res) => {
     summary.sitemap  = await checkSitemap(fails);
     summary.rpcs     = await checkRpcs(fails);
     await checkHomepage(fails);
+    summary.inlineScripts = await checkInlineScripts(fails);
     await checkSecurity(fails);
   } catch (e) {
     fails.push({ check: 'runner', msg: 'smoke test itself threw: ' + (e && e.message || e) });
