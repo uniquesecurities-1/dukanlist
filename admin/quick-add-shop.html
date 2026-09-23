@@ -161,6 +161,38 @@
       <h3>✅ Added Successfully!</h3>
       <div class="shop-name" id="successShopName"></div>
 
+      <!-- =========================================================
+           v289 — finish the page BEFORE leaving the shop
+           ---------------------------------------------------------
+           On 2026-09-23: 220 live shops, but only 56 had a photo and
+           60 had timings, because this page could not add either and
+           the owner has to claim + log in to do it himself — which
+           he does not. So the boy standing in the shop sees a page
+           with a name and a number on it and nothing else, and that
+           is what he shows the shopkeeper. Nobody shares that.
+           Two taps here and the page is worth showing.
+           ========================================================= -->
+      <div id="fieldFinish" style="background:#fff;border:2px dashed #FB923C;border-radius:12px;padding:14px;margin:14px 0;text-align:left">
+        <div style="font-weight:900;color:#9A3412;font-size:.95rem;margin-bottom:2px">🎯 Jaane se pehle page poora karo</div>
+        <div style="font-size:.78rem;color:#7C2D12;margin-bottom:12px;line-height:1.45">Photo aur timing ke bina page khali lagta hai — dukaandaar use kisi ko nahi dikhata.</div>
+
+        <button type="button" class="btn-sec" id="ffPhotoBtn" onclick="ffAddPhotos()" style="margin-bottom:6px;background:#FFF7ED;border-color:#FDBA74;color:#9A3412">📸 Dukaan ki photo lo (camera)</button>
+        <div id="ffPhotoStatus" style="font-size:.78rem;font-weight:700;margin-bottom:10px;min-height:1em"></div>
+
+        <div style="font-size:.75rem;font-weight:800;color:#7C2D12;text-transform:uppercase;margin-bottom:6px">⏰ Roz ka time</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <input type="time" id="ffOpen" value="09:00" style="flex:1;padding:9px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit">
+          <span style="font-weight:800;color:#7C2D12">se</span>
+          <input type="time" id="ffClose" value="21:00" style="flex:1;padding:9px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit">
+        </div>
+        <div style="font-size:.75rem;font-weight:800;color:#7C2D12;text-transform:uppercase;margin-bottom:6px">Chhutti ka din (tap karo)</div>
+        <div id="ffDays" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
+        <button type="button" class="btn-sec" onclick="ffSaveHours()" style="margin-bottom:6px">⏰ Timing save karo</button>
+        <div id="ffHoursStatus" style="font-size:.78rem;font-weight:700;margin-bottom:10px;min-height:1em"></div>
+
+        <a id="ffViewLive" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;background:#0F172A;color:#fff;padding:11px;border-radius:9px;font-weight:800;text-decoration:none;font-size:.88rem">🔗 Dukaandaar ko page dikhao</a>
+      </div>
+
       <div style="font-size:.75rem;color:#065F46;font-weight:800;text-transform:uppercase;margin-bottom:6px">📋 Claim URL</div>
       <div class="claim-url" id="successClaimUrl"></div>
 
@@ -323,6 +355,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://upload-widget.cloudinary.com/global/all.js" async></script>
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script src="/assets/js/admin-common.js?v=20260921e"></script>
 <script>
@@ -800,6 +833,7 @@ async function submitSingle(){
       mobile:      mobile,
       area:        area,
       claim_url:   data.claim_url,
+      slug:        data.slug,          // v289: to open the live page in front of the owner
       email:       email || null,
       inviteMsg:   ''
     };
@@ -865,6 +899,7 @@ function showSuccess(){
   document.getElementById('singleFormCard').style.display = 'none';
   document.getElementById('successCard').classList.add('show');
   document.getElementById('successShopName').textContent = '🏪 ' + LAST_RESULT.name;
+  ffResetPanel();   // v289: fresh photo/timing panel for this shop
   document.getElementById('successClaimUrl').textContent = LAST_RESULT.claim_url;
   // v225: show whether the invite email actually went out
   var inv = document.getElementById('inviteStatus');
@@ -1265,8 +1300,12 @@ function openCategorySlugList(){
     'pre{white-space:pre-wrap;color:#cbd5e1}' +
     '.hint{color:#94a3b8;font-size:12px;margin-bottom:14px;font-family:sans-serif}' +
     '.match{color:#10B981;font-weight:700}' +
-    '</style><link rel="stylesheet" href="/assets/css/dl-admin-simple.css?v=1784106000">
-</head><body>');
+    // v289 FIX: a site-wide stylesheet-stamping pass (15 Jul 2026) inserted this
+    // <link> INSIDE the JS string and left the quote unclosed, so this whole
+    // inline <script> failed to parse — every button on Quick Add has been dead
+    // since that day. Closing the string is the entire fix.
+    '</style><link rel="stylesheet" href="/assets/css/dl-admin-simple.css?v=1784106000">' +
+    '</head><body>');
   win.document.write('<h1>📋 ' + ALL_CATEGORIES.length + ' Valid Category Slugs</h1>');
   win.document.write('<div class="hint">CSV ke category_slug column me ye exact slug daalo. Search karo:</div>');
   win.document.write('<input type="text" class="search" id="searchInput" placeholder="🔍 Filter (e.g. gas, doctor, tailor)...">');
@@ -1285,6 +1324,141 @@ function openCategorySlugList(){
 
 function esc(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+
+// ============================================================
+// v289 — FIELD FINISH: photos + timings, from the boy's own phone
+// ============================================================
+// Why this lives in Quick Add and not in the owner panel: the owner
+// panel needs the shopkeeper to claim his listing, verify an email and
+// log in. Measured on 2026-09-23, that path has left 75% of shops with
+// no photo and 73% with no timings. The person actually standing in the
+// shop is our boy, with a camera in his hand. So he does it.
+//
+// Photos go to the same Cloudinary folder the owner panel uses, so when
+// the shopkeeper does log in later he sees them and can delete or
+// reorder them as his own. business_photos allows this insert under the
+// admin_all_photos policy; the db/222 trigger copies the URLs into
+// businesses.photos by itself.
+// ============================================================
+var FF_CLOUD_NAME = 'dukanlist';          // same as panel/photos.html
+var FF_UPLOAD_PRESET = 'dukanlist_shops'; // same as panel/photos.html
+var FF_DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
+var FF_DAY_LABEL = { mon:'Som', tue:'Mang', wed:'Budh', thu:'Guru', fri:'Shukr', sat:'Shani', sun:'Ravi' };
+var FF_OFF_DAYS = [];
+var FF_PHOTO_COUNT = 0;
+var FF_WIDGET = null;
+
+function ffSetStatus(id, msg, ok){
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = ok === false ? '#B91C1C' : (ok === true ? '#047857' : '#7C2D12');
+}
+
+function ffRenderDays(){
+  var host = document.getElementById('ffDays');
+  if (!host) return;
+  host.innerHTML = FF_DAYS.map(function(d){
+    var on = FF_OFF_DAYS.indexOf(d) !== -1;
+    return '<button type="button" data-ffday="' + d + '" style="padding:6px 11px;border-radius:99px;font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;border:1.5px solid ' +
+      (on ? '#DC2626;background:#FEE2E2;color:#991B1B' : '#E2E8F0;background:#fff;color:#475569') + '">' +
+      FF_DAY_LABEL[d] + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(host.querySelectorAll('[data-ffday]'), function(b){
+    b.onclick = function(){
+      var d = b.getAttribute('data-ffday');
+      var i = FF_OFF_DAYS.indexOf(d);
+      if (i === -1) FF_OFF_DAYS.push(d); else FF_OFF_DAYS.splice(i, 1);
+      ffRenderDays();
+    };
+  });
+}
+
+function ffResetPanel(){
+  FF_OFF_DAYS = [];
+  FF_PHOTO_COUNT = 0;
+  FF_WIDGET = null;                       // new shop -> new Cloudinary folder
+  ffSetStatus('ffPhotoStatus', '');
+  ffSetStatus('ffHoursStatus', '');
+  ffRenderDays();
+  var a = document.getElementById('ffViewLive');
+  if (a) a.href = LAST_RESULT && LAST_RESULT.slug ? ('https://dukanlist.com/' + LAST_RESULT.slug) : '#';
+  var o = document.getElementById('ffOpen'), c = document.getElementById('ffClose');
+  if (o) o.value = '09:00';
+  if (c) c.value = '21:00';
+}
+
+function ffAddPhotos(){
+  if (!LAST_RESULT || !LAST_RESULT.business_id) return;
+  if (typeof cloudinary === 'undefined'){
+    ffSetStatus('ffPhotoStatus', 'Photo tool load nahi hua — page refresh karke dobara try karo.', false);
+    return;
+  }
+  if (!FF_WIDGET){
+    FF_WIDGET = cloudinary.createUploadWidget({
+      cloudName: FF_CLOUD_NAME,
+      uploadPreset: FF_UPLOAD_PRESET,
+      folder: 'businesses/' + LAST_RESULT.business_id,
+      sources: ['camera', 'local'],
+      multiple: true,
+      maxFiles: 8,
+      maxFileSize: 5 * 1024 * 1024,
+      clientAllowedFormats: ['jpg','jpeg','png','webp','heic'],
+      cropping: false
+    }, function(err, result){
+      if (err){
+        ffSetStatus('ffPhotoStatus', 'Photo upload nahi hui: ' + (err.message || err.statusText || 'error'), false);
+        return;
+      }
+      if (result && result.event === 'success'){ ffSavePhoto(result.info); }
+    });
+  }
+  FF_WIDGET.open();
+}
+
+async function ffSavePhoto(info){
+  try {
+    var isFirst = FF_PHOTO_COUNT === 0;
+    var res = await C.from('business_photos').insert({
+      business_id:          LAST_RESULT.business_id,
+      cloudinary_url:       info.secure_url,
+      cloudinary_public_id: info.public_id,
+      delete_token:         info.delete_token || null,
+      is_featured:          isFirst
+    });
+    if (res.error) throw res.error;
+    FF_PHOTO_COUNT++;
+    ffSetStatus('ffPhotoStatus', '✅ ' + FF_PHOTO_COUNT + ' photo page par lag gayi' + (isFirst ? ' (pehli = main photo)' : ''), true);
+  } catch(e){
+    ffSetStatus('ffPhotoStatus', 'Photo save nahi hui: ' + (e.message || e), false);
+  }
+}
+
+async function ffSaveHours(){
+  if (!LAST_RESULT || !LAST_RESULT.business_id) return;
+  var open = (document.getElementById('ffOpen') || {}).value || '09:00';
+  var close = (document.getElementById('ffClose') || {}).value || '21:00';
+  if (open >= close){
+    ffSetStatus('ffHoursStatus', 'Band hone ka time khulne ke baad hona chahiye.', false);
+    return;
+  }
+  if (FF_OFF_DAYS.length === 7){
+    ffSetStatus('ffHoursStatus', 'Saare din chhutti? Kam se kam ek din khula rakho.', false);
+    return;
+  }
+  var hours = {};
+  FF_DAYS.forEach(function(d){
+    hours[d] = FF_OFF_DAYS.indexOf(d) !== -1 ? { closed: true } : { open: open, close: close };
+  });
+  try {
+    var res = await C.from('businesses').update({ hours_json: hours }).eq('id', LAST_RESULT.business_id);
+    if (res.error) throw res.error;
+    ffSetStatus('ffHoursStatus', '✅ Timing page par lag gayi — ab "Abhi khula hai" dikhega', true);
+  } catch(e){
+    ffSetStatus('ffHoursStatus', 'Timing save nahi hui: ' + (e.message || e), false);
+  }
 }
 
 init();
