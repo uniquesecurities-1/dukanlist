@@ -1,7 +1,7 @@
 {
   "version": "4.1",
-  "updated": "2026-06-15",
-  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged]",
+  "updated": "2026-09-24",
+  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged] | v293: added 12 town categories (bag/luggage, tailor, dry cleaner, courier, mochi, locksmith, water supplier, cable-internet, labour contractor, security agency, ambulance, hosiery) — keep in step with db/234.",
   "parents": [
     {
       "slug": "healthcare",
@@ -168,6 +168,12 @@
           "name": "Ultrasound / Sonography Center",
           "name_hi": "अल्ट्रासाउंड / सोनोग्राफी",
           "icon": "🔊"
+        },
+        {
+          "slug": "ambulance",
+          "name": "Ambulance Service",
+          "name_hi": "एम्बुलेंस सेवा",
+          "icon": "🚑"
         }
       ]
     },
@@ -507,6 +513,42 @@
           "name": "Mobile Repair",
           "name_hi": "मोबाइल रिपेयर",
           "icon": "🔧"
+        },
+        {
+          "slug": "tailor-darzi",
+          "name": "Tailor / Darzi",
+          "name_hi": "दर्जी / सिलाई",
+          "icon": "✂️"
+        },
+        {
+          "slug": "dry-cleaner",
+          "name": "Dry Cleaner & Laundry",
+          "name_hi": "ड्राई क्लीनर और लॉन्ड्री",
+          "icon": "🧺"
+        },
+        {
+          "slug": "cobbler-mochi",
+          "name": "Cobbler / Mochi",
+          "name_hi": "मोची / जूता मरम्मत",
+          "icon": "👞"
+        },
+        {
+          "slug": "locksmith",
+          "name": "Locksmith / Key Maker",
+          "name_hi": "ताला-चाबी वाला",
+          "icon": "🔑"
+        },
+        {
+          "slug": "water-supplier",
+          "name": "Water Supplier (Jar / Tanker)",
+          "name_hi": "पानी सप्लाई (जार/टैंकर)",
+          "icon": "🚰"
+        },
+        {
+          "slug": "cable-internet",
+          "name": "Cable TV & Internet / Broadband",
+          "name_hi": "केबल टीवी और इंटरनेट",
+          "icon": "📡"
         }
       ]
     },
@@ -1295,6 +1337,18 @@
           "name": "Lottery Centre",
           "name_hi": "लॉटरी सेंटर",
           "icon": "🎟️"
+        },
+        {
+          "slug": "bag-luggage",
+          "name": "Bag, Suitcase & Luggage",
+          "name_hi": "बैग, सूटकेस और लगेज",
+          "icon": "🧳"
+        },
+        {
+          "slug": "hosiery-woollen",
+          "name": "Hosiery & Woollen / Sweaters",
+          "name_hi": "होज़री और ऊनी कपड़े",
+          "icon": "🧶"
         }
       ]
     },
@@ -1784,6 +1838,24 @@
           "name": "Drone / Pre-Wedding Photography",
           "name_hi": "ड्रोन / प्री-वेडिंग",
           "icon": "🚁"
+        },
+        {
+          "slug": "courier-parcel",
+          "name": "Courier & Parcel Service",
+          "name_hi": "कूरियर और पार्सल सेवा",
+          "icon": "📦"
+        },
+        {
+          "slug": "labour-contractor",
+          "name": "Labour Contractor / Thekedar",
+          "name_hi": "लेबर ठेकेदार",
+          "icon": "👷"
+        },
+        {
+          "slug": "security-agency",
+          "name": "Security Guard Agency",
+          "name_hi": "सिक्योरिटी गार्ड एजेंसी",
+          "icon": "🛡️"
         }
       ]
     },
