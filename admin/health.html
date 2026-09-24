@@ -133,7 +133,7 @@ table.checks td.expected,table.checks td.actual{font-family:ui-monospace,Menlo,C
   </section>
 
   <section>
-    <h2>RPC Self-Test</h2>
+    <h2>RPC Self-Test <span class="badge b-ok" id="rpcSummary" style="display:none"></span></h2>
     <div class="sub" style="margin-bottom:14px">Click "Run RPC Self-Test" above. Each card calls a critical RPC with a safe payload to confirm it's reachable + not throwing.</div>
     <div class="rpc-grid" id="rpcGrid"></div>
   </section>
@@ -343,6 +343,17 @@ const RPC_TESTS = [
 
 async function runRpcSelfTest(){
   const grid = document.getElementById('rpcGrid');
+  // v292: this section is the last one on a very long page, so clicking the
+  // button at the top looked like nothing happened — the cards were being
+  // drawn three screens below. Go to them, and keep a running tally in the
+  // heading so progress is visible from anywhere on the page.
+  const sum = document.getElementById('rpcSummary');
+  if (sum){
+    sum.style.display = '';
+    sum.className = 'badge b-warn';
+    sum.textContent = 'running 0/' + RPC_TESTS.length;
+  }
+  try { document.getElementById('rpcGrid').scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_){}
   grid.innerHTML = RPC_TESTS.map((t, i) => '<div class="rpc-card running" id="rpc-' + i + '"><div class="name">' + esc(t.name) + '</div><div class="desc">' + esc(t.desc) + '</div><div class="result">⏳ running…</div></div>').join('');
 
   let sampleShopId = null;
@@ -373,6 +384,13 @@ async function runRpcSelfTest(){
       card.className = 'rpc-card fail';
       card.querySelector('.result').innerHTML = '<b>THREW</b><br>' + esc(e.message || e);
     }
+    if (sum) sum.textContent = 'running ' + (i + 1) + '/' + RPC_TESTS.length;
+  }
+  if (sum){
+    const failed = grid.querySelectorAll('.rpc-card.fail').length;
+    sum.className = failed ? 'badge b-fail' : 'badge b-ok';
+    sum.textContent = failed ? (failed + ' of ' + RPC_TESTS.length + ' failing')
+                             : ('all ' + RPC_TESTS.length + ' OK');
   }
 }
 
