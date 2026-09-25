@@ -481,7 +481,10 @@
       async function load(){
         try{
           if (!(window.ShopDB && ShopDB.client)){
-            if (++tries > 25) return;            // ~10s, then give up quietly
+            if (++tries > 25){                   // ~10s, then give up quietly
+              if (window.DLShown) DLShown.claim([], 'hero');   // v294: stop the Featured feed waiting
+              return;
+            }
             return setTimeout(load, 400);
           }
           var r = await ShopDB.client.rpc('get_top_for_seo', {
@@ -489,9 +492,13 @@
           });
           if (r.error) throw r.error;
           var items = (r.data && r.data.items) || [];
+          /* v294: claim BEFORE the empty check. This strip is the first of
+             three rankings the Featured feed waits on; when a visitor picks a
+             city with almost nothing in it this comes back empty, and the old
+             order meant the wait never completed and every Featured grid sat
+             through the full timeout. Saying "nothing here" is also an answer. */
+          if (window.DLShown) DLShown.claim(items.map(function(x){ return x.slug; }), 'hero');
           if (!items.length) return;
-          /* v282: tell the Featured feed which shops this ranking already used */
-          if (window.DLShown) DLShown.claim(items.map(function(x){ return x.slug; }));
           document.getElementById('htsRow').innerHTML = items.map(function(b, i){
             // data-fit-skip: photo-fit.js letterboxes tall portraits so a
             // signboard is never cropped — right for the big photo on a
@@ -516,7 +523,10 @@
               '</div></a>';
           }).join('');
           document.getElementById('heroTopShops').style.display = '';
-        }catch(e){ console.warn('[hero-top-shops]', e && e.message); }
+        }catch(e){
+          console.warn('[hero-top-shops]', e && e.message);
+          if (window.DLShown) DLShown.claim([], 'hero');   // v294: a failed ranking must not stall the Featured feed
+        }
       }
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
       else load();
@@ -1146,7 +1156,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/dl-core.js?v=a2b7ac4c20"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
-<script src="/assets/js/dl-shown.js?v=20260922b"></script><!-- v282: shared "already on screen" list (hero strip, Top 5, Trending claim; Featured fills around them) -->
+<script src="/assets/js/dl-shown.js?v=20260925a"></script><!-- v282: shared "already on screen" list (hero strip, Top 5, Trending claim; Featured fills around them) -->
 <script>if(window.DLShown){DLShown.expect(3);}</script>
 <script src="/assets/js/daily-buzz.js?v=20260923a" defer></script>
 <!-- geo-nearby.js disabled — open-near-you RPC was failing intermittently -->
@@ -1297,8 +1307,8 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20260922f" defer></script>
-<script src="/assets/js/trending.js?v=20260922b" defer></script>
+<script src="/assets/js/homepage.js?v=20260925a" defer></script>
+<script src="/assets/js/trending.js?v=20260925a" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260922a" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
 <script>

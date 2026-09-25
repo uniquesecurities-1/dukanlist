@@ -20,7 +20,10 @@
       if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
       var c = ShopDB.client;
       var r = await c.rpc('get_trending_shops', { p_city_id: null, p_limit: 8 });
-      if (r.error || !Array.isArray(r.data) || r.data.length < 3) return;
+      if (r.error || !Array.isArray(r.data) || r.data.length < 3){
+        if (window.DLShown) DLShown.claim([], 'trending');   // v294: nothing to show, but say so
+        return;
+      }
 
       var grid = document.getElementById('trendingGrid');
       var section = document.getElementById('trendingSection');
@@ -28,7 +31,7 @@
 
       var isHi = document.documentElement.dataset.lang === 'hi';
 
-      /* v282 */ if (window.DLShown) DLShown.claim(r.data.map(function(x){ return x.slug; }));
+      if (window.DLShown) DLShown.claim(r.data.map(function(x){ return x.slug; }), 'trending');
       grid.innerHTML = r.data.map(function (b, i) {
         var photo = b.photo
           ? (window.DukanImg ? DukanImg.card(b.photo) : b.photo)

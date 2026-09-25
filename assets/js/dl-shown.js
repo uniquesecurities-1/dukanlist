@@ -40,8 +40,20 @@
   // so ready() knows how many claims are still on their way.
   function expect(n){ expected += (n || 1); }
 
-  function claim(slugs){
+  // v294: claim(slugs, key). The key names the section, so a section may
+  // report from whichever code path it reaches — including "I found
+  // nothing" — and still only count once. Before this, all three callers
+  // claimed AFTER their early returns, so an empty ranking (a city with
+  // one shop, an RPC hiccup, fewer than three trending rows) meant the
+  // count never completed and the Featured grid sat through the full
+  // timeout on every single load.
+  var seen = {};
+  function claim(slugs, key){
     (slugs || []).forEach(function (s){ if (s) claimed.add(String(s)); });
+    if (key){
+      if (seen[key]) { flush(); return; }
+      seen[key] = true;
+    }
     arrived++;
     flush();
   }

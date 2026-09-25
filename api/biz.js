@@ -347,7 +347,17 @@ module.exports = async (req, res) => {
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  // Cache at the edge so we are not hitting Supabase on every crawl
-  res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=86400');
+  // Cache at the edge so we are not hitting Supabase on every crawl.
+  // v294: stale-while-revalidate raised from 1 day to 7. Measured on
+  // 2026-09-25: a shop page already in the edge cache answers in ~80 ms,
+  // one that is not takes ~1,000 ms — this function has to fetch the
+  // 280 KB template plus three Supabase round trips before it can reply.
+  // With 220 shops and traffic still thin, most pages fell out of the
+  // one-day window and nearly every visitor paid the cold price. A week
+  // of stale-while-revalidate keeps them instant: the visitor is served
+  // the cached copy immediately and the refresh happens behind them.
+  // s-maxage stays at 10 minutes, so an owner's edit still goes live
+  // quickly — only the truly untouched pages lean on the stale copy.
+  res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=604800');
   res.end(html);
 };

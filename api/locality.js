@@ -429,7 +429,9 @@ export default async function handler(req, res){
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=300');
+    // v294: same reasoning as api/biz.js — 5 minutes of stale cover was not
+    // enough for pages nobody visits twice in an hour.
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=604800');
     return res.end(renderPage({ city, cat, shops, isParent, subCategories }));
 
   } catch (err){
