@@ -119,6 +119,20 @@
         ➕ <span data-i18n-en>Add a Service</span><span data-i18n-hi>नई सेवा जोड़ें</span>
       </div>
 
+      <!-- v299: only 7 shops out of 268 had filled this list. Typing twenty
+           item names on a phone is why. These are the items of this shop's own
+           trade — one tap each, edit the price later if they want. -->
+      <div id="ideaBox" style="display:none;background:#FFF7ED;border:1px dashed #FDBA74;border-radius:12px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-weight:800;color:#9A3412;font-size:.88rem;margin-bottom:2px">
+          <span data-i18n-en>⚡ Quick add — tap what you sell</span><span data-i18n-hi>⚡ झट से जोड़ें — जो आप बेचते हैं उस पर टैप करें</span>
+        </div>
+        <div style="font-size:.78rem;color:#7C2D12;margin-bottom:10px">
+          <span data-i18n-en>Rate is optional. You can rename or remove any of them afterwards.</span>
+          <span data-i18n-hi>रेट डालना ज़रूरी नहीं। बाद में नाम बदल या हटा सकते हैं।</span>
+        </div>
+        <div id="ideaChips" style="display:flex;flex-wrap:wrap;gap:7px"></div>
+      </div>
+
       <div class="add-svc-card">
         <div class="form-group">
           <label><span data-i18n-en>Service Name</span><span data-i18n-hi>सेवा का नाम</span><span class="req">*</span></label>
@@ -179,6 +193,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/product-suggestions.js?v=20260929a"></script>
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script src="/assets/js/nav.js?v=20260921b" defer></script>
 <script>
@@ -222,7 +237,7 @@ async function loadServices(){
   }
 
   const { data: biz, error } = await c.from('businesses')
-    .select('id, slug, name, services_json')
+    .select('id, slug, name, services_json, category_id, sub_category_id')
     .eq('id', owners[0].business_id)
     .maybeSingle();
 
@@ -235,6 +250,7 @@ async function loadServices(){
   SERVICES = Array.isArray(biz.services_json) ? biz.services_json : [];
 
   document.getElementById('viewPublicLink').href = '/' + encodeURIComponent(biz.slug); // v218: clean URL
+  renderIdeas();   // v299
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = '';
 
@@ -312,12 +328,82 @@ function addService(){
   document.getElementById('svcName').focus();
 
   renderServices();
+  renderIdeas();   // v299: an item just added should stop being offered
+}
+
+// ============================================================
+// v299 — "tap what you sell"
+// ============================================================
+// CAT_SLUG/PARENT_SLUG are looked up once from the shop's own trade, so
+// a kirana is offered Atta and Chawal while a mutual fund distributor is
+// offered SIP and ELSS. A chip already in the list is not shown again,
+// and the strip hides itself when everything has been used or the shop
+// has hit its limit.
+// ============================================================
+let IDEA_LIST = [];
+
+async function loadIdeaList(){
+  if (!MY_BIZ) return;
+  const c = ShopDB.client;
+  const ids = [MY_BIZ.sub_category_id, MY_BIZ.category_id].filter(Boolean);
+  if (!ids.length) { IDEA_LIST = window.DukanProductIdeas ? DukanProductIdeas.forCategory() : []; return; }
+  let own = null, parent = null;
+  try {
+    const r = await c.from('categories').select('id,slug,parent_id').in('id', ids);
+    if (!r.error && r.data){
+      const byId = {}; r.data.forEach(x => byId[x.id] = x);
+      own = byId[MY_BIZ.sub_category_id] || byId[MY_BIZ.category_id] || null;
+      if (own && own.parent_id){
+        const pr = await c.from('categories').select('slug').eq('id', own.parent_id).maybeSingle();
+        if (!pr.error && pr.data) parent = pr.data.slug;
+      }
+    }
+  } catch(_){}
+  IDEA_LIST = window.DukanProductIdeas
+    ? DukanProductIdeas.forCategory(own && own.slug, parent)
+    : [];
+}
+
+function renderIdeas(){
+  loadIdeaList().then(function(){
+    const box = document.getElementById('ideaBox');
+    const host = document.getElementById('ideaChips');
+    if (!box || !host) return;
+    const used = new Set(SERVICES.map(s => String(s.name || '').trim().toLowerCase()));
+    const left = IDEA_LIST.filter(n => !used.has(n.toLowerCase()));
+    if (!left.length || SERVICES.length >= MAX_SERVICES){ box.style.display = 'none'; return; }
+    host.innerHTML = left.map(function(n){
+      return '<button type="button" class="idea-chip" data-idea="' + n.replace(/"/g, '&quot;') + '" ' +
+        'style="background:#fff;border:1.5px solid #FDBA74;color:#9A3412;border-radius:99px;' +
+        'padding:6px 13px;font-size:.84rem;font-weight:700;cursor:pointer;font-family:inherit">+ ' +
+        n.replace(/[&<>]/g, '') + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(host.querySelectorAll('[data-idea]'), function(btn){
+      btn.onclick = function(){ addIdea(btn.getAttribute('data-idea')); };
+    });
+    box.style.display = '';
+  });
+}
+
+function addIdea(name){
+  if (!name) return;
+  if (SERVICES.length >= MAX_SERVICES){
+    const e = document.getElementById('addErr');
+    e.textContent = 'Maximum ' + MAX_SERVICES + ' items. Remove one first.';
+    e.style.display = 'flex';
+    return;
+  }
+  if (SERVICES.some(s => String(s.name || '').trim().toLowerCase() === name.toLowerCase())) return;
+  SERVICES.push({ name: name });
+  renderServices();
+  renderIdeas();
 }
 
 function removeService(idx){
   if (!confirm('Remove this service?')) return;
   SERVICES.splice(idx, 1);
   renderServices();
+  renderIdeas();   // v299: a removed item becomes a chip again
 }
 
 async function saveAll(){
