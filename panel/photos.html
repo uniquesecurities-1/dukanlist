@@ -253,7 +253,24 @@ async function loadPhotos(){
     .maybeSingle();
 
   if (!bizErr && bizRow && Array.isArray(bizRow.photos)) {
-    STATE.legacyPhotos = bizRow.photos.filter(u => typeof u === 'string' && u.length > 0);
+    // v297: businesses.photos used to hold the OLD Supabase-storage URLs while
+    // business_photos held the Cloudinary ones — two different lists, so showing
+    // both made sense. The 2026-09-22 migration put the same Cloudinary URLs in
+    // both, and this screen started showing every photo twice: once under
+    // "Photos" and again under "Old photos". Owners tidied up the apparent
+    // duplicates, and "Delete old photo" only empties businesses.photos — which
+    // is the list every card on the site reads. Three shops ended up with a full
+    // gallery on their own page and no picture anywhere else.
+    // Same picture = same Cloudinary path once the size part of the URL is
+    // ignored (w_600.../w_160... are the same file).
+    const cloudKey = (u) => {
+      const m = String(u).match(/\/image\/upload\/(?:[^/]*[,_][^/]*\/)?(v\d+\/.+)$/);
+      return m ? m[1] : String(u);
+    };
+    const already = new Set(STATE.photos.map(p => cloudKey(p.cloudinary_url)));
+    STATE.legacyPhotos = bizRow.photos
+      .filter(u => typeof u === 'string' && u.length > 0)
+      .filter(u => !already.has(cloudKey(u)));
   }
 
   renderPhotos();
