@@ -35,7 +35,11 @@
 
   function card(b){
     var lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
-    var cat = CATS[b.category_id] || {};
+    // v295: category_id is the top-level parent on almost every shop
+    // (262 of 266 on 2026-09-29), so this card used to announce "RETAIL &
+    // SHOPPING" and leave the customer none the wiser. The specific trade
+    // is already on the row as sub_category_id — prefer it.
+    var cat = CATS[b.sub_category_id] || CATS[b.category_id] || {};
     var catName = (lang === 'hi' && cat.name_hi) ? cat.name_hi : (cat.name || 'BUSINESS');
     var catIcon = cat.icon || '🏪';
     var thumb = pickThumb(b);
@@ -136,7 +140,7 @@
       if (Object.keys(CATS).length === 0) await loadCats(c);
       console.log(TAG, 'fetching businesses...');
       var r = await c.from('businesses')
-        .select('id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,city_id,category_id,photos,is_professional_listing,professional_tier,geo_cities(name)')
+        .select('id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,city_id,category_id,sub_category_id,photos,is_professional_listing,professional_tier,geo_cities(name)')
         .eq('status', 'active')
         .or('professional_tier.is.null,professional_tier.neq.strict')
         .order('created_at', { ascending: false })

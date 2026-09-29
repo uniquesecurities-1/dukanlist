@@ -1,7 +1,7 @@
 {
   "version": "4.1",
-  "updated": "2026-09-24",
-  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged] | v293: added 12 town categories (bag/luggage, tailor, dry cleaner, courier, mochi, locksmith, water supplier, cable-internet, labour contractor, security agency, ambulance, hosiery) — keep in step with db/234.",
+  "updated": "2026-09-29",
+  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged] | v293: added 12 town categories (bag/luggage, tailor, dry cleaner, courier, mochi, locksmith, water supplier, cable-internet, labour contractor, security agency, ambulance, hosiery) — keep in step with db/234. | v295: +23 (newspaper, media, accessories, perfume, supplements, garments by wearer, 10 distributor types, tailor by wearer, builder) and mens-wear renamed — keep in step with db/235.",
   "parents": [
     {
       "slug": "healthcare",
@@ -549,6 +549,30 @@
           "name": "Cable TV & Internet / Broadband",
           "name_hi": "केबल टीवी और इंटरनेट",
           "icon": "📡"
+        },
+        {
+          "slug": "tailor-ladies",
+          "name": "Ladies Tailor / Boutique Stitching",
+          "name_hi": "लेडीज़ टेलर / बुटीक सिलाई",
+          "icon": "✂️"
+        },
+        {
+          "slug": "tailor-gents",
+          "name": "Gents Tailor",
+          "name_hi": "जेंट्स टेलर",
+          "icon": "✂️"
+        },
+        {
+          "slug": "tailor-girls",
+          "name": "Girls (Kids) Tailor",
+          "name_hi": "गर्ल्स (बच्चों) टेलर",
+          "icon": "✂️"
+        },
+        {
+          "slug": "tailor-boys",
+          "name": "Boys (Kids) Tailor",
+          "name_hi": "ब्वॉयज़ (बच्चों) टेलर",
+          "icon": "✂️"
         }
       ]
     },
@@ -987,8 +1011,8 @@
         },
         {
           "slug": "mens-wear",
-          "name": "Men's Wear / Suiting",
-          "name_hi": "पुरुष परिधान / सूटिंग",
+          "name": "Readymade Garments — Gents",
+          "name_hi": "रेडीमेड गारमेंट्स — जेंट्स",
           "icon": "👔"
         },
         {
@@ -1349,6 +1373,102 @@
           "name": "Hosiery & Woollen / Sweaters",
           "name_hi": "होज़री और ऊनी कपड़े",
           "icon": "🧶"
+        },
+        {
+          "slug": "fashion-accessories",
+          "name": "Belts, Wallets & Fashion Accessories",
+          "name_hi": "बेल्ट, वॉलेट और फैशन एक्सेसरीज़",
+          "icon": "👜"
+        },
+        {
+          "slug": "perfume-ittar",
+          "name": "Perfume & Ittar",
+          "name_hi": "परफ्यूम और इत्र",
+          "icon": "🌸"
+        },
+        {
+          "slug": "gym-supplements",
+          "name": "Gym & Health Supplements",
+          "name_hi": "जिम और हेल्थ सप्लीमेंट",
+          "icon": "💪"
+        },
+        {
+          "slug": "garments-ladies",
+          "name": "Readymade Garments — Ladies",
+          "name_hi": "रेडीमेड गारमेंट्स — लेडीज़",
+          "icon": "👗"
+        },
+        {
+          "slug": "garments-girls",
+          "name": "Readymade Garments — Girls",
+          "name_hi": "रेडीमेड गारमेंट्स — गर्ल्स",
+          "icon": "🎀"
+        },
+        {
+          "slug": "garments-boys",
+          "name": "Readymade Garments — Boys",
+          "name_hi": "रेडीमेड गारमेंट्स — ब्वॉयज़",
+          "icon": "👕"
+        },
+        {
+          "slug": "distributor-food",
+          "name": "Distributor / Wholesaler — Food & Grocery",
+          "name_hi": "डिस्ट्रीब्यूटर — खाद्य एवं किराना",
+          "icon": "📦"
+        },
+        {
+          "slug": "distributor-clothing",
+          "name": "Distributor / Wholesaler — Clothing & Textile",
+          "name_hi": "डिस्ट्रीब्यूटर — कपड़ा एवं टेक्सटाइल",
+          "icon": "🧵"
+        },
+        {
+          "slug": "distributor-cosmetics",
+          "name": "Distributor / Wholesaler — Cosmetics & Toiletries",
+          "name_hi": "डिस्ट्रीब्यूटर — कॉस्मेटिक",
+          "icon": "💄"
+        },
+        {
+          "slug": "distributor-electronics",
+          "name": "Distributor / Wholesaler — Electronics & Appliances",
+          "name_hi": "डिस्ट्रीब्यूटर — इलेक्ट्रॉनिक्स",
+          "icon": "🔌"
+        },
+        {
+          "slug": "distributor-stationery",
+          "name": "Distributor / Wholesaler — Stationery & Paper",
+          "name_hi": "डिस्ट्रीब्यूटर — स्टेशनरी एवं पेपर",
+          "icon": "📗"
+        },
+        {
+          "slug": "distributor-hardware",
+          "name": "Distributor / Wholesaler — Hardware & Tools",
+          "name_hi": "डिस्ट्रीब्यूटर — हार्डवेयर एवं टूल्स",
+          "icon": "🔩"
+        },
+        {
+          "slug": "distributor-pharma",
+          "name": "Distributor / Wholesaler — Medicine & Pharma",
+          "name_hi": "डिस्ट्रीब्यूटर — दवा एवं फार्मा",
+          "icon": "💊"
+        },
+        {
+          "slug": "distributor-plastic",
+          "name": "Distributor / Wholesaler — Plastic & Household",
+          "name_hi": "डिस्ट्रीब्यूटर — प्लास्टिक एवं घरेलू",
+          "icon": "🧴"
+        },
+        {
+          "slug": "distributor-beverages",
+          "name": "Distributor / Wholesaler — Cold Drinks & Beverages",
+          "name_hi": "डिस्ट्रीब्यूटर — कोल्ड ड्रिंक",
+          "icon": "🥤"
+        },
+        {
+          "slug": "distributor-general",
+          "name": "Distributor / Wholesaler — Other Goods",
+          "name_hi": "डिस्ट्रीब्यूटर — अन्य सामान",
+          "icon": "🚚"
         }
       ]
     },
@@ -1533,6 +1653,12 @@
           "name_hi": "आर्किटेक्ट / सिविल इंजीनियर",
           "icon": "📐",
           "keywords": "architect,civil engineer,structural engineer,naksha,building plan,building design,3d elevation,vastu consultant,interior architect,construction consultant,floor plan,building approval"
+        },
+        {
+          "slug": "builder-contractor",
+          "name": "Builder / Contractor",
+          "name_hi": "बिल्डर / ठेकेदार",
+          "icon": "🏗️"
         }
       ]
     },
@@ -1856,6 +1982,18 @@
           "name": "Security Guard Agency",
           "name_hi": "सिक्योरिटी गार्ड एजेंसी",
           "icon": "🛡️"
+        },
+        {
+          "slug": "newspaper-agency",
+          "name": "Newspaper Agency / Hawker",
+          "name_hi": "अख़बार एजेंसी / हॉकर",
+          "icon": "📰"
+        },
+        {
+          "slug": "media-news",
+          "name": "Media / News Channel / Reporter",
+          "name_hi": "मीडिया / न्यूज़ चैनल / पत्रकार",
+          "icon": "🎙️"
         }
       ]
     },

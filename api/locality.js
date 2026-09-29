@@ -150,7 +150,7 @@ async function fetchShops(cityId, catId, catIsParent, megaIds){
     orClauses.push('id.in.(' + linkedIds.join(',') + ')');
   }
 
-  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name),categories:category_id(name,icon)'
+  const q = 'businesses?select=id,slug,name,name_hi,owner_name,mobile,whatsapp,address_line1,address_line2,pincode,photos,usp_text,rating_avg,rating_count,verified_score,established_year,featured,is_professional_listing,professional_tier,geo_cities(name),categories:category_id(name,icon),subcat:sub_category_id(name,icon)'
     + '&status=eq.active'
     + '&city_id=eq.' + cityId
     + '&or=(' + orClauses.join(',') + ')'
@@ -210,11 +210,21 @@ function renderShopCard(b){
   const callBtn = phone.length === 10
     ? `<a href="tel:+91${phone}" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#fff;color:#0F2952;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #E5B84F">📞 Call</a>`
     : '';
+  // v295: a shop card on a PARENT page ("Retail & Shopping in Mandi Dabwali")
+  // said nothing about what the shop actually sells — forty shops, no way to
+  // tell the saree shop from the utensils shop without opening each one. The
+  // specific category is already on the row (sub_category_id); show it.
+  const specific = b.subcat || b.categories || null;
+  const catChip = specific && specific.name
+    ? `<div style="font-size:.76rem;font-weight:800;color:#9A3412;background:#FFF7ED;border:1px solid #FED7AA;border-radius:99px;padding:3px 10px;align-self:flex-start;margin-bottom:2px">${esc(specific.icon || '🏪')} ${esc(specific.name)}</div>`
+    : '';
+
   return `
   <article onclick="if(!event.target.closest('a,button')){window.location.href='${ORIGIN}/${esc(b.slug)}';}" style="background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:0;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 3px rgba(15,23,42,.04);cursor:pointer;overflow:hidden">
     ${thumbHTML}
     <div style="padding:10px 14px;display:flex;flex-direction:column;gap:4px">
       <div style="font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:#0F172A;line-height:1.2"><span style="color:#FF6B1A">🏢</span> ${esc(b.name)}</div>
+      ${catChip}
       ${b.owner_name ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px"><span>👤</span> <b style="color:#0F172A">${esc(b.owner_name)}</b></div>` : ''}
       ${phone ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:center;gap:5px;font-family:monospace"><span>📱</span> +91-${phone}</div>` : ''}
       ${addr ? `<div style="font-size:.82rem;color:#475569;display:flex;align-items:flex-start;gap:5px;line-height:1.4"><span style="color:#DC2626;flex-shrink:0">📍</span> ${esc(addr)}</div>` : ''}
