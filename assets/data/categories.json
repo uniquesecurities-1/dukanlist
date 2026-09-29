@@ -69,7 +69,7 @@
         },
         {
           "slug": "veterinary",
-          "name": "Veterinary / Pet Doctor",
+          "name": "Veterinary / Animal & Pet Doctor",
           "name_hi": "पशु चिकित्सक",
           "icon": "🐾"
         },
@@ -429,12 +429,6 @@
             "होम डेकोर",
             "सजावट"
           ]
-        },
-        {
-          "slug": "solar-inverter",
-          "name": "Solar / Inverter / Battery",
-          "name_hi": "सोलर / इन्वर्टर",
-          "icon": "🔋"
         },
         {
           "slug": "computer-laptop-repair",
@@ -806,12 +800,6 @@
           "icon": "🎂"
         },
         {
-          "slug": "dhaba-roadside",
-          "name": "Dhaba / Roadside Eatery",
-          "name_hi": "ढाबा",
-          "icon": "🍛"
-        },
-        {
           "slug": "tea-stall",
           "name": "Tea Stall / Chai Kiosk",
           "name_hi": "चाय की दुकान",
@@ -822,12 +810,6 @@
           "name": "Juice / Shake / Cold Drink",
           "name_hi": "जूस / शेक",
           "icon": "🥤"
-        },
-        {
-          "slug": "ice-cream-parlour",
-          "name": "Ice Cream Parlour",
-          "name_hi": "आइसक्रीम पार्लर",
-          "icon": "🍦"
         },
         {
           "slug": "dairy-milk",
@@ -1925,22 +1907,10 @@
           "icon": "💋"
         },
         {
-          "slug": "mehendi-artist",
-          "name": "Mehendi / Henna Artist",
-          "name_hi": "मेहंदी आर्टिस्ट",
-          "icon": "🌿"
-        },
-        {
           "slug": "tattoo-piercing",
           "name": "Tattoo / Piercing Studio",
           "name_hi": "टैटू स्टूडियो",
           "icon": "🎨"
-        },
-        {
-          "slug": "dietician",
-          "name": "Dietician / Nutritionist",
-          "name_hi": "डायटीशियन",
-          "icon": "🥗"
         }
       ]
     },
@@ -2026,12 +1996,6 @@
           "icon": "📚"
         },
         {
-          "slug": "computer-class",
-          "name": "Computer Class / Tally / Typing",
-          "name_hi": "कंप्यूटर क्लास",
-          "icon": "💻"
-        },
-        {
           "slug": "music-dance-class",
           "name": "Music / Singing / Dance Class",
           "name_hi": "संगीत / नृत्य कक्षा",
@@ -2054,7 +2018,7 @@
       "subs": [
         {
           "slug": "lawyer",
-          "name": "Lawyers & Notaries",
+          "name": "Lawyer / Advocate",
           "name_hi": "वकील एवं नोटरी",
           "icon": "⚖️"
         },
@@ -2117,18 +2081,6 @@
           "name": "Seeds / Fertilizer Shop",
           "name_hi": "बीज / खाद",
           "icon": "🌱"
-        },
-        {
-          "slug": "veterinary-doctor",
-          "name": "Veterinary Doctor",
-          "name_hi": "पशु चिकित्सक",
-          "icon": "🐄"
-        },
-        {
-          "slug": "cattle-feed",
-          "name": "Cattle Feed / Dana",
-          "name_hi": "पशु आहार",
-          "icon": "🐂"
         },
         {
           "slug": "photo-studio",
@@ -2288,12 +2240,6 @@
           "name": "Plant Nursery / Saplings",
           "name_hi": "पौधा नर्सरी / पौधे",
           "icon": "🌿"
-        },
-        {
-          "slug": "agri-vet-doctor",
-          "name": "Veterinary / Animal Doctor",
-          "name_hi": "पशु चिकित्सक",
-          "icon": "🐾"
         },
         {
           "slug": "drip-irrigation",
@@ -2521,12 +2467,6 @@
           "name": "Blood Donation / Welfare Camp",
           "name_hi": "रक्तदान / कल्याण शिविर",
           "icon": "🩸"
-        },
-        {
-          "slug": "temple-mandir",
-          "name": "Temple / Mandir",
-          "name_hi": "मंदिर",
-          "icon": "🛕"
         },
         {
           "slug": "masjid",
