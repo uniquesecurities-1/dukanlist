@@ -1,7 +1,7 @@
 {
   "version": "4.1",
   "updated": "2026-09-29",
-  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged] | v293: added 12 town categories (bag/luggage, tailor, dry cleaner, courier, mochi, locksmith, water supplier, cable-internet, labour contractor, security agency, ambulance, hosiery) — keep in step with db/234. | v295: +23 (newspaper, media, accessories, perfume, supplements, garments by wearer, 10 distributor types, tailor by wearer, builder) and mens-wear renamed — keep in step with db/235.",
+  "note": "v3.9: Added searchable keywords to 26 key categories (CA, doctors, lawyers, MFD, stock brokers, pharmacy, etc.) so users can search by synonyms like \"Chartered Accountant\" → CA, \"vakeel\" → Advocate, \"MFD\" → Mutual Fund Distributor. JSON fallback path now provides the same search experience as DB-backed path. v3.8: Synced 14 healthcare specialist sub-categories from DB (db/58) into JSON — gynecologist, pediatrician, orthopedic, cardiologist, dermatologist, ent-specialist, surgeon-general, urologist, neurologist, psychiatrist, diabetes-specialist, radiology-xray, ultrasound-sonography, nursing-home. These were live in DB since June 2025 but the JSON didn't list them, so autocomplete / register fallback dropdowns couldn't suggest them. v3.7: Expanded Automotive parent with 11 new sub-categories — Car Showroom, Bike/Scooter/Scooty Showroom, EV Dealer, Truck/Tempo/Bus Dealer, Auto/E-Rickshaw Dealer, Car AC Repair, Denting & Painting, Car/Bike Accessories, Towing/Roadside Assistance, RTO Agent, Crane/JCB/Hydra Service. db/142 syncs to DB. v3.6: Added 5 new sub-categories — Laptops/Computers Sale, Laptop/Computer Accessories, Mobile Accessories, Lottery Centre (retail-shopping) + Mobile Repair (home-services). computer-laptop-repair already present in JSON; db/133 syncs it to the DB. v3.5: Added new parent 'Hospitality, Hotels & Banquets' (hotel, marriage-palace, banquet-hall, resort-farm-stay, guest-house-lodge, dharamshala, travel-agent, ticket-booking-counter). Added training-institute under Education. Added placement-agency under Professional Services. v3.4: Added Energy/Solar/Renewable parent with 15 sub-categories. v3.3: Added 15 more local categories. [db/123: 6 duplicate slugs merged] | v293: added 12 town categories (bag/luggage, tailor, dry cleaner, courier, mochi, locksmith, water supplier, cable-internet, labour contractor, security agency, ambulance, hosiery) — keep in step with db/234. | v295: +23 (newspaper, media, accessories, perfume, supplements, garments by wearer, 10 distributor types, tailor by wearer, builder) and mens-wear renamed — keep in step with db/235. | v296: Wholesale & Distribution is now its own parent — 12 moved out of Retail, 35 trades added (db/236).",
   "parents": [
     {
       "slug": "healthcare",
@@ -1141,12 +1141,6 @@
           "icon": "💐"
         },
         {
-          "slug": "wholesale-dealer",
-          "name": "Wholesale / Galla Mandi Dealer",
-          "name_hi": "थोक विक्रेता",
-          "icon": "📦"
-        },
-        {
           "slug": "manufacturer",
           "name": "Manufacturer / Factory / Production Unit",
           "name_hi": "निर्माता / फैक्ट्री",
@@ -1327,12 +1321,6 @@
           "icon": "🗄️"
         },
         {
-          "slug": "mithai-wholesale",
-          "name": "Mithai Wholesale / Halwai Supplier",
-          "name_hi": "मिठाई होलसेल",
-          "icon": "🧁"
-        },
-        {
           "slug": "gift-bouquet",
           "name": "Gift Shop / Flower Bouquet",
           "name_hi": "गिफ्ट / फूल बुके",
@@ -1409,6 +1397,27 @@
           "name": "Readymade Garments — Boys",
           "name_hi": "रेडीमेड गारमेंट्स — ब्वॉयज़",
           "icon": "👕"
+        }
+      ]
+    },
+    {
+      "slug": "wholesale-distribution",
+      "name": "Wholesale & Distribution",
+      "name_hi": "होलसेल एवं डिस्ट्रीब्यूशन",
+      "icon": "📦",
+      "color": "#B45309",
+      "subs": [
+        {
+          "slug": "wholesale-dealer",
+          "name": "Wholesale / Galla Mandi Dealer",
+          "name_hi": "थोक विक्रेता",
+          "icon": "📦"
+        },
+        {
+          "slug": "mithai-wholesale",
+          "name": "Mithai Wholesale / Halwai Supplier",
+          "name_hi": "मिठाई होलसेल",
+          "icon": "🧁"
         },
         {
           "slug": "distributor-food",
@@ -1469,6 +1478,216 @@
           "name": "Distributor / Wholesaler — Other Goods",
           "name_hi": "डिस्ट्रीब्यूटर — अन्य सामान",
           "icon": "🚚"
+        },
+        {
+          "slug": "wholesale-kirana",
+          "name": "Wholesale — Kirana & Grocery",
+          "name_hi": "होलसेल — किराना एवं ग्रॉसरी",
+          "icon": "🛒"
+        },
+        {
+          "slug": "wholesale-grain",
+          "name": "Wholesale — Grain, Rice & Flour",
+          "name_hi": "होलसेल — अनाज, चावल एवं आटा",
+          "icon": "🌾"
+        },
+        {
+          "slug": "wholesale-spices",
+          "name": "Wholesale — Spices, Dal & Pulses",
+          "name_hi": "होलसेल — मसाले, दाल एवं पल्सेस",
+          "icon": "🌶️"
+        },
+        {
+          "slug": "wholesale-dryfruits",
+          "name": "Wholesale — Dry Fruits & Mewa",
+          "name_hi": "होलसेल — ड्राई फ्रूट्स एवं मेवा",
+          "icon": "🥜"
+        },
+        {
+          "slug": "wholesale-namkeen",
+          "name": "Wholesale — Namkeen & Snacks",
+          "name_hi": "होलसेल — नमकीन एवं स्नैक्स",
+          "icon": "🍿"
+        },
+        {
+          "slug": "wholesale-bakery",
+          "name": "Wholesale — Bakery & Confectionery",
+          "name_hi": "होलसेल — बेकरी एवं कन्फेक्शनरी",
+          "icon": "🧁"
+        },
+        {
+          "slug": "wholesale-dairy",
+          "name": "Wholesale — Dairy & Milk Products",
+          "name_hi": "होलसेल — डेयरी एवं दूध उत्पाद",
+          "icon": "🥛"
+        },
+        {
+          "slug": "wholesale-tea",
+          "name": "Wholesale — Tea & Coffee",
+          "name_hi": "होलसेल — चाय एवं कॉफी",
+          "icon": "🍵"
+        },
+        {
+          "slug": "wholesale-fruit-veg",
+          "name": "Wholesale — Fruit & Vegetable (Mandi)",
+          "name_hi": "होलसेल — फल एवं सब्ज़ी (मंडी)",
+          "icon": "🥬"
+        },
+        {
+          "slug": "wholesale-ice",
+          "name": "Wholesale — Ice Supplier",
+          "name_hi": "होलसेल — बर्फ सप्लायर",
+          "icon": "🧊"
+        },
+        {
+          "slug": "wholesale-sarees",
+          "name": "Wholesale — Saree & Dress Material",
+          "name_hi": "होलसेल — साड़ी एवं ड्रेस मटेरियल",
+          "icon": "🥻"
+        },
+        {
+          "slug": "wholesale-hosiery",
+          "name": "Wholesale — Hosiery & Undergarments",
+          "name_hi": "होलसेल — होज़री एवं अंडरगारमेंट",
+          "icon": "🧦"
+        },
+        {
+          "slug": "wholesale-footwear",
+          "name": "Wholesale — Footwear",
+          "name_hi": "होलसेल — फुटवियर",
+          "icon": "👟"
+        },
+        {
+          "slug": "wholesale-imitation",
+          "name": "Wholesale — Imitation Jewellery & Bangles",
+          "name_hi": "होलसेल — इमिटेशन ज्वेलरी एवं चूड़ी",
+          "icon": "💍"
+        },
+        {
+          "slug": "wholesale-crockery",
+          "name": "Wholesale — Crockery, Utensils & Steel",
+          "name_hi": "होलसेल — क्रॉकरी, बर्तन एवं स्टील",
+          "icon": "🍽️"
+        },
+        {
+          "slug": "wholesale-glass",
+          "name": "Wholesale — Glass & Mirror",
+          "name_hi": "होलसेल — ग्लास एवं मिरर",
+          "icon": "🪞"
+        },
+        {
+          "slug": "wholesale-furniture",
+          "name": "Wholesale — Furniture & Mattress",
+          "name_hi": "होलसेल — फर्नीचर एवं गद्दे",
+          "icon": "🛋️"
+        },
+        {
+          "slug": "wholesale-electrical",
+          "name": "Wholesale — Electrical Goods",
+          "name_hi": "होलसेल — इलेक्ट्रिकल सामान",
+          "icon": "💡"
+        },
+        {
+          "slug": "wholesale-sanitary",
+          "name": "Wholesale — Sanitary & Bath Fittings",
+          "name_hi": "होलसेल — सैनिटरी एवं बाथ फिटिंग",
+          "icon": "🚿"
+        },
+        {
+          "slug": "wholesale-paint",
+          "name": "Wholesale — Paint & Coatings",
+          "name_hi": "होलसेल — पेंट",
+          "icon": "🎨"
+        },
+        {
+          "slug": "wholesale-cement-steel",
+          "name": "Wholesale — Cement, Sariya & Building",
+          "name_hi": "होलसेल — सीमेंट, सरिया एवं बिल्डिंग",
+          "icon": "🧱"
+        },
+        {
+          "slug": "wholesale-mobile",
+          "name": "Wholesale — Mobile & Accessories",
+          "name_hi": "होलसेल — मोबाइल एवं एक्सेसरीज़",
+          "icon": "📱"
+        },
+        {
+          "slug": "wholesale-computer",
+          "name": "Wholesale — Computer & IT Hardware",
+          "name_hi": "होलसेल — कंप्यूटर एवं आईटी",
+          "icon": "💻"
+        },
+        {
+          "slug": "wholesale-auto-parts",
+          "name": "Wholesale — Auto Parts & Spares",
+          "name_hi": "होलसेल — ऑटो पार्ट्स",
+          "icon": "🔧"
+        },
+        {
+          "slug": "wholesale-books",
+          "name": "Wholesale — Books & School Supplies",
+          "name_hi": "होलसेल — किताबें एवं स्कूल सामान",
+          "icon": "📚"
+        },
+        {
+          "slug": "wholesale-toys-gifts",
+          "name": "Wholesale — Toys, Gifts & Novelty",
+          "name_hi": "होलसेल — खिलौने एवं गिफ्ट",
+          "icon": "🎁"
+        },
+        {
+          "slug": "wholesale-sports",
+          "name": "Wholesale — Sports Goods",
+          "name_hi": "होलसेल — स्पोर्ट्स गुड्स",
+          "icon": "🏏"
+        },
+        {
+          "slug": "wholesale-pooja",
+          "name": "Wholesale — Pooja Samagri & Agarbatti",
+          "name_hi": "होलसेल — पूजा सामग्री एवं अगरबत्ती",
+          "icon": "🪔"
+        },
+        {
+          "slug": "wholesale-packaging",
+          "name": "Wholesale — Packaging, Cartons & Poly Bags",
+          "name_hi": "होलसेल — पैकेजिंग एवं कार्टन",
+          "icon": "📦"
+        },
+        {
+          "slug": "wholesale-disposable",
+          "name": "Wholesale — Disposable Items (Dona, Glass)",
+          "name_hi": "होलसेल — डिस्पोजेबल आइटम",
+          "icon": "🥤"
+        },
+        {
+          "slug": "wholesale-agri-inputs",
+          "name": "Wholesale — Seeds, Fertilizer & Pesticide",
+          "name_hi": "होलसेल — बीज, खाद एवं कीटनाशक",
+          "icon": "🌱"
+        },
+        {
+          "slug": "wholesale-cattle-feed",
+          "name": "Wholesale — Cattle & Poultry Feed",
+          "name_hi": "होलसेल — पशु एवं पोल्ट्री आहार",
+          "icon": "🐄"
+        },
+        {
+          "slug": "wholesale-chemicals",
+          "name": "Wholesale — Chemicals & Industrial Supply",
+          "name_hi": "होलसेल — केमिकल एवं इंडस्ट्रियल",
+          "icon": "⚗️"
+        },
+        {
+          "slug": "wholesale-scrap",
+          "name": "Wholesale — Scrap & Recycling",
+          "name_hi": "होलसेल — स्क्रैप एवं रीसाइक्लिंग",
+          "icon": "♻️"
+        },
+        {
+          "slug": "cf-agent",
+          "name": "C&F Agent / Super Stockist",
+          "name_hi": "सी एंड एफ एजेंट / सुपर स्टॉकिस्ट",
+          "icon": "🏬"
         }
       ]
     },
