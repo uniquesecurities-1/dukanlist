@@ -60,6 +60,20 @@ async function getTemplate(){
   return TEMPLATE;
 }
 
+// v301: dead slugs used to be answered with the whole 277 KB business.html
+// (which then booted, called Supabase again and told the visitor "not
+// found"). The site already has an 8 KB 404 page with a search box, so a
+// dead link now gets that. Cached like the template; falls back to the old
+// behaviour if it cannot be fetched, so a 404 is never turned into a 500.
+let NOT_FOUND = null;
+async function getNotFound(){
+  if (NOT_FOUND) return NOT_FOUND;
+  const r = await fetch(ORIGIN + '/404.html', { headers: { 'User-Agent': 'dukanlist-ssr' } });
+  if (!r.ok) throw new Error('404 template fetch failed: ' + r.status);
+  NOT_FOUND = await r.text();
+  return NOT_FOUND;
+}
+
 // Returns an array on success. THROWS on transport/HTTP failure so the
 // caller can tell "this slug does not exist" (real 404) apart from "our
 // backend hiccuped" (must NOT be reported to Google as a 404).
@@ -134,7 +148,8 @@ module.exports = async (req, res) => {
       '&select=id,name,name_hi,slug,usp_text,about_text,address_line1,address_line2,pincode,' +
       'mobile,whatsapp,photos,rating_avg,rating_count,established_year,hours_json,lat,lng,' +
       'claim_status,is_professional_listing,professional_tier,og_image_url,' +
-      'categories:category_id(name,name_hi,slug),geo_cities(name,name_hi),geo_localities(name)');
+      'categories:category_id(name,name_hi,slug),subcat:sub_category_id(name,name_hi,slug),' +
+      'geo_cities(name,name_hi),geo_localities(name)');
   } catch (e) {
     rows = null;
     backendFailed = true;
@@ -160,6 +175,13 @@ module.exports = async (req, res) => {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300');
+    let nf = null;
+    try { nf = await getNotFound(); } catch (e) { nf = null; }
+    if (nf){
+      res.end(nf.replace('<title>404 — Page Not Found | dukanlist.com</title>',
+                         '<title>Listing not found — dukanlist.com</title>'));
+      return;
+    }
     res.end(html
       .replace('<title>Business Details — dukanlist.com</title>',
                '<title>Listing not found — dukanlist.com</title>')
@@ -168,7 +190,11 @@ module.exports = async (req, res) => {
   }
 
   // ---------- derive the SEO strings ----------
-  const cat      = (b.categories && b.categories.name) || 'Local Business';
+  // v301: the trade, not the family. category_id is the parent on every
+  // shop (Food & Beverage, Retail & Shopping); sub_category_id is what the
+  // shop actually is (Restaurant, Kirana Store). Google indexes THIS title,
+  // and nobody searches "food & beverage in mandi dabwali".
+  const cat      = (b.subcat && b.subcat.name) || (b.categories && b.categories.name) || 'Local Business';
   const city     = (b.geo_cities && b.geo_cities.name) || 'Mandi Dabwali';
   const locality = (b.geo_localities && b.geo_localities.name) || '';
   const addr     = [b.address_line1, b.address_line2, locality, city, b.pincode]

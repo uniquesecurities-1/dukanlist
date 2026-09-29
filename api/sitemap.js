@@ -106,7 +106,7 @@ export default async function handler(req, res){
     const businesses = await fetchFromSupabase(
       'businesses?status=eq.active' +
       '&select=slug,updated_at,created_at,categories:category_id(slug),' +
-      'geo_cities(name),geo_localities(slug)'
+      'subcat:sub_category_id(slug),geo_cities(name),geo_localities(slug)'
     );
 
     const citySlug = n => String(n || '').toLowerCase().replace(/\s+/g, '-');
@@ -116,9 +116,15 @@ export default async function handler(req, res){
     const areaCombos  = new Set();   // "city/locality"
     businesses.forEach(b => {
       const cat  = b.categories && b.categories.slug;
+      // v301: the sub-category is the page people search for
+      // ("kirana in mandi dabwali", "pharmacy in sirsa"). Before this the
+      // sitemap only carried the parent (retail-shopping, food-beverage), so
+      // /local/mandi-dabwali/kirana-grocery with 19 shops was never submitted.
+      const sub  = b.subcat && b.subcat.slug;
       const city = b.geo_cities && citySlug(b.geo_cities.name);
       const loc  = b.geo_localities && b.geo_localities.slug;
       if (city && cat) localCombos.add(city + '/' + cat);
+      if (city && sub && sub !== cat) localCombos.add(city + '/' + sub);
       if (city && loc) areaCombos.add(city + '/' + loc);
     });
 
