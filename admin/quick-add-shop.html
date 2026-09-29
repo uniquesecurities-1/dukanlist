@@ -190,6 +190,26 @@
         <button type="button" class="btn-sec" onclick="ffSaveHours()" style="margin-bottom:6px">⏰ Timing save karo</button>
         <div id="ffHoursStatus" style="font-size:.78rem;font-weight:700;margin-bottom:10px;min-height:1em"></div>
 
+        <div style="font-size:.75rem;font-weight:800;color:#7C2D12;text-transform:uppercase;margin:12px 0 6px">🛍️ Ye dukaan kya bechti hai</div>
+        <div style="font-size:.76rem;color:#7C2D12;margin-bottom:8px;line-height:1.45">Tap karo — yahi cheezein search me is dukaan ko laayengi.</div>
+        <div id="ffProdChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input type="text" id="ffProdOther" placeholder="Koi aur cheez… (Enter)" maxlength="80" style="flex:1;padding:9px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:.86rem">
+          <button type="button" class="btn-sec" onclick="ffAddOtherProduct()" style="width:auto;margin:0;padding:9px 14px">+</button>
+        </div>
+        <div id="ffProdPicked" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
+        <script>
+          // v300: Enter should add, not submit the form behind it
+          document.addEventListener('DOMContentLoaded', function(){
+            var el = document.getElementById('ffProdOther');
+            if (el) el.addEventListener('keydown', function(e){
+              if (e.key === 'Enter'){ e.preventDefault(); ffAddOtherProduct(); }
+            });
+          });
+        </script>
+        <button type="button" class="btn-sec" onclick="ffSaveProducts()" style="margin-bottom:6px">🛍️ Products save karo</button>
+        <div id="ffProdStatus" style="font-size:.78rem;font-weight:700;margin-bottom:10px;min-height:1em"></div>
+
         <a id="ffViewLive" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;background:#0F172A;color:#fff;padding:11px;border-radius:9px;font-weight:800;text-decoration:none;font-size:.88rem">🔗 Dukaandaar ko page dikhao</a>
       </div>
 
@@ -356,6 +376,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://upload-widget.cloudinary.com/global/all.js" async></script>
+<script src="/assets/js/product-suggestions.js?v=20260929a"></script>
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script src="/assets/js/admin-common.js?v=20260921e"></script>
 <script>
@@ -834,6 +855,7 @@ async function submitSingle(){
       area:        area,
       claim_url:   data.claim_url,
       slug:        data.slug,          // v289: to open the live page in front of the owner
+      catSlug:     primarySlug || null,   // v300: decides which product chips to offer
       email:       email || null,
       inviteMsg:   ''
     };
@@ -1372,6 +1394,7 @@ function ffRenderDays(){
       var i = FF_OFF_DAYS.indexOf(d);
       if (i === -1) FF_OFF_DAYS.push(d); else FF_OFF_DAYS.splice(i, 1);
       ffRenderDays();
+  ffResetProducts();   // v300
     };
   });
 }
@@ -1433,6 +1456,106 @@ async function ffSavePhoto(info){
     ffSetStatus('ffPhotoStatus', '✅ ' + FF_PHOTO_COUNT + ' photo page par lag gayi' + (isFirst ? ' (pehli = main photo)' : ''), true);
   } catch(e){
     ffSetStatus('ffPhotoStatus', 'Photo save nahi hui: ' + (e.message || e), false);
+  }
+}
+
+// ============================================================
+// v300 — the boy in the shop fills its products
+// ============================================================
+// db/238 made products searchable and v299 made them tappable in the
+// owner panel — but the owner has to claim his listing and log in, and
+// on 2026-09-29 that path had left 261 of 268 product lists empty. The
+// person actually standing in the shop is ours. Ten taps here and the
+// shop is findable by what it sells.
+//
+// Written to businesses.services_json, exactly the shape panel/services
+// writes, so the owner can rename, price or delete them later as his own.
+// ============================================================
+var FF_PRODUCTS = [];
+var FF_PROD_MAX = 20;
+
+function ffResetProducts(){
+  FF_PRODUCTS = [];
+  ffSetStatus('ffProdStatus', '');
+  var other = document.getElementById('ffProdOther');
+  if (other) other.value = '';
+  ffRenderProdChips();
+  ffRenderProdPicked();
+}
+
+function ffRenderProdChips(){
+  var host = document.getElementById('ffProdChips');
+  if (!host) return;
+  var ideas = (window.DukanProductIdeas && LAST_RESULT)
+    ? DukanProductIdeas.forCategory(LAST_RESULT.catSlug)
+    : [];
+  var picked = FF_PRODUCTS.map(function(p){ return p.toLowerCase(); });
+  var left = ideas.filter(function(n){ return picked.indexOf(n.toLowerCase()) === -1; });
+  if (!left.length || FF_PRODUCTS.length >= FF_PROD_MAX){ host.innerHTML = ''; return; }
+  host.innerHTML = left.map(function(n){
+    return '<button type="button" data-prod="' + n.replace(/"/g, '&quot;') + '" ' +
+      'style="background:#fff;border:1.5px solid #FDBA74;color:#9A3412;border-radius:99px;' +
+      'padding:5px 11px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit">+ ' +
+      n.replace(/[&<>]/g, '') + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(host.querySelectorAll('[data-prod]'), function(b){
+    b.onclick = function(){ ffAddProduct(b.getAttribute('data-prod')); };
+  });
+}
+
+function ffRenderProdPicked(){
+  var host = document.getElementById('ffProdPicked');
+  if (!host) return;
+  host.innerHTML = FF_PRODUCTS.map(function(n, i){
+    return '<span style="background:#DCFCE7;border:1px solid #86EFAC;color:#065F46;border-radius:99px;' +
+      'padding:5px 9px 5px 11px;font-size:.8rem;font-weight:700">' + n.replace(/[&<>]/g, '') +
+      ' <button type="button" data-drop="' + i + '" style="background:none;border:none;color:#047857;' +
+      'cursor:pointer;font-weight:900;font-size:.9rem;padding:0 2px">x</button></span>';
+  }).join('');
+  Array.prototype.forEach.call(host.querySelectorAll('[data-drop]'), function(b){
+    b.onclick = function(){
+      FF_PRODUCTS.splice(parseInt(b.getAttribute('data-drop'), 10), 1);
+      ffRenderProdChips(); ffRenderProdPicked();
+    };
+  });
+}
+
+function ffAddProduct(name){
+  name = String(name || '').trim();
+  if (name.length < 2) return;
+  if (FF_PRODUCTS.length >= FF_PROD_MAX){
+    ffSetStatus('ffProdStatus', 'Zyada se zyada ' + FF_PROD_MAX + ' cheezein.', false);
+    return;
+  }
+  if (FF_PRODUCTS.some(function(p){ return p.toLowerCase() === name.toLowerCase(); })) return;
+  FF_PRODUCTS.push(name);
+  ffRenderProdChips();
+  ffRenderProdPicked();
+}
+
+function ffAddOtherProduct(){
+  var el = document.getElementById('ffProdOther');
+  if (!el) return;
+  ffAddProduct(el.value);
+  el.value = '';
+  el.focus();
+}
+
+async function ffSaveProducts(){
+  if (!LAST_RESULT || !LAST_RESULT.business_id) return;
+  if (!FF_PRODUCTS.length){
+    ffSetStatus('ffProdStatus', 'Pehle kuch cheezein tap karo.', false);
+    return;
+  }
+  try {
+    var payload = FF_PRODUCTS.map(function(n){ return { name: n }; });
+    var res = await C.from('businesses')
+      .update({ services_json: payload })
+      .eq('id', LAST_RESULT.business_id);
+    if (res.error) throw res.error;
+    ffSetStatus('ffProdStatus', '\u2705 ' + FF_PRODUCTS.length + ' cheezein page par lag gayi — ab search me milegi', true);
+  } catch(e){
+    ffSetStatus('ffProdStatus', 'Save nahi hui: ' + (e.message || e), false);
   }
 }
 
