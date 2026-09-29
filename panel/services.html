@@ -193,7 +193,10 @@ function setLang(lang){
 
 let MY_BIZ = null;
 let SERVICES = []; // [{name, desc, price_min, price_max}]
-const MAX_SERVICES = 15;
+// v298: 15 -> 20. These are the shop's products, and they are now
+// searchable (db/238), so the list is worth filling properly — a kirana
+// or a distributor has more than fifteen things worth naming.
+const MAX_SERVICES = 20;
 
 async function loadServices(){
   const user = await ShopDB.requireAuth();
