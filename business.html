@@ -1045,9 +1045,6 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 .gallery .main img{ cursor:zoom-in !important }
 /* ===== Always-applied fixes (desktop + mobile) ===== */
 
-/* Hide Google Maps iframe — often shows broken-image placeholder when Google
-   blocks the keyless embed. The 'Open in Google Maps' button below works fine. */
-#mapEmbedWrap{ display:none !important }
 
 /* CTA action grid — 6-col layout: 2 large primary buttons + 3 medium secondary.
    Eliminates the empty 6th cell blank space that appeared with 5 buttons in 2-col grid. */
@@ -1778,9 +1775,6 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="addr-box">
             <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
             <div class="a-text" id="addrDisp"></div>
-            <div id="mapEmbedWrap" style="margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;display:none">
-              <iframe id="mapEmbed" loading="lazy" style="width:100%;height:200px;border:0" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-            </div>
             <a class="a-map-link" id="addrMapLink" target="_blank" rel="noopener" href="#" style="margin-top:8px">
               🗺 <span data-i18n-en>Open in Google Maps</span><span data-i18n-hi>Google Maps में खोलें</span>
             </a>
@@ -2993,22 +2987,42 @@ function render(){
   //
   // Safe behavior:
   //   - Has lat + lng → show pinpoint embed (no risk of name-collision)
-  //   - No coords    → DON'T embed. The existing "Open in Google Maps" button
-  //                    in the right column already uses the full /search/?api=1
-  //                    endpoint which handles addresses correctly.
+  //   - No coords    → embed the AREA, never the name (v301). 0 of 269 shops
+  //                    have coordinates today, so "no coords → no map" meant
+  //                    no shop had a map at all. Address + city + pincode
+  //                    without the shop name cannot collide with a
+  //                    similarly-named business; Google centres on the street
+  //                    or the town. Labelled approximate; the "Open in Google
+  //                    Maps" link below it still uses the full /search/?api=1
+  //                    endpoint for the exact place.
   try {
     const _mapCard = document.getElementById('bizMapCard');
     const _mapIframe = document.getElementById('bizMapEmbed');
     const _mapOpen = document.getElementById('bizMapOpen');
-    if (_mapCard && _mapIframe && b.lat && b.lng){
-      const q = b.lat + ',' + b.lng;
-      _mapIframe.src = 'https://www.google.com/maps?q=loc:' + encodeURIComponent(q) + '&output=embed';
-      if (_mapOpen){
-        _mapOpen.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+    if (_mapCard && _mapIframe){
+      let _src = null, _open = null;
+      if (b.lat && b.lng){
+        const q = b.lat + ',' + b.lng;
+        _src  = 'https://www.google.com/maps?q=loc:' + encodeURIComponent(q) + '&output=embed';
+        _open = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+      } else {
+        const _cityNm = (b.geo_cities && b.geo_cities.name) || '';
+        const _locNm  = (b.geo_localities && b.geo_localities.name) || '';
+        const _area = [b.address_line1, b.address_line2, _locNm, _cityNm, b.pincode]
+          .map(function(s){ return String(s || '').trim(); }).filter(Boolean).join(', ');
+        if (_cityNm && _area.length > 6){
+          _src  = 'https://www.google.com/maps?q=' + encodeURIComponent(_area) + '&z=15&output=embed';
+          _open = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([b.name, _area].filter(Boolean).join(', '));
+          const _head = _mapCard.querySelector('.biz-map-head');
+          if (_head) _head.innerHTML = '📍 <span data-i18n-en>Area on map (approximate)</span><span data-i18n-hi>नक्शे पर इलाका (अनुमानित)</span>';
+        }
       }
-      _mapCard.style.display = '';
+      if (_src){
+        _mapIframe.src = _src;
+        if (_mapOpen && _open) _mapOpen.href = _open;
+        _mapCard.style.display = '';
+      }
     }
-    // No coords → leave _mapCard hidden (its inline style="display:none" stays)
   } catch(mapErr){
     console.warn('Map embed skipped:', mapErr);
   }
@@ -3401,24 +3415,11 @@ function render(){
     }
   } catch(_){}
 
-  // Google Maps embed (if lat/lng available)
-  try {
-    const wrap = document.getElementById('mapEmbedWrap');
-    const iframe = document.getElementById('mapEmbed');
-    if (wrap && iframe){
-      let src = null;
-      if (b.lat && b.lng){
-        src = 'https://maps.google.com/maps?q=' + b.lat + ',' + b.lng + '&z=16&output=embed';
-      } else {
-        const q = [b.name, b.address_line1, b.address_line2, (b.geo_cities && b.geo_cities.name) || '', b.pincode].filter(Boolean).join(', ');
-        if (q.length > 4) src = 'https://maps.google.com/maps?q=' + encodeURIComponent(q) + '&z=15&output=embed';
-      }
-      if (src){
-        iframe.src = src;
-        wrap.style.display = '';
-      }
-    }
-  } catch(_){}
+  // v301: the second address-box map (#mapEmbed) is gone. Its src pointed at
+  // maps.google.com, which the CSP frame-src never allowed, so it was a
+  // blocked request on every shop page and its wrapper was force-hidden with
+  // !important to cover the resulting blank box. The single map card above
+  // (#bizMapCard) now handles both the lat/lng and the address case.
 
   // Profile Highlights — fills empty left-column space, builds trust
   try { renderShopHighlights(b); } catch(e){ console.warn('highlights render failed', e); }
