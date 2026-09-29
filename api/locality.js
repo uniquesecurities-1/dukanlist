@@ -441,7 +441,7 @@ export default async function handler(req, res){
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     // v294: same reasoning as api/biz.js — 5 minutes of stale cover was not
     // enough for pages nobody visits twice in an hour.
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=604800');
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=604800');  // v303: same edge TTL as shop pages
     return res.end(renderPage({ city, cat, shops, isParent, subCategories }));
 
   } catch (err){

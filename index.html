@@ -509,7 +509,12 @@
             // choosing: at this size the signboards still read fine cropped,
             // and four matching cards is the whole point of the strip.
             var img = b.photo
-              ? '<img class="hts-img" data-fit-skip="1" width="250" height="156" src="' + esc(window.DukanImg ? DukanImg.strip(b.photo) : b.photo) + '" alt="' + esc(b.name) + '" loading="lazy">'
+              // v303: the first two cards are on screen at load on every
+              // phone — they ARE the largest visible element. lazy on them
+              // meant the browser waited for layout before even asking for
+              // the picture; on the live page they arrived seconds after
+              // the text. The rest of the row stays lazy.
+              ? '<img class="hts-img" data-fit-skip="1" width="250" height="156" src="' + esc(window.DukanImg ? DukanImg.strip(b.photo) : b.photo) + '" alt="' + esc(b.name) + '"' + (i < 2 ? ' loading="eager" fetchpriority="high"' : ' loading="lazy"') + '>'
               : '<div class="hts-ph">\u{1F3EA}</div>';
             var rating = (b.rating_count > 0)
               ? '\u2605 ' + Number(b.rating_avg).toFixed(1) + ' (' + b.rating_count + ')'
