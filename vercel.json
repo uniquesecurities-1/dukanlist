@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["bom1"],
+  "_regions_note": "bom1 = Mumbai. Checked 2026-09-30: db.<ref>.supabase.co resolves into AWS 2406:da1a::/35 = ap-south-1 (Mumbai), so the functions now sit next to the database. Do not move to sin1/iad1.",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
