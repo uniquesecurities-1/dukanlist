@@ -116,6 +116,28 @@
 .deal-strip-txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 .deal-strip-arrow{ flex:0 0 auto; color:#DC2626; font-weight:900 }
 .deal-flash{ animation:dealFlash 1.2s ease-in-out 2 }
+.deal-item{ cursor:pointer; flex-wrap:wrap }
+.deal-item .deal-photo{ width:100%; max-height:170px; object-fit:cover; border-radius:10px; margin-bottom:8px; display:block }
+/* v320: offer sheet */
+#dealSheet{ position:fixed; inset:0; z-index:10050; display:flex; align-items:flex-end; justify-content:center }
+#dealSheet .ds-back{ position:absolute; inset:0; background:rgba(15,23,42,.62); backdrop-filter:blur(3px) }
+#dealSheet .ds-card{ position:relative; background:#fff; width:100%; max-width:520px; max-height:92vh; max-height:92dvh; overflow-y:auto; border-radius:20px 20px 0 0; box-shadow:0 -10px 40px rgba(0,0,0,.3); animation:dsUp .25s ease-out }
+@media (min-width:700px){ #dealSheet{ align-items:center } #dealSheet .ds-card{ border-radius:20px } }
+@keyframes dsUp{ from{ transform:translateY(24px); opacity:0 } to{ transform:none; opacity:1 } }
+#dealSheet .ds-close{ position:absolute; top:10px; right:12px; z-index:2; width:34px; height:34px; border-radius:50%; border:0; background:rgba(255,255,255,.92); color:#0F172A; font-weight:900; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.2) }
+#dealSheet .ds-img{ width:100%; max-height:300px; object-fit:cover; display:block }
+#dealSheet .ds-body{ padding:16px 18px 20px }
+#dealSheet .ds-tag{ display:inline-block; background:#DC2626; color:#fff; font-weight:900; font-size:.8rem; padding:4px 11px; border-radius:99px; margin-bottom:8px }
+#dealSheet .ds-title{ font-size:1.3rem; font-weight:800; color:#0F172A; line-height:1.25; margin-bottom:6px }
+#dealSheet .ds-extra{ color:#B45309; font-weight:800; margin-bottom:6px }
+#dealSheet .ds-desc{ color:#334155; line-height:1.5; margin-bottom:10px }
+#dealSheet .ds-meta{ font-size:.86rem; color:#475569; margin-bottom:8px }
+#dealSheet .ds-shop{ font-size:.84rem; color:#64748B; margin-bottom:14px }
+#dealSheet .ds-actions{ display:flex; gap:10px }
+#dealSheet .ds-wa, #dealSheet .ds-call{ flex:1; text-align:center; padding:12px 10px; border-radius:12px; font-weight:800; text-decoration:none; font-size:.95rem }
+#dealSheet .ds-wa{ background:#25D366; color:#fff }
+#dealSheet .ds-call{ background:#FF6B1A; color:#fff }
+#dealSheet .ds-fine{ font-size:.72rem; color:#94A3B8; margin-top:12px; text-align:center }
 @keyframes dealFlash{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,0) } 50%{ box-shadow:0 0 0 6px rgba(220,38,38,.35) } }
 .deals-list{ display:grid; gap:10px }
 .deal-item{ background:#fff; border:1px solid #FECACA; border-radius:12px; padding:14px 16px; display:flex; align-items:flex-start; gap:14px; transition:.18s; cursor:pointer; position:relative; overflow:hidden }
@@ -2403,7 +2425,9 @@ async function loadDealsForShop(slug){
       const textLine = (d.discount_pct && d.discount_text)
         ? '<div class="deal-desc" style="color:#B45309;font-weight:800">🎁 ' + escapeDeal(d.discount_text) + '</div>' : '';
       const meta = dealMeta(d);
-      return '<div class="deal-item" data-deal-id="' + escapeDeal(d.id) + '">'
+      const photoHTML = d.image_url ? '<img class="deal-photo" src="' + escapeDeal(d.image_url) + '" alt="" loading="lazy">' : '';
+      return '<div class="deal-item" data-deal-id="' + escapeDeal(d.id) + '" role="button" tabindex="0" title="Tap for details">'
+        + photoHTML
         + pctHTML
         + '<div class="deal-body">'
         +   '<div class="deal-title">' + escapeDeal(d.title) + '</div>'
@@ -2458,9 +2482,55 @@ async function loadDealsForShop(slug){
         if (dealId) {
           try { c.rpc('track_deal_click', { p_deal_id: dealId }).then(null, function(){}); } catch(_){}   // v291: see note on the view log — needs .then() to be sent
         }
+        // v320: a tap opens the offer in full — photo, text, validity, and a
+        // WhatsApp / Call button that names the offer. The card used to log a
+        // click and do nothing the visitor could see.
+        const d = r.data.find(x => String(x.id) === String(dealId));
+        if (d) openDealSheet(d, dealMeta(d));
       });
     });
   } catch(e){ console.warn('loadDealsForShop failed', e); }
+}
+
+function openDealSheet(d, metaHTML){
+  const isHi = document.documentElement.dataset.lang === 'hi';
+  const old = document.getElementById('dealSheet'); if (old) old.remove();
+  const name = (BIZ && BIZ.name) || '';
+  const raw = String((BIZ && (BIZ.whatsapp || BIZ.mobile)) || '').replace(/\D/g,'').slice(-10);
+  const tel = String((BIZ && BIZ.mobile) || '').replace(/\D/g,'').slice(-10);
+  const tag = d.discount_pct ? d.discount_pct + '% OFF' : (d.discount_text || (isHi ? 'ऑफर' : 'OFFER'));
+  const msg = encodeURIComponent((isHi ? 'नमस्ते ' : 'Hi ') + name + ', DukanList par aapka offer dekha — "' + d.title + '" (' + tag + '). Kya ye abhi chal raha hai?');
+  const wrap = document.createElement('div');
+  wrap.id = 'dealSheet';
+  wrap.innerHTML =
+    '<div class="ds-back"></div>' +
+    '<div class="ds-card" role="dialog" aria-modal="true">' +
+      '<button type="button" class="ds-close" aria-label="Close">✕</button>' +
+      (d.image_url ? '<img class="ds-img" src="' + escapeDeal(d.image_url) + '" alt="">' : '') +
+      '<div class="ds-body">' +
+        '<div class="ds-tag">🏷️ ' + escapeDeal(tag) + '</div>' +
+        '<div class="ds-title">' + escapeDeal(d.title) + '</div>' +
+        ((d.discount_pct && d.discount_text) ? '<div class="ds-extra">🎁 ' + escapeDeal(d.discount_text) + '</div>' : '') +
+        (d.body ? '<div class="ds-desc">' + escapeDeal(d.body) + '</div>' : '') +
+        (metaHTML ? '<div class="ds-meta">' + metaHTML + '</div>' : '') +
+        '<div class="ds-shop">🏪 ' + escapeDeal(name) + '</div>' +
+        '<div class="ds-actions">' +
+          (raw.length === 10 ? '<a class="ds-wa" href="https://wa.me/91' + raw + '?text=' + msg + '" target="_blank" rel="noopener">💬 ' + (isHi ? 'WhatsApp पर पूछें' : 'Ask on WhatsApp') + '</a>' : '') +
+          (tel.length === 10 ? '<a class="ds-call" href="tel:+91' + tel + '">📞 ' + (isHi ? 'कॉल करें' : 'Call now') + '</a>' : '') +
+        '</div>' +
+        '<div class="ds-fine">' + (isHi ? 'ऑफर की शर्तें दुकान तय करती है।' : 'Offer terms are set by the shop.') + '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  document.body.style.overflow = 'hidden';
+  const close = () => { wrap.remove(); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  wrap.querySelector('.ds-back').addEventListener('click', close);
+  wrap.querySelector('.ds-close').addEventListener('click', close);
+  document.addEventListener('keydown', onKey);
+  wrap.querySelectorAll('.ds-wa, .ds-call').forEach(a => a.addEventListener('click', () => {
+    try { logLead(a.classList.contains('ds-wa') ? 'whatsapp' : 'call'); } catch(_){}
+  }));
 }
 
 function escapeDeal(s){
