@@ -721,7 +721,7 @@
     <!-- v306/v314: Offers tile, first in the row (the Zomato "Offers" pattern).
          Always visible; the badge shows the live count, and with no live
          deal the section below it invites shopkeepers to post one. -->
-    <a href="#deals-section" class="kcb-tile kcb-offers" id="kcbOffers"><span class="kcb-ico">🏷️<span class="kcb-badge" id="kcbOffersCount"></span></span><span class="kcb-lbl"><span data-i18n-en>Offers</span><span data-i18n-hi>ऑफर्स</span></span></a>
+    <a href="#deals-section" class="kcb-tile kcb-offers" id="kcbOffers" onclick="return dlGoOffers(event)"><span class="kcb-ico">🏷️<span class="kcb-badge" id="kcbOffersCount"></span></span><span class="kcb-lbl"><span data-i18n-en>Offers</span><span data-i18n-hi>ऑफर्स</span></span></a>
     <a href="/search.html?cat=doctor,dentist,ayurveda,homeopathy,hospital,physiotherapist,eye-care,gynecologist,pediatrician" class="kcb-tile"><span class="kcb-ico">🏥</span><span class="kcb-lbl"><span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></span></a>
     <a href="/search.html?cat=pharmacy" class="kcb-tile"><span class="kcb-ico">💊</span><span class="kcb-lbl"><span data-i18n-en>Pharmacy</span><span data-i18n-hi>दवाई</span></span></a>
     <a href="/search.html?cat=agri-business" class="kcb-tile"><span class="kcb-ico">🌾</span><span class="kcb-lbl"><span data-i18n-en>Agri Listings</span><span data-i18n-hi>कृषि लिस्टिंग</span></span></a>
@@ -740,6 +740,16 @@
   /* v313: once categories arrive, order the tiles by how many shops each
      one actually leads to — Offers stays first, All categories stays last.
      Counts come from the same categories query homepage.js already makes. */
+  /* v318: scroll to the offers and re-check as late sections settle. */
+  window.dlGoOffers = function(ev){
+    var sec = document.getElementById('deals-section'); if (!sec) return true;
+    if (ev) ev.preventDefault();
+    sec.style.display = '';
+    var go = function(){ sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    go(); setTimeout(go, 450); setTimeout(go, 1200);
+    try { history.replaceState(null, '', '#deals-section'); } catch(_){}
+    return false;
+  };
   document.addEventListener('dl:cats', function(ev){
     try{
       var rows = (ev.detail && ev.detail.rows) || []; if (!rows.length) return;
@@ -817,6 +827,30 @@
 .db-home-age b{color:#EA580C;font-weight:800}
 </style>
 <div id="homepageBuzz" style="display:none"></div>
+
+<!-- v318: Today's Offers sits right under the Buzz now (was below Featured /
+     Spotlight / Top 5). The Offers tile jumped to #deals-section before those
+     sections had loaded, and the page then grew under the visitor, leaving
+     them on Spotlight. Short jump, nothing loads in between. -->
+<section id="deals-section" style="scroll-margin-top:72px;background:linear-gradient(180deg,#FFF7ED 0%,#FFFFFF 100%);display:none">
+  <div class="section-head reveal">
+    <span class="eyebrow" style="color:#E55100">🎁 Today's Offers</span>
+    <h2><span data-i18n-en>Live deals near you</span><span data-i18n-hi>आज के ऑफर्स</span></h2>
+    <p class="sub"><span data-i18n-en>Limited-time discounts from local businesses. Tap to view.</span><span data-i18n-hi>स्थानीय दुकानों से सीमित समय के ऑफर्स।</span></p>
+  </div>
+  <div class="cats-wrap">
+    <div id="dealsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"></div>
+    <!-- v314: no live offer → say so, and turn the empty space into a nudge
+         for the shopkeeper reading it. Hidden the moment one deal is live. -->
+    <div id="dealsEmpty" style="display:none;background:#fff;border:1.5px dashed #FCA5A5;border-radius:16px;padding:18px 16px;text-align:center;max-width:520px;margin:0 auto">
+      <div style="font-size:1.8rem;margin-bottom:6px">🏷️</div>
+      <div style="font-weight:800;color:#0F172A;font-size:.98rem;margin-bottom:4px"><span data-i18n-en>No offer live right now</span><span data-i18n-hi>अभी कोई ऑफर लाइव नहीं</span></div>
+      <div style="font-size:.84rem;color:#64748B;line-height:1.45;margin-bottom:12px"><span data-i18n-en>Shop owners: post today's offer in 30 seconds — it shows here, on your page and on the Offers tile. Free.</span><span data-i18n-hi>दुकानदार भाई: आज का ऑफर 30 सेकंड में डालें — यहाँ, आपके पेज पर और Offers टाइल पर दिखेगा। फ्री।</span></div>
+      <a href="/panel/deals.html" style="display:inline-block;background:linear-gradient(135deg,#DC2626,#EF4444);color:#fff;font-weight:800;padding:10px 18px;border-radius:99px;text-decoration:none;font-size:.86rem;box-shadow:0 6px 16px rgba(220,38,38,.28)">🏷️ <span data-i18n-en>Post my offer →</span><span data-i18n-hi>अपना ऑफर डालें →</span></a>
+    </div>
+  </div>
+</section>
+
 
 <!-- v313: #catStrip (parent-category strip, phones only) removed — it sat
      right under the "Kya chahiye, bhai?" row and said the same thing twice. -->
@@ -993,24 +1027,6 @@
 </section>
 
 <!-- ===== TODAY'S DEALS ===== -->
-<section id="deals-section" style="background:linear-gradient(180deg,#FFF7ED 0%,#FFFFFF 100%);display:none">
-  <div class="section-head reveal">
-    <span class="eyebrow" style="color:#E55100">🎁 Today's Offers</span>
-    <h2><span data-i18n-en>Live deals near you</span><span data-i18n-hi>आज के ऑफर्स</span></h2>
-    <p class="sub"><span data-i18n-en>Limited-time discounts from local businesses. Tap to view.</span><span data-i18n-hi>स्थानीय दुकानों से सीमित समय के ऑफर्स।</span></p>
-  </div>
-  <div class="cats-wrap">
-    <div id="dealsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"></div>
-    <!-- v314: no live offer → say so, and turn the empty space into a nudge
-         for the shopkeeper reading it. Hidden the moment one deal is live. -->
-    <div id="dealsEmpty" style="display:none;background:#fff;border:1.5px dashed #FCA5A5;border-radius:16px;padding:18px 16px;text-align:center;max-width:520px;margin:0 auto">
-      <div style="font-size:1.8rem;margin-bottom:6px">🏷️</div>
-      <div style="font-weight:800;color:#0F172A;font-size:.98rem;margin-bottom:4px"><span data-i18n-en>No offer live right now</span><span data-i18n-hi>अभी कोई ऑफर लाइव नहीं</span></div>
-      <div style="font-size:.84rem;color:#64748B;line-height:1.45;margin-bottom:12px"><span data-i18n-en>Shop owners: post today's offer in 30 seconds — it shows here, on your page and on the Offers tile. Free.</span><span data-i18n-hi>दुकानदार भाई: आज का ऑफर 30 सेकंड में डालें — यहाँ, आपके पेज पर और Offers टाइल पर दिखेगा। फ्री।</span></div>
-      <a href="/panel/deals.html" style="display:inline-block;background:linear-gradient(135deg,#DC2626,#EF4444);color:#fff;font-weight:800;padding:10px 18px;border-radius:99px;text-decoration:none;font-size:.86rem;box-shadow:0 6px 16px rgba(220,38,38,.28)">🏷️ <span data-i18n-en>Post my offer →</span><span data-i18n-hi>अपना ऑफर डालें →</span></a>
-    </div>
-  </div>
-</section>
 
 <!-- ===== TRUST STRIP ===== -->
 <div class="trust">
