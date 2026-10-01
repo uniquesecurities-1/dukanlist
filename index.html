@@ -340,11 +340,11 @@
       <img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none">
       <span>Dukan<em>List</em></span>
     </a>
-    <!-- v307: Zomato-style location pill, phones only. Opens the same
-         "Pick your area" sheet; label follows DukanCity. On desktop the city
-         <select> in the search card does this job and the pill is hidden. -->
-    <button type="button" class="hdr-city" id="hdrCity" onclick="openLocalityPicker()" aria-label="Change city">📍 <span id="hdrCityName">Mandi Dabwali</span> <span class="hdr-city-caret">▾</span></button>
+    <!-- v307/v308: Zomato-style location pill, phones only — inside .nav-links
+         (main.css hides any other direct child of .topbar-inner). Opens the
+         same "Pick your area" sheet; label follows DukanCity. -->
     <nav class="nav-links">
+    <button type="button" class="hdr-city" id="hdrCity" onclick="openLocalityPicker()" aria-label="Change city">📍 <span id="hdrCityName">Mandi Dabwali</span> <span class="hdr-city-caret">▾</span></button>
       <div class="lang-toggle" role="group" aria-label="Language switcher">
         <button onclick="setLang('en')" id="langBtnEn">EN</button>
         <button onclick="setLang('hi')" id="langBtnHi" class="keep-en">हिं</button>
@@ -385,8 +385,9 @@
 .hdr-city{display:none}
 .hsc-btn-m{display:none}
 @media (max-width:760px){
-  .hdr-city{display:inline-flex;align-items:center;gap:4px;max-width:46vw;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:99px;padding:6px 10px;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:auto}
+  .hdr-city{display:inline-flex;align-items:center;gap:4px;max-width:38vw;margin-right:4px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:99px;padding:6px 10px;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:auto}
   .hdr-city #hdrCityName{overflow:hidden;text-overflow:ellipsis}
+  .topbar .brand{flex-shrink:0}
   .hdr-city-caret{opacity:.8;font-size:.7rem}
   .topbar .nav-cta{display:none !important}        /* bottom nav has Register */
   .hero-search-first .hero-sub{display:none !important}
@@ -1333,8 +1334,9 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 </script>
 
 <!-- ===== LOCALITY SELECTOR (first-visit modal) ===== -->
-<div id="localityModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:10001;align-items:center;justify-content:center;padding:20px;animation:locFade .3s ease-out">
-  <div style="background:#fff;border-radius:20px;max-width:520px;width:100%;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:locSlide .3s ease-out;position:relative">
+<div id="localityModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:10001;align-items:center;justify-content:center;padding:20px;animation:locFade .3s ease-out;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain">
+  <!-- v308: the sheet scrolls itself (14 towns did not fit a phone; the page behind scrolled instead) -->
+  <div style="background:#fff;border-radius:20px;max-width:520px;width:100%;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:locSlide .3s ease-out;position:relative;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain;margin:auto">
     <div style="text-align:center;margin-bottom:20px">
       <button type="button" onclick="dismissLocalityPicker()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:#F1F5F9;border:none;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;color:#475569">✕</button>
       <div style="font-size:2.6rem;margin-bottom:8px">📍</div>
@@ -1346,7 +1348,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
         <span data-i18n-hi>आस-पास के व्यवसाय देखें। कभी भी बदल सकते हैं।</span>
       </p>
     </div>
-    <div data-loc-grid style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">
+    <div data-loc-grid style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px">
       <button onclick="pickLocality('mandi-dabwali')" class="loc-btn">🏪 Mandi Dabwali</button>
       <button onclick="pickLocality('sirsa')" class="loc-btn">🏪 Sirsa</button>
       <button onclick="pickLocality('bathinda')" class="loc-btn">🏪 Bathinda</button>
@@ -1376,7 +1378,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20261001c" defer></script>
+<script src="/assets/js/homepage.js?v=20261001d" defer></script>
 <script src="/assets/js/trending.js?v=20260925a" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260922a" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
