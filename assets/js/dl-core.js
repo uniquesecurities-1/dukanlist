@@ -403,12 +403,12 @@ window.DL_CONFIG = Object.freeze({
 })(window);
 ;
 
-/* ---- mobile-nav.js (e5e1c01d34) ---- */
+/* ---- mobile-nav.js (9e8082ba4a) ---- */
 /* ============================================================
    mobile-nav.js — Sticky bottom navigation bar (mobile only ≤700px)
    ============================================================
    USAGE: include on any public page. Auto-injects a fixed bottom
-   navigation strip with: 🏠 Home / 🗂 Browse / 🔍 Search /
+   navigation strip with: 🏠 Home / 🗂 Categories / 🔍 Search /
    🏪 Register / 👤 Account.
 
    - Auto-hides above 700px (desktop)
@@ -420,7 +420,7 @@ window.DL_CONFIG = Object.freeze({
 
   const ITEMS = [
     { href: '/',            icon: '🏠', label: 'Home',     match: /^\/(index\.html)?$/ },
-    { href: '/browse',      icon: '🗂', label: 'Browse',   match: /^\/browse(\.html)?$/ },
+    { href: '/browse',      icon: '🗂', label: 'Categories', match: /^\/browse(\.html)?$/ },  // v304: say what it is
     { href: '/search.html', icon: '🔍', label: 'Search',   match: /^\/search(\.html)?$/ },
     { href: '/register.html', icon: '🏪', label: 'Register', match: /^\/register(\.html)?$/ },
     { href: '/panel/login.html', icon: '👤', label: 'Account', match: /^\/panel\// }

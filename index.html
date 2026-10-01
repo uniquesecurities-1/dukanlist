@@ -670,26 +670,40 @@
 
 <!-- ===== MMT-style category strip ===== -->
 <!-- ===== TRENDING SEARCHES ===== -->
-<section id="trendingSearches" style="max-width:1180px;margin:0 auto 28px;padding:0 20px">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
-    <span style="font-size:.84rem;font-weight:800;color:#0F172A;letter-spacing:.02em">🔥 <span data-i18n-en>Trending in your area</span><span data-i18n-hi>आपके इलाके में ट्रेंडिंग</span></span>
-    <span style="font-size:.74rem;color:var(--muted)" id="trendingSubtitle"><span data-i18n-en>What people search most</span><span data-i18n-hi>लोग सबसे ज़्यादा क्या खोजते हैं</span></span>
+<section id="trendingSearches" style="max-width:1180px;margin:0 auto 22px;padding:0 0 0 20px">
+  <!-- v304: was a wrapping cloud of 12 pill chips that, with "Browse by area"
+       under it, took half a phone screen before the first shop appeared.
+       Now one swipeable row of round tiles (the "What's on your mind?"
+       pattern every delivery app uses) — one row high on every screen. -->
+  <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;padding-right:20px">
+    <span style="font-size:1rem;font-weight:800;color:#0F172A;letter-spacing:-.01em"><span data-i18n-en>What do you need, bhai?</span><span data-i18n-hi>क्या चाहिए, भाई?</span></span>
+    <span style="font-size:.74rem;color:var(--muted)"><span data-i18n-en>Tap &amp; go</span><span data-i18n-hi>टैप करो, पहुँच जाओ</span></span>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px">
-    <a href="/search.html?cat=doctor,dentist,ayurveda,homeopathy,hospital,physiotherapist,eye-care,gynecologist,pediatrician" class="trend-chip">🏥 <span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></a>
-    <a href="/search.html?cat=pharmacy" class="trend-chip">💊 <span data-i18n-en>Pharmacy</span><span data-i18n-hi>दवाई</span></a>
-    <a href="/search.html?cat=agri-business" class="trend-chip">🌾 <span data-i18n-en>Agri Listings</span><span data-i18n-hi>कृषि लिस्टिंग</span></a>
-    <a href="/search.html?cat=tractor-parts,spare-parts" class="trend-chip">🚜 <span data-i18n-en>Tractor Parts</span><span data-i18n-hi>ट्रैक्टर पार्ट्स</span></a>
-    <a href="/search.html?cat=mechanic-2w,mechanic-4w,car-service,tyre-shop,spare-parts,cycle-shop,puncture-shop,tractor-parts,battery-shop,car-ac-repair,denting-painting" class="trend-chip">🔧 <span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span></a>
-    <a href="/search.html?cat=electrician" class="trend-chip">⚡ <span data-i18n-en>Electrician</span><span data-i18n-hi>बिजली मिस्त्री</span></a>
-    <a href="/search.html?cat=mobile-shop,mobile-repair" class="trend-chip">📱 <span data-i18n-en>Mobile Shop</span><span data-i18n-hi>मोबाइल शॉप</span></a>
-    <a href="/search.html?cat=salon-beauty,unisex-salon,mens-salon,beauty-parlour,salon,spa" class="trend-chip">💇 <span data-i18n-en>Salon</span><span data-i18n-hi>सैलून</span></a>
-    <a href="/search.html?cat=kirana-grocery,general-store,wholesale-dealer" class="trend-chip">🛒 <span data-i18n-en>Kirana</span><span data-i18n-hi>किराना</span></a>
-    <a href="/search.html?cat=clothes,readymade-garments,saree-shop,cloth-merchant,tailor" class="trend-chip">👕 <span data-i18n-en>Clothes / Tailor</span><span data-i18n-hi>कपड़े / दर्जी</span></a>
-    <a href="/search.html?cat=mutual-fund-distributor,financial-advisor" class="trend-chip">📊 <span data-i18n-en>Mutual Fund</span><span data-i18n-hi>म्यूचुअल फंड</span></a>
-    <a href="/search.html?cat=community-social" class="trend-chip">🏛️ <span data-i18n-en>Community</span><span data-i18n-hi>समुदाय</span></a>
+  <div class="kcb-row" id="kcbRow">
+    <a href="/search.html?cat=doctor,dentist,ayurveda,homeopathy,hospital,physiotherapist,eye-care,gynecologist,pediatrician" class="kcb-tile"><span class="kcb-ico">🏥</span><span class="kcb-lbl"><span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></span></a>
+    <a href="/search.html?cat=pharmacy" class="kcb-tile"><span class="kcb-ico">💊</span><span class="kcb-lbl"><span data-i18n-en>Pharmacy</span><span data-i18n-hi>दवाई</span></span></a>
+    <a href="/search.html?cat=agri-business" class="kcb-tile"><span class="kcb-ico">🌾</span><span class="kcb-lbl"><span data-i18n-en>Agri Listings</span><span data-i18n-hi>कृषि लिस्टिंग</span></span></a>
+    <a href="/search.html?cat=tractor-parts,spare-parts" class="kcb-tile"><span class="kcb-ico">🚜</span><span class="kcb-lbl"><span data-i18n-en>Tractor Parts</span><span data-i18n-hi>ट्रैक्टर पार्ट्स</span></span></a>
+    <a href="/search.html?cat=mechanic-2w,mechanic-4w,car-service,tyre-shop,spare-parts,cycle-shop,puncture-shop,tractor-parts,battery-shop,car-ac-repair,denting-painting" class="kcb-tile"><span class="kcb-ico">🔧</span><span class="kcb-lbl"><span data-i18n-en>Mechanic</span><span data-i18n-hi>मिस्त्री</span></span></a>
+    <a href="/search.html?cat=electrician" class="kcb-tile"><span class="kcb-ico">⚡</span><span class="kcb-lbl"><span data-i18n-en>Electrician</span><span data-i18n-hi>बिजली मिस्त्री</span></span></a>
+    <a href="/search.html?cat=mobile-shop,mobile-repair" class="kcb-tile"><span class="kcb-ico">📱</span><span class="kcb-lbl"><span data-i18n-en>Mobile Shop</span><span data-i18n-hi>मोबाइल शॉप</span></span></a>
+    <a href="/search.html?cat=salon-beauty,unisex-salon,mens-salon,beauty-parlour,salon,spa" class="kcb-tile"><span class="kcb-ico">💇</span><span class="kcb-lbl"><span data-i18n-en>Salon</span><span data-i18n-hi>सैलून</span></span></a>
+    <a href="/search.html?cat=kirana-grocery,general-store,wholesale-dealer" class="kcb-tile"><span class="kcb-ico">🛒</span><span class="kcb-lbl"><span data-i18n-en>Kirana</span><span data-i18n-hi>किराना</span></span></a>
+    <a href="/search.html?cat=clothes,readymade-garments,saree-shop,cloth-merchant,tailor" class="kcb-tile"><span class="kcb-ico">👕</span><span class="kcb-lbl"><span data-i18n-en>Clothes / Tailor</span><span data-i18n-hi>कपड़े / दर्जी</span></span></a>
+    <a href="/search.html?cat=mutual-fund-distributor,financial-advisor" class="kcb-tile"><span class="kcb-ico">📊</span><span class="kcb-lbl"><span data-i18n-en>Mutual Fund</span><span data-i18n-hi>म्यूचुअल फंड</span></span></a>
+    <a href="/search.html?cat=community-social" class="kcb-tile"><span class="kcb-ico">🏛️</span><span class="kcb-lbl"><span data-i18n-en>Community</span><span data-i18n-hi>समुदाय</span></span></a>
   </div>
-  <style>.trend-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #e2e8f0;color:#0f172a;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.15s;font-family:inherit}.trend-chip:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#fb923c;color:#9a3412;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,.15);text-decoration:none}@media (max-width:560px){.trend-chip{padding:5px 10px;font-size:.74rem;gap:4px}}</style>
+  <style>
+  .kcb-row{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;padding:4px 20px 8px 2px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .kcb-row::-webkit-scrollbar{display:none}
+  .kcb-tile{flex:0 0 auto;width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:#0f172a;scroll-snap-align:start;font-family:inherit}
+  .kcb-ico{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;font-size:1.9rem;line-height:1;background:linear-gradient(145deg,#FFF7ED 0%,#FFEDD5 60%,#FED7AA 100%);border:1px solid #FDBA74;box-shadow:0 6px 14px rgba(251,146,60,.18),inset 0 -3px 0 rgba(251,146,60,.18);transition:transform .15s,box-shadow .15s}
+  .kcb-tile:nth-child(3n) .kcb-ico{background:linear-gradient(145deg,#F0FDF4 0%,#DCFCE7 60%,#BBF7D0 100%);border-color:#86EFAC;box-shadow:0 6px 14px rgba(34,197,94,.16),inset 0 -3px 0 rgba(34,197,94,.14)}
+  .kcb-tile:nth-child(3n+2) .kcb-ico{background:linear-gradient(145deg,#EFF6FF 0%,#DBEAFE 60%,#BFDBFE 100%);border-color:#93C5FD;box-shadow:0 6px 14px rgba(59,130,246,.16),inset 0 -3px 0 rgba(59,130,246,.14)}
+  .kcb-tile:hover .kcb-ico,.kcb-tile:active .kcb-ico{transform:translateY(-2px) scale(1.04)}
+  .kcb-lbl{font-size:.72rem;font-weight:700;text-align:center;line-height:1.15;white-space:normal}
+  @media (max-width:560px){.kcb-tile{width:68px}.kcb-ico{width:60px;height:60px;font-size:1.7rem}.kcb-lbl{font-size:.68rem}}
+  </style>
 </section>
 
 <!-- ===== HYPERLOCAL: Browse by area ===== -->
@@ -698,8 +712,8 @@
     <span style="font-size:.84rem;font-weight:800;color:#0F172A;letter-spacing:.02em">📍 <span data-i18n-en>Browse by area</span><span data-i18n-hi>क्षेत्र से ब्राउज़ करें</span></span>
     <span style="font-size:.74rem;color:var(--muted)" id="browseAreaSubtitle"><span data-i18n-en>Hyperlocal — Meena Bazaar, Chotala Road & more</span><span data-i18n-hi>हाइपरलोकल — मीना बाज़ार, चोटाला रोड और भी</span></span>
   </div>
-  <div id="browseAreaChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-  <style>.area-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #fed7aa;color:#9a3412;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.15s;font-family:inherit}.area-chip:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#fb923c;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,.18);text-decoration:none}.area-chip .ac-count{background:#fef3c7;color:#92400e;padding:1px 7px;border-radius:99px;font-size:.66rem;font-weight:800;margin-left:3px}@media (max-width:560px){.area-chip{padding:5px 10px;font-size:.74rem;gap:4px}.area-chip .ac-count{font-size:.6rem;padding:1px 5px}#browseAreaChips{gap:5px !important}}</style>
+  <div id="browseAreaChips" class="bba-row" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  <style>.area-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #fed7aa;color:#9a3412;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.15s;font-family:inherit}.area-chip:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#fb923c;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,.18);text-decoration:none}.area-chip .ac-count{background:#fef3c7;color:#92400e;padding:1px 7px;border-radius:99px;font-size:.66rem;font-weight:800;margin-left:3px}@media (max-width:560px){.area-chip{padding:5px 10px;font-size:.74rem;gap:4px}.area-chip .ac-count{font-size:.6rem;padding:1px 5px}#browseAreaChips{gap:6px !important;flex-wrap:nowrap !important;overflow-x:auto;overflow-y:hidden;padding:2px 20px 6px 0;margin-right:-20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}#browseAreaChips::-webkit-scrollbar{display:none}.area-chip{flex:0 0 auto;white-space:nowrap}}</style>
 </section>
 
 <div id="localPulse" class="pulse-widget" style="display:none">
@@ -1160,7 +1174,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/dl-core.js?v=a2b7ac4c20"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
+<script src="/assets/js/dl-core.js?v=283935f4e1"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script src="/assets/js/dl-shown.js?v=20260925a"></script><!-- v282: shared "already on screen" list (hero strip, Top 5, Trending claim; Featured fills around them) -->
 <script>if(window.DLShown){DLShown.expect(3);}</script>
 <script src="/assets/js/daily-buzz.js?v=20260923a" defer></script>
