@@ -680,6 +680,10 @@
     <span style="font-size:.74rem;color:var(--muted)"><span data-i18n-en>Tap &amp; go</span><span data-i18n-hi>टैप करो, पहुँच जाओ</span></span>
   </div>
   <div class="kcb-row" id="kcbRow">
+    <!-- v306: Offers tile, first in the row (the Zomato "Offers" pattern).
+         Hidden until at least one deal is live — an empty offers page is a
+         dead end. loadDeals() shows it and fills the count. -->
+    <a href="#deals-section" class="kcb-tile kcb-offers" id="kcbOffers" style="display:none"><span class="kcb-ico">🏷️<span class="kcb-badge" id="kcbOffersCount"></span></span><span class="kcb-lbl"><span data-i18n-en>Offers</span><span data-i18n-hi>ऑफर्स</span></span></a>
     <a href="/search.html?cat=doctor,dentist,ayurveda,homeopathy,hospital,physiotherapist,eye-care,gynecologist,pediatrician" class="kcb-tile"><span class="kcb-ico">🏥</span><span class="kcb-lbl"><span data-i18n-en>Doctor</span><span data-i18n-hi>डॉक्टर</span></span></a>
     <a href="/search.html?cat=pharmacy" class="kcb-tile"><span class="kcb-ico">💊</span><span class="kcb-lbl"><span data-i18n-en>Pharmacy</span><span data-i18n-hi>दवाई</span></span></a>
     <a href="/search.html?cat=agri-business" class="kcb-tile"><span class="kcb-ico">🌾</span><span class="kcb-lbl"><span data-i18n-en>Agri Listings</span><span data-i18n-hi>कृषि लिस्टिंग</span></span></a>
@@ -700,6 +704,9 @@
   .kcb-ico{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;font-size:1.9rem;line-height:1;background:linear-gradient(145deg,#FFF7ED 0%,#FFEDD5 60%,#FED7AA 100%);border:1px solid #FDBA74;box-shadow:0 6px 14px rgba(251,146,60,.18),inset 0 -3px 0 rgba(251,146,60,.18);transition:transform .15s,box-shadow .15s}
   .kcb-tile:nth-child(3n) .kcb-ico{background:linear-gradient(145deg,#F0FDF4 0%,#DCFCE7 60%,#BBF7D0 100%);border-color:#86EFAC;box-shadow:0 6px 14px rgba(34,197,94,.16),inset 0 -3px 0 rgba(34,197,94,.14)}
   .kcb-tile:nth-child(3n+2) .kcb-ico{background:linear-gradient(145deg,#EFF6FF 0%,#DBEAFE 60%,#BFDBFE 100%);border-color:#93C5FD;box-shadow:0 6px 14px rgba(59,130,246,.16),inset 0 -3px 0 rgba(59,130,246,.14)}
+  .kcb-tile.kcb-offers .kcb-ico{background:linear-gradient(145deg,#FEE2E2 0%,#FECACA 55%,#FCA5A5 100%) !important;border-color:#F87171 !important;box-shadow:0 6px 14px rgba(239,68,68,.22),inset 0 -3px 0 rgba(239,68,68,.18) !important;position:relative}
+  .kcb-badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#DC2626;color:#fff;font-size:.66rem;font-weight:800;display:grid;place-items:center;border:2px solid #fff;font-family:inherit}
+  .kcb-tile.kcb-offers .kcb-lbl{color:#B91C1C}
   .kcb-tile:hover .kcb-ico,.kcb-tile:active .kcb-ico{transform:translateY(-2px) scale(1.04)}
   .kcb-lbl{font-size:.72rem;font-weight:700;text-align:center;line-height:1.15;white-space:normal}
   @media (max-width:560px){.kcb-tile{width:68px}.kcb-ico{width:60px;height:60px;font-size:1.7rem}.kcb-lbl{font-size:.68rem}}
@@ -1346,7 +1353,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20261001a" defer></script>
+<script src="/assets/js/homepage.js?v=20261001b" defer></script>
 <script src="/assets/js/trending.js?v=20260925a" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260922a" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
