@@ -340,6 +340,10 @@
       <img class="logo" src="/assets/icons/logo.svg" alt="DukanList" width="36" height="36" style="background:transparent;box-shadow:none">
       <span>Dukan<em>List</em></span>
     </a>
+    <!-- v307: Zomato-style location pill, phones only. Opens the same
+         "Pick your area" sheet; label follows DukanCity. On desktop the city
+         <select> in the search card does this job and the pill is hidden. -->
+    <button type="button" class="hdr-city" id="hdrCity" onclick="openLocalityPicker()" aria-label="Change city">📍 <span id="hdrCityName">Mandi Dabwali</span> <span class="hdr-city-caret">▾</span></button>
     <nav class="nav-links">
       <div class="lang-toggle" role="group" aria-label="Language switcher">
         <button onclick="setLang('en')" id="langBtnEn">EN</button>
@@ -374,6 +378,24 @@
 </header>
 
 <!-- ===== HERO (search-first) ===== -->
+<style>
+/* v307 — phones: the hero loses its subtitle and its city row. The city
+   lives in the header pill now (Zomato pattern); the search card is one
+   row with its own button. Desktop unchanged. */
+.hdr-city{display:none}
+.hsc-btn-m{display:none}
+@media (max-width:760px){
+  .hdr-city{display:inline-flex;align-items:center;gap:4px;max-width:46vw;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:99px;padding:6px 10px;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:auto}
+  .hdr-city #hdrCityName{overflow:hidden;text-overflow:ellipsis}
+  .hdr-city-caret{opacity:.8;font-size:.7rem}
+  .topbar .nav-cta{display:none !important}        /* bottom nav has Register */
+  .hero-search-first .hero-sub{display:none !important}
+  .hero-search-first .hero-tag{margin-bottom:12px !important}
+  .hsc-row-c{display:none !important}
+  .hsc-btn-m{display:inline-grid;place-items:center;width:38px;height:38px;padding:0 !important;border-radius:10px !important;font-size:1rem !important}
+  .hero-search-card{margin-bottom:12px}
+}
+</style>
 <section class="hero hero-search-first">
   <div class="hero-inner">
     <!-- v252: "Mandi Dabwali · Golden Pages" pill removed. The same words were
@@ -396,6 +418,7 @@
                data-ph-en="What are you looking for?"
                data-ph-hi="क्या ढूंढना है?">
         <span id="voiceMicSlot"></span>
+        <button type="submit" class="hsc-btn hsc-btn-m" aria-label="Search">🔍</button>
       </div>
       <div class="hsc-row hsc-row-c">
         <span class="hsc-ico">📍</span>
@@ -1353,7 +1376,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20261001b" defer></script>
+<script src="/assets/js/homepage.js?v=20261001c" defer></script>
 <script src="/assets/js/trending.js?v=20260925a" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260922a" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
