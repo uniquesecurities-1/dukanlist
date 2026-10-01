@@ -114,7 +114,7 @@ try {
 
 /* ===== Bundle chunk 10 (was inline script #13) ===== */
 try {
-!function(){function init(){if(window.DailyBuzz&&window.ShopDB&&ShopDB.client){let citySlug=null;try{window.CityPersist&&CityPersist.getCity&&(citySlug=(CityPersist.getCity()||{}).slug||null),citySlug||(citySlug=localStorage.getItem("dukanlist.city")||null)}catch(_){}DailyBuzz.renderHomepageCarousel("homepageBuzz",ShopDB.client,citySlug)}else setTimeout(init,400)}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",init):init()}();
+!function(){function init(){if(window.DailyBuzz&&window.ShopDB&&ShopDB.client){let citySlug=null;try{citySlug=window.DukanCity?DukanCity.slugOrDefault("mandi-dabwali"):null}catch(_){}DailyBuzz.renderHomepageCarousel("homepageBuzz",ShopDB.client,citySlug)}else setTimeout(init,400)}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",init):init()}();
 } catch(e) { console.warn('[homepage.js chunk 10]', e); }
 
 /* ===== Bundle chunk 11 (was inline script #14) ===== */

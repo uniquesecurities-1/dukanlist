@@ -706,15 +706,6 @@
   </style>
 </section>
 
-<!-- ===== HYPERLOCAL: Browse by area ===== -->
-<section id="browseByArea" style="display:none;max-width:1180px;margin:0 auto 20px;padding:0 20px">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
-    <span style="font-size:.84rem;font-weight:800;color:#0F172A;letter-spacing:.02em">📍 <span data-i18n-en>Browse by area</span><span data-i18n-hi>क्षेत्र से ब्राउज़ करें</span></span>
-    <span style="font-size:.74rem;color:var(--muted)" id="browseAreaSubtitle"><span data-i18n-en>Hyperlocal — Meena Bazaar, Chotala Road & more</span><span data-i18n-hi>हाइपरलोकल — मीना बाज़ार, चोटाला रोड और भी</span></span>
-  </div>
-  <div id="browseAreaChips" class="bba-row" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-  <style>.area-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #fed7aa;color:#9a3412;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.15s;font-family:inherit}.area-chip:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#fb923c;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,.18);text-decoration:none}.area-chip .ac-count{background:#fef3c7;color:#92400e;padding:1px 7px;border-radius:99px;font-size:.66rem;font-weight:800;margin-left:3px}@media (max-width:560px){.area-chip{padding:5px 10px;font-size:.74rem;gap:4px}.area-chip .ac-count{font-size:.6rem;padding:1px 5px}#browseAreaChips{gap:6px !important;flex-wrap:nowrap !important;overflow-x:auto;overflow-y:hidden;padding:2px 20px 6px 0;margin-right:-20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}#browseAreaChips::-webkit-scrollbar{display:none}.area-chip{flex:0 0 auto;white-space:nowrap}}</style>
-</section>
 
 <div id="localPulse" class="pulse-widget" style="display:none">
   <div class="pulse-head">
@@ -735,6 +726,22 @@
 -->
 
 
+<style>
+/* v305: Today's Buzz home strip. daily-buzz.js has rendered .db-home-* since
+   it shipped, and no stylesheet ever defined them — the strip showed as a
+   raw orange rectangle with unstyled text. */
+#homepageBuzz{max-width:1180px;margin:0 auto 22px;padding:0 20px}
+.db-home-label{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:.84rem;font-weight:800;color:#0F172A}
+.db-home-emoji{font-size:1rem}
+.db-home-count{margin-left:auto;font-size:.7rem;font-weight:800;color:#92400E;background:#FEF3C7;padding:2px 8px;border-radius:99px}
+.db-home-scroll{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.db-home-scroll::-webkit-scrollbar{display:none}
+.db-home-card{flex:0 0 auto;width:220px;min-height:92px;border:0;border-radius:14px;padding:12px 14px;color:#fff;text-align:left;cursor:pointer;font-family:inherit;scroll-snap-align:start;box-shadow:0 6px 16px rgba(15,23,42,.14);display:flex;flex-direction:column;gap:4px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.db-home-shop{font-size:.72rem;font-weight:800;opacity:.92;letter-spacing:.02em;text-transform:uppercase}
+.db-home-text{font-size:.9rem;font-weight:700;line-height:1.3}
+.db-home-age{margin-top:auto;font-size:.68rem;opacity:.85}
+@media (max-width:560px){.db-home-card{width:190px}}
+</style>
 <div id="homepageBuzz" style="display:none"></div>
 
 <section id="catStrip" style="max-width:1180px;margin:0 auto 40px;padding:0 20px">
@@ -976,6 +983,19 @@
 <!-- ===== HOW IT WORKS ===== -->
 
 <!-- Trust signals strip — Homepage v2 -->
+<!-- ===== HYPERLOCAL: Browse by area =====
+     v305: moved below the listings. Deepak, from the phone: with this and
+     Trending above the shops, a visitor scrolled half a screen before the
+     first shop. It is a browse aid, not the product. -->
+<section id="browseByArea" style="display:none;max-width:1180px;margin:28px auto 20px;padding:0 20px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="font-size:.84rem;font-weight:800;color:#0F172A;letter-spacing:.02em">📍 <span data-i18n-en>Browse by area</span><span data-i18n-hi>क्षेत्र से ब्राउज़ करें</span></span>
+    <span style="font-size:.74rem;color:var(--muted)" id="browseAreaSubtitle"><span data-i18n-en>Hyperlocal — Meena Bazaar, Chotala Road & more</span><span data-i18n-hi>हाइपरलोकल — मीना बाज़ार, चोटाला रोड और भी</span></span>
+  </div>
+  <div id="browseAreaChips" class="bba-row" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  <style>.area-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #fed7aa;color:#9a3412;padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.15s;font-family:inherit}.area-chip:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#fb923c;transform:translateY(-1px);box-shadow:0 4px 12px rgba(251,146,60,.18);text-decoration:none}.area-chip .ac-count{background:#fef3c7;color:#92400e;padding:1px 7px;border-radius:99px;font-size:.66rem;font-weight:800;margin-left:3px}@media (max-width:560px){.area-chip{padding:5px 10px;font-size:.74rem;gap:4px}.area-chip .ac-count{font-size:.6rem;padding:1px 5px}#browseAreaChips{gap:6px !important;flex-wrap:nowrap !important;overflow-x:auto;overflow-y:hidden;padding:2px 20px 6px 0;margin-right:-20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}#browseAreaChips::-webkit-scrollbar{display:none}.area-chip{flex:0 0 auto;white-space:nowrap}}</style>
+</section>
+
 <section class="trust-strip-section" style="margin:0 auto;max-width:1180px;padding:0 18px">
   <div class="trust-strip">
     <div class="ts-item">
@@ -1326,7 +1346,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
 
 <!-- ===== Sticky mini search + Quick Pick count badges ===== -->
 <!-- Bundled inline scripts extracted to external file for caching -->
-<script src="/assets/js/homepage.js?v=20260925a" defer></script>
+<script src="/assets/js/homepage.js?v=20261001a" defer></script>
 <script src="/assets/js/trending.js?v=20260925a" defer></script>
 <script src="/assets/js/dl-golden-render.js?v=20260922a" defer></script>
 <script src="/assets/js/dl-simple-mode.js?v=1786200000" defer></script>
