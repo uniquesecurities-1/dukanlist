@@ -156,11 +156,22 @@
         <!-- v317: upload from phone (camera / gallery) through the same
              Cloudinary widget the Photos page uses. The URL box stays as a
              fallback for a link someone already has. -->
+        <!-- v319: native phone pickers. capture="environment" opens the back
+             camera directly; the second input opens the gallery. The file is
+             uploaded to Cloudinary (unsigned preset, same as Photos) and only
+             the URL is saved with the deal — so a wrong pick is just Remove. -->
+        <input type="file" id="dealCamInput" accept="image/*" capture="environment" style="display:none" onchange="dealFilePicked(this)">
+        <input type="file" id="dealGalInput" accept="image/*" style="display:none" onchange="dealFilePicked(this)">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button type="button" id="dealImgBtn" onclick="dealPickImage()" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:800;font-family:inherit;cursor:pointer">📷 Upload photo</button>
+          <button type="button" onclick="document.getElementById('dealCamInput').click()" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:800;font-family:inherit;cursor:pointer">📷 Camera</button>
+          <button type="button" onclick="document.getElementById('dealGalInput').click()" style="background:#fff;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:10px;padding:10px 14px;font-weight:800;font-family:inherit;cursor:pointer">🖼️ Gallery</button>
           <span id="dealImgStatus" style="font-size:.8rem;color:#64748B"></span>
         </div>
-        <div id="dealImgPreview" style="display:none;margin-top:8px"><img id="dealImgPreviewImg" alt="" style="max-height:120px;border-radius:10px;border:1px solid #E2E8F0"><button type="button" onclick="dealClearImage()" style="margin-left:8px;background:#F1F5F9;border:0;border-radius:8px;padding:6px 10px;font-family:inherit;cursor:pointer">✕ Remove</button></div>
+        <div id="dealImgPreview" style="display:none;margin-top:10px;position:relative;width:fit-content">
+          <img id="dealImgPreviewImg" alt="" style="max-height:160px;max-width:100%;border-radius:10px;border:1px solid #E2E8F0;display:block">
+          <button type="button" onclick="dealClearImage()" title="Remove photo" style="position:absolute;top:-8px;right:-8px;width:28px;height:28px;border-radius:50%;background:#DC2626;color:#fff;border:2px solid #fff;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)">✕</button>
+          <div style="font-size:.74rem;color:#64748B;margin-top:4px">Galat photo? ✕ dabao aur dobara lo.</div>
+        </div>
         <details style="margin-top:8px"><summary style="font-size:.78rem;color:#64748B;cursor:pointer">…or paste an image link</summary>
           <input type="url" id="f_image_url" maxlength="500" placeholder="https://..." style="margin-top:6px">
         </details>
@@ -181,7 +192,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://upload-widget.cloudinary.com/global/all.js" async></script>
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script>
 let MY_DEALS = [];
@@ -368,45 +378,43 @@ function showErr(msg){
 }
 
 
-// ─── v317: offer photo upload (Cloudinary widget, same preset as Photos) ───
-var DEAL_WIDGET = null;
+// ─── v317/v319: offer photo — native picker → direct Cloudinary upload ───
 function dealShowPreview(url){
   var box = document.getElementById('dealImgPreview'), img = document.getElementById('dealImgPreviewImg');
   if (!box || !img) return;
   if (url){ img.src = url; box.style.display = ''; } else { img.src = ''; box.style.display = 'none'; }
 }
 function dealClearImage(){
-  document.getElementById('f_image_url').value = ''; dealShowPreview('');
+  document.getElementById('f_image_url').value = '';
   dealShowPreview('');
+  var st = document.getElementById('dealImgStatus'); if (st) st.textContent = '';
+  ['dealCamInput','dealGalInput'].forEach(function(id){ var i = document.getElementById(id); if (i) i.value = ''; });
 }
-function dealPickImage(){
+async function dealFilePicked(input){
+  var file = input.files && input.files[0]; if (!file) return;
   var st = document.getElementById('dealImgStatus');
-  if (typeof cloudinary === 'undefined' || !cloudinary.createUploadWidget){
-    if (st) st.textContent = 'Upload tool is still loading — try again in a moment.';
-    return;
+  if (!/^image\//.test(file.type)){ if (st) st.textContent = 'Sirf photo (JPG/PNG) chalegi.'; input.value = ''; return; }
+  if (file.size > 8 * 1024 * 1024){ if (st) st.textContent = 'Photo 8 MB se badi hai — chhoti lo.'; input.value = ''; return; }
+  // instant local preview while it uploads
+  try { dealShowPreview(URL.createObjectURL(file)); } catch(_){}
+  if (st) st.textContent = 'Uploading… ⏳';
+  try {
+    var fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', 'dukanlist_shops');
+    fd.append('folder', 'deals');
+    var r = await fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method: 'POST', body: fd });
+    var j = await r.json();
+    if (!r.ok || !j.secure_url) throw new Error((j.error && j.error.message) || ('HTTP ' + r.status));
+    var url = j.secure_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
+    document.getElementById('f_image_url').value = url;
+    dealShowPreview(url);
+    if (st) st.textContent = 'Photo added ✓';
+  } catch(e){
+    dealShowPreview('');
+    if (st) st.textContent = 'Upload nahi hui: ' + (e.message || e);
   }
-  if (!DEAL_WIDGET){
-    DEAL_WIDGET = cloudinary.createUploadWidget({
-      cloudName: 'dukanlist',
-      uploadPreset: 'dukanlist_shops',
-      folder: 'deals',
-      sources: ['camera', 'local'],
-      multiple: false,
-      maxFiles: 1,
-      maxFileSize: 5 * 1024 * 1024,
-      clientAllowedFormats: ['jpg','jpeg','png','webp','heic'],
-      cropping: false
-    }, function(err, result){
-      if (err){ if (st) st.textContent = 'Upload failed: ' + (err.message || err.statusText || 'error'); return; }
-      if (result && result.event === 'success' && result.info && result.info.secure_url){
-        var url = result.info.secure_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
-        document.getElementById('f_image_url').value = url;
-        dealShowPreview(url);
-        if (st) st.textContent = 'Photo added ✓';
-      }
-    });
-  }
-  DEAL_WIDGET.open();
+  input.value = '';
 }
 
 function escapeHtml(s){
