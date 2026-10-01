@@ -214,22 +214,26 @@ async function renderHomepageCarousel(targetId, supaClient, citySlug){
         const avatar = photo
           ? '<img src="' + esc(photo) + '" alt="" loading="lazy" width="48" height="48">'
           : '<span class="db-home-initial" style="background:' + gradientCss(s.bg_style) + '">' + esc(initial) + '</span>';
-        return '<button class="db-home-card" data-idx="' + i + '" style="--db-ring:' + gradientCss(s.bg_style) + '">' +
+        // v311: a tap goes to the shop. The fullscreen viewer (.db-viewer)
+        // never had a stylesheet, so a tap built an invisible overlay and
+        // looked like nothing happened. The view count still increments.
+        const href = s.shop_slug ? '/' + encodeURIComponent(s.shop_slug) : '#';
+        return '<a class="db-home-card" data-idx="' + i + '" data-sid="' + esc(String(s.id || '')) + '" href="' + href + '" style="--db-ring:' + gradientCss(s.bg_style) + '">' +
           '  <span class="db-home-ava">' + avatar + '</span>' +
           '  <span class="db-home-body">' +
           '    <span class="db-home-shop">' + esc(name) + '</span>' +
           '    <span class="db-home-text">' + esc(s.text.slice(0, 110) + (s.text.length > 110 ? '…' : '')) + '</span>' +
           '    <span class="db-home-age">' + timeAgo(s.created_at) + ' · <b>' + ('hi' === document.documentElement.dataset.lang ? 'देखें' : 'View') + '</b></span>' +
           '  </span>' +
-          '</button>';
+          '</a>';
       }).join('') +
       '  </div>' +
       '</div>';
     el.style.display = 'block';
 
-    el.querySelectorAll('.db-home-card').forEach(btn => {
-      btn.addEventListener('click', () => {
-        openViewer(items, parseInt(btn.dataset.idx, 10) || 0, supaClient);
+    el.querySelectorAll('.db-home-card').forEach(a => {
+      a.addEventListener('click', () => {
+        try { if (a.dataset.sid) supaClient.rpc('story_inc_view', { p_story_id: a.dataset.sid }).then(null, function(){}); } catch(_){}
       });
     });
   } catch(_){}
