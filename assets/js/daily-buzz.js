@@ -202,13 +202,27 @@ async function renderHomepageCarousel(targetId, supaClient, citySlug){
       '    <span class="db-home-count">' + items.length + ' active</span>' +
       '  </div>' +
       '  <div class="db-home-scroll">' +
-      items.map((s, i) =>
-        '<button class="db-home-card" data-idx="' + i + '" style="background:' + gradientCss(s.bg_style) + '">' +
-        '  <div class="db-home-shop">' + esc(s.shop_name || '') + '</div>' +
-        '  <div class="db-home-text">' + esc(s.text.slice(0, 90) + (s.text.length > 90 ? '…' : '')) + '</div>' +
-        '  <div class="db-home-age">' + timeAgo(s.created_at) + '</div>' +
-        '</button>'
-      ).join('') +
+      // v309: WhatsApp-status card — shop photo (or initial) in a gradient
+      // ring, name, the update, time. The old full-gradient block with
+      // uppercase text read as an ad banner, not as news from a shop.
+      items.map((s, i) => {
+        const name = String(s.shop_name || '').trim();
+        const initial = (name.match(/[A-Za-z\u0900-\u097F]/) || ['•'])[0].toUpperCase();
+        const photo = s.shop_photo
+          ? (window.DukanImg && DukanImg.thumb ? DukanImg.thumb(s.shop_photo) : s.shop_photo)
+          : null;
+        const avatar = photo
+          ? '<img src="' + esc(photo) + '" alt="" loading="lazy" width="48" height="48">'
+          : '<span class="db-home-initial" style="background:' + gradientCss(s.bg_style) + '">' + esc(initial) + '</span>';
+        return '<button class="db-home-card" data-idx="' + i + '" style="--db-ring:' + gradientCss(s.bg_style) + '">' +
+          '  <span class="db-home-ava">' + avatar + '</span>' +
+          '  <span class="db-home-body">' +
+          '    <span class="db-home-shop">' + esc(name) + '</span>' +
+          '    <span class="db-home-text">' + esc(s.text.slice(0, 110) + (s.text.length > 110 ? '…' : '')) + '</span>' +
+          '    <span class="db-home-age">' + timeAgo(s.created_at) + ' · <b>' + ('hi' === document.documentElement.dataset.lang ? 'देखें' : 'View') + '</b></span>' +
+          '  </span>' +
+          '</button>';
+      }).join('') +
       '  </div>' +
       '</div>';
     el.style.display = 'block';
