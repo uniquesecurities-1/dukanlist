@@ -152,9 +152,18 @@
       </div>
 
       <div class="modal-field">
-        <label>Image URL (optional)</label>
-        <input type="url" id="f_image_url" maxlength="500" placeholder="https://...">
-        <div class="hint">Paste an image link if you want to attach a visual</div>
+        <label>Offer photo (optional)</label>
+        <!-- v317: upload from phone (camera / gallery) through the same
+             Cloudinary widget the Photos page uses. The URL box stays as a
+             fallback for a link someone already has. -->
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button type="button" id="dealImgBtn" onclick="dealPickImage()" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:800;font-family:inherit;cursor:pointer">📷 Upload photo</button>
+          <span id="dealImgStatus" style="font-size:.8rem;color:#64748B"></span>
+        </div>
+        <div id="dealImgPreview" style="display:none;margin-top:8px"><img id="dealImgPreviewImg" alt="" style="max-height:120px;border-radius:10px;border:1px solid #E2E8F0"><button type="button" onclick="dealClearImage()" style="margin-left:8px;background:#F1F5F9;border:0;border-radius:8px;padding:6px 10px;font-family:inherit;cursor:pointer">✕ Remove</button></div>
+        <details style="margin-top:8px"><summary style="font-size:.78rem;color:#64748B;cursor:pointer">…or paste an image link</summary>
+          <input type="url" id="f_image_url" maxlength="500" placeholder="https://..." style="margin-top:6px">
+        </details>
       </div>
 
       <div class="modal-field">
@@ -172,6 +181,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://upload-widget.cloudinary.com/global/all.js" async></script>
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script>
 let MY_DEALS = [];
@@ -266,6 +276,7 @@ function openModal(id){
     document.getElementById('f_discount_pct').value = d.discount_pct || '';
     document.getElementById('f_discount_text').value = d.discount_text || '';
     document.getElementById('f_image_url').value = d.image_url || '';
+    dealShowPreview(d.image_url || '');
     document.getElementById('f_cta_label').value = d.cta_label || '';
     document.getElementById('f_valid_from').value = toLocalInput(d.valid_from);
     document.getElementById('f_valid_until').value = toLocalInput(d.valid_until);
@@ -353,6 +364,48 @@ function showErr(msg){
   const el = document.getElementById('errMsg');
   el.textContent = msg;
   el.style.display = 'block';
+}
+
+
+// ─── v317: offer photo upload (Cloudinary widget, same preset as Photos) ───
+var DEAL_WIDGET = null;
+function dealShowPreview(url){
+  var box = document.getElementById('dealImgPreview'), img = document.getElementById('dealImgPreviewImg');
+  if (!box || !img) return;
+  if (url){ img.src = url; box.style.display = ''; } else { img.src = ''; box.style.display = 'none'; }
+}
+function dealClearImage(){
+  document.getElementById('f_image_url').value = ''; dealShowPreview('');
+  dealShowPreview('');
+}
+function dealPickImage(){
+  var st = document.getElementById('dealImgStatus');
+  if (typeof cloudinary === 'undefined' || !cloudinary.createUploadWidget){
+    if (st) st.textContent = 'Upload tool is still loading — try again in a moment.';
+    return;
+  }
+  if (!DEAL_WIDGET){
+    DEAL_WIDGET = cloudinary.createUploadWidget({
+      cloudName: 'dukanlist',
+      uploadPreset: 'dukanlist_shops',
+      folder: 'deals',
+      sources: ['camera', 'local'],
+      multiple: false,
+      maxFiles: 1,
+      maxFileSize: 5 * 1024 * 1024,
+      clientAllowedFormats: ['jpg','jpeg','png','webp','heic'],
+      cropping: false
+    }, function(err, result){
+      if (err){ if (st) st.textContent = 'Upload failed: ' + (err.message || err.statusText || 'error'); return; }
+      if (result && result.event === 'success' && result.info && result.info.secure_url){
+        var url = result.info.secure_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
+        document.getElementById('f_image_url').value = url;
+        dealShowPreview(url);
+        if (st) st.textContent = 'Photo added ✓';
+      }
+    });
+  }
+  DEAL_WIDGET.open();
 }
 
 function escapeHtml(s){
