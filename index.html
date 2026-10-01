@@ -394,7 +394,12 @@
   .hero-search-first .hero-tag{margin-bottom:12px !important}
   .hsc-row-c{display:none !important}
   .hsc-btn-m{display:inline-grid;place-items:center;width:38px;height:38px;padding:0 !important;border-radius:10px !important;font-size:1rem !important}
-  .hero-search-card{margin-bottom:12px}
+  .hero-search-card{margin-bottom:10px}
+  .hero-extras{display:flex !important;flex-wrap:nowrap !important;justify-content:flex-start !important;overflow-x:auto;overflow-y:hidden;gap:6px !important;margin:0 -14px 12px !important;padding:2px 14px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .hero-extras::-webkit-scrollbar{display:none}
+  .hero-extras > *{flex:0 0 auto;white-space:nowrap}
+  .hdtw-strip{display:none !important}            /* how-it-works: 3 steps nobody reads twice */
+  .hero-register-strip{display:none !important}   /* bottom nav + header already offer Register */
 }
 </style>
 <section class="hero hero-search-first">
@@ -446,6 +451,31 @@
       </div>
     </form>
 
+    <!-- v310: the four shortcut pills (Open now / Discover / Pucho Bhai / For
+         Doctors & CA) moved up under the search card and, on phones, into one
+         swipe row — they were a 2x2 block ~120px tall further down. -->
+    <div class="hero-extras hero-extras-v2">
+      <label id="openNowHome">
+        <input type="checkbox" id="openNowCheck" onchange="document.getElementById('openNowHome').classList.toggle('on', this.checked);">
+        <span class="dot"></span>
+        <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
+      </label>
+      <a href="/discover.html" class="mini-pill mp-discover">
+        <span class="mp-ico">🎬</span>
+        <span><span data-i18n-en>Discover</span><span data-i18n-hi>लिस्टिंग देखें</span></span>
+      </a>
+      <a href="/puchobhai" class="mini-pill mp-pucho">
+        <span class="mp-ico">💬</span>
+        <span><span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span></span>
+      </a>
+      <a href="/pro" class="mini-pill mp-pro">
+        <span class="mp-ico">🎖️</span>
+        <span><span data-i18n-en>For Doctors / CA</span><span data-i18n-hi>Doctors / CA</span></span>
+      </a>
+      <button type="button" id="installBtn" style="display:none">
+        📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
+      </button>
+    </div>
     <div class="hero-stats">
       <div class="hero-stat"><b id="stat-shops">—</b><span data-i18n-en>Active Listings</span><span data-i18n-hi>लाइव दुकानें</span></div>
       <div class="hero-stat"><b id="stat-cats">—</b><span data-i18n-en>Categories</span><span data-i18n-hi>श्रेणियाँ</span></div>
@@ -633,28 +663,6 @@
     </div>
 
     <!-- Secondary actions — Discover, Pucho Bhai, Pro, Open Now (de-emphasised so Golden Pages stays the star) -->
-    <div class="hero-extras hero-extras-v2">
-      <label id="openNowHome">
-        <input type="checkbox" id="openNowCheck" onchange="document.getElementById('openNowHome').classList.toggle('on', this.checked);">
-        <span class="dot"></span>
-        <span data-i18n-en>Open Now only</span><span data-i18n-hi>अभी खुले</span>
-      </label>
-      <a href="/discover.html" class="mini-pill mp-discover">
-        <span class="mp-ico">🎬</span>
-        <span><span data-i18n-en>Discover</span><span data-i18n-hi>लिस्टिंग देखें</span></span>
-      </a>
-      <a href="/puchobhai" class="mini-pill mp-pucho">
-        <span class="mp-ico">💬</span>
-        <span><span data-i18n-en>Pucho Bhai</span><span data-i18n-hi>पूछो भाई</span></span>
-      </a>
-      <a href="/pro" class="mini-pill mp-pro">
-        <span class="mp-ico">🎖️</span>
-        <span><span data-i18n-en>For Doctors / CA</span><span data-i18n-hi>Doctors / CA</span></span>
-      </a>
-      <button type="button" id="installBtn" style="display:none">
-        📲 <span data-i18n-en>Install App</span><span data-i18n-hi>ऐप इंस्टॉल</span>
-      </button>
-    </div>
     <style>
       .hero-extras-v2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
       .mini-pill{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;font-family:Manrope,sans-serif;font-weight:800;font-size:.82rem;text-decoration:none!important;color:#fff!important;white-space:nowrap;transition:.18s;box-shadow:0 3px 10px rgba(15,23,42,.12)}
