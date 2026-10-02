@@ -461,6 +461,10 @@
          Doctors & CA) moved up under the search card and, on phones, into one
          swipe row — they were a 2x2 block ~120px tall further down. -->
     <div class="hero-extras hero-extras-v2">
+      <!-- v321: phones lost every visible Register entry point in v307/v310
+           (header button, List-Free card) except the bottom-nav icon. This is
+           the one that is always on screen: first chip under the search box. -->
+      <a href="/register.html" class="mini-pill mp-register"><span>🏪</span><span data-i18n-en>List your shop FREE</span><span data-i18n-hi>दुकान FREE जोड़ें</span></a>
       <label id="openNowHome">
         <input type="checkbox" id="openNowCheck" onchange="document.getElementById('openNowHome').classList.toggle('on', this.checked);">
         <span class="dot"></span>
@@ -675,6 +679,8 @@
       .mini-pill:hover{transform:translateY(-1px);text-decoration:none}
       .mp-ico{font-size:.98rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
       .mp-discover{background:linear-gradient(135deg,#7C3AED,#EC4899)}
+      .mp-register{background:linear-gradient(135deg,#FF6B1A,#E55100);box-shadow:0 4px 14px rgba(255,107,26,.35)}
+      @media (min-width:761px){.mp-register{display:none}}  /* desktop header already has Register Free */
       .mp-discover:hover{box-shadow:0 6px 16px rgba(124,58,237,.35)}
       .mp-pucho{background:linear-gradient(135deg,#3B82F6,#1E3A8A)}
       .mp-pucho:hover{box-shadow:0 6px 16px rgba(59,130,246,.3)}
