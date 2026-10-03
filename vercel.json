@@ -5,6 +5,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/api/home"
+    },
+    {
       "source": "/top/:cat([a-z][a-z0-9-]+)/:city([a-z][a-z0-9-]+)/",
       "destination": "/top?cat=:cat&city=:city"
     },
