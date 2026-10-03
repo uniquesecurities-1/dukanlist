@@ -45,7 +45,7 @@ window.DL_CONFIG = Object.freeze({
 });
 ;
 
-/* ---- image-opt.js (e7af66ab43) ---- */
+/* ---- image-opt.js (b776a2321b) ---- */
 /* ============================================================
    image-opt.js — ask the CDN for the size we actually display
    ============================================================
@@ -132,9 +132,14 @@ window.DL_CONFIG = Object.freeze({
 
   global.DukanImg = {
     opt: opt,
-    card:  function (u) { return opt(u, { width: 600, height: 375, crop: 'fill' }); },
+    // v325: a phone shows a card ~380 CSS px wide; 600 px was 2.3x the
+    // pixels on a 1.5x screen (Lighthouse: 159 KiB over the home page).
+    // Phones get 400x250, everything else keeps 600x375.
+    card:  function (u) { var ph = (global.innerWidth || 1024) <= 520; return opt(u, { width: ph ? 400 : 600, height: ph ? 250 : 375, crop: 'fill' }); },
     strip: function (u) { return opt(u, { width: 500, height: 312, crop: 'fill' }); },
     thumb: function (u) { return opt(u, { width: 160, height: 160, crop: 'fill' }); },
+    // 48 px avatars (Today's Buzz): 96 px is 2x, 160 was 3.3x.
+    avatar: function (u) { return opt(u, { width: 96, height: 96, crop: 'fill' }); },
     supportsWebP: supportsWebP,
     enableTransform: false        // Supabase Storage only; Cloudinary ignores it
   };

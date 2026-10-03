@@ -209,7 +209,7 @@ async function renderHomepageCarousel(targetId, supaClient, citySlug){
         const name = String(s.shop_name || '').trim();
         const initial = (name.match(/[A-Za-z\u0900-\u097F]/) || ['•'])[0].toUpperCase();
         const photo = s.shop_photo
-          ? (window.DukanImg && DukanImg.thumb ? DukanImg.thumb(s.shop_photo) : s.shop_photo)
+          ? (window.DukanImg && (DukanImg.avatar || DukanImg.thumb) ? (DukanImg.avatar || DukanImg.thumb)(s.shop_photo) : s.shop_photo)
           : null;
         const avatar = photo
           ? '<img src="' + esc(photo) + '" alt="" loading="lazy" width="48" height="48">'
