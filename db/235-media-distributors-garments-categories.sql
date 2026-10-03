@@ -83,7 +83,7 @@ UPDATE public.categories
  WHERE slug = 'mens-wear';
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/235-media-distributors-garments-categories.sql');
   END IF;
 END $$;

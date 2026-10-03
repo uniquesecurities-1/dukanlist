@@ -113,7 +113,7 @@ JOIN public.categories w ON w.slug = 'wholesale-distribution'
 ON CONFLICT (slug) DO NOTHING;
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/236-wholesale-distribution-parent.sql');
   END IF;
 END $$;

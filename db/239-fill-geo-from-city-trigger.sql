@@ -86,7 +86,7 @@ CREATE TRIGGER trg_biz_a_fill_geo
   EXECUTE FUNCTION public.fill_geo_from_city();
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/239-fill-geo-from-city-trigger.sql');
   END IF;
 END $$;

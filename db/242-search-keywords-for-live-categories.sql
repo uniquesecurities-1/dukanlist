@@ -166,7 +166,7 @@ UPDATE public.categories c
    AND POSITION(split_part(h.extra, ',', 1) IN COALESCE(c.keywords, '')) = 0;
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/242-search-keywords-for-live-categories.sql');
   END IF;
 END $$;

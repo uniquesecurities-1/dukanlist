@@ -152,7 +152,7 @@ UPDATE public.categories
  WHERE slug = 'mehndi-artist';
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/240-merge-duplicate-categories.sql');
   END IF;
 END $$;

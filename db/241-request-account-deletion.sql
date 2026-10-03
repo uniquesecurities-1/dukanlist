@@ -156,7 +156,7 @@ REVOKE ALL ON FUNCTION public.request_account_deletion() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.request_account_deletion() TO authenticated;
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/241-request-account-deletion.sql');
   END IF;
 END $$;

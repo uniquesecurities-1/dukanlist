@@ -199,7 +199,7 @@ END $$;
 -- Record in the register (db/233); guarded so this file also runs on a
 -- database where 233 was never applied.
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/238-search-inside-products.sql');
   END IF;
 END $$;

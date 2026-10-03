@@ -68,7 +68,7 @@ COMMIT;
 -- Self-record in the migration register (db/233). Guarded so this file
 -- also runs cleanly if 233 has not been applied yet.
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/232-unverify-bad-mobiles.sql');
   END IF;
 END $$;

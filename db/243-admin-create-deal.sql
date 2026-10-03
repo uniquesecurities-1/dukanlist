@@ -68,7 +68,7 @@ REVOKE ALL ON FUNCTION public.admin_create_deal(UUID, JSONB) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.admin_create_deal(UUID, JSONB) TO authenticated;
 
 DO $$ BEGIN
-  IF to_regproc('public.record_migration(text,text)') IS NOT NULL THEN
+  IF to_regprocedure('public.record_migration(text,text)') IS NOT NULL THEN
     PERFORM public.record_migration('db/243-admin-create-deal.sql');
   END IF;
 END $$;
