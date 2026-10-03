@@ -210,6 +210,22 @@
         <button type="button" class="btn-sec" onclick="ffSaveProducts()" style="margin-bottom:6px">🛍️ Products save karo</button>
         <div id="ffProdStatus" style="font-size:.78rem;font-weight:700;margin-bottom:10px;min-height:1em"></div>
 
+        <!-- v326: today's offer, on the spot. Needs db/243 (admin_create_deal). -->
+        <div style="font-weight:800;font-size:.84rem;color:#991B1B;margin:4px 0 6px">🏷️ Aaj ka offer (optional)</div>
+        <input type="text" id="ffOfferTitle" placeholder="Offer ka naam — e.g. Diwali special" maxlength="80" style="width:100%;padding:9px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:.9rem;margin-bottom:6px">
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input type="number" id="ffOfferPct" placeholder="% off" min="1" max="99" style="width:84px;padding:9px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:.9rem">
+          <input type="text" id="ffOfferText" placeholder="ya offer text — Buy 2 get 1" maxlength="60" style="flex:1;padding:9px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:.9rem">
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:.82rem;color:#475569">
+          <span>Kab tak:</span>
+          <select id="ffOfferDays" style="flex:1;padding:8px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:.88rem">
+            <option value="7">1 hafta</option><option value="15">15 din</option><option value="30" selected>1 mahina</option><option value="60">2 mahine</option>
+          </select>
+        </div>
+        <button type="button" class="btn-sec" onclick="ffSaveOffer()" style="margin-bottom:6px;border-color:#FCA5A5;color:#991B1B">🏷️ Offer live karo</button>
+        <div id="ffOfferStatus" style="font-size:.78rem;font-weight:700;margin-bottom:10px;min-height:1em"></div>
+
         <a id="ffViewLive" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;background:#0F172A;color:#fff;padding:11px;border-radius:9px;font-weight:800;text-decoration:none;font-size:.88rem">🔗 Dukaandaar ko page dikhao</a>
       </div>
 
@@ -1405,6 +1421,8 @@ function ffResetPanel(){
   FF_WIDGET = null;                       // new shop -> new Cloudinary folder
   ffSetStatus('ffPhotoStatus', '');
   ffSetStatus('ffHoursStatus', '');
+  ffSetStatus('ffOfferStatus', '');
+  ['ffOfferTitle','ffOfferPct','ffOfferText'].forEach(function(id){ var e = document.getElementById(id); if (e) e.value = ''; });
   ffRenderDays();
   var a = document.getElementById('ffViewLive');
   if (a) a.href = LAST_RESULT && LAST_RESULT.slug ? ('https://dukanlist.com/' + LAST_RESULT.slug) : '#';
@@ -1556,6 +1574,29 @@ async function ffSaveProducts(){
     ffSetStatus('ffProdStatus', '\u2705 ' + FF_PRODUCTS.length + ' cheezein page par lag gayi — ab search me milegi', true);
   } catch(e){
     ffSetStatus('ffProdStatus', 'Save nahi hui: ' + (e.message || e), false);
+  }
+}
+
+// v326: offer from the field — admin_create_deal (db/243)
+async function ffSaveOffer(){
+  if (!LAST_RESULT || !LAST_RESULT.business_id) return;
+  var title = (document.getElementById('ffOfferTitle').value || '').trim();
+  var pct = parseInt(document.getElementById('ffOfferPct').value, 10) || 0;
+  var txt = (document.getElementById('ffOfferText').value || '').trim();
+  var days = parseInt(document.getElementById('ffOfferDays').value, 10) || 30;
+  if (!title){ ffSetStatus('ffOfferStatus', 'Offer ka naam likho.', false); return; }
+  if (!pct && !txt){ ffSetStatus('ffOfferStatus', '% off ya offer text — ek to do.', false); return; }
+  try {
+    var until = new Date(Date.now() + days * 864e5); until.setHours(23, 59, 0, 0);
+    var r = await C.rpc('admin_create_deal', { p_business_id: LAST_RESULT.business_id, p_data: {
+      title: title, discount_pct: pct || null, discount_text: txt || null, valid_until: until.toISOString()
+    }});
+    if (r.error) throw r.error;
+    ffSetStatus('ffOfferStatus', '\u2705 Offer live — home page ke Offers tile aur shop page par dikh raha hai (' + until.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + ' tak)', true);
+  } catch(e){
+    var m = (e.message || String(e));
+    if (/admin_create_deal/.test(m) && /find|exist/i.test(m)) m = 'db/243 abhi Supabase me nahi chala — Deepak ko bolo.';
+    ffSetStatus('ffOfferStatus', 'Offer save nahi hua: ' + m, false);
   }
 }
 
