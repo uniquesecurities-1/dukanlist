@@ -29,7 +29,18 @@ async function getTemplate(){
   if (TEMPLATE) return TEMPLATE;
   const r = await fetch(ORIGIN + '/home.html', { headers: { 'User-Agent': 'dukanlist-ssr' } });
   if (!r.ok) throw new Error('template fetch failed: ' + r.status);
-  TEMPLATE = await r.text();
+  let html = await r.text();
+  // v324: the two stylesheets that block first paint (Lighthouse: 600 ms on
+  // slow 4G — one round trip each) are inlined at serve time, so they stay
+  // one file on disk for every other page and never drift. If a fetch
+  // fails the <link> stays as it was.
+  for (const m of html.matchAll(/<link rel="stylesheet" href="(\/assets\/css\/(?:public-premium|dl-simple-mode)\.css\?v=[^"]+)">/g)){
+    try {
+      const c = await fetch(ORIGIN + m[1], { headers: { 'User-Agent': 'dukanlist-ssr' } });
+      if (c.ok) html = html.replace(m[0], '<style data-inlined="' + m[1].split('?')[0] + '">' + (await c.text()).replace(/<\/style/gi, '<\\/style') + '</style>');
+    } catch(_){}
+  }
+  TEMPLATE = html;
   return TEMPLATE;
 }
 
@@ -100,7 +111,14 @@ module.exports = async (req, res) => {
         out = out.replace(rowRe, '<div class="hts-row" id="htsRow" data-slugs="' + esc(slugs) + '">' + items.map(card).join('') + '</div>\n');
         const first = items.find(x => x.photo);
         if (first){
-          out = out.replace('</head>', '<link rel="preload" as="image" href="' + esc(stripUrl(first.photo)) + '" fetchpriority="high">\n</head>');
+          // v324: at the TOP of <head>, inside the first packet. Appended
+          // before </head> it sat 42 KB down (inline CSS) and on slow 4G the
+          // browser reached it ~2 s in — Lighthouse: "resource load delay
+          // 1,960 ms" with the preload already in place.
+          const tag = '<link rel="preload" as="image" href="' + esc(stripUrl(first.photo)) + '" fetchpriority="high">';
+          const vp = out.indexOf('<meta name="viewport"');
+          const cut = vp >= 0 ? out.indexOf('>', vp) + 1 : -1;
+          out = cut > 0 ? out.slice(0, cut) + '\n' + tag + out.slice(cut) : out.replace('</head>', tag + '\n</head>');
         }
       }
     }
