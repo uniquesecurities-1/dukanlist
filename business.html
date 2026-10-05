@@ -2285,7 +2285,7 @@ async function loadBusiness(){
   if (!slug){
     const seg = location.pathname.replace(/^\/+|\/+$/g, '');
     // single path segment, slug-shaped, and not one of our real pages
-    if (seg && !seg.includes('/') && /^[a-z][a-z0-9-]{4,}$/.test(seg) && seg !== 'business'){
+    if (seg && !seg.includes('/') && /^[a-z][a-z0-9-]{2,}$/.test(seg) && seg !== 'business'){
       slug = seg;
     }
   }
