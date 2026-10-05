@@ -82,20 +82,22 @@
   }
 
   function exitImpersonation(){
-    if (!confirm('Exit impersonation and sign out of this user account?')) return;
+    if (!confirm('Exit impersonation and go back to admin?')) return;
     try { localStorage.removeItem(KEY); } catch(_){}
-    // Sign out the impersonated session, then redirect to admin
-    try {
-      if (window.ShopDB && window.ShopDB.client && window.ShopDB.client.auth){
-        window.ShopDB.client.auth.signOut().finally(function(){
-          window.location.href = '/admin/dashboard.html';
-        });
-      } else {
-        window.location.href = '/admin/dashboard.html';
+    // v328: restore the admin session parked by admin/shop.html, then return
+    // to the shop page the admin came from. Falls back to the old sign-out.
+    var stash = null;
+    try { stash = JSON.parse(localStorage.getItem('dl_admin_stash') || 'null'); localStorage.removeItem('dl_admin_stash'); } catch(_){}
+    var back = (stash && stash.return_to) || '/admin/dashboard.html';
+    var auth = window.ShopDB && window.ShopDB.client && window.ShopDB.client.auth;
+    if (!auth){ window.location.href = '/admin/dashboard.html'; return; }
+    auth.signOut({ scope: 'local' }).catch(function(){}).then(function(){
+      if (stash && stash.refresh_token){
+        return auth.setSession({ access_token: stash.access_token, refresh_token: stash.refresh_token })
+          .then(function(r){ window.location.href = (r && r.error) ? '/admin/login.html' : back; });
       }
-    } catch(_){
       window.location.href = '/admin/dashboard.html';
-    }
+    });
   }
 
   if (document.readyState === 'loading'){

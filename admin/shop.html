@@ -1862,21 +1862,18 @@ async function adminResetPassword(email){
 // ====== Impersonate Login (open as the user) ======
 async function adminImpersonate(email){
   if (!email) return;
-  var msg = '🎭 LOGIN AS ' + email + '\n\n' +
-    'You will be signed in as this user in a NEW INCOGNITO/PRIVATE window.\n' +
-    'Use a private window so your admin session is preserved here.\n\n' +
-    'WHAT TO DO:\n' +
-    '  1. Click OK below\n' +
-    '  2. A link will be shown — copy it\n' +
-    '  3. Open INCOGNITO window (Ctrl+Shift+N) and paste\n' +
-    '  4. You will land on the shopkeeper dashboard with a red banner on top\n\n' +
-    'Every action you take is logged. Proceed?';
-  if (!confirm(msg)) return;
+  // v328: one click. The admin's own session is parked in localStorage
+  // (same place supabase-js keeps it anyway), the magic link is followed in
+  // THIS tab, and the red banner's "Exit" restores the admin session and
+  // brings you back to this shop page. No incognito, no copy-paste.
+  if (!confirm('🎭 Login as ' + email + '?\n\nYou will see the owner panel exactly as they do. ' +
+    'Every action is logged. Use "Exit impersonation" on the red banner to come back here as admin.')) return;
   try {
     var sess = await ShopDB.client.auth.getSession();
-    var jwt = sess.data && sess.data.session ? sess.data.session.access_token : null;
+    var cur = sess.data && sess.data.session;
+    var jwt = cur ? cur.access_token : null;
     if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
-    toast('⏳ Generating impersonation link...');
+    toast('⏳ Switching to owner…');
     var r = await fetch('/api/admin-impersonate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
@@ -1884,17 +1881,13 @@ async function adminImpersonate(email){
     });
     var data = await r.json();
     if (!r.ok){ alert('Impersonation failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
-    var link = data.url;
-    var copied = false;
-    try { await navigator.clipboard.writeText(link); copied = true; } catch(_){}
-    prompt(
-      '✓ IMPERSONATION LINK READY' + (copied ? ' (copied to clipboard)' : '') + '\n\n' +
-      'Paste in an INCOGNITO window — link expires in 60 min.\n\n' +
-      'Target: ' + email + '\n\n' +
-      'LINK:',
-      link
-    );
-    toast('🎭 Link ready');
+    try {
+      localStorage.setItem('dl_admin_stash', JSON.stringify({
+        access_token: cur.access_token, refresh_token: cur.refresh_token,
+        return_to: location.pathname + location.search, at: Date.now()
+      }));
+    } catch(_){}
+    window.location.href = data.url;
   } catch(e){ alert('Network error: ' + (e.message || e)); }
 }
 
