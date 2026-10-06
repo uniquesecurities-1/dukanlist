@@ -271,6 +271,19 @@ html[data-lang="hi"] .parent-header h2{ font-family:'Noto Sans Devanagari',sans-
     <div class="stat"><div class="num" id="stTotalStates">—</div><div class="lbl" data-i18n-en>States</div><div class="lbl" data-i18n-hi>राज्य</div></div>
   </div>
 
+  <!-- v330: 439 categories, sorted by shop count inside each parent — a new
+       or empty trade sits at the bottom of a hundred tiles. A search box
+       filters tiles live by name, Hindi name, slug and keywords. -->
+  <div class="cat-find" style="max-width:720px;margin:0 auto 18px;padding:0 4px">
+    <div style="position:relative">
+      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.05rem;opacity:.6">🔍</span>
+      <input type="search" id="catFind" autocomplete="off" inputmode="search"
+        data-ph-en="Find a category — newspaper, accessories, mistri…" data-ph-hi="श्रेणी खोजें — अख़बार, एक्सेसरीज़, मिस्त्री…"
+        placeholder="Find a category — newspaper, accessories, mistri…"
+        style="width:100%;padding:13px 44px 13px 42px;border:1.5px solid #E2E8F0;border-radius:14px;font:inherit;font-size:1rem;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.05);outline:none">
+      <span id="catFindCount" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.72rem;font-weight:800;color:#64748B;background:#F1F5F9;padding:3px 8px;border-radius:99px;display:none"></span>
+    </div>
+  </div>
   <!-- Parent sections -->
   <div class="parents-wrap" id="parentList">
     <div class="skeleton-card"></div>
@@ -304,6 +317,7 @@ function setLang(lang){
   localStorage.setItem('shop_lang',lang);
   document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
   document.getElementById('langBtnHi').classList.toggle('active',lang==='hi');
+  try { var cf = document.getElementById('catFind'); if (cf) cf.placeholder = cf.getAttribute('data-ph-' + lang) || cf.placeholder; } catch(_){}
   if (PARENTS.length) renderParents();
 }
 
@@ -318,7 +332,7 @@ async function loadAll(){
 
   // Fetch ALL categories with hierarchy + counts
   const { data: cats, error } = await c.from('categories')
-    .select('id, slug, name, name_hi, icon, color, parent_id, sort_order, business_count')
+    .select('id, slug, name, name_hi, icon, color, parent_id, sort_order, business_count, keywords')
     .eq('active', true)
     .order('sort_order');
 
@@ -367,11 +381,36 @@ async function loadAll(){
   renderParents();
 }
 
+// v330: live filter. Hides tiles that do not match, hides parents with no
+// match left, and shows "n categories" in the box. Empty query restores all.
+(function(){
+  var inp = document.getElementById('catFind'), cnt = document.getElementById('catFindCount');
+  if (!inp) return;
+  function apply(){
+    var q = (inp.value || '').trim().toLowerCase();
+    var tiles = document.querySelectorAll('.sub-tile'); var shown = 0;
+    tiles.forEach(function(t){
+      var ok = !q || (t.getAttribute('data-find') || '').indexOf(q) !== -1;
+      t.style.display = ok ? '' : 'none'; if (ok) shown++;
+    });
+    document.querySelectorAll('.parent-card').forEach(function(card){
+      var any = !q || Array.prototype.some.call(card.querySelectorAll('.sub-tile'), function(t){ return t.style.display !== 'none'; });
+      card.style.display = any ? '' : 'none';
+      if (q && any) card.classList.add('expanded');   // phones collapse parents; a match must be visible
+    });
+    if (cnt){ cnt.style.display = q ? '' : 'none'; cnt.textContent = shown + (document.documentElement.dataset.lang === 'hi' ? ' मिलीं' : ' found'); }
+  }
+  inp.addEventListener('input', apply);
+  document.addEventListener('dl:browse-rendered', apply);
+  var p = new URLSearchParams(location.search).get('find'); if (p){ inp.value = p; setTimeout(apply, 50); }
+})();
+
 function renderParents(){
   const lang = document.documentElement.getAttribute('data-lang') || 'en';
   const html = PARENTS.map(p => renderParentCard(p, lang)).join('');
   const list = document.getElementById('parentList');
   list.innerHTML = html;
+  try { document.dispatchEvent(new Event('dl:browse-rendered')); } catch(_){}
   list.classList.add('stagger');
   // Mobile accordion: tap parent header to expand its sub-cats
   list.querySelectorAll('.parent-card').forEach(card => {
@@ -402,7 +441,7 @@ function renderParentCard(p, lang){
     ? `<span class="p-shop-badge" title="${totalShops} ${lang==='hi'?'व्यवसाय':'active shops'}">🏪 ${totalShops}</span>`
     : '';
   return `
-    <div class="parent-card" style="--p-color:${color}; --p-tint:${tint}">
+    <div class="parent-card" data-parent="${escapeHTML(p.slug)}" style="--p-color:${color}; --p-tint:${tint}">
       <div class="parent-header">
         <div class="p-icon" style="background:${color}">${p.icon || '📂'}</div>
         <div class="p-info">
@@ -429,7 +468,7 @@ function renderSubTile(s, lang){
     ? (count + (lang==='hi' ? '' : ''))
     : (lang==='hi' ? '—' : '0');
   return `
-    <a class="sub-tile${cls}" href="/search.html?cat=${encodeURIComponent(s.slug)}">
+    <a class="sub-tile${cls}" href="/search.html?cat=${encodeURIComponent(s.slug)}" data-find="${escapeHTML(((s.name||'')+' '+(s.name_hi||'')+' '+(s.slug||'').replace(/-/g,' ')+' '+(s.keywords||'')).toLowerCase())}">
       <span class="s-icon">${s.icon || '🏪'}</span>
       <span class="s-body">
         <span class="s-name">${escapeHTML(name)}</span>
