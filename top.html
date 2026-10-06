@@ -145,8 +145,12 @@
   /* The name used to be nowrap + ellipsis, which chopped the "✓ Verified"
      badge off any long name — #1 lost its badge while #2 kept it. Wrap to
      two lines instead; the badge always shows. */
-  .seo-name{ white-space:normal; overflow:visible; text-overflow:clip; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height:1.25 }
-  .seo-name .ver{ vertical-align:middle }
+  /* v329: the badge was INSIDE the clamped name box with overflow:visible —
+     on a two-line name it fell to a third line and painted over the USP.
+     It lives on its own line under the name now; the name clamps cleanly. */
+  .seo-name{ white-space:normal; overflow:hidden; text-overflow:clip; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height:1.25 }
+  .seo-badges{ margin:2px 0 4px; line-height:1 }
+  .seo-badges .ver{ display:inline-flex; align-items:center; gap:3px; background:#DBEAFE; color:#1E3A8A; padding:2px 7px; border-radius:99px; font-size:.66rem; font-weight:800 }
   .seo-btn.share{ background:#fff; color:#0F172A; border:1.5px solid #CBD5E1 }
   .seo-btn.share:hover{ border-color:#1E3A8A }
   .seo-cta{ flex-direction:column; gap:6px; align-items:stretch; min-width:96px }
@@ -399,7 +403,8 @@
       '  </div>' +
       '  <div class="seo-photo">' + photo + '</div>' +
       '  <div class="seo-info">' +
-      '    <div class="seo-name">' + escHtml(b.name || '') + verifiedBadge + '</div>' +
+      '    <div class="seo-name">' + escHtml(b.name || '') + '</div>' +
+      (verifiedBadge ? '    <div class="seo-badges">' + verifiedBadge + '</div>' : '') +
       (b.usp ? '<div class="seo-usp">' + escHtml(b.usp) + '</div>' : '') +
       why +
       '    <div class="seo-meta">' + rating + ' ' + established + '</div>' +
