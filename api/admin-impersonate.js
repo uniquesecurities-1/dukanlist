@@ -200,10 +200,20 @@ module.exports = async (req, res) => {
     });
   } catch(_){ /* non-fatal */ }
 
+  // v331: the site's supabase client runs flowType 'pkce'. A magic link from
+  // generate_link lands with #access_token in the hash (implicit flow),
+  // which a PKCE client never reads — so the link opened, no session was
+  // made, and the panel bounced to login. The admin page now exchanges the
+  // hashed token directly with auth.verifyOtp(), no redirect involved.
+  const tokenHash =
+    (genLink.body && genLink.body.properties && genLink.body.properties.hashed_token) ||
+    (genLink.body && genLink.body.hashed_token) || null;
+
   res.status(200).json({
     ok: true,
     user_id: targetUser.id,
     email: targetEmail,
+    token_hash: tokenHash,
     url: linkUrl,
     expires_in_minutes: 60,
     warning: 'This is a privileged impersonation link. Open in a new private/incognito window so you don\'t mix sessions. Every action you take is logged against this user.'

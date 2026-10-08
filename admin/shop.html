@@ -238,6 +238,7 @@ async function init(){
   } catch(_){}
   render();
   loadEditHistory();
+  admLoadPhotos();
   setTimeout(loadCategoryEditor, 100);
   setTimeout(loadLocationEditor, 100);
   setTimeout(loadReviewsForAdmin, 100);
@@ -297,6 +298,20 @@ function render(){
           + '<span>Verified Score</span>'
           + '<span id="vScore" style="font-weight:800;font-size:15px;color:#0F172A">' + (s.verified_score || 0) + ' / 5</span>'
         + '</div>'
+      + '</div>'
+
+      // === v331: Photos card — admin uploads for the owner ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>📷 Shop Photos <span class="subtle">owner sent them on WhatsApp? upload here</span></h2>'
+        + '<input type="file" id="admPhotoCam" accept="image/*" capture="environment" style="display:none" onchange="admPhotoPicked(this)">'
+        + '<input type="file" id="admPhotoGal" accept="image/*" multiple style="display:none" onchange="admPhotoPicked(this)">'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'
+          + '<button type="button" onclick="document.getElementById(\'admPhotoGal\').click()" style="background:linear-gradient(135deg,#FF6B1A,#E55100);color:#fff;border:0;border-radius:9px;padding:9px 14px;font-weight:800;cursor:pointer;font-family:inherit">🖼️ Upload photos</button>'
+          + '<button type="button" onclick="document.getElementById(\'admPhotoCam\').click()" style="background:#fff;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:9px;padding:9px 14px;font-weight:800;cursor:pointer;font-family:inherit">📷 Camera</button>'
+          + '<span id="admPhotoStatus" style="font-size:12.5px;color:#64748B"></span>'
+        + '</div>'
+        + '<div id="admPhotoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px"><div style="color:#94a3b8;font-size:13px">Loading…</div></div>'
+        + '<div style="font-size:11.5px;color:#94a3b8;margin-top:8px">★ = main photo (shown on cards). Max ' + 15 + ' photos. Same storage as the owner panel — the owner sees these too.</div>'
       + '</div>'
 
       // === Recent Changes card ===
@@ -1859,36 +1874,119 @@ async function adminResetPassword(email){
   } catch(e){ alert('Network error: ' + (e.message || e)); }
 }
 
+// ====== v331: Shop photos (admin) ======
+var ADM_PHOTO_MAX = 15;
+async function admLoadPhotos(){
+  var grid = document.getElementById('admPhotoGrid'); if (!grid) return;
+  var r = await ShopDB.client.from('business_photos')
+    .select('id, cloudinary_url, is_featured, uploaded_at')
+    .eq('business_id', BIZ_ID).order('uploaded_at', { ascending: true });
+  if (r.error){ grid.innerHTML = '<div style="color:#DC2626;font-size:13px">' + esc(r.error.message) + '</div>'; return; }
+  var rows = (r.data || []).filter(function(p){ return p.cloudinary_url; });
+  rows.sort(function(a, b){ return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0); });
+  window.__admPhotoCount = rows.length;
+  if (!rows.length){ grid.innerHTML = '<div style="color:#94a3b8;font-size:13px;grid-column:1/-1">No photos yet.</div>'; return; }
+  grid.innerHTML = rows.map(function(p){
+    var th = p.cloudinary_url.replace('/upload/', '/upload/w_240,h_240,c_fill,q_auto,f_auto/');
+    return '<div style="position:relative;border-radius:10px;overflow:hidden;border:' + (p.is_featured ? '2.5px solid #F59E0B' : '1px solid #E2E8F0') + ';aspect-ratio:1">'
+      + '<a href="' + esc(p.cloudinary_url) + '" target="_blank" rel="noopener"><img src="' + esc(th) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></a>'
+      + '<div style="position:absolute;top:4px;left:4px;right:4px;display:flex;justify-content:space-between">'
+        + (p.is_featured
+            ? '<span style="background:#F59E0B;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:99px">★ MAIN</span>'
+            : '<button type="button" title="Make main photo" onclick="admMakeMain(\'' + p.id + '\')" style="background:rgba(255,255,255,.92);border:0;border-radius:99px;font-size:11px;font-weight:800;padding:2px 7px;cursor:pointer">☆</button>')
+        + '<button type="button" title="Delete photo" onclick="admDeletePhoto(\'' + p.id + '\')" style="background:#DC2626;color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-weight:900;cursor:pointer;line-height:1">✕</button>'
+      + '</div></div>';
+  }).join('');
+}
+async function admPhotoPicked(input){
+  var files = Array.prototype.slice.call(input.files || []); input.value = '';
+  if (!files.length) return;
+  var st = document.getElementById('admPhotoStatus');
+  var room = ADM_PHOTO_MAX - (window.__admPhotoCount || 0);
+  if (room <= 0){ st.textContent = 'Already ' + ADM_PHOTO_MAX + ' photos — delete one first.'; return; }
+  files = files.slice(0, room);
+  var done = 0, failed = 0;
+  for (var i = 0; i < files.length; i++){
+    var f = files[i];
+    if (!/^image\//.test(f.type) || f.size > 10 * 1024 * 1024){ failed++; continue; }
+    st.textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + '… ⏳';
+    try {
+      var fd = new FormData();
+      fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'businesses/' + BIZ_ID);
+      var up = await fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method: 'POST', body: fd });
+      var j = await up.json();
+      if (!up.ok || !j.secure_url) throw new Error((j.error && j.error.message) || ('HTTP ' + up.status));
+      var first = (window.__admPhotoCount || 0) === 0 && done === 0;
+      var ins = await ShopDB.client.from('business_photos').insert({
+        business_id: BIZ_ID, cloudinary_url: j.secure_url, cloudinary_public_id: j.public_id,
+        delete_token: j.delete_token || null, is_featured: first
+      });
+      if (ins.error) throw ins.error;
+      done++;
+    } catch(e){ failed++; console.warn('[admin photo]', e); }
+  }
+  st.textContent = '✅ ' + done + ' uploaded' + (failed ? ' · ' + failed + ' failed' : '');
+  admLoadPhotos();
+}
+async function admMakeMain(id){
+  var c = ShopDB.client;
+  var a = await c.from('business_photos').update({ is_featured: false }).eq('business_id', BIZ_ID).eq('is_featured', true);
+  var b = await c.from('business_photos').update({ is_featured: true }).eq('id', id);
+  if (a.error || b.error){ toast('Could not set main photo: ' + ((a.error || b.error).message), true); return; }
+  toast('★ Main photo set'); admLoadPhotos();
+}
+async function admDeletePhoto(id){
+  if (!confirm('Delete this photo from the shop page?')) return;
+  var r = await ShopDB.client.from('business_photos').delete().eq('id', id);
+  if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
+  toast('Photo deleted'); admLoadPhotos();
+}
+
 // ====== Impersonate Login (open as the user) ======
 async function adminImpersonate(email){
   if (!email) return;
-  // v328: one click. The admin's own session is parked in localStorage
-  // (same place supabase-js keeps it anyway), the magic link is followed in
-  // THIS tab, and the red banner's "Exit" restores the admin session and
-  // brings you back to this shop page. No incognito, no copy-paste.
+  // v331: one click, same tab, and it actually signs in. The admin session
+  // is parked in localStorage, the owner's one-time token is exchanged with
+  // verifyOtp (works with the PKCE client — the old magic link did not),
+  // and the red banner's Exit restores the admin and returns here.
   if (!confirm('🎭 Login as ' + email + '?\n\nYou will see the owner panel exactly as they do. ' +
     'Every action is logged. Use "Exit impersonation" on the red banner to come back here as admin.')) return;
+  var auth = ShopDB.client.auth, cur = null;
   try {
-    var sess = await ShopDB.client.auth.getSession();
-    var cur = sess.data && sess.data.session;
-    var jwt = cur ? cur.access_token : null;
-    if (!jwt) { alert('Login expired. Refresh page and try again.'); return; }
+    var sess = await auth.getSession();
+    cur = sess.data && sess.data.session;
+    if (!cur) { alert('Login expired. Refresh page and try again.'); return; }
     toast('⏳ Switching to owner…');
     var r = await fetch('/api/admin-impersonate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cur.access_token },
       body: JSON.stringify({ email: email })
     });
     var data = await r.json();
     if (!r.ok){ alert('Impersonation failed:\n' + (data.error || ('HTTP ' + r.status))); return; }
+    if (!data.token_hash){ alert('Server did not return a login token. Push the latest api/admin-impersonate.js and try again.'); return; }
+
     try {
       localStorage.setItem('dl_admin_stash', JSON.stringify({
         access_token: cur.access_token, refresh_token: cur.refresh_token,
         return_to: location.pathname + location.search, at: Date.now()
       }));
     } catch(_){}
-    window.location.href = data.url;
-  } catch(e){ alert('Network error: ' + (e.message || e)); }
+
+    var v = await auth.verifyOtp({ token_hash: data.token_hash, type: 'magiclink' });
+    if (v.error || !v.data || !v.data.session){
+      // put the admin back exactly as they were
+      try { await auth.setSession({ access_token: cur.access_token, refresh_token: cur.refresh_token }); } catch(_){}
+      try { localStorage.removeItem('dl_admin_stash'); } catch(_){}
+      alert('Could not sign in as owner: ' + ((v.error && v.error.message) || 'no session returned'));
+      return;
+    }
+    var by = (cur.user && cur.user.email) || 'admin';
+    window.location.href = '/panel/dashboard.html?dukan_impersonating=1&dukan_impersonating_by=' + encodeURIComponent(by);
+  } catch(e){
+    if (cur){ try { await auth.setSession({ access_token: cur.access_token, refresh_token: cur.refresh_token }); } catch(_){} }
+    alert('Network error: ' + (e.message || e));
+  }
 }
 
 // ====== Send / Resend Verification Email (admin one-click invite) ======
