@@ -311,7 +311,7 @@ function render(){
           + '<span id="admPhotoStatus" style="font-size:12.5px;color:#64748B"></span>'
         + '</div>'
         + '<div id="admPhotoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px"><div style="color:#94a3b8;font-size:13px">Loading…</div></div>'
-        + '<div style="font-size:11.5px;color:#94a3b8;margin-top:8px">★ = main photo (shown on cards). Max ' + 15 + ' photos. Same storage as the owner panel — the owner sees these too.</div>'
+        + '<div style="font-size:11.5px;color:#94a3b8;margin-top:8px">★ = main photo (shown on cards). Max ' + 8 + ' photos. Same storage as the owner panel — the owner sees these too.</div>'
       + '</div>'
 
       // === Recent Changes card ===
@@ -1875,7 +1875,7 @@ async function adminResetPassword(email){
 }
 
 // ====== v331: Shop photos (admin) ======
-var ADM_PHOTO_MAX = 15;
+var ADM_PHOTO_MAX = 8;   // db/231 enforce_photo_limit
 async function admLoadPhotos(){
   var grid = document.getElementById('admPhotoGrid'); if (!grid) return;
   var r = await ShopDB.client.from('business_photos')
@@ -1905,10 +1905,13 @@ async function admPhotoPicked(input){
   var room = ADM_PHOTO_MAX - (window.__admPhotoCount || 0);
   if (room <= 0){ st.textContent = 'Already ' + ADM_PHOTO_MAX + ' photos — delete one first.'; return; }
   files = files.slice(0, room);
-  var done = 0, failed = 0;
+  var done = 0, failed = 0, lastErr = '';
   for (var i = 0; i < files.length; i++){
     var f = files[i];
-    if (!/^image\//.test(f.type) || f.size > 10 * 1024 * 1024){ failed++; continue; }
+    // Windows sometimes reports '' for .jfif / WhatsApp images — trust the extension then
+    var isImg = /^image\//.test(f.type) || /\.(jpe?g|jfif|png|webp|heic|heif|gif)$/i.test(f.name || '');
+    if (!isImg){ failed++; lastErr = (f.name || 'file') + ' is not a photo'; continue; }
+    if (f.size > 10 * 1024 * 1024){ failed++; lastErr = (f.name || 'photo') + ' is over 10 MB'; continue; }
     st.textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + '… ⏳';
     try {
       var fd = new FormData();
@@ -1916,28 +1919,39 @@ async function admPhotoPicked(input){
       var up = await fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method: 'POST', body: fd });
       var j = await up.json();
       if (!up.ok || !j.secure_url) throw new Error((j.error && j.error.message) || ('HTTP ' + up.status));
-      var first = (window.__admPhotoCount || 0) === 0 && done === 0;
-      var ins = await ShopDB.client.from('business_photos').insert({
-        business_id: BIZ_ID, cloudinary_url: j.secure_url, cloudinary_public_id: j.public_id,
-        delete_token: j.delete_token || null, is_featured: first
+      // v332: db/246 RPC first (SECURITY DEFINER, one admin check); falls
+      // back to the direct insert if the RPC is not installed yet.
+      var ins = await ShopDB.client.rpc('admin_add_business_photo', {
+        p_business_id: BIZ_ID, p_url: j.secure_url, p_public_id: j.public_id || null, p_delete_token: j.delete_token || null
       });
+      if (ins.error && /admin_add_business_photo|PGRST202|schema cache/i.test((ins.error.message || '') + (ins.error.code || ''))){
+        var first = (window.__admPhotoCount || 0) === 0 && done === 0;
+        ins = await ShopDB.client.from('business_photos').insert({
+          business_id: BIZ_ID, cloudinary_url: j.secure_url, cloudinary_public_id: j.public_id,
+          delete_token: j.delete_token || null, is_featured: first
+        });
+      }
       if (ins.error) throw ins.error;
       done++;
-    } catch(e){ failed++; console.warn('[admin photo]', e); }
+    } catch(e){ failed++; lastErr = (e && (e.message || e.details || e.hint)) || String(e); console.warn('[admin photo]', e); }
   }
-  st.textContent = '✅ ' + done + ' uploaded' + (failed ? ' · ' + failed + ' failed' : '');
+  st.innerHTML = (done ? '✅ ' + done + ' uploaded' : '') + (failed ? (done ? ' · ' : '') + '<b style="color:#DC2626">' + failed + ' failed: ' + esc(lastErr) + '</b>' : '');
   admLoadPhotos();
 }
 async function admMakeMain(id){
   var c = ShopDB.client;
-  var a = await c.from('business_photos').update({ is_featured: false }).eq('business_id', BIZ_ID).eq('is_featured', true);
-  var b = await c.from('business_photos').update({ is_featured: true }).eq('id', id);
-  if (a.error || b.error){ toast('Could not set main photo: ' + ((a.error || b.error).message), true); return; }
+  var r = await c.rpc('admin_set_main_photo', { p_photo_id: id });
+  if (r.error){
+    var a = await c.from('business_photos').update({ is_featured: false }).eq('business_id', BIZ_ID).eq('is_featured', true);
+    var b = await c.from('business_photos').update({ is_featured: true }).eq('id', id);
+    if (a.error || b.error){ toast('Could not set main photo: ' + ((a.error || b.error).message), true); return; }
+  }
   toast('★ Main photo set'); admLoadPhotos();
 }
 async function admDeletePhoto(id){
   if (!confirm('Delete this photo from the shop page?')) return;
-  var r = await ShopDB.client.from('business_photos').delete().eq('id', id);
+  var r = await ShopDB.client.rpc('admin_delete_business_photo', { p_photo_id: id });
+  if (r.error) r = await ShopDB.client.from('business_photos').delete().eq('id', id);
   if (r.error){ toast('Delete failed: ' + r.error.message, true); return; }
   toast('Photo deleted'); admLoadPhotos();
 }
