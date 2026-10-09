@@ -1011,3 +1011,9 @@ body:has(#dukanCompareBar){ padding-bottom:80px }
 .admin-empty .es-cta:hover{ background:#1E293B }
 .admin-empty .es-cta-secondary{ background:#fff; color:#0F172A; border:1px solid #cbd5e1; margin-left:6px }
 .admin-empty .es-cta-secondary:hover{ background:#f8fafc; border-color:#0F172A }
+
+
+/* v339: new DukanList wordmark in the header (replaces icon + text).
+   36px on desktop, 28px on phones where the city pill and EN/हिं share the bar. */
+.brand .brand-wordmark{ height:36px; width:auto; display:block }
+@media (max-width:560px){ .brand .brand-wordmark{ height:28px !important } }

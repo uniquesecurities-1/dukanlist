@@ -314,7 +314,7 @@ ${isEmpty ? '<meta name="robots" content="noindex, follow">' : ''}
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
 <meta name="twitter:image" content="${ORIGIN}/assets/og-default.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
@@ -358,7 +358,7 @@ ${isEmpty ? '<meta name="robots" content="noindex, follow">' : ''}
 <body>
 
 <header class="topbar">
-  <a href="${ORIGIN}/" class="brand"><span class="logo">🏪</span><span>Dukan<em style="font-style:normal;color:#FFB088">List</em></span></a>
+  <a href="${ORIGIN}/" class="brand"><img class="brand-wordmark" src="/assets/brand/wordmark-dark.webp" alt="DukanList" width="154" height="36" style="height:36px;width:auto;display:block"></a>
   <nav>
     <a href="${ORIGIN}/browse">Browse</a>
     <a href="${ORIGIN}/top">🏆 Top Rated</a>

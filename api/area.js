@@ -193,7 +193,7 @@ ${itemListSchema ? `<script type="application/ld+json">${JSON.stringify(itemList
 <body>
 
 <header class="topbar">
-  <a class="brand" href="${ORIGIN}/">DukanList<span class="badge">LOCAL</span></a>
+  <a class="brand" href="${ORIGIN}/" style="display:flex;align-items:center;gap:8px"><img class="brand-wordmark" src="/assets/brand/wordmark-light.webp" alt="DukanList" width="154" height="36" style="height:30px;width:auto;display:block"><span class="badge">LOCAL</span></a>
   <div class="actions">
     <a href="${ORIGIN}/top">🏆 Top Rated</a>
     <a href="${ORIGIN}/search?city=${citySlug}">Search ${esc(cityName)}</a>
