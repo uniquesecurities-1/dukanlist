@@ -1016,4 +1016,8 @@ body:has(#dukanCompareBar){ padding-bottom:80px }
 /* v339: new DukanList wordmark in the header (replaces icon + text).
    36px on desktop, 28px on phones where the city pill and EN/हिं share the bar. */
 .brand .brand-wordmark{ height:36px; width:auto; display:block }
-@media (max-width:560px){ .brand .brand-wordmark{ height:28px !important } }
+@media (max-width:560px){
+  .brand .brand-wordmark{ height:26px !important }
+  .nav-links .lang-toggle button{ padding:4px 10px }
+}
+@media (max-width:380px){ .brand .brand-wordmark{ height:22px !important } }

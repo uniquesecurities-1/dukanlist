@@ -393,6 +393,17 @@
   .topbar .brand{flex-shrink:0}
   .hdr-city-caret{opacity:.8;font-size:.7rem}
   .topbar .nav-cta{display:none !important}        /* bottom nav has Register */
+  /* v341: the home page does not load main.css, so the v339 phone size for
+     the wordmark never applied — 154px logo + city pill + EN/हिं overflowed
+     and the language toggle fell off the right edge. Also hide the stray
+     hamburger (its icon styles live in main.css; here it drew as a 4px dot,
+     and the bottom nav already covers it). */
+  .topbar .brand-wordmark{height:24px !important}
+  .topbar .hamburger{display:none !important}
+  .topbar-inner{gap:6px !important}
+  .hdr-city{max-width:36vw;padding:5px 8px;font-size:.74rem}
+  .nav-links .lang-toggle{margin-right:0 !important;padding:2px !important}
+  .nav-links .lang-toggle button{padding:4px 9px !important;font-size:.72rem !important}
   .hero-search-first .hero-sub{display:none !important}
   .hero-search-first .hero-tag{margin-bottom:12px !important}
   .hsc-row-c{display:none !important}
