@@ -19,7 +19,13 @@
     try {
       if (typeof ShopDB === 'undefined' || !ShopDB || !ShopDB.client) return;
       var c = ShopDB.client;
-      var r = await c.rpc('get_trending_shops', { p_city_id: null, p_limit: 8 });
+      var r = await c.rpc('get_trending_shops', { p_city_id: null, p_limit: 30 });
+      // v335: no photo, no Trending slot. A shop that sits here with the
+      // grey placeholder has no reason to add a photo; one that is left
+      // out does. Ask for 30, keep the first 8 that have a photo.
+      if (!r.error && Array.isArray(r.data)){
+        r.data = r.data.filter(function (b) { return !!(b && b.photo); }).slice(0, 8);
+      }
       if (r.error || !Array.isArray(r.data) || r.data.length < 3){
         if (window.DLShown) DLShown.claim([], 'trending');   // v294: nothing to show, but say so
         return;
