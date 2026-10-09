@@ -2950,8 +2950,14 @@ function render(){
   // UNCLAIMED listing (db/163 Option B) — apply body class + inject
   // a prominent banner. CSS gates contact buttons via .claim-unclaimed.
   // ============================================================
-  const _isUnclaimed     = b.claim_status === 'unclaimed';
-  const _isClaimPending  = b.claim_status === 'claimed_pending';
+  // v333: a shop our team has verified (phone confirmed, or score 3+) is
+  // never locked and never shows the "claim in progress" banner — the
+  // claim is about the owner's LOGIN, not about whether the listing is
+  // real. Wadhwa Electronics (5/5, GOLD) was showing "contact details
+  // unlock honge" because its owner's claim never got promoted (db/247).
+  const _teamVerified    = !!(b.verified_mobile || (Number(b.verified_score) || 0) >= 3);
+  const _isUnclaimed     = b.claim_status === 'unclaimed' && !_teamVerified;
+  const _isClaimPending  = b.claim_status === 'claimed_pending' && !_teamVerified;
   if (_isUnclaimed){
     document.body.classList.add('claim-unclaimed');
     document.body.classList.add('claim-locked');

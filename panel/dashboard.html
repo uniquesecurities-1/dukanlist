@@ -1067,6 +1067,8 @@ async function loadNotifications(){
     if (!c) return;
     const u = await c.auth.getUser();
     if (!u || !u.data || !u.data.user) return;
+    // v333: finish a claim whose email was confirmed outside email-verified.html
+    try { c.rpc('auto_approve_after_email_verify').then(null, function(){}); } catch(_){}
     const r = await c.rpc('my_notifications', { p_limit: 10 });
     if (r.error) return; // RPC may not exist yet — silent
     const items = r.data || [];

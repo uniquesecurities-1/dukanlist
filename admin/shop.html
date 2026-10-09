@@ -233,7 +233,8 @@ async function init(){
   // the jsonb_build_object arg limit). One small extra query keeps the
   // admin form fully populated without forcing a full RPC rewrite.
   try {
-    var ar = await c.from('businesses').select('alt_mobile').eq('id', BIZ_ID).maybeSingle();
+    var ar = await c.from('businesses').select('alt_mobile, claim_status').eq('id', BIZ_ID).maybeSingle();
+    if (ar.data && ar.data.claim_status) SHOP.claim_status = ar.data.claim_status;
     if (ar.data && ar.data.alt_mobile !== undefined) SHOP.alt_mobile = ar.data.alt_mobile;
   } catch(_){}
   render();
@@ -294,6 +295,12 @@ function render(){
           + verifyTile('verified_photo',   '📸', 'Photos Verified',  'At least one real shop photo',     s.verified_photo)
           + verifyTile('verified_visit',   '👤', 'Visit Verified',   'Personally visited by team (×2)',  s.verified_visit)
         + '</div>'
+        + (s.claim_status === 'claimed_pending'
+            ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;padding:10px 12px;margin:10px 0">'
+              + '<span style="font-size:13px;color:#1E3A8A"><b>⏳ Claim in progress</b> — owner started a claim but it never completed (usually: email confirmed outside the verify page).</span>'
+              + '<button type="button" onclick="admCompleteClaim()" style="background:#1E3A8A;color:#fff;border:0;border-radius:8px;padding:8px 12px;font-weight:800;cursor:pointer;font-family:inherit">✓ Complete claim</button>'
+            + '</div>'
+            : '')
         + '<div class="verify-score">'
           + '<span>Verified Score</span>'
           + '<span id="vScore" style="font-weight:800;font-size:15px;color:#0F172A">' + (s.verified_score || 0) + ' / 5</span>'
@@ -1872,6 +1879,14 @@ async function adminResetPassword(email){
     });
     toast('✓ Password reset');
   } catch(e){ alert('Network error: ' + (e.message || e)); }
+}
+
+// v333: finish a stuck claim (db/247)
+async function admCompleteClaim(){
+  if (!confirm('Mark this claim as complete? Do this only if you have confirmed the owner (phone / visit).')) return;
+  var r = await ShopDB.client.rpc('admin_complete_claim', { p_business_id: BIZ_ID });
+  if (r.error){ toast('Failed: ' + r.error.message + (/admin_complete_claim/.test(r.error.message) ? ' — run db/247 first' : ''), true); return; }
+  toast('✓ Claim complete'); SHOP.claim_status = r.data; render(); loadEditHistory(); admLoadPhotos();
 }
 
 // ====== v331: Shop photos (admin) ======
