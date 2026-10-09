@@ -265,7 +265,7 @@
     const r = await ShopDB.client.rpc('get_top_for_seo', {
       p_category_slug: catSlug,
       p_city_slug:     citySlug,
-      p_limit:         12
+      p_limit:         catSlug ? 12 : 40   // v338: overall list drops no-photo shops, so ask for more
     });
     if (r.error) throw r.error;
     data = r.data || {};
@@ -278,7 +278,11 @@
   const catName  = data.category_name || (catSlug ? catSlug.replace(/-/g,' ').replace(/\b\w/g, m=>m.toUpperCase()) : 'Local Businesses');
   const cityName = data.city_name || (citySlug ? citySlug.replace(/-/g,' ').replace(/\b\w/g, m=>m.toUpperCase()) : '');
   const stateName = data.state_name || '';
-  const items = Array.isArray(data.items) ? data.items : [];
+  // v338: the overall Top list (no category) is a showcase — a shop with no
+  // photo does not get a place in it. Inside a category the list stays
+  // complete, because most categories do not have 12 photo shops yet.
+  let items = Array.isArray(data.items) ? data.items : [];
+  if (!catSlug) items = items.filter(function(b){ return !!b.photo; }).slice(0, 12);
 
   // ─── Title + meta + canonical ──────────────────────────────
   const titleStr = (cityName)

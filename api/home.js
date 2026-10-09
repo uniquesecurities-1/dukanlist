@@ -65,11 +65,11 @@ async function topShops(citySlug){
   const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_top_for_seo', {
     method: 'POST',
     headers: { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ p_category_slug: null, p_city_slug: citySlug, p_limit: 4 })
+    body: JSON.stringify({ p_category_slug: null, p_city_slug: citySlug, p_limit: 12 })
   });
   if (!r.ok) throw new Error('rpc ' + r.status);
   const j = await r.json();
-  return (j && j.items) || [];
+  return ((j && j.items) || []).filter(x => !!x.photo).slice(0, 4);   // v338: photo shops only, same as the client
 }
 
 // Mirrors the client renderer in home.html (hero-top-shops) — keep in step.

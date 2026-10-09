@@ -561,10 +561,10 @@
             return setTimeout(load, 400);
           }
           var r = await ShopDB.client.rpc('get_top_for_seo', {
-            p_category_slug: null, p_city_slug: (window.DukanCity ? DukanCity.slugOrDefault('mandi-dabwali') : 'mandi-dabwali'), p_limit: 4
+            p_category_slug: null, p_city_slug: (window.DukanCity ? DukanCity.slugOrDefault('mandi-dabwali') : 'mandi-dabwali'), p_limit: 12
           });
           if (r.error) throw r.error;
-          var items = (r.data && r.data.items) || [];
+          var items = ((r.data && r.data.items) || []).filter(function(x){ return !!x.photo; }).slice(0, 4);   // v338: photo shops only
           /* v294: claim BEFORE the empty check. This strip is the first of
              three rankings the Featured feed waits on; when a visitor picks a
              city with almost nothing in it this comes back empty, and the old
