@@ -16,6 +16,7 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I';
 
 const ORIGIN = 'https://dukanlist.com';
+import PH from './_ph.js';   // v336 no-photo card face (CJS module, default = module.exports)
 
 // ============================================================
 // MEGA_SLUGS: user-friendly chip slugs that expand into a SET
@@ -203,7 +204,7 @@ function renderShopCard(b){
   const catName = (b.categories && b.categories.name) || 'Business';
   const thumbHTML = thumb
     ? `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:#F1F5F9"><img src="${esc(thumb)}" alt="${esc(b.name)}" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block"></div>`
-    : `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden;background:linear-gradient(135deg,#FFF7ED 0%,#FED7AA 40%,#FFB870 100%)"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.5), transparent 45%),radial-gradient(circle at 80% 80%, rgba(255,107,26,.15), transparent 55%)"><div style="font-size:3rem;line-height:1;filter:drop-shadow(0 3px 6px rgba(120,53,15,.20))">${esc(catIcon)}</div></div><div style="position:absolute;bottom:8px;right:10px;font-size:.6rem;font-weight:800;color:#9A3412;letter-spacing:.1em;text-transform:uppercase;opacity:.6">dukanlist</div></div>`;
+    : `<div style="width:100%;position:relative;padding-bottom:62.5%;overflow:hidden"><div style="position:absolute;inset:0">${PH.html(b.name, (b.subcat && b.subcat.name) || catName, (b.subcat && b.subcat.icon) || catIcon)}</div></div>`;   // v336
   const waBtn = wa.length === 10
     ? `<a href="https://wa.me/91${wa}?text=${waMsg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;text-decoration:none;border:1.5px solid #25D366">💬 WhatsApp</a>`
     : '';

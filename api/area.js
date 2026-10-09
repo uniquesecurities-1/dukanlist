@@ -16,6 +16,7 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhenV5eWdycHFvcHd5Z3htdndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUwOTEsImV4cCI6MjA5NDczMTA5MX0.FR8x2kldC2yelpPnK2QKd5WGwHUAQheCVmxfs6hR00I';
 
 const ORIGIN = 'https://dukanlist.com';
+const PH = require('./_ph.js');   // v336 no-photo card face
 
 function esc(s){
   return String(s == null ? '' : s)
@@ -63,7 +64,7 @@ function renderShopCard(b, idx){
     ${rankRibbon}
     ${photo
       ? `<img src="${esc(photo)}" alt="${esc(b.name)}" style="width:100%;aspect-ratio:16/10;object-fit:cover" loading="lazy">`
-      : `<div style="width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#FAFAFA,#F1F5F9);display:grid;place-items:center;font-size:3rem;opacity:.5">${esc(b.category_icon || '🏪')}</div>`
+      : `<div style="width:100%;aspect-ratio:16/10">${PH.html(b.name, b.category_name, b.category_icon)}</div>`
     }
     <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;gap:6px;flex-wrap:wrap">${verifPill}</div>

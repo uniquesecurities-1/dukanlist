@@ -759,7 +759,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/dl-core.js?v=270e8a0dc8"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
+<script src="/assets/js/dl-core.js?v=575e93909f"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script src="/assets/js/share.js?v=20260921e"></script>
 <script src="/assets/js/filter-chips.js?v=20260920"></script>
 <script src="/assets/js/autocomplete.js?v=20260921g"></script>
@@ -1401,7 +1401,11 @@ function renderCard(b){
   const photo = (b.photos && b.photos.length) ? b.photos[0] : null;
   const photoHTML = photo
     ? `<img src="${(window.DukanImg?DukanImg.opt(photo,{width:400,height:240,crop:"fill"}):photo)}" alt="${escapeHTML(b.name)}" width="400" height="240" loading="lazy" decoding="async">`
-    : `<div class="ph-fb">${b.category_icon || '🏪'}</div><span class="ph-label">${escapeHTML(b.category_name || 'Business')}</span>`;
+    : (function(){ var f = (window.DukanImg && DukanImg.phFace) ? DukanImg.phFace(b.name, b.category_name, b.category_icon) : null;
+        return f
+          ? `<div class="ph-fb" style="width:30px;height:30px;border-radius:50%;background:${f.dot};color:${f.bg};font-size:.95rem;font-weight:800;justify-content:center">${escapeHTML(f.letter)}</div><span class="ph-label" style="color:${f.ink}">${escapeHTML(f.emoji)} ${escapeHTML(b.category_name || f.label || 'Business')}</span>`
+          : `<div class="ph-fb">${b.category_icon || '🏪'}</div><span class="ph-label">${escapeHTML(b.category_name || 'Business')}</span>`; })();
+  const _phTint = (!photo && window.DukanImg && DukanImg.phFace) ? DukanImg.phFace(b.name, b.category_name, b.category_icon).bg : '';
   const noPhotoClass = photo ? '' : ' no-photo';
   // Verified badge: hide tier badge in strict mode (replaced with profession badge below)
   const verified = isProfStrict
@@ -1503,7 +1507,7 @@ function renderCard(b){
     <article class="biz-card${noPhotoClass}${profClass}">
       ${heartHTML}
       <a class="biz-card-link" href="/${b.slug}" aria-label="${escapeHTML(b.name)}"></a>
-      <div class="biz-photo">${photoHTML}${openBadge}${ribbon || featuredRibbon}${verified}</div>
+      <div class="biz-photo"${_phTint ? ' style="background:' + _phTint + '"' : ''}>${photoHTML}${openBadge}${ribbon || featuredRibbon}${verified}</div>
       <div class="biz-info">
         <div class="biz-cat">${b.category_icon || '🏪'} ${escapeHTML(b.category_name || '')}</div>
         <div class="biz-name">${escapeHTML(b.name)}${compactTagsHTML}</div>
