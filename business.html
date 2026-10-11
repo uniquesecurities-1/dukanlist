@@ -820,6 +820,22 @@ body.prof-partial #reviewsAnchor::before{
   transform:rotate(15deg);
 }
 
+/* v347: USP as clean bullets + review highlights */
+.usp-box.usp-list{ background:#fff !important; border:1px solid var(--line) !important; color:var(--ink) !important;
+  font-style:normal !important; padding:14px 16px !important; box-shadow:none !important; border-radius:13px !important;
+  font-size:.92rem !important; line-height:1.5 !important; font-family:inherit !important }
+.usp-box.usp-list::before, .usp-box.usp-list::after{ display:none !important; content:none !important }
+.usp-box.usp-list .usp-h, .review-highlights .rh-h{ font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:8px }
+.usp-box.usp-list ul{ margin:0; padding:0; list-style:none; display:grid; gap:6px }
+.usp-box.usp-list li{ position:relative; padding-left:22px; font-weight:600 }
+.usp-box.usp-list li::before{ content:'✓'; position:absolute; left:0; top:0; color:#16A34A; font-weight:900 }
+.review-highlights{ background:#F0FDF4; border:1px solid #BBF7D0; border-radius:13px; padding:14px 16px; margin-bottom:18px }
+.review-highlights .rh-item{ padding:8px 0; border-bottom:1px dashed #BBF7D0 }
+.review-highlights .rh-item:last-of-type{ border-bottom:0 }
+.review-highlights .rh-t{ font-size:.93rem; line-height:1.5; color:var(--ink); font-weight:500 }
+.review-highlights .rh-by{ margin-top:4px; font-size:.76rem; color:#15803D; font-weight:700 }
+.review-highlights .rh-all{ display:inline-block; margin-top:6px; font-size:.8rem; font-weight:800; color:#15803D; text-decoration:none }
+
 .addr-box{
   background:#fff;
   border:1px solid var(--line);
@@ -1807,6 +1823,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
             <div class="verif-row" id="verifRow"></div>
           </div>
           <div class="usp-box" id="uspBox" style="display:none"></div>
+          <div class="review-highlights" id="reviewHighlights" style="display:none"></div>
           <div class="addr-box">
             <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
             <div class="a-text" id="addrDisp"></div>
@@ -3052,8 +3069,9 @@ function render(){
     }
 
     // Verified chip
-    if (Number(b.verified_score) >= 4){
-      _set('premVerifiedChip', '🛡 Verified');
+    const _trH = dlTrust(b);
+    if (_trH){
+      _set('premVerifiedChip', '🛡 ' + _trH.label);
       document.getElementById('premVerifiedChip').style.display = '';
     }
 
@@ -3322,15 +3340,22 @@ function render(){
     rEl.innerHTML = '<span style="color:var(--muted);font-weight:600;font-size:.85rem">⭐ No reviews yet</span>';
   }
 
-  // Admin Verified premium badge
-  if (b.verified_visit){
+  // v347: the one trust card — label + exactly what the team checked.
+  // Replaces the old "Admin Verified" card, the ✓Mobile/✓Address pills,
+  // the "Verified · BRONZE" pill and the tier chip beside the name.
+  const _tr = dlTrust(b);
+  if (_tr){
     const av = document.getElementById('adminVerified');
+    const enChecks = _tr.checks.map(c => c[0]).join(' · ');
+    const hiChecks = _tr.checks.map(c => c[1]).join(' · ');
     av.innerHTML = `
       <div class="admin-verified-badge">
         <div class="av-icon">🛡️</div>
         <div>
-          <div class="av-text">Admin Verified</div>
-          <div class="av-sub">Personally verified by DukanList team</div>
+          <div class="av-text"><span data-i18n-en>${escapeHTML(_tr.label)}</span><span data-i18n-hi>${escapeHTML(_tr.labelHi)}</span></div>
+          <div class="av-sub">${enChecks
+            ? `<span data-i18n-en>Checked by DukanList team: ${escapeHTML(enChecks)}</span><span data-i18n-hi>DukanList टीम ने जाँचा: ${escapeHTML(hiChecks)}</span>`
+            : `<span data-i18n-en>Checked by DukanList team</span><span data-i18n-hi>DukanList टीम ने जाँचा</span>`}</div>
         </div>
       </div>`;
     av.style.display = '';
@@ -3344,7 +3369,7 @@ function render(){
   // shows the specific regulator verification (NMC/ICAI/BCI etc.), and the generic
   // Bronze/Silver/Gold tier is unrelated to professional credentials.
   const _isProfStrictTier = b.is_professional_listing === true && b.professional_tier === 'strict';
-  if (typeof DukanTier !== 'undefined' && !_isProfStrictTier){
+  if (false && typeof DukanTier !== 'undefined' && !_isProfStrictTier){  // v347: trust card shows the tier
     const tierHTML = DukanTier.badge(b);
     if (tierHTML){
       const nameEl = document.querySelector('.biz-name, h1.title, h1');
@@ -3388,7 +3413,8 @@ function render(){
   if (b.verified_address) verifs.push('✓ Address');
   if (b.verified_photo)   verifs.push('✓ Photos');
   if (b.verified_visit)   verifs.push('✓ Visited');
-  document.getElementById('verifRow').innerHTML = verifs.map(v => `<span class="verify-pill">${v}</span>`).join('');
+  // v347: these checks now sit inside the trust card's sub-line.
+  document.getElementById('verifRow').innerHTML = '';
 
   // USP
   // Inject Professional Listing card (compliance info + practice areas + disclaimer)
@@ -3414,8 +3440,28 @@ function render(){
   // CSS hides it but this prevents data-leak via DOM inspection / external selectors.
   if (b.usp_text && !(b.is_professional_listing && b.professional_tier === 'strict')){
     const uspText = (lang === 'hi' && b.usp_hi) ? b.usp_hi : b.usp_text;
-    document.getElementById('uspBox').textContent = uspText;
-    document.getElementById('uspBox').style.display = '';
+    // v347: the owner's picked USP chips arrive as one "a · b · c · …" run
+    // that read like a machine-made paragraph. Show at most 4 as plain
+    // bullets and drop the unverifiable ones ("guaranteed", "sabse kam",
+    // "jaana-maana naam", "1000+ families"). The owner's own sentences are shown as written.
+    const _bad = /guarant|गारंटी|sabse kam|सबसे कम|lowest|cheapest|jaana-maana|जाना-माना|no\.?\s?1\b|number one|100%|1000\+|families ka bharosa|परिवारों/i;
+    const _parts = String(uspText).split(/\s+·\s+/).map(s => s.replace(/^[\s\-–—,]+/, '').trim()).filter(Boolean);
+    const _box = document.getElementById('uspBox');
+    // Chip runs are 2+ multi-word phrases; "SIP · ELSS · NPS — …" is the
+    // owner's own sentence and stays as written.
+    const _isChips = _parts.length >= 2 && _parts.every(p => p.split(/\s+/).length >= 2);
+    if (_isChips){
+      const keep = _parts.filter(s => !_bad.test(s)).slice(0, 4);
+      if (keep.length){
+        _box.classList.add('usp-list');
+        _box.innerHTML = '<div class="usp-h"><span data-i18n-en>What makes this shop special</span><span data-i18n-hi>इस दुकान की खासियत</span></div><ul>'
+          + keep.map(s => '<li>' + escapeHTML(s) + '</li>').join('') + '</ul>';
+        _box.style.display = '';
+      }
+    } else {
+      _box.textContent = uspText;
+      _box.style.display = '';
+    }
   }
 
   // Address
@@ -3859,6 +3905,30 @@ function getDistance(bizLat, bizLng){
 // =============================================================
 // Quick-scan summary so customer can decide in 3 seconds.
 // All data is already loaded — no extra fetches.
+// v347: ONE trust rule for the whole page. Before this, four places each
+// had their own maths (tile: score>=3 → "Silver"; pill: score 3 → "BRONZE";
+// hero chip: score>=4; h1: DukanTier) so one shop showed Silver and Bronze
+// at once. Everything now reads dlTrust(b), which follows DukanTier (the same
+// rule search/browse cards and the owner panel use).
+function dlTrust(b){
+  const strict = b.is_professional_listing === true && b.professional_tier === 'strict';
+  const vs = Number(b.verified_score) || 0;
+  let tier = null;
+  try { if (typeof DukanTier !== 'undefined') tier = DukanTier.compute(b).tier; } catch(_){}
+  const verified = !!(tier || b.verified_visit || vs >= 3);
+  if (!verified) return null;
+  const label = strict ? 'Verified by DukanList'
+    : tier === 'gold' ? 'Gold Trusted' : tier === 'silver' ? 'Silver Verified' : 'Verified';
+  const labelHi = strict ? 'DukanList द्वारा वेरिफाइड'
+    : tier === 'gold' ? 'गोल्ड ट्रस्टेड' : tier === 'silver' ? 'सिल्वर वेरिफाइड' : 'वेरिफाइड';
+  const checks = [];
+  if (b.verified_mobile)  checks.push(['mobile','मोबाइल']);
+  if (b.verified_address) checks.push(['address','पता']);
+  if (b.verified_photo)   checks.push(['photos','फोटो']);
+  if (b.verified_visit)   checks.push(['shop visit','दुकान विज़िट']);
+  return { tier, label, labelHi, checks, strict };
+}
+
 function renderWhyThisShop(b){
   if (!b) return;
   const host = document.getElementById('whyThisShop');
@@ -3872,13 +3942,8 @@ function renderWhyThisShop(b){
   const isProfStrict = b.is_professional_listing === true && b.professional_tier === 'strict';
 
   // Verified (only if score >= 3 — i.e. mobile + address + photo all done)
-  if ((b.verified_score || 0) >= 3 && !isProfStrict){
-    const tier = (b.verified_score >= 5) ? 'GOLD' : (b.verified_score >= 4 ? 'SILVER' : 'BRONZE');
-    pills.push({
-      cls: 'verified',
-      html: '✓ <b>Verified</b> · ' + tier
-    });
-  }
+  // v347: the Verified pill lived here with its own tier maths — now the
+  // single trust card (#adminVerified, dlTrust) carries it.
 
   // Rating
   if (b.rating_count > 0 && b.rating_avg > 0 && !isProfStrict){
@@ -4669,6 +4734,28 @@ async function loadReviews(bizId){
   if (!data || !data.length) return;
   // Stash for review-boost widget
   try { window._latestReviews = data; } catch(_){}
+  // v347: the two best customer lines, up top beside the shop's own details —
+  // the most real content a listing has. Not for strict professional listings.
+  try {
+    const rh = document.getElementById('reviewHighlights');
+    const strictRH = BIZ && BIZ.is_professional_listing === true && BIZ.professional_tier === 'strict';
+    if (rh && !strictRH){
+      const best = data.filter(r => Number(r.rating) >= 4 && String(r.text || '').trim().length >= 20)
+        .sort((a, b2) => (b2.rating - a.rating) || (String(b2.text).length - String(a.text).length))
+        .slice(0, 2);
+      if (best.length){
+        rh.innerHTML = '<div class="rh-h"><span data-i18n-en>What customers say</span><span data-i18n-hi>ग्राहक क्या कहते हैं</span></div>'
+          + best.map(r => {
+              let t = String(r.text).trim().replace(/\s+/g, ' ');
+              if (t.length > 160) t = t.slice(0, 157).replace(/\s+\S*$/, '') + '…';
+              const nm = (r.customer_name || '').trim().split(/\s+/)[0] || 'Customer';
+              return '<div class="rh-item"><div class="rh-t">“' + escapeHTML(t) + '”</div><div class="rh-by">' + '★'.repeat(Math.round(r.rating)) + ' · ' + escapeHTML(nm) + '</div></div>';
+            }).join('')
+          + '<a href="#reviewsAnchor" class="rh-all" onclick="event.preventDefault();var t=document.getElementById(\'reviewsAnchor\');if(t)t.scrollIntoView({behavior:\'smooth\',block:\'start\'});"><span data-i18n-en>All reviews →</span><span data-i18n-hi>सभी रिव्यू →</span></a>';
+        rh.style.display = '';
+      }
+    }
+  } catch(e){ console.warn('review highlights:', e); }
   const TOTAL_REVIEWS = data.length;
   const REVIEW_VISIBLE = 4;
   document.getElementById('reviewCount').textContent = `(${TOTAL_REVIEWS})`;
@@ -4808,8 +4895,7 @@ async function renderDetailTrustStrip(b){
   // Strict pros: skip Verified/Featured/Rating pills here too — same reasoning as renderWhyThisShop
   const isProfStrict = b.is_professional_listing === true && b.professional_tier === 'strict';
   const pills = [];
-  if (Number(b.verified_score) >= 3 && !isProfStrict) pills.push({ ico: '✓', text: 'Verified', cls: 'verified' });
-  if (b.verified_mobile && !isProfStrict) pills.push({ ico: '📞', text: 'Phone Verified', cls: 'verified' });
+  // v347: Verified / Phone Verified pills removed — the trust card owns them.
   if (b.is_featured && !isProfStrict) pills.push({ ico: '★', text: 'Featured', cls: 'featured' });
   if (b.established_year){
     const yrs = new Date().getFullYear() - Number(b.established_year);
@@ -5399,16 +5485,18 @@ function renderShopHighlights(b){
   const isProfStrictTile = b.is_professional_listing === true && b.professional_tier === 'strict';
   if (Number(b.rating_avg) > 0 && !isProfStrictTile){
     tiles.push({cls:'rating', emoji:'\u2b50', main: Number(b.rating_avg).toFixed(1)+' rating', sub:(b.rating_count||0)+' review'+((b.rating_count||0)===1?'':'s')});
-  } else {
-    const vs = Number(b.verified_score) || 0;
-    if (vs >= 5)      tiles.push({cls:'rating', emoji:'\ud83e\udd47', main:'Gold verified', sub:'Premium trust tier'});
-    else if (vs >= 3) tiles.push({cls:'rating', emoji:'\ud83e\udd48', main:'Silver verified', sub:'Trusted listing'});
-    else if (vs >= 1) tiles.push({cls:'rating', emoji:'\ud83e\udd49', main:'Bronze listed', sub:'Building trust'});
-    else              tiles.push({cls:'rating', emoji:'\ud83c\udd95', main:'New listing', sub:'Be the first to review'});
+  } else if (!isProfStrictTile){
+    // v347: no fake tier here (it disagreed with the Verified pill) — just the truth.
+    tiles.push({cls:'rating', emoji:'\u2b50', main:'No reviews yet', sub:'Be the first to review'});
   }
 
-  // Tile 4: Local badge — ALWAYS shown as brand assurance
-  tiles.push({cls:'verify', emoji:'\ud83d\udccd', main:'Sirsa\u2013Bathinda', sub:'Local trusted directory'});
+  // Tile 4 (v347): the shop's real area — was a hard-coded "Sirsa–Bathinda"
+  // on every listing, including Dabwali ones.
+  const _loc = b.geo_localities && b.geo_localities.name;
+  const _city = b.geo_cities && b.geo_cities.name;
+  if (_loc || _city){
+    tiles.push({cls:'verify', emoji:'\ud83d\udccd', main:(_loc || _city), sub:(_loc && _city ? _city : 'Local shop')});
+  }
 
   if (!tiles.length){ host.style.display='none'; return; }
   function esc(s){ return String(s||'').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c])); }

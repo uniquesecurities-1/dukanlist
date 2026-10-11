@@ -292,7 +292,7 @@ module.exports = async (req, res) => {
     });
     if (rr.ok){
       const rk = await rr.json();
-      if (rk && rk.found && rk.public_ok && rk.rank && rk.category_name){
+      if (rk && rk.found && rk.public_ok && rk.rank && rk.rank <= 10 && rk.category_name){  // v347: '#66 in Retail' read as a weakness, not a reason to visit
         const medal = rk.rank === 1 ? '🥇' : rk.rank === 2 ? '🥈' : rk.rank === 3 ? '🥉' : '▲';
         rankBadge =
           '<a href="/top/' + encodeURIComponent(rk.category_slug || '') + '/' +

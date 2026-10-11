@@ -25,7 +25,6 @@
       label_en: 'Trust',           label_hi: 'भरोसा',           emoji: '🤝',
       items: [
         { emoji:'🏛️', en:'20+ saal se isi jagah par',                hi:'20+ साल से इसी जगह पर' },
-        { emoji:'⭐', en:'Sirsa · Bathinda · Mansa · Muktsar mein jaana-maana naam',     hi:'सिरसा-बठिंडा में जाना-माना नाम' },
         { emoji:'🏠', en:'Family business — personal touch',        hi:'फैमिली बिज़नेस — पर्सनल टच' },
         { emoji:'✅', en:'Honest pricing — no bargain needed',      hi:'ईमानदार दाम — मोलभाव नहीं' },
         { emoji:'💯', en:'Money-back if not satisfied',             hi:'पैसे वापस अगर खुश नहीं' }
@@ -34,7 +33,7 @@
     price: {
       label_en: 'Price',           label_hi: 'दाम',             emoji: '💰',
       items: [
-        { emoji:'🏷️', en:'Sabse kam rate guaranteed',                hi:'सबसे कम रेट गारंटी' },
+        { emoji:'🏷️', en:'Wajib daam, pakka bill',                   hi:'वाजिब दाम, पक्का बिल' },
         { emoji:'🚫', en:'No hidden charges, no extra fees',         hi:'कोई छुपा चार्ज नहीं' },
         { emoji:'📦', en:'Wholesale rates available',                hi:'होलसेल रेट उपलब्ध' },
         { emoji:'💳', en:'EMI / installment available',              hi:'EMI / किस्तों पर उपलब्ध' },
@@ -56,7 +55,7 @@
     quality: {
       label_en: 'Quality',         label_hi: 'क्वालिटी',          emoji: '✨',
       items: [
-        { emoji:'💎', en:'100% asli maal — pakka guarantee',         hi:'100% असली माल — पक्की गारंटी' },
+        { emoji:'💎', en:'Sirf original / branded maal',            hi:'सिर्फ ओरिजिनल / ब्रांडेड माल' },
         { emoji:'🏷️', en:'Sirf branded items',                       hi:'सिर्फ ब्रांडेड आइटम' },
         { emoji:'🧾', en:'Bill aur warranty milta hai',              hi:'बिल और वारंटी मिलती है' },
         { emoji:'🧼', en:'Saaf-suthri dukaan — hygienic',            hi:'साफ-सुथरी दुकान — hygienic' },
