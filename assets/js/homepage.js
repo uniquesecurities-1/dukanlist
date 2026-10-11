@@ -33,7 +33,7 @@ function setLang(lang){"en"!==lang&&"hi"!==lang&&(lang="en"),document.documentEl
    the hour, and over a day every photo shop gets its turn — shops with
    reviews and verification come round more often. Admin-featured rows stay
    on top (they too need a photo). */
-let pool=[];try{const pr=await c.from("businesses").select("id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,category_id,sub_category_id,mobile,whatsapp,created_at,is_professional_listing,professional_tier,geo_cities(name)").eq("status","active").or("professional_tier.is.null,professional_tier.neq.strict").not("photos","is",null).neq("photos","{}").limit(500);if(!pr.error&&pr.data)pool=pr.data.filter(r=>Array.isArray(r.photos)&&r.photos.length).map(r=>({...r,city_name:r.geo_cities&&r.geo_cities.name}))}catch(e){console.warn("Featured pool load failed",e)}
+let pool=[];try{const pr=await c.from("businesses").select("id,slug,name,name_hi,usp_text,photos,verified_score,rating_avg,rating_count,hours_json,city_id,category_id,sub_category_id,mobile,whatsapp,created_at,is_professional_listing,professional_tier,why_text,offerings,geo_cities(name)").eq("status","active").or("professional_tier.is.null,professional_tier.neq.strict").not("photos","is",null).neq("photos","{}").limit(500);if(!pr.error&&pr.data)pool=pr.data.filter(r=>Array.isArray(r.photos)&&r.photos.length).map(r=>({...r,city_name:r.geo_cities&&r.geo_cities.name}))}catch(e){console.warn("Featured pool load failed",e)}
 featuredRows=featuredRows.filter(r=>Array.isArray(r.photos)&&r.photos.length);
 /* v342 (Deepak, 11 Oct): plumbers, electricians, carpenters and painters are
    people, not shops — they stay in search and their category pages, but not
@@ -46,7 +46,7 @@ const _ist=new Date(Date.now()+330*60000),_seed=_ist.toISOString().slice(0,13);
    (was ~16), none more than 4 times. Weights are now gentle (+25% for a
    review, +25% for team-verified) so it is a rotation, not a ranking. */
 const _h=str=>{let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}h^=h>>>16;h=Math.imul(h,0x85ebca6b);h^=h>>>13;h=Math.imul(h,0xc2b2ae35);h^=h>>>16;return((h>>>0)+1)/4294967297};
-const _w=r=>1+((Number(r.rating_count)||0)>0?.25:0)+((Number(r.verified_score)||0)>=3?.25:0);
+const _w=r=>1+((Number(r.rating_count)||0)>0?.25:0)+((Number(r.verified_score)||0)>=3?.25:0)+((r.why_text||(Array.isArray(r.offerings)&&r.offerings.length>=3))?.5:0);/* v350: a page the owner filled in gets shown more */
 pool.forEach(r=>{r._k=Math.pow(_h(_seed+"|"+r.id),1/_w(r))});pool.sort((x,y)=>y._k-x._k);
 if(window.DLShown)await DLShown.ready(900);
 const isShown=s=>!!(window.DLShown&&DLShown.has(s));

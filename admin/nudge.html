@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nudge — DukanList Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@500;700;800;900&display=swap" rel="stylesheet">
+<!--
+  v350: the office's daily list (db/250). Which shop pages are incomplete,
+  what is missing, and one button that makes a fresh "page sudhaaro" link
+  (db/249) and opens WhatsApp with the message written. Nothing is sent
+  automatically — the office person presses Send in WhatsApp.
+-->
+<style>
+  *,*::before,*::after{ box-sizing:border-box }
+  body{ margin:0; font-family:'Plus Jakarta Sans',-apple-system,sans-serif; background:#f4f6fb; color:#0F172A; line-height:1.5 }
+  .topbar{ background:linear-gradient(180deg,#0A1226 0%,#0B1530 100%); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px }
+  .topbar a.brand{ color:#fff; font-weight:900; font-size:1.05rem; text-decoration:none }
+  .topbar a.brand .badge{ background:linear-gradient(135deg,#C2A05A,#8C6A1F); color:#FFF8E6; font-size:.6rem; font-weight:800; padding:3px 8px; border-radius:6px; margin-left:6px; letter-spacing:.12em }
+  .topbar .nav a{ color:#C5CDDA; text-decoration:none; font-size:.85rem; margin-left:10px; padding:6px 10px; border-radius:7px }
+  .topbar .nav a.active{ background:rgba(99,140,255,.16); color:#DBEAFE }
+  .page{ max-width:1100px; margin:0 auto; padding:22px 16px 60px }
+  h1{ font-family:'Manrope',sans-serif; font-size:1.5rem; margin:0 0 4px }
+  .sub{ color:#64748B; font-size:.86rem; margin-bottom:14px; max-width:780px }
+  .goal{ background:#ECFDF5; border:1px solid #A7F3D0; color:#065F46; border-radius:12px; padding:10px 14px; font-size:.86rem; font-weight:700; margin-bottom:14px }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; align-items:center }
+  .tab{ background:#fff; border:1px solid #E2E8F0; padding:7px 14px; border-radius:99px; font-weight:700; font-size:.82rem; cursor:pointer; font-family:inherit; color:#475569 }
+  .tab.on{ background:#0F172A; color:#fff; border-color:#0F172A }
+  .search{ margin-left:auto; border:1px solid #E2E8F0; border-radius:10px; padding:8px 12px; font-family:inherit; font-size:.85rem; min-width:200px }
+  .list{ display:grid; gap:8px }
+  .row{ background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; display:grid; grid-template-columns:1fr 150px auto; gap:12px; align-items:center }
+  .row.sent{ background:#F0FDF4; border-color:#BBF7D0 }
+  .nm{ font-weight:800; font-size:.98rem }
+  .nm a{ color:inherit; text-decoration:none }
+  .meta{ font-size:.75rem; color:#64748B; margin-top:2px }
+  .miss{ display:flex; gap:4px; flex-wrap:wrap; margin-top:6px }
+  .miss span{ background:#FEF2F2; color:#B91C1C; border:1px solid #FECACA; border-radius:99px; padding:1px 8px; font-size:.7rem; font-weight:700 }
+  .bar{ height:8px; background:#E2E8F0; border-radius:99px; overflow:hidden }
+  .bar i{ display:block; height:100%; border-radius:99px }
+  .pct{ font-size:.78rem; font-weight:800; margin-top:4px; text-align:right }
+  .acts{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end }
+  .btn{ border:0; border-radius:9px; padding:8px 12px; font-weight:800; cursor:pointer; font-family:inherit; font-size:.8rem; white-space:nowrap; text-decoration:none; display:inline-block }
+  .btn.wa{ background:#25D366; color:#fff }
+  .btn.ghost{ background:#fff; color:#0F172A; border:1.5px solid #CBD5E1 }
+  .btn:disabled{ opacity:.55; cursor:default }
+  .empty{ text-align:center; color:#64748B; padding:40px 10px; background:#fff; border-radius:14px; border:1px dashed #CBD5E1 }
+  .err{ color:#DC2626; background:#FEF2F2; border:1px solid #FECACA; padding:12px; border-radius:10px }
+  .toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#0F172A; color:#fff; padding:10px 16px; border-radius:10px; font-weight:700; font-size:.86rem; display:none; z-index:9 }
+  @media (max-width:720px){ .row{ grid-template-columns:1fr } .acts{ justify-content:flex-start } .search{ margin-left:0; width:100% } }
+</style>
+<script src="/assets/js/admin-error-monitor.js?v=20260921e"></script>
+</head>
+<body>
+<header class="topbar">
+  <a href="/admin/dashboard.html" class="brand">DukanList<span class="badge">ADMIN</span></a>
+  <nav class="nav">
+    <a href="/admin/dashboard.html">📊 Dashboard</a>
+    <a href="/admin/nudge.html" class="active">📲 Nudge</a>
+    <a href="/admin/shop-updates.html">📝 Shop Updates</a>
+    <a href="#" onclick="logout(); return false">Logout</a>
+  </nav>
+</header>
+
+<main class="page">
+  <h1>📲 Nudge — adhoore pages</h1>
+  <div class="sub">Har dukaan ke aage <b>"Link + WhatsApp"</b> dabao — naya "page sudhaaro" link banega aur WhatsApp message likha hua khulega; wahan sirf Send dabana hai. Shopkeeper jo bhejega wo <a href="/admin/shop-updates.html">Shop Updates</a> mein aayega. Jinko pichhle 7 din mein bhej chuke ho, wo neeche chale jaate hain.</div>
+  <div class="goal" id="goal">Roz ka target: 30 dukaanein · aaj bheje: <span id="todayN">0</span></div>
+  <div class="tabs">
+    <button class="tab on" data-f="todo" onclick="setTab(this)">🛠 To-do (score &lt; 80)</button>
+    <button class="tab" data-f="nophoto" onclick="setTab(this)">📷 Bina photo</button>
+    <button class="tab" data-f="sent" onclick="setTab(this)">📤 Bheje (7 din)</button>
+    <button class="tab" data-f="done" onclick="setTab(this)">✅ Poore (80+)</button>
+    <input class="search" id="q" placeholder="Dukaan ka naam…" oninput="draw()">
+  </div>
+  <div id="root"><div class="empty">Loading…</div></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js?v=20260921e"></script>
+<script>
+var FILTER = 'todo', ROWS = [], TODAY_KEY = 'dl_nudge_' + new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 2600); }
+async function logout(){ try { await ShopDB.client.auth.signOut(); } catch(_){} location.href = '/admin/login.html'; }
+function setTab(b){ document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('on', x === b); }); FILTER = b.dataset.f; load(); }
+function todayCount(d){ try { var n = Number(localStorage.getItem(TODAY_KEY) || 0) + (d || 0); if (d) localStorage.setItem(TODAY_KEY, n); return n; } catch(_){ return 0; } }
+function ago(t){
+  if (!t) return '';
+  var d = (Date.now() - new Date(t).getTime()) / 86400000;
+  return d < 1 ? 'aaj' : Math.floor(d) + ' din pehle';
+}
+function color(p){ return p >= 80 ? '#16A34A' : p >= 50 ? '#F59E0B' : '#EF4444'; }
+
+function message(d, link){
+  var page = location.origin + '/' + (d.slug || '');
+  return 'Namaste ji 🙏\n\nDukanList par aapki dukaan "' + (d.name || '') + '" ka page hai: ' + page + '\n\n'
+    + 'Is link par 2 minute mein apni dukaan ki jaankari aur photo daal dijiye — kya milta hai, log aapke paas kyon aate hain. Koi login nahi chahiye:\n' + link + '\n\n'
+    + 'Jin dukaanon ka page poora hota hai, wo DukanList ke home page par zyada dikhti hain.\n— DukanList Helpline';
+}
+
+async function load(){
+  var root = document.getElementById('root');
+  root.innerHTML = '<div class="empty">Loading…</div>';
+  var r = await ShopDB.client.rpc('admin_page_completeness', { p_filter: FILTER, p_limit: 500 });
+  if (r.error){ root.innerHTML = '<div class="err">' + esc(r.error.message) + (/admin_page_completeness/.test(r.error.message) ? ' — run db/250 first' : '') + '</div>'; return; }
+  ROWS = r.data || [];
+  draw();
+}
+
+function draw(){
+  var root = document.getElementById('root');
+  var q = (document.getElementById('q').value || '').trim().toLowerCase();
+  var rows = q ? ROWS.filter(function(s){ return String(s.name || '').toLowerCase().indexOf(q) !== -1; }) : ROWS;
+  document.getElementById('todayN').textContent = todayCount();
+  if (!rows.length){ root.innerHTML = '<div class="empty">Is list mein koi dukaan nahi.</div>'; return; }
+  root.innerHTML = '<div class="meta" style="margin-bottom:8px">' + rows.length + ' dukaanein</div><div class="list">' + rows.map(function(s){
+    var wa = String(s.whatsapp || '').replace(/\D/g, '').slice(-10);
+    var recent = s.last_link_at && (Date.now() - new Date(s.last_link_at).getTime()) < 7 * 86400000;
+    return '<div class="row' + (recent ? ' sent' : '') + '" id="r_' + esc(s.id) + '">'
+      + '<div><div class="nm"><a href="/admin/shop.html?id=' + esc(s.id) + '">' + esc(s.name) + '</a> <a href="/' + esc(s.slug) + '" target="_blank" rel="noopener" style="font-size:.75rem;color:#64748B">page ↗</a></div>'
+      + '<div class="meta">' + esc(s.category || '') + ' · 📷 ' + (s.photos || 0) + (s.last_link_at ? ' · link bheja: ' + esc(ago(s.last_link_at)) : '') + (s.pending_updates ? ' · ⏳ ' + s.pending_updates + ' update approval mein' : '') + '</div>'
+      + ((s.missing || []).length ? '<div class="miss">' + s.missing.map(function(m){ return '<span>' + esc(m) + '</span>'; }).join('') + '</div>' : '')
+      + '</div>'
+      + '<div><div class="bar"><i style="width:' + (s.score || 0) + '%;background:' + color(s.score || 0) + '"></i></div><div class="pct" style="color:' + color(s.score || 0) + '">' + (s.score || 0) + '% poora</div></div>'
+      + '<div class="acts">'
+      + (wa.length === 10
+          ? '<button class="btn wa" onclick="nudge(\'' + esc(s.id) + '\', this)">📲 Link + WhatsApp</button>'
+          : '<span class="meta" style="color:#DC2626">WhatsApp number nahi</span>')
+      + '<button class="btn ghost" onclick="nudge(\'' + esc(s.id) + '\', this, true)">📋 Copy</button>'
+      + '</div></div>';
+  }).join('') + '</div>';
+}
+
+async function nudge(id, btn, copyOnly){
+  var s = ROWS.find(function(x){ return String(x.id) === String(id); }); if (!s) return;
+  // open the tab now, inside the click — a window.open after an await is blocked as a pop-up
+  var win = copyOnly ? null : window.open('about:blank', '_blank');
+  btn.disabled = true;
+  var r = await ShopDB.client.rpc('admin_create_update_link', { p_business_id: id, p_days: 7 });
+  btn.disabled = false;
+  if (r.error){ if (win) win.close(); alert('Link nahi bana: ' + r.error.message); return; }
+  var d = r.data || {};
+  var link = location.origin + '/update-shop?t=' + d.token;
+  var msg = message(d, link);
+  if (copyOnly){
+    try { await navigator.clipboard.writeText(msg); toast('✓ Message copy ho gaya'); } catch(_){ prompt('Copy karo:', msg); }
+  } else {
+    var wa = String(d.whatsapp || s.whatsapp || '').replace(/\D/g, '').slice(-10);
+    var url = 'https://wa.me/91' + wa + '?text=' + encodeURIComponent(msg);
+    if (win) win.location.href = url; else location.href = url;
+  }
+  s.last_link_at = new Date().toISOString();
+  todayCount(1);
+  var el = document.getElementById('r_' + id); if (el) el.classList.add('sent');
+  document.getElementById('todayN').textContent = todayCount();
+}
+
+(async function(){
+  var c = ShopDB.client;
+  var u = await c.auth.getUser();
+  if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
+  var a = await c.rpc('is_admin');
+  if (a.error || !a.data){ document.getElementById('root').innerHTML = '<div class="err">Admin access required.</div>'; return; }
+  load();
+})();
+</script>
+<script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>
+</body>
+</html>
