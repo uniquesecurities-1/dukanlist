@@ -25,7 +25,6 @@
       label_en: 'Trust',           label_hi: 'भरोसा',           emoji: '🤝',
       items: [
         { emoji:'🏛️', en:'20+ saal se isi jagah par',                hi:'20+ साल से इसी जगह पर' },
-        { emoji:'👨‍👩‍👧', en:'1000+ families ka bharosa',                hi:'1000+ परिवारों का भरोसा' },
         { emoji:'⭐', en:'Sirsa · Bathinda · Mansa · Muktsar mein jaana-maana naam',     hi:'सिरसा-बठिंडा में जाना-माना नाम' },
         { emoji:'🏠', en:'Family business — personal touch',        hi:'फैमिली बिज़नेस — पर्सनल टच' },
         { emoji:'✅', en:'Honest pricing — no bargain needed',      hi:'ईमानदार दाम — मोलभाव नहीं' },

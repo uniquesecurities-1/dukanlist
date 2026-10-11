@@ -52,7 +52,7 @@
 
 <div class="legal-wrap">
   <h1>Privacy Policy</h1>
-  <div class="meta">Effective Date: 19 May 2026 · Last Updated: 26 June 2026 · Compliant with India's Digital Personal Data Protection (DPDP) Act, 2023</div>
+  <div class="meta">Effective Date: 19 May 2026 · Last Updated: 11 October 2026 · Compliant with India's Digital Personal Data Protection (DPDP) Act, 2023</div>
 
   <div class="toc">
     <h3>Quick links</h3>
@@ -81,7 +81,7 @@
 
   <h3>1.1 Owner Data (you provide)</h3>
   <ul>
-    <li><strong>Mobile number</strong> — required for OTP verification and account login</li>
+    <li><strong>Mobile number</strong> — shown on your listing so customers can call/WhatsApp you, and used by our team to verify you on WhatsApp</li>
     <li><strong>Business details</strong> — business name, owner name, category, USP/about, services, hours</li>
     <li><strong>Address</strong> — full address with state, district, city, locality, pincode</li>
     <li><strong>Contact info</strong> — WhatsApp number (optional), email (optional)</li>
@@ -118,7 +118,7 @@
   <h2 id="use">2. How We Use It</h2>
   <ul>
     <li><strong>Directory listing</strong> — your business info is shown publicly on dukanlist.com to help customers find you</li>
-    <li><strong>OTP authentication</strong> — mobile number used only for OTP login (Supabase Phone Auth)</li>
+    <li><strong>Account login</strong> — email and password through Supabase Auth; passwords are stored only as secure one-way hashes, never in readable form</li>
     <li><strong>Verification trust score</strong> — pincode-city match, photo count contribute to your verification badge</li>
     <li><strong>Lead tracking</strong> — call/WhatsApp/direction clicks logged so you can see how many leads you got</li>
     <li><strong>Anti-spam</strong> — phone hash prevents duplicate reviews/reports from same number</li>
@@ -142,9 +142,10 @@
   <h3>3.2 Third-Party Service Providers (data processors)</h3>
   <p>We use the following trusted infrastructure providers strictly for app operation. Each is bound by their own privacy commitments and DPA agreements:</p>
   <ul>
-    <li><strong>Supabase (Singapore region)</strong> — Postgres database, authentication, file storage. SOC 2 Type II compliant. Used for storing your account and business data. <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></li>
+    <li><strong>Supabase (Mumbai, India region)</strong> — Postgres database and authentication. SOC 2 Type II compliant. Used for storing your account and business data. <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></li>
+    <li><strong>Cloudinary</strong> — stores and serves the shop and offer photos you upload. <a href="https://cloudinary.com/privacy" target="_blank" rel="noopener">cloudinary.com/privacy</a></li>
     <li><strong>Vercel (USA)</strong> — Static website hosting and serverless functions (edge network). Used for serving web pages and APIs. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">vercel.com/legal/privacy-policy</a></li>
-    <li><strong>Google Play Services</strong> (Android app users only) — required to deliver app updates, push notifications via Firebase Cloud Messaging, and crash reports. No personal info beyond device/app version is shared. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></li>
+    <li><strong>Google Play Services</strong> (Android app users only) — required to install and update the app; push notifications (only if you allow them) are delivered through Google's Firebase Cloud Messaging. No personal info beyond device/app version is shared. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></li>
     <li><strong>Cloudflare Turnstile</strong> (optional, when enabled) — anti-bot CAPTCHA on registration/login forms. Privacy-respecting alternative to reCAPTCHA. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a></li>
     <li><strong>Groq AI</strong> (poster studio feature only) — when you tap "AI suggest" for poster captions, the category + day-of-week is sent to Groq's LLM API. No personal information is sent. <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener">groq.com/privacy-policy</a></li>
     <li><strong>Google Input Tools</strong> (optional Hindi transliteration) — when you type your business name in English, transliterated Hindi suggestions come from Google's free public API. Only the text typed in the name field is sent, no identifiers</li>
@@ -161,7 +162,7 @@
   <h2 id="cookies">4. Cookies & Local Storage</h2>
   <p>We use minimal browser storage:</p>
   <ul>
-    <li><strong>Session cookies</strong> — to keep you logged in after OTP verification (Supabase Auth)</li>
+    <li><strong>Session cookies</strong> — to keep you logged in after you sign in (Supabase Auth)</li>
     <li><strong>localStorage</strong> — language preference (EN/HI), pending registration drafts</li>
     <li><strong>No tracking pixels</strong> — we don't use Facebook Pixel, Google Analytics yet (may add anonymous analytics later with consent)</li>
   </ul>
@@ -169,10 +170,10 @@
   <h2 id="mobile-app">4.5 Mobile App, Notifications & Permissions</h2>
   <p>The DukanList Android app (TWA / Progressive Web App wrapper) operates under these conditions:</p>
   <ul>
-    <li><strong>Permissions requested:</strong> Internet access (required), push notifications (optional, only after your explicit consent), file storage (only when you upload a photo)</li>
-    <li><strong>Permissions NOT requested:</strong> Camera, microphone, location (GPS), contacts, SMS, call logs, calendar, or any other sensitive sensor</li>
+    <li><strong>Permissions requested:</strong> Internet access (required), push notifications (optional, only after your explicit consent), file storage and camera (only when you choose to upload or take a photo yourself)</li>
+    <li><strong>Permissions NOT requested:</strong> Microphone, location (GPS), contacts, SMS, call logs, calendar, or any other sensitive sensor</li>
     <li><strong>Push notifications</strong> are sent only with your explicit permission and only for: replies to your reviews/Q&A, new shop announcements in your area, important account alerts (security, deletion confirmation). You can disable anytime from system Settings → Apps → DukanList → Notifications</li>
-    <li><strong>App update mechanism:</strong> served through Google Play Store / Apple App Store automatic update channels. Service Worker handles website asset updates</li>
+    <li><strong>App update mechanism:</strong> served through the Google Play Store's automatic update channel. Service Worker handles website asset updates</li>
     <li><strong>Telemetry collected by the app:</strong> none. We do not collect crash reports, app open events, device model, screen resolution, network type, or any other passive telemetry beyond what your browser/Android OS shares with Play Store</li>
     <li><strong>Local data:</strong> language preference, login session token (encrypted by Supabase Auth), pending registration draft, saved shortlist (stored on your device only, not synced to our servers unless you log in)</li>
   </ul>
@@ -209,7 +210,7 @@
 
   <p><strong>Option B — Without installing the app or logging in:</strong></p>
   <p>
-    Visit <a href="/delete-account.html">dukanlist.com/delete-account</a> from any browser. Fill the form with your registered mobile number; we will verify by OTP and then start the same 30-day grace period. This option is provided so that anyone — including users who have uninstalled the app — can request deletion at any time.
+    Visit <a href="/delete-account.html">dukanlist.com/delete-account</a> from any browser. Fill the form with your registered mobile number; we will confirm it is you on WhatsApp and then start the same 30-day grace period. This option is provided so that anyone — including users who have uninstalled the app — can request deletion at any time.
   </p>
 
   <p><strong>Option C — By writing to us:</strong></p>
@@ -241,7 +242,7 @@
     <li>HTTPS/TLS encryption for all data transmission</li>
     <li>Database hosted on Supabase with Row-Level Security (RLS) policies</li>
     <li>Phone numbers hashed (SHA-256) for review/report submissions</li>
-    <li>OTP-based authentication (no passwords stored)</li>
+    <li>Passwords handled by Supabase Auth and stored only as one-way hashes</li>
     <li>Regular security audits and dependency updates</li>
   </ul>
 
@@ -252,7 +253,7 @@
     <li><strong>Banned/removed listings</strong> — retained 90 days for audit, then deleted</li>
     <li><strong>Reviews</strong> — retained while business is active; deleted with business closure</li>
     <li><strong>Logs (leads, views)</strong> — retained 12 months for analytics</li>
-    <li><strong>OTP/session data</strong> — auto-expires after 24 hours of inactivity</li>
+    <li><strong>Login session data</strong> — ends when you log out or delete your account</li>
   </ul>
 
   <h2 id="children">8. Children's Privacy</h2>
