@@ -213,7 +213,7 @@ When you fill the questionnaire:
 | Data Type | Collected | Shared | Required | Purpose |
 |---|---|---|---|---|
 | Email address | Yes | No | Yes (for login) | Account management |
-| Phone number | Yes | No | Yes (for OTP + business contact) | Authentication, business display |
+| Phone number | Yes | Yes (public listing if owner) | Yes for owners | Business contact display, WhatsApp verification by our team |
 | User-provided name | Yes | Yes (public listing if owner) | Optional | Listing display |
 | Address (business) | Yes | Yes (public listing) | Yes for owners | Listing display |
 | Photos | Yes | Yes (public listing) | Optional | Business showcase |
@@ -228,7 +228,7 @@ When you fill the questionnaire:
 ### Security practices
 - ✅ Data is encrypted in transit (HTTPS/TLS)
 - ✅ Users can request data deletion (in-app + email)
-- ✅ Independent security review committed (annual audit)
+- ❌ Independent security review — do NOT tick (none has been done)
 - ✅ Follows Play Families Policy (no targeting children)
 
 ---
@@ -240,7 +240,7 @@ The DukanList app uses ONLY:
 - `POST_NOTIFICATIONS` (Android 13+) — Optional, requested only with user consent for business alerts
 - `READ_MEDIA_IMAGES` — Optional, requested only when user uploads a photo
 
-**NOT requested:** Camera (use system picker), Microphone, Location, Contacts, SMS, Call Log, Calendar, Bluetooth, Body Sensors.
+**NOT requested:** Camera (the "Take photo" button opens the phone's own camera app through the system picker — no CAMERA permission in the app), Microphone, Location, Contacts, SMS, Call Log, Calendar, Bluetooth, Body Sensors.
 
 ---
 
@@ -254,7 +254,7 @@ The DukanList app uses ONLY:
 3. **Discover Feed** — TikTok-style swipe (one business card)
 4. **Business detail page** — verified business with photo + reviews
 5. **Search results** — multiple businesses in a category
-6. **Browse categories tree** — all 12 segments
+6. **Browse categories tree** — all 16 segments
 7. **Owner dashboard** — your business's analytics
 8. **Review write modal** — clean UI
 
@@ -289,8 +289,9 @@ YouTube URL goes in Play Console.
 ## 12. Contact
 
 - Email: support@dukanlist.com
-- Phone: +91 7986169442
-- Address: SCO-01, Near IndusInd Bank, Aastha Hospital Street, Chotala Road, Mandi Dabwali — 125104, District Sirsa, Haryana, India
+- Phone: +91 7986169442 (helpline, Anshu Garg — Mon–Sat 10 AM – 7 PM)
+- Address: AumSetu · Mandi Dabwali, Haryana 125104, India
+- Developer name (public): AumSetu
 
 ---
 
