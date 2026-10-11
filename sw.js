@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.74.0';   // v350 nudge + one completeness score
+const VERSION = 'dukan-v3.75.0';   // v351 Explore card identity line
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
