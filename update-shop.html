@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hi" data-lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>अपनी दुकान का पेज सुधारें — DukanList</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<!--
+  v348: the "page sudhaaro" link (db/249). The office sends this on
+  WhatsApp as /update-shop?t=<64-char token>. No login: the token is the
+  key, it expires, and nothing goes live from here — answers and photos
+  land as a pending submission an admin approves.
+-->
+<style>
+  :root{ --ink:#0F172A; --ink2:#334155; --muted:#64748B; --line:#E2E8F0; --sf:#FF6B1A; --sfd:#C2410C; --ok:#15803D }
+  *{ box-sizing:border-box }
+  body{ margin:0; font-family:'Noto Sans Devanagari','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:#FFF8F1; color:var(--ink); }
+  .top{ background:#0F172A; padding:12px 16px; display:flex; align-items:center; justify-content:center }
+  .top img{ height:28px; width:auto; display:block }
+  .wrap{ max-width:560px; margin:0 auto; padding:16px 14px 90px }
+  .hero{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:14px }
+  .hero h1{ font-size:1.25rem; margin:0 0 4px; line-height:1.3 }
+  .hero .cat{ color:var(--muted); font-size:.88rem }
+  .hero p{ margin:10px 0 0; font-size:.92rem; color:var(--ink2); line-height:1.55 }
+  .q{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:14px }
+  .q .n{ display:inline-flex; width:26px; height:26px; border-radius:50%; background:var(--sf); color:#fff; font-weight:800; align-items:center; justify-content:center; font-size:.85rem; margin-right:8px }
+  .q h2{ font-size:1.02rem; margin:0 0 4px; display:flex; align-items:center }
+  .q .en{ color:var(--muted); font-size:.8rem; margin:0 0 10px 34px }
+  .q .hint{ color:var(--muted); font-size:.8rem; margin-top:6px; line-height:1.45 }
+  label.sm{ display:block; font-size:.82rem; font-weight:700; color:var(--ink2); margin:10px 0 4px }
+  textarea, input[type=text], input[type=number]{ width:100%; border:1.5px solid #CBD5E1; border-radius:10px; padding:11px 12px; font-size:1rem; font-family:inherit; color:var(--ink); background:#fff }
+  textarea:focus, input:focus{ outline:none; border-color:var(--sf); box-shadow:0 0 0 3px rgba(255,107,26,.15) }
+  textarea{ min-height:96px; resize:vertical; line-height:1.5 }
+  .cnt{ text-align:right; font-size:.72rem; color:var(--muted); margin-top:3px }
+  .pbtns{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px }
+  .pbtn{ flex:1; min-width:140px; border:0; border-radius:11px; padding:12px; font-weight:800; font-size:.95rem; cursor:pointer; font-family:inherit }
+  .pbtn.cam{ background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff }
+  .pbtn.gal{ background:#fff; color:var(--ink); border:1.5px solid #CBD5E1 }
+  .pgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px }
+  .ph{ position:relative; aspect-ratio:1; border-radius:10px; overflow:hidden; background:#F1F5F9; border:1px solid var(--line) }
+  .ph img{ width:100%; height:100%; object-fit:cover; display:block }
+  .ph .x{ position:absolute; top:4px; right:4px; width:26px; height:26px; border-radius:50%; border:0; background:rgba(15,23,42,.75); color:#fff; font-weight:900; cursor:pointer }
+  .ph .st{ position:absolute; left:0; right:0; bottom:0; background:rgba(15,23,42,.7); color:#fff; font-size:.7rem; text-align:center; padding:3px }
+  .bar{ position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding:10px 14px; box-shadow:0 -6px 18px rgba(0,0,0,.06) }
+  .bar .in{ max-width:560px; margin:0 auto }
+  .send{ width:100%; border:0; border-radius:12px; padding:14px; font-size:1.05rem; font-weight:800; color:#fff; background:linear-gradient(135deg,#16A34A,#15803D); cursor:pointer; font-family:inherit }
+  .send:disabled{ opacity:.6; cursor:default }
+  .msg{ font-size:.86rem; margin-top:6px; text-align:center }
+  .msg.err{ color:#DC2626 } .msg.ok{ color:var(--ok) }
+  .center{ text-align:center; padding:30px 16px }
+  .center .big{ font-size:3rem }
+  .center h2{ margin:8px 0 6px }
+  .center p{ color:var(--ink2); line-height:1.55 }
+  .wa{ display:inline-block; margin-top:12px; background:#25D366; color:#fff; text-decoration:none; font-weight:800; padding:11px 18px; border-radius:11px }
+  .hide{ display:none !important }
+</style>
+</head>
+<body>
+<div class="top"><img src="/assets/brand/wordmark-dark.webp" alt="DukanList" width="120" height="28"></div>
+
+<div class="wrap">
+  <div id="loading" class="center"><div class="big">⏳</div><p>लोड हो रहा है…</p></div>
+
+  <div id="bad" class="center hide">
+    <div class="big">🔗</div>
+    <h2>यह लिंक अब काम नहीं करता</h2>
+    <p id="badWhy">लिंक पुराना हो गया है या गलत है। नया लिंक मंगवाने के लिए DukanList हेल्पलाइन पर WhatsApp करें।</p>
+    <a class="wa" id="badWa" href="#" target="_blank" rel="noopener">💬 WhatsApp करें</a>
+  </div>
+
+  <div id="done" class="center hide">
+    <div class="big">✅</div>
+    <h2>शुक्रिया! जानकारी मिल गई</h2>
+    <p>हमारी टीम इसे जाँच कर 24 घंटे में आपके पेज पर लगा देगी।<br><span style="color:var(--muted);font-size:.86rem">Thank you — our team will check and publish it within 24 hours.</span></p>
+    <a class="wa" id="doneView" href="/" style="background:#0F172A">अपना पेज देखें →</a>
+  </div>
+
+  <form id="form" class="hide" onsubmit="return send(event)">
+    <div class="hero">
+      <h1 id="shopName"></h1>
+      <div class="cat" id="shopCat"></div>
+      <p>नीचे तीन छोटे सवाल हैं — अपने शब्दों में, जैसे ग्राहक को बताते हैं वैसे ही लिखें। जो आप लिखेंगे वही आपके पेज पर दिखेगा।<br>
+      <span style="color:var(--muted);font-size:.84rem">Three short questions — answer in your own words. What you write is what customers will see.</span></p>
+    </div>
+
+    <div class="q">
+      <h2><span class="n">1</span>आपके यहाँ क्या-क्या मिलता है?</h2>
+      <div class="en">What do you sell / which brands or services?</div>
+      <textarea id="offerings" maxlength="900" placeholder="हर लाइन में एक चीज़, जैसे:&#10;Samsung, Vivo, Oppo मोबाइल&#10;मोबाइल रिपेयर&#10;रिचार्ज और सिम"></textarea>
+      <div class="hint">हर लाइन में एक चीज़ (या कॉमा से अलग)। ज़्यादा से ज़्यादा 20। ब्रांड के नाम ज़रूर लिखें — ग्राहक इन्हीं से ढूँढते हैं।</div>
+    </div>
+
+    <div class="q">
+      <h2><span class="n">2</span>लोग आपके पास ही क्यों आते हैं?</h2>
+      <div class="en">The one real reason customers choose you</div>
+      <textarea id="why" maxlength="300" style="min-height:70px" placeholder="जैसे: 25 साल से एक ही जगह, हर मोबाइल की बिल के साथ गारंटी कार्ड, रिपेयर उसी दिन"></textarea>
+      <div class="cnt"><span id="whyN">0</span>/300</div>
+      <div class="hint">"सबसे सस्ता" या "नंबर 1" जैसी बातें न लिखें — एक सच्ची, खास बात लिखें।</div>
+    </div>
+
+    <div class="q">
+      <h2><span class="n">3</span>दुकान कब शुरू हुई, कौन चलाता है?</h2>
+      <div class="en">Your story — since when, who runs it</div>
+      <label class="sm" for="year">शुरू होने का साल (Since)</label>
+      <input type="number" id="year" inputmode="numeric" min="1900" max="2100" placeholder="जैसे 2009" style="max-width:160px">
+      <label class="sm" for="about">थोड़ा अपने बारे में</label>
+      <textarea id="about" maxlength="1500" placeholder="जैसे: मेरे पिताजी ने 1998 में यह दुकान शुरू की थी, अब मैं और मेरा भाई चलाते हैं…"></textarea>
+      <div class="cnt"><span id="aboutN">0</span>/1500</div>
+    </div>
+
+    <div class="q">
+      <h2><span class="n">📷</span>दुकान की फोटो</h2>
+      <div class="en">Photos — outside board, inside counter, products, you at the shop</div>
+      <div class="hint" id="photoRoomTxt"></div>
+      <input type="file" id="camIn" accept="image/*" capture="environment" class="hide" onchange="picked(this)">
+      <input type="file" id="galIn" accept="image/*" multiple class="hide" onchange="picked(this)">
+      <div class="pbtns" id="pbtns">
+        <button type="button" class="pbtn cam" onclick="document.getElementById('camIn').click()">📷 फोटो खींचें</button>
+        <button type="button" class="pbtn gal" onclick="document.getElementById('galIn').click()">🖼️ गैलरी से</button>
+      </div>
+      <div class="pgrid" id="pgrid"></div>
+    </div>
+  </form>
+</div>
+
+<div class="bar hide" id="bar"><div class="in">
+  <button class="send" id="sendBtn" form="form" type="submit">✅ भेजें (Send)</button>
+  <div class="msg" id="msg"></div>
+</div></div>
+
+<script src="/assets/js/dl-config.js"></script>
+<script>
+(function(){
+  var CFG = window.DL_CONFIG || {};
+  var SB = (CFG.supabase || {});
+  var HELP = ((CFG.support || {}).whatsapp) || '';
+  var TOKEN = (new URLSearchParams(location.search).get('t') || '').trim();
+  var ROOM = 0, PHOTOS = [], BUSY = 0, SLUG = '';
+  var $ = function(id){ return document.getElementById(id); };
+
+  function rpc(fn, body){
+    return fetch(SB.url + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { apikey: SB.anon_key, Authorization: 'Bearer ' + SB.anon_key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function(r){
+      return r.json().catch(function(){ return null; }).then(function(j){
+        if (!r.ok) throw new Error((j && (j.message || j.hint)) || ('HTTP ' + r.status));
+        return j;
+      });
+    });
+  }
+  function show(id){ ['loading','bad','done','form'].forEach(function(x){ $(x).classList.toggle('hide', x !== id); }); $('bar').classList.toggle('hide', id !== 'form'); }
+  function bad(why){
+    if (why) $('badWhy').textContent = why;
+    var m = encodeURIComponent('Namaste, mujhe DukanList par apni dukaan ka page sudhaarne ka naya link chahiye.');
+    $('badWa').href = HELP ? ('https://wa.me/91' + HELP + '?text=' + m) : '/contact';
+    show('bad');
+  }
+  function counter(inp, out){ var f = function(){ $(out).textContent = $(inp).value.length; }; $(inp).addEventListener('input', f); f(); }
+
+  if (!/^[0-9a-f]{64}$/.test(TOKEN)){ bad(); return; }
+
+  rpc('public_get_update_link', { p_token: TOKEN }).then(function(d){
+    if (!d || !d.ok){ bad(); return; }
+    SLUG = d.slug || '';
+    $('shopName').textContent = d.name || '';
+    $('shopCat').textContent = d.category || '';
+    $('offerings').value = (d.offerings || []).join('\n');
+    $('why').value = d.why_text || '';
+    $('about').value = d.about_text || '';
+    if (d.established_year) $('year').value = d.established_year;
+    ROOM = Math.min(6, Number(d.photo_room) || 0);
+    $('photoRoomTxt').textContent = ROOM > 0
+      ? ('अभी ' + (d.photo_count || 0) + ' फोटो लगी हैं। आप ' + ROOM + ' और जोड़ सकते हैं।')
+      : 'आपकी दुकान पर पहले से 8 फोटो हैं — नई फोटो के लिए हेल्पलाइन से पुरानी हटवाएँ।';
+    if (ROOM <= 0) $('pbtns').classList.add('hide');
+    counter('why', 'whyN'); counter('about', 'aboutN');
+    show('form');
+  }).catch(function(){ bad('इंटरनेट की दिक्कत लगती है — थोड़ी देर बाद फिर खोलें।'); });
+
+  function drawPhotos(){
+    $('pgrid').innerHTML = PHOTOS.map(function(p, i){
+      return '<div class="ph"><img src="' + (p.preview || p.url) + '" alt="">'
+        + (p.state === 'up' ? '<div class="st">अपलोड…</div>' : p.state === 'err' ? '<div class="st" style="background:#DC2626">फेल</div>' : '')
+        + '<button type="button" class="x" onclick="rmPhoto(' + i + ')" aria-label="हटाएँ">✕</button></div>';
+    }).join('');
+    $('pbtns').classList.toggle('hide', PHOTOS.length >= ROOM);
+  }
+  window.rmPhoto = function(i){ PHOTOS.splice(i, 1); drawPhotos(); };
+  window.picked = function(input){
+    var files = Array.prototype.slice.call(input.files || []);
+    input.value = '';
+    files.forEach(function(file){
+      if (PHOTOS.length >= ROOM) return;
+      if (!/^image\//.test(file.type) || file.size > 8 * 1024 * 1024) return;
+      var p = { state: 'up', preview: '' };
+      try { p.preview = URL.createObjectURL(file); } catch(_){}
+      PHOTOS.push(p); drawPhotos(); BUSY++;
+      var fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'dukanlist_shops');
+      fd.append('folder', 'shop-updates');
+      fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method: 'POST', body: fd })
+        .then(function(r){ return r.json(); })
+        .then(function(j){
+          if (!j || !j.secure_url) throw new Error('upload');
+          p.url = j.secure_url; p.state = 'ok';
+        })
+        .catch(function(){ p.state = 'err'; })
+        .then(function(){ BUSY--; drawPhotos(); });
+    });
+  };
+
+  window.send = function(e){
+    e.preventDefault();
+    var msg = $('msg'); msg.className = 'msg'; msg.textContent = '';
+    if (BUSY > 0){ msg.className = 'msg err'; msg.textContent = 'फोटो अपलोड हो रही हैं — 2 सेकंड रुकें।'; return false; }
+    var offers = $('offerings').value.split(/[\n,]+/).map(function(s){ return s.trim(); }).filter(function(s){ return s.length >= 2; }).slice(0, 20);
+    var data = {
+      offerings: offers,
+      why_text: $('why').value.trim(),
+      about_text: $('about').value.trim(),
+      established_year: $('year').value.trim(),
+      photos: PHOTOS.filter(function(p){ return p.state === 'ok' && p.url; }).map(function(p){ return p.url; })
+    };
+    var btn = $('sendBtn'); btn.disabled = true; btn.textContent = 'भेज रहे हैं…';
+    rpc('public_submit_shop_update', { p_token: TOKEN, p_data: data }).then(function(){
+      $('doneView').href = SLUG ? ('/' + SLUG) : '/';
+      show('done');
+      window.scrollTo(0, 0);
+    }).catch(function(err){
+      msg.className = 'msg err'; msg.textContent = err.message || 'कुछ गड़बड़ हुई — फिर कोशिश करें।';
+      btn.disabled = false; btn.textContent = '✅ भेजें (Send)';
+    });
+    return false;
+  };
+})();
+</script>
+</body>
+</html>

@@ -301,6 +301,13 @@
         <span data-i18n-hi>विस्तार से अपने बारे में बताएं — इतिहास, अनुभव, टीम। ग्राहक कहानी पसंद करते हैं।</span>
       </div>
       <div class="form-group">
+        <!-- v348 (db/249): the two questions customers actually ask -->
+        <label><span data-i18n-en>What do you sell? Brands / items / services (one per line)</span><span data-i18n-hi>आपके यहाँ क्या-क्या मिलता है? ब्रांड / सामान / सेवाएं (हर लाइन में एक)</span></label>
+        <textarea id="offeringsText" class="textarea" maxlength="900" rows="4" placeholder="Samsung, Vivo, Oppo mobiles&#10;Mobile repair&#10;Recharge &amp; SIM"></textarea>
+        <small style="color:var(--muted);font-size:.78rem;margin:4px 0 12px;display:block"><span data-i18n-en>Shown as tags under "What you get here" on your page. Up to 20. Brand names help customers find you.</span><span data-i18n-hi>आपके पेज पर "यहाँ क्या मिलता है" में दिखेगा। ज़्यादा से ज़्यादा 20। ब्रांड के नाम लिखें — ग्राहक इन्हीं से ढूँढते हैं।</span></small>
+        <label><span data-i18n-en>Why do people come to you? One real reason (max 300)</span><span data-i18n-hi>लोग आपके पास ही क्यों आते हैं? एक सच्ची बात (max 300)</span></label>
+        <input id="whyText" class="input" type="text" maxlength="300" placeholder="e.g. Same place for 25 years · repair the same day">
+        <small style="color:var(--muted);font-size:.78rem;margin:4px 0 12px;display:block"><span data-i18n-en>Avoid "cheapest" or "No. 1" — one true, specific thing works best.</span><span data-i18n-hi>"सबसे सस्ता" या "नंबर 1" न लिखें — एक सच्ची, खास बात लिखें।</span></small>
         <label><span data-i18n-en>Your business story (max 1500 chars)</span><span data-i18n-hi>आपकी बिज़नेस कहानी</span></label>
         <div class="tpl-hint">
           💡 <span data-i18n-en>Use ready-made templates customised for your profession — Mutual Fund Distributor, Stock Broker, Insurance Agent, Doctor, Shop, etc. Just click the orange button and pick one.</span><span data-i18n-hi>अपने पेशे के लिए तैयार टेम्पलेट इस्तेमाल करें — Mutual Fund Distributor, Stock Broker, Insurance Agent, Doctor, Shop आदि। ऑरेंज बटन दबाकर पसंदीदा चुनें।</span>
@@ -743,6 +750,8 @@ function populateFields(){
   document.getElementById('usp').value = MY_BIZ.usp_text || '';
   document.getElementById('uspHi').value = MY_BIZ.usp_hi || '';
   document.getElementById('aboutText').value = MY_BIZ.about_text || '';
+  { const oEl = document.getElementById('offeringsText'); if (oEl) oEl.value = Array.isArray(MY_BIZ.offerings) ? MY_BIZ.offerings.join('\n') : ''; }
+  { const wEl = document.getElementById('whyText'); if (wEl) wEl.value = MY_BIZ.why_text || ''; }
 
   // Render Supersonic Simple USP picker — universal common-man friendly templates
   if (window.renderSimpleUspPicker) {
@@ -1152,6 +1161,16 @@ async function saveProfile(){
     btn.disabled=false; btn.innerHTML='<span>💾 Save Changes</span>';
     errEl.textContent = 'Save failed: ' + updErr.message; errEl.style.display = 'flex'; return;
   }
+
+  // v348: offerings + why (db/249). Separate RPC so update_my_business stays untouched.
+  try {
+    const offs = ((document.getElementById('offeringsText') || {}).value || '')
+      .split(/[\n,]+/).map(s => s.trim()).filter(s => s.length >= 2).slice(0, 20);
+    const why = ((document.getElementById('whyText') || {}).value || '').trim();
+    const ar = await c.rpc('update_my_about', { p_business_id: MY_BIZ.id, p_offerings: offs, p_why: why });
+    if (ar.error) console.warn('About save warning:', ar.error.message);
+    else { MY_BIZ.offerings = (ar.data && ar.data.offerings) || offs; MY_BIZ.why_text = (ar.data && ar.data.why_text) || why; }
+  } catch(abErr){ console.warn('About save skipped:', abErr); }
 
   // Save social links via dedicated RPC
   try {

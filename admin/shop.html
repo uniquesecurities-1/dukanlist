@@ -321,6 +321,14 @@ function render(){
         + '<div style="font-size:11.5px;color:#94a3b8;margin-top:8px">★ = main photo (shown on cards). Max ' + 8 + ' photos. Same storage as the owner panel — the owner sees these too.</div>'
       + '</div>'
 
+      // === v348: "page sudhaaro" link (db/249) ===
+      + '<div class="card" style="margin-top:14px">'
+        + '<h2>🔗 Page sudhaaro link <span class="subtle">shopkeeper fills it on his phone — no login, no field visit</span></h2>'
+        + '<div style="font-size:12.5px;color:#475569;line-height:1.5;margin-bottom:10px">Link 7 din chalega. Shopkeeper jo bhejega wo <a href="/admin/shop-updates.html" style="font-weight:800">Shop Updates</a> mein approval ke liye aayega — seedha live nahi hota. Naya link banane se purana band ho jaata hai.</div>'
+        + '<button type="button" onclick="admMakeUpdateLink()" style="background:linear-gradient(135deg,#16A34A,#15803D);color:#fff;border:0;border-radius:9px;padding:9px 14px;font-weight:800;cursor:pointer;font-family:inherit">🔗 Link banao</button>'
+        + '<div id="admLinkOut" style="margin-top:10px"></div>'
+      + '</div>'
+
       // === Recent Changes card ===
       + '<div class="card" style="margin-top:14px">'
         + '<h2>📝 Recent Changes <span class="subtle">last 10 edits</span></h2>'
@@ -1887,6 +1895,34 @@ async function admCompleteClaim(){
   var r = await ShopDB.client.rpc('admin_complete_claim', { p_business_id: BIZ_ID });
   if (r.error){ toast('Failed: ' + r.error.message + (/admin_complete_claim/.test(r.error.message) ? ' — run db/247 first' : ''), true); return; }
   toast('✓ Claim complete'); SHOP.claim_status = r.data; render(); loadEditHistory(); admLoadPhotos();
+}
+
+// ====== v348: "page sudhaaro" link (db/249) ======
+async function admMakeUpdateLink(){
+  var out = document.getElementById('admLinkOut'); if (!out) return;
+  out.innerHTML = '<span style="color:#64748B;font-size:13px">Bana rahe hain…</span>';
+  var r = await ShopDB.client.rpc('admin_create_update_link', { p_business_id: BIZ_ID, p_days: 7 });
+  if (r.error){
+    out.innerHTML = '<div style="color:#DC2626;font-size:13px">' + esc(r.error.message) + (/admin_create_update_link/.test(r.error.message) ? ' — run db/249 first' : '') + '</div>';
+    return;
+  }
+  var d = r.data || {};
+  var link = location.origin + '/update-shop?t=' + d.token;
+  var wa = String(d.whatsapp || '').replace(/\D/g, '').slice(-10);
+  var msg = 'Namaste ji 🙏\n\nDukanList par aapki dukaan "' + (d.name || '') + '" ka page hai: ' + location.origin + '/' + (d.slug || '') + '\n\n'
+    + 'Is link par 2 minute mein apni dukaan ki jaankari aur photo daal dijiye — kya milta hai, log aapke paas kyon aate hain. Koi login nahi chahiye:\n' + link + '\n\n'
+    + 'Jin dukaanon ka page poora hota hai, wo DukanList ke home page par zyada dikhti hain.\n— DukanList Helpline';
+  var exp = d.expires_at ? new Date(d.expires_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '';
+  out.innerHTML =
+      '<input type="text" readonly value="' + esc(link) + '" onclick="this.select()" style="width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:8px;font-size:12px;font-family:monospace">'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center">'
+    + (wa.length === 10 ? '<a href="https://wa.me/91' + wa + '?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener" style="background:#25D366;color:#fff;text-decoration:none;border-radius:9px;padding:8px 13px;font-weight:800;font-size:13px">💬 WhatsApp par bhejo</a>' : '<span style="color:#DC2626;font-size:12.5px">Shop ka WhatsApp number nahi hai — link copy karke bhejo</span>')
+    + '<button type="button" id="admLinkCopy" style="background:#fff;border:1.5px solid #CBD5E1;border-radius:9px;padding:7px 12px;font-weight:800;cursor:pointer;font-family:inherit;font-size:13px">📋 Message copy</button>'
+    + '<span style="font-size:12px;color:#64748B">Valid till ' + esc(exp) + '</span>'
+    + '</div>';
+  document.getElementById('admLinkCopy').onclick = function(){
+    try { navigator.clipboard.writeText(msg).then(function(){ toast('✓ Message copied'); }); } catch(_){ toast('Copy nahi hua — link select karke copy karo', true); }
+  };
 }
 
 // ====== v331: Shop photos (admin) ======

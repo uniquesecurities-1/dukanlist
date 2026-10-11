@@ -820,6 +820,20 @@ body.prof-partial #reviewsAnchor::before{
   transform:rotate(15deg);
 }
 
+/* v348: "About this shop" */
+.shop-about{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:14px 16px; margin-bottom:18px }
+.shop-about .sa-h{ font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:10px }
+.shop-about .sa-k{ display:block; font-size:.74rem; font-weight:800; color:var(--saffron-deep,#C2410C); margin:2px 0 6px }
+.shop-about .sa-why{ font-size:.95rem; font-weight:600; color:var(--ink); line-height:1.5; margin-bottom:12px }
+.shop-about .sa-offers{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px }
+.shop-about .sa-offers span{ background:#FFF7ED; border:1px solid #FED7AA; color:#9A3412; border-radius:99px; padding:4px 10px; font-size:.8rem; font-weight:700 }
+.shop-about .sa-story{ font-size:.92rem; line-height:1.65; color:var(--ink-2); white-space:pre-wrap }
+.shop-about .sa-story.sa-clamp{ display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden }
+.shop-about .sa-more{ background:none; border:0; padding:4px 0 0; color:var(--saffron-deep,#C2410C); font-weight:800; font-size:.82rem; cursor:pointer; font-family:inherit }
+.shop-about.sa-empty{ background:#F8FAFC; border-style:dashed; padding:12px 14px }
+.shop-about .sa-empty-t{ font-size:.86rem; color:var(--muted); margin-bottom:6px }
+.shop-about .sa-wa{ font-size:.84rem; font-weight:800; color:#15803D; text-decoration:none }
+
 /* v347: USP as clean bullets + review highlights */
 .usp-box.usp-list{ background:#fff !important; border:1px solid var(--line) !important; color:var(--ink) !important;
   font-style:normal !important; padding:14px 16px !important; box-shadow:none !important; border-radius:13px !important;
@@ -1824,6 +1838,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           </div>
           <div class="usp-box" id="uspBox" style="display:none"></div>
           <div class="review-highlights" id="reviewHighlights" style="display:none"></div>
+          <div class="shop-about" id="shopAbout" style="display:none"></div>
           <div class="addr-box">
             <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
             <div class="a-text" id="addrDisp"></div>
@@ -2390,6 +2405,10 @@ async function loadBusiness(){
   // read view_count = 0; the call/WhatsApp logger three thousand lines below
   // does await, which is why 107 of those were recorded and not one view.
   try { c.rpc('log_lead', { p_business_id: BIZ.id, p_action: 'view' }).then(null, function(){}); } catch(_) {}
+
+  // v348: "Dukaan ke baare mein" (db/249). Separate, forgiving query — if the
+  // migration has not run yet the page simply shows what it has.
+  loadShopAbout();
 
   // Load all categories (multi-cat badges), reviews and deals in parallel
   loadCategoryBadges(BIZ.id);
@@ -3927,6 +3946,58 @@ function dlTrust(b){
   if (b.verified_photo)   checks.push(['photos','फोटो']);
   if (b.verified_visit)   checks.push(['shop visit','दुकान विज़िट']);
   return { tier, label, labelHi, checks, strict };
+}
+
+// =============================================================
+// v348: "Dukaan ke baare mein" — the shop in the owner's own words:
+// story (about_text), what it sells (offerings) and why people come
+// (why_text). Filled by the owner in his panel or through the office's
+// "page sudhaaro" link (db/249). When nothing is filled we say so
+// honestly and point to WhatsApp — never invent text.
+// =============================================================
+async function loadShopAbout(){
+  if (!BIZ) return;
+  try {
+    const r = await ShopDB.client.from('businesses').select('offerings, why_text').eq('id', BIZ.id).maybeSingle();
+    if (!r.error && r.data){ BIZ.offerings = r.data.offerings || []; BIZ.why_text = r.data.why_text || ''; }
+  } catch(_){}
+  try { renderShopAbout(BIZ); } catch(e){ console.warn('shop about:', e); }
+}
+function renderShopAbout(b){
+  const host = document.getElementById('shopAbout');
+  if (!host || !b) return;
+  const story = String(b.about_text || '').trim();
+  const offers = Array.isArray(b.offerings) ? b.offerings.filter(Boolean) : [];
+  const why = String(b.why_text || '').trim();
+  const raw = String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10);
+  const waMsg = encodeURIComponent('Namaste, DukanList par aapki dukaan "' + (b.name || '') + '" dekhi. Aapke yahan kya-kya milta hai?');
+  const waBtn = raw.length === 10
+    ? '<a class="sa-wa" href="https://wa.me/91' + raw + '?text=' + waMsg + '" target="_blank" rel="noopener" onclick="try{logLead(\'whatsapp\')}catch(_){}"><span data-i18n-en>Ask the shop on WhatsApp →</span><span data-i18n-hi>WhatsApp पर पूछें →</span></a>'
+    : '';
+  if (!story && !offers.length && !why){
+    host.className = 'shop-about sa-empty';
+    host.innerHTML = '<div class="sa-empty-t"><span data-i18n-en>The owner has not added details about this shop yet.</span><span data-i18n-hi>मालिक ने अभी दुकान की पूरी जानकारी नहीं दी है।</span></div>' + waBtn;
+    host.style.display = '';
+    return;
+  }
+  let h = '<div class="sa-h"><span data-i18n-en>About this shop</span><span data-i18n-hi>दुकान के बारे में</span></div>';
+  if (why){
+    h += '<div class="sa-why"><span class="sa-k"><span data-i18n-en>Why people come here</span><span data-i18n-hi>लोग यहाँ क्यों आते हैं</span></span>' + escapeHTML(why) + '</div>';
+  }
+  if (offers.length){
+    h += '<div class="sa-k"><span data-i18n-en>What you get here</span><span data-i18n-hi>यहाँ क्या मिलता है</span></div>'
+      + '<div class="sa-offers">' + offers.slice(0, 20).map(o => '<span>' + escapeHTML(o) + '</span>').join('') + '</div>';
+  }
+  if (story){
+    const long = story.length > 320;
+    h += '<div class="sa-story' + (long ? ' sa-clamp' : '') + '" id="saStory">' + escapeHTML(story) + '</div>'
+      + (long ? '<button type="button" class="sa-more" onclick="var s=document.getElementById(\'saStory\');s.classList.toggle(\'sa-clamp\');this.style.display=\'none\'"><span data-i18n-en>Read more</span><span data-i18n-hi>और पढ़ें</span></button>' : '');
+    // the same text sat in the "About Us" card lower down — show it once
+    const oldCard = document.getElementById('aboutCard'); if (oldCard) oldCard.style.display = 'none';
+  }
+  host.className = 'shop-about';
+  host.innerHTML = h;
+  host.style.display = '';
 }
 
 function renderWhyThisShop(b){
