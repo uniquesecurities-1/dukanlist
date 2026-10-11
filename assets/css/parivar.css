@@ -1,0 +1,47 @@
+/* Dabwali Parivar — /parivar, /parivar/<slug>, /sanstha/<slug> */
+.pv-wrap{ max-width:880px; margin:0 auto; padding:18px 16px 60px }
+.pv-hero{ text-align:center; padding:34px 16px 22px; background:linear-gradient(180deg,#FFF7ED 0%,#fff 100%); border-bottom:1px solid var(--line) }
+.pv-hero h1{ font-family:'Manrope','Noto Sans Devanagari',sans-serif; font-size:clamp(1.7rem,4.4vw,2.5rem); font-weight:900; letter-spacing:-.02em; margin:0 0 6px }
+.pv-hero p{ color:var(--ink-2); margin:0 auto; max-width:560px; font-size:.98rem }
+.pv-search{ max-width:560px; margin:18px auto 0; display:flex; gap:8px }
+.pv-search input{ flex:1; border:1.5px solid #CBD5E1; border-radius:12px; padding:13px 14px; font-size:1rem; font-family:inherit; background:#fff }
+.pv-search input:focus{ outline:none; border-color:#FF6B1A; box-shadow:0 0 0 3px rgba(255,107,26,.15) }
+.pv-h2{ font-family:'Manrope','Noto Sans Devanagari',sans-serif; font-size:1.05rem; font-weight:800; margin:22px 0 10px; color:var(--ink) }
+.pv-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px }
+.pv-card{ display:flex; gap:12px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 14px; text-decoration:none; color:var(--ink); transition:transform .15s, box-shadow .15s }
+.pv-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(15,23,42,.07); text-decoration:none }
+.pv-card .t{ font-weight:800; font-size:.96rem; line-height:1.3 }
+.pv-card .s{ font-size:.8rem; color:var(--muted); margin-top:2px }
+.pv-box{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:14px }
+.pv-head{ display:flex; gap:14px; align-items:center }
+.pv-head h1{ font-family:'Manrope','Noto Sans Devanagari',sans-serif; font-size:clamp(1.4rem,3.6vw,1.9rem); font-weight:900; margin:0; line-height:1.15 }
+.pv-head .sub{ color:var(--muted); font-size:.86rem; margin-top:4px }
+.pv-ok{ color:#15803D; font-weight:700 }
+.pv-tag{ display:inline-block; background:#F1F5F9; color:#475569; border-radius:99px; padding:2px 9px; font-size:.72rem; font-weight:700 }
+.pv-num{ font-size:1.15rem; font-weight:800; margin:14px 0 8px; letter-spacing:.01em }
+.pv-acts{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap }
+.pv-btn{ flex:1; min-width:130px; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:11px 14px; border-radius:11px; font-weight:800; font-size:.9rem; text-decoration:none }
+.pv-btn:hover{ text-decoration:none; filter:brightness(1.05) }
+.pv-wa{ background:#25D366; color:#fff }
+.pv-call{ background:#fff; color:var(--ink); border:1.5px solid #CBD5E1 }
+.pv-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:11px; margin-bottom:8px; text-decoration:none; color:var(--ink) }
+a.pv-row:hover{ border-color:#FDBA74; text-decoration:none }
+.pv-row .n{ font-weight:800; font-size:.94rem }
+.pv-row .m{ font-size:.76rem; color:var(--muted); margin-top:1px }
+.pv-role{ flex:0 0 auto; border-radius:99px; padding:3px 10px; font-size:.74rem; font-weight:800; background:#ECFDF5; color:#065F46 }
+.pv-role.f{ background:#FFF7ED; color:#9A3412 }
+.pv-role.m{ background:#F1F5F9; color:#475569 }
+.pv-past{ font-size:.8rem; color:var(--muted); margin-top:8px; line-height:1.6 }
+.pv-bearers{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:8px }
+.pv-bearer{ display:flex; gap:10px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:10px; text-decoration:none; color:var(--ink) }
+.pv-bearer:hover{ border-color:#FDBA74; text-decoration:none }
+.pv-bearer .r{ font-size:.72rem; font-weight:800; color:#047857 }
+.pv-bearer .n{ font-weight:800; font-size:.92rem; line-height:1.25 }
+.pv-members a, .pv-members span.x{ display:flex; justify-content:space-between; gap:8px; padding:9px 4px; border-bottom:1px dashed var(--line); color:var(--ink); text-decoration:none; font-size:.92rem }
+.pv-members a:hover{ color:#C2410C }
+.pv-members small{ color:var(--muted); font-size:.72rem }
+.pv-empty{ text-align:center; color:var(--muted); padding:30px 10px; background:#F8FAFC; border:1px dashed #CBD5E1; border-radius:14px }
+.pv-note{ font-size:.8rem; color:var(--muted); line-height:1.5 }
+.pv-join{ background:linear-gradient(135deg,#FFF7ED,#FFEDD5); border:1px solid #FED7AA; border-radius:16px; padding:16px; margin-top:20px; text-align:center }
+.pv-join b{ display:block; font-size:1rem; margin-bottom:4px }
+html[data-lang="hi"] .pv-hero h1, html[data-lang="hi"] .pv-head h1{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }

@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.78.0';   // v354 shop updates strip + story viewer
+const VERSION = 'dukan-v3.79.0';   // v355 Dabwali Parivar
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

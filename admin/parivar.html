@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dabwali Parivar — DukanList Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@500;700;800;900&display=swap" rel="stylesheet">
+<!--
+  v355: office screen for Dabwali Parivar (db/251). Add sansthas, people,
+  roles (per session), firms; start a new session. Mobile numbers are shown
+  here (admin only) and nowhere public unless the person's contact mode says so.
+-->
+<style>
+  *,*::before,*::after{ box-sizing:border-box }
+  body{ margin:0; font-family:'Plus Jakarta Sans',-apple-system,sans-serif; background:#f4f6fb; color:#0F172A; line-height:1.5 }
+  .topbar{ background:linear-gradient(180deg,#0A1226 0%,#0B1530 100%); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px }
+  .topbar a.brand{ color:#fff; font-weight:900; font-size:1.05rem; text-decoration:none }
+  .topbar a.brand .badge{ background:linear-gradient(135deg,#C2A05A,#8C6A1F); color:#FFF8E6; font-size:.6rem; font-weight:800; padding:3px 8px; border-radius:6px; margin-left:6px; letter-spacing:.12em }
+  .topbar .nav a{ color:#C5CDDA; text-decoration:none; font-size:.85rem; margin-left:10px; padding:6px 10px; border-radius:7px }
+  .topbar .nav a.active{ background:rgba(99,140,255,.16); color:#DBEAFE }
+  .page{ max-width:1180px; margin:0 auto; padding:20px 16px 60px }
+  h1{ font-family:'Manrope',sans-serif; font-size:1.5rem; margin:0 0 4px }
+  .sub{ color:#64748B; font-size:.86rem; margin-bottom:14px }
+  .tabs{ display:flex; gap:8px; margin-bottom:14px }
+  .tab{ background:#fff; border:1px solid #E2E8F0; padding:7px 16px; border-radius:99px; font-weight:800; font-size:.86rem; cursor:pointer; font-family:inherit; color:#475569 }
+  .tab.on{ background:#0F172A; color:#fff; border-color:#0F172A }
+  .cols{ display:grid; grid-template-columns:330px 1fr; gap:14px; align-items:start }
+  @media (max-width:860px){ .cols{ grid-template-columns:1fr } }
+  .card{ background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:14px }
+  .card h2{ font-size:1rem; margin:0 0 10px; display:flex; justify-content:space-between; align-items:center; gap:8px }
+  .list{ max-height:70vh; overflow:auto }
+  .item{ padding:9px 10px; border-radius:9px; cursor:pointer; border:1px solid transparent; margin-bottom:4px }
+  .item:hover{ background:#F8FAFC }
+  .item.on{ background:#FFF7ED; border-color:#FED7AA }
+  .item b{ display:block; font-size:.9rem }
+  .item small{ color:#64748B; font-size:.74rem }
+  input, select, textarea{ width:100%; border:1px solid #CBD5E1; border-radius:9px; padding:8px 10px; font-family:inherit; font-size:.88rem; background:#fff }
+  textarea{ min-height:70px; resize:vertical }
+  label{ display:block; font-size:.74rem; font-weight:800; color:#475569; margin:8px 0 3px }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+  @media (max-width:560px){ .grid2{ grid-template-columns:1fr } }
+  .btn{ border:0; border-radius:9px; padding:8px 13px; font-weight:800; cursor:pointer; font-family:inherit; font-size:.84rem; white-space:nowrap }
+  .btn.p{ background:linear-gradient(135deg,#FF6B1A,#E55100); color:#fff }
+  .btn.g{ background:#fff; color:#0F172A; border:1.5px solid #CBD5E1 }
+  .btn.d{ background:#fff; color:#B91C1C; border:1.5px solid #FCA5A5 }
+  .btn.s{ padding:4px 9px; font-size:.75rem }
+  .row{ display:grid; grid-template-columns:1fr 150px 130px auto; gap:8px; align-items:center; padding:7px 0; border-bottom:1px dashed #E2E8F0; font-size:.86rem }
+  @media (max-width:640px){ .row{ grid-template-columns:1fr 1fr } }
+  .row .mob{ color:#64748B; font-size:.78rem }
+  .muted{ color:#64748B; font-size:.8rem }
+  .pick{ border:1px solid #E2E8F0; border-radius:9px; margin-top:4px; max-height:200px; overflow:auto; background:#fff }
+  .pick div{ padding:7px 10px; cursor:pointer; font-size:.85rem; border-bottom:1px solid #F1F5F9 }
+  .pick div:hover{ background:#FFF7ED }
+  .sec{ border-top:1px solid #E2E8F0; margin-top:14px; padding-top:12px }
+  .pill{ display:inline-block; font-size:.7rem; font-weight:800; padding:1px 8px; border-radius:99px; background:#F1F5F9; color:#475569 }
+  .pill.ok{ background:#ECFDF5; color:#047857 }
+  .err{ color:#DC2626; background:#FEF2F2; border:1px solid #FECACA; padding:10px; border-radius:10px; font-size:.86rem }
+  .empty{ color:#64748B; text-align:center; padding:30px 10px; font-size:.88rem }
+  .toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#0F172A; color:#fff; padding:10px 16px; border-radius:10px; font-weight:700; font-size:.86rem; display:none; z-index:9 }
+  .photo{ display:flex; gap:10px; align-items:center }
+  .photo img{ width:56px; height:56px; border-radius:12px; object-fit:cover; border:1px solid #E2E8F0 }
+</style>
+<script src="/assets/js/admin-error-monitor.js?v=20260921e"></script>
+</head>
+<body>
+<header class="topbar">
+  <a href="/admin/dashboard.html" class="brand">DukanList<span class="badge">ADMIN</span></a>
+  <nav class="nav">
+    <a href="/admin/dashboard.html">📊 Dashboard</a>
+    <a href="/admin/parivar.html" class="active">👨‍👩‍👧 Dabwali Parivar</a>
+    <a href="/parivar" target="_blank" rel="noopener">Public page ↗</a>
+    <a href="#" onclick="logout(); return false">Logout</a>
+  </nav>
+</header>
+
+<main class="page">
+  <h1>👨‍👩‍👧 Dabwali Parivar</h1>
+  <div class="sub">Sansthayein, unke pad (har session ke), log aur unki firms. Mobile number sirf yahan dikhta hai — public page par tabhi jab vyakti ka "contact" option "Number dikhao" ya "Sirf WhatsApp" ho.</div>
+  <div class="tabs">
+    <button class="tab on" data-t="org" onclick="setTab(this)">🏛 Sansthayein</button>
+    <button class="tab" data-t="person" onclick="setTab(this)">👤 Log</button>
+  </div>
+  <div class="cols">
+    <div class="card">
+      <h2><span id="listTitle">Sansthayein</span><button class="btn p s" onclick="openNew()">+ Naya</button></h2>
+      <input id="lq" placeholder="Dhoondhein…" oninput="clearTimeout(window._lt);window._lt=setTimeout(loadList,250)">
+      <div class="list" id="list" style="margin-top:8px"><div class="empty">Loading…</div></div>
+    </div>
+    <div class="card" id="editor"><div class="empty">Baayein se chuniye, ya "+ Naya" dabaiye.</div></div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-init.js?v=20260921e"></script>
+<script>
+var TAB = 'org', CUR = null;
+var ROLES = [['president','President / अध्यक्ष'],['vice_president','Vice President / उपाध्यक्ष'],['secretary','Secretary / सचिव'],['joint_secretary','Joint Secretary / संयुक्त सचिव'],['treasurer','Treasurer / कोषाध्यक्ष'],['pro','PRO / प्रचार मंत्री'],['patron','Patron / संरक्षक'],['chairman','Chairman / चेयरमैन'],['director','Director / निदेशक'],['coordinator','Coordinator / संयोजक'],['member','Member / सदस्य'],['other','Other (likh kar)']];
+var FIRM_ROLES = [['founder','Founder / संस्थापक'],['owner','Owner / मालिक'],['proprietor','Proprietor'],['partner','Partner / पार्टनर'],['director','Director'],['ceo','CEO'],['manager','Manager'],['other','Other (likh kar)']];
+var KINDS = [['seva','Seva sanstha (Lions, Rotary…)'],['vyapar','Vyapar mandal / association'],['dharmik','Dharmik'],['shiksha','Shiksha'],['khel','Khel'],['samajik','Samajik'],['professional','Professional (CA, Doctors, Bar…)'],['other','Other']];
+var MODES = [['hidden','Number mat dikhao'],['whatsapp','Sirf WhatsApp button'],['show','Number dikhao (Call + WhatsApp)']];
+var MONTHS = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function c(){ return ShopDB.client; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(x){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[x]; }); }
+function opts(list, sel){ return list.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === sel ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join(''); }
+function label(list, v){ var f = list.find(function(o){ return o[0] === v; }); return f ? f[1].split(' / ')[0] : v; }
+function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 2600); }
+function fail(r){ if (r.error){ alert('Nahi hua: ' + r.error.message + (/parivar/.test(r.error.message) && /function|exist/.test(r.error.message) ? ' — run db/251 first' : '')); return true; } return false; }
+async function logout(){ try { await c().auth.signOut(); } catch(_){} location.href = '/admin/login.html'; }
+function val(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+function setTab(b){ document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('on', x === b); }); TAB = b.dataset.t; CUR = null;
+  document.getElementById('listTitle').textContent = TAB === 'org' ? 'Sansthayein' : 'Log';
+  document.getElementById('editor').innerHTML = '<div class="empty">Baayein se chuniye, ya "+ Naya" dabaiye.</div>'; loadList(); }
+
+async function loadList(){
+  var r = await c().rpc('admin_parivar_list', { p_kind: TAB, p_q: val('lq') || null });
+  var el = document.getElementById('list');
+  if (r.error){ el.innerHTML = '<div class="err">' + esc(r.error.message) + '</div>'; return; }
+  var rows = r.data || [];
+  if (!rows.length){ el.innerHTML = '<div class="empty">Abhi kuch nahi.</div>'; return; }
+  el.innerHTML = rows.map(function(x){
+    var sm = TAB === 'org' ? esc(label(KINDS, x.kind)) + ' · ' + esc(x.session) + ' · ' + (x.members || 0) + ' members' + (x.status !== 'active' ? ' · hidden' : '')
+                           : (x.mobile ? esc(x.mobile) : 'bina number') + ' · ' + esc(label(MODES, x.contact_mode)) + (x.status !== 'active' ? ' · hidden' : '');
+    return '<div class="item' + (CUR && CUR.id === x.id ? ' on' : '') + '" onclick="openItem(\'' + x.id + '\')"><b>' + esc(x.name) + '</b><small>' + sm + '</small></div>';
+  }).join('');
+}
+
+function openNew(){ CUR = null; TAB === 'org' ? drawOrg({}) : drawPerson({}); }
+async function openItem(id){
+  var r = await c().rpc('admin_parivar_get', { p_kind: TAB, p_id: id });
+  if (fail(r)) return;
+  CUR = r.data; TAB === 'org' ? drawOrg(CUR) : drawPerson(CUR); loadList();
+}
+
+/* ---------- photo (Cloudinary, same preset as the panel) ---------- */
+async function upload(input, targetId, prevId){
+  var f = input.files && input.files[0]; input.value = ''; if (!f) return;
+  var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar');
+  toast('Upload ho raha hai…');
+  try {
+    var r = await fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd }); var j = await r.json();
+    if (!j.secure_url) throw new Error((j.error && j.error.message) || 'upload');
+    document.getElementById(targetId).value = j.secure_url; var p = document.getElementById(prevId); if (p){ p.src = j.secure_url; p.style.display = ''; }
+    toast('✓ Photo lag gayi — Save dabaiye');
+  } catch(e){ alert('Photo upload nahi hui: ' + e.message); }
+}
+
+/* ---------- sanstha ---------- */
+function drawOrg(o){
+  var isNew = !o.id;
+  var h = '<h2>' + (isNew ? 'Nayi sanstha' : esc(o.name)) + (isNew ? '' : '<a class="btn g s" href="/sanstha/' + esc(o.slug) + '" target="_blank" rel="noopener">Public page ↗</a>') + '</h2>'
+    + '<div class="grid2"><div><label>Naam *</label><input id="o_name" value="' + esc(o.name) + '" placeholder="Lions Club Dabwali"></div>'
+    + '<div><label>Hindi naam</label><input id="o_name_hi" value="' + esc(o.name_hi) + '" placeholder="लायंस क्लब डबवाली"></div></div>'
+    + '<div class="grid2"><div><label>Kis tarah ki sanstha</label><select id="o_kind">' + opts(KINDS, o.kind || 'samajik') + '</select></div>'
+    + '<div><label>Naya session kab shuru hota hai</label><select id="o_month">' + MONTHS.slice(1).map(function(m, i){ return '<option value="' + (i + 1) + '"' + ((o.session_start_month || 4) === i + 1 ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div></div>'
+    + '<label>Sanstha ke baare mein</label><textarea id="o_about" maxlength="1000">' + esc(o.about) + '</textarea>'
+    + '<div class="grid2"><div><label>Sampark vyakti (public)</label><input id="o_cname" value="' + esc(o.contact_name) + '" placeholder="Secretary ka naam"></div>'
+    + '<div><label>Sanstha ka number (public)</label><input id="o_cmob" value="' + esc(o.contact_mobile) + '" inputmode="numeric" placeholder="10 digit"></div></div>'
+    + '<label>Logo / photo</label><div class="photo"><img id="o_logo_prev" src="' + esc(o.logo_url || '') + '" style="' + (o.logo_url ? '' : 'display:none') + '" alt=""><input type="hidden" id="o_logo" value="' + esc(o.logo_url) + '">'
+    + '<input type="file" accept="image/*" onchange="upload(this,\'o_logo\',\'o_logo_prev\')" style="width:auto"></div>'
+    + (isNew ? '' : '<label>Status</label><select id="o_status">' + opts([['active','Active (public)'],['hidden','Hidden']], o.status) + '</select>')
+    + '<div style="margin-top:12px"><button class="btn p" onclick="saveOrg()">💾 Save</button></div>';
+  if (!isNew){
+    var cur = (o.roles || []).filter(function(r){ return r.session === o.current_session; });
+    var past = (o.roles || []).filter(function(r){ return r.session !== o.current_session; });
+    h += '<div class="sec"><h2>Session ' + esc(o.current_session) + ' — pad aur members (' + cur.length + ')'
+      + '<button class="btn g s" onclick="newSession()">🔄 Naya session shuru karein</button></h2>'
+      + (cur.length ? cur.map(function(r){
+          return '<div class="row"><div><b>' + esc(r.name) + '</b> <a class="muted" href="/parivar/' + esc(r.slug) + '" target="_blank" rel="noopener">↗</a><div class="mob">' + (r.mobile ? esc(r.mobile) : 'bina number') + '</div></div>'
+            + '<select onchange="changeRole(\'' + r.person_id + '\', this.value)">' + opts(ROLES, r.role) + '</select>'
+            + '<span class="muted">' + esc(r.role_label || '') + '</span>'
+            + '<button class="btn d s" onclick="removeRole(' + r.id + ')">✕</button></div>';
+        }).join('') : '<div class="empty">Abhi koi nahi. Neeche se jodiye.</div>')
+      + '<div class="sec"><b style="font-size:.9rem">+ Vyakti jodiye</b>'
+      + '<label>Pehle se hai? Naam ya number se dhoondhein</label><input id="rp_q" placeholder="Naam / number" oninput="clearTimeout(window._rp);window._rp=setTimeout(pickPerson,250)"><div class="pick" id="rp_pick" style="display:none"></div>'
+      + '<input type="hidden" id="rp_id"><div class="muted" id="rp_sel" style="margin-top:4px"></div>'
+      + '<label>…ya naya vyakti</label><div class="grid2"><input id="rp_name" placeholder="Poora naam"><input id="rp_mob" inputmode="numeric" placeholder="Mobile (optional)"></div>'
+      + '<div class="grid2"><div><label>Number kaise dikhe</label><select id="rp_mode">' + opts(MODES, 'hidden') + '</select></div>'
+      + '<div><label>Pad</label><select id="rp_role" onchange="document.getElementById(\'rp_lbl_w\').style.display=this.value===\'other\'?\'\':\'none\'">' + opts(ROLES, 'member') + '</select></div></div>'
+      + '<div id="rp_lbl_w" style="display:none"><label>Pad ka naam</label><input id="rp_lbl" maxlength="40" placeholder="jaise Project Chairman"></div>'
+      + '<div style="margin-top:10px"><button class="btn p" onclick="addRole()">+ Jodiye</button></div></div>'
+      + (past.length ? '<div class="sec"><b style="font-size:.9rem">Pichhle session</b>' + past.map(function(r){ return '<div class="muted">' + esc(r.session) + ' · ' + esc(r.name) + ' — ' + esc(r.role_label || label(ROLES, r.role)) + '</div>'; }).join('') + '</div>' : '')
+      + '</div>';
+  }
+  document.getElementById('editor').innerHTML = h;
+}
+async function saveOrg(){
+  var p = { name: val('o_name'), name_hi: val('o_name_hi'), kind: val('o_kind'), about: val('o_about'), contact_name: val('o_cname'),
+            contact_mobile: val('o_cmob'), session_start_month: val('o_month'), logo_url: val('o_logo') };
+  if (CUR && CUR.id){ p.id = CUR.id; p.status = val('o_status'); }
+  if (p.name.length < 2){ alert('Sanstha ka naam likhiye'); return; }
+  var r = await c().rpc('admin_parivar_upsert_org', { p: p }); if (fail(r)) return;
+  toast('✓ Save ho gaya'); TAB = 'org'; await openItem(r.data.id);
+}
+async function pickPerson(){
+  var q = val('rp_q'), box = document.getElementById('rp_pick');
+  if (q.length < 2){ box.style.display = 'none'; return; }
+  var r = await c().rpc('admin_parivar_list', { p_kind: 'person', p_q: q }); if (r.error) return;
+  var rows = (r.data || []).slice(0, 12);
+  window._rpRows = rows;   // picked by index — a name with an apostrophe must not break an onclick string
+  box.innerHTML = rows.length ? rows.map(function(x, i){ return '<div onclick="selPerson(' + i + ')">' + esc(x.name) + ' <span class="muted">' + esc(x.mobile || '') + '</span></div>'; }).join('') : '<div class="muted">Koi nahi mila — neeche "naya vyakti" bhariye</div>';
+  box.style.display = '';
+}
+function selPerson(i){ var x = (window._rpRows || [])[i]; if (!x) return; document.getElementById('rp_id').value = x.id; document.getElementById('rp_sel').innerHTML = '✓ Chuna: <b>' + esc(x.name) + '</b>'; document.getElementById('rp_pick').style.display = 'none'; }
+async function addRole(){
+  var pid = val('rp_id');
+  if (!pid){
+    var name = val('rp_name'); if (name.length < 2){ alert('Vyakti chuniye ya naya naam likhiye'); return; }
+    var r1 = await c().rpc('admin_parivar_upsert_person', { p: { full_name: name, mobile: val('rp_mob'), contact_mode: val('rp_mode') } });
+    if (fail(r1)) return; pid = r1.data.id;
+  }
+  var role = val('rp_role');
+  var r = await c().rpc('admin_parivar_set_role', { p_org_id: CUR.id, p_person_id: pid, p_role: role, p_role_label: role === 'other' ? val('rp_lbl') : null, p_session: null });
+  if (fail(r)) return; toast('✓ Jod diya'); openItem(CUR.id);
+}
+async function changeRole(pid, role){
+  var lbl = null; if (role === 'other'){ lbl = prompt('Pad ka naam (jaise Project Chairman):') || null; }
+  var r = await c().rpc('admin_parivar_set_role', { p_org_id: CUR.id, p_person_id: pid, p_role: role, p_role_label: lbl, p_session: null });
+  if (fail(r)) return; toast('✓ Pad badal gaya'); openItem(CUR.id);
+}
+async function removeRole(id){ if (!confirm('Is session se hataiye?')) return; var r = await c().rpc('admin_parivar_remove_role', { p_role_id: id }); if (fail(r)) return; toast('Hata diya'); openItem(CUR.id); }
+async function newSession(){
+  if (!confirm('Naya session shuru karein? Sabhi log is session mein "Member" ban kar aage jayenge; naye pad (President, Secretary…) aap fir se denge. Purane pad itihaas mein rahenge.')) return;
+  var r = await c().rpc('admin_parivar_new_session', { p_org_id: CUR.id, p_session: null }); if (fail(r)) return;
+  toast('✓ Session ' + r.data.session + ' shuru — ' + r.data.carried_over + ' log aage aaye'); openItem(CUR.id);
+}
+
+/* ---------- vyakti ---------- */
+function drawPerson(p){
+  var isNew = !p.id;
+  var h = '<h2>' + (isNew ? 'Naya vyakti' : esc(p.full_name)) + (isNew ? '' : '<a class="btn g s" href="/parivar/' + esc(p.slug) + '" target="_blank" rel="noopener">Public page ↗</a>') + '</h2>'
+    + '<div class="grid2"><div><label>Poora naam *</label><input id="p_name" value="' + esc(p.full_name) + '"></div>'
+    + '<div><label>Hindi naam</label><input id="p_name_hi" value="' + esc(p.name_hi) + '"></div></div>'
+    + '<div class="grid2"><div><label>Mobile (private — sirf pehchaan ke liye)</label><input id="p_mob" value="' + esc(p.mobile) + '" inputmode="numeric" placeholder="10 digit, optional"></div>'
+    + '<div><label>Number kaise dikhe</label><select id="p_mode">' + opts(MODES, p.contact_mode || 'hidden') + '</select></div></div>'
+    + '<label>Chhota parichay (300 akshar)</label><textarea id="p_bio" maxlength="300">' + esc(p.bio) + '</textarea>'
+    + '<label>Photo</label><div class="photo"><img id="p_photo_prev" src="' + esc(p.photo_url || '') + '" style="' + (p.photo_url ? '' : 'display:none') + '" alt=""><input type="hidden" id="p_photo" value="' + esc(p.photo_url) + '">'
+    + '<input type="file" accept="image/*" onchange="upload(this,\'p_photo\',\'p_photo_prev\')" style="width:auto"></div>'
+    + (isNew ? '' : '<label>Status</label><select id="p_status">' + opts([['active','Active (public)'],['hidden','Hidden']], p.status) + '</select>'
+      + '<div class="muted" style="margin-top:6px">' + (p.mobile_verified_at ? '<span class="pill ok">✓ Number verified</span>' : '<span class="pill">Number verified nahi</span>') + '</div>')
+    + '<div style="margin-top:12px"><button class="btn p" onclick="savePerson()">💾 Save</button></div>';
+  if (!isNew){
+    h += '<div class="sec"><h2>Firms</h2>' + ((p.firms || []).length ? p.firms.map(function(f){
+        return '<div class="row" style="grid-template-columns:1fr 160px auto"><div><b>' + esc(f.name) + '</b>' + (f.business_id ? ' <span class="pill ok">DukanList listing</span>' : '') + '</div><span>' + esc(f.role_label || label(FIRM_ROLES, f.role)) + '</span><button class="btn d s" onclick="removeFirm(' + f.id + ')">✕</button></div>';
+      }).join('') : '<div class="muted">Abhi koi firm nahi.</div>')
+      + '<label>DukanList par listed firm dhoondhein</label><input id="f_q" placeholder="Firm ka naam" oninput="clearTimeout(window._fq);window._fq=setTimeout(pickFirm,250)"><div class="pick" id="f_pick" style="display:none"></div>'
+      + '<input type="hidden" id="f_bid"><div class="muted" id="f_sel" style="margin-top:4px"></div>'
+      + '<label>…ya firm ka naam (agar DukanList par nahi hai)</label><input id="f_name" maxlength="120">'
+      + '<div class="grid2"><div><label>Bhumika</label><select id="f_role" onchange="document.getElementById(\'f_lbl_w\').style.display=this.value===\'other\'?\'\':\'none\'">' + opts(FIRM_ROLES, 'owner') + '</select></div>'
+      + '<div id="f_lbl_w" style="display:none"><label>Bhumika ka naam</label><input id="f_lbl" maxlength="40"></div></div>'
+      + '<div style="margin-top:10px"><button class="btn p" onclick="addFirm()">+ Firm jodiye</button></div></div>'
+      + '<div class="sec"><h2>Sansthayein</h2>' + ((p.roles || []).length ? p.roles.map(function(r){
+        return '<div class="muted"><b style="color:#0F172A">' + esc(r.org) + '</b> · ' + esc(r.session) + ' · ' + esc(r.role_label || label(ROLES, r.role)) + '</div>';
+      }).join('') : '<div class="muted">Kisi sanstha mein nahi. Sanstha ke page se jodiye.</div>') + '</div>';
+  }
+  document.getElementById('editor').innerHTML = h;
+}
+async function savePerson(){
+  var p = { full_name: val('p_name'), name_hi: val('p_name_hi'), mobile: val('p_mob'), contact_mode: val('p_mode'), bio: val('p_bio'), photo_url: val('p_photo') };
+  if (CUR && CUR.id){ p.id = CUR.id; p.status = val('p_status'); }
+  if (p.full_name.length < 2){ alert('Naam likhiye'); return; }
+  if (!p.mobile && p.contact_mode !== 'hidden'){ alert('Bina number ke "Number dikhao / WhatsApp" nahi chalega — number daaliye ya "Number mat dikhao" chuniye.'); return; }
+  var r = await c().rpc('admin_parivar_upsert_person', { p: p }); if (fail(r)) return;
+  toast('✓ Save ho gaya'); TAB = 'person'; await openItem(r.data.id);
+}
+async function pickFirm(){
+  var q = val('f_q'), box = document.getElementById('f_pick');
+  if (q.length < 2){ box.style.display = 'none'; return; }
+  var r = await c().from('businesses').select('id,name,slug').eq('status', 'active').ilike('name', '%' + q + '%').limit(10);
+  if (r.error) return;
+  window._fRows = r.data || [];
+  box.innerHTML = window._fRows.length ? window._fRows.map(function(b, i){ return '<div onclick="selFirm(' + i + ')">' + esc(b.name) + ' <span class="muted">/' + esc(b.slug) + '</span></div>'; }).join('') : '<div class="muted">DukanList par nahi mili — neeche naam likhiye</div>';
+  box.style.display = '';
+}
+function selFirm(i){ var b = (window._fRows || [])[i]; if (!b) return; document.getElementById('f_bid').value = b.id; document.getElementById('f_sel').innerHTML = '✓ Chuni: <b>' + esc(b.name) + '</b>'; document.getElementById('f_pick').style.display = 'none'; }
+async function addFirm(){
+  var bid = val('f_bid') || null, name = val('f_name');
+  if (!bid && name.length < 2){ alert('Firm chuniye ya naam likhiye'); return; }
+  var role = val('f_role');
+  var r = await c().rpc('admin_parivar_add_firm', { p_person_id: CUR.id, p_business_id: bid, p_firm_name: bid ? null : name, p_role: role, p_role_label: role === 'other' ? val('f_lbl') : null });
+  if (fail(r)) return; toast('✓ Firm jud gayi'); openItem(CUR.id);
+}
+async function removeFirm(id){ if (!confirm('Ye firm hataiye?')) return; var r = await c().rpc('admin_parivar_remove_firm', { p_id: id }); if (fail(r)) return; toast('Hata di'); openItem(CUR.id); }
+
+(async function(){
+  var u = await c().auth.getUser();
+  if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
+  var a = await c().rpc('is_admin');
+  if (a.error || !a.data){ document.getElementById('list').innerHTML = '<div class="err">Admin access required.</div>'; return; }
+  loadList();
+})();
+</script>
+<script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>
+</body>
+</html>

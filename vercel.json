@@ -61,6 +61,14 @@
       "destination": "/card?slug=:slug"
     },
     {
+      "source": "/parivar/:slug([a-z0-9][a-z0-9-]+)",
+      "destination": "/parivar-person?slug=:slug"
+    },
+    {
+      "source": "/sanstha/:slug([a-z0-9][a-z0-9-]+)",
+      "destination": "/sanstha?slug=:slug"
+    },
+    {
       "source": "/:slug([a-z0-9][a-z0-9-][a-z0-9-]+)",
       "destination": "/api/biz?slug=:slug"
     }
