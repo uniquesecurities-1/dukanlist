@@ -480,6 +480,16 @@ body.pv2-on #galleryMain, body.pv2-on #galleryThumbs{ display:none !important }
 body.pv2-on .gallery{ min-height:0 !important }
 /* years + rating now sit in the header card and its rating box */
 body.pv2-on #detailTrustStrip{ display:none !important }
+/* v353: section tabs + the highlight tiles that repeat the header (since / open / rating / area) */
+body.pv2-on #shHighlightsGrid{ display:none !important }
+body.pv2-on #whyThisShop, body.pv2-on #bizRating, body.pv2-on #openStatus{ display:none !important }
+.pv2-tabs{ display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; border-top:1px solid var(--line); padding:0 14px; background:#fff }
+.pv2-tabs::-webkit-scrollbar{ display:none }
+.pv2-tabs button{ flex:0 0 auto; background:none; border:0; border-bottom:3px solid transparent; padding:11px 10px 9px; font-family:inherit; font-size:.86rem; font-weight:700; color:var(--muted); cursor:pointer; white-space:nowrap }
+.pv2-tabs button.act{ color:var(--ink); border-bottom-color:#E55100 }
+.pv2-tabs-fix{ position:fixed; left:0; right:0; z-index:60; box-shadow:0 4px 14px rgba(15,23,42,.08); transform:translateY(-110%); opacity:0; pointer-events:none; transition:transform .18s, opacity .18s; justify-content:center }
+.pv2-tabs-fix.on{ transform:none; opacity:1; pointer-events:auto }
+@media (max-width:560px){ .pv2-tabs{ padding:0 6px } .pv2-tabs button{ font-size:.8rem; padding:10px 8px 8px } .pv2-tabs-fix{ justify-content:flex-start } }
 .pv2-cover.ph > *{ height:100% }
 @media (max-width:560px){
   .pv2-cover{ height:210px }
@@ -4047,6 +4057,87 @@ function renderPv2(b){
   // the cover replaces the old gallery box (highlights below it stay)
   ['galleryMain', 'galleryThumbs'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   renderPv2Text(b);
+  // tabs: built once the async cards (about, offers, map) have had a moment
+  setTimeout(renderPv2Tabs, 900);
+  setTimeout(renderPv2Tabs, 3000);
+}
+
+// =============================================================
+// v353: section tabs (Zomato pattern) — Overview · What you get · Photos ·
+// Offers · Reviews · Map. They JUMP to the sections rather than hiding them,
+// so nothing on the page (column balancing, deep links, review prompts)
+// changes. One row sits at the bottom of the header card; a fixed copy
+// slides in under the top bar once that row scrolls out of view.
+// =============================================================
+function renderPv2Tabs(){
+  const hero = document.getElementById('premHero');
+  if (!hero || !hero.classList.contains('pv2') || !BIZ) return;
+  const vis = id => { const el = document.getElementById(id); return el && el.offsetParent !== null && el.offsetHeight > 0 ? el : null; };
+  const nPh = Array.isArray(BIZ.photos) ? BIZ.photos.length : 0;
+  const nRv = Number(BIZ.rating_count) || 0;
+  const strict = BIZ.is_professional_listing === true && BIZ.professional_tier === 'strict';
+  const tabs = [{ k:'premHero', en:'Overview', hi:'ओवरव्यू' }];
+  if (vis('shopAbout') && !document.getElementById('shopAbout').classList.contains('sa-empty')) tabs.push({ k:'shopAbout', en:'What you get', hi:'क्या मिलता है' });
+  else if (vis('servicesCard')) tabs.push({ k:'servicesCard', en:'Services', hi:'सेवाएं' });
+  if (nPh) tabs.push({ k:'@photos', en:'Photos (' + nPh + ')', hi:'फोटो (' + nPh + ')' });
+  if (vis('dealsCard')) tabs.push({ k:'dealsCard', en:'Offers', hi:'ऑफर' });
+  if (vis('reviewsAnchor') && !strict) tabs.push({ k:'reviewsAnchor', en:'Reviews' + (nRv ? ' (' + nRv + ')' : ''), hi:'रिव्यू' + (nRv ? ' (' + nRv + ')' : '') });
+  if (vis('bizMapCard')) tabs.push({ k:'bizMapCard', en:'Map', hi:'नक्शा' });
+  if (tabs.length < 3) return;
+  const html = tabs.map(t => '<button type="button" data-k="' + t.k + '"><span data-i18n-en>' + t.en + '</span><span data-i18n-hi>' + t.hi + '</span></button>').join('');
+
+  let row = document.getElementById('pv2Tabs');
+  if (!row){
+    row = document.createElement('nav'); row.id = 'pv2Tabs'; row.className = 'pv2-tabs'; row.setAttribute('aria-label', 'Sections');
+    hero.appendChild(row);
+  }
+  let fix = document.getElementById('pv2TabsFix');
+  if (!fix){
+    fix = document.createElement('nav'); fix.id = 'pv2TabsFix'; fix.className = 'pv2-tabs pv2-tabs-fix'; fix.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(fix);
+  }
+  row.innerHTML = html; fix.innerHTML = html;
+  [row, fix].forEach(nav => nav.onclick = function(e){
+    const btn = e.target.closest('button'); if (!btn) return;
+    const k = btn.dataset.k;
+    if (k === '@photos'){ try { openLightbox(0); } catch(_){} return; }
+    const t = document.getElementById(k); if (!t) return;
+    const tb = document.querySelector('.topbar');
+    const off = (tb ? tb.offsetHeight : 60) + (k === 'premHero' ? 8 : 56);
+    window.scrollTo({ top: Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - off), behavior: 'smooth' });
+  });
+
+  if (!window._pv2TabsWired){
+    window._pv2TabsWired = true;
+    let raf = 0;
+    const onScroll = function(){
+      if (raf) return;
+      raf = requestAnimationFrame(function(){
+        raf = 0;
+        const r = document.getElementById('pv2Tabs'), f = document.getElementById('pv2TabsFix');
+        if (!r || !f) return;
+        const tb = document.querySelector('.topbar');
+        const top = tb ? Math.max(0, tb.getBoundingClientRect().bottom) : 0;
+        f.style.top = top + 'px';
+        const show = r.getBoundingClientRect().bottom < top + 4;
+        f.classList.toggle('on', show);
+        // active = of the sections whose top has passed the bar, the one
+        // that passed it most recently (two columns on desktop, so DOM order
+        // is not page order)
+        let act = null, best = -Infinity;
+        r.querySelectorAll('button').forEach(b => {
+          const k = b.dataset.k; if (k === '@photos') return;
+          const el = document.getElementById(k); if (!el) return;
+          const t = el.getBoundingClientRect().top - top - 60;
+          if (t <= 0 && t > best){ best = t; act = k; }
+        });
+        [r, f].forEach(nav => nav.querySelectorAll('button').forEach(b => b.classList.toggle('act', b.dataset.k === (act || 'premHero'))));
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    onScroll();
+  }
 }
 function renderPv2Text(b){
   const hero = document.getElementById('premHero');
