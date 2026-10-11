@@ -437,6 +437,60 @@ html[data-lang=hi] .prem-hero-name{ font-family:'Noto Sans Devanagari','Manrope'
 @media (prefers-reduced-motion:reduce){
   .prem-hero-bg{ animation:none !important }
 }
+/* ===== v352: photo-first shop header (Zomato/Swiggy pattern) =====
+   The saffron banner took ~340px and said little; the shop's own photo sat
+   in a separate box below. Now: photo cover on top, then a white card with
+   name, one identity line, the owner's "why" quote, quiet facts and a rating
+   box. Same element ids, so every existing writer keeps working. */
+.prem-hero.pv2{ background:#fff; border:1px solid var(--line); min-height:0; box-shadow:0 6px 24px rgba(15,23,42,.06) }
+.prem-hero.pv2 .prem-hero-bg, .prem-hero.pv2 .prem-hero-overlay, .prem-hero.pv2 .prem-hero-eyebrow{ display:none }
+.prem-hero.pv2 .prem-hero-content{ height:auto; min-height:0; justify-content:flex-start; padding:18px 22px 20px; gap:6px; position:relative }
+.prem-hero.pv2 .prem-hero-name{ color:var(--ink); text-shadow:none; font-size:clamp(1.45rem,3.4vw,2.1rem); padding-right:84px }
+.prem-hero.pv2 .prem-hero-name-hi{ color:var(--muted); text-shadow:none; font-size:.9rem }
+.prem-hero.pv2 .prem-hero-byline{ color:var(--muted); font-size:.8rem }
+.prem-hero.pv2 .prem-hero-meta{ gap:12px; margin-top:4px }
+.prem-hero.pv2 .prem-meta-chip{ background:none; box-shadow:none; backdrop-filter:none; padding:0; color:var(--ink-2); font-weight:700; font-size:.8rem; border-radius:0 }
+.prem-hero.pv2 .prem-meta-chip.prem-open{ color:#15803D }
+.prem-hero.pv2 .prem-meta-chip.prem-open.closed{ color:#B91C1C }
+.prem-hero.pv2 .prem-meta-chip.prem-verified{ color:#1E40AF }
+.prem-hero.pv2 .prem-meta-chip.prem-rating{ display:none !important }
+.prem-hero.pv2 .prem-btn-call, .prem-hero.pv2 .prem-btn-dir, .prem-hero.pv2 .prem-btn-save, .prem-hero.pv2 .prem-btn-share{ background:#fff; color:var(--ink); border:1.5px solid #CBD5E1; box-shadow:none; backdrop-filter:none }
+.prem-hero.pv2 .prem-btn-save.saved{ background:#FEF2F2; color:#B91C1C; border-color:#FCA5A5 }
+.pv2-idline{ font-size:.9rem; color:var(--ink-2); font-weight:600; line-height:1.45; padding-right:84px }
+.pv2-why{ font-size:.95rem; font-style:italic; color:var(--ink); line-height:1.5; margin-top:2px }
+.pv2-rate{ position:absolute; top:18px; right:20px; text-align:center; min-width:64px }
+.pv2-rate .r{ background:#15803D; color:#fff; font-weight:800; font-size:.95rem; border-radius:8px 8px 0 0; padding:4px 8px }
+.pv2-rate .c{ border:1px solid #BBF7D0; border-top:0; border-radius:0 0 8px 8px; font-size:.68rem; color:#15803D; font-weight:700; padding:2px 6px }
+.pv2-rate.new .r{ background:#E2E8F0; color:#475569; font-size:.78rem }
+.pv2-rate.new .c{ border-color:#E2E8F0; color:#64748B }
+.pv2-cover{ display:grid; gap:3px; height:300px; background:#F1F5F9 }
+.pv2-cover.n2{ grid-template-columns:1fr 1fr }
+.pv2-cover.n3{ grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr }
+.pv2-cover.n3 .t0{ grid-row:1 / span 2 }
+.pv2-cover .t{ position:relative; overflow:hidden; cursor:zoom-in; background:#E2E8F0 }
+.pv2-cover .t img{ position:relative; z-index:1; width:100% !important; height:100% !important; max-width:none !important; object-fit:cover !important; display:block }
+.pv2-cover .t0::before{ content:''; position:absolute; inset:-24px; background:var(--pv2bg) center/cover no-repeat; filter:blur(22px) brightness(.8); transform:scale(1.05) }
+.pv2-cover .t0 img{ object-fit:contain !important }
+.pv2-cover .more{ z-index:2 }
+.pv2-cover .more{ position:absolute; inset:0; background:rgba(15,23,42,.55); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.05rem }
+.pv2-cover .cnt{ position:absolute; right:10px; bottom:10px; background:rgba(15,23,42,.7); color:#fff; font-size:.72rem; font-weight:800; padding:3px 9px; border-radius:99px }
+.pv2-cover.ph{ height:150px; display:block }
+/* dl-simple-mode.css forces #galleryMain{display:block !important}; this wins on specificity */
+body.pv2-on #galleryMain, body.pv2-on #galleryThumbs{ display:none !important }
+body.pv2-on .gallery{ min-height:0 !important }
+/* years + rating now sit in the header card and its rating box */
+body.pv2-on #detailTrustStrip{ display:none !important }
+.pv2-cover.ph > *{ height:100% }
+@media (max-width:560px){
+  .pv2-cover{ height:210px }
+  .pv2-cover.n3{ grid-template-columns:3fr 1fr }
+  .pv2-cover.ph{ height:120px }
+  .prem-hero.pv2{ min-height:0 }
+  .prem-hero.pv2 .prem-hero-content{ height:auto; padding:14px 14px 16px }
+  .prem-hero.pv2 .prem-hero-name{ font-size:1.35rem; padding-right:70px }
+  .pv2-idline{ font-size:.84rem; padding-right:0 }
+  .pv2-rate{ top:14px; right:12px; min-width:56px }
+}
 
 /* ===== PHASE 1B — Hide DUPLICATED meta + tighten spacing on desktop =====
    Premium banner now shows: name, hindi name, category, area, owner byline,
@@ -1710,6 +1764,8 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
       <!-- ====== PREMIUM SHOP HERO (saffron + cream, Indian premium) ====== -->
       <section class="prem-hero" id="premHero">
+        <!-- v352: photo cover (Zomato/Swiggy style) — filled by renderPv2() -->
+        <div class="pv2-cover" id="pv2Cover" style="display:none"></div>
         <div class="prem-hero-bg" id="premHeroBg"></div>
         <div class="prem-hero-overlay"></div>
         <div class="prem-hero-content">
@@ -1720,6 +1776,9 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <h1 class="prem-hero-name" id="premHeroName"></h1>
           <div class="prem-hero-name-hi" id="premHeroNameHi"></div>
           <div class="prem-hero-byline" id="premHeroByline"></div>
+          <div class="pv2-idline" id="pv2IdLine" style="display:none"></div>
+          <div class="pv2-why" id="pv2Why" style="display:none"></div>
+          <div class="pv2-rate" id="pv2Rate" style="display:none"></div>
           <div class="prem-hero-meta" id="premHeroMeta">
             <span class="prem-meta-chip prem-open" id="premOpenChip" style="display:none"></span>
             <span class="prem-meta-chip prem-rating" id="premRatingChip" style="display:none"></span>
@@ -3015,6 +3074,7 @@ function render(){
   }
 
   // ===== Populate the new PREMIUM SHOP HERO (saffron banner) =====
+  try { renderPv2(b); } catch(e){ console.warn('pv2 hero:', e); }
   try {
     const _set = (id, content, asHTML) => {
       const el = document.getElementById(id);
@@ -3949,6 +4009,83 @@ function dlTrust(b){
 }
 
 // =============================================================
+// v352: photo-first header. Cover = the shop's own photos (1 / 2 / 3+
+// layout, "+N" on the last tile), tap → existing lightbox. No photo → the
+// same "Option A" face the home page uses. The separate gallery box below
+// is hidden because the cover now carries the photos.
+// =============================================================
+function _pv2Sized(u, w){
+  return /res\.cloudinary\.com\//.test(u) ? String(u).replace(/\/upload\/w_\d+,/, '/upload/w_' + w + ',') : u;
+}
+function renderPv2(b){
+  const hero = document.getElementById('premHero');
+  const cov  = document.getElementById('pv2Cover');
+  if (!hero || !cov || !b) return;
+  const photos = (BIZ && Array.isArray(BIZ.photos)) ? BIZ.photos : [];
+  const n = photos.length;
+  const nm = escapeHTML(b.name || '');
+  if (n){
+    const show = Math.min(n, 3);
+    const big = (window.innerWidth || 1024) < 560 ? 900 : 1400;
+    cov.className = 'pv2-cover n' + show;
+    cov.innerHTML = photos.slice(0, show).map((u, i) => {
+      const src = i === 0 ? _pv2Sized(u, big) : _pv2Sized(u, 600);
+      const extra = (i === show - 1 && n > show) ? '<div class="more">+' + (n - show) + ' photos</div>' : '';
+      // main tile: the whole photo (posters and tall shop fronts are not
+      // cropped) over a blurred copy of itself; side tiles: plain crop.
+      const bg = i === 0 ? ' style="--pv2bg:url(\'' + src.replace(/'/g, '%27') + '\')"' : '';
+      return '<div class="t t' + i + '"' + bg + ' onclick="openLightbox(' + i + ')"><img data-fit-skip="1" src="' + src + '" alt="' + nm + ' photo ' + (i + 1) + '"'
+        + (i === 0 ? ' fetchpriority="high" decoding="async"' : ' loading="lazy" decoding="async"') + '>' + extra + '</div>';
+    }).join('');
+  } else {
+    cov.className = 'pv2-cover ph';
+    cov.innerHTML = (window.DukanImg && DukanImg.ph) ? DukanImg.ph(b.name, b.categories && b.categories.name, b.categories && b.categories.icon) : '';
+  }
+  cov.style.display = '';
+  hero.classList.add('pv2');
+  document.body.classList.add('pv2-on');
+  // the cover replaces the old gallery box (highlights below it stay)
+  ['galleryMain', 'galleryThumbs'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  renderPv2Text(b);
+}
+function renderPv2Text(b){
+  const hero = document.getElementById('premHero');
+  if (!hero || !hero.classList.contains('pv2') || !b) return;
+  const strict = b.is_professional_listing === true && b.professional_tier === 'strict';
+  // identity line: category · what you get here (max 3) · area
+  const bits = [];
+  const cat = b.categories && b.categories.name;
+  if (cat) bits.push((b.categories.icon ? b.categories.icon + ' ' : '') + cat);
+  const offs = Array.isArray(b.offerings) ? b.offerings.filter(Boolean) : [];
+  offs.slice(0, 3).forEach(o => bits.push(o));
+  const loc = b.geo_localities && b.geo_localities.name;
+  const city = b.geo_cities && b.geo_cities.name;
+  if (loc || city) bits.push('📍 ' + (loc && city && loc !== city ? loc + ', ' + city : (loc || city)));
+  const idl = document.getElementById('pv2IdLine');
+  if (idl){ idl.textContent = bits.join(' · '); idl.style.display = bits.length ? '' : 'none'; }
+  // the owner's own reason, as a quote
+  const why = String(b.why_text || '').trim();
+  const wEl = document.getElementById('pv2Why');
+  if (wEl){ wEl.textContent = why ? '“' + why + '”' : ''; wEl.style.display = why ? '' : 'none'; }
+  // rating box (not for strict professional listings)
+  const rEl = document.getElementById('pv2Rate');
+  if (rEl){
+    const cnt = Number(b.rating_count) || 0, avg = Number(b.rating_avg) || 0;
+    if (strict){ rEl.style.display = 'none'; }
+    else if (cnt > 0 && avg > 0){
+      rEl.className = 'pv2-rate';
+      rEl.innerHTML = '<div class="r">' + avg.toFixed(1) + ' ★</div><div class="c">' + cnt + ' review' + (cnt === 1 ? '' : 's') + '</div>';
+      rEl.style.display = ''; rEl.style.cursor = 'pointer';
+      rEl.onclick = function(){ const t = document.getElementById('reviewsAnchor'); if (t) t.scrollIntoView({ behavior:'smooth', block:'start' }); };
+    } else {
+      rEl.className = 'pv2-rate new';
+      rEl.innerHTML = '<div class="r"><span data-i18n-en>New</span><span data-i18n-hi>नया</span></div><div class="c"><span data-i18n-en>no reviews</span><span data-i18n-hi>रिव्यू नहीं</span></div>';
+      rEl.style.display = '';
+    }
+  }
+}
+
+// =============================================================
 // v348: "Dukaan ke baare mein" — the shop in the owner's own words:
 // story (about_text), what it sells (offerings) and why people come
 // (why_text). Filled by the owner in his panel or through the office's
@@ -3962,6 +4099,7 @@ async function loadShopAbout(){
     if (!r.error && r.data){ BIZ.offerings = r.data.offerings || []; BIZ.why_text = r.data.why_text || ''; }
   } catch(_){}
   try { renderShopAbout(BIZ); } catch(e){ console.warn('shop about:', e); }
+  try { renderPv2Text(BIZ); } catch(_){}
 }
 function renderShopAbout(b){
   const host = document.getElementById('shopAbout');

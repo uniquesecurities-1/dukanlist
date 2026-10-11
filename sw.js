@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.75.0';   // v351 Explore card identity line
+const VERSION = 'dukan-v3.76.0';   // v352 photo-first shop header
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
