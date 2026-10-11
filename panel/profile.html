@@ -309,13 +309,12 @@
         <input id="whyText" class="input" type="text" maxlength="300" placeholder="e.g. Same place for 25 years · repair the same day">
         <small style="color:var(--muted);font-size:.78rem;margin:4px 0 12px;display:block"><span data-i18n-en>Avoid "cheapest" or "No. 1" — one true, specific thing works best.</span><span data-i18n-hi>"सबसे सस्ता" या "नंबर 1" न लिखें — एक सच्ची, खास बात लिखें।</span></small>
         <label><span data-i18n-en>Your business story (max 1500 chars)</span><span data-i18n-hi>आपकी बिज़नेस कहानी</span></label>
+        <!-- v349: the ready-made About templates are gone — customers read
+             them as copied text (Deepak, 11 Oct). Owner's own words only. -->
         <div class="tpl-hint">
-          💡 <span data-i18n-en>Use ready-made templates customised for your profession — Mutual Fund Distributor, Stock Broker, Insurance Agent, Doctor, Shop, etc. Just click the orange button and pick one.</span><span data-i18n-hi>अपने पेशे के लिए तैयार टेम्पलेट इस्तेमाल करें — Mutual Fund Distributor, Stock Broker, Insurance Agent, Doctor, Shop आदि। ऑरेंज बटन दबाकर पसंदीदा चुनें।</span>
+          ✍️ <span data-i18n-en>Write it the way you'd tell a customer at your counter: since when, who runs the shop, what you are known for. Short and true beats long and polished.</span><span data-i18n-hi>वैसे ही लिखें जैसे काउंटर पर ग्राहक को बताते हैं: कब से हैं, कौन चलाता है, किस चीज़ के लिए जाने जाते हैं। छोटा और सच्चा — लंबे और बनावटी से बेहतर।</span>
         </div>
-        <textarea id="aboutText" class="textarea" maxlength="1500" rows="6" placeholder="Tell customers who you are, since when, what makes you special..."></textarea>
-        <button type="button" class="tpl-btn" onclick="openTemplates('about')">
-          📋 <span data-i18n-en>Browse Ready-Made About Us Templates (by profession)</span><span data-i18n-hi>तैयार About Us टेम्पलेट देखें (पेशे के अनुसार)</span>
-        </button>
+        <textarea id="aboutText" class="textarea" maxlength="1500" rows="6" placeholder="e.g. My father started this shop in 1998. Today my brother and I run it. People come to us for…"></textarea>
       </div>
     </div>
 
