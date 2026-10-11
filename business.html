@@ -2357,7 +2357,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/dl-core.js?v=68f5d957e0"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
-<script src="/assets/js/daily-buzz.js?v=20261003a" defer></script>
+<script src="/assets/js/daily-buzz.js?v=20261011a" defer></script>
 <script src="/assets/js/share.js?v=20260921e"></script>
 <script src="/assets/js/breadcrumbs.js?v=20260920"></script>
 <script src="/assets/js/announcements.js?v=20260920"></script>
@@ -3700,7 +3700,7 @@ function render(){
 
   // Profile Highlights — fills empty left-column space, builds trust
   try { renderShopHighlights(b); } catch(e){ console.warn('highlights render failed', e); }
-  try { if (window.DailyBuzz && window.ShopDB) DailyBuzz.renderShopStrip('businessBuzzStrip', ShopDB.client, b.id); } catch(_){}
+  try { if (window.DailyBuzz && window.ShopDB) DailyBuzz.renderShopStrip('businessBuzzStrip', ShopDB.client, b.id, b); } catch(_){}
   try { loadPublicLoyaltyCount(); } catch(_){}
   try { loadShopQA(b.id); } catch(e){ console.warn('Q&A load failed', e); }
 
@@ -4054,6 +4054,8 @@ function renderPv2(b){
   cov.style.display = '';
   hero.classList.add('pv2');
   document.body.classList.add('pv2-on');
+  // v354: the shop's 24-hour updates sat above the site header; now right under this card
+  try { const bz = document.getElementById('businessBuzzStrip'); if (bz && hero.parentNode && bz.previousElementSibling !== hero) hero.parentNode.insertBefore(bz, hero.nextSibling); } catch(_){}
   // the cover replaces the old gallery box (highlights below it stay)
   ['galleryMain', 'galleryThumbs'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   renderPv2Text(b);
