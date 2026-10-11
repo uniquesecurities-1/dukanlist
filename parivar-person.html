@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <meta name="theme-color" content="#FF6B1A">
 <title>Dabwali Parivar | DukanList</title>
-<meta name="description" content="Dabwali Parivar — the people of Mandi Dabwali, their firms and sansthas.">
+<meta name="description" content="Dabwali Parivar — the people of Mandi Dabwali, their firms and organisations.">
 <meta name="robots" content="noindex, follow" id="metaRobots">
 <!-- v355: a person in Dabwali Parivar (db/251) — firms, sansthas, roles. Served at /parivar/<slug>. -->
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
@@ -32,7 +32,7 @@
 <main class="pv-wrap" id="root"><div class="pv-empty">…</div></main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261011a"></script>
+<script src="/assets/js/parivar-common.js?v=20261011b"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -52,7 +52,7 @@
     var sub = [];
     if (p.city) sub.push(esc(p.city));
     if (p.verified) sub.push('<span class="pv-ok">✓ ' + bi('Number verified', 'नंबर वेरिफाइड') + '</span>');
-    else if (p.added_by_sanstha) sub.push('<span class="pv-tag">' + bi('Added by sanstha', 'संस्था द्वारा जोड़ा गया') + '</span>');
+    else if (p.added_by_sanstha) sub.push('<span class="pv-tag">' + bi('Added by an organisation', 'संस्था द्वारा जोड़ा गया') + '</span>');
     var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(p.photo, p.name, 64)
       + '<div><h1>' + esc(p.name) + '</h1>' + (p.name_hi ? '<div class="sub">' + esc(p.name_hi) + '</div>' : '')
       + '<div class="sub">' + sub.join(' · ') + '</div></div></div>'
@@ -66,7 +66,7 @@
       }).join('');
     }
     if (cur.length){
-      h += '<h2 class="pv-h2">' + bi('Sansthas', 'संस्थाएं') + '</h2>' + cur.map(function(r){
+      h += '<h2 class="pv-h2">' + bi('Organisations', 'संस्थाएं') + '</h2>' + cur.map(function(r){
         return '<a class="pv-row" href="/sanstha/' + encodeURIComponent(r.org_slug) + '"><div><div class="n">' + esc(r.org) + '</div><div class="m">' + esc(r.session) + '</div></div>'
           + '<span class="pv-role' + (r.role === 'member' ? ' m' : '') + '">' + PV.roleHtml(r.role, r.role_label) + '</span></a>';
       }).join('');
@@ -77,7 +77,7 @@
       }).join(' · ') + '</div>';
     }
     if (!(p.firms || []).length && !cur.length && !past.length){
-      h += '<div class="pv-empty">' + bi('No firms or sansthas added yet.', 'अभी कोई फर्म या संस्था नहीं जोड़ी गई।') + '</div>';
+      h += '<div class="pv-empty">' + bi('No firms or organisations added yet.', 'अभी कोई फर्म या संस्था नहीं जोड़ी गई।') + '</div>';
     }
     h += '<p class="pv-note" style="margin-top:18px">' + bi('Is this you? Something wrong or want it removed? ', 'यह आप हैं? कुछ गलत है या हटवाना है? ')
       + '<a href="/contact">' + bi('Contact the DukanList helpline', 'DukanList हेल्पलाइन से संपर्क करें') + '</a></p>';

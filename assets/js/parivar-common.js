@@ -87,6 +87,13 @@
     if (h) h.classList.toggle('active', lang === 'hi');
   }
   global.setLang = global.setLang || setLang;
+  // inputs can't hold <span data-i18n-*>, so placeholders swap from data-ph-en / data-ph-hi
+  function syncPlaceholders(){
+    var hi = document.documentElement.getAttribute('data-lang') === 'hi';
+    document.querySelectorAll('[data-ph-en]').forEach(function(el){ el.placeholder = hi ? (el.getAttribute('data-ph-hi') || el.getAttribute('data-ph-en')) : el.getAttribute('data-ph-en'); });
+  }
+  global.PVsyncPlaceholders = syncPlaceholders;
+  try { new MutationObserver(syncPlaceholders).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] }); } catch(_){}
   document.addEventListener('DOMContentLoaded', function(){ var l = 'en'; try { l = localStorage.getItem('shop_lang') || 'en'; } catch(_){} global.setLang(l); });
 
   global.PV = { rpc: rpc, esc: esc, bi: bi, roleHtml: roleHtml, firmRoleHtml: firmRoleHtml, kindHtml: kindHtml,
