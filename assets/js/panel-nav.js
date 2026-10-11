@@ -17,7 +17,7 @@
 (function(){
   'use strict';
 
-  var SUPPORT_WA = (window.DL_CONFIG && DL_CONFIG.support && DL_CONFIG.support.whatsapp) || '9541223377';
+  var SUPPORT_WA = (window.DL_CONFIG && DL_CONFIG.support && DL_CONFIG.support.whatsapp) || '7986169442';
 
   var LINKS = [
     { href: '/panel/dashboard.html',     en: 'Dashboard',         hi: 'डैशबोर्ड' },

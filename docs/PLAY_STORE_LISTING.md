@@ -102,7 +102,7 @@ Free features include: listing your business, customer search, WhatsApp/Call but
 📞 SUPPORT
 ━━━━━━━━━━━━━━━━━━━━━━━
 
-Need help? WhatsApp us at +91 9541223377 or email support@dukanlist.com — we typically reply within a few hours.
+Need help? WhatsApp us at +91 7986169442 or email support@dukanlist.com — we typically reply within a few hours.
 
 Built and operated by DigiMutual Goals Pvt. Ltd., Mandi Dabwali, Haryana, India.
 
@@ -168,7 +168,7 @@ Terms: dukanlist.com/terms.html
 • Digital Personal Data Protection Act 2023 अनुपालन
 • Community reporting + admin moderation
 
-📞 सहायता: WhatsApp +91 9541223377 या support@dukanlist.com
+📞 सहायता: WhatsApp +91 7986169442 या support@dukanlist.com
 
 संचालन: DigiMutual Goals Pvt. Ltd., मंडी डबवाली, हरियाणा
 ```
@@ -289,7 +289,7 @@ YouTube URL goes in Play Console.
 ## 12. Contact
 
 - Email: support@dukanlist.com
-- Phone: +91 9541223377
+- Phone: +91 7986169442
 - Address: SCO-01, Near IndusInd Bank, Aastha Hospital Street, Chotala Road, Mandi Dabwali — 125104, District Sirsa, Haryana, India
 
 ---

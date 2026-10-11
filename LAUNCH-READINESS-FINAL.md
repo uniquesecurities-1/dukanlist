@@ -182,7 +182,7 @@ Abhi 30+ dukaanein listed, aur badh rahi hain.
 Add karein: dukanlist.com/register
 Browse karein: dukanlist.com
 
-Help ke liye seedha WhatsApp: +91 95412 23377
+Help ke liye seedha WhatsApp: +91 79861 69442
 — Deepak Singla, DigiMutual Goals Pvt. Ltd.
 Mandi Dabwali se Bharat tak.
 ```

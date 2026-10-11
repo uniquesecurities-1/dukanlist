@@ -6,8 +6,8 @@ window.DL_CONFIG = Object.freeze({
     "url": "https://dukanlist.com"
   },
   "support": {
-    "whatsapp": "9541223377",
-    "owner_name": "Deepak Singla"
+    "whatsapp": "7986169442",
+    "owner_name": "Anshu Garg"
   },
   "emails": {
     "privacy": "privacy@dukanlist.com",

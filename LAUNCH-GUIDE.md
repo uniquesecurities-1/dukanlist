@@ -83,7 +83,7 @@ Mandi Dabwali ki sabhi dukaanon ko free me list karne ki facility.
 Register karein: dukanlist.com/register
 Already 100+ shops listed!
 
-Help: Call/WhatsApp +91 95412 23377
+Help: Call/WhatsApp +91 79861 69442
 - Deepak Singla
 DigiMutual Goals Pvt. Ltd.
 ```
@@ -146,7 +146,7 @@ When a shopkeeper later wants to **login** to edit their shop:
 |-------|----------|
 | "Pincode does not match" | Add the pincode mapping in `geo_cities.pincodes` array |
 | Bulk upload "Unknown category" | Use exact category slug from list above |
-| Shopkeeper says "I didn't get OTP" | Tell them: we don't send OTP anymore. WhatsApp +91 9541223377 to verify |
+| Shopkeeper says "I didn't get OTP" | Tell them: we don't send OTP anymore. WhatsApp +91 7986169442 to verify |
 | Pending count not updating | Refresh dashboard — count is cached for 30 seconds |
 
 ---

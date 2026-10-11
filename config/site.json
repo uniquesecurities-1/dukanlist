@@ -8,9 +8,9 @@
   },
 
   "support": {
-    "_note": "10 digits, no +91. The tool also rewrites the spaced form '95412 23377' and 'wa.me/91…'. The DB copy (is_admin / verify_mobile in db/*.sql) is NOT touched — change it with a migration.",
-    "whatsapp": "9541223377",
-    "owner_name": "Deepak Singla"
+    "_note": "10 digits, no +91. The tool also rewrites the spaced form '79861 69442' and 'wa.me/91…'. The DB copy (is_admin / verify_mobile in db/*.sql) is NOT touched — change it with a migration.",
+    "whatsapp": "7986169442",
+    "owner_name": "Anshu Garg"
   },
 
   "emails": {

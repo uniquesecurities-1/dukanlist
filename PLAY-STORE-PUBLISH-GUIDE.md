@@ -130,7 +130,7 @@ The `signing-key-info.txt` contains your keystore password. **Without it, you ca
 | App category | `Shopping` |
 | Tags | `shopping`, `business`, `local`, `directory` |
 | Email | `singla223377@gmail.com` |
-| Phone (optional) | `+91 9541223377` |
+| Phone (optional) | `+91 7986169442` |
 | Website | `https://dukanlist.com` |
 | Privacy policy | `https://dukanlist.com/privacy.html` |
 

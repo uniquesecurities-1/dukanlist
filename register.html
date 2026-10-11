@@ -599,8 +599,8 @@
     <div class="alert info" style="margin-bottom:14px">
       <span class="a-icon">💡</span>
       <div>
-        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 95412 23377</b>. We'll personally verify your business and activate it within 24 hours.</span>
-        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 95412 23377</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपका व्यवसाय को व्यक्तिगत रूप से सत्यापित करके 24 घंटे में सक्रिय कर देंगे।</span>
+        <span data-i18n-en class="block">After you submit, we'll send you a WhatsApp link to message <b>+91 79861 69442</b>. We'll personally verify your business and activate it within 24 hours.</span>
+        <span data-i18n-hi class="block">सबमिट करने के बाद आपको <b>+91 79861 69442</b> पर WhatsApp भेजने का लिंक मिलेगा। हम आपका व्यवसाय को व्यक्तिगत रूप से सत्यापित करके 24 घंटे में सक्रिय कर देंगे।</span>
       </div>
     </div>
 
@@ -1148,8 +1148,8 @@
     <!-- Help block -->
     <div style="margin-top:18px;padding:12px;background:#F8FAFC;border-radius:10px;text-align:left;font-size:.82rem;color:var(--ink-2);line-height:1.55">
       <strong><span data-i18n-en>📞 Need help?</span><span data-i18n-hi>📞 मदद चाहिए?</span></strong><br>
-      <span data-i18n-en>WhatsApp only: <a href="https://wa.me/919541223377" target="_blank" rel="noopener" style="color:var(--saffron-deep);font-weight:700">+91 95412 23377</a> · (no calls, please)</span>
-      <span data-i18n-hi>सिर्फ WhatsApp: <a href="https://wa.me/919541223377" target="_blank" rel="noopener" style="color:var(--saffron-deep);font-weight:700">+91 95412 23377</a> · (कॉल न करें)</span>
+      <span data-i18n-en>Helpline (WhatsApp / Call): <a href="https://wa.me/917986169442" target="_blank" rel="noopener" style="color:var(--saffron-deep);font-weight:700">+91 79861 69442</a> · Anshu Garg</span>
+      <span data-i18n-hi>हेल्पलाइन (WhatsApp / कॉल): <a href="https://wa.me/917986169442" target="_blank" rel="noopener" style="color:var(--saffron-deep);font-weight:700">+91 79861 69442</a> · Anshu Garg</span>
     </div>
   </div>
 
@@ -1201,7 +1201,7 @@
 </div><!-- /.register-layout --></div>
 
 <footer class="site">
-  © 2026 dukanlist.com · An initiative by Deepak Singla · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a>
+  © 2026 dukanlist.com · An initiative by AumSetu · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1411,8 +1411,8 @@ async function handleStep1(){
     return;
   }
 
-  STATE.phone = '91' + tenDigit;          // e.g., 919541223377
-  STATE.phoneDisplay = tenDigit;          // e.g., 9541223377
+  STATE.phone = '91' + tenDigit;          // e.g., 917986169442
+  STATE.phoneDisplay = tenDigit;          // e.g., 7986169442
 
   btn.disabled = true; btn.innerHTML = '<span>⏳ Loading...</span>';
   try {
@@ -2269,7 +2269,7 @@ async function handleSubmit(){
   try { localStorage.removeItem('shop_orphan_id'); } catch(_){}
 
   // ==== Success — build WhatsApp verify link + show pending screen ====
-  const ADMIN_WA = '919541223377';
+  const ADMIN_WA = '917986169442';
   const shopName = STATE.data.name;
   const ownerPhone = STATE.phoneDisplay;
   const verifyMsg =
@@ -2492,7 +2492,7 @@ window.addEventListener('DOMContentLoaded', () => {
         <span data-i18n-en>🤔 Can't find your category?</span>
         <span data-i18n-hi>🤔 आपकी श्रेणी नहीं मिल रही?</span>
       </span>
-      <a href="https://wa.me/919541223377?text=Hi%2C%20DukanList%20me%20meri%20category%20nahi%20mil%20rahi%3A%20" target="_blank">
+      <a href="https://wa.me/917986169442?text=Hi%2C%20DukanList%20me%20meri%20category%20nahi%20mil%20rahi%3A%20" target="_blank">
         💬 <span data-i18n-en>WhatsApp</span><span data-i18n-hi>WA</span>
       </a>
       <button type="button" id="catModalDoneBtn" onclick="closeCatPicker()" style="background:#0F172A;color:#fff;border:0;padding:9px 16px;border-radius:99px;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;transition:.15s;flex-shrink:0">Close</button>
@@ -2631,7 +2631,7 @@ function renderCatTiles(query){
         <div class="cat-empty-state-ico">🤔</div>
         <div class="cat-empty-state-text">"${query}" — No matches found</div>
         <div style="font-size:.82rem;color:#64748B;margin-bottom:14px">Try a different keyword, or let us know on WhatsApp.</div>
-        <a href="https://wa.me/919541223377?text=DukanList:%20I%20cannot%20find%20the%20category%20'${encodeURIComponent(query)}'"
+        <a href="https://wa.me/917986169442?text=DukanList:%20I%20cannot%20find%20the%20category%20'${encodeURIComponent(query)}'"
            target="_blank"
            style="display:inline-block;background:#25D366;color:#fff;padding:10px 18px;border-radius:99px;font-weight:700;text-decoration:none;font-size:.88rem">
           💬 Request "${escapeHTML(query)}" on WhatsApp

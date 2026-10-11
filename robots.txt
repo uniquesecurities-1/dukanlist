@@ -1,6 +1,6 @@
 # robots.txt for dukanlist.com
 # Mandi Dabwali · Sirsa · Bathinda · Mansa · Muktsar — local business directory
-# An initiative by Deepak Singla
+# An initiative by AumSetu
 
 User-agent: *
 Allow: /

@@ -2140,7 +2140,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </style>
 
 <footer class="site" style="margin-bottom:60px">
-  © 2026 dukanlist.com · An initiative by Deepak Singla
+  © 2026 dukanlist.com · An initiative by AumSetu
 </footer>
 
 <!-- Review Modal -->
@@ -2255,7 +2255,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/dl-core.js?v=575e93909f"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
+<script src="/assets/js/dl-core.js?v=68f5d957e0"></script><!-- v281: dl-config + image-opt + supabase-init + hours + city-persist + mobile-nav (tools/build-core.js) -->
 <script src="/assets/js/daily-buzz.js?v=20261003a" defer></script>
 <script src="/assets/js/share.js?v=20260921e"></script>
 <script src="/assets/js/breadcrumbs.js?v=20260920"></script>
@@ -3217,10 +3217,10 @@ function render(){
               '</div>' +
             '</div>' +
             '<div class="uc-cta-row">' +
-              '<a href="https://wa.me/919541223377?text=' + encodeURIComponent('Mein ' + sName + ' (' + (b.slug || '') + ') ka owner hu — claim link maango') + '" target="_blank" rel="noopener" class="uc-cta-owner">' +
+              '<a href="https://wa.me/917986169442?text=' + encodeURIComponent('Mein ' + sName + ' (' + (b.slug || '') + ') ka owner hu — claim link maango') + '" target="_blank" rel="noopener" class="uc-cta-owner">' +
                 '👋 <span data-i18n-en>Owner hain? Claim karo</span><span data-i18n-hi>Owner हैं? Claim करें</span>' +
               '</a>' +
-              '<a href="https://wa.me/919541223377?text=' + encodeURIComponent('Mein ' + sName + ' ka customer hu — please owner ko bolo claim karne ke liye') + '" target="_blank" rel="noopener" class="uc-cta-cust">' +
+              '<a href="https://wa.me/917986169442?text=' + encodeURIComponent('Mein ' + sName + ' ka customer hu — please owner ko bolo claim karne ke liye') + '" target="_blank" rel="noopener" class="uc-cta-cust">' +
                 '📢 <span data-i18n-en>Customer? Notify owner</span><span data-i18n-hi>Customer? Owner को कहो</span>' +
               '</a>' +
             '</div>';
@@ -3465,8 +3465,8 @@ function render(){
   });
 
   // Normalize phone to 10-digit Indian, then prepend +91 E.164 format.
-  // Avoids the bug where stored 12-digit numbers like "919541223377"
-  // get dialed as "91 9541223377" (wrong) when used directly.
+  // Avoids the bug where stored 12-digit numbers like "917986169442"
+  // get dialed as "91 7986169442" (wrong) when used directly.
   document.getElementById('ctaCall').href = 'tel:+91' + normIndianPhone(b.whatsapp || b.mobile);
   document.getElementById('ctaCall').addEventListener('click', () => {
     logLead('call');
@@ -3627,7 +3627,7 @@ function render(){
   const sStatus = document.getElementById('stickyStatus');
   if (sCall) sCall.href = 'tel:+91' + normIndianPhone(b.whatsapp || b.mobile);
   if (sWa)   sWa.href = `https://wa.me/${wa}?text=${waMsg}`;
-  // Format phone like +91 95412 23377
+  // Format phone like +91 79861 69442
   if (sPhone && (b.whatsapp || b.mobile)){
     const m = String(b.whatsapp || b.mobile).replace(/\D/g, '').slice(-10);
     sPhone.textContent = m.length === 10 ? `+91 ${m.slice(0,5)} ${m.slice(5)}` : '+91 ' + m;
@@ -4833,8 +4833,8 @@ async function renderDetailTrustStrip(b){
 }
 
 // Normalize any Indian phone variant → clean 10-digit national number.
-// Handles: "9541223377", "+919541223377", "919541223377", "09541223377",
-// "+91 95412 23377", numbers with hyphens/spaces. Returns 10-digit or ''.
+// Handles: "7986169442", "+917986169442", "917986169442", "07986169442",
+// "+91 79861 69442", numbers with hyphens/spaces. Returns 10-digit or ''.
 function normIndianPhone(raw){
   var d = String(raw || '').replace(/[^0-9]/g, '');
   if (d.length === 12 && d.slice(0, 2) === '91') d = d.slice(2);
@@ -5779,13 +5779,13 @@ async function reportReview(reviewId, btnEl){
       }
     }
     if (ok){
-      alert("Thank you. Our team will review this within 24 hours.\n\nIf urgent, WhatsApp us at +91 9541223377.");
+      alert("Thank you. Our team will review this within 24 hours.\n\nIf urgent, WhatsApp us at +91 7986169442.");
     } else {
-      alert("Could not report right now. Please WhatsApp us at +91 9541223377 with the review details.");
+      alert("Could not report right now. Please WhatsApp us at +91 7986169442 with the review details.");
     }
   } catch(e){
     if (btnEl){ btnEl.disabled = false; btnEl.innerHTML = '🚩 Report'; }
-    alert("Could not report right now. Please WhatsApp us at +91 9541223377 with the review details.\n\n" + (e.message || ''));
+    alert("Could not report right now. Please WhatsApp us at +91 7986169442 with the review details.\n\n" + (e.message || ''));
   }
 }
 

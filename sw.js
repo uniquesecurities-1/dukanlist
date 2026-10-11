@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.68.0';   // v339 new logo + icons
+const VERSION = 'dukan-v3.69.0';   // v343 helpline 79861 69442 · AumSetu
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

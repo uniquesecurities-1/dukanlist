@@ -315,7 +315,7 @@ If something looks wrong (e.g., suspicious admin activity, mass spam):
 
 If you find a vulnerability:
 - Email: privacy@dukanlist.com
-- Phone/WhatsApp: +91 95412 23377
+- Phone/WhatsApp: +91 79861 69442
 
 Please do NOT disclose publicly until we have fixed it.
 

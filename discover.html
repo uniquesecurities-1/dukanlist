@@ -1175,7 +1175,7 @@ function normIN(raw){
   return d.length === 10 ? d : d;
 }
 // tel: href — always use E.164 format (+91 prefix) for universal dialer compatibility.
-// Without "+", a 12-digit "919541223377" gets interpreted as "91 9541223377" (wrong number).
+// Without "+", a 12-digit "917986169442" gets interpreted as "91 7986169442" (wrong number).
 function telHref(raw){
   var d = normIN(raw);
   return d ? 'tel:+91' + d : '';

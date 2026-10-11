@@ -551,8 +551,8 @@
     <div id="delResult" style="display:none;margin-top:14px;padding:12px;border-radius:8px;font-size:.88rem;line-height:1.5"></div>
 
     <div style="margin-top:14px;font-size:.78rem;color:#64748b;text-align:center;line-height:1.5">
-      <span data-i18n-en>Need help instead? <a href="https://wa.me/919541223377?text=Hi%2C%20I%20need%20help%20with%20my%20DukanList%20account" target="_blank" style="color:#FF6B1A;font-weight:700;text-decoration:none">💬 Chat with us on WhatsApp</a></span>
-      <span data-i18n-hi>मदद चाहिए? <a href="https://wa.me/919541223377?text=Namaste%2C%20DukanList%20account%20me%20help%20chahiye" target="_blank" style="color:#FF6B1A;font-weight:700;text-decoration:none">💬 WhatsApp पर बात करें</a></span>
+      <span data-i18n-en>Need help instead? <a href="https://wa.me/917986169442?text=Hi%2C%20I%20need%20help%20with%20my%20DukanList%20account" target="_blank" style="color:#FF6B1A;font-weight:700;text-decoration:none">💬 Chat with us on WhatsApp</a></span>
+      <span data-i18n-hi>मदद चाहिए? <a href="https://wa.me/917986169442?text=Namaste%2C%20DukanList%20account%20me%20help%20chahiye" target="_blank" style="color:#FF6B1A;font-weight:700;text-decoration:none">💬 WhatsApp पर बात करें</a></span>
     </div>
   </div>
 </div>
@@ -575,7 +575,7 @@
 </div>
 
 <footer class="site">
-  © 2026 dukanlist.com · An initiative by Deepak Singla
+  © 2026 dukanlist.com · An initiative by AumSetu
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1447,8 +1447,8 @@ async function confirmAccountDeletion(){
         ((typeof MY_BIZ !== 'undefined' && MY_BIZ && MY_BIZ.name) || '') );
       res.style.cssText = 'display:block;margin-top:14px;padding:12px;border-radius:8px;font-size:.88rem;line-height:1.5;background:#FEF3C7;border:1.5px solid #FCD34D;color:#92400E';
       res.innerHTML = (lang === 'hi')
-        ? '<b>⚠️ Request अपने-आप process नहीं हो payi.</b><br>Delete karne ke liye hume WhatsApp par likhein — hum 48 ghante mein kar denge.<br><a href="https://wa.me/919541223377?text=' + waMsg + '" target="_blank" rel="noopener" style="color:#1D4ED8;font-weight:800">💬 WhatsApp par request bhejein →</a>'
-        : '<b>⚠️ We could not process this automatically.</b><br>Please message us on WhatsApp and we will delete your listing and account within 48 hours.<br><a href="https://wa.me/919541223377?text=' + waMsg + '" target="_blank" rel="noopener" style="color:#1D4ED8;font-weight:800">💬 Send the request on WhatsApp →</a>';
+        ? '<b>⚠️ Request अपने-आप process नहीं हो payi.</b><br>Delete karne ke liye hume WhatsApp par likhein — hum 48 ghante mein kar denge.<br><a href="https://wa.me/917986169442?text=' + waMsg + '" target="_blank" rel="noopener" style="color:#1D4ED8;font-weight:800">💬 WhatsApp par request bhejein →</a>'
+        : '<b>⚠️ We could not process this automatically.</b><br>Please message us on WhatsApp and we will delete your listing and account within 48 hours.<br><a href="https://wa.me/917986169442?text=' + waMsg + '" target="_blank" rel="noopener" style="color:#1D4ED8;font-weight:800">💬 Send the request on WhatsApp →</a>';
       if (btn){ btn.disabled = false; }
       return;
     }
@@ -1465,8 +1465,8 @@ async function confirmAccountDeletion(){
   } catch(e){
     res.style.cssText = 'display:block;margin-top:14px;padding:12px;border-radius:8px;font-size:.88rem;line-height:1.5;background:#FEF2F2;border:1.5px solid #FCA5A5;color:#991B1B';
     res.innerHTML = (lang === 'hi')
-      ? '<b>⚠️ कुछ गलत हुआ।</b><br>हमें WhatsApp पर लिखें: <a href="https://wa.me/919541223377" target="_blank" style="color:#DC2626;font-weight:800">+91 9541223377</a> और हम आपका खाता मैन्युअल रूप से हटा देंगे।<br><small style="opacity:.7">' + (e.message || 'Unknown error') + '</small>'
-      : '<b>⚠️ Something went wrong.</b><br>Please WhatsApp us at <a href="https://wa.me/919541223377" target="_blank" style="color:#DC2626;font-weight:800">+91 9541223377</a> and we will delete your account manually within 24 hours.<br><small style="opacity:.7">' + (e.message || 'Unknown error') + '</small>';
+      ? '<b>⚠️ कुछ गलत हुआ।</b><br>हमें WhatsApp पर लिखें: <a href="https://wa.me/917986169442" target="_blank" style="color:#DC2626;font-weight:800">+91 7986169442</a> और हम आपका खाता मैन्युअल रूप से हटा देंगे।<br><small style="opacity:.7">' + (e.message || 'Unknown error') + '</small>'
+      : '<b>⚠️ Something went wrong.</b><br>Please WhatsApp us at <a href="https://wa.me/917986169442" target="_blank" style="color:#DC2626;font-weight:800">+91 7986169442</a> and we will delete your account manually within 24 hours.<br><small style="opacity:.7">' + (e.message || 'Unknown error') + '</small>';
     btn.disabled = false;
     btn.innerHTML = '🗑️ <span data-i18n-en>Permanently Delete</span><span data-i18n-hi>स्थायी रूप से हटाएँ</span>';
   }

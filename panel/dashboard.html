@@ -922,7 +922,7 @@
           <div class="qa-tile-lbl" style="color:#7C3AED;font-weight:800"><span data-i18n-en>Discover Feed</span><span data-i18n-hi>Discover Feed</span></div>
           <span style="position:absolute;top:4px;right:5px;background:#EC4899;color:#fff;font-size:7.5px;font-weight:900;padding:1px 5px;border-radius:99px;letter-spacing:.03em">NEW</span>
         </a>
-        <a href="https://wa.me/919541223377?text=Hello%20DukanList%20support%2C%20I%20need%20help%20with%20my%20business%20listing." target="_blank" rel="noopener" class="qa-tile">
+        <a href="https://wa.me/917986169442?text=Hello%20DukanList%20support%2C%20I%20need%20help%20with%20my%20business%20listing." target="_blank" rel="noopener" class="qa-tile">
           <div class="qa-tile-ico">🆘</div>
           <div class="qa-tile-lbl"><span data-i18n-en>Get Help</span><span data-i18n-hi>सहायता</span></div>
         </a>
@@ -1046,7 +1046,7 @@
 </div>
 
 <footer class="site">
-  © 2026 dukanlist.com · An initiative by Deepak Singla
+  © 2026 dukanlist.com · An initiative by AumSetu
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1298,7 +1298,7 @@ async function loadDashboard(){
       ? String(user.user_metadata.mobile).replace(/\D/g,'').slice(-10) : '';
     const userEmail = user.email || '';
     const waMsg = encodeURIComponent('Hello DukanList team, I registered with email ' + userEmail + ' but my account shows "No business linked". Kindly help me link my business.');
-    const waUrl = 'https://wa.me/919541223377?text=' + waMsg;
+    const waUrl = 'https://wa.me/917986169442?text=' + waMsg;
 
     function escapeHtmlSafe(s){
       return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1462,7 +1462,7 @@ async function loadDashboard(){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
     var waMsg = encodeURIComponent('Hello DukanList team, my listing "' + (biz.name || '') + '" is awaiting admin approval. Could you please review it?');
-    var waLink = 'https://wa.me/919541223377?text=' + waMsg;
+    var waLink = 'https://wa.me/917986169442?text=' + waMsg;
 
     var heroGrad = 'linear-gradient(135deg,#F59E0B 0%,#F97316 55%,#EA580C 100%)';  // pending - warm amber
     var iconChar = '⧖';   // hourglass-like
@@ -1498,7 +1498,7 @@ async function loadDashboard(){
       ];
       etaText = 'Contact our team for next steps.';
       waMsg = encodeURIComponent('Hello DukanList team, my listing "' + (biz.name || '') + '" was rejected. Could you share the reason and how I can re-apply?');
-      waLink = 'https://wa.me/919541223377?text=' + waMsg;
+      waLink = 'https://wa.me/917986169442?text=' + waMsg;
     } else if (biz.status !== 'pending'){
       heroGrad = 'linear-gradient(135deg,#3B82F6 0%,#2563EB 55%,#1D4ED8 100%)';
       iconEmoji = 'ℹ';
@@ -1545,7 +1545,7 @@ async function loadDashboard(){
           +   '<span style="font-size:1.2rem">💬</span>'
           +   '<span>Speed up review on WhatsApp</span>'
           + '</a>'
-          + '<div style="text-align:center;margin-top:8px;font-size:.76rem;color:#94A3B8;font-weight:500">+91 95412 23377 · Replies within minutes</div>'
+          + '<div style="text-align:center;margin-top:8px;font-size:.76rem;color:#94A3B8;font-weight:500">+91 79861 69442 · Replies within minutes</div>'
         : '')
       +     '<div style="margin-top:22px;padding-top:16px;border-top:1px solid #E2E8F0;text-align:center">'
       +       '<button onclick="ShopDB.signOut()" style="background:transparent;color:#64748B;border:0;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:.86rem;letter-spacing:-.01em">Sign out</button>'
@@ -2018,7 +2018,7 @@ function renderSmartActions(b){
       icon: '\u{1F6E1}',
       title: 'Get DukanList verified',
       sub: 'Verified businesses appear higher in search',
-      href: 'https://wa.me/919541223377?text=' + encodeURIComponent('Please verify my business: ' + (b.name || '')),
+      href: 'https://wa.me/917986169442?text=' + encodeURIComponent('Please verify my business: ' + (b.name || '')),
       cta: 'Request verify',
       external: true
     });

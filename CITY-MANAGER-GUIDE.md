@@ -103,7 +103,7 @@ Daily routine (5 min/day):
 1. Open /admin/moderation
 2. Approve good shops, reject fake ones, WhatsApp owners to verify
 
-For help: +91 9541223377
+For help: +91 7986169442
 
 Welcome aboard!
 - Deepak Singla

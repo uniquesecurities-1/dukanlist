@@ -151,7 +151,7 @@ echo - Keep last 4 weekly + last 6 monthly backups
 echo.
 echo CONTACT:
 echo --------------------------------------------------------
-echo Issue with restore? WhatsApp +91 95412 23377
+echo Issue with restore? WhatsApp +91 79861 69442
 echo.
 ) > "%BACKUP_DIR%\README.txt"
 
