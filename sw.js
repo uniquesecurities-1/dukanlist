@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.83.0';   // v361 parivar founded/address/profession/bulk
+const VERSION = 'dukan-v3.84.0';   // v362 customer favourites rotate hourly
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
