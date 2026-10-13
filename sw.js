@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.9';   // v374 sanstha manager link
+const VERSION = 'dukan-v3.88.0';   // v375 manager add/remove need office approval
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

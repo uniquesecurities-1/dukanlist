@@ -125,7 +125,7 @@ async function loadList(){
   var rows = r.data || [];
   if (!rows.length){ el.innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
   el.innerHTML = rows.map(function(x){
-    var sm = TAB === 'org' ? (x.logo_waiting ? '<span style="color:#C2410C;font-weight:800">🖼 logo waiting</span> · ' : '') + (x.manager_changes_24h ? '<span style="color:#047857;font-weight:800">✏️ ' + x.manager_changes_24h + ' changes today</span> · ' : '')
+    var sm = TAB === 'org' ? (x.requests_pending ? '<span style="color:#B45309;font-weight:800">⏳ ' + x.requests_pending + ' to approve</span> · ' : '') + (x.logo_waiting ? '<span style="color:#C2410C;font-weight:800">🖼 logo waiting</span> · ' : '') + (x.manager_changes_24h ? '<span style="color:#047857;font-weight:800">✏️ ' + x.manager_changes_24h + ' changes today</span> · ' : '')
                              + esc(label(KINDS, x.kind)) + ' · ' + esc(x.session) + ' · ' + (x.members || 0) + ' members' + (x.status !== 'active' ? ' · hidden' : '')
                            : (x.photo_waiting ? '<span style="color:#C2410C;font-weight:800">📷 photo waiting</span> · ' : '') + (x.note_waiting ? '<span style="color:#B45309;font-weight:800">📝 note</span> · ' : '')
                              + (x.mobile ? esc(x.mobile) : 'no number') + ' · ' + esc(label(MODES, x.contact_mode)) + (x.status !== 'active' ? ' · hidden' : '');
@@ -235,6 +235,7 @@ function drawOrg(o){
     // v374: logo sent by the organisation's manager (db/264)
     if (o.pending_logo_url) h += '<div class="sec"><b>🖼 New logo from the organisation</b><div class="photo" style="margin-top:6px"><img src="' + esc(o.pending_logo_url) + '" alt="">'
       + '<button class="btn p s" onclick="reviewLogo(\'' + o.id + '\', true)">✓ Approve</button><button class="btn d s" onclick="reviewLogo(\'' + o.id + '\', false)">✕ Reject</button></div></div>';
+    h += '<div class="sec" id="reqSec" style="display:none"></div>';
     h += '<div class="sec" id="mgrSec"><b>🧑‍💼 Sanstha Manager</b> <span class="muted">loading…</span></div>';
   }
   if (!isNew){
@@ -270,7 +271,7 @@ function drawOrg(o){
       + '</div>';
   }
   document.getElementById('editor').innerHTML = h;
-  if (!isNew) loadMgr(o);
+  if (!isNew){ loadReqs(o); loadMgr(o); }
 }
 
 /* ---------- v374: Sanstha Manager link (db/264) ---------- */
@@ -278,7 +279,12 @@ var MGR_ACT = {
   manager_link_sent: function(d){ return '🔗 Manager link sent to ' + esc(d.to || ''); },
   manager_link_stopped: function(){ return '⛔ Manager link stopped'; },
   members_added: function(d){ return '➕ Added — new ' + (d.new_people || 0) + ', already in Parivar ' + (d.existing_people || 0) + (d.already_in_session ? ', already listed ' + d.already_in_session : '') + (d.shops_linked ? ', shops linked ' + d.shops_linked : ''); },
-  role_changed: function(d){ return '🎖 ' + esc(d.person || '') + ': ' + esc(d.from || '—') + ' → ' + esc(d.to || ''); },
+  role_changed: function(d, i){ return '🎖 ' + esc(d.person || '') + ': ' + esc(d.from || '—') + ' → ' + esc(d.to || '') + (d.from_role ? ' <button class="btn g s" onclick="undoRole(' + i + ')">↩ Undo</button>' : ''); },
+  add_requested: function(d){ return '⏳ Asked to add ' + (d.count || '') + ' name(s)'; },
+  remove_requested: function(d){ return '⏳ Asked to remove ' + esc(d.person || ''); },
+  request_cancelled: function(){ return '↩ Took back a request'; },
+  request_approved: function(d){ return '✅ Approved: ' + (d.kind === 'add' ? 'add ' + (d.count || '') + ' (new ' + (d.new_people || 0) + ', existing ' + (d.existing_people || 0) + ')' : 'remove ' + esc(d.person || '')); },
+  request_rejected: function(d){ return '❌ Rejected: ' + (d.kind === 'add' ? 'add ' + (d.count || '') : 'remove ' + esc(d.person || '')); },
   member_removed: function(d, i){ return '✕ Removed ' + esc(d.person || '') + ' from ' + esc(d.session || '') + ' <button class="btn g s" onclick="putBack(' + i + ')">↩ Put back</button>'; },
   member_since: function(d){ return '📅 ' + esc(d.person || '') + ': member since ' + esc(d.year || '—'); },
   details_updated: function(d){ return '✏️ Details updated' + (d.logo_sent ? ' + new logo sent' : ''); },
@@ -298,7 +304,7 @@ async function loadMgr(o){
   (o.roles || []).filter(function(x){ return x.session === o.current_session && x.mobile; }).forEach(function(x){ if (!by[x.person_id] || x.role !== 'member') by[x.person_id] = x; });
   var ppl = Object.keys(by).map(function(k){ return by[k]; }).sort(function(a, b){ return (a.role === 'member') - (b.role === 'member') || a.name.localeCompare(b.name); });
   var fmt = function(t){ return t ? new Date(t).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : ''; };
-  var h = '<b>🧑‍💼 Sanstha Manager</b> <span class="muted">— the President / Secretary runs this organisation from a WhatsApp link (no login): members, office bearers, details, logo (you approve), new session. They see only the last 5 digits of members’ numbers. Every change is listed below.</span>'
+  var h = '<b>🧑‍💼 Sanstha Manager</b> <span class="muted">— the President / Secretary runs this organisation from a WhatsApp link (no login). Office bearers, details and a due new session save at once; <b>adding or removing members and the logo wait for your approval</b>. They see only the last 5 digits of members’ numbers. Every change is listed below.</span>'
     + '<div style="margin-top:8px;padding:8px 10px;border-radius:9px;background:' + (L ? '#ECFDF5' : '#F8FAFC') + '">'
     + (L ? '✅ Active — sent to <b>' + esc(L.to || '') + '</b> · valid till ' + esc(fmt(L.expires_at)) + ' · ' + (L.last_used_at ? 'last used ' + esc(fmt(L.last_used_at)) + ' (' + (L.uses || 0) + ' changes)' : 'not opened yet')
          + ' <button class="btn d s" onclick="stopMgr(\'' + o.id + '\')">⛔ Stop link</button>'
@@ -311,6 +317,39 @@ async function loadMgr(o){
         var f = MGR_ACT[ch.action]; return '<div class="muted" style="padding:3px 0;border-bottom:1px dashed #E2E8F0">' + esc(fmt(ch.at)) + ' · <b>' + esc(ch.by || '') + '</b> · ' + (f ? f(ch.detail || {}, i) : esc(ch.action)) + '</div>';
       }).join('') + '</div>' : '');
   el.innerHTML = h;
+}
+// v375: additions / removals asked for from the manager link wait here (db/265)
+async function loadReqs(o){
+  var el = document.getElementById('reqSec'); if (!el) return;
+  var r = await c().rpc('admin_parivar_requests', { p_org_id: o.id });
+  if (r.error || !(r.data || []).length){ el.style.display = 'none'; return; }
+  var fmt = function(t){ return t ? new Date(t).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : ''; };
+  el.style.cssText = 'display:block;background:#FFFBEB;border:1px solid #FDE68A;border-radius:11px;padding:10px 12px';
+  el.innerHTML = '<b>⏳ Waiting for your approval (' + r.data.length + ')</b> <span class="muted">— sent from the manager link. Nothing changes until you approve.</span>'
+    + r.data.map(function(q){
+        var p = q.payload || {};
+        var what = q.kind === 'add'
+          ? '➕ Add ' + (p.count || '') + ' name(s)' + (p.role && p.role !== 'member' ? ' as <b>' + esc(label(ROLES, p.role)) + '</b>' : '') + (p.since ? ' · member since ' + esc(p.since) : '')
+            + '<pre style="white-space:pre-wrap;margin:4px 0 0;font-family:inherit;font-size:.8rem;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:6px 8px;max-height:160px;overflow:auto">' + esc(p.lines || '') + '</pre>'
+          : '✕ Remove <b>' + esc(p.person || '') + '</b> from ' + esc(p.session || '') + (q.person_now ? ' <span class="muted">(now: ' + esc(q.person_now) + ')</span>' : '');
+        return '<div style="border-top:1px dashed #FCD34D;padding:8px 0;margin-top:6px"><div class="muted">' + esc(fmt(q.at)) + ' · by <b>' + esc(q.by || '') + '</b></div>' + what
+          + '<div style="margin-top:6px;display:flex;gap:6px"><button class="btn p s" onclick="decideReq(' + q.id + ', true)">✓ Approve</button><button class="btn d s" onclick="decideReq(' + q.id + ', false)">✕ Reject</button></div></div>';
+      }).join('');
+}
+async function decideReq(id, ok){
+  if (!ok && !confirm('Reject this request?')) return;
+  var r = await c().rpc('admin_parivar_decide_request', { p_request_id: id, p_approve: ok }); if (fail(r)) return;
+  var d = r.data || {};
+  toast(ok ? '✓ Approved' + (d.new_people != null ? ' — new ' + d.new_people + ', existing ' + (d.existing_people || 0) + (d.shops_linked ? ', shops linked ' + d.shops_linked : '') : '') : 'Rejected');
+  if (CUR) openItem(CUR.id);
+}
+// undo a role change made from the manager link
+async function undoRole(i){
+  var ch = (window._mgrChanges || [])[i]; if (!ch || !CUR) return; var d = ch.detail || {};
+  if (d.session !== CUR.current_session){ alert('That was in session ' + d.session + ' — it can no longer be undone here.'); return; }
+  if (!confirm('Set ' + (d.person || '') + ' back to ' + (d.from || d.from_role) + '?')) return;
+  var r = await c().rpc('admin_parivar_set_role', { p_org_id: CUR.id, p_person_id: d.person_id, p_role: d.from_role, p_role_label: d.from_label || null, p_session: null });
+  if (fail(r)) return; toast('↩ Role restored'); openItem(CUR.id);
 }
 async function sendMgr(orgId){
   var pid = val('mgrPerson'); if (!pid){ alert('Pick the person'); return; }

@@ -8,7 +8,7 @@
 <title>संस्था मैनेजर — Dabwali Parivar</title>
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <!--
-  v374: "Sanstha Manager" — the President / Secretary runs their own
+  v374/v375: "Sanstha Manager" — the President / Secretary runs their own
   organisation from a personal link (/sanstha-manage?t=<64-char token>, db/264).
   No login. Members (add one / paste a list), office bearers, remove from this
   session, member since, about / address / founded year / Hindi name, logo
@@ -64,6 +64,10 @@
   .toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#0F172A; color:#fff; padding:10px 16px; border-radius:11px; font-size:.88rem; font-weight:700; z-index:99; display:none; max-width:92vw; text-align:center }
   .toast.err{ background:#B91C1C }
   .out{ font-size:.84rem; margin-top:8px; color:#065F46; font-weight:700 }
+  .pend{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; padding:8px 0; border-top:1px dashed var(--line); font-size:.86rem }
+  .pend:first-child{ border-top:0 }
+  .pend pre{ margin:4px 0 0; white-space:pre-wrap; font-family:inherit; font-size:.78rem; color:var(--muted) }
+  .wait{ display:inline-block; background:#FEF3C7; color:#92400E; border-radius:99px; padding:1px 8px; font-size:.7rem; font-weight:800; margin-left:4px }
 </style>
 </head>
 <body>
@@ -84,8 +88,14 @@
       <a id="viewLink" href="#" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-weight:800;color:var(--or);text-decoration:none">संस्था का पेज देखें → <span class="en">View the public page</span></a>
     </div>
 
-    <div class="note" style="margin-bottom:14px">🙏 आप इस लिंक से अपनी संस्था खुद संभाल सकते हैं। हर बदलाव DukanList ऑफिस को दिखता है।
-      यह लिंक किसी और को न भेजें। <span class="en">Every change is visible to the DukanList office. Please don’t forward this link.</span></div>
+    <div class="note" style="margin-bottom:14px">🙏 आप इस लिंक से अपनी संस्था खुद संभाल सकते हैं। <b>सदस्य जोड़ना या हटाना DukanList ऑफिस की मंज़ूरी के बाद होता है</b>; पद, जानकारी वगैरह तुरंत सेव होते हैं। हर बदलाव ऑफिस को दिखता है।
+      यह लिंक किसी और को न भेजें। <span class="en">Adding or removing members waits for the office’s approval; everything else saves at once. Please don’t forward this link.</span></div>
+
+    <!-- v375: requests waiting for the office -->
+    <div class="card hide" id="pendCard">
+      <h2>⏳ ऑफिस की मंज़ूरी बाकी <span class="en">Waiting for approval</span></h2>
+      <div id="pendList"></div>
+    </div>
 
     <!-- members -->
     <div class="card">
@@ -108,14 +118,14 @@
         <div><label class="sm">पद <span class="en">Role</span></label><select id="anRole"></select></div>
         <div><label class="sm">सदस्य कब से (साल) <span class="en">Member since</span></label><input type="text" id="anSince" inputmode="numeric" maxlength="4" placeholder="जैसे 2012"></div>
       </div>
-      <button class="btn p" id="anBtn" style="margin-top:12px">➕ जोड़ें <span style="font-weight:600">(Add)</span></button>
+      <button class="btn p" id="anBtn" style="margin-top:12px">➕ मंज़ूरी के लिए भेजें <span style="font-weight:600">(Send for approval)</span></button>
       <div class="out" id="anOut"></div>
 
       <div style="border-top:1px solid var(--line);margin-top:16px;padding-top:12px">
         <h2>📋 पूरी लिस्ट एक साथ <span class="en">Paste a whole list</span></h2>
         <div class="en">एक लाइन में एक व्यक्ति: <b>नाम, मोबाइल, पेशा</b> (मोबाइल और पेशा ज़रूरी नहीं). जो पहले से हैं वो दोबारा नहीं बनेंगे; उसी नंबर की DukanList दुकान अपने-आप जुड़ जाएगी।</div>
         <textarea id="bkLines" style="margin-top:8px;min-height:120px" placeholder="Ramesh Garg, 98765 43210, Chartered Accountant&#10;Sunita Jain 9812345678&#10;Anil Kumar, , Teacher"></textarea>
-        <button class="btn p" id="bkBtn" style="margin-top:8px">➕ सबको जोड़ें <span style="font-weight:600">(Add all)</span></button>
+        <button class="btn p" id="bkBtn" style="margin-top:8px">➕ सबको मंज़ूरी के लिए भेजें <span style="font-weight:600">(Send for approval)</span></button>
         <div class="out" id="bkOut"></div>
       </div>
     </div>
@@ -194,8 +204,31 @@
         + '<div style="margin-top:10px"><button class="btn p" id="nsBtn">🔄 ' + esc(o.next_session_due) + ' शुरू करें</button></div>'
       : 'अभी <b>' + esc(o.session) + '</b> सेशन चल रहा है। नया सेशन शुरू होने का समय आने पर यहाँ बटन आ जाएगा।<br><span class="en">The ' + esc(o.session) + ' session is running. A button appears here when the next one is due.</span>';
     var ns = $('nsBtn'); if (ns) ns.onclick = newSession;
+    drawPending();
     drawMembers();
   }
+
+  function fmtAt(t){ return t ? new Date(t).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : ''; }
+  function drawPending(){
+    var pend = D.pending || [], dec = D.recent_decisions || [];
+    $('pendCard').classList.toggle('hide', !pend.length && !dec.length);
+    $('pendList').innerHTML = pend.map(function(q){
+      var what = q.kind === 'add'
+        ? '➕ जोड़ने की request' + (q.role && q.role !== 'member' ? ' (' + esc(roleName(q.role)) + ')' : '') + '<pre>' + esc(String(q.lines || '').slice(0, 600)) + '</pre>'
+        : '✕ हटाने की request: <b>' + esc(q.person || '') + '</b>';
+      return '<div class="pend"><div>' + what + '<div class="en">' + esc(fmtAt(q.at)) + '</div></div>'
+        + '<button class="btn g s" data-cancel="' + q.id + '">वापस लें <span class="en">Cancel</span></button></div>';
+    }).join('') + (dec.length ? '<div class="en" style="margin-top:8px"><b>हाल के फैसले (Recent decisions)</b></div>' + dec.map(function(q){
+      var ok = q.status === 'approved';
+      return '<div class="pend"><div>' + (ok ? '✅ मंज़ूर' : '❌ नामंज़ूर') + ' · ' + (q.kind === 'add' ? 'जोड़ना: ' + esc(String(q.lines || '').split('\n')[0]) + (String(q.lines || '').indexOf('\n') !== -1 ? ' …' : '') : 'हटाना: ' + esc(q.person || ''))
+        + '<div class="en">' + esc(fmtAt(q.at)) + '</div></div></div>';
+    }).join('') : '');
+  }
+  $('pendList').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-cancel]'); if (!b) return;
+    if (!confirm('यह request वापस लेनी है?')) return;
+    rpc('pv_mgr_cancel_request', { p_token: TOKEN, p_request_id: +b.getAttribute('data-cancel') }).then(function(){ toast('Request वापस ले ली'); return load(); }).catch(oops);
+  });
 
   function drawMembers(){
     var q = $('mq').value.trim().toLowerCase(), all = D.members || [];
@@ -206,14 +239,15 @@
     });
     $('mlist').innerHTML = list.length ? list.map(function(x){
       var m = x.m, isOff = m.role !== 'member';
+      var leaving = (D.pending || []).some(function(q){ return q.kind === 'remove' && q.person_id === m.id; });
       var meta = [m.profession, m.firm ? '🏪 ' + m.firm : '', m.mobile_hint ? '📱 ' + m.mobile_hint : 'नंबर नहीं'].filter(Boolean).map(esc).join(' · ');
       return '<div class="mrow" data-i="' + x.i + '"><div class="mi">' + (m.photo ? '<img src="' + esc(m.photo) + '" alt="">' : esc(initials(m.name))) + '</div>'
-        + '<div style="min-width:0"><div class="mn">' + esc(m.name) + (m.verified ? ' <span class="ok" title="Confirmed by the member">✓</span>' : '') + (isOff ? '<span class="off">' + esc(roleName(m.role, m.role_label)) + '</span>' : '') + '</div>'
+        + '<div style="min-width:0"><div class="mn">' + esc(m.name) + (m.verified ? ' <span class="ok" title="Confirmed by the member">✓</span>' : '') + (isOff ? '<span class="off">' + esc(roleName(m.role, m.role_label)) + '</span>' : '') + (leaving ? '<span class="wait">हटाने की request बाकी</span>' : '') + '</div>'
         + '<div class="ms">' + meta + '</div>'
         + '<div class="mc"><select data-act="role">' + opts(ROLES, m.role) + '</select>'
         + '<input type="text" data-act="since" inputmode="numeric" maxlength="4" placeholder="सदस्य कब से" value="' + esc(m.joined_year || '') + '" title="Member since (year)"></div></div>'
         + '<div class="ma">' + (m.mobile_hint ? '<button class="btn g s" data-act="link" title="उनका अपना पेज-लिंक WhatsApp पर भेजें (Send their own profile link)">📲</button>' : '')
-        + '<button class="btn g s" data-act="remove" title="इस सेशन से हटाएँ (Remove from this session)">✕</button></div></div>';
+        + (leaving ? '' : '<button class="btn g s" data-act="remove" title="इस सेशन से हटाने की request (Ask to remove from this session)">✕</button>') + '</div></div>';
     }).join('') : '<div class="sub" style="padding:10px 0">' + (all.length ? 'कोई नहीं मिला।' : 'अभी कोई सदस्य नहीं — नीचे से जोड़िए।') + '</div>';
   }
   $('mq').addEventListener('input', drawMembers);
@@ -240,8 +274,8 @@
     var b = e.target.closest('button[data-act]'); if (!b) return;
     var row = b.closest('.mrow'); var m = D.members[+row.dataset.i]; if (!m) return;
     if (b.dataset.act === 'remove'){
-      if (!confirm(m.name + ' को इस सेशन (' + D.org.session + ') की लिस्ट से हटाना है?\n\nउनका पेज और पिछले साल बने रहेंगे।')) return;
-      rpc('pv_mgr_remove', { p_token: TOKEN, p_person_id: m.id }).then(function(){ toast('हटा दिया: ' + m.name); return load(); }).catch(oops);
+      if (!confirm(m.name + ' को इस सेशन (' + D.org.session + ') की लिस्ट से हटाने की request भेजनी है?\n\nDukanList ऑफिस की मंज़ूरी के बाद ही हटेंगे। उनका पेज और पिछले साल बने रहेंगे।')) return;
+      rpc('pv_mgr_remove', { p_token: TOKEN, p_person_id: m.id }).then(function(){ toast('⏳ हटाने की request ऑफिस को भेज दी'); return load(); }).catch(oops);
     } else if (b.dataset.act === 'link'){
       var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
       rpc('pv_mgr_member_link', { p_token: TOKEN, p_person_id: m.id }).then(function(d){
@@ -265,18 +299,12 @@
     if (sv && !(since >= 1900 && since <= new Date().getFullYear())){ toast('साल ऐसे लिखें: 2012', true); return; }
     var line = name.replace(/[,;|\t]/g, ' ') + ', ' + mob.slice(-10) + ', ' + prof.replace(/[,;|\t]/g, ' ');
     $('anBtn').disabled = true;
-    rpc('pv_mgr_add', { p_token: TOKEN, p_lines: line, p_role: 'member' }).then(function(r){
-      var pid = r && r.person_ids && r.person_ids[0];
-      if (!pid) throw new Error('नहीं जुड़ा — नाम दोबारा देखें।');
-      var steps = Promise.resolve();
-      if (role && role !== 'member') steps = steps.then(function(){ return rpc('pv_mgr_set_role', { p_token: TOKEN, p_person_id: pid, p_role: role }); });
-      if (since) steps = steps.then(function(){ return rpc('pv_mgr_set_joined', { p_token: TOKEN, p_person_id: pid, p_year: since }); });
-      return steps.then(function(){
-        $('anOut').textContent = '✓ ' + name + (r.already_in_session ? ' पहले से लिस्ट में थे' : ' जुड़ गए') + (r.shops_linked ? ' · 🏪 उनकी दुकान भी जुड़ गई' : '');
-        $('anName').value = ''; $('anMob').value = ''; $('anSince').value = ''; $('anRole').value = 'member';
-        if (window.ProfPicker) ProfPicker.set($('anProf'), '');
-        return load();
-      });
+    // v375: goes to the office for approval (db/265)
+    rpc('pv_mgr_add', { p_token: TOKEN, p_lines: line, p_role: role || 'member', p_since: since }).then(function(){
+      $('anOut').textContent = '⏳ ' + name + ' — मंज़ूरी के लिए ऑफिस को भेज दिया। मंज़ूरी मिलते ही लिस्ट में आ जाएंगे।';
+      $('anName').value = ''; $('anMob').value = ''; $('anSince').value = ''; $('anRole').value = 'member';
+      if (window.ProfPicker) ProfPicker.set($('anProf'), '');
+      return load();
     }).catch(oops).then(function(){ $('anBtn').disabled = false; });
   });
 
@@ -285,10 +313,8 @@
     var lines = $('bkLines').value.trim();
     if (!lines){ toast('पहले लिस्ट पेस्ट करें', true); return; }
     $('bkBtn').disabled = true;
-    rpc('pv_mgr_add', { p_token: TOKEN, p_lines: lines, p_role: 'member' }).then(function(r){
-      $('bkOut').innerHTML = '✓ नए: ' + (r.new_people || 0) + ' · पहले से Parivar में: ' + (r.existing_people || 0) + ' · पहले से इस सेशन में: ' + (r.already_in_session || 0)
-        + (r.shops_linked ? ' · 🏪 ' + r.shops_linked + ' दुकानें जुड़ीं' : '')
-        + ((r.skipped || []).length ? '<br><span style="color:#B91C1C">छोड़ी गई लाइनें: ' + r.skipped.map(esc).join(' | ') + '</span>' : '');
+    rpc('pv_mgr_add', { p_token: TOKEN, p_lines: lines, p_role: 'member', p_since: null }).then(function(r){
+      $('bkOut').textContent = '⏳ ' + (r.count || 0) + ' नाम मंज़ूरी के लिए ऑफिस को भेज दिए। मंज़ूरी मिलते ही लिस्ट में आ जाएंगे।';
       $('bkLines').value = '';
       return load();
     }).catch(oops).then(function(){ $('bkBtn').disabled = false; });
