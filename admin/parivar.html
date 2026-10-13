@@ -232,7 +232,8 @@ function drawOrg(o){
     + '<label>Logo / photo</label><div class="photo"><img id="o_logo_prev" src="' + esc(o.logo_url || '') + '" style="' + (o.logo_url ? '' : 'display:none') + '" alt=""><input type="hidden" id="o_logo" value="' + esc(o.logo_url) + '">'
     + '<input type="file" accept="image/*" onchange="upload(this,\'o_logo\',\'o_logo_prev\')" style="width:auto"></div>'
     + (isNew ? '' : '<label>Status</label><select id="o_status">' + opts([['active','Active (public)'],['hidden','Hidden']], o.status) + '</select>')
-    + '<div style="margin-top:12px"><button class="btn p" onclick="saveOrg()">💾 Save</button></div>';
+    + '<div style="margin-top:12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><button class="btn p" onclick="saveOrg()">💾 Save</button>'
+    + (isNew ? '' : '<button class="btn d" onclick="deleteOrg()">🗑 Delete organisation</button>') + '</div>';
   if (!isNew){
     // v374: logo sent by the organisation's manager (db/264)
     if (o.pending_logo_url) h += '<div class="sec"><b>🖼 New logo from the organisation</b><div class="photo" style="margin-top:6px"><img src="' + esc(o.pending_logo_url) + '" alt="">'
@@ -513,6 +514,24 @@ async function deletePerson(){
   document.getElementById('editor').innerHTML = '<div class="empty">🗑 Deleted <b>' + esc(d.name || '') + '</b>. <button class="btn g s" onclick="restorePerson(' + d.archive_id + ')">↩ Undo</button></div>';
   loadList(); showDeleted(true);
 }
+// v382: delete an organisation (db/269) — type its name to confirm; people stay, a copy is kept for Undo
+async function deleteOrg(){
+  if (!CUR || !CUR.id) return;
+  var n = new Set((CUR.roles || []).map(function(r){ return r.person_id; })).size;
+  var typed = prompt('Delete the organisation "' + CUR.name + '"?\n\n' + (n ? n + ' people will lose this membership (the people themselves stay in Dabwali Parivar). ' : '')
+    + 'Its manager link stops working. You can bring it back from "Recently deleted".\n\nType the organisation name to confirm:');
+  if (typed === null) return;
+  var r = await c().rpc('admin_parivar_delete_org', { p_org_id: CUR.id, p_confirm_name: typed });
+  if (r.error){ alert(r.error.message + (/function|exist/.test(r.error.message) && !/match/.test(r.error.message) ? ' — run db/269 first' : '')); return; }
+  var d = r.data || {}; CUR = null;
+  toast('🗑 Deleted ' + (d.name || ''));
+  document.getElementById('editor').innerHTML = '<div class="empty">🗑 Deleted <b>' + esc(d.name || '') + '</b>. <button class="btn g s" onclick="restoreOrg(' + d.archive_id + ')">↩ Undo</button></div>';
+  loadList(); showDeleted();
+}
+async function restoreOrg(id){
+  var r = await c().rpc('admin_parivar_restore_org', { p_archive_id: id }); if (fail(r)) return;
+  toast('↩ Brought back: ' + (r.data.name || '') + (r.data.roles_back ? ' (' + r.data.roles_back + ' memberships)' : '')); TAB = 'org'; await openItem(r.data.id); showDeleted();
+}
 async function restorePerson(id){
   var r = await c().rpc('admin_parivar_restore_person', { p_archive_id: id }); if (fail(r)) return;
   toast('↩ Brought back: ' + (r.data.name || '')); TAB = 'person'; await openItem(r.data.id);
@@ -520,10 +539,11 @@ async function restorePerson(id){
 // small "Recently deleted" box under the People list
 async function showDeleted(keepEditor){
   var box = document.getElementById('delBox'); if (!box) return;
-  if (TAB !== 'person'){ box.innerHTML = ''; return; }
-  var r = await c().rpc('admin_parivar_recently_deleted'); if (r.error || !(r.data || []).length){ box.innerHTML = ''; return; }
+  var isOrg = TAB === 'org';
+  var r = await c().rpc(isOrg ? 'admin_parivar_recently_deleted_orgs' : 'admin_parivar_recently_deleted'); if (r.error || !(r.data || []).length){ box.innerHTML = ''; return; }
   box.innerHTML = '<details style="margin-top:10px"><summary class="muted" style="cursor:pointer">🗑 Recently deleted (' + r.data.length + ')</summary>'
-    + r.data.map(function(x){ return '<div class="muted" style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:4px 0"><span><b style="color:#0F172A">' + esc(x.name) + '</b> ' + esc(x.mobile || '') + '</span><button class="btn g s" onclick="restorePerson(' + x.id + ')">↩ Restore</button></div>'; }).join('')
+    + r.data.map(function(x){ return '<div class="muted" style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:4px 0"><span><b style="color:#0F172A">' + esc(x.name) + '</b> '
+        + (isOrg ? (x.members ? x.members + ' members' : '') : esc(x.mobile || '')) + '</span><button class="btn g s" onclick="' + (isOrg ? 'restoreOrg' : 'restorePerson') + '(' + x.id + ')">↩ Restore</button></div>'; }).join('')
     + '</details>';
 }
 async function savePerson(){
@@ -563,7 +583,7 @@ async function removeFirm(id){ if (!confirm('Remove this business?')) return; va
   if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
   var a = await c().rpc('is_admin');
   if (a.error || !a.data){ document.getElementById('list').innerHTML = '<div class="err">Admin access required.</div>'; return; }
-  loadList();
+  loadList(); showDeleted();
 })();
 </script>
 <script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>
