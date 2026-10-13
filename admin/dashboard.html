@@ -1269,6 +1269,17 @@ function renderKPIs(s){
 
 function renderRecent(rows){
   window._recentRows = rows || [];
+  if (!window._pageScoreLoading){
+    window._pageScoreLoading = true;
+    try {
+      ShopDB.client.rpc('admin_page_completeness', { p_filter: 'all', p_limit: 1000 }).then(function(res){
+        if (res.error || !Array.isArray(res.data)) return;
+        window._pageScore = {};
+        res.data.forEach(function(x){ window._pageScore[x.id] = x.score; });
+        try { renderRecentFiltered(); } catch(_){}
+      }, function(){});
+    } catch(_){}
+  }
   // Init filter/sort state on first render
   if (!window._filterState){
     window._filterState = {
@@ -1290,6 +1301,10 @@ function renderRecent(rows){
 
 // Compute shop health score (0-100) based on completeness signals
 function computeHealthScore(r){
+  // v358: the same "page poora" score the owner sees on his dashboard and the
+  // office sees on /admin/nudge (db/252 admin_page_completeness). The old
+  // health maths below is only a fallback while that list loads.
+  if (window._pageScore && window._pageScore[r.id] != null) return window._pageScore[r.id];
   let s = 0;
   // Photos: 0-2 = 5, 3-5 = 15, 6+ = 25
   const p = r.photos_count || 0;
@@ -1405,7 +1420,7 @@ function renderRecentTable(rows, totalCount){
   const healthBadge = (h) => {
     const colour = h >= 70 ? '#10B981' : (h >= 40 ? '#F59E0B' : '#EF4444');
     const bg     = h >= 70 ? '#DCFCE7' : (h >= 40 ? '#FEF3C7' : '#FEE2E2');
-    return `<span style="background:${bg};color:${colour};padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800" title="Shop Health Score (photos+reviews+completeness)">${h}</span>`;
+    return `<span style="background:${bg};color:${colour};padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800" title="Page poora % — same score as the owner dashboard and Nudge">${h}%</span>`;
   };
 
   // SORT ICON helper
@@ -1499,7 +1514,7 @@ function renderRecentTable(rows, totalCount){
               ${SH('verified_score', 'Verified')}
               ${SH('rating_avg', 'Rating')}
               ${SH('photos_count', 'Photos')}
-              ${SH('health', 'Health', '70px')}
+              ${SH('health', 'Page %', '70px')}
               ${SH('created_at', 'Created')}
               <th style="padding:10px 10px;font-weight:600;color:#64748b" title="Quick actions">Actions</th>
             </tr>
