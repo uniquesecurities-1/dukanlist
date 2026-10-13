@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.7';   // v372 parivar search by firm + fuller cards
+const VERSION = 'dukan-v3.87.8';   // v373 firm cards like Recently viewed
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013c">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013d">
 </head>
 <body>
 
@@ -55,6 +55,51 @@
     }).join('');
     return firms + (orgs ? '<div class="pv-ocs">' + orgs + '</div>' : '');
   }
+  // v373: firm cards like "Recently viewed" — photo, category, rating, verified, city, call/WhatsApp.
+  // Shop details are the shop's own public listing (same as its DukanList page).
+  function thumb(u){ return /res\.cloudinary\.com\/[^/]+\/image\/upload\//.test(u || '') ? u.replace(/\/upload\/(?:[^/]*\/)?(v\d+\/)/, '/upload/w_144,h_144,c_fill,q_auto,f_auto/$1') : u; }
+  function firmCard(f, b){
+    var role = (f.role || f.role_label) ? '<span class="pv-role f">' + PV.firmRoleHtml(f.role, f.role_label) + '</span>' : '';
+    var photo = b && Array.isArray(b.photos) && b.photos[0];
+    var icon = (b && b.cat_icon) || '🏪';
+    var strict = b && b.is_professional_listing === true && b.professional_tier === 'strict';
+    var bits = [];
+    var cat = (b && b.cat_name) || f.category;
+    if (cat) bits.push('<span class="fc-cat">' + (b && b.cat_icon ? esc(b.cat_icon) + ' ' : '') + esc(cat) + '</span>');
+    if (strict) bits.push('<span style="color:#0EA5E9;font-weight:800">🛡 ' + bi('Professional', 'प्रोफेशनल') + '</span>');
+    else if (b && b.rating_avg > 0) bits.push('<span class="fc-rate">⭐ ' + Number(b.rating_avg).toFixed(1) + '</span>');
+    if (b && (b.verified_visit || b.verified_score >= 1)) bits.push('<span class="fc-ok">✓ ' + bi('Verified', 'वेरिफाइड') + '</span>');
+    var city = b && b.geo_cities && b.geo_cities.name;
+    var mob = b ? String(b.mobile || '').replace(/\D/g, '').slice(-10) : '';
+    var wa = b ? String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10) : '';
+    var acts = (mob.length === 10 ? '<a class="fc-btn call" href="tel:+91' + mob + '" aria-label="Call" title="Call">📞</a>' : '')
+      + (wa.length === 10 ? '<a class="fc-btn wa" href="https://wa.me/91' + wa + '?text=' + encodeURIComponent('Namaste, DukanList par aapki dukan ' + (b.name || f.name) + ' dekhi.') + '" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">💬</a>' : '');
+    var body = '<div class="fc-th">' + (photo ? '<img src="' + esc(thumb(photo)) + '" alt="" loading="lazy" width="72" height="72">' : esc(icon)) + '</div>'
+      + '<div class="fc-mid"><div class="fc-n">' + esc((b && b.name) || f.name) + '</div>'
+      + (bits.length ? '<div class="fc-l2">' + bits.join('<span>·</span>') + '</div>' : '')
+      + '<div class="fc-l3">' + (city ? '📍 ' + esc(city) : '') + (role ? ' ' + role : '') + '</div></div>';
+    return '<div class="pv-fc">' + (f.slug ? '<a class="fc-main" href="/' + encodeURIComponent(f.slug) + '">' + body + '</a>' : '<div class="fc-main">' + body + '</div>')
+      + (acts ? '<div class="fc-acts">' + acts + '</div>' : '') + '</div>';
+  }
+  function enrichFirms(firms){
+    var slugs = firms.map(function(f){ return f.slug; }).filter(function(x){ return x && /^[a-z0-9-]+$/.test(x); });
+    var C = (window.DL_CONFIG || {}).supabase; if (!slugs.length || !C) return;
+    var H = { apikey: C.anon_key, Authorization: 'Bearer ' + C.anon_key };
+    var sel = 'slug,name,photos,rating_avg,rating_count,mobile,whatsapp,verified_visit,verified_score,is_professional_listing,professional_tier,category_id,sub_category_id,geo_cities(name)';
+    fetch(C.url + '/rest/v1/businesses?status=eq.active&slug=in.(' + slugs.join(',') + ')&select=' + encodeURIComponent(sel), { headers: H })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(list){
+        if (!list || !list.length) return;
+        var ids = []; list.forEach(function(b){ var c = b.sub_category_id || b.category_id; if (c && ids.indexOf(c) === -1) ids.push(c); });
+        var catP = ids.length ? fetch(C.url + '/rest/v1/categories?id=in.(' + ids.join(',') + ')&select=id,name,icon', { headers: H }).then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; }) : Promise.resolve([]);
+        return catP.then(function(cats){
+          var cm = {}; (cats || []).forEach(function(c){ cm[c.id] = c; });
+          var bm = {}; list.forEach(function(b){ var c = cm[b.sub_category_id || b.category_id]; if (c){ b.cat_name = c.name; b.cat_icon = c.icon; } bm[b.slug] = b; });
+          var el = document.getElementById('pvFirms'); if (!el) return;
+          el.innerHTML = firms.map(function(f){ return firmCard(f, f.slug ? bm[f.slug] : null); }).join('');
+        });
+      }).catch(function(){});
+  }
   if (!slug){ notFound(); return; }
   PV.rpc('parivar_get_person', { p_slug: slug }).then(function(p){
     if (!p){ notFound(); return; }
@@ -74,11 +119,7 @@
       + (p.bio ? '<p style="margin:12px 0 0;color:var(--ink-2);line-height:1.55">' + esc(p.bio) + '</p>' : '')
       + PV.contactHtml(p.contact_mode, p.mobile, p.name) + '</div>';
     if ((p.firms || []).length){
-      h += '<h2 class="pv-h2">' + bi('Firms', 'फर्में') + '</h2>' + p.firms.map(function(f){
-        var inner = '<div><div class="n">' + esc(f.name) + '</div>' + (f.category ? '<div class="m">' + esc(f.category) + '</div>' : '') + '</div>'
-          + '<span class="pv-role f">' + PV.firmRoleHtml(f.role, f.role_label) + '</span>';
-        return f.slug ? '<a class="pv-row" href="/' + encodeURIComponent(f.slug) + '">' + inner + '</a>' : '<div class="pv-row">' + inner + '</div>';
-      }).join('');
+      h += '<h2 class="pv-h2">' + bi('Firms', 'फर्में') + '</h2><div class="pv-fcs" id="pvFirms">' + p.firms.map(function(f){ return firmCard(f, null); }).join('') + '</div>';
     }
     if (cur.length){
       h += '<h2 class="pv-h2">' + bi('Organisations', 'संस्थाएं') + '</h2>' + cur.map(function(r){
@@ -97,6 +138,7 @@
     h += '<p class="pv-note" style="margin-top:18px">' + bi('Is this you? Something wrong or want it removed? ', 'यह आप हैं? कुछ गलत है या हटवाना है? ')
       + '<a href="/contact">' + bi('Contact the DukanList helpline', 'DukanList हेल्पलाइन से संपर्क करें') + '</a></p>';
     root.innerHTML = h;
+    enrichFirms(p.firms || []);
   }).catch(function(){ root.innerHTML = '<div class="pv-empty">' + bi('Could not load — try again.', 'लोड नहीं हुआ — फिर कोशिश करें।') + '</div>'; });
 })();
 </script>
