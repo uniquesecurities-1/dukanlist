@@ -32,7 +32,7 @@
 <main class="pv-wrap" id="root"><div class="pv-empty">…</div></main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261013b"></script>
+<script src="/assets/js/parivar-common.js?v=20261013c"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -83,7 +83,7 @@
     SESS_START = parseInt(String(o.session || ''), 10) || 0;
     ORG_NAME = o.name || '';
     var cm = String(o.contact_mobile || '').replace(/\D/g, '').slice(-10);
-    var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(o.logo, o.name, 64, false)
+    var h = '<div class="pv-box"><div class="pv-head">' + PV.logo(o.logo, o.name, 80)
       + '<div><h1>' + esc(o.name) + '</h1>' + (o.name_hi ? '<div class="sub">' + esc(o.name_hi) + '</div>' : '')
       + '<div class="sub">' + PV.kindHtml(o.kind) + (o.city ? ' · ' + esc(o.city) : '') + ' · ' + MEMBERS.length + ' ' + bi('members', 'सदस्य') + ' · ' + bi('Session', 'सत्र') + ' ' + esc(o.session) + '</div></div></div>'
       + ((o.founded_year || o.address) ? '<div class="sub" style="margin-top:10px">'

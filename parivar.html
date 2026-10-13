@@ -52,7 +52,7 @@
 </main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261013b"></script>
+<script src="/assets/js/parivar-common.js?v=20261013c"></script>
 <script>
 (function(){
   var esc = PV.esc;
@@ -61,7 +61,7 @@
   if (jw) jw.href = help ? 'https://wa.me/91' + help + '?text=' + encodeURIComponent('नमस्ते, डबवाली परिवार में हमारी संस्था जोड़नी है। संस्था का नाम: ') : '/contact';
 
   function orgCard(o){
-    return '<a class="pv-card" href="/sanstha/' + encodeURIComponent(o.slug) + '">' + PV.avatar(o.logo || null, o.name, 46, false)
+    return '<a class="pv-card" href="/sanstha/' + encodeURIComponent(o.slug) + '">' + PV.logo(o.logo || null, o.name, 56)
       + '<div><div class="t">' + esc(o.name) + '</div><div class="s">' + PV.kindHtml(o.org_kind) + (o.members ? ' · ' + o.members + ' ' + PV.bi('members', 'सदस्य') : '') + '</div></div></a>';
   }
   // v372: firm(s) + every organisation (office positions first, highlighted) — db/263

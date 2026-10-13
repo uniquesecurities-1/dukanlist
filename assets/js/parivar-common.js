@@ -66,6 +66,19 @@
     }
     return '<span style="width:' + size + 'px;height:' + size + 'px;border-radius:' + r + ';background:#FFEDD5;color:#9A3412;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:' + Math.round(size / 2.6) + 'px;flex:0 0 auto">' + esc(initials(name)) + '</span>';
   }
+  // v384: organisation logos — white margins inside the logo file are trimmed off (Cloudinary e_trim),
+  // then the whole logo is fitted (never cropped) in a frame of fixed height; a wide logo may use
+  // up to 1.6× that width. So a small logo fills its frame and a big one can't grow past it.
+  function logo(url, name, size){
+    size = size || 80;
+    var maxW = Math.round(size * 1.6), pad = Math.round(size * 0.08);
+    if (url){
+      var src = /res\.cloudinary\.com\//.test(url) ? url.replace('/upload/', '/upload/e_trim:10/w_' + (maxW * 2) + ',h_' + (size * 2) + ',c_fit,q_auto,f_auto/') : url;
+      return '<span style="height:' + size + 'px;min-width:' + size + 'px;max-width:' + maxW + 'px;padding:' + pad + 'px;box-sizing:border-box;border-radius:16px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(15,23,42,.06);overflow:hidden">'
+        + '<img src="' + esc(src) + '" alt="' + esc(name || '') + ' logo" data-fit-skip="1" style="display:block;width:auto;height:auto;max-height:' + (size - 2 * pad - 2) + 'px;max-width:' + (maxW - 2 * pad - 2) + 'px;object-fit:contain"></span>';
+    }
+    return '<span style="width:' + size + 'px;height:' + size + 'px;border-radius:16px;flex:0 0 auto;background:#FFEDD5;color:#9A3412;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:' + Math.round(size / 2.8) + 'px">' + esc(initials(name)) + '</span>';
+  }
   // contact for a person: show → number + Call + WhatsApp; whatsapp → button only; hidden → nothing
   function contactHtml(mode, mobile, name){
     var m = String(mobile || '').replace(/\D/g, '').slice(-10);
@@ -98,5 +111,5 @@
   document.addEventListener('DOMContentLoaded', function(){ var l = 'en'; try { l = localStorage.getItem('shop_lang') || 'en'; } catch(_){} global.setLang(l); });
 
   global.PV = { rpc: rpc, esc: esc, bi: bi, roleHtml: roleHtml, firmRoleHtml: firmRoleHtml, kindHtml: kindHtml,
-                avatar: avatar, contactHtml: contactHtml, ROLES: ROLES, FIRM_ROLES: FIRM_ROLES, KINDS: KINDS, initials: initials };
+                avatar: avatar, logo: logo, contactHtml: contactHtml, ROLES: ROLES, FIRM_ROLES: FIRM_ROLES, KINDS: KINDS, initials: initials };
 })(window);
