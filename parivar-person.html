@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013b">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013c">
 </head>
 <body>
 
@@ -41,6 +41,20 @@
   function notFound(){
     root.innerHTML = '<div class="pv-empty">' + bi('This page is not available.', 'यह पेज उपलब्ध नहीं है।') + '<br><a href="/parivar">' + bi('← Dabwali Parivar', '← डबवाली परिवार') + '</a></div>';
   }
+  // v372: who they are at a glance — their firm(s) and every organisation, office positions first
+  function idLine(p, cur){
+    var firms = (p.firms || []).map(function(f){
+      var nm = f.slug ? '<a href="/' + encodeURIComponent(f.slug) + '">' + esc(f.name) + '</a>' : esc(f.name);
+      return '<div class="pf">🏪 ' + nm + (f.role ? ' <span>· ' + PV.firmRoleHtml(f.role, f.role_label) + '</span>' : '') + '</div>';
+    }).join('');
+    var seen = {}, orgs = cur.slice().sort(function(a, b){ return (a.role === 'member') - (b.role === 'member'); }).filter(function(r){
+      if (seen[r.org_slug]) return false; seen[r.org_slug] = 1; return true;
+    }).map(function(r){
+      var off = r.role !== 'member';
+      return '<a class="pv-oc' + (off ? ' o' : '') + '" href="/sanstha/' + encodeURIComponent(r.org_slug) + '">' + (off ? PV.roleHtml(r.role, r.role_label) + ' · ' : '') + esc(r.org) + '</a>';
+    }).join('');
+    return firms + (orgs ? '<div class="pv-ocs">' + orgs + '</div>' : '');
+  }
   if (!slug){ notFound(); return; }
   PV.rpc('parivar_get_person', { p_slug: slug }).then(function(p){
     if (!p){ notFound(); return; }
@@ -56,7 +70,7 @@
     else if (p.added_by_sanstha) sub.push('<span class="pv-tag">' + bi('Added by an organisation', 'संस्था द्वारा जोड़ा गया') + '</span>');
     var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(p.photo, p.name, 64)
       + '<div><h1>' + esc(p.name) + '</h1>' + (p.name_hi ? '<div class="sub">' + esc(p.name_hi) + '</div>' : '')
-      + '<div class="sub">' + sub.join(' · ') + '</div></div></div>'
+      + '<div class="sub">' + sub.join(' · ') + '</div>' + idLine(p, cur) + '</div></div>'
       + (p.bio ? '<p style="margin:12px 0 0;color:var(--ink-2);line-height:1.55">' + esc(p.bio) + '</p>' : '')
       + PV.contactHtml(p.contact_mode, p.mobile, p.name) + '</div>';
     if ((p.firms || []).length){

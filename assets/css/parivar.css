@@ -63,3 +63,14 @@ html[data-lang="hi"] .pv-hero h1, html[data-lang="hi"] .pv-head h1{ font-family:
 .pv-mcard .mc-call{ background:#fff; color:var(--ink); border:1.5px solid #CBD5E1 }
 .pv-mcard .mc-wa{ background:#25D366; color:#fff; border:1.5px solid #25D366 }
 .pv-mcard .mc-acts a:hover{ filter:brightness(1.05); text-decoration:none }
+
+/* v372: person search cards + person page header — firm and every organisation */
+.pv-pcard{ align-items:flex-start }
+.pv-card .pf, .pv-head .pf{ font-size:.8rem; color:var(--muted); margin-top:3px; line-height:1.4 }
+.pv-card .pf{ color:#C2410C; font-weight:700 }
+.pv-card .pf span, .pv-head .pf span{ color:var(--muted); font-weight:600 }
+.pv-head .pf a{ color:#C2410C; font-weight:700; text-decoration:none }
+.pv-ocs{ display:flex; flex-wrap:wrap; gap:4px; margin-top:6px }
+.pv-oc{ font-size:.7rem; font-weight:700; background:#F1F5F9; color:#475569; border-radius:99px; padding:2px 9px; text-decoration:none; line-height:1.5 }
+.pv-oc.o{ background:#ECFDF5; color:#065F46 }
+a.pv-oc:hover{ filter:brightness(.96); text-decoration:none }

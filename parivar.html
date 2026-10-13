@@ -14,7 +14,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013b">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013c">
 </head>
 <body>
 
@@ -64,9 +64,20 @@
     return '<a class="pv-card" href="/sanstha/' + encodeURIComponent(o.slug) + '">' + PV.avatar(o.logo || null, o.name, 46, false)
       + '<div><div class="t">' + esc(o.name) + '</div><div class="s">' + PV.kindHtml(o.org_kind) + (o.members ? ' · ' + o.members + ' ' + PV.bi('members', 'सदस्य') : '') + '</div></div></a>';
   }
+  // v372: firm(s) + every organisation (office positions first, highlighted) — db/263
   function personCard(p){
-    return '<a class="pv-card" href="/parivar/' + encodeURIComponent(p.slug) + '">' + PV.avatar(p.photo, p.name, 46)
-      + '<div><div class="t">' + esc(p.name) + (p.verified ? ' <span class="pv-ok">✓</span>' : '') + '</div><div class="s">' + esc(p.line || p.profession || '') + '</div></div></a>';
+    var firms = (p.firms || []).slice(0, 2).map(function(f){
+      return '<div class="pf">🏪 ' + esc(f.name) + (f.role ? ' <span>· ' + PV.firmRoleHtml(f.role, f.role_label) + '</span>' : '') + '</div>';
+    }).join('');
+    var orgs = (p.orgs || []).map(function(o){
+      var off = o.role && o.role !== 'member';
+      return '<span class="pv-oc' + (off ? ' o' : '') + '">' + (off ? PV.roleHtml(o.role, o.role_label) + ' · ' : '') + esc(o.org) + '</span>';
+    }).join('');
+    var legacy = (!p.firms && !p.orgs) ? '<div class="s">' + esc(p.line || '') + '</div>' : '';
+    return '<a class="pv-card pv-pcard" href="/parivar/' + encodeURIComponent(p.slug) + '">' + PV.avatar(p.photo, p.name, 46)
+      + '<div style="min-width:0"><div class="t">' + esc(p.name) + (p.verified ? ' <span class="pv-ok">✓</span>' : '') + '</div>'
+      + (p.profession ? '<div class="s">' + esc(p.profession) + '</div>' : '')
+      + firms + (orgs ? '<div class="pv-ocs">' + orgs + '</div>' : '') + legacy + '</div></a>';
   }
   PV.rpc('parivar_search', { p_q: null, p_limit: 100 }).then(function(rows){
     var orgs = (rows || []).filter(function(r){ return r.kind === 'org'; });
@@ -82,7 +93,7 @@
     PV.rpc('parivar_search', { p_q: q, p_limit: 60 }).then(function(rows){
       rows = rows || [];
       var people = rows.filter(function(r){ return r.kind === 'person'; }), orgs = rows.filter(function(r){ return r.kind === 'org'; });
-      if (!rows.length){ box.innerHTML = '<div class="pv-empty" style="margin-top:14px">' + PV.bi('No one found by that name yet.', 'इस नाम से अभी कोई नहीं मिला।') + '</div>'; return; }
+      if (!rows.length){ box.innerHTML = '<div class="pv-empty" style="margin-top:14px">' + PV.bi('No one found yet — try a name, a firm or a profession.', 'अभी कोई नहीं मिला — नाम, फर्म या पेशा लिखकर देखें।') + '</div>'; return; }
       box.innerHTML = (people.length ? '<h2 class="pv-h2">' + PV.bi('People', 'लोग') + '</h2><div class="pv-grid">' + people.map(personCard).join('') + '</div>' : '')
         + (orgs.length ? '<h2 class="pv-h2">' + PV.bi('Organisations', 'संस्थाएं') + '</h2><div class="pv-grid">' + orgs.map(orgCard).join('') + '</div>' : '');
     }).catch(function(){});
