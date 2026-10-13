@@ -190,6 +190,22 @@ function suggestShop(mobile, px){
 }
 function clearShop(px){ document.getElementById(px + '_bid').value = ''; var sel = document.getElementById(px + '_sel'); sel.innerHTML = ''; sel.style.display = 'none'; }
 
+/* ---------- v364: member's own profile link (db/256) ---------- */
+async function sendProfileLink(pid){
+  var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
+  var r = await c().rpc('admin_parivar_create_profile_link', { p_person_id: pid, p_days: 7 });
+  if (r.error){ if (win) win.close(); alert('Could not create the link: ' + r.error.message + (/function|exist/.test(r.error.message) ? ' — run db/256 first' : '')); return; }
+  var d = r.data || {}, link = location.origin + '/parivar-profile?t=' + d.token;
+  var msg = 'Namaste ' + (d.name || '') + ' ji 🙏\n\nDukanList ke "Dabwali Parivar" mein aapka page bana hai: ' + location.origin + '/parivar/' + (d.slug || '') + '\n\n'
+    + 'Is link par khud dekhiye aur theek kijiye — "haan, ye main hoon" confirm kijiye, number dikhana hai ya nahi chuniye, photo aur parichay badaliye. Koi login nahi chahiye:\n' + link
+    + '\n\n(Link 7 din chalega.)\n— DukanList Helpline';
+  var url = 'https://wa.me/91' + String(d.mobile || '').replace(/\D/g, '').slice(-10) + '?text=' + encodeURIComponent(msg);
+  if (win) win.location.href = url; else location.href = url;
+  toast('📲 Link created — press Send in WhatsApp');
+}
+async function reviewPhoto(pid, ok){ var r = await c().rpc('admin_parivar_review_photo', { p_person_id: pid, p_approve: ok }); if (fail(r)) return; toast(ok ? '✓ Photo is live' : 'Photo rejected'); openItem(pid); }
+async function clearNote(pid){ var r = await c().rpc('admin_parivar_clear_note', { p_person_id: pid }); if (fail(r)) return; toast('✓ Marked handled'); openItem(pid); }
+
 /* ---------- sanstha ---------- */
 function drawOrg(o){
   var isNew = !o.id;
@@ -221,7 +237,8 @@ function drawOrg(o){
           return '<div class="row"><div><b>' + esc(r.name) + '</b> <a class="muted" href="/parivar/' + esc(r.slug) + '" target="_blank" rel="noopener">↗</a><div class="mob">' + (r.mobile ? esc(r.mobile) : 'no number') + '</div></div>'
             + '<select onchange="changeRole(\'' + r.person_id + '\', this.value)">' + opts(ROLES, r.role) + '</select>'
             + '<span class="muted">' + esc(r.role_label || '') + '</span>'
-            + '<button class="btn d s" onclick="removeRole(' + r.id + ')">✕</button></div>';
+            + '<span style="display:flex;gap:4px">' + (r.mobile ? '<button class="btn g s" title="Send their profile link on WhatsApp" onclick="sendProfileLink(\'' + r.person_id + '\')">📲</button>' : '')
+            + '<button class="btn d s" onclick="removeRole(' + r.id + ')">✕</button></span></div>';
         }).join('') : '<div class="empty">No one yet. Add people below.</div>')
       + '<div class="sec"><b style="font-size:.9rem">+ Add a person</b>'
       + '<label>Already in Dabwali Parivar? Search by name or mobile</label><input id="rp_q" placeholder="Name / mobile" oninput="clearTimeout(window._rp);window._rp=setTimeout(pickPerson,250)"><div class="pick" id="rp_pick" style="display:none"></div>'
@@ -324,7 +341,10 @@ function drawPerson(p){
     + '<label>Photo</label><div class="photo"><img id="p_photo_prev" src="' + esc(p.photo_url || '') + '" style="' + (p.photo_url ? '' : 'display:none') + '" alt=""><input type="hidden" id="p_photo" value="' + esc(p.photo_url) + '">'
     + '<input type="file" accept="image/*" onchange="upload(this,\'p_photo\',\'p_photo_prev\')" style="width:auto"></div>'
     + (isNew ? '' : '<label>Status</label><select id="p_status">' + opts([['active','Active (public)'],['hidden','Hidden']], p.status) + '</select>'
-      + '<div class="muted" style="margin-top:6px">' + (p.mobile_verified_at ? '<span class="pill ok">✓ Number verified</span>' : '<span class="pill">Number not verified</span>') + '</div>')
+      + '<div class="muted" style="margin-top:6px">' + (p.mobile_verified_at ? '<span class="pill ok">✓ Number verified</span>' : '<span class="pill">Number not verified</span>') + '</div>'
+      + (p.mobile ? '<div style="margin-top:10px"><button class="btn g" onclick="sendProfileLink(\'' + p.id + '\')">📲 Send profile link on WhatsApp</button> <span class="muted">— they confirm "this is me", choose how their number shows, edit profession/bio/photo. No login.</span></div>' : '<div class="muted" style="margin-top:8px">Add a mobile number to send them their profile link.</div>')
+      + (p.pending_photo_url ? '<div class="sec"><b>📷 New photo from the member</b><div class="photo" style="margin-top:6px"><img src="' + esc(p.pending_photo_url) + '" alt=""><button class="btn p s" onclick="reviewPhoto(\'' + p.id + '\', true)">✓ Approve</button><button class="btn d s" onclick="reviewPhoto(\'' + p.id + '\', false)">✕ Reject</button></div></div>' : '')
+      + (p.member_note ? '<div class="sec"><b>📝 Note from the member</b> <span class="muted">' + esc(new Date(p.member_note_at).toLocaleString('en-IN')) + '</span><div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;padding:8px 10px;margin-top:6px;white-space:pre-wrap">' + esc(p.member_note) + '</div><button class="btn g s" style="margin-top:6px" onclick="clearNote(\'' + p.id + '\')">✓ Handled</button></div>' : ''))
     + '<div style="margin-top:12px"><button class="btn p" onclick="savePerson()">💾 Save</button></div>';
   if (!isNew){
     h += '<div class="sec"><h2>Firms</h2>' + ((p.firms || []).length ? p.firms.map(function(f){

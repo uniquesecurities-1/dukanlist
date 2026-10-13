@@ -720,6 +720,44 @@
   <!-- Profile completeness widget -->
     <div id="completenessWidget" style="margin-top:18px"></div>
 
+    <!-- v364: Dabwali Parivar — the owner's own people page(s), edited through the same no-login link (db/256) -->
+    <div id="parivarWidget" style="display:none;margin-top:18px"></div>
+    <script>
+    (function(){
+      var tries = 0;
+      function go(){
+        if (!window.ShopDB || !ShopDB.client){ if (tries++ < 40) return setTimeout(go, 250); return; }
+        ShopDB.client.rpc('my_parivar_profiles').then(function(r){
+          var list = (!r.error && Array.isArray(r.data)) ? r.data : [];
+          var el = document.getElementById('parivarWidget');
+          if (!el || !list.length) return;
+          var esc = function(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
+          el.innerHTML = '<div style="background:linear-gradient(135deg,#FFF1F2,#FFE4E6);border:1px solid #FECDD3;border-radius:16px;padding:16px">'
+            + '<div style="font-weight:900;font-size:1rem;color:#9F1239">👨‍👩‍👧 <span data-i18n-en>Your Dabwali Parivar page</span><span data-i18n-hi>आपका डबवाली परिवार पेज</span></div>'
+            + '<div style="font-size:.84rem;color:#475569;margin:4px 0 10px"><span data-i18n-en>Confirm it is you, choose how your number shows, and update your photo and profession.</span><span data-i18n-hi>"यह मैं हूँ" कन्फर्म करें, नंबर कैसे दिखे चुनें, फोटो और पेशा बदलें।</span></div>'
+            + list.map(function(p){
+                return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;border:1px solid #FECDD3;border-radius:12px;padding:10px 12px;margin-top:6px">'
+                  + '<div><b>' + esc(p.name) + '</b> ' + (p.verified ? '<span style="color:#047857;font-weight:800">✓</span>' : '<span style="font-size:.74rem;color:#B45309;font-weight:700">not confirmed</span>')
+                  + '<div style="font-size:.76rem"><a href="/parivar/' + encodeURIComponent(p.slug) + '" target="_blank" rel="noopener">dukanlist.com/parivar/' + esc(p.slug) + '</a></div></div>'
+                  + '<button type="button" data-pid="' + esc(p.id) + '" style="border:0;border-radius:10px;padding:9px 14px;font-weight:800;background:#BE123C;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap"><span data-i18n-en>Edit my page</span><span data-i18n-hi>पेज बदलें</span></button></div>';
+              }).join('') + '</div>';
+          el.style.display = '';
+          el.querySelectorAll('button[data-pid]').forEach(function(b){
+            b.addEventListener('click', function(){
+              b.disabled = true;
+              ShopDB.client.rpc('my_parivar_profile_link', { p_person_id: b.getAttribute('data-pid') }).then(function(x){
+                b.disabled = false;
+                if (x.error || !x.data){ alert('Could not open: ' + ((x.error && x.error.message) || 'try again')); return; }
+                location.href = '/parivar-profile?t=' + encodeURIComponent(x.data);
+              });
+            });
+          });
+        }, function(){});
+      }
+      go();
+    })();
+    </script>
+
     <!-- Push notifications opt-in -->
     <div style="margin-top:18px;display:flex;justify-content:flex-end">
       <button id="enableNotifBtn" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#0F172A;border:1.5px solid #cbd5e1;padding:8px 14px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔔 Enable notifications</button>

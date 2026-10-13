@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="hi" data-lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>अपना परिवार पेज — Dabwali Parivar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<!--
+  v364: a member's own Dabwali Parivar page, opened from a personal link
+  (/parivar-profile?t=<64-char token>, db/256). No login. Confirm "this is
+  me", choose how the number shows, profession, bio, a new photo (admin
+  approves it), a note to the office, or hide the page.
+-->
+<style>
+  :root{ --ink:#0F172A; --ink2:#334155; --muted:#64748B; --line:#E2E8F0; --rose:#BE123C }
+  *{ box-sizing:border-box }
+  body{ margin:0; font-family:'Noto Sans Devanagari','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:#FFF7F8; color:var(--ink) }
+  .top{ background:#0F172A; padding:12px 16px; display:flex; align-items:center; justify-content:center }
+  .top img{ height:28px; width:auto; display:block }
+  .wrap{ max-width:560px; margin:0 auto; padding:16px 14px 100px }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:14px }
+  .head{ display:flex; gap:12px; align-items:center }
+  .av{ width:64px; height:64px; border-radius:50%; object-fit:cover; background:#FFE4E6; color:#9F1239; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3rem; flex:0 0 auto }
+  h1{ font-size:1.25rem; margin:0 }
+  .sub{ color:var(--muted); font-size:.84rem; margin-top:2px }
+  .en{ color:var(--muted); font-size:.78rem }
+  h2{ font-size:1rem; margin:0 0 4px }
+  .chips span{ display:inline-block; background:#F1F5F9; border-radius:99px; padding:3px 10px; font-size:.78rem; font-weight:700; margin:3px 4px 0 0 }
+  .confirm{ background:linear-gradient(135deg,#ECFDF5,#D1FAE5); border-color:#A7F3D0 }
+  .done{ color:#047857; font-weight:800 }
+  label.opt{ display:flex; gap:10px; align-items:flex-start; border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:8px; cursor:pointer }
+  label.opt input{ margin-top:3px; width:18px; height:18px }
+  label.opt.on{ border-color:var(--rose); background:#FFF1F2 }
+  label.sm{ display:block; font-size:.82rem; font-weight:700; color:var(--ink2); margin:10px 0 4px }
+  input[type=text], textarea{ width:100%; border:1.5px solid #CBD5E1; border-radius:10px; padding:11px 12px; font-size:1rem; font-family:inherit }
+  textarea{ min-height:80px; resize:vertical }
+  .btn{ border:0; border-radius:12px; padding:13px 16px; font-weight:800; font-size:1rem; cursor:pointer; font-family:inherit; width:100% }
+  .btn.ok{ background:linear-gradient(135deg,#16A34A,#15803D); color:#fff }
+  .btn.g{ background:#fff; color:var(--ink); border:1.5px solid #CBD5E1 }
+  .btn.d{ background:#fff; color:#B91C1C; border:1.5px solid #FCA5A5 }
+  .bar{ position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding:10px 14px; box-shadow:0 -6px 18px rgba(0,0,0,.06) }
+  .bar .in{ max-width:560px; margin:0 auto }
+  .msg{ font-size:.86rem; margin-top:6px; text-align:center }
+  .msg.err{ color:#DC2626 } .msg.ok{ color:#047857 }
+  .center{ text-align:center; padding:30px 16px }
+  .center .big{ font-size:3rem }
+  .wa{ display:inline-block; margin-top:12px; background:#25D366; color:#fff; text-decoration:none; font-weight:800; padding:11px 18px; border-radius:11px }
+  .hide{ display:none !important }
+  .phbox{ display:flex; gap:10px; align-items:center; margin-top:6px }
+  .phbox img{ width:64px; height:64px; border-radius:12px; object-fit:cover }
+</style>
+</head>
+<body>
+<div class="top"><img src="/assets/brand/wordmark-dark.webp" alt="DukanList" width="120" height="28"></div>
+<div class="wrap">
+  <div id="loading" class="center"><div class="big">⏳</div><p>लोड हो रहा है…</p></div>
+  <div id="bad" class="center hide">
+    <div class="big">🔗</div>
+    <h2>यह लिंक अब काम नहीं करता</h2>
+    <p>लिंक पुराना हो गया है या गलत है। नया लिंक मंगवाने के लिए DukanList हेल्पलाइन पर WhatsApp करें।<br><span class="en">This link has expired. Ask the DukanList helpline for a new one.</span></p>
+    <a class="wa" id="badWa" href="/contact" target="_blank" rel="noopener">💬 WhatsApp करें</a>
+  </div>
+
+  <div id="form" class="hide">
+    <div class="card">
+      <div class="head"><div id="av"></div><div><h1 id="nm"></h1><div class="sub" id="sb"></div></div></div>
+      <div id="links" style="margin-top:10px"></div>
+      <a id="viewLink" href="#" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;font-weight:800;color:var(--rose);text-decoration:none">अपना पेज देखें → <span class="en">View my page</span></a>
+    </div>
+
+    <div class="card confirm" id="confirmCard">
+      <h2>✅ क्या यह आप हैं?</h2>
+      <div class="en">Is this you? Confirming verifies your number and adds a ✓ to your page.</div>
+      <label class="opt" style="background:#fff"><input type="checkbox" id="confirm"><span><b>हाँ, यह मैं हूँ</b> — जानकारी सही है<br><span class="en">Yes, this is me</span></span></label>
+    </div>
+
+    <div class="card" id="contactCard">
+      <h2>📞 आपका नंबर पेज पर कैसे दिखे?</h2>
+      <div class="en">How should your number appear? <span id="mh"></span></div>
+      <label class="opt" data-v="show"><input type="radio" name="cm" value="show"><span><b>नंबर दिखाओ</b> — कॉल और WhatsApp बटन<br><span class="en">Show number (Call + WhatsApp)</span></span></label>
+      <label class="opt" data-v="whatsapp"><input type="radio" name="cm" value="whatsapp"><span><b>सिर्फ WhatsApp बटन</b> — नंबर लिखा नहीं दिखेगा<br><span class="en">WhatsApp button only</span></span></label>
+      <label class="opt" data-v="hidden"><input type="radio" name="cm" value="hidden"><span><b>नंबर छुपाओ</b> — कोई संपर्क बटन नहीं<br><span class="en">Hide my number</span></span></label>
+    </div>
+
+    <div class="card">
+      <h2>✍️ अपने बारे में</h2>
+      <label class="sm" for="prof">पेशा <span class="en">Profession</span></label>
+      <input type="text" id="prof" maxlength="60" list="profList" placeholder="जैसे: CA, Doctor, Teacher, Businessman">
+      <datalist id="profList"><option value="Chartered Accountant"><option value="Doctor"><option value="Advocate"><option value="Teacher"><option value="Engineer"><option value="Businessman"><option value="Shopkeeper"><option value="Trader"><option value="Farmer"><option value="Mutual Fund Distributor"><option value="Insurance Advisor"><option value="Government Service"><option value="Social Worker"><option value="Retired"></datalist>
+      <label class="sm" for="bio">छोटा परिचय (300 अक्षर) <span class="en">Short bio</span></label>
+      <textarea id="bio" maxlength="300" placeholder="जैसे: 25 साल से कपड़े का कारोबार, लायंस क्लब से 10 साल से जुड़ा हूँ"></textarea>
+      <label class="sm">फोटो <span class="en">Photo (checked by our team before it goes live)</span></label>
+      <div class="phbox"><img id="phPrev" class="hide" alt=""><input type="file" accept="image/*" id="phIn"></div>
+      <div class="en" id="phSt"></div>
+    </div>
+
+    <div class="card">
+      <h2>📝 कुछ गलत है?</h2>
+      <div class="en">Wrong organisation, role or business? Tell the office.</div>
+      <textarea id="note" maxlength="500" style="margin-top:8px" placeholder="जैसे: मैं इस साल Secretary नहीं, Treasurer हूँ"></textarea>
+    </div>
+
+    <div class="card">
+      <h2 id="hideH">🙈 पेज छुपाना है?</h2>
+      <div class="en" id="hideEn">Your page will disappear from Dabwali Parivar. You can bring it back with a new link.</div>
+      <button type="button" class="btn d" id="hideBtn" style="margin-top:10px">मेरा पेज छुपाओ <span class="en">Hide my page</span></button>
+    </div>
+  </div>
+
+  <div id="done" class="center hide">
+    <div class="big">✅</div>
+    <h2>शुक्रिया! सेव हो गया</h2>
+    <p id="doneTxt">आपका पेज अपडेट हो गया है।<br><span class="en">Your page has been updated.</span></p>
+    <a class="wa" id="doneView" href="/" style="background:#0F172A">अपना पेज देखें →</a>
+  </div>
+</div>
+<div class="bar hide" id="bar"><div class="in"><button class="btn ok" id="saveBtn">✅ सेव करें (Save)</button><div class="msg" id="msg"></div></div></div>
+
+<script src="/assets/js/dl-config.js"></script>
+<script>
+(function(){
+  var CFG = window.DL_CONFIG || {}, SB = CFG.supabase || {}, HELP = (CFG.support || {}).whatsapp || '';
+  var TOKEN = (new URLSearchParams(location.search).get('t') || '').trim();
+  var $ = function(id){ return document.getElementById(id); };
+  var D = null, PHOTO = '', BUSY = 0;
+  var ROLE = { president:'President', vice_president:'Vice President', secretary:'Secretary', joint_secretary:'Joint Secretary', treasurer:'Treasurer', pro:'PRO', patron:'Patron', chairman:'Chairman', founder:'Founder', director:'Director', advisor:'Advisor', coordinator:'Coordinator', member:'Member', other:'Office bearer' };
+  var FROLE = { founder:'Founder', owner:'Owner', proprietor:'Proprietor', partner:'Partner', director:'Director', ceo:'CEO', manager:'Manager', other:'' };
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  function rpc(fn, body){
+    return fetch(SB.url + '/rest/v1/rpc/' + fn, { method:'POST', headers:{ apikey:SB.anon_key, Authorization:'Bearer ' + SB.anon_key, 'Content-Type':'application/json' }, body: JSON.stringify(body) })
+      .then(function(r){ return r.json().catch(function(){ return null; }).then(function(j){ if (!r.ok) throw new Error((j && j.message) || ('HTTP ' + r.status)); return j; }); });
+  }
+  function show(id){ ['loading','bad','form','done'].forEach(function(x){ $(x).classList.toggle('hide', x !== id); }); $('bar').classList.toggle('hide', id !== 'form'); }
+  function bad(){ if (HELP) $('badWa').href = 'https://wa.me/91' + HELP + '?text=' + encodeURIComponent('Namaste, mujhe Dabwali Parivar mein apna page theek karne ka naya link chahiye.'); show('bad'); }
+  if (!/^[0-9a-f]{64}$/.test(TOKEN)){ bad(); return; }
+
+  function pickMode(v){ document.querySelectorAll('label.opt[data-v]').forEach(function(l){ var on = l.dataset.v === v; l.classList.toggle('on', on); l.querySelector('input').checked = on; }); }
+  document.querySelectorAll('label.opt[data-v]').forEach(function(l){ l.addEventListener('click', function(){ pickMode(l.dataset.v); }); });
+
+  rpc('parivar_profile_get', { p_token: TOKEN }).then(function(d){
+    if (!d || !d.ok){ bad(); return; }
+    D = d;
+    $('nm').textContent = d.name;
+    $('av').outerHTML = d.photo ? '<img class="av" src="' + esc(d.photo) + '" alt="">' : '<div class="av">' + esc(String(d.name || '?').charAt(0).toUpperCase()) + '</div>';
+    $('sb').innerHTML = (d.verified ? '<span class="done">✓ Verified</span>' : '') + (d.status === 'hidden' ? ' · <b style="color:#B91C1C">पेज छुपा है (hidden)</b>' : '');
+    var rows = (d.firms || []).map(function(f){ return '🏪 ' + esc(f.name) + (f.role_label || FROLE[f.role] ? ' — ' + esc(f.role_label || FROLE[f.role]) : ''); })
+      .concat((d.roles || []).map(function(r){ return '🏛 ' + esc(r.org) + ' — ' + esc(r.role_label || ROLE[r.role] || '') + ' (' + esc(r.session) + ')'; }));
+    $('links').innerHTML = rows.length ? '<div class="chips">' + rows.map(function(x){ return '<span>' + x + '</span>'; }).join('') + '</div>' : '';
+    $('viewLink').href = '/parivar/' + encodeURIComponent(d.slug);
+    if (d.verified){ $('confirmCard').innerHTML = '<h2 class="done">✓ आपका नंबर वेरिफाइड है</h2><div class="en">Your number is verified.</div>'; }
+    if (!d.has_mobile){ $('contactCard').classList.add('hide'); }
+    else { $('mh').textContent = '(' + d.mobile_hint + ')'; pickMode(d.contact_mode || 'hidden'); }
+    $('prof').value = d.profession || '';
+    $('bio').value = d.bio || '';
+    if (d.pending_photo) $('phSt').textContent = 'आपकी भेजी फोटो जाँच में है। (A photo you sent is waiting for approval.)';
+    if (d.status === 'hidden'){
+      $('hideH').textContent = '👀 पेज वापस दिखाना है?';
+      $('hideEn').textContent = 'Your page is hidden. Bring it back on Dabwali Parivar.';
+      $('hideBtn').innerHTML = 'मेरा पेज फिर से दिखाओ <span class="en">Show my page again</span>';
+      $('hideBtn').className = 'btn g';
+    }
+    show('form');
+  }).catch(function(){ bad(); });
+
+  $('phIn').addEventListener('change', function(){
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    if (!/^image\//.test(f.type) || f.size > 8 * 1024 * 1024){ $('phSt').textContent = 'सिर्फ फोटो, 8 MB तक।'; return; }
+    try { $('phPrev').src = URL.createObjectURL(f); $('phPrev').classList.remove('hide'); } catch(_){}
+    $('phSt').textContent = 'अपलोड हो रही है…'; BUSY++;
+    var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar');
+    fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd }).then(function(r){ return r.json(); })
+      .then(function(j){ if (!j.secure_url) throw 0; PHOTO = j.secure_url; $('phSt').textContent = '✓ फोटो तैयार — सेव दबाइए (Photo ready — press Save)'; })
+      .catch(function(){ $('phSt').textContent = 'फोटो अपलोड नहीं हुई — फिर कोशिश करें।'; $('phPrev').classList.add('hide'); })
+      .then(function(){ BUSY--; });
+  });
+
+  function save(extra){
+    var msg = $('msg'); msg.className = 'msg'; msg.textContent = '';
+    if (BUSY){ msg.className = 'msg err'; msg.textContent = 'फोटो अपलोड हो रही है — 2 सेकंड रुकें।'; return; }
+    var cm = document.querySelector('input[name=cm]:checked');
+    var p = { confirm: !!($('confirm') && $('confirm').checked), profession: $('prof').value.trim(), bio: $('bio').value.trim(), note: $('note').value.trim() };
+    if (cm && D && D.has_mobile) p.contact_mode = cm.value;
+    if (PHOTO) p.photo = PHOTO;
+    for (var k in (extra || {})) p[k] = extra[k];
+    $('saveBtn').disabled = true;
+    rpc('parivar_profile_save', { p_token: TOKEN, p: p }).then(function(r){
+      $('doneView').href = '/parivar/' + encodeURIComponent((r && r.slug) || D.slug);
+      if (p.hide){ $('doneTxt').innerHTML = 'आपका पेज छुपा दिया गया है।<br><span class="en">Your page is now hidden.</span>'; $('doneView').classList.add('hide'); }
+      show('done'); window.scrollTo(0, 0);
+    }).catch(function(e){ msg.className = 'msg err'; msg.textContent = e.message || 'कुछ गड़बड़ हुई — फिर कोशिश करें।'; })
+      .then(function(){ $('saveBtn').disabled = false; });
+  }
+  $('saveBtn').addEventListener('click', function(){ save(); });
+  $('hideBtn').addEventListener('click', function(){
+    if (D && D.status === 'hidden'){ save({ unhide: true }); return; }
+    if (confirm('पक्का? आपका पेज Dabwali Parivar से छुप जाएगा। (Hide your page?)')) save({ hide: true });
+  });
+})();
+</script>
+</body>
+</html>
