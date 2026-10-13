@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013d">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013e">
 </head>
 <body>
 
@@ -61,7 +61,8 @@
     var now = new Date().getFullYear();
     el.innerHTML = list.length ? list.map(function(m){
       var firm = m.firm && m.firm.name
-        ? '<div class="mc-f">🏪 ' + (m.firm.slug ? '<a href="/' + encodeURIComponent(m.firm.slug) + '" onclick="event.stopPropagation()">' + esc(m.firm.name) + '</a>' : esc(m.firm.name))
+        // v383: shop name is plain text here — tapping anywhere on the card opens the member's page (the shop link is there)
+        ? '<div class="mc-f">🏪 <b class="mc-shop">' + esc(m.firm.name) + '</b>'
           + ((m.firm.role_label || m.firm.role) ? ' <span>· ' + PV.firmRoleHtml(m.firm.role, m.firm.role_label) + '</span>' : '') + '</div>' : '';
       // only show a real joining year — a year equal to the current session just means 'added this year'
       var since = m.since && m.since <= now && (!SESS_START || m.since < SESS_START) ? '<div class="mc-s">' + bi('Member since', 'सदस्य') + ' ' + esc(m.since) + (now - m.since >= 2 ? ' · ' + (now - m.since) + ' ' + bi('yrs', 'साल') : '') + '</div>' : '';

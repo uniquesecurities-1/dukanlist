@@ -96,3 +96,4 @@ a.pv-oc:hover{ filter:brightness(.96); text-decoration:none }
 .pv-fc .fc-btn.wa{ background:linear-gradient(135deg,#25D366,#128C7E); box-shadow:0 3px 8px rgba(37,211,102,.3) }
 .pv-fc .fc-btn:hover{ text-decoration:none; filter:brightness(1.05) }
 @media (max-width:480px){ .pv-fc .fc-acts{ flex-direction:column } }
+.pv-mcard .mc-f .mc-shop{ color:#C2410C; font-weight:700 }
