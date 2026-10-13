@@ -3,9 +3,6 @@
 -- Paste the whole file in the Supabase SQL Editor and press Run once.
 
 
--- ===================== 253-257-parivar-catchup.sql =====================
-
-
 -- ===================== 253-parivar-contact-designation-shop.sql =====================
 -- ============================================================
 -- db/253 — sanstha contact: designation + their DukanList shop
