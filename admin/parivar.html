@@ -86,6 +86,7 @@
       <h2><span id="listTitle">Organisations</span><button class="btn p s" onclick="openNew()">+ New</button></h2>
       <input id="lq" placeholder="Search…" oninput="clearTimeout(window._lt);window._lt=setTimeout(loadList,250)">
       <div class="list" id="list" style="margin-top:8px"><div class="empty">Loading…</div></div>
+      <div id="delBox"></div>
     </div>
     <div class="card" id="editor"><div class="empty">Pick one on the left, or press "+ New".</div></div>
   </div>
@@ -116,7 +117,7 @@ function val(id){ var e = document.getElementById(id); return e ? e.value.trim()
 
 function setTab(b){ document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('on', x === b); }); TAB = b.dataset.t; CUR = null;
   document.getElementById('listTitle').textContent = TAB === 'org' ? 'Organisations' : 'People';
-  document.getElementById('editor').innerHTML = '<div class="empty">Pick one on the left, or press "+ New".</div>'; loadList(); }
+  document.getElementById('editor').innerHTML = '<div class="empty">Pick one on the left, or press "+ New".</div>'; loadList(); showDeleted(); }
 
 async function loadList(){
   var r = await c().rpc('admin_parivar_list', { p_kind: TAB, p_q: val('lq') || null });
@@ -482,7 +483,8 @@ function drawPerson(p){
       + (p.mobile ? '<div style="margin-top:10px"><button class="btn g" onclick="sendProfileLink(\'' + p.id + '\')">📲 Send profile link on WhatsApp</button> <span class="muted">— they confirm "this is me", choose how their number shows, edit profession/bio/photo. No login.</span></div>' : '<div class="muted" style="margin-top:8px">Add a mobile number to send them their profile link.</div>')
       + (p.pending_photo_url ? '<div class="sec"><b>📷 New photo from the member</b><div class="photo" style="margin-top:6px"><img src="' + esc(p.pending_photo_url) + '" alt=""><button class="btn p s" onclick="reviewPhoto(\'' + p.id + '\', true)">✓ Approve</button><button class="btn d s" onclick="reviewPhoto(\'' + p.id + '\', false)">✕ Reject</button></div></div>' : '')
       + (p.member_note ? '<div class="sec"><b>📝 Note from the member</b> <span class="muted">' + esc(new Date(p.member_note_at).toLocaleString('en-IN')) + '</span><div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;padding:8px 10px;margin-top:6px;white-space:pre-wrap">' + esc(p.member_note) + '</div><button class="btn g s" style="margin-top:6px" onclick="clearNote(\'' + p.id + '\')">✓ Handled</button></div>' : ''))
-    + '<div style="margin-top:12px"><button class="btn p" onclick="savePerson()">💾 Save</button></div>';
+    + '<div style="margin-top:12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><button class="btn p" onclick="savePerson()">💾 Save</button>'
+    + (isNew ? '' : '<button class="btn d" onclick="deletePerson()" title="Only for someone added by mistake who is in no organisation">🗑 Delete person</button>') + '</div>';
   if (!isNew){
     h += '<div class="sec"><h2>Firms</h2>' + ((p.firms || []).length ? p.firms.map(function(f){
         return '<div class="row" style="grid-template-columns:1fr 160px auto"><div><b>' + esc(f.name) + '</b>' + (f.business_id ? ' <span class="pill ok">DukanList listing</span>' : '') + '</div><span>' + esc(f.role_label || label(FIRM_ROLES, f.role)) + '</span><button class="btn d s" onclick="removeFirm(' + f.id + ')">✕</button></div>';
@@ -498,6 +500,31 @@ function drawPerson(p){
       }).join('') : '<div class="muted">Not in any organisation yet. Add them from an organisation.</div>') + '</div>';
   }
   document.getElementById('editor').innerHTML = h;
+}
+// v379: delete someone added by mistake (db/267) — refused while they are in any organisation; a copy is kept for Undo
+async function deletePerson(){
+  if (!CUR || !CUR.id) return;
+  if ((CUR.roles || []).length){ alert(CUR.full_name + ' is in an organisation. Remove them from there first (open the organisation → ✕), then delete.'); return; }
+  if (!confirm('Delete ' + CUR.full_name + ' from Dabwali Parivar?\n\nTheir page and firm links go. You can bring them back from "Recently deleted".')) return;
+  var r = await c().rpc('admin_parivar_delete_person', { p_person_id: CUR.id });
+  if (r.error){ alert(r.error.message + (/function|exist/.test(r.error.message) && !/still in/.test(r.error.message) ? ' — run db/267 first' : '')); return; }
+  var d = r.data || {}; CUR = null;
+  toast('🗑 Deleted ' + (d.name || ''));
+  document.getElementById('editor').innerHTML = '<div class="empty">🗑 Deleted <b>' + esc(d.name || '') + '</b>. <button class="btn g s" onclick="restorePerson(' + d.archive_id + ')">↩ Undo</button></div>';
+  loadList(); showDeleted(true);
+}
+async function restorePerson(id){
+  var r = await c().rpc('admin_parivar_restore_person', { p_archive_id: id }); if (fail(r)) return;
+  toast('↩ Brought back: ' + (r.data.name || '')); TAB = 'person'; await openItem(r.data.id);
+}
+// small "Recently deleted" box under the People list
+async function showDeleted(keepEditor){
+  var box = document.getElementById('delBox'); if (!box) return;
+  if (TAB !== 'person'){ box.innerHTML = ''; return; }
+  var r = await c().rpc('admin_parivar_recently_deleted'); if (r.error || !(r.data || []).length){ box.innerHTML = ''; return; }
+  box.innerHTML = '<details style="margin-top:10px"><summary class="muted" style="cursor:pointer">🗑 Recently deleted (' + r.data.length + ')</summary>'
+    + r.data.map(function(x){ return '<div class="muted" style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:4px 0"><span><b style="color:#0F172A">' + esc(x.name) + '</b> ' + esc(x.mobile || '') + '</span><button class="btn g s" onclick="restorePerson(' + x.id + ')">↩ Restore</button></div>'; }).join('')
+    + '</details>';
 }
 async function savePerson(){
   var p = { full_name: val('p_name'), name_hi: val('p_name_hi'), profession: val('p_prof'), mobile: val('p_mob'), contact_mode: val('p_mode'), bio: val('p_bio'), photo_url: val('p_photo') };
