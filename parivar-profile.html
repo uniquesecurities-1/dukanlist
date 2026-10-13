@@ -124,7 +124,7 @@
   var CFG = window.DL_CONFIG || {}, SB = CFG.supabase || {}, HELP = (CFG.support || {}).whatsapp || '';
   var TOKEN = (new URLSearchParams(location.search).get('t') || '').trim();
   var $ = function(id){ return document.getElementById(id); };
-  var D = null, PHOTO = '', BUSY = 0;
+  var D = null, PHOTO = '', BUSY = 0, LAST_SAVE = 0;
   var ROLE = { president:'President', vice_president:'Vice President', secretary:'Secretary', joint_secretary:'Joint Secretary', treasurer:'Treasurer', pro:'PRO', patron:'Patron', chairman:'Chairman', founder:'Founder', director:'Director', advisor:'Advisor', coordinator:'Coordinator', member:'Member', other:'Office bearer' };
   var FROLE = { founder:'Founder', owner:'Owner', proprietor:'Proprietor', partner:'Partner', director:'Director', ceo:'CEO', manager:'Manager', other:'' };
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
@@ -171,14 +171,35 @@
     $('phSt').textContent = 'अपलोड हो रही है…'; BUSY++;
     var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar');
     fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd }).then(function(r){ return r.json(); })
-      .then(function(j){ if (!j.secure_url) throw 0; PHOTO = j.secure_url; $('phSt').textContent = '✓ फोटो तैयार — सेव दबाइए (Photo ready — press Save)'; })
-      .catch(function(){ $('phSt').textContent = 'फोटो अपलोड नहीं हुई — फिर कोशिश करें।'; $('phPrev').classList.add('hide'); })
+      .then(function(j){
+        if (!j || !j.secure_url) throw new Error((j && j.error && j.error.message) || 'upload');
+        PHOTO = j.secure_url;
+        // v370: send it to the office right away — members often leave without pressing Save
+        $('phSt').textContent = 'फोटो भेज रहे हैं…';
+        return sendPhoto(0);
+      })
+      .catch(function(e){ $('phSt').textContent = 'फोटो अपलोड नहीं हुई — फिर कोशिश करें।' + (e && e.message && e.message !== 'upload' ? ' (' + e.message + ')' : ''); $('phPrev').classList.add('hide'); PHOTO = ''; })
       .then(function(){ BUSY--; });
   });
 
+  function sendPhoto(tries){
+    return rpc('parivar_profile_save', { p_token: TOKEN, p: { photo: PHOTO } }).then(function(r){
+      LAST_SAVE = Date.now();
+      if (r && r.photo_saved === false) throw new Error('not saved');
+      PHOTO = '';   // it is with the office now
+      $('phSt').textContent = '✓ फोटो भेज दी गई — हमारी टीम देखकर लगा देगी। (Photo sent — it goes live after a quick check.)';
+    }).catch(function(e){
+      var m = (e && e.message) || '';
+      if (/wait/i.test(m) && tries < 2) return new Promise(function(res){ setTimeout(res, 10500); }).then(function(){ return sendPhoto(tries + 1); });
+      // keep PHOTO — pressing Save will try again
+      $('phSt').textContent = 'फोटो अभी नहीं गई — नीचे सेव दबाइए। ' + (m && m !== 'not saved' ? '(' + m + ')' : '');
+    });
+  }
   function save(extra){
     var msg = $('msg'); msg.className = 'msg'; msg.textContent = '';
     if (BUSY){ msg.className = 'msg err'; msg.textContent = 'फोटो अपलोड हो रही है — 2 सेकंड रुकें।'; return; }
+    var gap = Date.now() - LAST_SAVE;
+    if (LAST_SAVE && gap < 10500){ msg.textContent = 'एक पल…'; $('saveBtn').disabled = true; setTimeout(function(){ $('saveBtn').disabled = false; save(extra); }, 10500 - gap); return; }
     var cm = document.querySelector('input[name=cm]:checked');
     var p = { confirm: !!($('confirm') && $('confirm').checked), profession: $('prof').value.trim(), bio: $('bio').value.trim(), note: $('note').value.trim() };
     if (cm && D && D.has_mobile) p.contact_mode = cm.value;
@@ -186,6 +207,7 @@
     for (var k in (extra || {})) p[k] = extra[k];
     $('saveBtn').disabled = true;
     rpc('parivar_profile_save', { p_token: TOKEN, p: p }).then(function(r){
+      LAST_SAVE = Date.now(); if (p.photo) PHOTO = '';
       $('doneView').href = '/parivar/' + encodeURIComponent((r && r.slug) || D.slug);
       if (p.hide){ $('doneTxt').innerHTML = 'आपका पेज छुपा दिया गया है।<br><span class="en">Your page is now hidden.</span>'; $('doneView').classList.add('hide'); }
       show('done'); window.scrollTo(0, 0);

@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.4';   // v369 searchable profession picker, up to 3
+const VERSION = 'dukan-v3.87.5';   // v370 member photo sent on upload + office sees waiting photos
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

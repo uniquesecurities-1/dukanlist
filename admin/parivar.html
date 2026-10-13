@@ -126,7 +126,8 @@ async function loadList(){
   if (!rows.length){ el.innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
   el.innerHTML = rows.map(function(x){
     var sm = TAB === 'org' ? esc(label(KINDS, x.kind)) + ' · ' + esc(x.session) + ' · ' + (x.members || 0) + ' members' + (x.status !== 'active' ? ' · hidden' : '')
-                           : (x.mobile ? esc(x.mobile) : 'no number') + ' · ' + esc(label(MODES, x.contact_mode)) + (x.status !== 'active' ? ' · hidden' : '');
+                           : (x.photo_waiting ? '<span style="color:#C2410C;font-weight:800">📷 photo waiting</span> · ' : '') + (x.note_waiting ? '<span style="color:#B45309;font-weight:800">📝 note</span> · ' : '')
+                             + (x.mobile ? esc(x.mobile) : 'no number') + ' · ' + esc(label(MODES, x.contact_mode)) + (x.status !== 'active' ? ' · hidden' : '');
     return '<div class="item' + (CUR && CUR.id === x.id ? ' on' : '') + '" onclick="openItem(\'' + x.id + '\')"><b>' + esc(x.name) + '</b><small>' + sm + '</small></div>';
   }).join('');
 }
