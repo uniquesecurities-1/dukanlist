@@ -243,8 +243,10 @@ function drawOrg(o){
     var past = (o.roles || []).filter(function(r){ return r.session !== o.current_session; });
     h += '<div class="sec"><h2>Session ' + esc(o.current_session) + ' — office bearers and members (' + cur.length + ')'
       + '<button class="btn g s" onclick="newSession()">🔄 Start new session</button></h2>'
+      // v376: find someone in a long list — name, mobile or role
+      + (cur.length > 5 ? '<input id="orgRowQ" placeholder="🔎 Search this list — name, mobile or role" oninput="filterOrgRows(this.value)" style="margin-bottom:6px"><div class="muted" id="orgRowN" style="margin-bottom:4px"></div>' : '')
       + (cur.length ? cur.map(function(r){
-          return '<div class="row"><div><b>' + esc(r.name) + '</b> <a class="muted" href="/parivar/' + esc(r.slug) + '" target="_blank" rel="noopener">↗</a><div class="mob">' + (r.mobile ? esc(r.mobile) : 'no number') + '</div></div>'
+          return '<div class="row" data-q="' + esc([r.name, r.mobile, r.role_label, label(ROLES, r.role)].join(' ').toLowerCase()) + '"><div><b>' + esc(r.name) + '</b> <a class="muted" href="/parivar/' + esc(r.slug) + '" target="_blank" rel="noopener">↗</a><div class="mob">' + (r.mobile ? esc(r.mobile) : 'no number') + '</div></div>'
             + '<select onchange="changeRole(\'' + r.person_id + '\', this.value)">' + opts(ROLES, r.role) + '</select>'
             + '<span class="muted">' + esc(r.role_label || '') + '</span>'
             + '<span style="display:flex;gap:4px">' + (r.mobile ? '<button class="btn g s" title="Send their profile link on WhatsApp" onclick="sendProfileLink(\'' + r.person_id + '\')">📲</button>' : '')
@@ -378,6 +380,14 @@ async function putBack(i){
   if (fail(r)) return;
   if (row.joined_year){ await c().rpc('admin_parivar_set_joined', { p_org_id: CUR.id, p_person_id: d.person_id, p_year: row.joined_year }); }
   toast('↩ Put back: ' + (d.person || '')); openItem(CUR.id);
+}
+function filterOrgRows(q){
+  q = String(q || '').trim().toLowerCase(); var digits = q.replace(/\D/g, ''), n = 0, all = 0;
+  document.querySelectorAll('#editor .row[data-q]').forEach(function(el){
+    var t = el.getAttribute('data-q'), hit = !q || t.indexOf(q) !== -1 || (digits.length >= 3 && t.replace(/\D/g, '').indexOf(digits) !== -1);
+    el.style.display = hit ? '' : 'none'; all++; if (hit) n++;
+  });
+  var c = document.getElementById('orgRowN'); if (c) c.textContent = q ? n + ' of ' + all + ' shown' : '';
 }
 async function saveOrg(){
   var p = { name: val('o_name'), name_hi: val('o_name_hi'), kind: val('o_kind'), about: val('o_about'), contact_name: val('o_cname'),
