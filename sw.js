@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.88.1';   // v377 WhatsApp messages in proper Hindi
+const VERSION = 'dukan-v3.88.2';   // v380 score counts services
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

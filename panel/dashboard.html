@@ -2668,7 +2668,9 @@ function renderProfileCompleteness(b){
     { en:'Upload 6+ shop photos (outside, inside, products, you)', hi:'6+ फोटो डालें (बाहर, अंदर, सामान, आप)', pts:25, href:'/panel/photos.html#upload',
       ok: _ph >= 6, partial: _ph >= 3 ? 15 : (_ph >= 1 ? 8 : 0) },
     { en:'What do you sell? Add 3+ items / brands', hi:'क्या मिलता है? 3+ सामान / ब्रांड लिखें', pts:20, href:'/panel/profile.html#about',
-      ok: Array.isArray(b.offerings) && b.offerings.length >= 3 },
+      // v380: items on the Services page count too — they are shown on the shop page (db/268)
+      ok: Math.max(Array.isArray(b.offerings) ? b.offerings.filter(Boolean).length : 0,
+                   Array.isArray(b.services_json) ? b.services_json.filter(function(x){ return x && String(x.name || '').trim(); }).length : 0) >= 3 },
     { en:'Why do people come to you? (one line)', hi:'लोग आपके पास क्यों आते हैं? (एक लाइन)', pts:15, href:'/panel/profile.html#about',
       ok: !!(b.why_text && String(b.why_text).trim()) },
     { en:'Your story — About Us (50+ chars)', hi:'आपकी कहानी — हमारे बारे में (50+ अक्षर)', pts:15, href:'/panel/profile.html#about',
