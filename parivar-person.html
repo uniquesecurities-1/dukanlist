@@ -50,6 +50,7 @@
     var cur = (p.roles || []).filter(function(r){ return r.current; });
     var past = (p.roles || []).filter(function(r){ return !r.current && r.role !== 'member'; });
     var sub = [];
+    if (p.profession) sub.push('<b style="color:var(--ink-2)">' + esc(p.profession) + '</b>');
     if (p.city) sub.push(esc(p.city));
     if (p.verified) sub.push('<span class="pv-ok">✓ ' + bi('Number verified', 'नंबर वेरिफाइड') + '</span>');
     else if (p.added_by_sanstha) sub.push('<span class="pv-tag">' + bi('Added by an organisation', 'संस्था द्वारा जोड़ा गया') + '</span>');

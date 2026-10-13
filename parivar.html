@@ -66,7 +66,7 @@
   }
   function personCard(p){
     return '<a class="pv-card" href="/parivar/' + encodeURIComponent(p.slug) + '">' + PV.avatar(p.photo, p.name, 46)
-      + '<div><div class="t">' + esc(p.name) + (p.verified ? ' <span class="pv-ok">✓</span>' : '') + '</div><div class="s">' + esc(p.line || '') + '</div></div></a>';
+      + '<div><div class="t">' + esc(p.name) + (p.verified ? ' <span class="pv-ok">✓</span>' : '') + '</div><div class="s">' + esc(p.line || p.profession || '') + '</div></div></a>';
   }
   PV.rpc('parivar_search', { p_q: null, p_limit: 100 }).then(function(rows){
     var orgs = (rows || []).filter(function(r){ return r.kind === 'org'; });

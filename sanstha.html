@@ -62,6 +62,10 @@
     var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(o.logo, o.name, 64, false)
       + '<div><h1>' + esc(o.name) + '</h1>' + (o.name_hi ? '<div class="sub">' + esc(o.name_hi) + '</div>' : '')
       + '<div class="sub">' + PV.kindHtml(o.kind) + (o.city ? ' · ' + esc(o.city) : '') + ' · ' + MEMBERS.length + ' ' + bi('members', 'सदस्य') + ' · ' + bi('Session', 'सत्र') + ' ' + esc(o.session) + '</div></div></div>'
+      + ((o.founded_year || o.address) ? '<div class="sub" style="margin-top:10px">'
+          + (o.founded_year ? '🏛 ' + bi('Founded', 'स्थापना') + ' ' + esc(o.founded_year) + ((new Date().getFullYear() - o.founded_year) >= 2 ? ' · ' + (new Date().getFullYear() - o.founded_year) + ' ' + bi('years', 'साल') : '') : '')
+          + (o.founded_year && o.address ? ' &nbsp;·&nbsp; ' : '')
+          + (o.address ? '📍 ' + esc(o.address) : '') + '</div>' : '')
       + (o.about ? '<p style="margin:12px 0 0;color:var(--ink-2);line-height:1.55;white-space:pre-wrap">' + esc(o.about) + '</p>' : '')
       // v359: the contact person — designation, their own page, their shop (db/253)
       + (o.contact_name

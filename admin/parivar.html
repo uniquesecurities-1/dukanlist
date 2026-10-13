@@ -198,6 +198,8 @@ function drawOrg(o){
     + '<div><label>Name in Hindi</label><input id="o_name_hi" value="' + esc(o.name_hi) + '" placeholder="लायंस क्लब डबवाली"></div></div>'
     + '<div class="grid2"><div><label>Type</label><select id="o_kind">' + opts(KINDS, o.kind || 'samajik') + '</select></div>'
     + '<div><label>New session starts in</label><select id="o_month">' + MONTHS.slice(1).map(function(m, i){ return '<option value="' + (i + 1) + '"' + ((o.session_start_month || 4) === i + 1 ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div></div>'
+    + '<div class="grid2"><div><label>Founded in (year)</label><input id="o_year" value="' + esc(o.founded_year || '') + '" inputmode="numeric" maxlength="4" placeholder="e.g. 1985"></div>'
+    + '<div><label>Meeting place / office address</label><input id="o_addr" value="' + esc(o.address) + '" maxlength="200" placeholder="e.g. Agarwal Dharamshala, Main Bazaar"></div></div>'
     + '<label>About the organisation</label><textarea id="o_about" maxlength="1000">' + esc(o.about) + '</textarea>'
     + '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:10px 12px;margin-top:10px">'
     + '<b style="font-size:.86rem">📞 Contact person</b> <span class="muted">— on Save they are added to Dabwali Parivar with this designation, and their business is linked to their profile</span>'
@@ -230,6 +232,11 @@ function drawOrg(o){
       + '<div id="rp_lbl_w" style="display:none"><label>Role title</label><input id="rp_lbl" maxlength="40" placeholder="e.g. Project Chairman"></div>'
       + '<label>Their business on DukanList (optional)</label>' + shopPicker('rs', null, null)
       + '<div style="margin-top:10px"><button class="btn p" onclick="addRole()">+ Add</button></div></div>'
+      + '<div class="sec"><b style="font-size:.9rem">📋 Paste a member list</b> <span class="muted">— one person per line: <code>Name, mobile</code> or just <code>Name</code>. Existing people are matched by mobile; new ones are added with the number hidden.</span>'
+      + '<textarea id="bk_lines" style="min-height:120px;margin-top:6px" placeholder="Ramesh Garg, 98765 43210&#10;Sunita Jain 9812345678&#10;Anil Kumar"></textarea>'
+      + '<div class="grid2"><div><label>Add them as</label><select id="bk_role">' + opts(ROLES.filter(function(x){ return x[0] !== 'other'; }), 'member') + '</select></div>'
+      + '<div style="display:flex;align-items:flex-end"><button class="btn p" onclick="bulkAdd()">+ Add all to ' + esc(o.current_session) + '</button></div></div>'
+      + '<div id="bk_out" class="muted" style="margin-top:6px"></div></div>'
       + (past.length ? '<div class="sec"><b style="font-size:.9rem">Previous sessions</b>' + past.map(function(r){ return '<div class="muted">' + esc(r.session) + ' · ' + esc(r.name) + ' — ' + esc(r.role_label || label(ROLES, r.role)) + '</div>'; }).join('') + '</div>' : '')
       + '</div>';
   }
@@ -238,6 +245,7 @@ function drawOrg(o){
 async function saveOrg(){
   var p = { name: val('o_name'), name_hi: val('o_name_hi'), kind: val('o_kind'), about: val('o_about'), contact_name: val('o_cname'),
             contact_mobile: val('o_cmob'), contact_role: val('o_crole'), contact_business_id: val('oc_bid'),
+            founded_year: val('o_year'), address: val('o_addr'),
             session_start_month: val('o_month'), logo_url: val('o_logo') };
   if (p.contact_name && !p.contact_role){ alert('Select the contact person\'s designation'); return; }
   if (CUR && CUR.id){ p.id = CUR.id; p.status = val('o_status'); }
@@ -277,6 +285,24 @@ async function changeRole(pid, role){
   if (fail(r)) return; toast('✓ Role changed'); openItem(CUR.id);
 }
 async function removeRole(id){ if (!confirm('Remove from this session?')) return; var r = await c().rpc('admin_parivar_remove_role', { p_role_id: id }); if (fail(r)) return; toast('Removed'); openItem(CUR.id); }
+// v361: paste a whole member list (db/255 admin_parivar_bulk_add)
+async function bulkAdd(){
+  var lines = (document.getElementById('bk_lines') || {}).value || '';
+  var n = lines.split('\n').filter(function(l){ return l.trim(); }).length;
+  if (!n){ alert('Paste at least one name'); return; }
+  if (n > 300){ alert('Please paste at most 300 lines at a time'); return; }
+  if (!confirm('Add ' + n + ' line' + (n === 1 ? '' : 's') + ' to ' + (CUR.current_session || 'this session') + '?')) return;
+  var r = await c().rpc('admin_parivar_bulk_add', { p_org_id: CUR.id, p_lines: lines, p_role: val('bk_role') || 'member' });
+  if (fail(r)) return;
+  var d = r.data || {};
+  var sk = (d.skipped || []);
+  toast('✓ ' + (d.new_people || 0) + ' new, ' + (d.existing_people || 0) + ' already in Parivar');
+  await openItem(CUR.id);
+  var out = document.getElementById('bk_out');
+  if (out) out.innerHTML = '✓ Added: <b>' + (d.new_people || 0) + '</b> new people, <b>' + (d.existing_people || 0) + '</b> matched to existing people'
+    + (d.already_in_session ? ', <b>' + d.already_in_session + '</b> were already in this session (roles kept)' : '')
+    + (sk.length ? '<br><span style="color:#B91C1C">Skipped ' + sk.length + ' line' + (sk.length === 1 ? '' : 's') + ' (no readable name): ' + sk.map(esc).join(' · ') + '</span>' : '');
+}
 async function newSession(){
   if (!confirm('Start a new session? Everyone moves into it as "Member"; you assign the new office bearers (President, Secretary…) again. This year\'s roles stay in the history.')) return;
   var r = await c().rpc('admin_parivar_new_session', { p_org_id: CUR.id, p_session: null }); if (fail(r)) return;
@@ -289,6 +315,8 @@ function drawPerson(p){
   var h = '<h2>' + (isNew ? 'New person' : esc(p.full_name)) + (isNew ? '' : '<a class="btn g s" href="/parivar/' + esc(p.slug) + '" target="_blank" rel="noopener">Public page ↗</a>') + '</h2>'
     + '<div class="grid2"><div><label>Full name *</label><input id="p_name" value="' + esc(p.full_name) + '"></div>'
     + '<div><label>Name in Hindi</label><input id="p_name_hi" value="' + esc(p.name_hi) + '"></div></div>'
+    + '<label>Profession</label><input id="p_prof" value="' + esc(p.profession) + '" maxlength="60" list="profList" placeholder="e.g. Chartered Accountant, Doctor, Teacher">'
+    + '<datalist id="profList">' + ['Chartered Accountant','Doctor','Advocate','Teacher','Engineer','Businessman','Shopkeeper','Trader','Farmer','Mutual Fund Distributor','Insurance Advisor','Government Service','Social Worker','Retired'].map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>'
     + '<div class="grid2"><div><label>Mobile (private — used for identity only)</label><input id="p_mob" value="' + esc(p.mobile) + '" inputmode="numeric" placeholder="10 digits, optional"' + (isNew ? ' oninput="suggestShop(this.value,\'ps\')"' : '') + '></div>'
     + '<div><label>Contact visibility</label><select id="p_mode">' + opts(MODES, p.contact_mode || 'hidden') + '</select></div></div>'
     + (isNew ? '<label>Their business on DukanList (optional)</label>' + shopPicker('ps', null, null) : '')
@@ -315,7 +343,7 @@ function drawPerson(p){
   document.getElementById('editor').innerHTML = h;
 }
 async function savePerson(){
-  var p = { full_name: val('p_name'), name_hi: val('p_name_hi'), mobile: val('p_mob'), contact_mode: val('p_mode'), bio: val('p_bio'), photo_url: val('p_photo') };
+  var p = { full_name: val('p_name'), name_hi: val('p_name_hi'), profession: val('p_prof'), mobile: val('p_mob'), contact_mode: val('p_mode'), bio: val('p_bio'), photo_url: val('p_photo') };
   if (CUR && CUR.id){ p.id = CUR.id; p.status = val('p_status'); }
   if (p.full_name.length < 2){ alert('Enter the full name'); return; }
   if (!p.mobile && p.contact_mode !== 'hidden'){ alert('"Show number" and "WhatsApp only" need a mobile number — add one or choose "Hide number".'); return; }
