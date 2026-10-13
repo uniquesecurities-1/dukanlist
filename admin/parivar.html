@@ -244,7 +244,7 @@ function drawOrg(o){
       + '<label>Already in Dabwali Parivar? Search by name or mobile</label><input id="rp_q" placeholder="Name / mobile" oninput="clearTimeout(window._rp);window._rp=setTimeout(pickPerson,250)"><div class="pick" id="rp_pick" style="display:none"></div>'
       + '<input type="hidden" id="rp_id"><div class="muted" id="rp_sel" style="margin-top:4px"></div>'
       + '<label>…or add someone new</label><div class="grid2"><input id="rp_name" placeholder="Full name"><input id="rp_mob" inputmode="numeric" placeholder="Mobile (optional)" oninput="suggestShop(this.value,\'rs\')"></div>'
-      + '<div class="grid2"><div><label>Contact visibility</label><select id="rp_mode">' + opts(MODES, 'hidden') + '</select></div>'
+      + '<div class="grid2"><div><label>Contact visibility</label><select id="rp_mode">' + opts(MODES, 'whatsapp') + '</select></div>'
       + '<div><label>Role</label><select id="rp_role" onchange="document.getElementById(\'rp_lbl_w\').style.display=this.value===\'other\'?\'\':\'none\'">' + opts(ROLES, 'member') + '</select></div></div>'
       + '<div id="rp_lbl_w" style="display:none"><label>Role title</label><input id="rp_lbl" maxlength="40" placeholder="e.g. Project Chairman"></div>'
       + '<div class="grid2"><div><label>Profession</label><input id="rp_prof" maxlength="60" list="rpProfList" placeholder="e.g. Chartered Accountant">'
@@ -253,7 +253,7 @@ function drawOrg(o){
       + '<label>Their business on DukanList (optional)</label>' + shopPicker('rs', null, null)
       + '<label>Their role in that business</label><select id="rp_frole">' + opts(FIRM_ROLES.filter(function(x){ return x[0] !== 'other'; }), 'owner') + '</select>'
       + '<div style="margin-top:10px"><button class="btn p" onclick="addRole()">+ Add</button></div></div>'
-      + '<div class="sec"><b style="font-size:.9rem">📋 Paste a member list</b> <span class="muted">— one person per line: <code>Name, mobile, Profession</code> (mobile and profession optional). Existing people are matched by mobile; new ones are added with the number hidden; a DukanList shop on the same number is linked automatically.</span>'
+      + '<div class="sec"><b style="font-size:.9rem">📋 Paste a member list</b> <span class="muted">— one person per line: <code>Name, mobile, Profession</code> (mobile and profession optional). Existing people are matched by mobile; new ones get a WhatsApp button (number not shown); a DukanList shop on the same number is linked automatically.</span>'
       + '<textarea id="bk_lines" style="min-height:120px;margin-top:6px" placeholder="Ramesh Garg, 98765 43210, Chartered Accountant&#10;Sunita Jain 9812345678&#10;Anil Kumar, , Teacher"></textarea>'
       + '<div class="grid2"><div><label>Add them as</label><select id="bk_role">' + opts(ROLES.filter(function(x){ return x[0] !== 'other'; }), 'member') + '</select></div>'
       + '<div style="display:flex;align-items:flex-end"><button class="btn p" onclick="bulkAdd()">+ Add all to ' + esc(o.current_session) + '</button></div></div>'
@@ -288,7 +288,7 @@ async function addRole(){
   var pid = val('rp_id');
   if (!pid){
     var name = val('rp_name'); if (name.length < 2){ alert('Pick a person or enter a new name'); return; }
-    var r1 = await c().rpc('admin_parivar_upsert_person', { p: { full_name: name, mobile: val('rp_mob'), contact_mode: val('rp_mode'), profession: val('rp_prof') } });
+    var r1 = await c().rpc('admin_parivar_upsert_person', { p: { full_name: name, mobile: val('rp_mob'), contact_mode: val('rp_mob') ? val('rp_mode') : 'hidden', profession: val('rp_prof') } });
     if (fail(r1)) return; pid = r1.data.id;
   } else if (val('rp_prof')){
     var r2 = await c().rpc('admin_parivar_upsert_person', { p: { id: pid, profession: val('rp_prof') } });
@@ -346,7 +346,7 @@ function drawPerson(p){
     + '<label>Profession</label><input id="p_prof" value="' + esc(p.profession) + '" maxlength="60" list="profList" placeholder="e.g. Chartered Accountant, Doctor, Teacher">'
     + '<datalist id="profList">' + ['Chartered Accountant','Doctor','Advocate','Teacher','Engineer','Businessman','Shopkeeper','Trader','Farmer','Mutual Fund Distributor','Insurance Advisor','Government Service','Social Worker','Retired'].map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>'
     + '<div class="grid2"><div><label>Mobile (private — used for identity only)</label><input id="p_mob" value="' + esc(p.mobile) + '" inputmode="numeric" placeholder="10 digits, optional"' + (isNew ? ' oninput="suggestShop(this.value,\'ps\')"' : '') + '></div>'
-    + '<div><label>Contact visibility</label><select id="p_mode">' + opts(MODES, p.contact_mode || 'hidden') + '</select></div></div>'
+    + '<div><label>Contact visibility</label><select id="p_mode">' + opts(MODES, p.contact_mode || (isNew ? 'whatsapp' : 'hidden')) + '</select></div></div>'
     + (isNew ? '<label>Their business on DukanList (optional)</label>' + shopPicker('ps', null, null) : '')
     + '<label>Short bio (300 characters)</label><textarea id="p_bio" maxlength="300">' + esc(p.bio) + '</textarea>'
     + '<label>Photo</label><div class="photo"><img id="p_photo_prev" src="' + esc(p.photo_url || '') + '" style="' + (p.photo_url ? '' : 'display:none') + '" alt=""><input type="hidden" id="p_photo" value="' + esc(p.photo_url) + '">'
@@ -377,6 +377,7 @@ async function savePerson(){
   var p = { full_name: val('p_name'), name_hi: val('p_name_hi'), profession: val('p_prof'), mobile: val('p_mob'), contact_mode: val('p_mode'), bio: val('p_bio'), photo_url: val('p_photo') };
   if (CUR && CUR.id){ p.id = CUR.id; p.status = val('p_status'); }
   if (p.full_name.length < 2){ alert('Enter the full name'); return; }
+  if (!p.mobile && p.contact_mode !== 'hidden' && !(CUR && CUR.id)) p.contact_mode = 'hidden';   // new person, no number yet
   if (!p.mobile && p.contact_mode !== 'hidden'){ alert('"Show number" and "WhatsApp only" need a mobile number — add one or choose "Hide number".'); return; }
   var r = await c().rpc('admin_parivar_upsert_person', { p: p }); if (fail(r)) return;
   if (!(CUR && CUR.id) && val('ps_bid')){

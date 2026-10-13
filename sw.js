@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.2';   // v367 call/WhatsApp on member cards, full shop names
+const VERSION = 'dukan-v3.87.3';   // v368 default WhatsApp only for listed members
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
