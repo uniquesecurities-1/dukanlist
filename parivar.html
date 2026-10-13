@@ -52,13 +52,13 @@
 </main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261013a"></script>
+<script src="/assets/js/parivar-common.js?v=20261013b"></script>
 <script>
 (function(){
   var esc = PV.esc;
   var help = ((window.DL_CONFIG || {}).support || {}).whatsapp || '';
   var jw = document.getElementById('joinWa');
-  if (jw) jw.href = help ? 'https://wa.me/91' + help + '?text=' + encodeURIComponent('Namaste, Dabwali Parivar mein hamari sanstha jodni hai. Sanstha ka naam: ') : '/contact';
+  if (jw) jw.href = help ? 'https://wa.me/91' + help + '?text=' + encodeURIComponent('नमस्ते, डबवाली परिवार में हमारी संस्था जोड़नी है। संस्था का नाम: ') : '/contact';
 
   function orgCard(o){
     return '<a class="pv-card" href="/sanstha/' + encodeURIComponent(o.slug) + '">' + PV.avatar(o.logo || null, o.name, 46, false)

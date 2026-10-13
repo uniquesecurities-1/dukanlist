@@ -176,7 +176,7 @@
   function opts(list, sel){ return list.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === sel ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join(''); }
   function roleName(r, lbl){ if (r === 'other' && lbl) return lbl; var f = ROLES.find(function(x){ return x[0] === r; }); return f ? f[1].split(' — ')[1] : r; }
   function bad(){ ['loading','app'].forEach(function(x){ $(x).classList.add('hide'); }); $('bad').classList.remove('hide'); }
-  if (HELP) $('badWa').href = 'https://wa.me/91' + HELP + '?text=' + encodeURIComponent('Namaste, Dabwali Parivar ka sanstha manager link expire ho gaya hai. Naya link bhej dijiye.');
+  if (HELP) $('badWa').href = 'https://wa.me/91' + HELP + '?text=' + encodeURIComponent('नमस्ते, डबवाली परिवार का संस्था मैनेजर लिंक खत्म हो गया है। कृपया नया लिंक भेज दीजिए।');
   if (!/^[a-f0-9]{64}$/.test(TOKEN)){ bad(); return; }
 
   $('anRole').innerHTML = opts(ROLES.filter(function(x){ return x[0] !== 'other'; }), 'member');
@@ -280,8 +280,9 @@
       var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
       rpc('pv_mgr_member_link', { p_token: TOKEN, p_person_id: m.id }).then(function(d){
         var link = location.origin + '/parivar-profile?t=' + d.token;
-        var msg = 'Namaste ' + (d.name || '') + ' ji 🙏\n\n' + D.org.name + ' ki taraf se: DukanList ke "Dabwali Parivar" mein aapka page bana hai.\n\n'
-          + 'Is link par khud dekhiye aur theek kijiye — "haan, ye main hoon" confirm kijiye, number dikhana hai ya nahi chuniye, photo aur parichay badaliye. Koi login nahi chahiye:\n' + link + '\n\n(Link 7 din chalega.)';
+        var msg = 'नमस्ते ' + (d.name || '') + ' जी,\n\n' + D.org.name + ' की ओर से: DukanList के "डबवाली परिवार" में आपका पेज बना है।\n\n'
+          + 'इस लिंक पर खुद देखिए और ठीक कीजिए — "हाँ, यह मैं हूँ" कन्फर्म कीजिए, नंबर दिखाना है या नहीं चुनिए, फोटो और परिचय बदलिए। कोई लॉगिन नहीं चाहिए:\n' + link
+          + '\n\nयह लिंक 7 दिन चलेगा।\n— ' + D.org.name;
         var url = 'https://wa.me/91' + String(d.mobile || '').replace(/\D/g, '').slice(-10) + '?text=' + encodeURIComponent(msg);
         if (win) win.location.href = url; else location.href = url;
         toast('📲 WhatsApp में Send दबाइए');

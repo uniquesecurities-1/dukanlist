@@ -133,7 +133,7 @@
       .then(function(r){ return r.json().catch(function(){ return null; }).then(function(j){ if (!r.ok) throw new Error((j && j.message) || ('HTTP ' + r.status)); return j; }); });
   }
   function show(id){ ['loading','bad','form','done'].forEach(function(x){ $(x).classList.toggle('hide', x !== id); }); $('bar').classList.toggle('hide', id !== 'form'); }
-  function bad(){ if (HELP) $('badWa').href = 'https://wa.me/91' + HELP + '?text=' + encodeURIComponent('Namaste, mujhe Dabwali Parivar mein apna page theek karne ka naya link chahiye.'); show('bad'); }
+  function bad(){ if (HELP) $('badWa').href = 'https://wa.me/91' + HELP + '?text=' + encodeURIComponent('नमस्ते, मुझे डबवाली परिवार में अपना पेज ठीक करने का नया लिंक चाहिए।'); show('bad'); }
   if (!/^[0-9a-f]{64}$/.test(TOKEN)){ bad(); return; }
 
   function pickMode(v){ document.querySelectorAll('label.opt[data-v]').forEach(function(l){ var on = l.dataset.v === v; l.classList.toggle('on', on); l.querySelector('input').checked = on; }); }

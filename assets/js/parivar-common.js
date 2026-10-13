@@ -70,7 +70,7 @@
   function contactHtml(mode, mobile, name){
     var m = String(mobile || '').replace(/\D/g, '').slice(-10);
     if (m.length !== 10 || mode === 'hidden') return '';
-    var wa = 'https://wa.me/91' + m + '?text=' + encodeURIComponent('Namaste ' + (name || '') + ' ji, Dabwali Parivar (DukanList) par aapka page dekha.');
+    var wa = 'https://wa.me/91' + m + '?text=' + encodeURIComponent('नमस्ते ' + (name || '') + ' जी, डबवाली परिवार (DukanList) पर आपका पेज देखा।');
     var waBtn = '<a class="pv-btn pv-wa" href="' + wa + '" target="_blank" rel="noopener">💬 ' + bi('WhatsApp', 'WhatsApp करें') + '</a>';
     if (mode === 'show'){
       return '<div class="pv-num">+91 ' + esc(m.slice(0, 5) + ' ' + m.slice(5)) + '</div>'

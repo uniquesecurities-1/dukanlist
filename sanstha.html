@@ -32,7 +32,7 @@
 <main class="pv-wrap" id="root"><div class="pv-empty">…</div></main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261013a"></script>
+<script src="/assets/js/parivar-common.js?v=20261013b"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -46,7 +46,7 @@
   function memberActs(m){
     var d = String(m.mobile || '').replace(/\D/g, '').slice(-10);
     if (d.length !== 10 || (m.contact_mode !== 'show' && m.contact_mode !== 'whatsapp')) return '';
-    var wa = 'https://wa.me/91' + d + '?text=' + encodeURIComponent('Namaste ' + (m.name || '') + ' ji, ' + (ORG_NAME ? ORG_NAME + ' ke ' : '') + 'Dabwali Parivar (DukanList) page se aapka number mila.');
+    var wa = 'https://wa.me/91' + d + '?text=' + encodeURIComponent('नमस्ते ' + (m.name || '') + ' जी, ' + (ORG_NAME ? ORG_NAME + ' के ' : '') + 'डबवाली परिवार (DukanList) पेज से आपका नंबर मिला।');
     return '<div class="mc-acts">'
       + (m.contact_mode === 'show' ? '<a class="mc-call" href="tel:+91' + d + '" onclick="event.stopPropagation()">📞 ' + bi('Call', 'कॉल') + '</a>' : '')
       + '<a class="mc-wa" href="' + wa + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 WhatsApp</a></div>';
@@ -98,7 +98,7 @@
             + '</div>' + (o.contact_role ? '<span class="pv-role">' + PV.roleHtml(o.contact_role) + '</span>' : '') + '</div>'
           : '')
       + (cm.length === 10
-          ? '<div class="pv-acts"><a class="pv-btn pv-wa" target="_blank" rel="noopener" href="https://wa.me/91' + cm + '?text=' + encodeURIComponent('Namaste, Dabwali Parivar (DukanList) par ' + o.name + ' ka page dekha.') + '">💬 '
+          ? '<div class="pv-acts"><a class="pv-btn pv-wa" target="_blank" rel="noopener" href="https://wa.me/91' + cm + '?text=' + encodeURIComponent('नमस्ते, डबवाली परिवार (DukanList) पर ' + o.name + ' का पेज देखा।') + '">💬 '
             + bi('Contact the organisation', 'संस्था से संपर्क') + '</a>'
             + '<a class="pv-btn pv-call" href="tel:+91' + cm + '">📞 ' + bi('Call', 'कॉल') + '</a></div>'
           : '')

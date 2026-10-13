@@ -95,9 +95,10 @@ function color(p){ return p >= 80 ? '#16A34A' : p >= 50 ? '#F59E0B' : '#EF4444';
 
 function message(d, link){
   var page = location.origin + '/' + (d.slug || '');
-  return 'Namaste ji 🙏\n\nDukanList par aapki dukaan "' + (d.name || '') + '" ka page hai: ' + page + '\n\n'
-    + 'Is link par 2 minute mein apni dukaan ki jaankari aur photo daal dijiye — kya milta hai, log aapke paas kyon aate hain. Koi login nahi chahiye:\n' + link + '\n\n'
-    + 'Jin dukaanon ka page poora hota hai, wo DukanList ke home page par zyada dikhti hain.\n— DukanList Helpline';
+  // v377: proper Hindi, no emoji
+  return 'नमस्ते जी,\n\nDukanList पर आपकी दुकान "' + (d.name || '') + '" का पेज है:\n' + page + '\n\n'
+    + 'इस लिंक पर 2 मिनट में अपनी दुकान की जानकारी और फोटो डाल दीजिए — आपके यहाँ क्या मिलता है और ग्राहक आपके पास क्यों आते हैं। कोई लॉगिन नहीं चाहिए:\n' + link + '\n\n'
+    + 'जिन दुकानों का पेज पूरा होता है, वे DukanList के होम पेज पर ज़्यादा दिखती हैं।\n— DukanList हेल्पलाइन';
 }
 
 async function load(){

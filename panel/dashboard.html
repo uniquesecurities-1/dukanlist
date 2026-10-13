@@ -3263,8 +3263,8 @@ function shareReferralWhatsApp(){
   if (!link) return;
   const lang = document.documentElement.dataset.lang === 'hi' ? 'hi' : 'en';
   const message = lang === 'hi'
-    ? 'Namaste! Apni dukaan ko DukanList par list karwao — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Aaj hi karein: ' + link
-    : 'Namaste! List your business on DukanList — Sirsa · Bathinda · Mansa · Muktsar ka apna local directory. FREE registration. Register today: ' + link;
+    ? 'नमस्ते! अपनी दुकान DukanList पर मुफ़्त लिस्ट करवाइए — सिरसा · बठिंडा · मानसा · मुक्तसर की अपनी लोकल डायरेक्टरी। आज ही रजिस्टर करें: ' + link
+    : 'Namaste! List your business on DukanList — the local directory for Sirsa · Bathinda · Mansa · Muktsar. Registration is FREE. Register today: ' + link;
   window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
 }
 

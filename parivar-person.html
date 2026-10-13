@@ -32,7 +32,7 @@
 <main class="pv-wrap" id="root"><div class="pv-empty">…</div></main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261013a"></script>
+<script src="/assets/js/parivar-common.js?v=20261013b"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -73,7 +73,7 @@
     var mob = b ? String(b.mobile || '').replace(/\D/g, '').slice(-10) : '';
     var wa = b ? String(b.whatsapp || b.mobile || '').replace(/\D/g, '').slice(-10) : '';
     var acts = (mob.length === 10 ? '<a class="fc-btn call" href="tel:+91' + mob + '" aria-label="Call" title="Call">📞</a>' : '')
-      + (wa.length === 10 ? '<a class="fc-btn wa" href="https://wa.me/91' + wa + '?text=' + encodeURIComponent('Namaste, DukanList par aapki dukan ' + (b.name || f.name) + ' dekhi.') + '" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">💬</a>' : '');
+      + (wa.length === 10 ? '<a class="fc-btn wa" href="https://wa.me/91' + wa + '?text=' + encodeURIComponent('नमस्ते, DukanList पर आपकी दुकान ' + (b.name || f.name) + ' देखी।') + '" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">💬</a>' : '');
     var body = '<div class="fc-th">' + (photo ? '<img src="' + esc(thumb(photo)) + '" alt="" loading="lazy" width="72" height="72">' : esc(icon)) + '</div>'
       + '<div class="fc-mid"><div class="fc-n">' + esc((b && b.name) || f.name) + '</div>'
       + (bits.length ? '<div class="fc-l2">' + bits.join('<span>·</span>') + '</div>' : '')
