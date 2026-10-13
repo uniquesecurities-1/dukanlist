@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.0';   // v365 member cards
+const VERSION = 'dukan-v3.87.1';   // v366 hide 'member since' that only reflects this session
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

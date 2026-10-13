@@ -38,7 +38,7 @@
   var esc = PV.esc, bi = PV.bi;
   var slug = (location.pathname.match(/^\/sanstha\/([a-z0-9-]+)/) || [])[1] || new URLSearchParams(location.search).get('slug') || '';
   var root = document.getElementById('root');
-  var MEMBERS = [];
+  var MEMBERS = [], SESS_START = 0;
   function notFound(){
     root.innerHTML = '<div class="pv-empty">' + bi('This organisation is not available.', 'यह संस्था उपलब्ध नहीं है।') + '<br><a href="/parivar">' + bi('← Dabwali Parivar', '← डबवाली परिवार') + '</a></div>';
   }
@@ -54,7 +54,8 @@
       var firm = m.firm && m.firm.name
         ? '<div class="mc-f">🏪 ' + (m.firm.slug ? '<a href="/' + encodeURIComponent(m.firm.slug) + '" onclick="event.stopPropagation()">' + esc(m.firm.name) + '</a>' : esc(m.firm.name))
           + ((m.firm.role_label || m.firm.role) ? ' <span>· ' + PV.firmRoleHtml(m.firm.role, m.firm.role_label) + '</span>' : '') + '</div>' : '';
-      var since = m.since && m.since <= now ? '<div class="mc-s">' + bi('Member since', 'सदस्य') + ' ' + esc(m.since) + (now - m.since >= 2 ? ' · ' + (now - m.since) + ' ' + bi('yrs', 'साल') : '') + '</div>' : '';
+      // only show a real joining year — a year equal to the current session just means 'added this year'
+      var since = m.since && m.since <= now && (!SESS_START || m.since < SESS_START) ? '<div class="mc-s">' + bi('Member since', 'सदस्य') + ' ' + esc(m.since) + (now - m.since >= 2 ? ' · ' + (now - m.since) + ' ' + bi('yrs', 'साल') : '') + '</div>' : '';
       return '<div class="pv-mcard" onclick="location.href=\'/parivar/' + encodeURIComponent(m.slug) + '\'">' + PV.avatar(m.photo, m.name, 46)
         + '<div class="mc-b"><div class="mc-n"><a href="/parivar/' + encodeURIComponent(m.slug) + '">' + esc(m.name) + '</a>' + (m.verified ? ' <span class="pv-ok" title="Confirmed by the member">✓</span>' : '') + '</div>'
         + (m.role && m.role !== 'member' ? '<span class="pv-role" style="font-size:.66rem;padding:1px 8px">' + PV.roleHtml(m.role, m.role_label) + '</span> ' : '')
@@ -69,6 +70,7 @@
     var md = document.querySelector('meta[name="description"]');
     if (md) md.setAttribute('content', o.name + (o.city ? ', ' + o.city : '') + ' — office bearers ' + o.session + ', members and past presidents on Dabwali Parivar.');
     MEMBERS = o.members || [];
+    SESS_START = parseInt(String(o.session || ''), 10) || 0;
     var cm = String(o.contact_mobile || '').replace(/\D/g, '').slice(-10);
     var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(o.logo, o.name, 64, false)
       + '<div><h1>' + esc(o.name) + '</h1>' + (o.name_hi ? '<div class="sub">' + esc(o.name_hi) + '</div>' : '')
