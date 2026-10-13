@@ -125,7 +125,8 @@ async function loadList(){
   var rows = r.data || [];
   if (!rows.length){ el.innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
   el.innerHTML = rows.map(function(x){
-    var sm = TAB === 'org' ? esc(label(KINDS, x.kind)) + ' · ' + esc(x.session) + ' · ' + (x.members || 0) + ' members' + (x.status !== 'active' ? ' · hidden' : '')
+    var sm = TAB === 'org' ? (x.logo_waiting ? '<span style="color:#C2410C;font-weight:800">🖼 logo waiting</span> · ' : '') + (x.manager_changes_24h ? '<span style="color:#047857;font-weight:800">✏️ ' + x.manager_changes_24h + ' changes today</span> · ' : '')
+                             + esc(label(KINDS, x.kind)) + ' · ' + esc(x.session) + ' · ' + (x.members || 0) + ' members' + (x.status !== 'active' ? ' · hidden' : '')
                            : (x.photo_waiting ? '<span style="color:#C2410C;font-weight:800">📷 photo waiting</span> · ' : '') + (x.note_waiting ? '<span style="color:#B45309;font-weight:800">📝 note</span> · ' : '')
                              + (x.mobile ? esc(x.mobile) : 'no number') + ' · ' + esc(label(MODES, x.contact_mode)) + (x.status !== 'active' ? ' · hidden' : '');
     return '<div class="item' + (CUR && CUR.id === x.id ? ' on' : '') + '" onclick="openItem(\'' + x.id + '\')"><b>' + esc(x.name) + '</b><small>' + sm + '</small></div>';
@@ -231,6 +232,12 @@ function drawOrg(o){
     + (isNew ? '' : '<label>Status</label><select id="o_status">' + opts([['active','Active (public)'],['hidden','Hidden']], o.status) + '</select>')
     + '<div style="margin-top:12px"><button class="btn p" onclick="saveOrg()">💾 Save</button></div>';
   if (!isNew){
+    // v374: logo sent by the organisation's manager (db/264)
+    if (o.pending_logo_url) h += '<div class="sec"><b>🖼 New logo from the organisation</b><div class="photo" style="margin-top:6px"><img src="' + esc(o.pending_logo_url) + '" alt="">'
+      + '<button class="btn p s" onclick="reviewLogo(\'' + o.id + '\', true)">✓ Approve</button><button class="btn d s" onclick="reviewLogo(\'' + o.id + '\', false)">✕ Reject</button></div></div>';
+    h += '<div class="sec" id="mgrSec"><b>🧑‍💼 Sanstha Manager</b> <span class="muted">loading…</span></div>';
+  }
+  if (!isNew){
     var cur = (o.roles || []).filter(function(r){ return r.session === o.current_session; });
     var past = (o.roles || []).filter(function(r){ return r.session !== o.current_session; });
     h += '<div class="sec"><h2>Session ' + esc(o.current_session) + ' — office bearers and members (' + cur.length + ')'
@@ -263,6 +270,75 @@ function drawOrg(o){
       + '</div>';
   }
   document.getElementById('editor').innerHTML = h;
+  if (!isNew) loadMgr(o);
+}
+
+/* ---------- v374: Sanstha Manager link (db/264) ---------- */
+var MGR_ACT = {
+  manager_link_sent: function(d){ return '🔗 Manager link sent to ' + esc(d.to || ''); },
+  manager_link_stopped: function(){ return '⛔ Manager link stopped'; },
+  members_added: function(d){ return '➕ Added — new ' + (d.new_people || 0) + ', already in Parivar ' + (d.existing_people || 0) + (d.already_in_session ? ', already listed ' + d.already_in_session : '') + (d.shops_linked ? ', shops linked ' + d.shops_linked : ''); },
+  role_changed: function(d){ return '🎖 ' + esc(d.person || '') + ': ' + esc(d.from || '—') + ' → ' + esc(d.to || ''); },
+  member_removed: function(d, i){ return '✕ Removed ' + esc(d.person || '') + ' from ' + esc(d.session || '') + ' <button class="btn g s" onclick="putBack(' + i + ')">↩ Put back</button>'; },
+  member_since: function(d){ return '📅 ' + esc(d.person || '') + ': member since ' + esc(d.year || '—'); },
+  details_updated: function(d){ return '✏️ Details updated' + (d.logo_sent ? ' + new logo sent' : ''); },
+  new_session: function(d){ return '🔄 New session ' + esc(d.to || '') + ' (' + (d.carried_over || 0) + ' carried over)'; },
+  member_link: function(d){ return '📲 Profile link sent to ' + esc(d.person || ''); },
+  logo_approved: function(){ return '🖼 Logo approved'; },
+  logo_rejected: function(){ return '🖼 Logo rejected'; }
+};
+async function loadMgr(o){
+  var el = document.getElementById('mgrSec'); if (!el) return;
+  var r = await c().rpc('admin_parivar_manager_info', { p_org_id: o.id });
+  if (r.error){ el.innerHTML = '<b>🧑‍💼 Sanstha Manager</b> <span class="muted">— run db/264 first (' + esc(r.error.message) + ')</span>'; return; }
+  var d = r.data || {}, L = d.link;
+  window._mgrChanges = d.changes || [];
+  // people of this session who have a number — office bearers first
+  var by = {};
+  (o.roles || []).filter(function(x){ return x.session === o.current_session && x.mobile; }).forEach(function(x){ if (!by[x.person_id] || x.role !== 'member') by[x.person_id] = x; });
+  var ppl = Object.keys(by).map(function(k){ return by[k]; }).sort(function(a, b){ return (a.role === 'member') - (b.role === 'member') || a.name.localeCompare(b.name); });
+  var fmt = function(t){ return t ? new Date(t).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : ''; };
+  var h = '<b>🧑‍💼 Sanstha Manager</b> <span class="muted">— the President / Secretary runs this organisation from a WhatsApp link (no login): members, office bearers, details, logo (you approve), new session. They see only the last 5 digits of members’ numbers. Every change is listed below.</span>'
+    + '<div style="margin-top:8px;padding:8px 10px;border-radius:9px;background:' + (L ? '#ECFDF5' : '#F8FAFC') + '">'
+    + (L ? '✅ Active — sent to <b>' + esc(L.to || '') + '</b> · valid till ' + esc(fmt(L.expires_at)) + ' · ' + (L.last_used_at ? 'last used ' + esc(fmt(L.last_used_at)) + ' (' + (L.uses || 0) + ' changes)' : 'not opened yet')
+         + ' <button class="btn d s" onclick="stopMgr(\'' + o.id + '\')">⛔ Stop link</button>'
+       : 'No manager link yet.') + '</div>'
+    + (ppl.length
+        ? '<div class="grid2" style="margin-top:8px"><select id="mgrPerson">' + ppl.map(function(x){ return '<option value="' + x.person_id + '"' + (L && L.person_id === x.person_id ? ' selected' : '') + '>' + esc(x.name) + ' — ' + esc(x.role_label || label(ROLES, x.role)) + '</option>'; }).join('') + '</select>'
+          + '<div><button class="btn p" onclick="sendMgr(\'' + o.id + '\')">📲 ' + (L ? 'Send a new link (old one stops)' : 'Send manager link on WhatsApp') + '</button></div></div>'
+        : '<div class="muted" style="margin-top:6px">Add the President / Secretary with a mobile number first.</div>')
+    + ((d.changes || []).length ? '<div style="margin-top:10px"><b style="font-size:.84rem">Recent changes</b>' + d.changes.map(function(ch, i){
+        var f = MGR_ACT[ch.action]; return '<div class="muted" style="padding:3px 0;border-bottom:1px dashed #E2E8F0">' + esc(fmt(ch.at)) + ' · <b>' + esc(ch.by || '') + '</b> · ' + (f ? f(ch.detail || {}, i) : esc(ch.action)) + '</div>';
+      }).join('') + '</div>' : '');
+  el.innerHTML = h;
+}
+async function sendMgr(orgId){
+  var pid = val('mgrPerson'); if (!pid){ alert('Pick the person'); return; }
+  var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
+  var r = await c().rpc('admin_parivar_create_manager_link', { p_org_id: orgId, p_person_id: pid, p_days: 30 });
+  if (r.error){ if (win) win.close(); alert('Could not create the link: ' + r.error.message); return; }
+  var d = r.data || {}, link = location.origin + '/sanstha-manage?t=' + d.token;
+  var msg = 'Namaste ' + (d.name || '') + ' ji 🙏\n\nDukanList ke "Dabwali Parivar" par aapki sanstha *' + (CUR && CUR.name || '') + '* ka page: ' + location.origin + '/sanstha/' + (CUR && CUR.slug || '') + '\n\n'
+    + 'Is link se aap apni sanstha khud sambhal sakte hain — members jodna, pad (President, Secretary…) set karna, jaankari aur logo badalna, naya session shuru karna. Koi login nahi chahiye:\n' + link
+    + '\n\n(Link 30 din chalega. Kripya kisi aur ko forward na karein.)\n— DukanList Helpline';
+  var url = 'https://wa.me/91' + String(d.mobile || '').replace(/\D/g, '').slice(-10) + '?text=' + encodeURIComponent(msg);
+  if (win) win.location.href = url; else location.href = url;
+  toast('📲 Manager link created — press Send in WhatsApp');
+  openItem(orgId);
+}
+async function stopMgr(orgId){
+  if (!confirm('Stop the manager link? They will not be able to make changes until you send a new one.')) return;
+  var r = await c().rpc('admin_parivar_revoke_manager_link', { p_org_id: orgId }); if (fail(r)) return; toast('⛔ Link stopped'); openItem(orgId);
+}
+async function reviewLogo(orgId, ok){ var r = await c().rpc('admin_parivar_review_logo', { p_org_id: orgId, p_approve: ok }); if (fail(r)) return; toast(ok ? '✓ Logo is live' : 'Logo rejected'); openItem(orgId); }
+// undo a removal made from the manager link
+async function putBack(i){
+  var ch = (window._mgrChanges || [])[i]; if (!ch || !CUR) return; var d = ch.detail || {}, row = (d.rows || [])[0] || {};
+  if (d.session !== CUR.current_session){ alert('That was in session ' + d.session + ' — it can only be put back during that session.'); return; }
+  var r = await c().rpc('admin_parivar_set_role', { p_org_id: CUR.id, p_person_id: d.person_id, p_role: row.role || 'member', p_role_label: row.role_label || null, p_session: null });
+  if (fail(r)) return;
+  if (row.joined_year){ await c().rpc('admin_parivar_set_joined', { p_org_id: CUR.id, p_person_id: d.person_id, p_year: row.joined_year }); }
+  toast('↩ Put back: ' + (d.person || '')); openItem(CUR.id);
 }
 async function saveOrg(){
   var p = { name: val('o_name'), name_hi: val('o_name_hi'), kind: val('o_kind'), about: val('o_about'), contact_name: val('o_cname'),

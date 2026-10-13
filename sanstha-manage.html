@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="hi" data-lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>संस्था मैनेजर — Dabwali Parivar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<!--
+  v374: "Sanstha Manager" — the President / Secretary runs their own
+  organisation from a personal link (/sanstha-manage?t=<64-char token>, db/264).
+  No login. Members (add one / paste a list), office bearers, remove from this
+  session, member since, about / address / founded year / Hindi name, logo
+  (office approves), next session when due, members' own profile links.
+  Members' numbers show only as the last 5 digits. Every change is logged for the office.
+-->
+<style>
+  :root{ --ink:#0F172A; --ink2:#334155; --muted:#64748B; --line:#E2E8F0; --or:#EA580C }
+  *{ box-sizing:border-box }
+  body{ margin:0; font-family:'Noto Sans Devanagari','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:#FFF8F1; color:var(--ink) }
+  .top{ background:#0F172A; padding:12px 16px; display:flex; align-items:center; justify-content:center }
+  .top img{ height:28px; width:auto; display:block }
+  .wrap{ max-width:720px; margin:0 auto; padding:16px 14px 60px }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:14px }
+  .head{ display:flex; gap:12px; align-items:center }
+  .lg{ width:64px; height:64px; border-radius:14px; object-fit:cover; background:#FFEDD5; color:#9A3412; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3rem; flex:0 0 auto }
+  h1{ font-size:1.25rem; margin:0 }
+  h2{ font-size:1.02rem; margin:0 0 4px }
+  .sub{ color:var(--muted); font-size:.84rem; margin-top:3px }
+  .en{ color:var(--muted); font-size:.78rem; font-weight:500 }
+  label.sm{ display:block; font-size:.82rem; font-weight:700; color:var(--ink2); margin:10px 0 4px }
+  input[type=text], input[type=number], textarea, select{ width:100%; border:1.5px solid #CBD5E1; border-radius:10px; padding:10px 11px; font-size:.96rem; font-family:inherit; background:#fff }
+  textarea{ min-height:80px; resize:vertical }
+  .g2{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+  @media (max-width:560px){ .g2{ grid-template-columns:1fr } }
+  .btn{ border:0; border-radius:11px; padding:11px 16px; font-weight:800; font-size:.95rem; cursor:pointer; font-family:inherit }
+  .btn.ok{ background:linear-gradient(135deg,#16A34A,#15803D); color:#fff }
+  .btn.p{ background:linear-gradient(135deg,#F97316,#EA580C); color:#fff }
+  .btn.g{ background:#fff; color:var(--ink); border:1.5px solid #CBD5E1 }
+  .btn.s{ padding:6px 10px; font-size:.8rem; border-radius:9px }
+  .btn:disabled{ opacity:.55; cursor:default }
+  .note{ background:#FFF7ED; border:1px solid #FED7AA; border-radius:12px; padding:10px 12px; font-size:.84rem; color:#7C2D12; line-height:1.5 }
+  .search{ margin:10px 0 8px }
+  .mrow{ display:grid; grid-template-columns:42px 1fr auto; gap:10px; align-items:start; padding:10px 0; border-top:1px dashed var(--line) }
+  .mrow:first-child{ border-top:0 }
+  .mi{ width:42px; height:42px; border-radius:50%; background:#FFEDD5; color:#9A3412; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; overflow:hidden }
+  .mi img{ width:100%; height:100%; object-fit:cover }
+  .mn{ font-weight:800; font-size:.95rem }
+  .mn .ok{ color:#15803D }
+  .ms{ font-size:.76rem; color:var(--muted); margin-top:2px; line-height:1.4 }
+  .mc{ display:flex; gap:6px; margin-top:6px; flex-wrap:wrap }
+  .mc select{ width:auto; min-width:150px; padding:6px 8px; font-size:.82rem }
+  .mc input{ width:110px; padding:6px 8px; font-size:.82rem }
+  .ma{ display:flex; gap:4px }
+  .off{ display:inline-block; background:#ECFDF5; color:#065F46; border-radius:99px; padding:1px 8px; font-size:.7rem; font-weight:800; margin-left:4px }
+  .cnt{ color:var(--muted); font-weight:600; font-size:.85rem }
+  .center{ text-align:center; padding:30px 16px }
+  .center .big{ font-size:3rem }
+  .wa{ display:inline-block; margin-top:12px; background:#25D366; color:#fff; text-decoration:none; font-weight:800; padding:11px 18px; border-radius:11px }
+  .hide{ display:none !important }
+  .phbox{ display:flex; gap:10px; align-items:center; margin-top:6px }
+  .phbox img{ width:64px; height:64px; border-radius:12px; object-fit:cover }
+  .toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#0F172A; color:#fff; padding:10px 16px; border-radius:11px; font-size:.88rem; font-weight:700; z-index:99; display:none; max-width:92vw; text-align:center }
+  .toast.err{ background:#B91C1C }
+  .out{ font-size:.84rem; margin-top:8px; color:#065F46; font-weight:700 }
+</style>
+</head>
+<body>
+<div class="top"><img src="/assets/brand/wordmark-dark.webp" alt="DukanList" width="120" height="28"></div>
+<div class="wrap">
+  <div id="loading" class="center"><div class="big">⏳</div><p>लोड हो रहा है…</p></div>
+  <div id="bad" class="center hide">
+    <div class="big">🔗</div>
+    <h2>यह लिंक अब काम नहीं करता</h2>
+    <p id="badTxt">लिंक पुराना हो गया है या नया लिंक भेजा जा चुका है। नया लिंक मंगवाने के लिए DukanList हेल्पलाइन पर WhatsApp करें।<br><span class="en">This link has expired or was replaced. Ask the DukanList helpline for a new one.</span></p>
+    <a class="wa" id="badWa" href="/contact" target="_blank" rel="noopener">💬 WhatsApp करें</a>
+  </div>
+
+  <div id="app" class="hide">
+    <div class="card">
+      <div class="head"><div id="lg"></div><div style="min-width:0"><h1 id="onm"></h1><div class="sub" id="osb"></div></div></div>
+      <div class="sub" id="mgr" style="margin-top:10px"></div>
+      <a id="viewLink" href="#" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-weight:800;color:var(--or);text-decoration:none">संस्था का पेज देखें → <span class="en">View the public page</span></a>
+    </div>
+
+    <div class="note" style="margin-bottom:14px">🙏 आप इस लिंक से अपनी संस्था खुद संभाल सकते हैं। हर बदलाव DukanList ऑफिस को दिखता है।
+      यह लिंक किसी और को न भेजें। <span class="en">Every change is visible to the DukanList office. Please don’t forward this link.</span></div>
+
+    <!-- members -->
+    <div class="card">
+      <h2>👥 सदस्य और पदाधिकारी <span class="cnt" id="mcount"></span></h2>
+      <div class="en">Members and office bearers — change a role or "member since" and it saves straight away.</div>
+      <input type="text" id="mq" class="search" placeholder="नाम, पेशा या दुकान से खोजें — Search">
+      <div id="mlist"></div>
+    </div>
+
+    <!-- add -->
+    <div class="card">
+      <h2>➕ नया सदस्य जोड़ें <span class="en">Add a member</span></h2>
+      <div class="g2">
+        <div><label class="sm">पूरा नाम * <span class="en">Full name</span></label><input type="text" id="anName" maxlength="80" placeholder="जैसे: Ramesh Garg"></div>
+        <div><label class="sm">मोबाइल <span class="en">Mobile (private)</span></label><input type="text" id="anMob" inputmode="numeric" maxlength="14" placeholder="10 अंक"></div>
+      </div>
+      <label class="sm">पेशा <span class="en">Profession</span></label>
+      <input type="text" id="anProf" data-prof-picker>
+      <div class="g2">
+        <div><label class="sm">पद <span class="en">Role</span></label><select id="anRole"></select></div>
+        <div><label class="sm">सदस्य कब से (साल) <span class="en">Member since</span></label><input type="text" id="anSince" inputmode="numeric" maxlength="4" placeholder="जैसे 2012"></div>
+      </div>
+      <button class="btn p" id="anBtn" style="margin-top:12px">➕ जोड़ें <span style="font-weight:600">(Add)</span></button>
+      <div class="out" id="anOut"></div>
+
+      <div style="border-top:1px solid var(--line);margin-top:16px;padding-top:12px">
+        <h2>📋 पूरी लिस्ट एक साथ <span class="en">Paste a whole list</span></h2>
+        <div class="en">एक लाइन में एक व्यक्ति: <b>नाम, मोबाइल, पेशा</b> (मोबाइल और पेशा ज़रूरी नहीं). जो पहले से हैं वो दोबारा नहीं बनेंगे; उसी नंबर की DukanList दुकान अपने-आप जुड़ जाएगी।</div>
+        <textarea id="bkLines" style="margin-top:8px;min-height:120px" placeholder="Ramesh Garg, 98765 43210, Chartered Accountant&#10;Sunita Jain 9812345678&#10;Anil Kumar, , Teacher"></textarea>
+        <button class="btn p" id="bkBtn" style="margin-top:8px">➕ सबको जोड़ें <span style="font-weight:600">(Add all)</span></button>
+        <div class="out" id="bkOut"></div>
+      </div>
+    </div>
+
+    <!-- details -->
+    <div class="card">
+      <h2>🏛 संस्था की जानकारी <span class="en">About the organisation</span></h2>
+      <div class="g2">
+        <div><label class="sm">हिंदी में नाम <span class="en">Name in Hindi</span></label><input type="text" id="dHi" maxlength="120"></div>
+        <div><label class="sm">स्थापना वर्ष <span class="en">Founded in</span></label><input type="text" id="dYear" inputmode="numeric" maxlength="4" placeholder="जैसे 1995"></div>
+      </div>
+      <label class="sm">मीटिंग की जगह / पता <span class="en">Meeting place / address</span></label><input type="text" id="dAddr" maxlength="200">
+      <label class="sm">संस्था के बारे में <span class="en">About (up to 1000 letters)</span></label><textarea id="dAbout" maxlength="1000"></textarea>
+      <label class="sm">लोगो <span class="en">Logo (goes live after a quick check by our team)</span></label>
+      <div class="phbox"><img id="lgPrev" class="hide" alt=""><input type="file" accept="image/*" id="lgIn"></div>
+      <div class="en" id="lgSt"></div>
+      <button class="btn ok" id="dBtn" style="margin-top:12px">✅ जानकारी सेव करें <span style="font-weight:600">(Save)</span></button>
+    </div>
+
+    <!-- session -->
+    <div class="card" id="sessCard">
+      <h2>🔄 सेशन <span class="en">Session</span></h2>
+      <div id="sessTxt" class="sub"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="/assets/js/dl-config.js"></script>
+<script src="/assets/js/prof-picker.js?v=20261013a"></script>
+<script>
+(function(){
+  var CFG = window.DL_CONFIG || {}, SB = CFG.supabase || {}, HELP = (CFG.support || {}).whatsapp || '';
+  var TOKEN = (new URLSearchParams(location.search).get('t') || '').trim();
+  var $ = function(id){ return document.getElementById(id); };
+  var D = null, BUSY = 0;
+  var ROLES = [['president','अध्यक्ष — President'],['vice_president','उपाध्यक्ष — Vice President'],['secretary','सचिव — Secretary'],['joint_secretary','संयुक्त सचिव — Joint Secretary'],
+               ['treasurer','कोषाध्यक्ष — Treasurer'],['pro','प्रचार मंत्री — PRO'],['founder','संस्थापक — Founder'],['patron','संरक्षक — Patron'],['chairman','चेयरमैन — Chairman'],
+               ['director','निदेशक — Director'],['advisor','सलाहकार — Advisor'],['coordinator','संयोजक — Coordinator'],['member','सदस्य — Member'],['other','अन्य पद — Other (type it)']];
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  function rpc(fn, body){
+    return fetch(SB.url + '/rest/v1/rpc/' + fn, { method:'POST', headers:{ apikey:SB.anon_key, Authorization:'Bearer ' + SB.anon_key, 'Content-Type':'application/json' }, body: JSON.stringify(body) })
+      .then(function(r){ return r.json().catch(function(){ return null; }).then(function(j){ if (!r.ok) throw new Error((j && j.message) || ('HTTP ' + r.status)); return j; }); });
+  }
+  function toast(m, err){ var t = $('toast'); t.textContent = m; t.className = 'toast' + (err ? ' err' : ''); t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, err ? 5000 : 2600); }
+  function oops(e){ toast((e && e.message) || 'कुछ गड़बड़ हुई — फिर कोशिश करें।', true); if (/expired|replaced/i.test((e && e.message) || '')) bad(); }
+  function initials(n){ return String(n || '?').trim().split(/\s+/).slice(0, 2).map(function(w){ return w.charAt(0).toUpperCase(); }).join(''); }
+  function opts(list, sel){ return list.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === sel ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join(''); }
+  function roleName(r, lbl){ if (r === 'other' && lbl) return lbl; var f = ROLES.find(function(x){ return x[0] === r; }); return f ? f[1].split(' — ')[1] : r; }
+  function bad(){ ['loading','app'].forEach(function(x){ $(x).classList.add('hide'); }); $('bad').classList.remove('hide'); }
+  if (HELP) $('badWa').href = 'https://wa.me/91' + HELP + '?text=' + encodeURIComponent('Namaste, Dabwali Parivar ka sanstha manager link expire ho gaya hai. Naya link bhej dijiye.');
+  if (!/^[a-f0-9]{64}$/.test(TOKEN)){ bad(); return; }
+
+  $('anRole').innerHTML = opts(ROLES.filter(function(x){ return x[0] !== 'other'; }), 'member');
+
+  function load(){
+    return rpc('pv_mgr_get', { p_token: TOKEN }).then(function(d){
+      if (!d || !d.ok){ bad(); return; }
+      D = d; draw();
+      $('loading').classList.add('hide'); $('app').classList.remove('hide');
+    }).catch(function(e){ if (/expired|replaced|not active/i.test(e.message || '')){ if (/not active/i.test(e.message)) $('badTxt').textContent = e.message; bad(); } else { $('loading').innerHTML = '<div class="big">⚠️</div><p>लोड नहीं हुआ — पेज रीफ्रेश करें।<br><span class="en">' + esc(e.message) + '</span></p>'; } });
+  }
+
+  function draw(){
+    var o = D.org;
+    $('lg').outerHTML = o.logo ? '<img id="lg" class="lg" src="' + esc(o.logo) + '" alt="">' : '<div id="lg" class="lg">' + esc(initials(o.name)) + '</div>';
+    $('onm').textContent = o.name;
+    $('osb').innerHTML = (o.name_hi ? esc(o.name_hi) + ' · ' : '') + 'सेशन ' + esc(o.session) + (o.logo_waiting ? ' · <b style="color:#C2410C">नया लोगो जाँच में है</b>' : '');
+    var exp = D.expires_at ? new Date(D.expires_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '';
+    $('mgr').innerHTML = 'मैनेजर: <b>' + esc(D.manager || '') + '</b>' + (exp ? ' · लिंक ' + esc(exp) + ' तक <span class="en">(link valid till ' + esc(exp) + ')</span>' : '');
+    $('viewLink').href = '/sanstha/' + encodeURIComponent(o.slug);
+    $('dHi').value = o.name_hi || ''; $('dYear').value = o.founded_year || ''; $('dAddr').value = o.address || ''; $('dAbout').value = o.about || '';
+    if (o.logo_waiting) $('lgSt').textContent = 'आपका भेजा लोगो जाँच में है। (Your logo is waiting for a quick check.)';
+    $('sessTxt').innerHTML = o.next_session_due
+      ? 'अभी <b>' + esc(o.session) + '</b> चल रहा है और <b>' + esc(o.next_session_due) + '</b> शुरू करने का समय हो गया है। नए सेशन में सभी सदस्य "सदस्य" बनकर आ जाएंगे, फिर नए पदाधिकारी चुन लीजिए।<br><span class="en">Start the new session: everyone carries over as a member, then set the new office bearers.</span>'
+        + '<div style="margin-top:10px"><button class="btn p" id="nsBtn">🔄 ' + esc(o.next_session_due) + ' शुरू करें</button></div>'
+      : 'अभी <b>' + esc(o.session) + '</b> सेशन चल रहा है। नया सेशन शुरू होने का समय आने पर यहाँ बटन आ जाएगा।<br><span class="en">The ' + esc(o.session) + ' session is running. A button appears here when the next one is due.</span>';
+    var ns = $('nsBtn'); if (ns) ns.onclick = newSession;
+    drawMembers();
+  }
+
+  function drawMembers(){
+    var q = $('mq').value.trim().toLowerCase(), all = D.members || [];
+    var off = all.filter(function(m){ return m.role !== 'member'; }).length;
+    $('mcount').textContent = '(' + all.length + (off ? ' · ' + off + ' पदाधिकारी' : '') + ')';
+    var list = all.map(function(m, i){ return { m: m, i: i }; }).filter(function(x){
+      return !q || [x.m.name, x.m.profession, x.m.firm].join(' ').toLowerCase().indexOf(q) !== -1;
+    });
+    $('mlist').innerHTML = list.length ? list.map(function(x){
+      var m = x.m, isOff = m.role !== 'member';
+      var meta = [m.profession, m.firm ? '🏪 ' + m.firm : '', m.mobile_hint ? '📱 ' + m.mobile_hint : 'नंबर नहीं'].filter(Boolean).map(esc).join(' · ');
+      return '<div class="mrow" data-i="' + x.i + '"><div class="mi">' + (m.photo ? '<img src="' + esc(m.photo) + '" alt="">' : esc(initials(m.name))) + '</div>'
+        + '<div style="min-width:0"><div class="mn">' + esc(m.name) + (m.verified ? ' <span class="ok" title="Confirmed by the member">✓</span>' : '') + (isOff ? '<span class="off">' + esc(roleName(m.role, m.role_label)) + '</span>' : '') + '</div>'
+        + '<div class="ms">' + meta + '</div>'
+        + '<div class="mc"><select data-act="role">' + opts(ROLES, m.role) + '</select>'
+        + '<input type="text" data-act="since" inputmode="numeric" maxlength="4" placeholder="सदस्य कब से" value="' + esc(m.joined_year || '') + '" title="Member since (year)"></div></div>'
+        + '<div class="ma">' + (m.mobile_hint ? '<button class="btn g s" data-act="link" title="उनका अपना पेज-लिंक WhatsApp पर भेजें (Send their own profile link)">📲</button>' : '')
+        + '<button class="btn g s" data-act="remove" title="इस सेशन से हटाएँ (Remove from this session)">✕</button></div></div>';
+    }).join('') : '<div class="sub" style="padding:10px 0">' + (all.length ? 'कोई नहीं मिला।' : 'अभी कोई सदस्य नहीं — नीचे से जोड़िए।') + '</div>';
+  }
+  $('mq').addEventListener('input', drawMembers);
+
+  // one handler for every member row — names with apostrophes never break anything
+  $('mlist').addEventListener('change', function(e){
+    var row = e.target.closest('.mrow'); if (!row) return; var m = D.members[+row.dataset.i]; if (!m) return;
+    var act = e.target.getAttribute('data-act');
+    if (act === 'role'){
+      var role = e.target.value, lbl = null;
+      if (role === 'other'){ lbl = (prompt('पद का नाम लिखें (जैसे Project Chairman):') || '').trim(); if (!lbl){ e.target.value = m.role; return; } }
+      rpc('pv_mgr_set_role', { p_token: TOKEN, p_person_id: m.id, p_role: role, p_role_label: lbl })
+        .then(function(){ m.role = role; m.role_label = lbl; toast('✓ ' + m.name + ': ' + roleName(role, lbl)); drawMembers(); })
+        .catch(function(err){ e.target.value = m.role; oops(err); });
+    } else if (act === 'since'){
+      var v = e.target.value.trim(), y = v ? parseInt(v, 10) : null;
+      if (v && !(y >= 1900 && y <= new Date().getFullYear())){ toast('साल ऐसे लिखें: 2012', true); e.target.value = m.joined_year || ''; return; }
+      rpc('pv_mgr_set_joined', { p_token: TOKEN, p_person_id: m.id, p_year: y })
+        .then(function(){ m.joined_year = y; toast('✓ सेव हो गया'); })
+        .catch(oops);
+    }
+  });
+  $('mlist').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-act]'); if (!b) return;
+    var row = b.closest('.mrow'); var m = D.members[+row.dataset.i]; if (!m) return;
+    if (b.dataset.act === 'remove'){
+      if (!confirm(m.name + ' को इस सेशन (' + D.org.session + ') की लिस्ट से हटाना है?\n\nउनका पेज और पिछले साल बने रहेंगे।')) return;
+      rpc('pv_mgr_remove', { p_token: TOKEN, p_person_id: m.id }).then(function(){ toast('हटा दिया: ' + m.name); return load(); }).catch(oops);
+    } else if (b.dataset.act === 'link'){
+      var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
+      rpc('pv_mgr_member_link', { p_token: TOKEN, p_person_id: m.id }).then(function(d){
+        var link = location.origin + '/parivar-profile?t=' + d.token;
+        var msg = 'Namaste ' + (d.name || '') + ' ji 🙏\n\n' + D.org.name + ' ki taraf se: DukanList ke "Dabwali Parivar" mein aapka page bana hai.\n\n'
+          + 'Is link par khud dekhiye aur theek kijiye — "haan, ye main hoon" confirm kijiye, number dikhana hai ya nahi chuniye, photo aur parichay badaliye. Koi login nahi chahiye:\n' + link + '\n\n(Link 7 din chalega.)';
+        var url = 'https://wa.me/91' + String(d.mobile || '').replace(/\D/g, '').slice(-10) + '?text=' + encodeURIComponent(msg);
+        if (win) win.location.href = url; else location.href = url;
+        toast('📲 WhatsApp में Send दबाइए');
+      }).catch(function(err){ if (win) win.close(); oops(err); });
+    }
+  });
+
+  // add one
+  $('anBtn').addEventListener('click', function(){
+    var name = $('anName').value.trim(), mob = $('anMob').value.replace(/\D/g, ''), prof = $('anProf').value.trim(), role = $('anRole').value;
+    var sv = $('anSince').value.trim(), since = sv ? parseInt(sv, 10) : null;
+    if (name.length < 2){ toast('पूरा नाम लिखें', true); return; }
+    if (/[0-9]/.test(name)){ toast('नाम में अंक नहीं — मोबाइल अलग बॉक्स में लिखें', true); return; }
+    if (mob && !/^(91)?[6-9][0-9]{9}$/.test(mob)){ toast('मोबाइल 10 अंक का होना चाहिए', true); return; }
+    if (sv && !(since >= 1900 && since <= new Date().getFullYear())){ toast('साल ऐसे लिखें: 2012', true); return; }
+    var line = name.replace(/[,;|\t]/g, ' ') + ', ' + mob.slice(-10) + ', ' + prof.replace(/[,;|\t]/g, ' ');
+    $('anBtn').disabled = true;
+    rpc('pv_mgr_add', { p_token: TOKEN, p_lines: line, p_role: 'member' }).then(function(r){
+      var pid = r && r.person_ids && r.person_ids[0];
+      if (!pid) throw new Error('नहीं जुड़ा — नाम दोबारा देखें।');
+      var steps = Promise.resolve();
+      if (role && role !== 'member') steps = steps.then(function(){ return rpc('pv_mgr_set_role', { p_token: TOKEN, p_person_id: pid, p_role: role }); });
+      if (since) steps = steps.then(function(){ return rpc('pv_mgr_set_joined', { p_token: TOKEN, p_person_id: pid, p_year: since }); });
+      return steps.then(function(){
+        $('anOut').textContent = '✓ ' + name + (r.already_in_session ? ' पहले से लिस्ट में थे' : ' जुड़ गए') + (r.shops_linked ? ' · 🏪 उनकी दुकान भी जुड़ गई' : '');
+        $('anName').value = ''; $('anMob').value = ''; $('anSince').value = ''; $('anRole').value = 'member';
+        if (window.ProfPicker) ProfPicker.set($('anProf'), '');
+        return load();
+      });
+    }).catch(oops).then(function(){ $('anBtn').disabled = false; });
+  });
+
+  // paste a list
+  $('bkBtn').addEventListener('click', function(){
+    var lines = $('bkLines').value.trim();
+    if (!lines){ toast('पहले लिस्ट पेस्ट करें', true); return; }
+    $('bkBtn').disabled = true;
+    rpc('pv_mgr_add', { p_token: TOKEN, p_lines: lines, p_role: 'member' }).then(function(r){
+      $('bkOut').innerHTML = '✓ नए: ' + (r.new_people || 0) + ' · पहले से Parivar में: ' + (r.existing_people || 0) + ' · पहले से इस सेशन में: ' + (r.already_in_session || 0)
+        + (r.shops_linked ? ' · 🏪 ' + r.shops_linked + ' दुकानें जुड़ीं' : '')
+        + ((r.skipped || []).length ? '<br><span style="color:#B91C1C">छोड़ी गई लाइनें: ' + r.skipped.map(esc).join(' | ') + '</span>' : '');
+      $('bkLines').value = '';
+      return load();
+    }).catch(oops).then(function(){ $('bkBtn').disabled = false; });
+  });
+
+  // details
+  $('dBtn').addEventListener('click', function(){
+    if (BUSY){ toast('लोगो अपलोड हो रहा है — 2 सेकंड रुकें', true); return; }
+    var y = $('dYear').value.trim();
+    if (y && !(+y >= 1800 && +y <= new Date().getFullYear())){ toast('स्थापना वर्ष ऐसे लिखें: 1995', true); return; }
+    $('dBtn').disabled = true;
+    rpc('pv_mgr_update_org', { p_token: TOKEN, p: { name_hi: $('dHi').value.trim(), founded_year: y, address: $('dAddr').value.trim(), about: $('dAbout').value.trim() } })
+      .then(function(){ toast('✓ जानकारी सेव हो गई'); return load(); }).catch(oops).then(function(){ $('dBtn').disabled = false; });
+  });
+
+  // logo: upload, then send it to the office straight away
+  $('lgIn').addEventListener('change', function(){
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    if (!/^image\//.test(f.type) || f.size > 8 * 1024 * 1024){ $('lgSt').textContent = 'सिर्फ फोटो, 8 MB तक।'; return; }
+    try { $('lgPrev').src = URL.createObjectURL(f); $('lgPrev').classList.remove('hide'); } catch(_){}
+    $('lgSt').textContent = 'अपलोड हो रहा है…'; BUSY++;
+    var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar');
+    fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd }).then(function(r){ return r.json(); })
+      .then(function(j){
+        if (!j || !j.secure_url) throw new Error((j && j.error && j.error.message) || 'upload');
+        return rpc('pv_mgr_update_org', { p_token: TOKEN, p: { logo: j.secure_url } });
+      })
+      .then(function(){ $('lgSt').textContent = '✓ लोगो भेज दिया — हमारी टीम देखकर लगा देगी। (Logo sent — it goes live after a quick check.)'; D.org.logo_waiting = true; })
+      .catch(function(e){ $('lgSt').textContent = 'लोगो नहीं गया — फिर कोशिश करें।' + (e && e.message && e.message !== 'upload' ? ' (' + e.message + ')' : ''); $('lgPrev').classList.add('hide'); })
+      .then(function(){ BUSY--; });
+  });
+
+  function newSession(){
+    var nx = D.org.next_session_due;
+    if (!confirm(nx + ' सेशन शुरू करना है?\n\nसभी मौजूदा सदस्य नए सेशन में "सदस्य" बनकर आ जाएंगे। फिर नए पदाधिकारी चुन लीजिए।')) return;
+    rpc('pv_mgr_new_session', { p_token: TOKEN }).then(function(r){ toast('✓ ' + r.session + ' शुरू — ' + r.carried_over + ' सदस्य आ गए'); return load(); }).catch(oops);
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
