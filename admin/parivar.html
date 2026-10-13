@@ -96,7 +96,9 @@
 <script src="/assets/js/supabase-init.js?v=20260921e"></script>
 <script>
 var TAB = 'org', CUR = null;
-var ROLES = [['president','President / अध्यक्ष'],['vice_president','Vice President / उपाध्यक्ष'],['secretary','Secretary / सचिव'],['joint_secretary','Joint Secretary / संयुक्त सचिव'],['treasurer','Treasurer / कोषाध्यक्ष'],['pro','PRO / प्रचार मंत्री'],['patron','Patron / संरक्षक'],['chairman','Chairman / चेयरमैन'],['director','Director / निदेशक'],['coordinator','Coordinator / संयोजक'],['member','Member / सदस्य'],['other','Other (likh kar)']];
+var ROLES = [['president','President / अध्यक्ष'],['vice_president','Vice President / उपाध्यक्ष'],['secretary','Secretary / सचिव'],['joint_secretary','Joint Secretary / संयुक्त सचिव'],['treasurer','Treasurer / कोषाध्यक्ष'],['pro','PRO / प्रचार मंत्री'],['founder','Founder / संस्थापक'],['patron','Patron / संरक्षक'],['chairman','Chairman / चेयरमैन'],['director','Director / निदेशक'],['advisor','Advisor / सलाहकार'],['coordinator','Coordinator / संयोजक'],['member','Member / सदस्य'],['other','Other (likh kar)']];
+// v359: designation of the sanstha's contact person (db/253)
+var DESIG = [['president','President / अध्यक्ष'],['secretary','Secretary / सचिव'],['founder','Founder / संस्थापक'],['chairman','Chairman / चेयरमैन'],['vice_president','Vice President / उपाध्यक्ष'],['treasurer','Treasurer / कोषाध्यक्ष'],['pro','PRO / प्रचार मंत्री'],['patron','Patron / संरक्षक'],['coordinator','Coordinator / संयोजक'],['director','Director / निदेशक']];
 var FIRM_ROLES = [['founder','Founder / संस्थापक'],['owner','Owner / मालिक'],['proprietor','Proprietor'],['partner','Partner / पार्टनर'],['director','Director'],['ceo','CEO'],['manager','Manager'],['other','Other (likh kar)']];
 var KINDS = [['seva','Seva sanstha (Lions, Rotary…)'],['vyapar','Vyapar mandal / association'],['dharmik','Dharmik'],['shiksha','Shiksha'],['khel','Khel'],['samajik','Samajik'],['professional','Professional (CA, Doctors, Bar…)'],['other','Other']];
 var MODES = [['hidden','Number mat dikhao'],['whatsapp','Sirf WhatsApp button'],['show','Number dikhao (Call + WhatsApp)']];
@@ -148,6 +150,32 @@ async function upload(input, targetId, prevId){
   } catch(e){ alert('Photo upload nahi hui: ' + e.message); }
 }
 
+/* ---------- v359: tag a DukanList shop (used by the contact + "add person") ---------- */
+function shopPicker(px, id, name){
+  return '<input type="hidden" id="' + px + '_bid" value="' + esc(id || '') + '">'
+    + '<div id="' + px + '_sel" class="muted" style="margin:2px 0 4px;' + (id ? '' : 'display:none') + '">' + (id ? '🏪 <b style="color:#0F172A">' + esc(name || 'Tagged shop') + '</b> <a href="#" onclick="clearShop(\'' + px + '\');return false">✕ hatao</a>' : '') + '</div>'
+    + '<input id="' + px + '_q" placeholder="Dukaan ka naam likhiye…" oninput="clearTimeout(window._sp);window._sp=setTimeout(function(){pickShop(\'' + px + '\')},250)">'
+    + '<div class="pick" id="' + px + '_pick" style="display:none"></div>';
+}
+window._shopRows = {};
+async function pickShop(px){
+  var q = val(px + '_q'), box = document.getElementById(px + '_pick');
+  if (q.length < 2){ box.style.display = 'none'; return; }
+  var r = await c().from('businesses').select('id,name,slug').eq('status', 'active').ilike('name', '%' + q + '%').limit(10);
+  if (r.error) return;
+  window._shopRows[px] = r.data || [];
+  box.innerHTML = window._shopRows[px].length ? window._shopRows[px].map(function(b, i){ return '<div onclick="selShop(\'' + px + '\',' + i + ')">🏪 ' + esc(b.name) + ' <span class="muted">/' + esc(b.slug) + '</span></div>'; }).join('') : '<div class="muted">DukanList par ye dukaan nahi mili</div>';
+  box.style.display = '';
+}
+function selShop(px, i){
+  var b = (window._shopRows[px] || [])[i]; if (!b) return;
+  document.getElementById(px + '_bid').value = b.id;
+  var sel = document.getElementById(px + '_sel');
+  sel.innerHTML = '🏪 <b style="color:#0F172A">' + esc(b.name) + '</b> <a href="#" onclick="clearShop(\'' + px + '\');return false">✕ hatao</a>'; sel.style.display = '';
+  document.getElementById(px + '_pick').style.display = 'none'; document.getElementById(px + '_q').value = '';
+}
+function clearShop(px){ document.getElementById(px + '_bid').value = ''; var sel = document.getElementById(px + '_sel'); sel.innerHTML = ''; sel.style.display = 'none'; }
+
 /* ---------- sanstha ---------- */
 function drawOrg(o){
   var isNew = !o.id;
@@ -157,8 +185,13 @@ function drawOrg(o){
     + '<div class="grid2"><div><label>Kis tarah ki sanstha</label><select id="o_kind">' + opts(KINDS, o.kind || 'samajik') + '</select></div>'
     + '<div><label>Naya session kab shuru hota hai</label><select id="o_month">' + MONTHS.slice(1).map(function(m, i){ return '<option value="' + (i + 1) + '"' + ((o.session_start_month || 4) === i + 1 ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div></div>'
     + '<label>Sanstha ke baare mein</label><textarea id="o_about" maxlength="1000">' + esc(o.about) + '</textarea>'
-    + '<div class="grid2"><div><label>Sampark vyakti (public)</label><input id="o_cname" value="' + esc(o.contact_name) + '" placeholder="Secretary ka naam"></div>'
-    + '<div><label>Sanstha ka number (public)</label><input id="o_cmob" value="' + esc(o.contact_mobile) + '" inputmode="numeric" placeholder="10 digit"></div></div>'
+    + '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:10px 12px;margin-top:10px">'
+    + '<b style="font-size:.86rem">📞 Sanstha ka sampark vyakti</b> <span class="muted">— Save karte hi ye vyakti Dabwali Parivar mein is pad ke saath jud jayega, aur unki dukaan unke page par</span>'
+    + '<div class="grid2"><div><label>Naam (public)</label><input id="o_cname" value="' + esc(o.contact_name) + '" placeholder="jaise Deepak Singla"></div>'
+    + '<div><label>Pad / designation</label><select id="o_crole"><option value="">— chuniye —</option>' + opts(DESIG, o.contact_role || '') + '</select></div></div>'
+    + '<div class="grid2"><div><label>Number (public — sanstha ka official)</label><input id="o_cmob" value="' + esc(o.contact_mobile) + '" inputmode="numeric" placeholder="10 digit"></div>'
+    + '<div><label>Unki dukaan DukanList par? (optional)</label>' + shopPicker('oc', o.contact_business_id, o.contact_business_name) + '</div></div>'
+    + '</div>'
     + '<label>Logo / photo</label><div class="photo"><img id="o_logo_prev" src="' + esc(o.logo_url || '') + '" style="' + (o.logo_url ? '' : 'display:none') + '" alt=""><input type="hidden" id="o_logo" value="' + esc(o.logo_url) + '">'
     + '<input type="file" accept="image/*" onchange="upload(this,\'o_logo\',\'o_logo_prev\')" style="width:auto"></div>'
     + (isNew ? '' : '<label>Status</label><select id="o_status">' + opts([['active','Active (public)'],['hidden','Hidden']], o.status) + '</select>')
@@ -181,6 +214,7 @@ function drawOrg(o){
       + '<div class="grid2"><div><label>Number kaise dikhe</label><select id="rp_mode">' + opts(MODES, 'hidden') + '</select></div>'
       + '<div><label>Pad</label><select id="rp_role" onchange="document.getElementById(\'rp_lbl_w\').style.display=this.value===\'other\'?\'\':\'none\'">' + opts(ROLES, 'member') + '</select></div></div>'
       + '<div id="rp_lbl_w" style="display:none"><label>Pad ka naam</label><input id="rp_lbl" maxlength="40" placeholder="jaise Project Chairman"></div>'
+      + '<label>Unki dukaan DukanList par? (optional)</label>' + shopPicker('rs', null, null)
       + '<div style="margin-top:10px"><button class="btn p" onclick="addRole()">+ Jodiye</button></div></div>'
       + (past.length ? '<div class="sec"><b style="font-size:.9rem">Pichhle session</b>' + past.map(function(r){ return '<div class="muted">' + esc(r.session) + ' · ' + esc(r.name) + ' — ' + esc(r.role_label || label(ROLES, r.role)) + '</div>'; }).join('') + '</div>' : '')
       + '</div>';
@@ -189,7 +223,9 @@ function drawOrg(o){
 }
 async function saveOrg(){
   var p = { name: val('o_name'), name_hi: val('o_name_hi'), kind: val('o_kind'), about: val('o_about'), contact_name: val('o_cname'),
-            contact_mobile: val('o_cmob'), session_start_month: val('o_month'), logo_url: val('o_logo') };
+            contact_mobile: val('o_cmob'), contact_role: val('o_crole'), contact_business_id: val('oc_bid'),
+            session_start_month: val('o_month'), logo_url: val('o_logo') };
+  if (p.contact_name && !p.contact_role){ alert('Sampark vyakti ka pad (designation) chuniye'); return; }
   if (CUR && CUR.id){ p.id = CUR.id; p.status = val('o_status'); }
   if (p.name.length < 2){ alert('Sanstha ka naam likhiye'); return; }
   var r = await c().rpc('admin_parivar_upsert_org', { p: p }); if (fail(r)) return;
@@ -214,7 +250,12 @@ async function addRole(){
   }
   var role = val('rp_role');
   var r = await c().rpc('admin_parivar_set_role', { p_org_id: CUR.id, p_person_id: pid, p_role: role, p_role_label: role === 'other' ? val('rp_lbl') : null, p_session: null });
-  if (fail(r)) return; toast('✓ Jod diya'); openItem(CUR.id);
+  if (fail(r)) return;
+  if (val('rs_bid')){
+    var rf = await c().rpc('admin_parivar_add_firm', { p_person_id: pid, p_business_id: val('rs_bid'), p_firm_name: null, p_role: 'owner', p_role_label: null });
+    if (fail(rf)) return;
+  }
+  toast('✓ Jod diya'); openItem(CUR.id);
 }
 async function changeRole(pid, role){
   var lbl = null; if (role === 'other'){ lbl = prompt('Pad ka naam (jaise Project Chairman):') || null; }

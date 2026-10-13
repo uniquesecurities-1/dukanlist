@@ -30,6 +30,7 @@
     secretary: ['Secretary', 'सचिव'], joint_secretary: ['Joint Secretary', 'संयुक्त सचिव'],
     treasurer: ['Treasurer', 'कोषाध्यक्ष'], pro: ['PRO', 'प्रचार मंत्री'], patron: ['Patron', 'संरक्षक'],
     chairman: ['Chairman', 'चेयरमैन'], director: ['Director', 'निदेशक'], coordinator: ['Coordinator', 'संयोजक'],
+    founder: ['Founder', 'संस्थापक'], advisor: ['Advisor', 'सलाहकार'],
     member: ['Member', 'सदस्य'], other: ['Office bearer', 'पदाधिकारी']
   };
   var FIRM_ROLES = {

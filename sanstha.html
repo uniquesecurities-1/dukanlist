@@ -32,7 +32,7 @@
 <main class="pv-wrap" id="root"><div class="pv-empty">…</div></main>
 
 <script src="/assets/js/dl-config.js"></script>
-<script src="/assets/js/parivar-common.js?v=20261011b"></script>
+<script src="/assets/js/parivar-common.js?v=20261013a"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -63,9 +63,16 @@
       + '<div><h1>' + esc(o.name) + '</h1>' + (o.name_hi ? '<div class="sub">' + esc(o.name_hi) + '</div>' : '')
       + '<div class="sub">' + PV.kindHtml(o.kind) + (o.city ? ' · ' + esc(o.city) : '') + ' · ' + MEMBERS.length + ' ' + bi('members', 'सदस्य') + ' · ' + bi('Session', 'सत्र') + ' ' + esc(o.session) + '</div></div></div>'
       + (o.about ? '<p style="margin:12px 0 0;color:var(--ink-2);line-height:1.55;white-space:pre-wrap">' + esc(o.about) + '</p>' : '')
+      // v359: the contact person — designation, their own page, their shop (db/253)
+      + (o.contact_name
+          ? '<div class="pv-row" style="margin:14px 0 0;background:#F8FAFC"><div><div class="m">' + bi('Contact person', 'संपर्क व्यक्ति') + '</div>'
+            + '<div class="n">' + (o.contact_slug ? '<a href="/parivar/' + encodeURIComponent(o.contact_slug) + '" style="color:inherit">' + esc(o.contact_name) + '</a>' : esc(o.contact_name)) + '</div>'
+            + (o.contact_shop && o.contact_shop.slug ? '<div class="m">🏪 <a href="/' + encodeURIComponent(o.contact_shop.slug) + '">' + esc(o.contact_shop.name) + '</a></div>' : '')
+            + '</div>' + (o.contact_role ? '<span class="pv-role">' + PV.roleHtml(o.contact_role) + '</span>' : '') + '</div>'
+          : '')
       + (cm.length === 10
           ? '<div class="pv-acts"><a class="pv-btn pv-wa" target="_blank" rel="noopener" href="https://wa.me/91' + cm + '?text=' + encodeURIComponent('Namaste, Dabwali Parivar (DukanList) par ' + o.name + ' ka page dekha.') + '">💬 '
-            + bi('Contact the organisation', 'संस्था से संपर्क') + (o.contact_name ? ' · ' + esc(o.contact_name) : '') + '</a>'
+            + bi('Contact the organisation', 'संस्था से संपर्क') + '</a>'
             + '<a class="pv-btn pv-call" href="tel:+91' + cm + '">📞 ' + bi('Call', 'कॉल') + '</a></div>'
           : '')
       + '</div>';
