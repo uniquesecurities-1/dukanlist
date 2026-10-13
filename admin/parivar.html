@@ -247,10 +247,14 @@ function drawOrg(o){
       + '<div class="grid2"><div><label>Contact visibility</label><select id="rp_mode">' + opts(MODES, 'hidden') + '</select></div>'
       + '<div><label>Role</label><select id="rp_role" onchange="document.getElementById(\'rp_lbl_w\').style.display=this.value===\'other\'?\'\':\'none\'">' + opts(ROLES, 'member') + '</select></div></div>'
       + '<div id="rp_lbl_w" style="display:none"><label>Role title</label><input id="rp_lbl" maxlength="40" placeholder="e.g. Project Chairman"></div>'
+      + '<div class="grid2"><div><label>Profession</label><input id="rp_prof" maxlength="60" list="rpProfList" placeholder="e.g. Chartered Accountant">'
+      + '<datalist id="rpProfList">' + ['Chartered Accountant','Doctor','Advocate','Teacher','Engineer','Businessman','Shopkeeper','Trader','Farmer','Mutual Fund Distributor','Insurance Advisor','Government Service','Social Worker','Retired'].map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist></div>'
+      + '<div><label>Member since (year)</label><input id="rp_since" inputmode="numeric" maxlength="4" placeholder="e.g. 2012"></div></div>'
       + '<label>Their business on DukanList (optional)</label>' + shopPicker('rs', null, null)
+      + '<label>Their role in that business</label><select id="rp_frole">' + opts(FIRM_ROLES.filter(function(x){ return x[0] !== 'other'; }), 'owner') + '</select>'
       + '<div style="margin-top:10px"><button class="btn p" onclick="addRole()">+ Add</button></div></div>'
-      + '<div class="sec"><b style="font-size:.9rem">📋 Paste a member list</b> <span class="muted">— one person per line: <code>Name, mobile</code> or just <code>Name</code>. Existing people are matched by mobile; new ones are added with the number hidden.</span>'
-      + '<textarea id="bk_lines" style="min-height:120px;margin-top:6px" placeholder="Ramesh Garg, 98765 43210&#10;Sunita Jain 9812345678&#10;Anil Kumar"></textarea>'
+      + '<div class="sec"><b style="font-size:.9rem">📋 Paste a member list</b> <span class="muted">— one person per line: <code>Name, mobile, Profession</code> (mobile and profession optional). Existing people are matched by mobile; new ones are added with the number hidden; a DukanList shop on the same number is linked automatically.</span>'
+      + '<textarea id="bk_lines" style="min-height:120px;margin-top:6px" placeholder="Ramesh Garg, 98765 43210, Chartered Accountant&#10;Sunita Jain 9812345678&#10;Anil Kumar, , Teacher"></textarea>'
       + '<div class="grid2"><div><label>Add them as</label><select id="bk_role">' + opts(ROLES.filter(function(x){ return x[0] !== 'other'; }), 'member') + '</select></div>'
       + '<div style="display:flex;align-items:flex-end"><button class="btn p" onclick="bulkAdd()">+ Add all to ' + esc(o.current_session) + '</button></div></div>'
       + '<div id="bk_out" class="muted" style="margin-top:6px"></div></div>'
@@ -284,16 +288,22 @@ async function addRole(){
   var pid = val('rp_id');
   if (!pid){
     var name = val('rp_name'); if (name.length < 2){ alert('Pick a person or enter a new name'); return; }
-    var r1 = await c().rpc('admin_parivar_upsert_person', { p: { full_name: name, mobile: val('rp_mob'), contact_mode: val('rp_mode') } });
+    var r1 = await c().rpc('admin_parivar_upsert_person', { p: { full_name: name, mobile: val('rp_mob'), contact_mode: val('rp_mode'), profession: val('rp_prof') } });
     if (fail(r1)) return; pid = r1.data.id;
+  } else if (val('rp_prof')){
+    var r2 = await c().rpc('admin_parivar_upsert_person', { p: { id: pid, profession: val('rp_prof') } });
+    if (fail(r2)) return;
   }
+  var since = parseInt(val('rp_since'), 10);
+  if (val('rp_since') && !(since >= 1900 && since <= new Date().getFullYear())){ alert('Member since: enter a year like 2012'); return; }
   var role = val('rp_role');
   var r = await c().rpc('admin_parivar_set_role', { p_org_id: CUR.id, p_person_id: pid, p_role: role, p_role_label: role === 'other' ? val('rp_lbl') : null, p_session: null });
   if (fail(r)) return;
   if (val('rs_bid')){
-    var rf = await c().rpc('admin_parivar_add_firm', { p_person_id: pid, p_business_id: val('rs_bid'), p_firm_name: null, p_role: 'owner', p_role_label: null });
+    var rf = await c().rpc('admin_parivar_add_firm', { p_person_id: pid, p_business_id: val('rs_bid'), p_firm_name: null, p_role: val('rp_frole') || 'owner', p_role_label: null });
     if (fail(rf)) return;
   }
+  if (since){ var rs = await c().rpc('admin_parivar_set_joined', { p_org_id: CUR.id, p_person_id: pid, p_year: since }); if (fail(rs)) return; }
   toast('✓ Added'); openItem(CUR.id);
 }
 async function changeRole(pid, role){
@@ -318,6 +328,7 @@ async function bulkAdd(){
   var out = document.getElementById('bk_out');
   if (out) out.innerHTML = '✓ Added: <b>' + (d.new_people || 0) + '</b> new people, <b>' + (d.existing_people || 0) + '</b> matched to existing people'
     + (d.already_in_session ? ', <b>' + d.already_in_session + '</b> were already in this session (roles kept)' : '')
+    + (d.shops_linked ? ', 🏪 <b>' + d.shops_linked + '</b> DukanList shop' + (d.shops_linked === 1 ? '' : 's') + ' linked by mobile' : '')
     + (sk.length ? '<br><span style="color:#B91C1C">Skipped ' + sk.length + ' line' + (sk.length === 1 ? '' : 's') + ' (no readable name): ' + sk.map(esc).join(' · ') + '</span>' : '');
 }
 async function newSession(){

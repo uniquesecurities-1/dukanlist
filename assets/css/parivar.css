@@ -45,3 +45,16 @@ a.pv-row:hover{ border-color:#FDBA74; text-decoration:none }
 .pv-join{ background:linear-gradient(135deg,#FFF7ED,#FFEDD5); border:1px solid #FED7AA; border-radius:16px; padding:16px; margin-top:20px; text-align:center }
 .pv-join b{ display:block; font-size:1rem; margin-bottom:4px }
 html[data-lang="hi"] .pv-hero h1, html[data-lang="hi"] .pv-head h1{ font-family:'Noto Sans Devanagari','Manrope',sans-serif }
+
+/* v365: member cards on the organisation page */
+.pv-mgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:8px }
+.pv-mcard{ display:flex; gap:11px; align-items:flex-start; background:#fff; border:1px solid var(--line); border-radius:13px; padding:11px 12px; cursor:pointer; transition:border-color .15s, transform .15s }
+.pv-mcard:hover{ border-color:#FDBA74; transform:translateY(-1px) }
+.pv-mcard .mc-b{ min-width:0; flex:1 }
+.pv-mcard .mc-n{ font-weight:800; font-size:.94rem; line-height:1.3 }
+.pv-mcard .mc-n a{ color:var(--ink); text-decoration:none }
+.pv-mcard .mc-p{ font-size:.8rem; color:var(--ink-2); font-weight:600; margin-top:2px }
+.pv-mcard .mc-f{ font-size:.78rem; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.pv-mcard .mc-f a{ color:#C2410C; font-weight:700; text-decoration:none }
+.pv-mcard .mc-s{ font-size:.72rem; color:var(--muted); margin-top:2px }
+@media (max-width:560px){ .pv-mgrid{ grid-template-columns:1fr } }

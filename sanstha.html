@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261011a">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013a">
 </head>
 <body>
 
@@ -44,12 +44,23 @@
   }
   function drawMembers(q){
     q = String(q || '').trim().toLowerCase();
-    var list = q ? MEMBERS.filter(function(m){ return String(m.name).toLowerCase().indexOf(q) !== -1; }) : MEMBERS;
+    // v365: search name, profession and business
+    var list = q ? MEMBERS.filter(function(m){
+      return [m.name, m.profession, m.firm && m.firm.name].join(' ').toLowerCase().indexOf(q) !== -1;
+    }) : MEMBERS;
     var el = document.getElementById('pvMembers'); if (!el) return;
+    var now = new Date().getFullYear();
     el.innerHTML = list.length ? list.map(function(m){
-      return '<a href="/parivar/' + encodeURIComponent(m.slug) + '"><span>' + esc(m.name) + '</span>'
-        + (m.verified ? '<small class="pv-ok">✓ ' + bi('verified', 'वेरिफाइड') + '</small>' : (m.added_by_sanstha ? '<small>' + bi('added by the organisation', 'संस्था द्वारा जोड़ा गया') + '</small>' : '')) + '</a>';
-    }).join('') : '<div class="pv-note" style="padding:10px 4px">' + bi('No member by that name.', 'इस नाम से कोई सदस्य नहीं।') + '</div>';
+      var firm = m.firm && m.firm.name
+        ? '<div class="mc-f">🏪 ' + (m.firm.slug ? '<a href="/' + encodeURIComponent(m.firm.slug) + '" onclick="event.stopPropagation()">' + esc(m.firm.name) + '</a>' : esc(m.firm.name))
+          + ((m.firm.role_label || m.firm.role) ? ' <span>· ' + PV.firmRoleHtml(m.firm.role, m.firm.role_label) + '</span>' : '') + '</div>' : '';
+      var since = m.since && m.since <= now ? '<div class="mc-s">' + bi('Member since', 'सदस्य') + ' ' + esc(m.since) + (now - m.since >= 2 ? ' · ' + (now - m.since) + ' ' + bi('yrs', 'साल') : '') + '</div>' : '';
+      return '<div class="pv-mcard" onclick="location.href=\'/parivar/' + encodeURIComponent(m.slug) + '\'">' + PV.avatar(m.photo, m.name, 46)
+        + '<div class="mc-b"><div class="mc-n"><a href="/parivar/' + encodeURIComponent(m.slug) + '">' + esc(m.name) + '</a>' + (m.verified ? ' <span class="pv-ok" title="Confirmed by the member">✓</span>' : '') + '</div>'
+        + (m.role && m.role !== 'member' ? '<span class="pv-role" style="font-size:.66rem;padding:1px 8px">' + PV.roleHtml(m.role, m.role_label) + '</span> ' : '')
+        + (m.profession ? '<div class="mc-p">' + esc(m.profession) + '</div>' : '')
+        + firm + since + '</div></div>';
+    }).join('') : '<div class="pv-note" style="padding:10px 4px">' + bi('No member matches that.', 'कोई सदस्य नहीं मिला।') + '</div>';
   }
   if (!slug){ notFound(); return; }
   PV.rpc('parivar_get_org', { p_slug: slug }).then(function(o){
@@ -88,9 +99,12 @@
     }
     h += '<h2 class="pv-h2">' + bi('Members', 'सदस्य') + ' (' + MEMBERS.length + ')</h2>';
     if (MEMBERS.length > 8){
-      h += '<div class="pv-search" style="margin:0 0 6px;max-width:none"><input type="search" id="mq" placeholder="Search members" data-ph-en="Search members" data-ph-hi="सदस्य खोजें"></div>';
+      h += '<div class="pv-search" style="margin:0 0 6px;max-width:none"><input type="search" id="mq" placeholder="Search by name, profession or business" data-ph-en="Search by name, profession or business" data-ph-hi="नाम, पेशा या दुकान से खोजें"></div>';
     }
-    h += '<div class="pv-box pv-members" id="pvMembers" style="padding:6px 14px"></div>';
+    if (MEMBERS.some(function(m){ return m.added_by_sanstha; })){
+      h += '<div class="pv-note" style="margin:0 0 8px">' + bi('Members added by the organisation · ✓ = confirmed by the member', 'सदस्य संस्था द्वारा जोड़े गए · ✓ = सदस्य ने खुद पुष्टि की') + '</div>';
+    }
+    h += '<div class="pv-mgrid" id="pvMembers"></div>';
     if ((o.past_presidents || []).length){
       h += '<div class="pv-past"><b>' + bi('Past presidents', 'पूर्व अध्यक्ष') + ':</b> ' + o.past_presidents.map(function(p){
         return esc(p.session) + ' <a href="/parivar/' + encodeURIComponent(p.slug) + '">' + esc(p.name) + '</a>';
