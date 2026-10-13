@@ -87,8 +87,7 @@
     <div class="card">
       <h2>✍️ अपने बारे में</h2>
       <label class="sm" for="prof">पेशा <span class="en">Profession</span></label>
-      <input type="text" id="prof" maxlength="60" list="profList" placeholder="जैसे: CA, Doctor, Teacher, Businessman">
-      <datalist id="profList"><option value="Chartered Accountant"><option value="Doctor"><option value="Advocate"><option value="Teacher"><option value="Engineer"><option value="Businessman"><option value="Shopkeeper"><option value="Trader"><option value="Farmer"><option value="Mutual Fund Distributor"><option value="Insurance Advisor"><option value="Government Service"><option value="Social Worker"><option value="Retired"></datalist>
+      <input type="text" id="prof" data-prof-picker>
       <label class="sm" for="bio">छोटा परिचय (300 अक्षर) <span class="en">Short bio</span></label>
       <textarea id="bio" maxlength="300" placeholder="जैसे: 25 साल से कपड़े का कारोबार, लायंस क्लब से 10 साल से जुड़ा हूँ"></textarea>
       <label class="sm">फोटो <span class="en">Photo (checked by our team before it goes live)</span></label>
@@ -119,6 +118,7 @@
 <div class="bar hide" id="bar"><div class="in"><button class="btn ok" id="saveBtn">✅ सेव करें (Save)</button><div class="msg" id="msg"></div></div></div>
 
 <script src="/assets/js/dl-config.js"></script>
+<script src="/assets/js/prof-picker.js?v=20261013a"></script>
 <script>
 (function(){
   var CFG = window.DL_CONFIG || {}, SB = CFG.supabase || {}, HELP = (CFG.support || {}).whatsapp || '';
@@ -152,7 +152,7 @@
     if (d.verified){ $('confirmCard').innerHTML = '<h2 class="done">✓ आपका नंबर वेरिफाइड है</h2><div class="en">Your number is verified.</div>'; }
     if (!d.has_mobile){ $('contactCard').classList.add('hide'); }
     else { $('mh').textContent = '(' + d.mobile_hint + ')'; pickMode(d.contact_mode || 'hidden'); }
-    $('prof').value = d.profession || '';
+    ProfPicker.set($('prof'), d.profession || '');
     $('bio').value = d.bio || '';
     if (d.pending_photo) $('phSt').textContent = 'आपकी भेजी फोटो जाँच में है। (A photo you sent is waiting for approval.)';
     if (d.status === 'hidden'){

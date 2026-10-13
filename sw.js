@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.3';   // v368 default WhatsApp only for listed members
+const VERSION = 'dukan-v3.87.4';   // v369 searchable profession picker, up to 3
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
