@@ -357,12 +357,12 @@ async function undoRole(i){
 async function sendMgr(orgId){
   var pid = val('mgrPerson'); if (!pid){ alert('Pick the person'); return; }
   var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
-  var r = await c().rpc('admin_parivar_create_manager_link', { p_org_id: orgId, p_person_id: pid, p_days: 30 });
+  var r = await c().rpc('admin_parivar_create_manager_link', { p_org_id: orgId, p_person_id: pid, p_days: 7 });
   if (r.error){ if (win) win.close(); alert('Could not create the link: ' + r.error.message); return; }
   var d = r.data || {}, link = location.origin + '/sanstha-manage?t=' + d.token;
   var msg = 'नमस्ते ' + (d.name || '') + ' जी,\n\nDukanList के "डबवाली परिवार" पर आपकी संस्था *' + (CUR && CUR.name || '') + '* का पेज:\n' + location.origin + '/sanstha/' + (CUR && CUR.slug || '') + '\n\n'
     + 'इस लिंक से आप अपनी संस्था खुद संभाल सकते हैं — सदस्य जोड़ना, पदाधिकारी (अध्यक्ष, सचिव…) तय करना, संस्था की जानकारी और लोगो बदलना, नया सेशन शुरू करना। कोई लॉगिन नहीं चाहिए:\n' + link
-    + '\n\nयह लिंक 30 दिन चलेगा। कृपया इसे किसी और को न भेजें।\n— DukanList हेल्पलाइन';
+    + '\n\nयह लिंक 7 दिन चलेगा। कृपया इसे किसी और को न भेजें।\n— DukanList हेल्पलाइन';
   var url = 'https://wa.me/91' + String(d.mobile || '').replace(/\D/g, '').slice(-10) + '?text=' + encodeURIComponent(msg);
   if (win) win.location.href = url; else location.href = url;
   toast('📲 Manager link created — press Send in WhatsApp');
