@@ -21,6 +21,7 @@
 //   4xx/5xx { error, detail }
 // =====================================================
 
+const findAuthUserByEmail = require('./_find-auth-user.js');
 const SUPABASE_URL =
   process.env.SUPABASE_URL || 'https://qazuyygrpqopwygxmvwq.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -97,14 +98,10 @@ module.exports = async (req, res) => {
 
   // ===== 4. Look up the user — must exist and NOT yet be confirmed =====
   // Use Admin REST to find the user by email
-  const lookupRes = await sbAdmin(
-    '/auth/v1/admin/users?email=' + encodeURIComponent(email),
-    { method: 'GET' }
-  );
-  let targetUser = null;
-  if (lookupRes.ok && lookupRes.body && Array.isArray(lookupRes.body.users) && lookupRes.body.users.length) {
-    targetUser = lookupRes.body.users[0];
-  }
+  // v357: GoTrue ignores ?email= and returns page 1 of ALL users, so
+  // users[0] was a random account — whose confirmed/unconfirmed state then
+  // decided what this endpoint did. Exact match across every page now.
+  const targetUser = await findAuthUserByEmail(sbAdmin, email);
   if (!targetUser) {
     return res.status(404).json({ error: 'No account found with this email' });
   }

@@ -29,6 +29,8 @@ const SUPABASE_URL =
   process.env.SUPABASE_URL || 'https://qazuyygrpqopwygxmvwq.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+import findAuthUserByEmail from './_find-auth-user.js';
+
 async function sb(path, opts = {}, jwt = null) {
   const headers = {
     'apikey': SERVICE_KEY,
@@ -115,12 +117,10 @@ export default async function handler(req, res) {
   biz.owner_id = ownerLookup.data[0].auth_user_id;
 
   // 5. Check email isn't already used by someone else
-  const emailCheck = await sb(
-    `/auth/v1/admin/users?email=${encodeURIComponent(cleanEmail)}`,
-    { method: 'GET' }
-  );
-  if (emailCheck.ok && Array.isArray(emailCheck.data?.users) && emailCheck.data.users.length > 0) {
-    const existing = emailCheck.data.users[0];
+  // v357: ?email= is ignored by GoTrue (it returned page 1 of all users, so
+  // users[0] was a random account and every change hit "already in use").
+  const existing = await findAuthUserByEmail((p, o) => sb(p, o).then(r => ({ ok: r.ok, body: r.data })), cleanEmail);
+  if (existing) {
     if (existing.id !== biz.owner_id) {
       return res.status(409).json({
         error: 'Email already in use by another account',

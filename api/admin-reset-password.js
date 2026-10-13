@@ -27,6 +27,7 @@
 //   * Minimum 8 chars enforced; max 72 chars (bcrypt limit).
 // =====================================================
 
+const findAuthUserByEmail = require('./_find-auth-user.js');
 const SUPABASE_URL =
   process.env.SUPABASE_URL || 'https://qazuyygrpqopwygxmvwq.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -121,19 +122,8 @@ module.exports = async (req, res) => {
   }
 
   // ===== 3. Lookup target user =====
-  const lookup = await sbFetch('/auth/v1/admin/users?filter=' + encodeURIComponent('email.eq.' + targetEmail), {
-    method: 'GET'
-  });
-  let targetUser = null;
-  if (lookup.ok && lookup.body && Array.isArray(lookup.body.users)) {
-    targetUser = lookup.body.users.find(u => (u.email || '').toLowerCase() === targetEmail);
-  }
-  if (!targetUser) {
-    const listRes = await sbFetch('/auth/v1/admin/users?per_page=200', { method: 'GET' });
-    if (listRes.ok && listRes.body && Array.isArray(listRes.body.users)) {
-      targetUser = listRes.body.users.find(u => (u.email || '').toLowerCase() === targetEmail);
-    }
-  }
+  // v357: every page of users, not just the first 200 (see api/_find-auth-user.js)
+  const targetUser = await findAuthUserByEmail(sbFetch, targetEmail);
   if (!targetUser) {
     res.status(404).json({ error: 'No user with this email exists' });
     return;
