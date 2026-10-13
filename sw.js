@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.87.5';   // v370 member photo sent on upload + office sees waiting photos
+const VERSION = 'dukan-v3.87.6';   // v371 organisation logos in lists
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

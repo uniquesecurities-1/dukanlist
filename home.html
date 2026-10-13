@@ -754,6 +754,8 @@
       .pvb-orgs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
       .pvb-orgs:empty{display:none}
       .pvb-orgs span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:2px 9px;font-size:.72rem;font-weight:700;white-space:nowrap}
+      .pvb-orgs span{display:inline-flex;align-items:center;gap:5px}
+      .pvb-orgs img{width:16px;height:16px;border-radius:50%;object-fit:cover;background:#fff;flex:0 0 auto}
       .pvb-go{flex:0 0 auto;background:#fff;color:#9F1239;font-weight:900;font-size:.86rem;border-radius:11px;padding:9px 14px;font-family:Manrope,sans-serif}
       @media (max-width:560px){
         .pvb{gap:10px;padding:12px;margin:12px 0 2px;border-radius:14px}
@@ -1507,7 +1509,10 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
         var orgs = (rows || []).filter(function(r){ return r.kind === 'org'; });
         if (!orgs.length) return;
         var esc = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
-        el.innerHTML = orgs.slice(0, 4).map(function(o){ return '<span>' + esc(o.name) + '</span>'; }).join('')
+        el.innerHTML = orgs.slice(0, 4).map(function(o){
+          // v371: small logo in the chip when the organisation has one (db/262)
+          var lg = /^https:\/\/res\.cloudinary\.com\/dukanlist\/image\/upload\//.test(o.logo || '') ? o.logo.replace('/upload/', '/upload/w_36,h_36,c_fill,q_auto,f_auto/') : '';
+          return '<span>' + (lg ? '<img src="' + esc(lg) + '" alt="" width="16" height="16" loading="lazy">' : '') + esc(o.name) + '</span>'; }).join('')
           + (orgs.length > 4 ? '<span>+' + (orgs.length - 4) + '</span>' : '');
       }).catch(function(){});
   }

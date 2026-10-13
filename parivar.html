@@ -61,7 +61,7 @@
   if (jw) jw.href = help ? 'https://wa.me/91' + help + '?text=' + encodeURIComponent('Namaste, Dabwali Parivar mein hamari sanstha jodni hai. Sanstha ka naam: ') : '/contact';
 
   function orgCard(o){
-    return '<a class="pv-card" href="/sanstha/' + encodeURIComponent(o.slug) + '">' + PV.avatar(null, o.name, 46, false)
+    return '<a class="pv-card" href="/sanstha/' + encodeURIComponent(o.slug) + '">' + PV.avatar(o.logo || null, o.name, 46, false)
       + '<div><div class="t">' + esc(o.name) + '</div><div class="s">' + PV.kindHtml(o.org_kind) + (o.members ? ' · ' + o.members + ' ' + PV.bi('members', 'सदस्य') : '') + '</div></div></a>';
   }
   function personCard(p){
