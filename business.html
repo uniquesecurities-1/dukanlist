@@ -884,6 +884,19 @@ body.prof-partial #reviewsAnchor::before{
   transform:rotate(15deg);
 }
 
+/* v360: people behind the shop (Dabwali Parivar) */
+.shop-people{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:12px 14px; margin-bottom:18px }
+.shop-people .sp-h{ font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:8px }
+.shop-people .sp-row{ display:flex; gap:10px; align-items:center; padding:8px 0; border-top:1px dashed var(--line); text-decoration:none; color:var(--ink) }
+.shop-people .sp-row:first-of-type{ border-top:0 }
+.shop-people .sp-av{ flex:0 0 40px; width:40px; height:40px; border-radius:50%; overflow:hidden; background:#FFEDD5; color:#9A3412; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem }
+.shop-people .sp-av img{ width:100%; height:100%; object-fit:cover }
+.shop-people .sp-t{ flex:1; min-width:0; font-size:.9rem; line-height:1.35 }
+.shop-people .sp-role{ display:inline-block; background:#FFF7ED; color:#9A3412; border-radius:99px; padding:1px 8px; font-size:.7rem; font-weight:800; margin-left:4px }
+.shop-people .sp-orgs{ display:block; font-size:.78rem; color:var(--muted); margin-top:2px }
+.shop-people .sp-ok{ color:#15803D }
+.shop-people .sp-go{ color:var(--muted); font-size:1.3rem }
+
 /* v348: "About this shop" */
 .shop-about{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:14px 16px; margin-bottom:18px }
 .shop-about .sa-h{ font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:10px }
@@ -1908,6 +1921,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="usp-box" id="uspBox" style="display:none"></div>
           <div class="review-highlights" id="reviewHighlights" style="display:none"></div>
           <div class="shop-about" id="shopAbout" style="display:none"></div>
+          <div class="shop-people" id="shopPeople" style="display:none"></div>
           <div class="addr-box">
             <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
             <div class="a-text" id="addrDisp"></div>
@@ -2478,6 +2492,7 @@ async function loadBusiness(){
   // v348: "Dukaan ke baare mein" (db/249). Separate, forgiving query — if the
   // migration has not run yet the page simply shows what it has.
   loadShopAbout();
+  loadShopPeople();
 
   // Load all categories (multi-cat badges), reviews and deals in parallel
   loadCategoryBadges(BIZ.id);
@@ -4194,6 +4209,39 @@ async function loadShopAbout(){
   try { renderShopAbout(BIZ); } catch(e){ console.warn('shop about:', e); }
   try { renderPv2Text(BIZ); } catch(_){}
 }
+// v360: Dabwali Parivar on the shop page (db/254) — the people behind this
+// shop (founder, partner …) and the organisations they serve, each linking
+// to their Parivar page. Hidden when nobody is linked or before db/254.
+async function loadShopPeople(){
+  const host = document.getElementById('shopPeople');
+  if (!host || !BIZ) return;
+  try {
+    const r = await ShopDB.client.rpc('parivar_people_for_business', { p_business_id: BIZ.id });
+    const people = (!r.error && Array.isArray(r.data)) ? r.data : [];
+    if (!people.length) return;
+    const FR = { founder:['Founder','संस्थापक'], owner:['Owner','मालिक'], proprietor:['Proprietor','प्रोपराइटर'], partner:['Partner','पार्टनर'],
+                 director:['Director','डायरेक्टर'], ceo:['CEO','CEO'], manager:['Manager','मैनेजर'], other:['Team','टीम'] };
+    const RL = { president:['President','अध्यक्ष'], vice_president:['Vice President','उपाध्यक्ष'], secretary:['Secretary','सचिव'],
+                 joint_secretary:['Joint Secretary','संयुक्त सचिव'], treasurer:['Treasurer','कोषाध्यक्ष'], pro:['PRO','प्रचार मंत्री'],
+                 patron:['Patron','संरक्षक'], chairman:['Chairman','चेयरमैन'], founder:['Founder','संस्थापक'], director:['Director','निदेशक'],
+                 advisor:['Advisor','सलाहकार'], coordinator:['Coordinator','संयोजक'], member:['Member','सदस्य'], other:['Office bearer','पदाधिकारी'] };
+    const bi = (p) => '<span data-i18n-en>' + escapeHTML(p[0]) + '</span><span data-i18n-hi>' + escapeHTML(p[1]) + '</span>';
+    const ini = (n) => String(n || '?').trim().split(/\s+/).map(w => w.charAt(0)).slice(0, 2).join('').toUpperCase();
+    host.innerHTML = '<div class="sp-h"><span data-i18n-en>People behind this shop · Dabwali Parivar</span><span data-i18n-hi>इस दुकान के लोग · डबवाली परिवार</span></div>'
+      + people.map(p => {
+          const av = p.photo
+            ? '<img src="' + escapeHTML(p.photo.replace('/upload/', '/upload/w_96,h_96,c_fill,g_face,q_auto,f_auto/')) + '" alt="">'
+            : '<span>' + escapeHTML(ini(p.name)) + '</span>';
+          const firm = p.firm_role_label ? escapeHTML(p.firm_role_label) : bi(FR[p.firm_role] || FR.other);
+          const orgs = (p.roles || []).slice(0, 3).map(r => (r.role_label ? escapeHTML(r.role_label) : bi(RL[r.role] || RL.other)) + ', ' + escapeHTML(r.org)).join(' · ');
+          return '<a class="sp-row" href="/parivar/' + encodeURIComponent(p.slug) + '"><span class="sp-av">' + av + '</span>'
+            + '<span class="sp-t"><b>' + escapeHTML(p.name) + (p.verified ? ' <span class="sp-ok">✓</span>' : '') + '</b> <span class="sp-role">' + firm + '</span>'
+            + (orgs ? '<span class="sp-orgs">' + orgs + '</span>' : '') + '</span><span class="sp-go">›</span></a>';
+        }).join('');
+    host.style.display = '';
+  } catch(_){}
+}
+
 function renderShopAbout(b){
   const host = document.getElementById('shopAbout');
   if (!host || !b) return;
