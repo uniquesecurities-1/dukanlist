@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013a">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013b">
 </head>
 <body>
 
@@ -38,9 +38,18 @@
   var esc = PV.esc, bi = PV.bi;
   var slug = (location.pathname.match(/^\/sanstha\/([a-z0-9-]+)/) || [])[1] || new URLSearchParams(location.search).get('slug') || '';
   var root = document.getElementById('root');
-  var MEMBERS = [], SESS_START = 0;
+  var MEMBERS = [], SESS_START = 0, ORG_NAME = '';
   function notFound(){
     root.innerHTML = '<div class="pv-empty">' + bi('This organisation is not available.', 'यह संस्था उपलब्ध नहीं है।') + '<br><a href="/parivar">' + bi('← Dabwali Parivar', '← डबवाली परिवार') + '</a></div>';
+  }
+  // v367: Call / WhatsApp right on the card — only when the member allows it (same rule as their own page)
+  function memberActs(m){
+    var d = String(m.mobile || '').replace(/\D/g, '').slice(-10);
+    if (d.length !== 10 || (m.contact_mode !== 'show' && m.contact_mode !== 'whatsapp')) return '';
+    var wa = 'https://wa.me/91' + d + '?text=' + encodeURIComponent('Namaste ' + (m.name || '') + ' ji, ' + (ORG_NAME ? ORG_NAME + ' ke ' : '') + 'Dabwali Parivar (DukanList) page se aapka number mila.');
+    return '<div class="mc-acts">'
+      + (m.contact_mode === 'show' ? '<a class="mc-call" href="tel:+91' + d + '" onclick="event.stopPropagation()">📞 ' + bi('Call', 'कॉल') + '</a>' : '')
+      + '<a class="mc-wa" href="' + wa + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 WhatsApp</a></div>';
   }
   function drawMembers(q){
     q = String(q || '').trim().toLowerCase();
@@ -60,7 +69,7 @@
         + '<div class="mc-b"><div class="mc-n"><a href="/parivar/' + encodeURIComponent(m.slug) + '">' + esc(m.name) + '</a>' + (m.verified ? ' <span class="pv-ok" title="Confirmed by the member">✓</span>' : '') + '</div>'
         + (m.role && m.role !== 'member' ? '<span class="pv-role" style="font-size:.66rem;padding:1px 8px">' + PV.roleHtml(m.role, m.role_label) + '</span> ' : '')
         + (m.profession ? '<div class="mc-p">' + esc(m.profession) + '</div>' : '')
-        + firm + since + '</div></div>';
+        + firm + since + memberActs(m) + '</div></div>';
     }).join('') : '<div class="pv-note" style="padding:10px 4px">' + bi('No member matches that.', 'कोई सदस्य नहीं मिला।') + '</div>';
   }
   if (!slug){ notFound(); return; }
@@ -71,6 +80,7 @@
     if (md) md.setAttribute('content', o.name + (o.city ? ', ' + o.city : '') + ' — office bearers ' + o.session + ', members and past presidents on Dabwali Parivar.');
     MEMBERS = o.members || [];
     SESS_START = parseInt(String(o.session || ''), 10) || 0;
+    ORG_NAME = o.name || '';
     var cm = String(o.contact_mobile || '').replace(/\D/g, '').slice(-10);
     var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(o.logo, o.name, 64, false)
       + '<div><h1>' + esc(o.name) + '</h1>' + (o.name_hi ? '<div class="sub">' + esc(o.name_hi) + '</div>' : '')
