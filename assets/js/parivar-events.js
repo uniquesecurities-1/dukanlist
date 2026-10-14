@@ -11,6 +11,20 @@
   'use strict';
   var PV = global.PV, esc = PV.esc, bi = PV.bi;
   var SEEN = 'pv_ev_seen_';
+  // v386: "already seen" is kept in localStorage AND in a cookie — some phone in-app browsers
+  // (WhatsApp / Instagram / Facebook) lose localStorage between visits, a cookie survives
+  function cookieIds(){ var m = document.cookie.match(/(?:^|;\s*)pvevs=([^;]*)/); return m ? decodeURIComponent(m[1]).split('.').filter(Boolean) : []; }
+  function markSeen(id){
+    try { localStorage.setItem(SEEN + id, '1'); } catch(_){}
+    try {
+      var ids = cookieIds().filter(function(x){ return x !== id; }); ids.push(id);
+      document.cookie = 'pvevs=' + encodeURIComponent(ids.slice(-25).join('.')) + ';path=/;max-age=' + (90 * 86400) + ';SameSite=Lax';
+    } catch(_){}
+  }
+  function isSeen(id){
+    try { if (localStorage.getItem(SEEN + id) === '1') return true; } catch(_){}
+    return cookieIds().indexOf(id) !== -1;
+  }
 
   function css(){
     if (document.getElementById('pveCss')) return;
@@ -83,7 +97,7 @@
     var bg = document.createElement('div'); bg.className = 'pve-bg'; OPEN = bg;
     function draw(){
       var e = events[i];
-      try { localStorage.setItem(SEEN + e.id, '1'); } catch(_){}
+      markSeen(e.id);
       var place = e.venue ? '<div>📍 ' + esc(e.venue) + '</div>' : '';
       // WhatsApp text in Hindi (date too), no emoji — it shows as ? on some phones
       var msg = (e.org_hi || e.org || '') + ' का कार्यक्रम: ' + e.title + '\n' + when(e.starts_at, true, true) + (e.venue ? '\nस्थान: ' + e.venue : '') + '\n\nपूरी जानकारी और पोस्टर: ' + shareUrl(e);
@@ -115,11 +129,13 @@
     if (!events.length) return;
     var want = new URLSearchParams(location.search).get('event');
     if (want){
+      // a shared event link opens that poster once; the ?event= part is then dropped from the
+      // address, so a reload / reopening the tab does not bring it back
+      try { var u = new URL(location.href); u.searchParams.delete('event'); history.replaceState(null, '', u.pathname + u.search + u.hash); } catch(_){}
       var k = events.findIndex(function(e){ return e.id === want; });
-      if (k !== -1){ popup(events, k); return; }
+      if (k !== -1 && !isSeen(want)){ popup(events, k); return; }
     }
-    var seen = function(e){ try { return localStorage.getItem(SEEN + e.id) === '1'; } catch(_){ return false; } };
-    var first = events.findIndex(function(e){ return !seen(e); });
+    var first = events.findIndex(function(e){ return !isSeen(e.id); });
     if (first === -1) return;
     setTimeout(function(){ if (!OPEN) popup(events, first); }, delay == null ? 2500 : delay);
   }
