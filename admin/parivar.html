@@ -81,6 +81,7 @@
     <button class="tab on" data-t="org" onclick="setTab(this)">🏛 Organisations</button>
     <button class="tab" data-t="person" onclick="setTab(this)">👤 People</button>
   </div>
+  <div id="evBanner"></div>
   <div class="cols">
     <div class="card">
       <h2><span id="listTitle">Organisations</span><button class="btn p s" onclick="openNew()">+ New</button></h2>
@@ -239,6 +240,7 @@ function drawOrg(o){
     if (o.pending_logo_url) h += '<div class="sec"><b>🖼 New logo from the organisation</b><div class="photo" style="margin-top:6px"><img src="' + esc(o.pending_logo_url) + '" alt="">'
       + '<button class="btn p s" onclick="reviewLogo(\'' + o.id + '\', true)">✓ Approve</button><button class="btn d s" onclick="reviewLogo(\'' + o.id + '\', false)">✕ Reject</button></div></div>';
     h += '<div class="sec" id="reqSec" style="display:none"></div>';
+    h += '<div class="sec" id="evSec"><b>🗓 Upcoming events</b> <span class="muted">loading…</span></div>';
     h += '<div class="sec" id="mgrSec"><b>🧑‍💼 Sanstha Manager</b> <span class="muted">loading…</span></div>';
   }
   if (!isNew){
@@ -276,7 +278,7 @@ function drawOrg(o){
       + '</div>';
   }
   document.getElementById('editor').innerHTML = h;
-  if (!isNew){ loadReqs(o); loadMgr(o); }
+  if (!isNew){ loadReqs(o); loadOrgEvents(o); loadMgr(o); }
 }
 
 /* ---------- v374: Sanstha Manager link (db/264) ---------- */
@@ -289,6 +291,12 @@ var MGR_ACT = {
   remove_requested: function(d){ return '⏳ Asked to remove ' + esc(d.person || ''); },
   request_cancelled: function(){ return '↩ Took back a request'; },
   request_approved: function(d){ return '✅ Approved: ' + (d.kind === 'add' ? 'add ' + (d.count || '') + ' (new ' + (d.new_people || 0) + ', existing ' + (d.existing_people || 0) + ')' : 'remove ' + esc(d.person || '')); },
+  event_sent: function(d){ return '🗓 Sent event “' + esc(d.title || '') + '” for approval'; },
+  event_removed: function(d){ return '🗓 Removed event “' + esc(d.title || '') + '”'; },
+  event_added: function(d){ return '🗓 Office added event “' + esc(d.title || '') + '”'; },
+  event_approved: function(d){ return '✅ Event approved: ' + esc(d.title || ''); },
+  event_rejected: function(d){ return '❌ Event rejected: ' + esc(d.title || ''); },
+  event_taken_down: function(d){ return '🗓 Office took down: ' + esc(d.title || ''); },
   request_rejected: function(d){ return '❌ Rejected: ' + (d.kind === 'add' ? 'add ' + (d.count || '') : 'remove ' + esc(d.person || '')); },
   member_removed: function(d, i){ return '✕ Removed ' + esc(d.person || '') + ' from ' + esc(d.session || '') + ' <button class="btn g s" onclick="putBack(' + i + ')">↩ Put back</button>'; },
   member_since: function(d){ return '📅 ' + esc(d.person || '') + ': member since ' + esc(d.year || '—'); },
@@ -323,6 +331,55 @@ async function loadMgr(o){
       }).join('') + '</div>' : '');
   el.innerHTML = h;
 }
+/* ---------- v385: upcoming events (db/270) ---------- */
+function evWhen(t){ var d = new Date(t); return d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour:'numeric', minute:'2-digit', hour12:true }); }
+function evThumb(u){ return String(u || '').replace('/upload/', '/upload/w_160,h_200,c_fill,q_auto,f_auto/'); }
+// banner over the lists: manager events waiting for approval, all organisations
+async function evBanner(){
+  var el = document.getElementById('evBanner'); if (!el) return;
+  var r = await c().rpc('admin_parivar_events', { p_org_id: null });
+  var pend = (r.data || []).filter(function(e){ return e.status === 'pending'; });
+  el.innerHTML = pend.length ? '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:10px 12px;margin-bottom:12px"><b>🗓 ' + pend.length + ' event poster' + (pend.length > 1 ? 's' : '') + ' waiting for your approval</b> — '
+    + pend.map(function(e){ return '<a href="#" onclick="event.preventDefault();openOrgFromBanner(\'' + e.org_id + '\')">' + esc(e.org) + ': ' + esc(e.title) + '</a>'; }).join(' · ') + '</div>' : '';
+}
+async function openOrgFromBanner(orgId){ var t = document.querySelector('.tab[data-t="org"]'); if (t && TAB !== 'org') setTab(t); await openItem(orgId); var s = document.getElementById('evSec'); if (s) s.scrollIntoView({ behavior:'smooth', block:'start' }); }
+async function loadOrgEvents(o){
+  var el = document.getElementById('evSec'); if (!el) return;
+  var r = await c().rpc('admin_parivar_events', { p_org_id: o.id });
+  if (r.error){ el.innerHTML = '<b>🗓 Upcoming events</b> <span class="muted">— run db/270 first (' + esc(r.error.message) + ')</span>'; return; }
+  var list = r.data || [];
+  var pad = function(n){ return String(n).padStart(2, '0'); }, ymd = function(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  el.innerHTML = '<b>🗓 Upcoming events</b> <span class="muted">— poster pops up once per visitor on the Dabwali Parivar page, shows on this organisation’s page and as one line on the home page; goes away by itself after the day. Max 3, up to 60 days ahead.</span>'
+    + (list.length ? list.map(function(e){
+        var pend = e.status === 'pending';
+        return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #E2E8F0' + (pend ? ';background:#FFFBEB' : '') + '">'
+          + '<a href="' + esc(e.poster) + '" target="_blank" rel="noopener"><img src="' + esc(evThumb(e.poster)) + '" alt="" style="width:64px;height:80px;object-fit:cover;border-radius:8px"></a>'
+          + '<div style="flex:1;min-width:0"><b>' + esc(e.title) + '</b> ' + (pend ? '<span class="pill" style="background:#FEF3C7;color:#92400E">⏳ waiting — sent by ' + esc(e.by || 'manager') + '</span>' : '<span class="pill ok">✅ live</span>')
+          + '<div class="muted">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + (e.contact ? ' · 📞 ' + esc(e.contact) : '') + '</div>'
+          + (e.details ? '<div class="muted" style="white-space:pre-wrap">' + esc(e.details) + '</div>' : '')
+          + '<div style="display:flex;gap:6px;margin-top:6px">' + (pend ? '<button class="btn p s" onclick="decideEvent(\'' + e.id + '\',\'approve\')">✓ Approve</button><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'reject\')">✕ Reject</button>'
+              : '<a class="btn g s" href="/parivar?event=' + esc(e.id) + '" target="_blank" rel="noopener">See pop-up ↗</a><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'remove\')">Take down</button>') + '</div></div></div>';
+      }).join('') : '<div class="muted" style="margin-top:6px">No upcoming events.</div>')
+    + '<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:700;font-size:.86rem">+ Add an event (goes live at once)</summary>'
+    + '<label>Event name *</label><input id="ev_title" maxlength="120" placeholder="e.g. Blood Donation Camp">'
+    + '<div class="grid2"><div><label>Date *</label><input type="date" id="ev_date" min="' + ymd(new Date()) + '" max="' + ymd(new Date(Date.now() + 60 * 864e5)) + '"></div><div><label>Time *</label><input type="time" id="ev_time" value="10:00"></div></div>'
+    + '<div class="grid2"><div><label>Venue</label><input id="ev_venue" maxlength="200"></div><div><label>Contact number (shown)</label><input id="ev_contact" inputmode="numeric" placeholder="optional"></div></div>'
+    + '<label>Details</label><textarea id="ev_details" maxlength="500" style="min-height:60px"></textarea>'
+    + '<label>Poster *</label><div class="photo"><img id="ev_poster_prev" style="display:none" alt=""><input type="hidden" id="ev_poster"><input type="file" accept="image/*" onchange="upload(this,\'ev_poster\',\'ev_poster_prev\')" style="width:auto"></div>'
+    + '<div style="margin-top:8px"><button class="btn p" onclick="addEvent(\'' + o.id + '\')">🗓 Add event</button></div></details>';
+}
+async function addEvent(orgId){
+  var p = { title: val('ev_title'), starts_at: val('ev_date') ? val('ev_date') + 'T' + (val('ev_time') || '10:00') + ':00+05:30' : '', venue: val('ev_venue'), contact: val('ev_contact'), details: val('ev_details'), poster_url: val('ev_poster') };
+  if (!p.title || !p.starts_at || !p.poster_url){ alert('Event name, date and poster are needed'); return; }
+  var r = await c().rpc('admin_parivar_event_add', { p_org_id: orgId, p: p }); if (fail(r)) return;
+  toast('🗓 Event is live'); openItem(orgId);
+}
+async function decideEvent(id, d){
+  if (d !== 'approve' && !confirm(d === 'reject' ? 'Reject this event poster?' : 'Take this event down?')) return;
+  var r = await c().rpc('admin_parivar_event_decide', { p_event_id: id, p_decision: d }); if (fail(r)) return;
+  toast(d === 'approve' ? '✓ Event is live' : d === 'reject' ? 'Rejected' : 'Taken down'); evBanner(); if (CUR) openItem(CUR.id);
+}
+
 // v375: additions / removals asked for from the manager link wait here (db/265)
 async function loadReqs(o){
   var el = document.getElementById('reqSec'); if (!el) return;
@@ -583,7 +640,7 @@ async function removeFirm(id){ if (!confirm('Remove this business?')) return; va
   if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
   var a = await c().rpc('is_admin');
   if (a.error || !a.data){ document.getElementById('list').innerHTML = '<div class="err">Admin access required.</div>'; return; }
-  loadList(); showDeleted();
+  loadList(); showDeleted(); evBanner();
 })();
 </script>
 <script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>

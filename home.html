@@ -524,6 +524,7 @@
         <b><span data-i18n-en>Dabwali Parivar</span><span data-i18n-hi>डबवाली परिवार</span></b>
         <span class="pvb-sub"><span data-i18n-en>One town, one family — find the people of Dabwali, their businesses and the organisations they serve.</span><span data-i18n-hi>एक शहर, एक परिवार — डबवाली के लोग, उनके कारोबार और उनकी संस्थाएं।</span></span>
         <span class="pvb-orgs" id="pvbOrgs"></span>
+        <span class="pvb-ev" id="pvbEv"></span>
       </span>
       <span class="pvb-go"><span data-i18n-en>Explore →</span><span data-i18n-hi>देखें →</span></span>
     </a>
@@ -753,6 +754,8 @@
       .pvb-sub{font-size:.84rem;opacity:.92;line-height:1.4}
       .pvb-orgs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
       .pvb-orgs:empty{display:none}
+      .pvb-ev{display:block;margin-top:6px;font-size:.76rem;font-weight:700;background:rgba(255,255,255,.95);color:#9A3412;border-radius:9px;padding:4px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+      .pvb-ev:empty{display:none}
       .pvb-orgs span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:2px 9px;font-size:.72rem;font-weight:700;white-space:nowrap}
       .pvb-orgs span{display:inline-flex;align-items:center;gap:5px}
       .pvb-orgs img{width:16px;height:16px;border-radius:50%;object-fit:cover;background:#fff;flex:0 0 auto}
@@ -1516,7 +1519,24 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
           + (orgs.length > 4 ? '<span>+' + (orgs.length - 4) + '</span>' : '');
       }).catch(function(){});
   }
-  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 2500 }); else setTimeout(go, 1200);
+  // v385: the next upcoming event as one small line — no pop-up on the home page (db/270)
+  function ev(){
+    var C = (window.DL_CONFIG || {}).supabase; var el = document.getElementById('pvbEv');
+    if (!C || !el) return;
+    fetch(C.url + '/rest/v1/rpc/parivar_upcoming_events', { method:'POST', headers:{ apikey:C.anon_key, Authorization:'Bearer ' + C.anon_key, 'Content-Type':'application/json' }, body:'{"p_org_slug":null,"p_limit":3}' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        if (!rows || !rows.length) return;
+        var e = rows[0], d = new Date(e.starts_at);
+        var esc = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
+        var en = d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' }), hi = d.toLocaleDateString('hi-IN', { weekday:'short', day:'numeric', month:'short' });
+        el.innerHTML = '🗓 <span data-i18n-en>' + esc(en) + '</span><span data-i18n-hi>' + esc(hi) + '</span> · ' + esc(e.title) + ' — ' + esc(e.org)
+          + (rows.length > 1 ? ' <span data-i18n-en>(+' + (rows.length - 1) + ' more)</span><span data-i18n-hi>(+' + (rows.length - 1) + ' और)</span>' : '');
+        var a = document.getElementById('pvBanner'); if (a) a.href = '/parivar?event=' + encodeURIComponent(e.id);
+      }).catch(function(){});
+  }
+  function both(){ go(); ev(); }
+  if ('requestIdleCallback' in window) requestIdleCallback(both, { timeout: 2500 }); else setTimeout(both, 1200);
 })();
 </script>
 <script src="/assets/js/trending.js?v=20261009a" defer></script>

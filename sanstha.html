@@ -33,6 +33,7 @@
 
 <script src="/assets/js/dl-config.js"></script>
 <script src="/assets/js/parivar-common.js?v=20261013c"></script>
+<script src="/assets/js/parivar-events.js?v=20261014a"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -104,6 +105,7 @@
             + '<a class="pv-btn pv-call" href="tel:+91' + cm + '">📞 ' + bi('Call', 'कॉल') + '</a></div>'
           : '')
       + '</div>';
+    h += '<div id="pvEv" style="display:none"></div>';   // v385: this organisation's upcoming events (db/270)
     if ((o.bearers || []).length){
       h += '<h2 class="pv-h2">' + bi('Office bearers', 'पदाधिकारी') + ' ' + esc(o.session) + '</h2><div class="pv-bearers">' + o.bearers.map(function(b){
         return '<a class="pv-bearer" href="/parivar/' + encodeURIComponent(b.slug) + '">' + PV.avatar(b.photo, b.name, 40)
@@ -127,6 +129,7 @@
       + '<a href="/contact">' + bi('Tell the DukanList helpline', 'DukanList हेल्पलाइन को बताएं') + '</a></p>';
     root.innerHTML = h;
     drawMembers('');
+    if (window.PVE) PVE.load(o.slug).then(function(ev){ PVE.strip(document.getElementById('pvEv'), ev); });
     try { PVsyncPlaceholders(); } catch(_){}
     var mq = document.getElementById('mq'); if (mq) mq.addEventListener('input', function(){ drawMembers(mq.value); });
   }).catch(function(){ root.innerHTML = '<div class="pv-empty">' + bi('Could not load — try again.', 'लोड नहीं हुआ — फिर कोशिश करें।') + '</div>'; });

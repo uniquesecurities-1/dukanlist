@@ -145,6 +145,30 @@
       <button class="btn ok" id="dBtn" style="margin-top:12px">✅ जानकारी सेव करें <span style="font-weight:600">(Save)</span></button>
     </div>
 
+    <!-- v385: upcoming events (db/270) -->
+    <div class="card" id="evCard">
+      <h2>🗓 आने वाले कार्यक्रम <span class="en">Upcoming events</span></h2>
+      <div class="en">कार्यक्रम का पोस्टर डालिए — DukanList ऑफिस की मंज़ूरी के बाद यह "डबवाली परिवार" पेज पर पॉप-अप में और संस्था के पेज पर दिखेगा। कार्यक्रम का दिन बीतते ही अपने-आप हट जाएगा। (एक समय में 3 तक, 60 दिन आगे तक)</div>
+      <div id="evList" style="margin-top:8px"></div>
+      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">
+        <label class="sm">कार्यक्रम का नाम * <span class="en">Event name</span></label><input type="text" id="evTitle" maxlength="120" placeholder="जैसे: रक्तदान शिविर">
+        <div class="g2">
+          <div><label class="sm">तारीख * <span class="en">Date</span></label><input type="date" id="evDate" style="width:100%;border:1.5px solid #CBD5E1;border-radius:10px;padding:9px 11px;font-family:inherit;font-size:.96rem"></div>
+          <div><label class="sm">समय * <span class="en">Time</span></label><input type="time" id="evTime" value="10:00" style="width:100%;border:1.5px solid #CBD5E1;border-radius:10px;padding:9px 11px;font-family:inherit;font-size:.96rem"></div>
+        </div>
+        <label class="sm">जगह <span class="en">Venue</span></label><input type="text" id="evVenue" maxlength="200" placeholder="जैसे: अग्रवाल धर्मशाला, मेन बाज़ार">
+        <div class="g2">
+          <div><label class="sm">संपर्क नंबर <span class="en">Contact (shown on the event)</span></label><input type="text" id="evContact" inputmode="numeric" maxlength="14" placeholder="10 अंक (ज़रूरी नहीं)"></div>
+          <div></div>
+        </div>
+        <label class="sm">थोड़ी जानकारी <span class="en">Details (up to 500 letters)</span></label><textarea id="evDetails" maxlength="500" style="min-height:60px"></textarea>
+        <label class="sm">पोस्टर * <span class="en">Poster</span></label>
+        <div class="phbox"><img id="evPrev" class="hide" alt=""><input type="file" accept="image/*" id="evIn"></div>
+        <div class="en" id="evSt"></div>
+        <button class="btn p" id="evBtn" style="margin-top:12px">🗓 मंज़ूरी के लिए भेजें <span style="font-weight:600">(Send for approval)</span></button>
+      </div>
+    </div>
+
     <!-- session -->
     <div class="card" id="sessCard">
       <h2>🔄 सेशन <span class="en">Session</span></h2>
@@ -354,7 +378,61 @@
     rpc('pv_mgr_new_session', { p_token: TOKEN }).then(function(r){ toast('✓ ' + r.session + ' शुरू — ' + r.carried_over + ' सदस्य आ गए'); return load(); }).catch(oops);
   }
 
-  load();
+  // ---------- v385: upcoming events (db/270) ----------
+  var EV_POSTER = '', EV_BUSY = 0;
+  (function(){
+    var pad = function(n){ return String(n).padStart(2, '0'); };
+    var d0 = new Date(), d1 = new Date(Date.now() + 60 * 864e5);
+    var ymd = function(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+    $('evDate').min = ymd(d0); $('evDate').max = ymd(d1);
+  })();
+  function evWhen(t){ var d = new Date(t); return d.toLocaleDateString('hi-IN', { weekday:'short', day:'numeric', month:'short' }) + ' · ' + d.toLocaleTimeString('en-IN', { hour:'numeric', minute:'2-digit', hour12:true }); }
+  function loadEvents(){
+    return rpc('pv_mgr_events', { p_token: TOKEN }).then(function(list){
+      list = list || [];
+      var ST = { pending:'<span class="wait">⏳ मंज़ूरी बाकी</span>', approved:'<span class="off">✅ लाइव</span>', rejected:'<span class="wait" style="background:#FEE2E2;color:#991B1B">❌ नामंज़ूर</span>' };
+      $('evList').innerHTML = list.length ? list.map(function(e){
+        return '<div class="pend"><div style="display:flex;gap:10px;align-items:flex-start"><img src="' + esc(String(e.poster).replace('/upload/', '/upload/w_120,h_150,c_fill,q_auto,f_auto/')) + '" alt="" style="width:48px;height:60px;object-fit:cover;border-radius:8px">'
+          + '<div><b>' + esc(e.title) + '</b> ' + (ST[e.status] || '') + '<div class="en">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + '</div></div></div>'
+          + '<button class="btn g s" data-evrm="' + e.id + '">हटाएँ</button></div>';
+      }).join('') : '<div class="sub">अभी कोई कार्यक्रम नहीं।</div>';
+    }).catch(function(){ $('evList').innerHTML = ''; });
+  }
+  $('evList').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-evrm]'); if (!b) return;
+    if (!confirm('यह कार्यक्रम हटाना है?')) return;
+    rpc('pv_mgr_event_remove', { p_token: TOKEN, p_event_id: b.getAttribute('data-evrm') }).then(function(){ toast('कार्यक्रम हटा दिया'); loadEvents(); }).catch(oops);
+  });
+  $('evIn').addEventListener('change', function(){
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    if (!/^image\//.test(f.type) || f.size > 10 * 1024 * 1024){ $('evSt').textContent = 'सिर्फ फोटो, 10 MB तक।'; return; }
+    try { $('evPrev').src = URL.createObjectURL(f); $('evPrev').classList.remove('hide'); } catch(_){}
+    $('evSt').textContent = 'पोस्टर अपलोड हो रहा है…'; EV_BUSY++; EV_POSTER = '';
+    var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar/events');
+    fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd }).then(function(r){ return r.json(); })
+      .then(function(j){ if (!j || !j.secure_url) throw new Error((j && j.error && j.error.message) || 'upload'); EV_POSTER = j.secure_url; $('evSt').textContent = '✓ पोस्टर तैयार'; })
+      .catch(function(e){ $('evSt').textContent = 'पोस्टर अपलोड नहीं हुआ — फिर कोशिश करें।' + (e && e.message && e.message !== 'upload' ? ' (' + e.message + ')' : ''); $('evPrev').classList.add('hide'); })
+      .then(function(){ EV_BUSY--; });
+  });
+  $('evBtn').addEventListener('click', function(){
+    if (EV_BUSY){ toast('पोस्टर अपलोड हो रहा है — 2 सेकंड रुकें', true); return; }
+    var title = $('evTitle').value.trim(), dt = $('evDate').value, tm = $('evTime').value || '10:00';
+    if (title.length < 3){ toast('कार्यक्रम का नाम लिखें', true); return; }
+    if (!dt){ toast('तारीख चुनें', true); return; }
+    if (!EV_POSTER){ toast('पोस्टर डालें', true); return; }
+    var c = $('evContact').value.replace(/\D/g, '');
+    if (c && !/^(91)?[6-9][0-9]{9}$/.test(c)){ toast('संपर्क नंबर 10 अंक का होना चाहिए', true); return; }
+    $('evBtn').disabled = true;
+    rpc('pv_mgr_event_add', { p_token: TOKEN, p: { title: title, starts_at: dt + 'T' + tm + ':00+05:30', venue: $('evVenue').value.trim(), contact: c.slice(-10), details: $('evDetails').value.trim(), poster_url: EV_POSTER } })
+      .then(function(){
+        toast('⏳ कार्यक्रम मंज़ूरी के लिए ऑफिस को भेज दिया');
+        ['evTitle','evDate','evVenue','evContact','evDetails'].forEach(function(id){ $(id).value = ''; });
+        EV_POSTER = ''; $('evPrev').classList.add('hide'); $('evSt').textContent = '';
+        loadEvents();
+      }).catch(oops).then(function(){ $('evBtn').disabled = false; });
+  });
+
+  load().then(loadEvents);
 })();
 </script>
 </body>

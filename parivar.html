@@ -42,6 +42,7 @@
 
 <main class="pv-wrap">
   <div id="results"></div>
+  <div id="pvEv" style="display:none"></div>
   <h2 class="pv-h2" id="orgsH"><span data-i18n-en>Organisations</span><span data-i18n-hi>संस्थाएं</span></h2>
   <div class="pv-grid" id="orgs"><div class="pv-empty">…</div></div>
   <div class="pv-join">
@@ -53,6 +54,7 @@
 
 <script src="/assets/js/dl-config.js"></script>
 <script src="/assets/js/parivar-common.js?v=20261013c"></script>
+<script src="/assets/js/parivar-events.js?v=20261014a"></script>
 <script>
 (function(){
   var esc = PV.esc;
@@ -79,6 +81,8 @@
       + (p.profession ? '<div class="s">' + esc(p.profession) + '</div>' : '')
       + firms + (orgs ? '<div class="pv-ocs">' + orgs + '</div>' : '') + legacy + '</div></a>';
   }
+  // v385: upcoming events — strip + a one-time pop-up 2.5 s after opening (db/270)
+  if (window.PVE) PVE.load().then(function(ev){ PVE.strip(document.getElementById('pvEv'), ev); PVE.auto(ev, 2500); });
   PV.rpc('parivar_search', { p_q: null, p_limit: 100 }).then(function(rows){
     var orgs = (rows || []).filter(function(r){ return r.kind === 'org'; });
     document.getElementById('orgs').innerHTML = orgs.length ? orgs.map(orgCard).join('')
