@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.88.6';   // v386 event pop-up really once
+const VERSION = 'dukan-v3.88.7';   // v387 events: all-events view, rotation, see all
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and
