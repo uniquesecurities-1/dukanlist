@@ -7,14 +7,17 @@
 <title>Dabwali Parivar — the people and organisations of Mandi Dabwali | DukanList</title>
 <meta name="description" content="Dabwali Parivar: find the people of Mandi Dabwali, their firms and the organisations they serve — Lions Club, Rotary, trade associations, religious and social bodies.">
 <link rel="canonical" href="https://dukanlist.com/parivar">
-<meta property="og:title" content="Dabwali Parivar — एक शहर, एक परिवार">
+<meta property="og:title" content="डबवाली परिवार — हमारा शहर, हमारे लोग, एक ही पहचान">
 <meta property="og:description" content="मंडी डबवाली के लोग, उनकी फर्में और संस्थाएं — एक जगह।">
-<meta property="og:image" content="https://dukanlist.com/assets/og-default.png">
+<meta property="og:image" content="https://dukanlist.com/assets/brand/dabwali-parivar-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <!-- v355: Dabwali Parivar home (db/251). Search people + sansthas; list of sansthas. -->
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<link rel="preload" as="image" href="/assets/brand/dabwali-parivar-560.webp" imagesrcset="/assets/brand/dabwali-parivar-560.webp 560w, /assets/brand/dabwali-parivar-1120.webp 1120w" imagesizes="(max-width:600px) 92vw, 540px" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015a">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015b">
 </head>
 <body>
 
@@ -32,11 +35,13 @@
   </div>
 </header>
 
-<section class="pv-hero">
-  <h1><span data-i18n-en>Dabwali Parivar</span><span data-i18n-hi>डबवाली परिवार</span></h1>
-  <p><span data-i18n-en>One town, one family — the people of Mandi Dabwali, their firms and the organisations they serve.</span><span data-i18n-hi>एक शहर, एक परिवार — मंडी डबवाली के लोग, उनकी फर्में और वो संस्थाएं जिनसे वो जुड़े हैं।</span></p>
-  <form class="pv-search" onsubmit="event.preventDefault();doSearch();">
-    <input id="q" type="search" autocomplete="off" placeholder="Search a name or organisation — e.g. Lions Club" data-ph-en="Search a name or organisation — e.g. Lions Club" data-ph-hi="नाम या संस्था खोजें — जैसे लायंस क्लब">
+<section class="pv-hero pv-hero2">
+  <!-- v389: the Dabwali Parivar logo (Deepak's design) as the page title -->
+  <h1 class="pv-logo-h1"><img src="/assets/brand/dabwali-parivar-560.webp" srcset="/assets/brand/dabwali-parivar-560.webp 560w, /assets/brand/dabwali-parivar-1120.webp 1120w" sizes="(max-width:600px) 92vw, 540px" width="560" height="244" alt="डबवाली परिवार — हमारा शहर, हमारे लोग, एक ही पहचान · Dabwali Parivar by DukanList" fetchpriority="high"><span class="pv-sr">Dabwali Parivar</span></h1>
+  <p class="pv-sub2"><span data-i18n-en>The people of Mandi Dabwali, their firms and the organisations they serve — all in one place.</span><span data-i18n-hi>मंडी डबवाली के लोग, उनकी फर्में और वो संस्थाएं जिनसे वो जुड़े हैं — सब एक जगह।</span></p>
+  <form class="pv-search pv-search2" onsubmit="event.preventDefault();doSearch();">
+    <span class="pv-sico" aria-hidden="true">🔍</span>
+    <input id="q" type="search" autocomplete="off" placeholder="Search a name, firm, profession or organisation" data-ph-en="Search a name, firm, profession or organisation" data-ph-hi="नाम, दुकान, पेशा या संस्था खोजें">
   </form>
   <!-- v388: counts + quick search by profession (db/271 parivar_overview) -->
   <div class="pv-stats" id="pvStats"></div>
@@ -89,11 +94,14 @@
   // v388: counts, profession chips, recently joined people (db/271)
   PV.rpc('parivar_overview', {}).then(function(o){
     if (!o) return;
+    // v389: three small cards — each opens its part of the page
+    var card = function(ico, n, en, hi, href){ return '<a class="pv-stat" href="' + href + '"><span class="i">' + ico + '</span><b>' + n + '</b><span class="l">' + PV.bi(en, hi) + '</span></a>'; };
     var bits = [];
-    if (o.orgs) bits.push('<b>' + o.orgs + '</b> ' + PV.bi(o.orgs > 1 ? 'organisations' : 'organisation', 'संस्थाएं'));
-    if (o.people) bits.push('<b>' + o.people + '</b> ' + PV.bi('people', 'लोग'));
-    if (o.events) bits.push('<b>' + o.events + '</b> ' + PV.bi(o.events > 1 ? 'upcoming events' : 'upcoming event', 'आने वाले कार्यक्रम'));
-    document.getElementById('pvStats').innerHTML = bits.join('<span>·</span>');
+    if (o.orgs) bits.push(card('🏛', o.orgs, o.orgs > 1 ? 'Organisations' : 'Organisation', 'संस्थाएं', '#orgsH'));
+    if (o.people) bits.push(card('👥', o.people, 'People', 'लोग', '#q'));
+    if (o.events) bits.push(card('📅', o.events, o.events > 1 ? 'Upcoming events' : 'Upcoming event', 'आने वाले कार्यक्रम', '#pvEv'));
+    var st = document.getElementById('pvStats'); st.innerHTML = bits.join('');
+    var pq = st.querySelector('a[href="#q"]'); if (pq) pq.onclick = function(e){ e.preventDefault(); var q = document.getElementById('q'); q.focus(); };
     var pr = (o.professions || []).slice(0, 10);
     var ch = document.getElementById('pvChips');
     ch.innerHTML = pr.length ? '<span class="lbl">' + PV.bi('Find by profession:', 'पेशे से खोजें:') + '</span>' + pr.map(function(x){ return '<button type="button" data-q="' + esc(x.name) + '">' + esc(x.name) + ' <small>' + x.n + '</small></button>'; }).join('') : '';
