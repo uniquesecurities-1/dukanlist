@@ -21,6 +21,34 @@
       document.cookie = 'pvevs=' + encodeURIComponent(ids.slice(-25).join('.')) + ';path=/;max-age=' + (90 * 86400) + ';SameSite=Lax';
     } catch(_){}
   }
+  // v392: "मैं आऊँगा" — an anonymous id for this phone (no name, no number)
+  function deviceId(){
+    var k = 'pv_dev', v = null;
+    try { v = localStorage.getItem(k); } catch(_){}
+    if (!v){ var m = document.cookie.match(/(?:^|;\s*)pvdev=([a-z0-9]+)/); v = m ? m[1] : null; }
+    if (!v){ v = ''; for (var i = 0; i < 24; i++) v += 'abcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 36)); }
+    try { localStorage.setItem(k, v); } catch(_){}
+    try { document.cookie = 'pvdev=' + v + ';path=/;max-age=' + (365 * 86400) + ';SameSite=Lax'; } catch(_){}
+    return v;
+  }
+  function going(id, set){
+    var k = 'pv_go_' + id;
+    if (set === undefined){ try { return localStorage.getItem(k) === '1'; } catch(_){ return false; } }
+    try { if (set) localStorage.setItem(k, '1'); else localStorage.removeItem(k); } catch(_){}
+  }
+  function addToCalendar(e){
+    var s = new Date(e.starts_at), en = new Date(s.getTime() + 2 * 3600e3);
+    var f = function(d){ return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); };
+    var det = (e.details ? e.details + '\n\n' : '') + (e.org || '') + ' — ' + shareUrl(e);
+    if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document){
+      var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DukanList//Dabwali Parivar//HI', 'BEGIN:VEVENT', 'UID:' + e.id + '@dukanlist.com', 'DTSTAMP:' + f(new Date()),
+                 'DTSTART:' + f(s), 'DTEND:' + f(en), 'SUMMARY:' + String(e.title).replace(/[,;]/g, ' '), 'LOCATION:' + String(e.venue || '').replace(/[,;]/g, ' '),
+                 'DESCRIPTION:' + det.replace(/\n/g, '\\n').replace(/[,;]/g, ' '), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics); return;
+    }
+    window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(e.title) + '&dates=' + f(s) + '/' + f(en)
+      + '&details=' + encodeURIComponent(det) + '&location=' + encodeURIComponent(e.venue || ''), '_blank');
+  }
   function isSeen(id){
     try { if (localStorage.getItem(SEEN + id) === '1') return true; } catch(_){}
     return cookieIds().indexOf(id) !== -1;
@@ -121,6 +149,10 @@
   }
 
   var OPEN = null;
+  function goLabel(e){
+    var n = +e.going || 0, me = going(e.id);
+    return (me ? '✓ ' + bi('You are going', 'आप आ रहे हैं') : '🙋 ' + bi("I'll come", 'मैं आऊँगा')) + (n ? ' · ' + n + ' ' + bi(n > 1 ? 'going' : 'going', 'आ रहे') : '');
+  }
   function close(){ if (OPEN){ OPEN.remove(); OPEN = null; document.removeEventListener('keydown', onKey); } }
   function onKey(e){ if (e.key === 'Escape') close(); }
   // view 'list' = all upcoming events grouped by day (new ones marked); 'detail' = one big poster
@@ -165,11 +197,21 @@
         + (e.details ? '<div class="pve-det">' + esc(e.details) + '</div>' : '')
         + '<div class="pve-acts"><a class="pve-wa" href="https://wa.me/?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener">💬 ' + bi('Share on WhatsApp', 'WhatsApp पर भेजें') + '</a>'
         + (c.length === 10 ? '<a class="pve-call" href="tel:+91' + c + '">📞 ' + bi('Call', 'कॉल करें') + '</a>' : '') + '</div>'
+        + '<div class="pve-rsvp"><button type="button" class="pve-go' + (going(e.id) ? ' on' : '') + '">' + goLabel(e) + '</button>'
+        + '<button type="button" class="pve-cal">📅 ' + bi('Add to calendar', 'कैलेंडर में जोड़ें') + '</button></div>'
         + (events.length > 1 ? '<div class="pve-nav"><button data-nav="-1"' + (i === 0 ? ' disabled' : '') + '>← ' + bi('Previous', 'पिछला') + '</button><span>' + (i + 1) + ' / ' + events.length + '</span>'
             + '<button data-nav="1"' + (i === events.length - 1 ? ' disabled' : '') + '>' + bi('Next', 'अगला') + ' →</button></div>' : '')
         + '</div></div>';
       bg.querySelector('.pve-x').onclick = close;
       var back = bg.querySelector('.pve-back'); if (back) back.onclick = function(){ view = 'list'; draw(); };
+      bg.querySelector('.pve-cal').onclick = function(){ addToCalendar(e); };
+      var gb = bg.querySelector('.pve-go');
+      gb.onclick = function(){
+        var want = !going(e.id); gb.disabled = true;
+        PV.rpc('parivar_event_rsvp', { p_event_id: e.id, p_device: deviceId(), p_going: want }).then(function(n){
+          going(e.id, want); e.going = n; gb.classList.toggle('on', want); gb.innerHTML = goLabel(e);
+        }).catch(function(){}).then(function(){ gb.disabled = false; });
+      };
       bg.querySelectorAll('[data-nav]').forEach(function(b){ b.onclick = function(){ i = Math.max(0, Math.min(events.length - 1, i + (+b.getAttribute('data-nav')))); draw(); }; });
     }
     function draw(){ if (view === 'list') drawList(); else drawDetail(); var bx = bg.querySelector('.pve-box'); if (bx) bx.scrollTop = 0; }

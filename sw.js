@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.89.0';   // v390 Parivar back link, chip deselect
+const VERSION = 'dukan-v3.89.2';   // v392 phase 2: team poster, I'll come, past event photos
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

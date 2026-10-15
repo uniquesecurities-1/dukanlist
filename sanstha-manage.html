@@ -403,11 +403,38 @@
       var ST = { pending:'<span class="wait">⏳ मंज़ूरी बाकी</span>', approved:'<span class="off">✅ लाइव</span>', rejected:'<span class="wait" style="background:#FEE2E2;color:#991B1B">❌ नामंज़ूर</span>' };
       $('evList').innerHTML = list.length ? list.map(function(e){
         return '<div class="pend"><div style="display:flex;gap:10px;align-items:flex-start"><img src="' + esc(String(e.poster).replace('/upload/', '/upload/w_120,h_150,c_fill,q_auto,f_auto/')) + '" alt="" style="width:48px;height:60px;object-fit:cover;border-radius:8px">'
-          + '<div><b>' + esc(e.title) + '</b> ' + (ST[e.status] || '') + '<div class="en">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + '</div></div></div>'
-          + '<button class="btn g s" data-evrm="' + e.id + '">हटाएँ</button></div>';
+          + '<div><b>' + esc(e.title) + '</b> ' + (e.past ? '<span class="off" style="background:#F1F5F9;color:#475569">बीत गया</span>' : (ST[e.status] || '')) + '<div class="en">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + '</div>'
+          // v392: "I'll come" count; after the event, its photos (office approves)
+          + (!e.past && e.status === 'approved' ? '<div class="en" style="color:#15803D;font-weight:700">🙋 ' + (e.going || 0) + ' लोगों ने कहा "मैं आऊँगा"</div>' : '')
+          + (e.past ? '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">' + (e.photos || []).map(function(ph){
+                return '<span style="position:relative;display:inline-block"><img src="' + esc(String(ph.url).replace('/upload/', '/upload/w_120,h_120,c_fill,q_auto,f_auto/')) + '" alt="" style="width:52px;height:52px;object-fit:cover;border-radius:8px">'
+                  + (ph.status === 'pending' ? '<span style="position:absolute;bottom:2px;left:2px;background:#FEF3C7;color:#92400E;font-size:.6rem;font-weight:800;border-radius:6px;padding:0 4px">⏳</span>' : '') + '</span>';
+              }).join('')
+              + ((e.photos || []).length < 8 ? '<label class="btn g s" style="display:inline-flex;align-items:center;cursor:pointer">📷 फोटो जोड़ें<input type="file" accept="image/*" multiple data-evph="' + e.id + '" style="display:none"></label>' : '') + '</div>'
+              + '<div class="en">कार्यक्रम की फोटो (8 तक) — ऑफिस की मंज़ूरी के बाद संस्था के पेज पर "बीते कार्यक्रम" में दिखेंगी।</div>' : '')
+          + '</div></div>'
+          + (e.past ? '' : '<button class="btn g s" data-evrm="' + e.id + '">हटाएँ</button>') + '</div>';
       }).join('') : '<div class="sub">अभी कोई कार्यक्रम नहीं।</div>';
     }).catch(function(){ $('evList').innerHTML = ''; });
   }
+  // v392: photos of a past event — upload each to Cloudinary, then send it for approval
+  $('evList').addEventListener('change', function(ev){
+    var inp = ev.target.closest('input[data-evph]'); if (!inp) return;
+    var files = Array.prototype.slice.call(inp.files || [], 0, 8), id = inp.getAttribute('data-evph'); inp.value = '';
+    if (!files.length) return;
+    toast('फोटो अपलोड हो रही हैं…');
+    var chain = Promise.resolve(), ok = 0;
+    files.forEach(function(f){
+      chain = chain.then(function(){
+        if (!/^image\//.test(f.type) || f.size > 10 * 1024 * 1024) return;
+        var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar/events');
+        return fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd }).then(function(r){ return r.json(); })
+          .then(function(j){ if (!j || !j.secure_url) throw new Error('upload'); return rpc('pv_mgr_event_photo_add', { p_token: TOKEN, p_event_id: id, p_url: j.secure_url }); })
+          .then(function(){ ok++; });
+      });
+    });
+    chain.then(function(){ toast('⏳ ' + ok + ' फोटो मंज़ूरी के लिए भेज दी'); loadEvents(); }).catch(function(e){ oops(e); loadEvents(); });
+  });
   $('evList').addEventListener('click', function(e){
     var b = e.target.closest('button[data-evrm]'); if (!b) return;
     if (!confirm('यह कार्यक्रम हटाना है?')) return;

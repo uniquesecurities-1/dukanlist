@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015c">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015d">
 </head>
 <body>
 
@@ -40,7 +40,8 @@
 </script>
 <script src="/assets/js/dl-config.js"></script>
 <script src="/assets/js/parivar-common.js?v=20261013c"></script>
-<script src="/assets/js/parivar-events.js?v=20261015a"></script>
+<script src="/assets/js/parivar-events.js?v=20261015b"></script>
+<script src="/assets/js/parivar-poster.js?v=20261015a"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -58,6 +59,21 @@
     return '<div class="mc-acts">'
       + (m.contact_mode === 'show' ? '<a class="mc-call" href="tel:+91' + d + '" onclick="event.stopPropagation()">📞 ' + bi('Call', 'कॉल') + '</a>' : '')
       + '<a class="mc-wa" href="' + wa + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 WhatsApp</a></div>';
+  }
+  // v392: full-screen photo viewer for past events
+  function viewPhotos(e, i){
+    var ph = e.photos || []; if (!ph.length) return;
+    var bg = document.createElement('div'); bg.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:12px';
+    function draw(){
+      bg.innerHTML = '<button type="button" data-x style="position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:1.3rem;cursor:pointer">×</button>'
+        + '<img src="' + esc(String(ph[i]).replace('/upload/', '/upload/w_1400,c_limit,q_auto,f_auto/')) + '" alt="" style="max-width:100%;max-height:80vh;border-radius:10px;object-fit:contain">'
+        + '<div style="color:#fff;margin-top:10px;font-weight:700;text-align:center">' + esc(e.title) + ' · ' + (i + 1) + ' / ' + ph.length + '</div>'
+        + (ph.length > 1 ? '<div style="display:flex;gap:10px;margin-top:8px"><button type="button" data-n="-1" style="padding:8px 16px;border-radius:9px;border:0;font-weight:800;cursor:pointer">←</button><button type="button" data-n="1" style="padding:8px 16px;border-radius:9px;border:0;font-weight:800;cursor:pointer">→</button></div>' : '');
+      bg.querySelector('[data-x]').onclick = function(){ bg.remove(); };
+      bg.querySelectorAll('[data-n]').forEach(function(b){ b.onclick = function(){ i = (i + (+b.getAttribute('data-n')) + ph.length) % ph.length; draw(); }; });
+    }
+    bg.addEventListener('click', function(ev){ if (ev.target === bg) bg.remove(); });
+    draw(); document.body.appendChild(bg);
   }
   function drawMembers(q){
     q = String(q || '').trim().toLowerCase();
@@ -113,8 +129,11 @@
           : '')
       + '</div>';
     h += '<div id="pvEv" style="display:none"></div>';   // v385: this organisation's upcoming events (db/270)
+    h += '<div id="pvPast"></div>';                          // v392: past events with photos (db/273)
     if ((o.bearers || []).length){
-      h += '<h2 class="pv-h2">' + bi('Office bearers', 'पदाधिकारी') + ' ' + esc(o.session) + '</h2><div class="pv-bearers">' + o.bearers.map(function(b){
+      // v392: "Team poster" of the office bearers (drawn in the browser — parivar-poster.js)
+      h += '<h2 class="pv-h2" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span>' + bi('Office bearers', 'पदाधिकारी') + ' ' + esc(o.session) + '</span>'
+        + '<button type="button" class="pv-poster-btn" id="pvPoster">📸 ' + bi('Team poster', 'टीम पोस्टर') + '</button></h2><div class="pv-bearers">' + o.bearers.map(function(b){
         return '<a class="pv-bearer" href="/parivar/' + encodeURIComponent(b.slug) + '">' + PV.avatar(b.photo, b.name, 40)
           + '<div><div class="r">' + PV.roleHtml(b.role, b.role_label) + '</div><div class="n">' + esc(b.name) + (b.verified ? ' <span class="pv-ok">✓</span>' : '') + '</div></div></a>';
       }).join('') + '</div>';
@@ -137,6 +156,18 @@
     root.innerHTML = h;
     drawMembers('');
     if (window.PVE) PVE.load(o.slug).then(function(ev){ PVE.strip(document.getElementById('pvEv'), ev); });
+    var pb = document.getElementById('pvPoster'); if (pb && window.PVP) pb.onclick = function(){ PVP.open(o); };
+    // v392: "बीते कार्यक्रम" — events of the last 12 months that have approved photos
+    PV.rpc('parivar_past_events', { p_org_slug: o.slug }).then(function(list){
+      list = list || []; var el = document.getElementById('pvPast'); if (!el || !list.length) return;
+      var th = function(u, w, h){ return String(u).replace('/upload/', '/upload/w_' + w + ',h_' + h + ',c_fill,q_auto,f_auto/'); };
+      el.innerHTML = '<h2 class="pv-h2">📸 ' + bi('Past events', 'बीते कार्यक्रम') + '</h2>' + list.map(function(e, k){
+        var d = new Date(e.starts_at).toLocaleDateString(document.documentElement.getAttribute('data-lang') === 'hi' ? 'hi-IN' : 'en-IN', { day:'numeric', month:'long', year:'numeric' });
+        return '<div class="pv-past-ev"><div class="h"><b>' + esc(e.title) + '</b><span>' + esc(d) + (e.venue ? ' · ' + esc(e.venue) : '') + '</span></div><div class="g">'
+          + (e.photos || []).map(function(u, i){ return '<button type="button" data-e="' + k + '" data-i="' + i + '"><img src="' + esc(th(u, 300, 300)) + '" alt="" loading="lazy"></button>'; }).join('') + '</div></div>';
+      }).join('');
+      el.querySelectorAll('button[data-e]').forEach(function(b){ b.onclick = function(){ viewPhotos(list[+b.getAttribute('data-e')], +b.getAttribute('data-i')); }; });
+    }).catch(function(){});
     try { PVsyncPlaceholders(); } catch(_){}
     var mq = document.getElementById('mq'); if (mq) mq.addEventListener('input', function(){ drawMembers(mq.value); });
   }).catch(function(){ root.innerHTML = '<div class="pv-empty">' + bi('Could not load — try again.', 'लोड नहीं हुआ — फिर कोशिश करें।') + '</div>'; });

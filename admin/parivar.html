@@ -338,6 +338,7 @@ function drawOrg(o){
     h += '<div class="sec" id="reqSec" style="display:none"></div>';
     h += '<div class="sec" id="qSec"><b>📲 Members’ own pages</b> <span class="muted">loading…</span></div>';
     h += '<div class="sec" id="evSec"><b>📅 Upcoming events</b> <span class="muted">loading…</span></div>';
+    h += '<div class="sec" id="phSec"><b>📸 Past event photos</b> <span class="muted">loading…</span></div>';
     h += '<div class="sec" id="mgrSec"><b>🧑‍💼 Sanstha Manager</b> <span class="muted">loading…</span></div>';
   }
   if (!isNew){
@@ -375,7 +376,7 @@ function drawOrg(o){
       + '</div>';
   }
   document.getElementById('editor').innerHTML = h;
-  if (!isNew){ loadReqs(o); loadProgress(o); loadOrgEvents(o); loadMgr(o); }
+  if (!isNew){ loadReqs(o); loadProgress(o); loadOrgEvents(o); loadPastPhotos(o); loadMgr(o); }
 }
 
 /* ---------- v374: Sanstha Manager link (db/264) ---------- */
@@ -393,6 +394,7 @@ var MGR_ACT = {
   event_added: function(d){ return '🗓 Office added event “' + esc(d.title || '') + '”'; },
   event_approved: function(d){ return '✅ Event approved: ' + esc(d.title || ''); },
   event_rejected: function(d){ return '❌ Event rejected: ' + esc(d.title || ''); },
+  event_photo_sent: function(d){ return '📸 Sent a photo of “' + esc(d.title || '') + '” for approval'; },
   event_taken_down: function(d){ return '🗓 Office took down: ' + esc(d.title || ''); },
   request_rejected: function(d){ return '❌ Rejected: ' + (d.kind === 'add' ? 'add ' + (d.count || '') : 'remove ' + esc(d.person || '')); },
   member_removed: function(d, i){ return '✕ Removed ' + esc(d.person || '') + ' from ' + esc(d.session || '') + ' <button class="btn g s" onclick="putBack(' + i + ')">↩ Put back</button>'; },
@@ -436,8 +438,13 @@ async function evBanner(){
   var el = document.getElementById('evBanner'); if (!el) return;
   var r = await c().rpc('admin_parivar_events', { p_org_id: null });
   var pend = (r.data || []).filter(function(e){ return e.status === 'pending'; });
+  // v392: past-event photos waiting too
+  var rp = await c().rpc('admin_parivar_event_photos', { p_org_id: null });
+  var phw = []; (rp.data || []).forEach(function(e){ var n = (e.photos || []).filter(function(p){ return p.status === 'pending'; }).length; if (n) phw.push({ org_id: e.org_id, org: e.org, title: e.title, n: n }); });
   el.innerHTML = pend.length ? '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:10px 12px;margin-bottom:12px"><b>🗓 ' + pend.length + ' event poster' + (pend.length > 1 ? 's' : '') + ' waiting for your approval</b> — '
     + pend.map(function(e){ return '<a href="#" onclick="event.preventDefault();openOrgFromBanner(\'' + e.org_id + '\')">' + esc(e.org) + ': ' + esc(e.title) + '</a>'; }).join(' · ') + '</div>' : '';
+  if (phw.length) el.innerHTML += '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:10px 12px;margin-bottom:12px"><b>📸 Event photos waiting for your approval</b> — '
+    + phw.map(function(e){ return '<a href="#" onclick="event.preventDefault();openOrgFromBanner(\'' + e.org_id + '\')">' + esc(e.org) + ': ' + esc(e.title) + ' (' + e.n + ')</a>'; }).join(' · ') + '</div>';
 }
 async function openOrgFromBanner(orgId){ var t = document.querySelector('.tab[data-t="org"]'); if (t && TAB !== 'org') setTab(t); await openItem(orgId); var s = document.getElementById('evSec'); if (s) s.scrollIntoView({ behavior:'smooth', block:'start' }); }
 async function loadOrgEvents(o){
@@ -452,7 +459,7 @@ async function loadOrgEvents(o){
         return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #E2E8F0' + (pend ? ';background:#FFFBEB' : '') + '">'
           + '<a href="' + esc(e.poster) + '" target="_blank" rel="noopener"><img src="' + esc(evThumb(e.poster)) + '" alt="" style="width:64px;height:80px;object-fit:cover;border-radius:8px"></a>'
           + '<div style="flex:1;min-width:0"><b>' + esc(e.title) + '</b> ' + (pend ? '<span class="pill" style="background:#FEF3C7;color:#92400E">⏳ waiting — sent by ' + esc(e.by || 'manager') + '</span>' : '<span class="pill ok">✅ live</span>')
-          + '<div class="muted">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + (e.contact ? ' · 📞 ' + esc(e.contact) : '') + '</div>'
+          + '<div class="muted">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + (e.contact ? ' · 📞 ' + esc(e.contact) : '') + (!pend && e.going ? ' · <b style="color:#15803D">🙋 ' + e.going + ' going</b>' : '') + '</div>'
           + (e.details ? '<div class="muted" style="white-space:pre-wrap">' + esc(e.details) + '</div>' : '')
           + '<div style="display:flex;gap:6px;margin-top:6px">' + (pend ? '<button class="btn p s" onclick="decideEvent(\'' + e.id + '\',\'approve\')">✓ Approve</button><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'reject\')">✕ Reject</button>'
               : '<a class="btn g s" href="/parivar?event=' + esc(e.id) + '" target="_blank" rel="noopener">See pop-up ↗</a><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'remove\')">Take down</button>') + '</div></div></div>';
@@ -464,6 +471,35 @@ async function loadOrgEvents(o){
     + '<label>Details</label><textarea id="ev_details" maxlength="500" style="min-height:60px"></textarea>'
     + '<label>Poster *</label><div class="photo"><img id="ev_poster_prev" style="display:none" alt=""><input type="hidden" id="ev_poster"><input type="file" accept="image/*" onchange="upload(this,\'ev_poster\',\'ev_poster_prev\')" style="width:auto"></div>'
     + '<div style="margin-top:8px"><button class="btn p" onclick="addEvent(\'' + o.id + '\')">🗓 Add event</button></div></details>';
+}
+// v392: photos of past events (last 60 days) — approve the organisation's, or add your own (db/273)
+async function loadPastPhotos(o){
+  var el = document.getElementById('phSec'); if (!el) return;
+  var r = await c().rpc('admin_parivar_event_photos', { p_org_id: o.id });
+  if (r.error){ el.innerHTML = '<b>📸 Past event photos</b> <span class="muted">— run db/273 first</span>'; return; }
+  var list = r.data || [];
+  if (!list.length){ el.innerHTML = '<b>📸 Past event photos</b> <span class="muted">— none yet (events of the last 60 days show here after they are over)</span>'; return; }
+  el.innerHTML = '<b>📸 Past event photos</b> <span class="muted">— shown as “बीते कार्यक्रम” on the organisation page once approved (max 8 per event)</span>'
+    + list.map(function(e){
+        return '<div style="padding:8px 0;border-bottom:1px dashed #E2E8F0"><b>' + esc(e.title) + '</b> <span class="muted">' + esc(evWhen(e.starts_at)) + (e.going ? ' · 🙋 ' + e.going + ' said they would come' : '') + '</span>'
+          + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">' + (e.photos || []).map(function(ph){
+              return '<div style="text-align:center"><a href="' + esc(ph.url) + '" target="_blank" rel="noopener"><img src="' + esc(String(ph.url).replace('/upload/', '/upload/w_200,h_200,c_fill,q_auto,f_auto/')) + '" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:9px;' + (ph.status === 'pending' ? 'outline:3px solid #F59E0B' : '') + '"></a>'
+                + '<div style="display:flex;gap:3px;justify-content:center;margin-top:3px">' + (ph.status === 'pending' ? '<button class="btn p s" onclick="decidePhoto(' + ph.id + ',true)">✓</button>' : '') + '<button class="btn d s" onclick="decidePhoto(' + ph.id + ',false)" title="' + (ph.status === 'pending' ? 'Reject' : 'Take down') + '">✕</button></div></div>';
+            }).join('')
+          + ((e.photos || []).length < 8 ? '<label class="btn g s" style="align-self:center;cursor:pointer">+ Add photo<input type="file" accept="image/*" style="display:none" onchange="officeEventPhoto(this,\'' + e.event_id + '\')"></label>' : '') + '</div></div>';
+      }).join('');
+}
+async function decidePhoto(id, ok){ var r = await c().rpc('admin_parivar_event_photo_decide', { p_photo_id: id, p_approve: ok }); if (fail(r)) return; toast(ok ? '✓ Photo is live' : 'Removed'); evBanner(); if (CUR) loadPastPhotos(CUR); }
+async function officeEventPhoto(input, eventId){
+  var f = input.files && input.files[0]; input.value = ''; if (!f) return;
+  var fd = new FormData(); fd.append('file', f); fd.append('upload_preset', 'dukanlist_shops'); fd.append('folder', 'parivar/events');
+  toast('Uploading…');
+  try {
+    var j = await (await fetch('https://api.cloudinary.com/v1_1/dukanlist/image/upload', { method:'POST', body: fd })).json();
+    if (!j.secure_url) throw new Error((j.error && j.error.message) || 'upload');
+    var r = await c().rpc('admin_parivar_event_photo_add', { p_event_id: eventId, p_url: j.secure_url }); if (fail(r)) return;
+    toast('✓ Photo added'); if (CUR) loadPastPhotos(CUR);
+  } catch(e){ alert('Photo upload failed: ' + e.message); }
 }
 async function addEvent(orgId){
   var p = { title: val('ev_title'), starts_at: val('ev_date') ? val('ev_date') + 'T' + (val('ev_time') || '10:00') + ':00+05:30' : '', venue: val('ev_venue'), contact: val('ev_contact'), details: val('ev_details'), poster_url: val('ev_poster') };
