@@ -17,7 +17,7 @@
 <link rel="preload" as="image" href="/assets/brand/dabwali-parivar-560.webp" imagesrcset="/assets/brand/dabwali-parivar-560.webp 560w, /assets/brand/dabwali-parivar-1120.webp 1120w" imagesizes="(max-width:600px) 92vw, 540px" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015d">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015e">
 </head>
 <body>
 
@@ -51,15 +51,17 @@
 
 <main class="pv-wrap">
   <div id="results"></div>
+  <div id="pvBday"></div>
   <div id="pvEv" style="display:none"></div>
   <h2 class="pv-h2" id="orgsH"><span data-i18n-en>Organisations</span><span data-i18n-hi>संस्थाएं</span></h2>
   <div class="pv-kinds" id="pvKinds"></div>
   <div class="pv-grid" id="orgs"><div class="pv-empty">…</div></div>
   <div id="pvRecent"></div>
+  <div id="pvOffers"></div>
   <div class="pv-join">
     <b><span data-i18n-en>Is your organisation missing?</span><span data-i18n-hi>आपकी संस्था यहाँ नहीं है?</span></b>
     <span class="pv-note"><span data-i18n-en>Send the organisation's name and this year's office bearers on WhatsApp — we'll add it.</span><span data-i18n-hi>संस्था का नाम और इस साल के पदाधिकारी WhatsApp पर भेजें — हम जोड़ देंगे।</span></span>
-    <div class="pv-acts" style="justify-content:center"><a class="pv-btn pv-wa" id="joinWa" style="flex:0 0 auto" target="_blank" rel="noopener">💬 <span data-i18n-en>Add my organisation</span><span data-i18n-hi>मेरी संस्था जोड़ें</span></a></div>
+    <div class="pv-acts" style="justify-content:center"><a class="pv-btn pv-call" href="/parivar-join" style="flex:0 0 auto">👤 <span data-i18n-en>Join Dabwali Parivar</span><span data-i18n-hi>परिवार से जुड़िए</span></a><a class="pv-btn pv-wa" id="joinWa" style="flex:0 0 auto" target="_blank" rel="noopener">💬 <span data-i18n-en>Add my organisation</span><span data-i18n-hi>मेरी संस्था जोड़ें</span></a></div>
   </div>
 </main>
 
@@ -73,6 +75,13 @@
   var jw = document.getElementById('joinWa');
   if (jw) jw.href = help ? 'https://wa.me/91' + help + '?text=' + encodeURIComponent('नमस्ते, डबवाली परिवार में हमारी संस्था जोड़नी है। संस्था का नाम: ') : '/contact';
 
+  function offerCard(f){
+    var ph = f.shop_photo ? String(f.shop_photo).replace(/\/upload\/(?:[^/]*\/)?(v\d+\/)/, '/upload/w_140,h_140,c_fill,q_auto,f_auto/$1') : '';
+    var until = new Date(f.valid_until + 'T00:00:00').toLocaleDateString(document.documentElement.getAttribute('data-lang') === 'hi' ? 'hi-IN' : 'en-IN', { day:'numeric', month:'short' });
+    return '<a class="pv-offer" href="/' + encodeURIComponent(f.shop_slug) + '">' + (ph ? '<img src="' + esc(ph) + '" alt="" loading="lazy">' : '<span class="ic">🏪</span>')
+      + '<span><b>' + esc(f.offer) + '</b><small>🏪 ' + esc(f.shop) + ' · ' + (f.org ? esc(f.org) + ' ' + PV.bi('members', 'सदस्यों के लिए') : PV.bi('all Parivar members', 'सभी परिवार सदस्यों के लिए')) + ' · ' + PV.bi('till', 'तक') + ' ' + esc(until) + '</small></span></a>';
+  }
+  window.pvOfferCard = offerCard;
   function orgCard(o){
     // v388: the head of the organisation this session (db/271)
     var head = o.head && o.head.name ? '<div class="s pv-head-n">' + PV.roleHtml(o.head.role) + ': <b>' + esc(o.head.name) + '</b></div>' : '';
@@ -92,6 +101,19 @@
           return '<button type="button" data-k="' + esc(k) + '"' + (KIND === k ? ' class="on"' : '') + '>' + PV.kindHtml(k) + ' (' + n + ')</button>'; }).join('') : '';
     el.querySelectorAll('button').forEach(function(b){ b.onclick = function(){ KIND = b.getAttribute('data-k'); drawOrgs(); }; });
   }
+  // v393: today's birthdays (only people who chose to show theirs) + member offers (db/274)
+  PV.rpc('parivar_birthdays_today', {}).then(function(list){
+    list = list || []; var el = document.getElementById('pvBday'); if (!el || !list.length) return;
+    el.innerHTML = '<div class="pv-bday"><b>🎂 ' + PV.bi('Birthdays today', 'आज जन्मदिन है') + '</b><div class="pv-bday-l">' + list.map(function(p){
+      var m = String(p.mobile || '').replace(/\D/g, '').slice(-10);
+      var wish = m.length === 10 ? '<a class="pv-wish" target="_blank" rel="noopener" href="https://wa.me/91' + m + '?text=' + encodeURIComponent('जन्मदिन की बहुत-बहुत शुभकामनाएं, ' + p.name + ' जी! — डबवाली परिवार') + '">💬 ' + PV.bi('Wish', 'शुभकामना भेजें') + '</a>' : '';
+      return '<div class="pv-bday-p"><a href="/parivar/' + encodeURIComponent(p.slug) + '">' + PV.avatar(p.photo, p.name, 44) + '<span><b>' + esc(p.name) + '</b><small>' + esc(p.org || p.profession || '') + '</small></span></a>' + wish + '</div>';
+    }).join('') + '</div></div>';
+  }).catch(function(){});
+  PV.rpc('parivar_offers', { p_org_slug: null, p_business_id: null }).then(function(list){
+    list = list || []; var el = document.getElementById('pvOffers'); if (!el || !list.length) return;
+    el.innerHTML = '<h2 class="pv-h2">🎁 ' + PV.bi('Member offers', 'सदस्य ऑफर') + '</h2><div class="pv-offers">' + list.map(offerCard).join('') + '</div>';
+  }).catch(function(){});
   // v388: counts, profession chips, recently joined people (db/271)
   PV.rpc('parivar_overview', {}).then(function(o){
     if (!o) return;

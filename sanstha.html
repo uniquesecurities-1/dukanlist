@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015d">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015e">
 </head>
 <body>
 
@@ -130,6 +130,7 @@
       + '</div>';
     h += '<div id="pvEv" style="display:none"></div>';   // v385: this organisation's upcoming events (db/270)
     h += '<div id="pvPast"></div>';                          // v392: past events with photos (db/273)
+    h += '<div id="pvOffers"></div>';                        // v393: member offers (db/274)
     if ((o.bearers || []).length){
       // v392: "Team poster" of the office bearers (drawn in the browser — parivar-poster.js)
       h += '<h2 class="pv-h2" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span>' + bi('Office bearers', 'पदाधिकारी') + ' ' + esc(o.session) + '</span>'
@@ -157,6 +158,17 @@
     drawMembers('');
     if (window.PVE) PVE.load(o.slug).then(function(ev){ PVE.strip(document.getElementById('pvEv'), ev); });
     var pb = document.getElementById('pvPoster'); if (pb && window.PVP) pb.onclick = function(){ PVP.open(o); };
+    // v393: offers for this organisation's members (and for all Parivar members)
+    PV.rpc('parivar_offers', { p_org_slug: o.slug, p_business_id: null }).then(function(list){
+      list = list || []; var el = document.getElementById('pvOffers'); if (!el || !list.length) return;
+      var hi = document.documentElement.getAttribute('data-lang') === 'hi';
+      el.innerHTML = '<h2 class="pv-h2">🎁 ' + bi('Offers for members', 'सदस्यों के लिए ऑफर') + '</h2><div class="pv-offers">' + list.map(function(f){
+        var ph = f.shop_photo ? String(f.shop_photo).replace(/\/upload\/(?:[^/]*\/)?(v\d+\/)/, '/upload/w_140,h_140,c_fill,q_auto,f_auto/$1') : '';
+        var until = new Date(f.valid_until + 'T00:00:00').toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { day:'numeric', month:'short' });
+        return '<a class="pv-offer" href="/' + encodeURIComponent(f.shop_slug) + '">' + (ph ? '<img src="' + esc(ph) + '" alt="" loading="lazy">' : '<span class="ic">🏪</span>')
+          + '<span><b>' + esc(f.offer) + '</b><small>🏪 ' + esc(f.shop) + ' · ' + (f.org ? bi('for our members', 'हमारे सदस्यों के लिए') : bi('all Parivar members', 'सभी परिवार सदस्यों के लिए')) + ' · ' + bi('till', 'तक') + ' ' + esc(until) + '</small></span></a>';
+      }).join('') + '</div>';
+    }).catch(function(){});
     // v392: "बीते कार्यक्रम" — events of the last 12 months that have approved photos
     PV.rpc('parivar_past_events', { p_org_slug: o.slug }).then(function(list){
       list = list || []; var el = document.getElementById('pvPast'); if (!el || !list.length) return;

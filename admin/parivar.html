@@ -81,7 +81,8 @@
     <button class="tab on" data-t="org" onclick="setTab(this)">🏛 Organisations</button>
     <button class="tab" data-t="person" onclick="setTab(this)">👤 People</button>
   </div>
-  <div style="display:flex;justify-content:flex-end;margin:-6px 0 10px"><button class="btn g s" onclick="weeklyMessage()">📣 This week’s WhatsApp message</button></div>
+  <div style="display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;margin:-6px 0 10px"><button class="btn g s" onclick="joinRequests()" id="jrBtn">👤 Join requests</button><button class="btn g s" onclick="offersBox()">🎁 Member offers</button><button class="btn g s" onclick="weeklyMessage()">📣 This week’s WhatsApp message</button></div>
+  <div id="jrBanner"></div>
   <div id="evBanner"></div>
   <div class="cols">
     <div class="card">
@@ -291,6 +292,67 @@ async function weeklyMessage(){
     + '<button class="btn g" onclick="window.open(\'https://wa.me/?text=\'+encodeURIComponent(document.getElementById(\'wkText\').value),\'_blank\')">💬 Open WhatsApp</button></div></div>';
   document.body.appendChild(bx);
 }
+
+/* ---------- v393: join requests + member offers (db/274) ---------- */
+function popBox(id, html){
+  var b = document.getElementById(id); if (b) b.remove();
+  b = document.createElement('div'); b.id = id; b.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:999;display:flex;align-items:flex-start;justify-content:center;padding:24px 14px;overflow:auto';
+  b.innerHTML = '<div class="card" style="max-width:640px;width:100%">' + html + '</div>';
+  b.addEventListener('click', function(e){ if (e.target === b) b.remove(); });
+  document.body.appendChild(b); return b;
+}
+async function jrBanner(){
+  var r = await c().rpc('admin_parivar_join_requests'); var n = (r.data || []).length;
+  var btn = document.getElementById('jrBtn'); if (btn) btn.textContent = '👤 Join requests' + (n ? ' (' + n + ')' : '');
+  var el = document.getElementById('jrBanner'); if (!el) return;
+  el.innerHTML = n ? '<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:10px 12px;margin-bottom:12px"><b>👤 ' + n + ' ' + (n > 1 ? 'people want' : 'person wants') + ' to join Dabwali Parivar</b> — <a href="#" onclick="event.preventDefault();joinRequests()">review</a></div>' : '';
+}
+async function joinRequests(){
+  var r = await c().rpc('admin_parivar_join_requests');
+  if (r.error){ alert(r.error.message + ' — run db/274 first'); return; }
+  var list = r.data || [];
+  var MODE = { show:'Show number', whatsapp:'WhatsApp only', hidden:'Hidden' };
+  popBox('jrBox', '<h2>👤 Join requests (' + list.length + ') <button class="btn g s" onclick="document.getElementById(\'jrBox\').remove()">Close</button></h2>'
+    + (list.length ? list.map(function(j){
+        return '<div style="border-top:1px dashed #E2E8F0;padding:10px 0" id="jr' + j.id + '"><b style="font-size:1rem">' + esc(j.name) + '</b> <span class="muted">' + esc(j.mobile) + ' · ' + esc(new Date(j.at).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })) + '</span>'
+          + (j.existing ? '<div class="muted" style="color:#B45309">Already in Dabwali Parivar as <a href="/parivar/' + esc(j.existing.slug) + '" target="_blank">' + esc(j.existing.name) + '</a> — approving adds the organisation / details to that person</div>' : '')
+          + '<div class="muted">' + [j.profession ? '💼 ' + esc(j.profession) : '', j.org ? '🏛 ' + esc(j.org) : (j.org_other ? '🏛 ' + esc(j.org_other) + ' <i>(not in Parivar yet)</i>' : ''),
+               j.role_wanted ? '🎖 says: ' + esc(j.role_wanted) : '', j.business ? '🏪 ' + esc(j.business) : '', (j.shops || []).length ? '🏪 DukanList shop on this number: ' + j.shops.map(esc).join(', ') : '',
+               '📞 ' + esc(MODE[j.contact_mode] || j.contact_mode), j.birthday ? '🎂 ' + esc(j.birthday) + (j.birthday_public ? ' (show)' : ' (private)') : ''].filter(Boolean).join(' · ') + '</div>'
+          + '<div style="display:flex;gap:6px;margin-top:6px"><button class="btn p s" onclick="decideJoin(' + j.id + ',true)">✓ Approve</button><button class="btn d s" onclick="decideJoin(' + j.id + ',false)">✕ Reject</button></div></div>';
+      }).join('') : '<div class="empty">No requests waiting.</div>')
+    + '<div class="muted" style="margin-top:8px">Share the form: <b>' + location.origin + '/parivar-join</b></div>');
+}
+async function decideJoin(id, ok){
+  if (!ok && !confirm('Reject this request?')) return;
+  var r = await c().rpc('admin_parivar_join_decide', { p_id: id, p_approve: ok }); if (fail(r)) return;
+  var d = r.data || {}, row = document.getElementById('jr' + id);
+  if (row) row.innerHTML = ok ? '✅ Added' + (d.new ? '' : ' (existing person updated)') + (d.shops_linked ? ' · 🏪 shop linked' : '') + ' — <a href="/parivar/' + esc(d.slug) + '" target="_blank">page ↗</a>'
+      + ' <button class="btn g s" onclick="sendProfileLink(\'' + d.person_id + '\')">📲 Send their profile link</button>'
+      + (d.role_wanted && d.org_id ? ' <button class="btn g s" onclick="document.getElementById(\'jrBox\').remove();TAB=\'org\';openItem(\'' + d.org_id + '\')">🎖 Set post “' + esc(d.role_wanted) + '”</button>' : '')
+    : '✕ Rejected';
+  jrBanner();
+}
+async function offersBox(){
+  var r = await c().rpc('admin_parivar_offers'); if (r.error){ alert(r.error.message + ' — run db/274 first'); return; }
+  var orgs = await c().rpc('admin_parivar_list', { p_kind: 'org', p_q: null });
+  var list = r.data || [], ol = (orgs.data || []);
+  var d30 = new Date(Date.now() + 30 * 864e5), ymd = function(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  popBox('ofBox', '<h2>🎁 Member offers <button class="btn g s" onclick="document.getElementById(\'ofBox\').remove()">Close</button></h2>'
+    + '<div class="muted">A DukanList shop gives members of an organisation (or every Dabwali Parivar member) an offer. Shows on the organisation page, the shop page and the Parivar page until the end date.</div>'
+    + (list.length ? list.map(function(f){ return '<div class="row" style="grid-template-columns:1fr auto"><div><b>' + esc(f.offer) + '</b><div class="muted">🏪 ' + esc(f.shop) + ' · ' + esc(f.org) + ' · till ' + esc(f.valid_until) + (f.expired ? ' <span class="pill">ended</span>' : '') + '</div></div><button class="btn d s" onclick="removeOffer(' + f.id + ')">✕</button></div>'; }).join('') : '<div class="empty">No offers yet.</div>')
+    + '<div class="sec"><b>+ New offer</b><label>Shop on DukanList *</label>' + shopPicker('of', null, null)
+    + '<label>For members of</label><select id="of_org"><option value="">All Dabwali Parivar members</option>' + ol.map(function(o){ return '<option value="' + esc(o.id) + '">' + esc(o.name) + '</option>'; }).join('') + '</select>'
+    + '<label>Offer *</label><input id="of_text" maxlength="140" placeholder="e.g. 10% छूट / Free home delivery">'
+    + '<label>Valid till *</label><input type="date" id="of_until" value="' + ymd(d30) + '" min="' + ymd(new Date()) + '">'
+    + '<div style="margin-top:10px"><button class="btn p" onclick="addOffer()">🎁 Add offer</button></div></div>');
+}
+async function addOffer(){
+  if (!val('of_bid')){ alert('Pick the shop'); return; }
+  var r = await c().rpc('admin_parivar_offer_add', { p_business_id: val('of_bid'), p_org_id: val('of_org') || null, p_text: val('of_text'), p_until: val('of_until') });
+  if (fail(r)) return; toast('🎁 Offer added'); offersBox();
+}
+async function removeOffer(id){ if (!confirm('Remove this offer?')) return; var r = await c().rpc('admin_parivar_offer_remove', { p_id: id }); if (fail(r)) return; toast('Removed'); offersBox(); }
 
 async function sendProfileLink(pid){
   var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
@@ -773,7 +835,7 @@ async function removeFirm(id){ if (!confirm('Remove this business?')) return; va
   if (!u.data || !u.data.user){ location.href = '/admin/login.html'; return; }
   var a = await c().rpc('is_admin');
   if (a.error || !a.data){ document.getElementById('list').innerHTML = '<div class="err">Admin access required.</div>'; return; }
-  loadList(); showDeleted(); evBanner();
+  loadList(); showDeleted(); evBanner(); jrBanner();
 })();
 </script>
 <script src="/assets/js/admin-auto-logout.js?v=20260921e"></script>

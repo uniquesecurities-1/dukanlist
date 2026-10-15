@@ -180,3 +180,21 @@ a.pv-oc:hover{ filter:brightness(.96); text-decoration:none }
 .pve-rsvp{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
 .pve-rsvp button{ flex:1; min-width:140px; padding:10px 12px; border-radius:11px; font-weight:800; font-size:.86rem; cursor:pointer; font-family:inherit; border:1.5px solid #FDBA74; background:#FFF7ED; color:#9A3412 }
 .pve-rsvp button.on{ background:#16A34A; border-color:#16A34A; color:#fff }
+
+/* v393: birthdays today, member offers */
+.pv-bday{ background:linear-gradient(135deg,#FDF2F8,#FFF7ED); border:1px solid #FBCFE8; border-radius:16px; padding:12px 14px; margin:14px 0 4px }
+.pv-bday > b{ font-size:1rem }
+.pv-bday-l{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px }
+.pv-bday-p{ display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #FBCFE8; border-radius:14px; padding:6px 8px }
+.pv-bday-p > a{ display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink) }
+.pv-bday-p span{ display:flex; flex-direction:column }
+.pv-bday-p small{ font-size:.72rem; color:var(--muted) }
+.pv-wish{ background:#25D366; color:#fff; border-radius:99px; padding:5px 10px; font-size:.76rem; font-weight:800; text-decoration:none; white-space:nowrap }
+.pv-offers{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:10px }
+.pv-offer{ display:flex; gap:10px; align-items:center; background:linear-gradient(135deg,#F0FDF4,#fff); border:1px solid #BBF7D0; border-radius:14px; padding:10px; text-decoration:none; color:var(--ink) }
+.pv-offer:hover{ border-color:#4ADE80; text-decoration:none }
+.pv-offer img{ width:56px; height:56px; border-radius:10px; object-fit:cover; flex:0 0 auto }
+.pv-offer .ic{ width:56px; height:56px; border-radius:10px; background:#DCFCE7; display:grid; place-items:center; font-size:1.5rem; flex:0 0 auto }
+.pv-offer > span{ display:flex; flex-direction:column; gap:2px; min-width:0 }
+.pv-offer b{ color:#166534; font-size:.95rem; line-height:1.3 }
+.pv-offer small{ font-size:.74rem; color:var(--muted) }

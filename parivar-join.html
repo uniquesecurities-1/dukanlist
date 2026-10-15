@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="hi" data-lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>डबवाली परिवार से जुड़िए — DukanList</title>
+<meta name="description" content="डबवाली परिवार से जुड़िए — अपना नाम, पेशा, संस्था और दुकान जोड़िए। मुफ़्त।">
+<meta property="og:title" content="डबवाली परिवार से जुड़िए">
+<meta property="og:image" content="https://dukanlist.com/assets/brand/dabwali-parivar-og.jpg">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
+<!--
+  v393: "परिवार से जुड़िए" — anyone asks to be added to Dabwali Parivar (db/274 parivar_join).
+  The request waits for the DukanList office; nothing is public until it is approved.
+-->
+<style>
+  :root{ --ink:#0F172A; --ink2:#334155; --muted:#64748B; --line:#E2E8F0; --or:#EA580C }
+  *{ box-sizing:border-box }
+  body{ margin:0; font-family:'Noto Sans Devanagari','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:#FFF8F1; color:var(--ink) }
+  .top{ background:#0F172A; padding:12px 16px; display:flex; align-items:center; justify-content:space-between }
+  .top img{ height:28px; width:auto; display:block }
+  .top a{ color:#FDBA74; font-weight:800; font-size:.86rem; text-decoration:none }
+  .wrap{ max-width:560px; margin:0 auto; padding:16px 14px 60px }
+  .logo{ display:block; width:min(360px,80vw); height:auto; margin:6px auto 4px }
+  h1{ font-size:1.3rem; text-align:center; margin:4px 0 2px }
+  .lead{ text-align:center; color:var(--ink2); font-size:.9rem; margin:0 0 14px }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:14px }
+  .en{ color:var(--muted); font-size:.78rem; font-weight:500 }
+  label.sm{ display:block; font-size:.84rem; font-weight:700; color:var(--ink2); margin:12px 0 4px }
+  input[type=text], select, textarea{ width:100%; border:1.5px solid #CBD5E1; border-radius:10px; padding:11px 12px; font-size:1rem; font-family:inherit; background:#fff }
+  .g2{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+  label.opt{ display:flex; gap:10px; align-items:flex-start; border:1.5px solid var(--line); border-radius:12px; padding:9px 12px; margin-top:8px; cursor:pointer; font-size:.92rem }
+  label.opt input{ margin-top:3px; width:18px; height:18px }
+  .btn{ border:0; border-radius:12px; padding:14px 16px; font-weight:800; font-size:1.02rem; cursor:pointer; font-family:inherit; width:100%; background:linear-gradient(135deg,#F97316,#EA580C); color:#fff }
+  .btn:disabled{ opacity:.6 }
+  .msg{ font-size:.88rem; margin-top:8px; text-align:center; color:#DC2626 }
+  .center{ text-align:center; padding:30px 16px }
+  .center .big{ font-size:3rem }
+  .hide{ display:none !important }
+  .hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
+</style>
+</head>
+<body>
+<div class="top"><a href="/"><img src="/assets/brand/wordmark-dark.webp" alt="DukanList" width="120" height="28"></a><a href="/parivar">← डबवाली परिवार</a></div>
+<div class="wrap">
+  <img class="logo" src="/assets/brand/dabwali-parivar-560.webp" alt="डबवाली परिवार" width="560" height="244">
+  <h1>परिवार से जुड़िए</h1>
+  <p class="lead">अपना नाम, पेशा, संस्था और दुकान जोड़िए — बिल्कुल मुफ़्त। DukanList ऑफिस देखकर आपका पेज बना देगा।<br><span class="en">Join Dabwali Parivar — free. The DukanList office checks and adds you.</span></p>
+
+  <div id="form">
+    <div class="card">
+      <label class="sm">पूरा नाम * <span class="en">Full name</span></label><input type="text" id="jName" maxlength="80" placeholder="जैसे: Ramesh Garg">
+      <label class="sm">मोबाइल * <span class="en">Mobile — stays private unless you choose below</span></label><input type="text" id="jMob" inputmode="numeric" maxlength="14" placeholder="10 अंक">
+      <label class="sm">पेशा <span class="en">Profession (up to 3)</span></label><input type="text" id="jProf" data-prof-picker>
+      <label class="sm">आपकी दुकान / फर्म <span class="en">Your shop / firm (if any)</span></label><input type="text" id="jBiz" maxlength="120" placeholder="जैसे: Garg Cloth House">
+    </div>
+    <div class="card">
+      <label class="sm" style="margin-top:0">आप किस संस्था से जुड़े हैं? <span class="en">Your organisation</span></label>
+      <select id="jOrg"><option value="">— चुनिए (ज़रूरी नहीं) —</option></select>
+      <div id="jOtherW" class="hide"><label class="sm">संस्था का नाम <span class="en">Organisation name</span></label><input type="text" id="jOther" maxlength="120"></div>
+      <label class="sm">पद (अगर है) <span class="en">Post, if any — the office will confirm it</span></label><input type="text" id="jRole" maxlength="40" placeholder="जैसे: सचिव / Treasurer">
+    </div>
+    <div class="card">
+      <b>📞 आपका नंबर पेज पर कैसे दिखे?</b>
+      <label class="opt"><input type="radio" name="cm" value="show"><span><b>नंबर दिखाओ</b> — कॉल और WhatsApp बटन<br><span class="en">Show number (Call + WhatsApp)</span></span></label>
+      <label class="opt"><input type="radio" name="cm" value="whatsapp" checked><span><b>सिर्फ WhatsApp बटन</b> — नंबर लिखा नहीं दिखेगा<br><span class="en">WhatsApp button only</span></span></label>
+      <label class="opt"><input type="radio" name="cm" value="hidden"><span><b>नंबर छुपाओ</b><br><span class="en">Hide my number</span></span></label>
+    </div>
+    <div class="card">
+      <b>🎂 जन्मदिन (ज़रूरी नहीं)</b> <span class="en">— day and month only, no year</span>
+      <div class="g2" style="margin-top:8px"><select id="jBd"><option value="">दिन</option></select><select id="jBm"><option value="">महीना</option></select></div>
+      <label class="opt"><input type="checkbox" id="jBp"><span>मेरा जन्मदिन डबवाली परिवार पेज पर दिखाओ, ताकि लोग शुभकामनाएं भेज सकें<br><span class="en">Show my birthday on the Dabwali Parivar page</span></span></label>
+    </div>
+    <div class="hp" aria-hidden="true"><input type="text" id="jWeb" tabindex="-1" autocomplete="off"></div>
+    <button class="btn" id="jBtn">✅ जुड़ने की request भेजें <span style="font-weight:600">(Send)</span></button>
+    <div class="msg" id="jMsg"></div>
+  </div>
+
+  <div id="done" class="center hide">
+    <div class="big">🙏</div>
+    <h2>धन्यवाद! आपकी request मिल गई</h2>
+    <p>DukanList ऑफिस जल्दी ही आपको डबवाली परिवार में जोड़ देगा। फिर आपको WhatsApp पर आपके पेज का लिंक मिलेगा, जिससे आप फोटो लगा सकेंगे।<br><span class="en">The office will add you soon and send your page link on WhatsApp.</span></p>
+    <a href="/parivar" style="display:inline-block;margin-top:10px;background:#0F172A;color:#fff;text-decoration:none;font-weight:800;padding:11px 18px;border-radius:11px">डबवाली परिवार देखें →</a>
+  </div>
+</div>
+
+<script src="/assets/js/dl-config.js"></script>
+<script src="/assets/js/prof-picker.js?v=20261013a"></script>
+<script>
+(function(){
+  var SB = (window.DL_CONFIG || {}).supabase || {};
+  var $ = function(id){ return document.getElementById(id); };
+  function rpc(fn, body){
+    return fetch(SB.url + '/rest/v1/rpc/' + fn, { method:'POST', headers:{ apikey:SB.anon_key, Authorization:'Bearer ' + SB.anon_key, 'Content-Type':'application/json' }, body: JSON.stringify(body || {}) })
+      .then(function(r){ return r.json().catch(function(){ return null; }).then(function(j){ if (!r.ok) throw new Error((j && j.message) || ('HTTP ' + r.status)); return j; }); });
+  }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  var MON = ['जनवरी','फ़रवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+  for (var d = 1; d <= 31; d++) $('jBd').insertAdjacentHTML('beforeend', '<option value="' + d + '">' + d + '</option>');
+  MON.forEach(function(m, i){ $('jBm').insertAdjacentHTML('beforeend', '<option value="' + (i + 1) + '">' + m + '</option>'); });
+  rpc('parivar_org_names').then(function(list){
+    (list || []).forEach(function(o){ $('jOrg').insertAdjacentHTML('beforeend', '<option value="' + esc(o.id) + '">' + esc(o.name_hi ? o.name_hi + ' — ' + o.name : o.name) + '</option>'); });
+    $('jOrg').insertAdjacentHTML('beforeend', '<option value="other">कोई और संस्था…</option>');
+  }).catch(function(){ $('jOrg').insertAdjacentHTML('beforeend', '<option value="other">कोई और संस्था…</option>'); });
+  $('jOrg').addEventListener('change', function(){ $('jOtherW').classList.toggle('hide', this.value !== 'other'); });
+
+  $('jBtn').addEventListener('click', function(){
+    var msg = $('jMsg'); msg.textContent = '';
+    var name = $('jName').value.trim(), mob = $('jMob').value.replace(/\D/g, '');
+    if (name.length < 2 || /[0-9]/.test(name)){ msg.textContent = 'पूरा नाम लिखें (अंक नहीं)।'; return; }
+    if (!/^(91)?[6-9][0-9]{9}$/.test(mob)){ msg.textContent = '10 अंकों का मोबाइल नंबर लिखें।'; return; }
+    var bd = $('jBd').value, bm = $('jBm').value, bday = '';
+    if (bd && bm){
+      var max = [31,29,31,30,31,30,31,31,30,31,30,31][+bm - 1];
+      if (+bd > max){ msg.textContent = 'जन्मदिन की तारीख दोबारा देखें।'; return; }
+      bday = String(bm).padStart(2, '0') + '-' + String(bd).padStart(2, '0');
+    }
+    var cm = document.querySelector('input[name=cm]:checked');
+    var org = $('jOrg').value;
+    var p = { full_name: name, mobile: mob.slice(-10), profession: $('jProf').value.trim(), business: $('jBiz').value.trim(),
+              org_id: org && org !== 'other' ? org : '', org_other: org === 'other' ? $('jOther').value.trim() : '',
+              role_wanted: $('jRole').value.trim(), contact_mode: cm ? cm.value : 'whatsapp',
+              birthday: bday, birthday_public: !!(bday && $('jBp').checked), website: $('jWeb').value };
+    $('jBtn').disabled = true;
+    rpc('parivar_join', { p: p }).then(function(){ $('form').classList.add('hide'); $('done').classList.remove('hide'); window.scrollTo(0, 0); })
+      .catch(function(e){ msg.textContent = e.message || 'कुछ गड़बड़ हुई — फिर कोशिश करें।'; })
+      .then(function(){ $('jBtn').disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

@@ -90,6 +90,10 @@
       <input type="text" id="prof" data-prof-picker>
       <label class="sm" for="bio">छोटा परिचय (300 अक्षर) <span class="en">Short bio</span></label>
       <textarea id="bio" maxlength="300" placeholder="जैसे: 25 साल से कपड़े का कारोबार, लायंस क्लब से 10 साल से जुड़ा हूँ"></textarea>
+      <!-- v393: birthday (day + month only), shown only if they tick the box -->
+      <label class="sm">🎂 जन्मदिन <span class="en">Birthday — day and month only (optional)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><select id="bd" style="border:1.5px solid #CBD5E1;border-radius:10px;padding:10px;font-size:1rem;font-family:inherit"><option value="">दिन</option></select><select id="bm" style="border:1.5px solid #CBD5E1;border-radius:10px;padding:10px;font-size:1rem;font-family:inherit"><option value="">महीना</option></select></div>
+      <label class="opt" style="margin-top:6px"><input type="checkbox" id="bp"><span>मेरा जन्मदिन डबवाली परिवार पेज पर दिखाओ<br><span class="en">Show my birthday on the Dabwali Parivar page</span></span></label>
       <label class="sm">फोटो <span class="en">Photo (checked by our team before it goes live)</span></label>
       <div class="phbox"><img id="phPrev" class="hide" alt=""><input type="file" accept="image/*" id="phIn"></div>
       <div class="en" id="phSt"></div>
@@ -139,6 +143,9 @@
   function pickMode(v){ document.querySelectorAll('label.opt[data-v]').forEach(function(l){ var on = l.dataset.v === v; l.classList.toggle('on', on); l.querySelector('input').checked = on; }); }
   document.querySelectorAll('label.opt[data-v]').forEach(function(l){ l.addEventListener('click', function(){ pickMode(l.dataset.v); }); });
 
+  (function(){ var M = ['जनवरी','फ़रवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+    for (var i = 1; i <= 31; i++) $('bd').insertAdjacentHTML('beforeend', '<option value="' + i + '">' + i + '</option>');
+    M.forEach(function(m, i){ $('bm').insertAdjacentHTML('beforeend', '<option value="' + (i + 1) + '">' + m + '</option>'); }); })();
   rpc('parivar_profile_get', { p_token: TOKEN }).then(function(d){
     if (!d || !d.ok){ bad(); return; }
     D = d;
@@ -153,6 +160,8 @@
     if (!d.has_mobile){ $('contactCard').classList.add('hide'); }
     else { $('mh').textContent = '(' + d.mobile_hint + ')'; pickMode(d.contact_mode || 'hidden'); }
     ProfPicker.set($('prof'), d.profession || '');
+    if (d.birthday){ var bp = d.birthday.split('-'); $('bm').value = String(+bp[0]); $('bd').value = String(+bp[1]); }
+    $('bp').checked = !!d.birthday_public;
     $('bio').value = d.bio || '';
     if (d.pending_photo) $('phSt').textContent = 'आपकी भेजी फोटो जाँच में है। (A photo you sent is waiting for approval.)';
     if (d.status === 'hidden'){
@@ -202,6 +211,11 @@
     if (LAST_SAVE && gap < 10500){ msg.textContent = 'एक पल…'; $('saveBtn').disabled = true; setTimeout(function(){ $('saveBtn').disabled = false; save(extra); }, 10500 - gap); return; }
     var cm = document.querySelector('input[name=cm]:checked');
     var p = { confirm: !!($('confirm') && $('confirm').checked), profession: $('prof').value.trim(), bio: $('bio').value.trim(), note: $('note').value.trim() };
+    var bdv = $('bd').value, bmv = $('bm').value;
+    if (bdv && bmv){
+      if (+bdv > [31,29,31,30,31,30,31,31,30,31,30,31][+bmv - 1]){ msg.className = 'msg err'; msg.textContent = 'जन्मदिन की तारीख दोबारा देखें।'; return; }
+      p.birthday = String(bmv).padStart(2, '0') + '-' + String(bdv).padStart(2, '0'); p.birthday_public = $('bp').checked;
+    } else if (!bdv && !bmv){ p.birthday = ''; p.birthday_public = false; }
     if (cm && D && D.has_mobile) p.contact_mode = cm.value;
     if (PHOTO) p.photo = PHOTO;
     for (var k in (extra || {})) p[k] = extra[k];

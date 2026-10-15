@@ -886,6 +886,13 @@ body.prof-partial #reviewsAnchor::before{
 
 /* v360: people behind the shop (Dabwali Parivar) */
 .shop-people{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:12px 14px; margin-bottom:18px }
+.shop-offers{ background:linear-gradient(135deg,#F0FDF4,#fff); border:1px solid #BBF7D0; border-radius:13px; padding:12px 14px; margin-bottom:18px }
+.shop-offers .so-h{ font-weight:800; font-size:.92rem; margin-bottom:6px }
+.shop-offers .so-row{ display:flex; flex-direction:column; gap:2px; padding:6px 0; border-top:1px dashed #BBF7D0 }
+.shop-offers .so-row:first-of-type{ border-top:0 }
+.shop-offers .so-row b{ color:#166534; font-size:.98rem }
+.shop-offers .so-row span{ font-size:.78rem; color:#64748B }
+.shop-offers .so-row a{ color:#C2410C; font-weight:700 }
 .shop-people .sp-h{ font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:8px }
 .shop-people .sp-row{ display:flex; gap:10px; align-items:center; padding:8px 0; border-top:1px dashed var(--line); text-decoration:none; color:var(--ink) }
 .shop-people .sp-row:first-of-type{ border-top:0 }
@@ -1922,6 +1929,7 @@ html[data-lang="hi"] .card-pill h3{ font-family:'Noto Sans Devanagari',sans-seri
           <div class="review-highlights" id="reviewHighlights" style="display:none"></div>
           <div class="shop-about" id="shopAbout" style="display:none"></div>
           <div class="shop-people" id="shopPeople" style="display:none"></div>
+          <div class="shop-offers" id="shopOffers" style="display:none"></div>
           <div class="addr-box">
             <div class="a-label">📍 <span data-i18n-en>Address</span><span data-i18n-hi>पता</span></div>
             <div class="a-text" id="addrDisp"></div>
@@ -2493,6 +2501,7 @@ async function loadBusiness(){
   // migration has not run yet the page simply shows what it has.
   loadShopAbout();
   loadShopPeople();
+  loadShopOffers();
 
   // Load all categories (multi-cat badges), reviews and deals in parallel
   loadCategoryBadges(BIZ.id);
@@ -4212,6 +4221,25 @@ async function loadShopAbout(){
 // v360: Dabwali Parivar on the shop page (db/254) — the people behind this
 // shop (founder, partner …) and the organisations they serve, each linking
 // to their Parivar page. Hidden when nobody is linked or before db/254.
+// v393: Dabwali Parivar member offers of this shop (db/274 parivar_offers)
+async function loadShopOffers(){
+  const host = document.getElementById('shopOffers');
+  if (!host || !BIZ) return;
+  try {
+    const r = await ShopDB.client.rpc('parivar_offers', { p_org_slug: null, p_business_id: BIZ.id });
+    const list = (!r.error && Array.isArray(r.data)) ? r.data : [];
+    if (!list.length) return;
+    const hi = document.documentElement.getAttribute('data-lang') === 'hi';
+    host.innerHTML = '<div class="so-h">🎁 <span data-i18n-en>Offers for Dabwali Parivar members</span><span data-i18n-hi>डबवाली परिवार सदस्यों के लिए ऑफर</span></div>'
+      + list.map(f => {
+          const until = new Date(f.valid_until + 'T00:00:00').toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { day:'numeric', month:'short' });
+          const who = f.org ? '<a href="/sanstha/' + encodeURIComponent(f.org_slug) + '">' + escapeHTML(f.org) + '</a> <span data-i18n-en>members</span><span data-i18n-hi>के सदस्य</span>'
+                            : '<span data-i18n-en>All Dabwali Parivar members</span><span data-i18n-hi>सभी डबवाली परिवार सदस्य</span>';
+          return '<div class="so-row"><b>' + escapeHTML(f.offer) + '</b><span>' + who + ' · <span data-i18n-en>till</span><span data-i18n-hi>तक</span> ' + escapeHTML(until) + '</span></div>';
+        }).join('');
+    host.style.display = '';
+  } catch(_){}
+}
 async function loadShopPeople(){
   const host = document.getElementById('shopPeople');
   if (!host || !BIZ) return;
