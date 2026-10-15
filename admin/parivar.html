@@ -81,6 +81,7 @@
     <button class="tab on" data-t="org" onclick="setTab(this)">🏛 Organisations</button>
     <button class="tab" data-t="person" onclick="setTab(this)">👤 People</button>
   </div>
+  <div style="display:flex;justify-content:flex-end;margin:-6px 0 10px"><button class="btn g s" onclick="weeklyMessage()">📣 This week’s WhatsApp message</button></div>
   <div id="evBanner"></div>
   <div class="cols">
     <div class="card">
@@ -196,6 +197,101 @@ function suggestShop(mobile, px){
 function clearShop(px){ document.getElementById(px + '_bid').value = ''; var sel = document.getElementById(px + '_sel'); sel.innerHTML = ''; sel.style.display = 'none'; }
 
 /* ---------- v364: member's own profile link (db/256) ---------- */
+/* ---------- v391: progress + send profile links one after another (db/272) ---------- */
+var PQ = { list: [], i: 0, org: null };
+async function loadProgress(o){
+  var el = document.getElementById('qSec'); if (!el) return;
+  var r = await c().rpc('admin_parivar_org_progress', { p_org_id: o.id });
+  if (r.error){ el.innerHTML = '<b>📲 Members’ own pages</b> <span class="muted">— run db/272 first (' + esc(r.error.message) + ')</span>'; return; }
+  var m = (r.data || {}).members || [], n = m.length;
+  var conf = m.filter(function(x){ return x.verified; }).length, ph = m.filter(function(x){ return x.photo; }).length;
+  var sent = m.filter(function(x){ return x.link_sent_at; }).length, noMob = m.filter(function(x){ return !x.mobile; }).length;
+  var todo = m.filter(function(x){ return x.mobile && !x.verified; });
+  var pct = n ? Math.round(conf * 100 / n) : 0;
+  PQ.all = m; PQ.org = o;
+  el.innerHTML = '<b>📲 Members’ own pages</b> <span class="muted">— each member confirms “this is me”, adds a photo and chooses how their number shows</span>'
+    + '<div style="margin:8px 0 4px;height:10px;border-radius:99px;background:#E2E8F0;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#16A34A,#22C55E)"></div></div>'
+    + '<div class="muted"><b style="color:#15803D">' + conf + '/' + n + ' confirmed</b> · ' + ph + ' with photo · ' + sent + ' got a link' + (noMob ? ' · <span style="color:#B91C1C">' + noMob + ' without a number</span>' : '') + '</div>'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
+    + (todo.length ? '<button class="btn p" onclick="startQueue(\'todo\')">📲 Send links to ' + todo.length + ' not confirmed yet</button>' : '<span class="pill ok">🎉 Everyone with a number has confirmed</span>')
+    + '<button class="btn g s" onclick="startQueue(\'fresh\')">Only those without a link in the last 3 days</button>'
+    + '<button class="btn g s" onclick="startQueue(\'nophoto\')">Confirmed but no photo</button></div>';
+}
+function startQueue(kind){
+  var m = PQ.all || [], three = Date.now() - 3 * 864e5;
+  PQ.list = m.filter(function(x){
+    if (!x.mobile) return false;
+    if (kind === 'todo') return !x.verified;
+    if (kind === 'fresh') return !x.verified && (!x.link_sent_at || new Date(x.link_sent_at).getTime() < three);
+    if (kind === 'nophoto') return x.verified && !x.photo;
+    return true;
+  });
+  PQ.i = 0; PQ.done = 0;
+  if (!PQ.list.length){ toast('Nobody in this list'); return; }
+  drawQueue();
+}
+function closeQueue(){ var q = document.getElementById('pqBox'); if (q) q.remove(); if (PQ.org) loadProgress(PQ.org); }
+function drawQueue(){
+  var q = document.getElementById('pqBox');
+  if (!q){ q = document.createElement('div'); q.id = 'pqBox'; q.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:14px'; document.body.appendChild(q); }
+  if (PQ.i >= PQ.list.length){
+    q.innerHTML = '<div class="card" style="max-width:420px;width:100%;text-align:center"><div style="font-size:2.4rem">🎉</div><h2 style="justify-content:center">Done — ' + PQ.done + ' link' + (PQ.done === 1 ? '' : 's') + ' sent</h2>'
+      + '<div class="muted">Members open their link, confirm and add a photo. Check this card again in a day or two.</div><div style="margin-top:12px"><button class="btn p" onclick="closeQueue()">Close</button></div></div>';
+    return;
+  }
+  var x = PQ.list[PQ.i];
+  var st = [x.verified ? '<span class="pill ok">✓ confirmed</span>' : '<span class="pill">not confirmed</span>', x.photo ? '<span class="pill ok">📷 photo</span>' : '<span class="pill">no photo</span>',
+            x.link_sent_at ? '<span class="pill">link sent ' + esc(new Date(x.link_sent_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' })) + (x.link_opened ? ', opened' : '') + '</span>' : ''].join(' ');
+  q.innerHTML = '<div class="card" style="max-width:440px;width:100%">'
+    + '<div class="muted">' + (PQ.i + 1) + ' of ' + PQ.list.length + ' · ' + esc(PQ.org ? PQ.org.name : '') + ' · sent so far: ' + PQ.done + '</div>'
+    + '<div style="height:6px;border-radius:99px;background:#E2E8F0;margin:6px 0 12px;overflow:hidden"><div style="height:100%;width:' + Math.round(PQ.i * 100 / PQ.list.length) + '%;background:#EA580C"></div></div>'
+    + '<h2 style="margin:0">' + esc(x.name) + '</h2><div class="muted">' + esc(x.role_label || label(ROLES, x.role)) + ' · ' + esc(x.mobile) + '</div><div style="margin-top:6px">' + st + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn p" style="flex:1" onclick="queueSend()">📲 Send on WhatsApp</button><button class="btn g" onclick="PQ.i++;drawQueue()">Skip →</button></div>'
+    + '<div style="display:flex;justify-content:space-between;margin-top:10px"><button class="btn g s" onclick="PQ.i=Math.max(0,PQ.i-1);drawQueue()"' + (PQ.i ? '' : ' disabled') + '>← Back</button><button class="btn g s" onclick="closeQueue()">Stop</button></div>'
+    + '<div class="muted" style="margin-top:8px">After pressing Send in WhatsApp, come back to this tab — the next person is ready.</div></div>';
+}
+async function queueSend(){
+  var x = PQ.list[PQ.i]; if (!x) return;
+  var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
+  var r = await c().rpc('admin_parivar_create_profile_link', { p_person_id: x.id, p_days: 7 });
+  if (r.error){ if (win) win.close(); alert('Could not create the link: ' + r.error.message); return; }
+  var d = r.data || {}, link = location.origin + '/parivar-profile?t=' + d.token;
+  var msg = 'नमस्ते ' + (d.name || '') + ' जी,\n\n' + (PQ.org ? PQ.org.name + ' के सदस्य के रूप में ' : '') + 'DukanList के "डबवाली परिवार" में आपका पेज बना है:\n' + location.origin + '/parivar/' + (d.slug || '') + '\n\n'
+    + 'इस लिंक पर खुद देखिए और ठीक कीजिए — "हाँ, यह मैं हूँ" कन्फर्म कीजिए, अपनी फोटो लगाइए और चुनिए कि आपका नंबर कैसे दिखे। कोई लॉगिन नहीं चाहिए:\n' + link
+    + '\n\nयह लिंक 7 दिन चलेगा।\n— DukanList हेल्पलाइन';
+  var url = 'https://wa.me/91' + String(d.mobile || '').replace(/\D/g, '').slice(-10) + '?text=' + encodeURIComponent(msg);
+  if (win) win.location.href = url; else window.open(url, '_blank');
+  x.link_sent_at = new Date().toISOString(); PQ.done++; PQ.i++; drawQueue();
+}
+
+/* ---------- v391: this week's WhatsApp message for groups ---------- */
+async function weeklyMessage(){
+  var r = await c().rpc('parivar_upcoming_events', { p_org_slug: null, p_limit: 30 });
+  var ov = await c().rpc('parivar_overview');
+  var ev = (r.data || []).filter(function(e){ return new Date(e.starts_at).getTime() < Date.now() + 8 * 864e5; });
+  var o = ov.data || {}, base = location.origin;
+  var day = function(t){ return new Date(t).toLocaleDateString('hi-IN', { weekday:'long', day:'numeric', month:'long' }) + ', ' + new Date(t).toLocaleTimeString('en-IN', { hour:'numeric', minute:'2-digit', hour12:true }); };
+  var lines = ['*डबवाली परिवार — इस हफ्ते*', ''];
+  if (ev.length){
+    lines.push('*आने वाले कार्यक्रम:*');
+    ev.forEach(function(e, i){ lines.push((i + 1) + '. ' + e.title + ' — ' + (e.org_hi || e.org)); lines.push('   ' + day(e.starts_at) + (e.venue ? ', ' + e.venue : '')); lines.push('   ' + base + '/parivar?event=' + e.id); });
+    lines.push('');
+  }
+  var rc = (o.recent || []).slice(0, 5).map(function(p){ return p.name; });
+  if (rc.length){ lines.push('*नए जुड़े लोग:* ' + rc.join(', ')); lines.push(''); }
+  lines.push('अब तक ' + (o.orgs || 0) + ' संस्थाएं और ' + (o.people || 0) + ' लोग डबवाली परिवार से जुड़ चुके हैं।');
+  lines.push('अपनी संस्था, दुकान या किसी भी व्यक्ति को खोजिए: ' + base + '/parivar');
+  lines.push(''); lines.push('— DukanList, मंडी डबवाली');
+  var text = lines.join('\n');
+  var bx = document.createElement('div'); bx.id = 'wkBox'; bx.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:14px';
+  bx.innerHTML = '<div class="card" style="max-width:560px;width:100%"><h2>📣 This week’s message <button class="btn g s" onclick="document.getElementById(\'wkBox\').remove()">Close</button></h2>'
+    + '<div class="muted">Ready to paste in WhatsApp groups. You can edit it here first.</div>'
+    + '<textarea id="wkText" style="min-height:260px;margin-top:8px;font-family:inherit">' + esc(text) + '</textarea>'
+    + '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn p" onclick="navigator.clipboard.writeText(document.getElementById(\'wkText\').value).then(function(){toast(\'✓ Copied\')})">📋 Copy</button>'
+    + '<button class="btn g" onclick="window.open(\'https://wa.me/?text=\'+encodeURIComponent(document.getElementById(\'wkText\').value),\'_blank\')">💬 Open WhatsApp</button></div></div>';
+  document.body.appendChild(bx);
+}
+
 async function sendProfileLink(pid){
   var win = window.open('about:blank', '_blank');   // opened inside the click, or it is blocked as a pop-up
   var r = await c().rpc('admin_parivar_create_profile_link', { p_person_id: pid, p_days: 7 });
@@ -240,7 +336,8 @@ function drawOrg(o){
     if (o.pending_logo_url) h += '<div class="sec"><b>🖼 New logo from the organisation</b><div class="photo" style="margin-top:6px"><img src="' + esc(o.pending_logo_url) + '" alt="">'
       + '<button class="btn p s" onclick="reviewLogo(\'' + o.id + '\', true)">✓ Approve</button><button class="btn d s" onclick="reviewLogo(\'' + o.id + '\', false)">✕ Reject</button></div></div>';
     h += '<div class="sec" id="reqSec" style="display:none"></div>';
-    h += '<div class="sec" id="evSec"><b>🗓 Upcoming events</b> <span class="muted">loading…</span></div>';
+    h += '<div class="sec" id="qSec"><b>📲 Members’ own pages</b> <span class="muted">loading…</span></div>';
+    h += '<div class="sec" id="evSec"><b>📅 Upcoming events</b> <span class="muted">loading…</span></div>';
     h += '<div class="sec" id="mgrSec"><b>🧑‍💼 Sanstha Manager</b> <span class="muted">loading…</span></div>';
   }
   if (!isNew){
@@ -278,7 +375,7 @@ function drawOrg(o){
       + '</div>';
   }
   document.getElementById('editor').innerHTML = h;
-  if (!isNew){ loadReqs(o); loadOrgEvents(o); loadMgr(o); }
+  if (!isNew){ loadReqs(o); loadProgress(o); loadOrgEvents(o); loadMgr(o); }
 }
 
 /* ---------- v374: Sanstha Manager link (db/264) ---------- */

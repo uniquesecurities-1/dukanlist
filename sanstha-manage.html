@@ -101,6 +101,8 @@
     <div class="card">
       <h2>👥 सदस्य और पदाधिकारी <span class="cnt" id="mcount"></span></h2>
       <div class="en">Members and office bearers — change a role or "member since" and it saves straight away.</div>
+      <!-- v391: how many members have confirmed their own page -->
+      <div id="mprog" style="margin-top:8px"></div>
       <input type="text" id="mq" class="search" placeholder="नाम, पेशा या दुकान से खोजें — Search">
       <div id="mlist"></div>
     </div>
@@ -258,7 +260,15 @@
     var q = $('mq').value.trim().toLowerCase(), all = D.members || [];
     var off = all.filter(function(m){ return m.role !== 'member'; }).length;
     $('mcount').textContent = '(' + all.length + (off ? ' · ' + off + ' पदाधिकारी' : '') + ')';
+    var conf = all.filter(function(m){ return m.verified; }).length, ph = all.filter(function(m){ return m.photo; }).length;
+    var pct = all.length ? Math.round(conf * 100 / all.length) : 0;
+    $('mprog').innerHTML = all.length ? '<div style="height:9px;border-radius:99px;background:#E2E8F0;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#16A34A,#22C55E)"></div></div>'
+      + '<div class="sub" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px"><span><b style="color:#15803D">' + conf + '/' + all.length + '</b> ने अपना पेज कन्फर्म किया · ' + ph + ' की फोटो लगी</span>'
+      + (conf < all.length ? '<label style="cursor:pointer;font-weight:700"><input type="checkbox" id="monly"' + (window._monly ? ' checked' : '') + '> सिर्फ बाकी वाले दिखाओ</label>' : '<span>🎉 सबने कन्फर्म कर दिया</span>') + '</div>'
+      + (conf < all.length ? '<div class="en" style="margin-top:2px">बाकी सदस्यों को 📲 दबाकर उनका लिंक WhatsApp पर भेजिए — वो खुद कन्फर्म करके फोटो लगा सकते हैं।</div>' : '') : '';
+    var mo = $('monly'); if (mo) mo.onchange = function(){ window._monly = mo.checked; drawMembers(); };
     var list = all.map(function(m, i){ return { m: m, i: i }; }).filter(function(x){
+      if (window._monly && x.m.verified) return false;
       return !q || [x.m.name, x.m.profession, x.m.firm].join(' ').toLowerCase().indexOf(q) !== -1;
     });
     $('mlist').innerHTML = list.length ? list.map(function(x){
