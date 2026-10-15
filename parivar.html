@@ -125,9 +125,19 @@
     if (o.events) bits.push(card('📅', o.events, o.events > 1 ? 'Upcoming events' : 'Upcoming event', 'आने वाले कार्यक्रम', '#pvEv'));
     var st = document.getElementById('pvStats'); st.innerHTML = bits.join('');
     var pq = st.querySelector('a[href="#q"]'); if (pq) pq.onclick = function(e){ e.preventDefault(); var q = document.getElementById('q'); q.focus(); };
-    var pr = (o.professions || []).slice(0, 10);
+    // v395: profession chips only once there is enough to find — at least 4 professions with 2+ people each.
+    // With 1–2 people per profession the row looked empty and odd. Icon + Hindi name in Hindi mode, no counts.
+    var PI = { 'doctor':['🩺','डॉक्टर'], 'dentist':['🦷','दंत चिकित्सक'], 'chartered accountant':['📊','सीए'], 'advocate':['⚖️','वकील'], 'teacher':['📚','अध्यापक'],
+               'engineer':['🛠','इंजीनियर'], 'businessman':['💼','व्यापारी'], 'shopkeeper':['🏪','दुकानदार'], 'trader':['📦','ट्रेडर'], 'jeweller':['💍','ज्वैलर'],
+               'mutual fund distributor':['📈','म्यूचुअल फंड'], 'insurance advisor':['🛡','बीमा सलाहकार'], 'farmer':['🌾','किसान'], 'government service':['🏛','सरकारी नौकरी'],
+               'commission agent (arhtiya)':['⚖️','आढ़ती'], 'contractor':['🏗','ठेकेदार'], 'property dealer':['🏠','प्रॉपर्टी डीलर'], 'pharmacist':['💊','फार्मासिस्ट'],
+               'social worker':['🤝','समाजसेवी'], 'retired':['🌿','सेवानिवृत्त'], 'student':['🎓','विद्यार्थी'], 'architect':['📐','आर्किटेक्ट'] };
+    var pr = (o.professions || []).filter(function(x){ return x.n >= 2; }).slice(0, 8);
     var ch = document.getElementById('pvChips');
-    ch.innerHTML = pr.length ? '<span class="lbl">' + PV.bi('Find by profession:', 'पेशे से खोजें:') + '</span>' + pr.map(function(x){ return '<button type="button" data-q="' + esc(x.name) + '">' + esc(x.name) + ' <small>' + x.n + '</small></button>'; }).join('') : '';
+    ch.innerHTML = pr.length >= 4 ? '<span class="lbl">' + PV.bi('Find by profession:', 'पेशे से खोजें:') + '</span>' + pr.map(function(x){
+        var m = PI[String(x.name).toLowerCase()] || ['👤', x.name];
+        return '<button type="button" data-q="' + esc(x.name) + '">' + m[0] + ' ' + PV.bi(x.name, m[1]) + '</button>';
+      }).join('') : '';
     // v390: tap a profession again (or ✕) to clear it
     ch.querySelectorAll('button').forEach(function(b){ b.onclick = function(){
       var q = document.getElementById('q'), v = b.getAttribute('data-q');
