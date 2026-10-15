@@ -1530,7 +1530,7 @@ footer .copy{font-size:.7rem !important;padding-top:10px !important;margin-top:8
         var e = rows[0], d = new Date(e.starts_at);
         var esc = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
         var en = d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' }), hi = d.toLocaleDateString('hi-IN', { weekday:'short', day:'numeric', month:'short' });
-        el.innerHTML = '🗓 <span data-i18n-en>' + esc(en) + '</span><span data-i18n-hi>' + esc(hi) + '</span> · ' + esc(e.title) + ' — ' + esc(e.org)
+        el.innerHTML = '📅 <span data-i18n-en>' + esc(en) + '</span><span data-i18n-hi>' + esc(hi) + '</span> · ' + esc(e.title) + ' — ' + esc(e.org)
           + (rows.length > 1 ? ' <span data-i18n-en>(+' + (rows.length - 1) + ' more)</span><span data-i18n-hi>(+' + (rows.length - 1) + ' और)</span>' : '');
       }).catch(function(){});
   }

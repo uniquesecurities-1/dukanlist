@@ -97,3 +97,31 @@ a.pv-oc:hover{ filter:brightness(.96); text-decoration:none }
 .pv-fc .fc-btn:hover{ text-decoration:none; filter:brightness(1.05) }
 @media (max-width:480px){ .pv-fc .fc-acts{ flex-direction:column } }
 .pv-mcard .mc-f .mc-shop{ color:#C2410C; font-weight:700 }
+
+/* v388: person page — save/share row, organisation rows with logo, "is this you?" box */
+.pv-acts2{ margin-top:8px }
+.pv-acts2 .pv-btn{ font-size:.84rem; padding:9px 12px; cursor:pointer; font-family:inherit }
+.pv-orow{ justify-content:flex-start; gap:12px }
+.pv-claim{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:20px; padding:14px 16px; border-radius:14px; background:linear-gradient(135deg,#FFF7ED,#FFEDD5); border:1px solid #FED7AA }
+.pv-claim b{ font-size:.98rem }
+
+/* v388: Parivar page — counts, profession chips, type filter, head of organisation, recently joined */
+.pv-stats{ margin:14px auto 0; color:var(--ink-2); font-size:.92rem; display:flex; gap:8px; justify-content:center; flex-wrap:wrap }
+.pv-stats b{ color:#C2410C; font-size:1.02rem }
+.pv-stats span{ color:#CBD5E1 }
+.pv-stats:empty, .pv-chips:empty, .pv-kinds:empty{ display:none }
+.pv-chips{ max-width:720px; margin:12px auto 0; display:flex; gap:6px; flex-wrap:wrap; justify-content:center; align-items:center }
+.pv-chips .lbl{ font-size:.78rem; color:var(--muted); font-weight:700; margin-right:2px }
+.pv-chips button, .pv-kinds button{ border:1px solid #FED7AA; background:#fff; color:#9A3412; border-radius:99px; padding:5px 11px; font-size:.8rem; font-weight:700; cursor:pointer; font-family:inherit }
+.pv-chips button small{ color:#94A3B8; font-weight:700; margin-left:2px }
+.pv-chips button:hover, .pv-kinds button:hover{ background:#FFF7ED; border-color:#FB923C }
+.pv-kinds{ display:flex; gap:6px; flex-wrap:wrap; margin:-2px 0 10px }
+.pv-kinds button{ border-color:#E2E8F0; color:#334155 }
+.pv-kinds button.on{ background:#0F172A; color:#fff; border-color:#0F172A }
+.pv-head-n{ color:#065F46 !important }
+.pv-head-n b{ color:var(--ink) }
+.pv-recent{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; -webkit-overflow-scrolling:touch }
+.pv-recent a{ flex:0 0 112px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:5px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 8px; text-decoration:none; color:var(--ink) }
+.pv-recent a:hover{ border-color:#FDBA74 }
+.pv-recent b{ font-size:.82rem; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden }
+.pv-recent span{ font-size:.7rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100% }

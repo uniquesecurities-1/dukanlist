@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261013e">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015a">
 </head>
 <body>
 
@@ -33,6 +33,7 @@
 
 <script src="/assets/js/dl-config.js"></script>
 <script src="/assets/js/parivar-common.js?v=20261013c"></script>
+<script src="/assets/js/parivar-events.js?v=20261015a"></script>
 <script>
 (function(){
   var esc = PV.esc, bi = PV.bi;
@@ -100,32 +101,67 @@
         });
       }).catch(function(){});
   }
+  // v388: "Save contact" — a vCard the phone adds to its contacts (only when the person shows their number)
+  function vEsc(x){ return String(x || '').replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1').replace(/\n/g, ' '); }
+  function saveContact(p){
+    var m = String(p.mobile || '').replace(/\D/g, '').slice(-10); if (m.length !== 10) return;
+    var firm = (p.firms || [])[0];
+    var v = ['BEGIN:VCARD', 'VERSION:3.0', 'FN:' + vEsc(p.name), 'N:' + vEsc(p.name) + ';;;;', 'TEL;TYPE=CELL:+91' + m]
+      .concat(firm ? ['ORG:' + vEsc(firm.name)] : []).concat(p.profession ? ['TITLE:' + vEsc(p.profession)] : [])
+      .concat(['URL:' + location.origin + '/parivar/' + p.slug, 'NOTE:' + vEsc('Dabwali Parivar — DukanList'), 'END:VCARD']).join('\r\n');
+    var name = String(p.name || 'contact').replace(/[^A-Za-z0-9\u0900-\u097F ]+/g, '').trim().replace(/\s+/g, '-') || 'contact';
+    try {
+      var blob = new Blob([v], { type: 'text/vcard;charset=utf-8' }), a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name + '.vcf'; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    } catch(_){ location.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(v); }
+  }
+  function shareProfile(p){
+    var url = location.origin + '/parivar/' + p.slug;
+    var line = [p.profession, (p.firms || [])[0] && p.firms[0].name].filter(Boolean).join(' · ');
+    var text = p.name + (line ? ' — ' + line : '') + '\nडबवाली परिवार (DukanList) पर देखें: ' + url;
+    if (navigator.share){ navigator.share({ title: p.name, text: text, url: url }).catch(function(){}); return; }
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  }
   if (!slug){ notFound(); return; }
   PV.rpc('parivar_get_person', { p_slug: slug }).then(function(p){
     if (!p){ notFound(); return; }
     document.title = p.name + ' — Dabwali Parivar | DukanList';
     // verified people (they confirmed their own number) may be indexed; others stay out of search engines
     if (p.verified){ var mr = document.getElementById('metaRobots'); if (mr) mr.setAttribute('content', 'index, follow'); }
-    var cur = (p.roles || []).filter(function(r){ return r.current; });
+    var cur = (p.roles || []).filter(function(r){ return r.current; }), order = [];
     var past = (p.roles || []).filter(function(r){ return !r.current && r.role !== 'member'; });
     var sub = [];
     if (p.profession) sub.push('<b style="color:var(--ink-2)">' + esc(p.profession) + '</b>');
     if (p.city) sub.push(esc(p.city));
-    if (p.verified) sub.push('<span class="pv-ok">✓ ' + bi('Number verified', 'नंबर वेरिफाइड') + '</span>');
-    else if (p.added_by_sanstha) sub.push('<span class="pv-tag">' + bi('Added by an organisation', 'संस्था द्वारा जोड़ा गया') + '</span>');
+    // v388: only the positive label — "added by an organisation" read as a weakness
+    if (p.verified) sub.push('<span class="pv-ok">✓ ' + bi('Verified', 'वेरिफाइड') + '</span>');
     var h = '<div class="pv-box"><div class="pv-head">' + PV.avatar(p.photo, p.name, 64)
       + '<div><h1>' + esc(p.name) + '</h1>' + (p.name_hi ? '<div class="sub">' + esc(p.name_hi) + '</div>' : '')
       + '<div class="sub">' + sub.join(' · ') + '</div>' + idLine(p, cur) + '</div></div>'
       + (p.bio ? '<p style="margin:12px 0 0;color:var(--ink-2);line-height:1.55">' + esc(p.bio) + '</p>' : '')
-      + PV.contactHtml(p.contact_mode, p.mobile, p.name) + '</div>';
+      + PV.contactHtml(p.contact_mode, p.mobile, p.name)
+      + '<div class="pv-acts pv-acts2">'
+      + (p.contact_mode === 'show' && p.mobile ? '<button type="button" class="pv-btn pv-call" id="pvSave">📇 ' + bi('Save contact', 'कॉन्टैक्ट सेव करें') + '</button>' : '')
+      + '<button type="button" class="pv-btn pv-call" id="pvShare">🔗 ' + bi('Share profile', 'प्रोफ़ाइल भेजें') + '</button></div>'
+      + '</div>';
     if ((p.firms || []).length){
       h += '<h2 class="pv-h2">' + bi('Firms', 'फर्में') + '</h2><div class="pv-fcs" id="pvFirms">' + p.firms.map(function(f){ return firmCard(f, null); }).join('') + '</div>';
     }
     if (cur.length){
-      h += '<h2 class="pv-h2">' + bi('Organisations', 'संस्थाएं') + '</h2>' + cur.map(function(r){
-        return '<a class="pv-row" href="/sanstha/' + encodeURIComponent(r.org_slug) + '"><div><div class="n">' + esc(r.org) + '</div><div class="m">' + esc(r.session) + '</div></div>'
-          + '<span class="pv-role' + (r.role === 'member' ? ' m' : '') + '">' + PV.roleHtml(r.role, r.role_label) + '</span></a>';
+      // v388: "Member of", one row per organisation (office position first), logo, session, member since
+      var byOrg = {};
+      cur.forEach(function(r){ var k = r.org_slug; if (!byOrg[k]){ byOrg[k] = r; order.push(k); } else if (byOrg[k].role === 'member' && r.role !== 'member') byOrg[k] = r; });
+      var nowY = new Date().getFullYear();
+      h += '<h2 class="pv-h2">' + bi('Member of', 'इन संस्थाओं से जुड़े हैं') + '</h2>' + order.map(function(k){
+        var r = byOrg[k], off = r.role !== 'member';
+        var meta = (off ? PV.roleHtml(r.role, r.role_label) + ' ' + esc(r.session) : bi('Session', 'सत्र') + ' ' + esc(r.session))
+          + (r.since && r.since < parseInt(r.session, 10) ? ' · ' + bi('Member since', 'सदस्य') + ' ' + esc(r.since) + (nowY - r.since >= 2 ? ' (' + (nowY - r.since) + ' ' + bi('yrs', 'साल') + ')' : '') : '');
+        return '<a class="pv-row pv-orow" href="/sanstha/' + encodeURIComponent(r.org_slug) + '">' + PV.logo(r.org_logo || null, r.org, 44)
+          + '<div style="flex:1;min-width:0"><div class="n">' + esc(r.org) + '</div><div class="m">' + meta + '</div></div>'
+          + '<span class="pv-role' + (off ? '' : ' m') + '">' + PV.roleHtml(r.role, r.role_label) + '</span></a>';
       }).join('');
+      h += '<div id="pvEv" style="display:none"></div>';
     }
     if (past.length){
       h += '<div class="pv-past">' + bi('Earlier: ', 'पहले: ') + past.map(function(r){
@@ -135,10 +171,21 @@
     if (!(p.firms || []).length && !cur.length && !past.length){
       h += '<div class="pv-empty">' + bi('No firms or organisations added yet.', 'अभी कोई फर्म या संस्था नहीं जोड़ी गई।') + '</div>';
     }
-    h += '<p class="pv-note" style="margin-top:18px">' + bi('Is this you? Something wrong or want it removed? ', 'यह आप हैं? कुछ गलत है या हटवाना है? ')
-      + '<a href="/contact">' + bi('Contact the DukanList helpline', 'DukanList हेल्पलाइन से संपर्क करें') + '</a></p>';
+    // v388: "Is this you?" — straight to the helpline on WhatsApp with this page's link
+    var help = ((window.DL_CONFIG || {}).support || {}).whatsapp || '';
+    var claim = 'नमस्ते, डबवाली परिवार पर मेरा पेज है: ' + location.origin + '/parivar/' + p.slug + '\nमुझे अपनी फोटो और जानकारी ठीक करने का लिंक भेज दीजिए।';
+    h += '<div class="pv-claim"><div><b>' + bi('Is this you?', 'यह आप हैं?') + '</b><div class="pv-note">' + bi('Add your photo, fix your details or choose how your number shows.', 'अपनी फोटो लगाइए, जानकारी ठीक कीजिए या चुनिए कि आपका नंबर कैसे दिखे।') + '</div></div>'
+      + (help ? '<a class="pv-btn pv-wa" style="flex:0 0 auto" target="_blank" rel="noopener" href="https://wa.me/91' + help + '?text=' + encodeURIComponent(claim) + '">💬 ' + bi('Update my page', 'मेरा पेज ठीक करवाएं') + '</a>'
+             : '<a class="pv-btn pv-call" style="flex:0 0 auto" href="/contact">' + bi('Contact us', 'संपर्क करें') + '</a>') + '</div>';
     root.innerHTML = h;
     enrichFirms(p.firms || []);
+    var sv = document.getElementById('pvSave'); if (sv) sv.onclick = function(){ saveContact(p); };
+    var sh = document.getElementById('pvShare'); if (sh) sh.onclick = function(){ shareProfile(p); };
+    // upcoming events of their organisations
+    if (window.PVE && order && order.length) PVE.load().then(function(ev){
+      ev = ev.filter(function(e){ return order.indexOf(e.org_slug) !== -1; });
+      PVE.strip(document.getElementById('pvEv'), ev);
+    });
   }).catch(function(){ root.innerHTML = '<div class="pv-empty">' + bi('Could not load — try again.', 'लोड नहीं हुआ — फिर कोशिश करें।') + '</div>'; });
 })();
 </script>

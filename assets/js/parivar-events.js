@@ -108,7 +108,7 @@
     if (!events.length){ el.innerHTML = ''; el.style.display = 'none'; return; }
     el.style.display = '';
     var more = events.length > STRIP_MAX;
-    el.innerHTML = '<h2 class="pv-h2">🗓 ' + bi('Upcoming events', 'आने वाले कार्यक्रम') + (events.length > 1 ? ' <span style="color:#64748B;font-weight:600;font-size:.85rem">(' + events.length + ')</span>' : '') + '</h2><div class="pve-strip">'
+    el.innerHTML = '<h2 class="pv-h2">📅 ' + bi('Upcoming events', 'आने वाले कार्यक्रम') + (events.length > 1 ? ' <span style="color:#64748B;font-weight:600;font-size:.85rem">(' + events.length + ')</span>' : '') + '</h2><div class="pve-strip">'
       + events.slice(0, STRIP_MAX).map(function(e, i){
           return '<button type="button" class="pve-card" data-i="' + i + '"><img src="' + esc(thumb(e.poster, 116, 144)) + '" alt="" loading="lazy">'
             + '<div style="min-width:0"><div class="d">' + esc(when(e.starts_at)) + '</div><div class="t">' + esc(e.title) + '</div><div class="o">' + esc(hi() && e.org_hi ? e.org_hi : e.org) + '</div></div></button>';
@@ -133,7 +133,7 @@
       var groups = [], last = null;
       events.forEach(function(e, k){ var key = dayKey(e.starts_at); if (key !== last){ groups.push({ t: e.starts_at, items: [] }); last = key; } groups[groups.length - 1].items.push(k); });
       bg.innerHTML = '<div class="pve-box" role="dialog" aria-modal="true"><button class="pve-x" aria-label="Close">×</button>'
-        + '<div class="pve-body" style="padding-top:16px"><div class="pve-title" style="margin:0 44px 2px 0">🗓 ' + bi('Upcoming events', 'आने वाले कार्यक्रम') + ' (' + events.length + ')</div>'
+        + '<div class="pve-body" style="padding-top:16px"><div class="pve-title" style="margin:0 44px 2px 0">📅 ' + bi('Upcoming events', 'आने वाले कार्यक्रम') + ' (' + events.length + ')</div>'
         + '<div class="pve-det" style="margin-top:0">' + bi('Tap a poster to see it in full.', 'पूरा पोस्टर देखने के लिए उस पर टैप करें।') + '</div>'
         + groups.map(function(g){
             return '<div class="pve-day">' + esc(dayLabel(g.t)) + ' · ' + g.items.length + ' ' + (g.items.length > 1 ? bi('events', 'कार्यक्रम') : bi('event', 'कार्यक्रम')) + '</div><div class="pve-grid">'
@@ -156,7 +156,7 @@
       var c = String(e.contact || '').replace(/\D/g, '').slice(-10);
       bg.innerHTML = '<div class="pve-box" role="dialog" aria-modal="true" aria-label="' + esc(e.title) + '">'
         + '<button class="pve-x" aria-label="Close">×</button>'
-        + (events.length > 1 ? '<button class="pve-tag pve-back" type="button">← ' + bi('All events', 'सभी कार्यक्रम') + ' (' + events.length + ')</button>' : '<span class="pve-tag">🗓 ' + bi('Upcoming', 'आने वाला कार्यक्रम') + '</span>')
+        + (events.length > 1 ? '<button class="pve-tag pve-back" type="button">← ' + bi('All events', 'सभी कार्यक्रम') + ' (' + events.length + ')</button>' : '<span class="pve-tag">📅 ' + bi('Upcoming', 'आने वाला कार्यक्रम') + '</span>')
         + '<img class="pve-img" src="' + esc(thumb(e.poster, 900)) + '" alt="' + esc(e.title) + '">'
         + '<div class="pve-body">'
         + '<a class="pve-org" href="/sanstha/' + encodeURIComponent(e.org_slug) + '">' + (e.org_logo ? '<img src="' + esc(thumb(e.org_logo, 60, 60)) + '" alt="">' : '🏛') + esc(hi() && e.org_hi ? e.org_hi : e.org) + ' →</a>'
