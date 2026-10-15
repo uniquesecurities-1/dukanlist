@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.89.6';   // v396 edit an event (poster + text)
+const VERSION = 'dukan-v3.89.7';   // v397 link queue: clear cancel (✕, Esc, tap outside)
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

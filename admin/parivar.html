@@ -234,7 +234,8 @@ function startQueue(kind){
 function closeQueue(){ var q = document.getElementById('pqBox'); if (q) q.remove(); if (PQ.org) loadProgress(PQ.org); }
 function drawQueue(){
   var q = document.getElementById('pqBox');
-  if (!q){ q = document.createElement('div'); q.id = 'pqBox'; q.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:14px'; document.body.appendChild(q); }
+  if (!q){ q = document.createElement('div'); q.id = 'pqBox'; q.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:14px'; document.body.appendChild(q);
+    q.addEventListener('click', function(e){ if (e.target === q) closeQueue(); }); }   // v397: tap outside = cancel
   if (PQ.i >= PQ.list.length){
     q.innerHTML = '<div class="card" style="max-width:420px;width:100%;text-align:center"><div style="font-size:2.4rem">🎉</div><h2 style="justify-content:center">Done — ' + PQ.done + ' link' + (PQ.done === 1 ? '' : 's') + ' sent</h2>'
       + '<div class="muted">Members open their link, confirm and add a photo. Check this card again in a day or two.</div><div style="margin-top:12px"><button class="btn p" onclick="closeQueue()">Close</button></div></div>';
@@ -243,13 +244,14 @@ function drawQueue(){
   var x = PQ.list[PQ.i];
   var st = [x.verified ? '<span class="pill ok">✓ confirmed</span>' : '<span class="pill">not confirmed</span>', x.photo ? '<span class="pill ok">📷 photo</span>' : '<span class="pill">no photo</span>',
             x.link_sent_at ? '<span class="pill">link sent ' + esc(new Date(x.link_sent_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' })) + (x.link_opened ? ', opened' : '') + '</span>' : ''].join(' ');
-  q.innerHTML = '<div class="card" style="max-width:440px;width:100%">'
-    + '<div class="muted">' + (PQ.i + 1) + ' of ' + PQ.list.length + ' · ' + esc(PQ.org ? PQ.org.name : '') + ' · sent so far: ' + PQ.done + '</div>'
+  q.innerHTML = '<div class="card" style="max-width:440px;width:100%;position:relative">'
+    + '<button onclick="closeQueue()" title="Cancel" aria-label="Cancel" style="position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;border:1px solid #E2E8F0;background:#fff;font-size:1.1rem;cursor:pointer;line-height:1">✕</button>'
+    + '<div class="muted" style="padding-right:36px">' + (PQ.i + 1) + ' of ' + PQ.list.length + ' · ' + esc(PQ.org ? PQ.org.name : '') + ' · sent so far: ' + PQ.done + '</div>'
     + '<div style="height:6px;border-radius:99px;background:#E2E8F0;margin:6px 0 12px;overflow:hidden"><div style="height:100%;width:' + Math.round(PQ.i * 100 / PQ.list.length) + '%;background:#EA580C"></div></div>'
     + '<h2 style="margin:0">' + esc(x.name) + '</h2><div class="muted">' + esc(x.role_label || label(ROLES, x.role)) + ' · ' + esc(x.mobile) + '</div><div style="margin-top:6px">' + st + '</div>'
     + '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn p" style="flex:1" onclick="queueSend()">📲 Send on WhatsApp</button><button class="btn g" onclick="PQ.i++;drawQueue()">Skip →</button></div>'
-    + '<div style="display:flex;justify-content:space-between;margin-top:10px"><button class="btn g s" onclick="PQ.i=Math.max(0,PQ.i-1);drawQueue()"' + (PQ.i ? '' : ' disabled') + '>← Back</button><button class="btn g s" onclick="closeQueue()">Stop</button></div>'
-    + '<div class="muted" style="margin-top:8px">After pressing Send in WhatsApp, come back to this tab — the next person is ready.</div></div>';
+    + '<div style="display:flex;justify-content:space-between;margin-top:10px"><button class="btn g s" onclick="PQ.i=Math.max(0,PQ.i-1);drawQueue()"' + (PQ.i ? '' : ' disabled') + '>← Back</button><button class="btn d s" onclick="closeQueue()">✕ Cancel / Stop</button></div>'
+    + '<div class="muted" style="margin-top:8px">After pressing Send in WhatsApp, come back to this tab — the next person is ready. Nothing is sent until you press Send.</div></div>';
 }
 async function queueSend(){
   var x = PQ.list[PQ.i]; if (!x) return;
@@ -264,6 +266,13 @@ async function queueSend(){
   if (win) win.location.href = url; else window.open(url, '_blank');
   x.link_sent_at = new Date().toISOString(); PQ.done++; PQ.i++; drawQueue();
 }
+
+// v397: Esc closes whichever pop-up is open
+document.addEventListener('keydown', function(e){
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('pqBox')){ closeQueue(); return; }
+  ['wkBox', 'jrBox', 'ofBox'].forEach(function(id){ var b = document.getElementById(id); if (b) b.remove(); });
+});
 
 /* ---------- v391: this week's WhatsApp message for groups ---------- */
 async function weeklyMessage(){
