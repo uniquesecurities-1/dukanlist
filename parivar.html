@@ -17,7 +17,7 @@
 <link rel="preload" as="image" href="/assets/brand/dabwali-parivar-560.webp" imagesrcset="/assets/brand/dabwali-parivar-560.webp 560w, /assets/brand/dabwali-parivar-1120.webp 1120w" imagesizes="(max-width:600px) 92vw, 540px" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015b">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015c">
 </head>
 <body>
 
@@ -41,6 +41,7 @@
   <p class="pv-sub2"><span data-i18n-en>The people of Mandi Dabwali, their firms and the organisations they serve — all in one place.</span><span data-i18n-hi>मंडी डबवाली के लोग, उनकी फर्में और वो संस्थाएं जिनसे वो जुड़े हैं — सब एक जगह।</span></p>
   <form class="pv-search pv-search2" onsubmit="event.preventDefault();doSearch();">
     <span class="pv-sico" aria-hidden="true">🔍</span>
+    <button type="button" class="pv-qx" id="qClear" aria-label="Clear search" style="display:none">✕</button>
     <input id="q" type="search" autocomplete="off" placeholder="Search a name, firm, profession or organisation" data-ph-en="Search a name, firm, profession or organisation" data-ph-hi="नाम, दुकान, पेशा या संस्था खोजें">
   </form>
   <!-- v388: counts + quick search by profession (db/271 parivar_overview) -->
@@ -105,7 +106,14 @@
     var pr = (o.professions || []).slice(0, 10);
     var ch = document.getElementById('pvChips');
     ch.innerHTML = pr.length ? '<span class="lbl">' + PV.bi('Find by profession:', 'पेशे से खोजें:') + '</span>' + pr.map(function(x){ return '<button type="button" data-q="' + esc(x.name) + '">' + esc(x.name) + ' <small>' + x.n + '</small></button>'; }).join('') : '';
-    ch.querySelectorAll('button').forEach(function(b){ b.onclick = function(){ var q = document.getElementById('q'); q.value = b.getAttribute('data-q'); window.doSearch(); if (q.scrollIntoView) q.scrollIntoView({ behavior:'smooth', block:'start' }); }; });
+    // v390: tap a profession again (or ✕) to clear it
+    ch.querySelectorAll('button').forEach(function(b){ b.onclick = function(){
+      var q = document.getElementById('q'), v = b.getAttribute('data-q');
+      q.value = (q.value.trim().toLowerCase() === v.toLowerCase()) ? '' : v;
+      window.doSearch();
+      if (q.value && q.scrollIntoView) q.scrollIntoView({ behavior:'smooth', block:'start' });
+    }; });
+    syncChips();
     var rc = (o.recent || []).slice(0, 10);
     document.getElementById('pvRecent').innerHTML = rc.length ? '<h2 class="pv-h2">🆕 ' + PV.bi('Recently joined', 'नए जुड़े लोग') + '</h2><div class="pv-recent">'
       + rc.map(function(p){ return '<a href="/parivar/' + encodeURIComponent(p.slug) + '">' + PV.avatar(p.photo, p.name, 52) + '<b>' + esc(p.name) + (p.verified ? ' <span class="pv-ok">✓</span>' : '') + '</b><span>' + esc(p.profession || p.org || '') + '</span></a>'; }).join('') + '</div>' : '';
@@ -137,6 +145,7 @@
   window.doSearch = function(){
     var q = document.getElementById('q').value.trim();
     var box = document.getElementById('results');
+    if (window.pvSyncChips) window.pvSyncChips();
     if (q.length < 2){ box.innerHTML = ''; return; }
     PV.rpc('parivar_search', { p_q: q, p_limit: 60 }).then(function(rows){
       rows = rows || [];
@@ -146,7 +155,15 @@
         + (orgs.length ? '<h2 class="pv-h2">' + PV.bi('Organisations', 'संस्थाएं') + '</h2><div class="pv-grid">' + orgs.map(orgCard).join('') + '</div>' : '');
     }).catch(function(){});
   };
-  document.getElementById('q').addEventListener('input', function(){ clearTimeout(t); t = setTimeout(window.doSearch, 280); });
+  document.getElementById('q').addEventListener('input', function(){ syncChips(); clearTimeout(t); t = setTimeout(window.doSearch, 280); });
+  // v390: chosen profession chip shows as selected (with ×); the search box gets a clear button
+  function syncChips(){
+    var v = document.getElementById('q').value.trim().toLowerCase();
+    document.querySelectorAll('#pvChips button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-q').toLowerCase() === v); });
+    var x = document.getElementById('qClear'); if (x) x.style.display = v ? '' : 'none';
+  }
+  window.pvSyncChips = syncChips;
+  document.getElementById('qClear').addEventListener('click', function(){ var q = document.getElementById('q'); q.value = ''; window.doSearch(); q.focus(); });
 })();
 </script>
 <footer class="site">

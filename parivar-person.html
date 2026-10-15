@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/icons/logo.svg">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
-<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015a">
+<link rel="stylesheet" href="/assets/css/parivar.css?v=20261015c">
 </head>
 <body>
 
@@ -29,8 +29,15 @@
   </div>
 </header>
 
+<!-- v390: way back to the Dabwali Parivar page -->
+<nav class="pv-crumb"><a href="/parivar" id="pvBack">← <span data-i18n-en>Dabwali Parivar</span><span data-i18n-hi>डबवाली परिवार</span></a></nav>
 <main class="pv-wrap" id="root"><div class="pv-empty">…</div></main>
 
+<script>
+// came here from /parivar (search results etc.)? go back so the search is still there
+(function(){ var a = document.getElementById('pvBack'); if (!a) return;
+  a.addEventListener('click', function(e){ try { if (document.referrer && new URL(document.referrer).pathname === '/parivar' && history.length > 1){ e.preventDefault(); history.back(); } } catch(_){} }); })();
+</script>
 <script src="/assets/js/dl-config.js"></script>
 <script src="/assets/js/parivar-common.js?v=20261013c"></script>
 <script src="/assets/js/parivar-events.js?v=20261015a"></script>

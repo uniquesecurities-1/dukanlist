@@ -108,7 +108,7 @@ a.pv-oc:hover{ filter:brightness(.96); text-decoration:none }
 /* v388: Parivar page — counts, profession chips, type filter, head of organisation, recently joined */
 .pv-stats{ margin:14px auto 0; color:var(--ink-2); font-size:.92rem; display:flex; gap:8px; justify-content:center; flex-wrap:wrap }
 .pv-stats b{ color:#C2410C; font-size:1.02rem }
-.pv-stats span{ color:#CBD5E1 }
+.pv-stats > span{ color:#CBD5E1 }
 .pv-stats:empty, .pv-chips:empty, .pv-kinds:empty{ display:none }
 .pv-chips{ max-width:720px; margin:12px auto 0; display:flex; gap:6px; flex-wrap:wrap; justify-content:center; align-items:center }
 .pv-chips .lbl{ font-size:.78rem; color:var(--muted); font-weight:700; margin-right:2px }
@@ -152,3 +152,16 @@ a.pv-oc:hover{ filter:brightness(.96); text-decoration:none }
   .pv-stat b{ font-size:1.05rem }
   .pv-stat .l{ font-size:.74rem }
 }
+
+/* v390: back link on person / organisation pages; selected profession chip; clear-search button */
+.pv-crumb{ max-width:880px; margin:0 auto; padding:12px 16px 0 }
+.pv-crumb a{ display:inline-flex; align-items:center; gap:4px; font-size:.86rem; font-weight:800; color:#C2410C; text-decoration:none; background:#FFF7ED; border:1px solid #FED7AA; border-radius:99px; padding:6px 12px }
+.pv-crumb a:hover{ background:#FFEDD5; text-decoration:none }
+.pv-crumb + .pv-wrap{ padding-top:10px }
+.pv-chips button.on{ background:#EA580C; border-color:#EA580C; color:#fff }
+.pv-chips button.on small{ color:#FFEDD5 }
+.pv-chips button.on::after{ content:' ×'; font-weight:900 }
+.pv-search2 input::-webkit-search-cancel-button{ display:none }
+.pv-qx{ position:absolute; right:10px; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:50%; border:0; background:#F1F5F9; color:#475569; font-size:.95rem; font-weight:800; cursor:pointer; z-index:1 }
+.pv-qx:hover{ background:#FFEDD5; color:#C2410C }
+.pv-search2 input{ padding-right:50px }
