@@ -18,7 +18,7 @@
      - notificationclick : focus/open the target URL
    ============================================================ */
 
-const VERSION = 'dukan-v3.89.5';   // v395 profession chips only when meaningful
+const VERSION = 'dukan-v3.89.6';   // v396 edit an event (poster + text)
 const CACHE_NAME = VERSION;
 
 // v226: use the CLEAN paths. With cleanUrls:true, '/index.html' and

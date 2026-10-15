@@ -514,6 +514,7 @@ async function loadOrgEvents(o){
   var r = await c().rpc('admin_parivar_events', { p_org_id: o.id });
   if (r.error){ el.innerHTML = '<b>🗓 Upcoming events</b> <span class="muted">— run db/270 first (' + esc(r.error.message) + ')</span>'; return; }
   var list = r.data || [];
+  window._evById = {}; list.forEach(function(e){ window._evById[e.id] = e; });
   var pad = function(n){ return String(n).padStart(2, '0'); }, ymd = function(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
   el.innerHTML = '<b>🗓 Upcoming events</b> <span class="muted">— poster pops up once per visitor on the Dabwali Parivar page, shows on this organisation’s page and as one line on the home page; goes away by itself after the day. Max 3, up to 60 days ahead.</span>'
     + (list.length ? list.map(function(e){
@@ -524,15 +525,16 @@ async function loadOrgEvents(o){
           + '<div class="muted">' + esc(evWhen(e.starts_at)) + (e.venue ? ' · ' + esc(e.venue) : '') + (e.contact ? ' · 📞 ' + esc(e.contact) : '') + (!pend && e.going ? ' · <b style="color:#15803D">🙋 ' + e.going + ' going</b>' : '') + '</div>'
           + (e.details ? '<div class="muted" style="white-space:pre-wrap">' + esc(e.details) + '</div>' : '')
           + '<div style="display:flex;gap:6px;margin-top:6px">' + (pend ? '<button class="btn p s" onclick="decideEvent(\'' + e.id + '\',\'approve\')">✓ Approve</button><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'reject\')">✕ Reject</button>'
-              : '<a class="btn g s" href="/parivar?event=' + esc(e.id) + '" target="_blank" rel="noopener">See pop-up ↗</a><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'remove\')">Take down</button>') + '</div></div></div>';
+              : '<a class="btn g s" href="/parivar?event=' + esc(e.id) + '" target="_blank" rel="noopener">See pop-up ↗</a><button class="btn d s" onclick="decideEvent(\'' + e.id + '\',\'remove\')">Take down</button>')
+              + '<button class="btn g s" onclick="editEvent(\'' + e.id + '\')">✏️ Edit</button></div></div></div>';
       }).join('') : '<div class="muted" style="margin-top:6px">No upcoming events.</div>')
-    + '<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:700;font-size:.86rem">+ Add an event (goes live at once)</summary>'
+    + '<details id="ev_box" style="margin-top:8px"><summary id="ev_sum" style="cursor:pointer;font-weight:700;font-size:.86rem">+ Add an event (goes live at once)</summary><input type="hidden" id="ev_id">'
     + '<label>Event name *</label><input id="ev_title" maxlength="120" placeholder="e.g. Blood Donation Camp">'
     + '<div class="grid2"><div><label>Date *</label><input type="date" id="ev_date" min="' + ymd(new Date()) + '" max="' + ymd(new Date(Date.now() + 60 * 864e5)) + '"></div><div><label>Time *</label><input type="time" id="ev_time" value="10:00"></div></div>'
     + '<div class="grid2"><div><label>Venue</label><input id="ev_venue" maxlength="200"></div><div><label>Contact number (shown)</label><input id="ev_contact" inputmode="numeric" placeholder="optional"></div></div>'
     + '<label>Details</label><textarea id="ev_details" maxlength="500" style="min-height:60px"></textarea>'
     + '<label>Poster *</label><div class="photo"><img id="ev_poster_prev" style="display:none" alt=""><input type="hidden" id="ev_poster"><input type="file" accept="image/*" onchange="upload(this,\'ev_poster\',\'ev_poster_prev\')" style="width:auto"></div>'
-    + '<div style="margin-top:8px"><button class="btn p" onclick="addEvent(\'' + o.id + '\')">🗓 Add event</button></div></details>';
+    + '<div style="margin-top:8px;display:flex;gap:6px"><button class="btn p" id="ev_save" onclick="addEvent(\'' + o.id + '\')">🗓 Add event</button><button class="btn g" id="ev_cancel" style="display:none" onclick="openItem(\'' + o.id + '\')">Cancel</button></div></details>';
 }
 // v392: photos of past events (last 60 days) — approve the organisation's, or add your own (db/273)
 async function loadPastPhotos(o){
@@ -563,9 +565,29 @@ async function officeEventPhoto(input, eventId){
     toast('✓ Photo added'); if (CUR) loadPastPhotos(CUR);
   } catch(e){ alert('Photo upload failed: ' + e.message); }
 }
+// v396: edit an event — fills the form below with the event, "Save changes" keeps it live (db/276)
+function editEvent(id){
+  var e = (window._evById || {})[id]; if (!e) return;
+  var d = new Date(e.starts_at), set = function(k, v){ var x = document.getElementById(k); if (x) x.value = v == null ? '' : v; };
+  set('ev_id', e.id); set('ev_title', e.title); set('ev_venue', e.venue); set('ev_contact', e.contact); set('ev_details', e.details); set('ev_poster', e.poster);
+  set('ev_date', d.toLocaleDateString('en-CA', { timeZone:'Asia/Kolkata' }));
+  set('ev_time', d.toLocaleTimeString('en-GB', { timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }));
+  var pv = document.getElementById('ev_poster_prev'); if (pv){ pv.src = e.poster || ''; pv.style.display = e.poster ? '' : 'none'; }
+  document.getElementById('ev_sum').textContent = '✏️ Edit event — change the poster or any text, then press Save changes';
+  document.getElementById('ev_save').textContent = '💾 Save changes';
+  document.getElementById('ev_cancel').style.display = '';
+  var box = document.getElementById('ev_box'); box.open = true; box.scrollIntoView({ behavior:'smooth', block:'center' });
+}
 async function addEvent(orgId){
   var p = { title: val('ev_title'), starts_at: val('ev_date') ? val('ev_date') + 'T' + (val('ev_time') || '10:00') + ':00+05:30' : '', venue: val('ev_venue'), contact: val('ev_contact'), details: val('ev_details'), poster_url: val('ev_poster') };
   if (!p.title || !p.starts_at || !p.poster_url){ alert('Event name, date and poster are needed'); return; }
+  var eid = val('ev_id');
+  if (eid){
+    var u = await c().rpc('admin_parivar_event_update', { p_event_id: eid, p: p });
+    if (u.error && /admin_parivar_event_update/.test(u.error.message || '')){ alert('Run db/276 first'); return; }
+    if (fail(u)) return;
+    toast('✓ Event updated'); evBanner(); openItem(orgId); return;
+  }
   var r = await c().rpc('admin_parivar_event_add', { p_org_id: orgId, p: p }); if (fail(r)) return;
   toast('🗓 Event is live'); openItem(orgId);
 }
