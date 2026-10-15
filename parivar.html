@@ -178,6 +178,8 @@
     }).catch(function(){});
   };
   document.getElementById('q').addEventListener('input', function(){ syncChips(); clearTimeout(t); t = setTimeout(window.doSearch, 280); });
+  // v394: /parivar?q=… (e.g. "See all" from the main DukanList search)
+  (function(){ var q0 = new URLSearchParams(location.search).get('q'); if (q0){ document.getElementById('q').value = q0.slice(0, 80); window.doSearch(); } })();
   // v390: chosen profession chip shows as selected (with ×); the search box gets a clear button
   function syncChips(){
     var v = document.getElementById('q').value.trim().toLowerCase();

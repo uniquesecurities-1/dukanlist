@@ -45,7 +45,23 @@
 <script>document.documentElement.setAttribute('data-dl-simple-mode','true')</script>
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
-<style>body,h1,h2,h3{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}</style>
+<style>body,h1,h2,h3{font-family:'Plus Jakarta Sans','Manrope','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+/* v394: Dabwali Parivar matches above the shop results */
+.pvs{ background:linear-gradient(135deg,#FFF7ED,#fff); border:1px solid #FED7AA; border-radius:14px; padding:10px 12px; margin:0 0 14px }
+.pvs-h{ display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:.9rem; margin-bottom:8px }
+.pvs-h a{ font-size:.8rem; color:#C2410C; text-decoration:none }
+.pvs-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch }
+.pvs-c{ flex:0 0 220px; display:flex; gap:8px; align-items:center; background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:8px; text-decoration:none; color:#0F172A }
+.pvs-c:hover{ border-color:#FB923C; text-decoration:none }
+.pvs-av{ width:40px; height:40px; border-radius:50%; overflow:hidden; background:#FFEDD5; color:#9A3412; display:grid; place-items:center; font-weight:800; font-size:.85rem; flex:0 0 auto }
+.pvs-av.sq{ border-radius:10px; background:#fff; border:1px solid #E2E8F0 }
+.pvs-av img{ width:100%; height:100%; object-fit:cover }
+.pvs-av.sq img{ object-fit:contain }
+.pvs-t{ display:flex; flex-direction:column; min-width:0 }
+.pvs-t b{ font-size:.86rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.pvs-t b i{ color:#15803D; font-style:normal }
+.pvs-t small{ font-size:.72rem; color:#64748B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+</style>
 <link rel="stylesheet" href="/assets/css/main.css?v=20261009b">
 <style>
 /* ===== Search bar (Apple-grade prominence) ===== */
@@ -741,6 +757,7 @@
     <button class="cta-dismiss" type="button" onclick="dismissOwnerCta()" aria-label="Dismiss">×</button>
   </div>
 
+  <div id="pvSearch"></div>
   <div id="results">
     <div class="biz-grid">
       <div class="sk-card"><div class="skeleton sk-square"></div><div class="skeleton sk-line sm w-50" style="margin-top:10px"></div><div class="skeleton sk-line lg w-70"></div><div class="skeleton sk-line w-90"></div><div class="skeleton sk-line w-50"></div></div>
@@ -1039,6 +1056,30 @@ function resolveCityParam(raw){
   return match ? match.id : null;
 }
 
+// v394: people and organisations from Dabwali Parivar that match the search (db/263 parivar_search)
+let _pvSeq = 0;
+async function loadParivarMatches(q){
+  const el = document.getElementById('pvSearch'); if (!el) return;
+  const my = ++_pvSeq; q = String(q || '').trim();
+  if (q.length < 3){ el.innerHTML = ''; return; }
+  try {
+    const r = await ShopDB.client.rpc('parivar_search', { p_q: q, p_limit: 12 });
+    if (my !== _pvSeq) return;
+    const rows = (!r.error && Array.isArray(r.data)) ? r.data : [];
+    const people = rows.filter(x => x.kind === 'person').slice(0, 6), orgs = rows.filter(x => x.kind === 'org').slice(0, 3);
+    if (!people.length && !orgs.length){ el.innerHTML = ''; return; }
+    const ini = n => String(n || '?').trim().split(/\s+/).map(w => w.charAt(0)).slice(0, 2).join('').toUpperCase();
+    const av = (ph, n) => ph ? '<img src="' + escapeHTML(String(ph).replace('/upload/', '/upload/w_80,h_80,c_fill,g_face,q_auto,f_auto/')) + '" alt="">' : '<span>' + escapeHTML(ini(n)) + '</span>';
+    el.innerHTML = '<div class="pvs"><div class="pvs-h">👨‍👩‍👧 <span data-i18n-en>In Dabwali Parivar</span><span data-i18n-hi>डबवाली परिवार में</span>'
+      + '<a href="/parivar?q=' + encodeURIComponent(q) + '"><span data-i18n-en>See all</span><span data-i18n-hi>सब देखें</span> →</a></div><div class="pvs-row">'
+      + orgs.map(o => '<a class="pvs-c" href="/sanstha/' + encodeURIComponent(o.slug) + '"><span class="pvs-av sq">' + (o.logo ? '<img src="' + escapeHTML(String(o.logo).replace('/upload/', '/upload/w_80,h_80,c_pad,b_white,q_auto,f_auto/')) + '" alt="">' : '🏛') + '</span><span class="pvs-t"><b>' + escapeHTML(o.name) + '</b><small>' + (o.members || 0) + ' <span data-i18n-en>members</span><span data-i18n-hi>सदस्य</span></small></span></a>').join('')
+      + people.map(p => {
+          const line = [p.profession, (p.firms || [])[0] && p.firms[0].name, (p.orgs || [])[0] && p.orgs[0].org].filter(Boolean).join(' · ');
+          return '<a class="pvs-c" href="/parivar/' + encodeURIComponent(p.slug) + '"><span class="pvs-av">' + av(p.photo, p.name) + '</span><span class="pvs-t"><b>' + escapeHTML(p.name) + (p.verified ? ' <i>✓</i>' : '') + '</b><small>' + escapeHTML(line) + '</small></span></a>';
+        }).join('') + '</div></div>';
+  } catch(_){ if (my === _pvSeq) el.innerHTML = ''; }
+}
+
 async function runSearch(){
   const params = new URLSearchParams(location.search);
   const q       = params.get('q')    || '';
@@ -1055,6 +1096,7 @@ async function runSearch(){
   const locSlug = (params.get('area') || params.get('locality') || '').trim();
 
   document.getElementById('q').value = q;
+  loadParivarMatches(q);
   document.getElementById('catSel').value = catSlug;
   if (cityId) document.getElementById('citySel').value = cityId;
   if (pin) document.getElementById('pinSel').value = pin;

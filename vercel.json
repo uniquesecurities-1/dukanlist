@@ -62,11 +62,11 @@
     },
     {
       "source": "/parivar/:slug([a-z0-9][a-z0-9-]+)",
-      "destination": "/parivar-person?slug=:slug"
+      "destination": "/api/parivar?kind=person&slug=:slug"
     },
     {
       "source": "/sanstha/:slug([a-z0-9][a-z0-9-]+)",
-      "destination": "/sanstha?slug=:slug"
+      "destination": "/api/parivar?kind=org&slug=:slug"
     },
     {
       "source": "/:slug([a-z0-9][a-z0-9-][a-z0-9-]+)",

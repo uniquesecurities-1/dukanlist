@@ -26,7 +26,10 @@ const STATIC_PAGES = [
   { path: '/privacy',     priority: '0.4',  freq: 'yearly'  },
   { path: '/terms',       priority: '0.4',  freq: 'yearly'  },
   { path: '/welcome-pro', priority: '0.9',  freq: 'weekly'  },
-  { path: '/how-ranking-works', priority: '0.7', freq: 'monthly' }
+  { path: '/how-ranking-works', priority: '0.7', freq: 'monthly' },
+  // v394: Dabwali Parivar
+  { path: '/parivar',      priority: '0.9',  freq: 'daily'   },
+  { path: '/parivar-join', priority: '0.6',  freq: 'monthly' }
   // '/pro' is deliberately NOT here: pro.html is a 757-byte noindex stub that
   // redirects to /welcome-pro. Listing a noindex redirect in the sitemap is a
   // contradiction, and it is what the "Excluded by 'noindex' tag" row in the
@@ -185,6 +188,23 @@ export default async function handler(req, res){
         b.updated_at || b.created_at
       ));
     });
+
+    // 6. v394: Dabwali Parivar — every organisation, and people who confirmed their own page
+    //    (an unconfirmed person's page is noindex, so it must not be in the sitemap either)
+    try {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/parivar_sitemap`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+        body: '{}'
+      });
+      if (r.ok){
+        const pv = await r.json();
+        (pv && pv.orgs || []).forEach(o => urls.push(urlBlock(ORIGIN + '/sanstha/' + encodeURIComponent(o.slug), '0.7', 'weekly', o.updated_at)));
+        (pv && pv.people || []).forEach(p => urls.push(urlBlock(ORIGIN + '/parivar/' + encodeURIComponent(p.slug), '0.5', 'monthly', p.updated_at)));
+      } else {
+        console.error('[api/sitemap] parivar_sitemap ' + r.status);
+      }
+    } catch(e){ console.error('[api/sitemap] parivar block failed:', e && e.message); }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
